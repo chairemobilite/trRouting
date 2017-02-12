@@ -1,0 +1,10 @@
+connectionsSqlWhereClause: |
+  WHERE sv_id IN (4,6,10,11,12,15,16,17,18,19,30,31,32,33,36,37,38,39,45,46,47,48,49,50,62,63,64,65,66,67,83,84,85,90,91,92,99,100,101,102,104,109,111,114,117,118,120,125,130,132,134,135,136,138,141,145,148,149,152)
+
+maxAccessWalkingTravelTimeFromOriginToFirstStopMinutes: 20
+maxAccessWalkingTravelTimeFromLastStopToDestinationMinutes: 20
+maxTransferWalkingTravelTimeMinutes: 10
+minWaitingTimeMinutes: 5
+tryNextModeIfRoutingFails: false
+noResultNextAccessTimeMinutesIncrement: 10
+maxNoResultNextAccessTimeMinutes: 60
