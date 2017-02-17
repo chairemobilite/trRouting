@@ -3,20 +3,25 @@
 CC = clang++
 CXXFLAGS += -std=c++11 -stdlib=libc++
 LOCAL_CPP_FILES := $(wildcard src/*.cpp)
+SPECIFIC_CPP_FILES := $(wildcard connection_scan_algorithm/src/*.cpp)
 LOCAL_OBJS = $(addprefix obj/,$(notdir $(LOCAL_CPP_FILES:.cpp=.o)))
+SPECIFIC_OBJS = $(addprefix connection_scan_algorithm/obj/,$(notdir $(SPECIFIC_CPP_FILES:.cpp=.o)))
 
-LDFLAGS  := -I/usr/local/include -Iinclude -L/usr/local/lib -lpqxx -lpq -lyaml-cpp -lcurses
+LDFLAGS  := -I/usr/local/include -Iinclude -Iconnection_scan_algorithm/include -L/usr/local/lib -lpqxx -lpq -lyaml-cpp -lcurses
 
 # SPECIFIY LINK OPTIONS
 LINKFLAGS = -lboost_thread-mt -lboost_serialization -lboost_system -lboost_filesystem -lboost_regex -lboost_program_options
 
 all: trRouting
 
-trRouting: $(LOCAL_OBJS)
+trRouting: $(LOCAL_OBJS) $(SPECIFIC_OBJS)
 	$(CC) $(CXXFLAGS) $(LDFLAGS) $(LINKFLAGS) $^ -o $@
 
 obj/%.o: src/%.cpp
 	$(CC) $(CXXFLAGS) $(LDFLAGS) $(LINKFLAGS) -c -o $@ $<
 
+connection_scan_algorithm/obj/%.o: connection_scan_algorithm/src/%.cpp
+	$(CC) $(CXXFLAGS) $(LDFLAGS) $(LINKFLAGS) -c -o $@ $<
+
 clean:
-	-rm obj/*.o trRouting
+	-rm connection_scan_algorithm/obj/*.o obj/*.o trRouting

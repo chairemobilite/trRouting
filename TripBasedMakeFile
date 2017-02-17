@@ -1,0 +1,27 @@
+# required libraries: yaml-cpp, boost, msgpack
+
+CC = clang++
+CXXFLAGS += -std=c++11 -stdlib=libc++
+LOCAL_CPP_FILES := $(wildcard src/*.cpp)
+SPECIFIC_CPP_FILES := $(wildcard trip_based_algorithm/src/*.cpp)
+LOCAL_OBJS = $(addprefix obj/,$(notdir $(LOCAL_CPP_FILES:.cpp=.o)))
+SPECIFIC_OBJS = $(addprefix trip_based_algorithm/obj/,$(notdir $(SPECIFIC_CPP_FILES:.cpp=.o)))
+
+LDFLAGS  := -I/usr/local/include -Iinclude -Itrip_based_algorithm/include -L/usr/local/lib -lpqxx -lpq -lyaml-cpp -lcurses
+
+# SPECIFIY LINK OPTIONS
+LINKFLAGS = -lboost_thread-mt -lboost_serialization -lboost_system -lboost_filesystem -lboost_regex -lboost_program_options
+
+all: trRoutingTripBased
+
+trRoutingTripBased: $(LOCAL_OBJS) $(SPECIFIC_OBJS)
+	$(CC) $(CXXFLAGS) $(LDFLAGS) $(LINKFLAGS) $^ -o $@
+
+obj/%.o: src/%.cpp
+	$(CC) $(CXXFLAGS) $(LDFLAGS) $(LINKFLAGS) -c -o $@ $<
+
+trip_based_algorithm/obj/%.o: trip_based_algorithm/src/%.cpp
+	$(CC) $(CXXFLAGS) $(LDFLAGS) $(LINKFLAGS) -c -o $@ $<
+
+clean:
+	-rm trip_based_algorithm/obj/*.o obj/*.o trRoutingTripBased
