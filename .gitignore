@@ -1,5 +1,12 @@
 .DS_Store
 trRouting
+trRoutingConfig.yml
+trRoutingTripBased
+trRoutingTripBasedConfig.yml
+
+# Cache files
+*.cache
+*.msgpack
 
 # Compiled Object files
 *.slo
