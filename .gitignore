@@ -1,5 +1,6 @@
 .DS_Store
 trRouting
+trRoutingConfig.yml
 
 # Compiled Object files
 *.slo
