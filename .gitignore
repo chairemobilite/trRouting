@@ -4,11 +4,6 @@ trRoutingConfig.yml
 trRoutingTripBased
 trRoutingTripBasedConfig.yml
 
-!/cache
-!/obj
-!/connection_scan_algorithm/obj
-!/trip_based_algorithm/obj
-
 # Cache files
 *.cache
 *.msgpack
