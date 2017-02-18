@@ -25,14 +25,10 @@
 #include "parameters.hpp"
 #include "trip_based_algorithm.hpp"
 
-//Added for the json-example:
-using namespace boost::property_tree;
 using namespace TrRouting;
 
 typedef SimpleWeb::Server<SimpleWeb::HTTP> HttpServer;
 typedef SimpleWeb::Client<SimpleWeb::HTTP> HttpClient;
-
-int stepCount = 1;
 
 std::string consoleRed        = "";
 std::string consoleGreen      = "";
@@ -107,30 +103,30 @@ int main(int argc, char** argv) {
   
   // setup console colors 
   // (this will create a new terminal window, check if the terminal is color-capable and then it will close the terminal window with endwin()):
-  initscr();
-  start_color();
-  if (has_colors())
-  {
-    consoleRed        = "\033[0;31m";
-    consoleGreen      = "\033[1;32m";
-    consoleYellow     = "\033[1;33m";
-    consoleCyan       = "\033[0;36m";
-    consoleMagenta    = "\033[0;35m";
-    consoleResetColor = "\033[0m";
-  }
-  else
-  {
-    consoleRed        = "";
-    consoleGreen      = "";
-    consoleYellow     = "";
-    consoleCyan       = "";
-    consoleMagenta    = "";
-    consoleResetColor = "";
-  }
-  endwin();
+  //initscr();
+  //start_color();
+  //if (has_colors())
+  //{
+  //  consoleRed        = "\033[0;31m";
+  //  consoleGreen      = "\033[1;32m";
+  //  consoleYellow     = "\033[1;33m";
+  //  consoleCyan       = "\033[0;36m";
+  //  consoleMagenta    = "\033[0;35m";
+  //  consoleResetColor = "\033[0m";
+  //}
+  //else
+  //{
+  //  consoleRed        = "";
+  //  consoleGreen      = "";
+  //  consoleYellow     = "";
+  //  consoleCyan       = "";
+  //  consoleMagenta    = "";
+  //  consoleResetColor = "";
+  //}
+  //endwin();
   
   std::cout << "Starting transit routing for the application: ";
-  std::cout << consoleGreen + dataShortname + consoleResetColor << std::endl << std::endl;
+  std::cout << dataShortname << std::endl << std::endl;
   
   // Set params:
   Parameters algorithmParams;

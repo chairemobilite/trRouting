@@ -1,5 +1,7 @@
 #include "trip_based_algorithm.hpp"
 
+using json = nlohmann::json;
+
 namespace TrRouting
 {
   
@@ -27,12 +29,93 @@ namespace TrRouting
     params.setDefaultValues();
     setParamsFromYaml("trRoutingTripBasedConfig.yml");
     
-    std::ifstream ifs("tr_stsh_2016_03_test__trip_based_routing__route_paths_index_by_id.msgpack", std::ifstream::in);
-    std::stringstream buffer;
-    buffer << ifs.rdbuf();
-    msgpack::unpacked upd;
-    msgpack::unpack(upd, buffer.str().data(), buffer.str().size());
-    std::cout << upd.get() << std::endl;
+    
+    std::string weekdayName {"sunday"};
+    std::string dataName;
+    std::ifstream stream;
+    std::vector<uint8_t> contents;
+    json jsonContent;
+    json::basic_json jsonData;
+    Footpath* footpath;
+    Trip* trip;
+    int i;
+    
+    // fetch footpaths_by_source:
+    dataName = "footpaths_by_source";
+    stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
+    contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+    jsonContent = json::from_msgpack(contents);
+    footpathsBySource = std::vector<Footpath>();
+    footpathsBySource.reserve(jsonContent.size());
+    footpath = new Footpath();
+    for (json::iterator it = jsonContent.begin(); it != jsonContent.end(); ++it) {
+      jsonData = *it;
+      footpath->i    = jsonData["i"].get<int>();
+      footpath->srcI = jsonData["source_stop_i"].get<int>();
+      footpath->tgtI = jsonData["target_stop_i"].get<int>();
+      footpath->tt   = jsonData["tt"].get<int>();
+      footpathsBySource.push_back(*footpath);
+    }
+    //std::cout << footpathsBySource[345].tt << std::endl;
+    
+    
+    
+    // fetch footpaths_by_target:
+    dataName = "footpaths_by_target";
+    stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
+    contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+    jsonContent = json::from_msgpack(contents);
+    footpathsByTarget = std::vector<Footpath>();
+    footpathsByTarget.reserve(jsonContent.size());
+    footpath = new Footpath();
+    for (json::iterator it = jsonContent.begin(); it != jsonContent.end(); ++it) {
+      jsonData = *it;
+      footpath->i    = jsonData["i"].get<int>();
+      footpath->srcI = jsonData["source_stop_i"].get<int>();
+      footpath->tgtI = jsonData["target_stop_i"].get<int>();
+      footpath->tt   = jsonData["tt"].get<int>();
+      footpathsByTarget.push_back(*footpath);
+    }
+    //std::cout << footpathsByTarget[345].tt << std::endl;
+    
+    
+    
+    // fetch footpaths_index_by_source: Exact same copy as footpaths_index_by_target, so we don't need both!
+    dataName = "footpaths_index_by_source";
+    stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
+    contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+    jsonContent = json::from_msgpack(contents);
+    footpathsIndex = std::vector<std::vector<int> >(jsonContent.size(), std::vector<int>(2,-1)); // initialize all to [-1, -1]
+    i = 0;
+    for (json::iterator it = jsonContent.begin(); it != jsonContent.end(); ++it) {
+      jsonData = *it;
+      footpathsIndex[i][0] = jsonData[0].get<int>();
+      footpathsIndex[i][1] = jsonData[1].get<int>();
+      i++;
+    }
+    //std::cout << footpathsIndexBySource[345][0] << std::endl;
+    
+    
+    
+    // fetch trips:
+    dataName = "trips";
+    stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + weekdayName + "__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
+    contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+    jsonContent = json::from_msgpack(contents);
+    trips = std::vector<Trip>();
+    trips.reserve(jsonContent.size());
+    trip = new Trip();
+    for (json::iterator it = jsonContent.begin(); it != jsonContent.end(); ++it) {
+      jsonData = *it;
+      trip->i    = jsonData["i"].get<int>();
+      trip->id   = jsonData["id"].get<int>();
+      trip->rpI = jsonData["route_path_i"].get<int>();
+      trip->seq  = jsonData["trip_seq"].get<int>();
+      trips.push_back(*trip);
+    }
+    
+  
+    
     
   }    
   

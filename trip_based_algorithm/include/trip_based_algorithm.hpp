@@ -12,11 +12,15 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <msgpack.hpp>
+#include <json.hpp>
 #include <yaml-cpp/yaml.h>
 #include <limits>
 
 #include "parameters.hpp"
+#include "footpath.hpp"
+#include "trip.hpp"
 #include "calculation_time.hpp"
+
 
 extern std::string consoleRed;
 extern std::string consoleGreen;
@@ -44,6 +48,12 @@ namespace TrRouting
     void resetAccessEgressModes();
     
   private:
+    
+    std::vector<std::vector<int> > footpathsIndex;
+    std::vector<Footpath> footpathsBySource;
+    std::vector<Footpath> footpathsByTarget;
+    std::vector<Trip> trips;
+    
     
     std::map<std::string,int> pickUpTypes;     // not yet implemented
     std::map<std::string,int> dropOffTypes;    // not yet implemented
