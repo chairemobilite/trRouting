@@ -9,7 +9,7 @@ Transit routing server app written in C++ using the Connection Scan or Trip-Base
 [Open Source Routing Machine (OSRM)][3] (must be installed separately, see [install and usage instructions in OSRM Wiki][4])
 
 [1]: http://i11www.iti.uni-karlsruhe.de/extra/publications/dpsw-isftr-13.pdf "Intriguingly Simple and Fast Transit Routing"
-[2]: https://arxiv.org/pdf/1504.07149 "Trip-Based Public Transit Routing"
+[2]: https://arxiv.org/pdf/1504.07149v2.pdf "Trip-Based Public Transit Routing"
 [3]: https://github.com/Project-OSRM/osrm-backend/ "Open Source Routing Machine Github Repository"
 [4]: https://github.com/Project-OSRM/osrm-backend/wiki "OSRM Wiki"
 

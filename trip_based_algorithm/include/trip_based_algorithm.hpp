@@ -20,6 +20,7 @@
 #include "footpath.hpp"
 #include "route_path.hpp"
 #include "trip.hpp"
+#include "stop.hpp"
 #include "calculation_time.hpp"
 
 
@@ -56,7 +57,8 @@ namespace TrRouting
     std::vector<Trip> trips;
     std::vector<RoutePath> routePaths;
     std::vector<int> routePathsIndexById;
-    
+    std::vector<std::vector<std::vector<int> > > routePathsIndexByStop;
+    std::vector<Stop> stops;
     
     std::map<std::string,int> pickUpTypes;     // not yet implemented
     std::map<std::string,int> dropOffTypes;    // not yet implemented

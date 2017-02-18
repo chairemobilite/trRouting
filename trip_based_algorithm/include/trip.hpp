@@ -6,10 +6,10 @@ namespace TrRouting
   
   struct Trip {
     
-    int i;        // trip index
-    long long id; // trip id
-    int seq;      // trip sequence in route path
-    int rpI;      // route path index
+    int i;         // trip index
+    int seq;       // trip sequence in route path
+    int rpI;       // route path index
+    long long id;  // trip id
     
   };
 
