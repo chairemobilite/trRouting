@@ -289,6 +289,68 @@ namespace TrRouting
     CalculationTime::algorithmCalculationTime.stopStep();
     std::cout << "-- Fetching data from cache -- " << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
     
+
+
+    // ------ start testing performance ------- 
+    /*
+    
+
+
+    CalculationTime::algorithmCalculationTime.startStep();
+    std::vector<std::vector<int>> containerVectors(100000, std::vector<int>(3));
+    for (int i = 0; i < 100000; i++)
+    {
+      containerVectors[i] = *(new std::vector<int>{234,453,12});
+    }
+    CalculationTime::algorithmCalculationTime.stopStep();
+    std::cout << "-- testing allocating vectors or int -- " << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+    CalculationTime::algorithmCalculationTime.startStep();
+    // this is faster!
+    std::vector<ReachableRoutePath> containerStructs;
+    for (int i = 0; i < 100000; i++)
+    {
+      containerStructs.push_back(*(new ReachableRoutePath(234,453,12)));
+    }
+    CalculationTime::algorithmCalculationTime.stopStep();
+    std::cout << "-- testing allocating structs -- " << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+    
+
+
+
+
+    int a,b,c;
+    CalculationTime::algorithmCalculationTime.startStep();
+    for (int i = 0; i < 1000; i++)
+    {
+      for(int j = 0; j < containerVectors.size(); j++)
+      {
+        a = containerVectors[j][0];
+        b = containerVectors[j][1];
+        c = containerVectors[j][2];
+      }
+    }
+    CalculationTime::algorithmCalculationTime.stopStep();
+    std::cout << "-- testing fetching vectors elements -- " << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+    CalculationTime::algorithmCalculationTime.startStep();
+    // this is faster!
+    for (int i = 0; i < 1000; i++)
+    {
+      for(int j = 0; j < containerStructs.size(); j++)
+      {
+        a = containerStructs[j].rpI;
+        b = containerStructs[j].stopSeq;
+        c = containerStructs[j].tt;
+      }
+    }
+    CalculationTime::algorithmCalculationTime.stopStep();
+    std::cout << "-- testing fetching structs elements -- " << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+
+
+
+
+    */
+    // ------ end testing performance ------- 
+
   }    
   
   void TripBasedAlgorithm::refresh()

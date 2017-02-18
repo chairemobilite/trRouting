@@ -22,6 +22,8 @@
 #include "trip.hpp"
 #include "transfer.hpp"
 #include "stop.hpp"
+#include "reachable_route_path.hpp"
+#include "trip_segment.hpp"
 #include "calculation_time.hpp"
 
 using json = nlohmann::json;
@@ -74,7 +76,6 @@ namespace TrRouting
     std::vector<std::vector<std::vector<int>>> tripsIndex          = std::vector<std::vector<std::vector<int>>>(7,std::vector<std::vector<int>>());
     std::vector<std::vector<int>>              tripsIndexById      = std::vector<std::vector<int>>(7,std::vector<int>());
     
-
     std::map<std::string,int> pickUpTypes;  // not yet implemented
     std::map<std::string,int> dropOffTypes; // not yet implemented
     std::string               accessMode;

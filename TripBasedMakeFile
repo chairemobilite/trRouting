@@ -7,7 +7,7 @@ SPECIFIC_CPP_FILES := $(wildcard trip_based_algorithm/src/*.cpp)
 LOCAL_OBJS = $(addprefix obj/,$(notdir $(LOCAL_CPP_FILES:.cpp=.o)))
 SPECIFIC_OBJS = $(addprefix trip_based_algorithm/obj/,$(notdir $(SPECIFIC_CPP_FILES:.cpp=.o)))
 
-LDFLAGS  := -I/usr/local/include -Iinclude -Itrip_based_algorithm/include -L/usr/local/lib -lpqxx -lpq -lyaml-cpp -lcurses
+LDFLAGS  := -I/usr/local/include -Iinclude -Itrip_based_algorithm/include -L/usr/local/lib -lpqxx -lpq -lyaml-cpp
 
 # SPECIFIY LINK OPTIONS
 LINKFLAGS = -lboost_thread-mt -lboost_serialization -lboost_system -lboost_filesystem -lboost_regex -lboost_program_options

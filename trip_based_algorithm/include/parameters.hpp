@@ -83,7 +83,7 @@ namespace TrRouting
       drivingSpeedMetersPerSecond                                = 90/3.6; // 90 km/h
       cyclingSpeedMetersPerSecond                                = 25/3.6; // 25 km/h
       maxTotalTravelTimeMinutes                                  = -1; // -1 means no limit
-      maxNumberOfTransfers                                       = -1; // -1 means no limit
+      maxNumberOfTransfers                                       = 5; // -1 means no limit
       minWaitingTimeMinutes                                      = 5;
       maxAccessWalkingTravelTimeFromOriginToFirstStopMinutes     = 20;
       maxAccessWalkingTravelTimeFromLastStopToDestinationMinutes = 20;
