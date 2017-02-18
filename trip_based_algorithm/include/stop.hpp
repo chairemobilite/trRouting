@@ -1,7 +1,6 @@
 #ifndef TR_STOP
 #define TR_STOP
 
-#include <vector>
 #include "point.hpp"
 
 namespace TrRouting

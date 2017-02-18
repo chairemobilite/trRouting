@@ -390,36 +390,23 @@ int main(int argc, char** argv) {
         calculator.params.arrivalTimeHour    = timeHour;
         calculator.params.arrivalTimeMinutes = timeMinute;
       }
-      
-      CalculationTime::algorithmCalculationTime.stopStep();
-      
+            
       std::cout << "-- parsing request -- " << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
       
       calculator.refresh();
-      
-      CalculationTime::algorithmCalculationTime.stopStep();
-      CalculationTime::algorithmCalculationTime.startStep();
-      
+            
       calculator.resetAccessEgressModes();
-      
-      CalculationTime::algorithmCalculationTime.stopStep();
-      
+            
       std::cout << "-- reset access egress modes -- " << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
       
       resultStr = calculator.calculate();
       
-      CalculationTime::algorithmCalculationTime.startStep();
-
     }
     else
     {
       resultStr = "{\"status\": \"failed\", \"error\": \"Wrong or malformed query\"}";
     }
-
-    CalculationTime::algorithmCalculationTime.stopStep();
-      
-    std::cout << "-- returning response -- " << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
-    
+        
     *response << "HTTP/1.1 200 OK\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << resultStr.length() << "\r\n\r\n" << resultStr;
   };
   

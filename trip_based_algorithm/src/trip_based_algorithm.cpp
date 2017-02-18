@@ -26,9 +26,11 @@ namespace TrRouting
   // call setup only once when starting the calculator. Use updateParams before each calculation.
   void TripBasedAlgorithm::setup()
   {
+
+    CalculationTime::algorithmCalculationTime.startStep();    
+
     params.setDefaultValues();
     setParamsFromYaml("trRoutingTripBasedConfig.yml");
-    
     
     std::string weekdayName {"sunday"};
     std::string dataName;
@@ -39,9 +41,11 @@ namespace TrRouting
     Footpath* footpath;
     RoutePath* routePath;
     Trip* trip;
+    Transfer* transfer;
     Stop* stop;
     int i;
     
+
     // fetch footpaths_by_source:
     dataName = "footpaths_by_source";
     stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
@@ -102,21 +106,25 @@ namespace TrRouting
     routePath = new RoutePath();
     for (json::iterator it = jsonContent.begin(); it != jsonContent.end(); ++it) {
       jsonData = *it;
-      routePath->i   = jsonData["i"].get<int>();
-      routePath->id  = jsonData["id"].get<long long>();
-      routePath->rId = jsonData["route_id"].get<long long>();
+      routePath->i     = jsonData["i"].get<int>();
+      routePath->id    = jsonData["id"].get<long long>();
+      routePath->rId   = jsonData["route_id"].get<long long>();
+      routePath->rSn   = jsonData["route_shortname"].get<std::string>();
+      routePath->rLn   = jsonData["route_longname"].get<std::string>();
+      routePath->aId   = jsonData["agency_id"].get<long long>();
+      routePath->aName = jsonData["agency_name"].get<std::string>();
       routePaths.push_back(*routePath);
     }
-    //std::cout << routePaths[21].routeId << std::endl;
+    //std::cout << routePaths[21].aName << std::endl;
     
     
-    
+
     // fetch route_paths_index_by_id
     dataName = "route_paths_index_by_id";
     stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
-    routePathsIndexById = jsonContent.get<std::vector<int> >(); // initialize all to -1
+    routePathsIndexById = jsonContent.get<std::vector<int> >();
     //std::cout << routePathsIndexById[3] << std::endl;
     
     
@@ -144,7 +152,7 @@ namespace TrRouting
       jsonData = *it;
       stop->i     = jsonData["i"].get<int>();
       stop->at    = 99999;
-      stop->tt    = 99999;
+      stop->tt    = -1;
       stop->id    = jsonData["id"].get<long long>();
       stop->code  = jsonData["code"].get<std::string>();
       stop->name  = jsonData["name"].get<std::string>();
@@ -152,9 +160,101 @@ namespace TrRouting
       stop->point = *(new Point(jsonData["latitude"].get<float>(), jsonData["longitude"].get<float>()));
       stops.push_back(*stop);
     }
-    std::cout << stops[21].name << std::endl;
+    //std::cout << stops[21].name << std::endl;
 
     
+
+    // fetch stops_index_by_id
+    dataName = "stops_index_by_id";
+    stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
+    contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+    jsonContent = json::from_msgpack(contents);
+    stopsIndexById = jsonContent.get<std::vector<int> >();
+    //std::cout << stopsIndexById[3] << std::endl;
+    
+    
+
+    // fetch stops_index_by_route_path:
+    dataName = "stops_index_by_route_path";
+    stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
+    contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+    jsonContent = json::from_msgpack(contents);
+    stopsIndexByRoutePath = jsonContent.get<std::vector<std::vector<int> > >();
+    //json dumpJson(stopsIndexByRoutePath);
+    //std::cout << dumpJson.dump() << std::endl;
+
+
+
+    // fetch arrival_times
+    dataName = "arrival_times";
+    stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + weekdayName + "__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
+    contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+    jsonContent = json::from_msgpack(contents);
+    arrivalTimes = jsonContent.get<std::vector<int> >();
+    //std::cout << arrivalTimes[3] << std::endl;
+
+
+
+    // fetch departure_times
+    dataName = "departure_times";
+    stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + weekdayName + "__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
+    contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+    jsonContent = json::from_msgpack(contents);
+    departureTimes = jsonContent.get<std::vector<int> >();
+    //std::cout << departureTimes[3] << std::endl;
+
+
+
+    // fetch arrival_times_index
+    dataName = "arrival_times_first_last_index_by_trip";
+    stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + weekdayName + "__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
+    contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+    jsonContent = json::from_msgpack(contents);
+    arrivalTimesIndex = jsonContent.get<std::vector<std::vector<int> > >();
+    //std::cout << arrivalTimesIndex[3][0] << std::endl;
+
+
+
+    // fetch departure_times_index
+    dataName = "departure_times_first_last_index_by_trip";
+    stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + weekdayName + "__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
+    contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+    jsonContent = json::from_msgpack(contents);
+    departureTimesIndex = jsonContent.get<std::vector<std::vector<int> > >();
+    //std::cout << departureTimesIndex[3][0] << std::endl;
+
+
+
+    // fetch transfers:
+    dataName = "transfers";
+    stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + weekdayName + "__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
+    contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+    jsonContent = json::from_msgpack(contents);
+    transfers = std::vector<Transfer>();
+    transfers.reserve(jsonContent.size());
+    transfer = new Transfer();
+    for (json::iterator it = jsonContent.begin(); it != jsonContent.end(); ++it) {
+      jsonData = *it;
+      transfer->srcStopSeq = jsonData["source_stop_seq"].get<int>();
+      transfer->srcTripI   = jsonData["source_trip_i"].get<int>();
+      transfer->tgtStopSeq = jsonData["target_stop_seq"].get<int>();
+      transfer->tgtTripI   = jsonData["target_trip_i"].get<int>();
+      transfers.push_back(*transfer);
+    }
+    //std::cout << transfers[3].tgtTripI << std::endl;
+
+
+
+    // fetch transfers_index
+    dataName = "transfers_first_last_by_arrival_time_index";
+    stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + weekdayName + "__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
+    contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+    jsonContent = json::from_msgpack(contents);
+    transfersIndex = jsonContent.get<std::vector<std::vector<int> > >();
+    //std::cout << transfersIndex[3][1] << std::endl;
+
+
+
     // fetch trips:
     dataName = "trips";
     stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + weekdayName + "__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
@@ -171,15 +271,38 @@ namespace TrRouting
       trip->id   = jsonData["id"].get<long long>();
       trips.push_back(*trip);
     }
-    
-  
-    
+    //std::cout << trips[3].rpI << std::endl;
+
+
+
+    // fetch trips_index
+    dataName = "trips_first_last_index_by_route_path";
+    stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + weekdayName + "__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
+    contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+    jsonContent = json::from_msgpack(contents);
+    tripsIndex = jsonContent.get<std::vector<std::vector<int> > >();
+    //std::cout << tripsIndex[3][0] << std::endl;
+
+    CalculationTime::algorithmCalculationTime.stopStep();
+    std::cout << "-- Fetching data from cache -- " << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
     
   }    
   
   void TripBasedAlgorithm::refresh()
   {
-    
+
+    CalculationTime::algorithmCalculationTime.startStep();
+
+    for(auto & stop : stops)
+    {
+      stop.at = 99999;
+      stop.tt = -1;
+    }
+
+    CalculationTime::algorithmCalculationTime.stopStep();
+    std::cout << "-- Refresh -- " << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+
+
   }
   
   // Call before each calculation

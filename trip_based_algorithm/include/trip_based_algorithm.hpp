@@ -20,6 +20,7 @@
 #include "footpath.hpp"
 #include "route_path.hpp"
 #include "trip.hpp"
+#include "transfer.hpp"
 #include "stop.hpp"
 #include "calculation_time.hpp"
 
@@ -54,12 +55,23 @@ namespace TrRouting
     std::vector<std::vector<int> > footpathsIndex;
     std::vector<Footpath> footpathsBySource;
     std::vector<Footpath> footpathsByTarget;
-    std::vector<Trip> trips;
     std::vector<RoutePath> routePaths;
     std::vector<int> routePathsIndexById;
     std::vector<std::vector<std::vector<int> > > routePathsIndexByStop;
     std::vector<Stop> stops;
+    std::vector<int> stopsIndexById;
+    std::vector<std::vector<int> > stopsIndexByRoutePath;
+    std::vector<int> arrivalTimes;
+    std::vector<int> departureTimes;
+    std::vector<std::vector<int> > arrivalTimesIndex;
+    std::vector<std::vector<int> > departureTimesIndex;
+    std::vector<Transfer> transfers;
+    std::vector<std::vector<int> > transfersIndex;
+    std::vector<Trip> trips;
+    std::vector<std::vector<int> > tripsIndex;
+    std::vector<int> tripsIndexById;
     
+
     std::map<std::string,int> pickUpTypes;     // not yet implemented
     std::map<std::string,int> dropOffTypes;    // not yet implemented
     std::string  accessMode;
