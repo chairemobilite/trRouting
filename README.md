@@ -1,5 +1,5 @@
 # trRouting
-Transit routing server app using the Connection Scan or Trip-Based algorithms and including flexible parameters.
+Transit routing server app written in C++ using the Connection Scan or Trip-Based algorithms and including flexible parameters.
 
 ## References
 [Connection Scan Algorithm (CSA)][1]  
@@ -33,7 +33,7 @@ brew install nlohmann/json/nlohmann_json
 ```
 make -f MakeFile
 ```
-### Trip-Based algorithm
+### Trip-Based Algorithm
 ```
 make -f TripBasedMakeFile
 ```
