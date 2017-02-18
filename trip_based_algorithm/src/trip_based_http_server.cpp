@@ -392,13 +392,7 @@ int main(int argc, char** argv) {
       }
             
       std::cout << "-- parsing request -- " << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
-      
-      calculator.refresh();
             
-      calculator.resetAccessEgressModes();
-            
-      std::cout << "-- reset access egress modes -- " << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
-      
       resultStr = calculator.calculate();
       
     }
@@ -406,7 +400,7 @@ int main(int argc, char** argv) {
     {
       resultStr = "{\"status\": \"failed\", \"error\": \"Wrong or malformed query\"}";
     }
-        
+
     *response << "HTTP/1.1 200 OK\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << resultStr.length() << "\r\n\r\n" << resultStr;
   };
   

@@ -32,18 +32,19 @@ namespace TrRouting
     params.setDefaultValues();
     setParamsFromYaml("trRoutingTripBasedConfig.yml");
     
-    std::string weekdayName {"sunday"};
-    std::string dataName;
-    std::ifstream stream;
+    std::string          weekdayName  {"sunday"};
+    int                  weekdayIndex {0}; // 0 = sunday, 6 = saturday
+    std::string          dataName;
+    std::ifstream        stream;
     std::vector<uint8_t> contents;
-    json jsonContent;
-    json::basic_json jsonData;
-    Footpath* footpath;
-    RoutePath* routePath;
-    Trip* trip;
-    Transfer* transfer;
-    Stop* stop;
-    int i;
+    json                 jsonContent;
+    json::basic_json     jsonData;
+    Footpath*            footpath;
+    RoutePath*           routePath;
+    Trip*                trip;
+    Transfer*            transfer;
+    Stop*                stop;
+    int                  i;
     
 
     // fetch footpaths_by_source:
@@ -91,7 +92,7 @@ namespace TrRouting
     stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
-    footpathsIndex = jsonContent.get<std::vector<std::vector<int> > >();
+    footpathsIndex = jsonContent.get<std::vector<std::vector<int>> >();
     //std::cout << footpathsIndexBySource[345][0] << std::endl;
     
     
@@ -124,7 +125,7 @@ namespace TrRouting
     stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
-    routePathsIndexById = jsonContent.get<std::vector<int> >();
+    routePathsIndexById = jsonContent.get<std::vector<int>>();
     //std::cout << routePathsIndexById[3] << std::endl;
     
     
@@ -134,7 +135,7 @@ namespace TrRouting
     stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
-    routePathsIndexByStop = jsonContent.get<std::vector<std::vector<std::vector<int> > > >();
+    routePathsIndexByStop = jsonContent.get<std::vector<std::vector<std::vector<int>> >>();
     //json dumpJson(routePathsIndexByStop);
     //std::cout << dumpJson.dump() << std::endl;
 
@@ -169,7 +170,7 @@ namespace TrRouting
     stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
-    stopsIndexById = jsonContent.get<std::vector<int> >();
+    stopsIndexById = jsonContent.get<std::vector<int>>();
     //std::cout << stopsIndexById[3] << std::endl;
     
     
@@ -179,7 +180,7 @@ namespace TrRouting
     stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
-    stopsIndexByRoutePath = jsonContent.get<std::vector<std::vector<int> > >();
+    stopsIndexByRoutePath = jsonContent.get<std::vector<std::vector<int>> >();
     //json dumpJson(stopsIndexByRoutePath);
     //std::cout << dumpJson.dump() << std::endl;
 
@@ -190,8 +191,8 @@ namespace TrRouting
     stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + weekdayName + "__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
-    arrivalTimes = jsonContent.get<std::vector<int> >();
-    //std::cout << arrivalTimes[3] << std::endl;
+    arrivalTimes[weekdayIndex] = jsonContent.get<std::vector<int>>();
+    //std::cout << arrivalTimes[weekdayIndex][3] << std::endl;
 
 
 
@@ -200,8 +201,8 @@ namespace TrRouting
     stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + weekdayName + "__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
-    departureTimes = jsonContent.get<std::vector<int> >();
-    //std::cout << departureTimes[3] << std::endl;
+    departureTimes[weekdayIndex] = jsonContent.get<std::vector<int>>();
+    //std::cout << departureTimes[weekdayIndex][3] << std::endl;
 
 
 
@@ -210,8 +211,8 @@ namespace TrRouting
     stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + weekdayName + "__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
-    arrivalTimesIndex = jsonContent.get<std::vector<std::vector<int> > >();
-    //std::cout << arrivalTimesIndex[3][0] << std::endl;
+    arrivalTimesIndex[weekdayIndex] = jsonContent.get<std::vector<std::vector<int>> >();
+    //std::cout << arrivalTimesIndex[weekdayIndex][3][0] << std::endl;
 
 
 
@@ -220,8 +221,8 @@ namespace TrRouting
     stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + weekdayName + "__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
-    departureTimesIndex = jsonContent.get<std::vector<std::vector<int> > >();
-    //std::cout << departureTimesIndex[3][0] << std::endl;
+    departureTimesIndex[weekdayIndex] = jsonContent.get<std::vector<std::vector<int>> >();
+    //std::cout << departureTimesIndex[weekdayIndex][3][0] << std::endl;
 
 
 
@@ -230,8 +231,8 @@ namespace TrRouting
     stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + weekdayName + "__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
-    transfers = std::vector<Transfer>();
-    transfers.reserve(jsonContent.size());
+    transfers[weekdayIndex] = std::vector<Transfer>();
+    transfers[weekdayIndex].reserve(jsonContent.size());
     transfer = new Transfer();
     for (json::iterator it = jsonContent.begin(); it != jsonContent.end(); ++it) {
       jsonData = *it;
@@ -239,9 +240,9 @@ namespace TrRouting
       transfer->srcTripI   = jsonData["source_trip_i"].get<int>();
       transfer->tgtStopSeq = jsonData["target_stop_seq"].get<int>();
       transfer->tgtTripI   = jsonData["target_trip_i"].get<int>();
-      transfers.push_back(*transfer);
+      transfers[weekdayIndex].push_back(*transfer);
     }
-    //std::cout << transfers[3].tgtTripI << std::endl;
+    //std::cout << transfers[weekdayIndex][3].tgtTripI << std::endl;
 
 
 
@@ -250,8 +251,8 @@ namespace TrRouting
     stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + weekdayName + "__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
-    transfersIndex = jsonContent.get<std::vector<std::vector<int> > >();
-    //std::cout << transfersIndex[3][1] << std::endl;
+    transfersIndex[weekdayIndex] = jsonContent.get<std::vector<std::vector<int>> >();
+    //std::cout << transfersIndex[weekdayIndex][3][1] << std::endl;
 
 
 
@@ -260,8 +261,8 @@ namespace TrRouting
     stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + weekdayName + "__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
-    trips = std::vector<Trip>();
-    trips.reserve(jsonContent.size());
+    trips[weekdayIndex] = std::vector<Trip>();
+    trips[weekdayIndex].reserve(jsonContent.size());
     trip = new Trip();
     for (json::iterator it = jsonContent.begin(); it != jsonContent.end(); ++it) {
       jsonData = *it;
@@ -269,9 +270,9 @@ namespace TrRouting
       trip->seq  = jsonData["trip_seq"].get<int>();
       trip->rpI  = jsonData["route_path_i"].get<int>();
       trip->id   = jsonData["id"].get<long long>();
-      trips.push_back(*trip);
+      trips[weekdayIndex].push_back(*trip);
     }
-    //std::cout << trips[3].rpI << std::endl;
+    //std::cout << trips[weekdayIndex][3].rpI << std::endl;
 
 
 
@@ -280,8 +281,10 @@ namespace TrRouting
     stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + weekdayName + "__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
-    tripsIndex = jsonContent.get<std::vector<std::vector<int> > >();
-    //std::cout << tripsIndex[3][0] << std::endl;
+    tripsIndex[weekdayIndex] = jsonContent.get<std::vector<std::vector<int>> >();
+    //std::cout << tripsIndex[weekdayIndex][3][0] << std::endl;
+
+
 
     CalculationTime::algorithmCalculationTime.stopStep();
     std::cout << "-- Fetching data from cache -- " << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
@@ -415,11 +418,6 @@ namespace TrRouting
       params.maxNoResultNextAccessTimeMinutes = config["maxNoResultNextAccessTimeMinutes"].as<int>();
     }
     
-  }
-  
-  std::string TripBasedAlgorithm::calculate()
-  {
-    return "";
   }
   
 }

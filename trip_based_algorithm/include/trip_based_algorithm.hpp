@@ -24,6 +24,7 @@
 #include "stop.hpp"
 #include "calculation_time.hpp"
 
+using json = nlohmann::json;
 
 extern std::string consoleRed;
 extern std::string consoleGreen;
@@ -44,7 +45,7 @@ namespace TrRouting
     TripBasedAlgorithm(Parameters& theParams);
     void setup();
     void setParamsFromYaml(std::string yamlFilePath = "");
-    std::string calculate();
+    json calculate();
     void refresh();
     void updateParams(Parameters& theParams);
     Parameters params;
@@ -52,32 +53,34 @@ namespace TrRouting
     
   private:
     
-    std::vector<std::vector<int> > footpathsIndex;
-    std::vector<Footpath> footpathsBySource;
-    std::vector<Footpath> footpathsByTarget;
-    std::vector<RoutePath> routePaths;
-    std::vector<int> routePathsIndexById;
-    std::vector<std::vector<std::vector<int> > > routePathsIndexByStop;
-    std::vector<Stop> stops;
-    std::vector<int> stopsIndexById;
-    std::vector<std::vector<int> > stopsIndexByRoutePath;
-    std::vector<int> arrivalTimes;
-    std::vector<int> departureTimes;
-    std::vector<std::vector<int> > arrivalTimesIndex;
-    std::vector<std::vector<int> > departureTimesIndex;
-    std::vector<Transfer> transfers;
-    std::vector<std::vector<int> > transfersIndex;
-    std::vector<Trip> trips;
-    std::vector<std::vector<int> > tripsIndex;
-    std::vector<int> tripsIndexById;
+    std::vector<std::vector<int>>              footpathsIndex;
+    std::vector<Footpath>                      footpathsBySource;
+    std::vector<Footpath>                      footpathsByTarget;
+    std::vector<RoutePath>                     routePaths;
+    std::vector<int>                           routePathsIndexById;
+    std::vector<std::vector<std::vector<int>>> routePathsIndexByStop;
+    std::vector<Stop>                          stops;
+    std::vector<int>                           stopsIndexById;
+    std::vector<std::vector<int>>              stopsIndexByRoutePath;
+
+    // by weekday:
+    std::vector<std::vector<int>>              arrivalTimes        = std::vector<std::vector<int>>(7,std::vector<int>());
+    std::vector<std::vector<int>>              departureTimes      = std::vector<std::vector<int>>(7,std::vector<int>());
+    std::vector<std::vector<std::vector<int>>> arrivalTimesIndex   = std::vector<std::vector<std::vector<int>>>(7,std::vector<std::vector<int>>());
+    std::vector<std::vector<std::vector<int>>> departureTimesIndex = std::vector<std::vector<std::vector<int>>>(7,std::vector<std::vector<int>>());
+    std::vector<std::vector<Transfer>>         transfers           = std::vector<std::vector<Transfer>>(7,std::vector<Transfer>());
+    std::vector<std::vector<std::vector<int>>> transfersIndex      = std::vector<std::vector<std::vector<int>>>(7,std::vector<std::vector<int>>());
+    std::vector<std::vector<Trip>>             trips               = std::vector<std::vector<Trip>>(7,std::vector<Trip>());
+    std::vector<std::vector<std::vector<int>>> tripsIndex          = std::vector<std::vector<std::vector<int>>>(7,std::vector<std::vector<int>>());
+    std::vector<std::vector<int>>              tripsIndexById      = std::vector<std::vector<int>>(7,std::vector<int>());
     
 
-    std::map<std::string,int> pickUpTypes;     // not yet implemented
-    std::map<std::string,int> dropOffTypes;    // not yet implemented
-    std::string  accessMode;
-    std::string  egressMode;
-    int  maxAccessWalkingTravelTimeFromOriginToFirstStopMinutes;
-    int  maxAccessWalkingTravelTimeFromLastStopToDestinationMinutes;
+    std::map<std::string,int> pickUpTypes;  // not yet implemented
+    std::map<std::string,int> dropOffTypes; // not yet implemented
+    std::string               accessMode;
+    std::string               egressMode;
+    int                       maxAccessWalkingTravelTimeFromOriginToFirstStopMinutes;
+    int                       maxAccessWalkingTravelTimeFromLastStopToDestinationMinutes;
 
   };
   
