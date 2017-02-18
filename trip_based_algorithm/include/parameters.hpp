@@ -24,6 +24,8 @@ namespace TrRouting
     std::map<int, bool> onlyAgencyIds;
     std::map<int, bool> exceptAgencyIds;
     
+    int weekdayIndex;
+
     int departureTimeHour;
     int departureTimeMinutes;
     int arrivalTimeHour;

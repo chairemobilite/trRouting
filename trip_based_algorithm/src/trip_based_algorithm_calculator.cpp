@@ -34,6 +34,23 @@ namespace TrRouting
       std::vector<ReachableRoutePath> reachableRoutePaths; // (line 2)
       std::vector<TripSegment>        tripSegments; // (line 3)
       tripSegments.reserve(nMax + 1);
+      std::vector<int> firstReachedStopSeqByTrip(trips[params.weekdayIndex].size() - 1, infinite); // (line 4)
+
+      Footpath footpathToTarget;
+      int stopToTargetI; // q
+      int travelTimeToTarget;
+
+      // fetch footpaths to target stop:
+      for (auto it = footpathsByTarget.begin() + footpathsIndex[tgtStopI][0]; it != footpathsByTarget.begin() + footpathsIndex[tgtStopI][1] + 1; ++it) { // (line 5)
+        footpathToTarget   = *it;
+        stopToTargetI      = footpathToTarget.srcI;
+        travelTimeToTarget = footpathToTarget.tt; // (line 6)
+        for (const auto & routePathIndexAndStopSeq : routePathsIndexByStop[stopToTargetI]) // (line 7)
+        {
+          reachableRoutePaths.push_back(*(new ReachableRoutePath(routePathIndexAndStopSeq[0], routePathIndexAndStopSeq[1], travelTimeToTarget)));
+        }
+      }
+
 
     }
 
