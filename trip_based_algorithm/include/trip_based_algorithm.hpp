@@ -18,6 +18,7 @@
 
 #include "parameters.hpp"
 #include "footpath.hpp"
+#include "route_path.hpp"
 #include "trip.hpp"
 #include "calculation_time.hpp"
 
@@ -53,6 +54,8 @@ namespace TrRouting
     std::vector<Footpath> footpathsBySource;
     std::vector<Footpath> footpathsByTarget;
     std::vector<Trip> trips;
+    std::vector<RoutePath> routePaths;
+    std::vector<int> routePathsIndexById;
     
     
     std::map<std::string,int> pickUpTypes;     // not yet implemented

@@ -37,6 +37,7 @@ namespace TrRouting
     json jsonContent;
     json::basic_json jsonData;
     Footpath* footpath;
+    RoutePath* routePath;
     Trip* trip;
     int i;
     
@@ -97,6 +98,41 @@ namespace TrRouting
     
     
     
+    // fetch route_paths:
+    dataName = "route_paths";
+    stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
+    contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+    jsonContent = json::from_msgpack(contents);
+    routePaths = std::vector<RoutePath>();
+    routePaths.reserve(jsonContent.size());
+    routePath = new RoutePath();
+    for (json::iterator it = jsonContent.begin(); it != jsonContent.end(); ++it) {
+      jsonData = *it;
+      routePath->i   = jsonData["i"].get<int>();
+      routePath->id  = jsonData["id"].get<long long>();
+      routePath->rId = jsonData["route_id"].get<long long>();
+      routePaths.push_back(*routePath);
+    }
+    //std::cout << routePaths[21].routeId << std::endl;
+    
+    
+    
+    // fetch route_paths_index_by_id
+    dataName = "route_paths_index_by_id";
+    stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
+    contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+    jsonContent = json::from_msgpack(contents);
+    routePathsIndexById = std::vector<int>(jsonContent.size(), -1); // initialize all to -1
+    i = 0;
+    for (json::iterator it = jsonContent.begin(); it != jsonContent.end(); ++it) {
+      jsonData = *it;
+      routePathsIndexById[i] = jsonData[0].get<int>();
+      i++;
+    }
+    std::cout << jsonContent.dump() << std::endl;
+    
+    
+    
     // fetch trips:
     dataName = "trips";
     stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + weekdayName + "__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
@@ -108,8 +144,8 @@ namespace TrRouting
     for (json::iterator it = jsonContent.begin(); it != jsonContent.end(); ++it) {
       jsonData = *it;
       trip->i    = jsonData["i"].get<int>();
-      trip->id   = jsonData["id"].get<int>();
-      trip->rpI = jsonData["route_path_i"].get<int>();
+      trip->id   = jsonData["id"].get<long long>();
+      trip->rpI  = jsonData["route_path_i"].get<int>();
       trip->seq  = jsonData["trip_seq"].get<int>();
       trips.push_back(*trip);
     }
