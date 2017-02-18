@@ -1,8 +1,8 @@
 # trRouting
-Transit routing server app using the CSA and trip-based algorithms and including flexible parameters
+Transit routing server app using the Connection Scan or Trip-Based algorithms and including flexible parameters.
 
 ## References
-[Connection Scan Algorithm (CSA)][1]
+[Connection Scan Algorithm (CSA)][1]  
 [Trib-Based Algorithm (TBA)][2]
 
 ## Dependencies
@@ -14,7 +14,7 @@ Transit routing server app using the CSA and trip-based algorithms and including
 [4]: https://github.com/Project-OSRM/osrm-backend/wiki "OSRM Wiki"
 
 ## Preparation
-Create a trRoutingConfig.yml file (copy from the example trRoutingConfig.example.yml provided) for the Connection Scan Algorithm
+Create a trRoutingConfig.yml file (copy from the example trRoutingConfig.example.yml provided) for the Connection Scan Algorithm  
 Create a trRoutingTripBasedConfig.yml file (copy from the example trRoutingConfig.example.yml provided) for the Trip Based Algorithm
 
 
