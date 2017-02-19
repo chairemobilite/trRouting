@@ -50,6 +50,7 @@ namespace TrRouting
     void setParamsFromYaml(std::string yamlFilePath = "");
     json calculate();
     void refresh();
+    void destroy();
     void updateParams(Parameters& theParams);
     Parameters params;
     void resetAccessEgressModes();

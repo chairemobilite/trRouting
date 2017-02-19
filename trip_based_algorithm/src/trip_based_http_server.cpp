@@ -37,10 +37,10 @@ std::string consoleCyan       = "";
 std::string consoleMagenta    = "";
 std::string consoleResetColor = "";
 
-namespace 
-{ 
-  const size_t ERROR_IN_COMMAND_LINE = 1;
-}
+//namespace 
+//{ 
+//  const size_t ERROR_IN_COMMAND_LINE = 1;
+//}
 
 //Added for the default_resource example
 void default_resource_send(const HttpServer &server, std::shared_ptr<HttpServer::Response> response,
@@ -53,12 +53,14 @@ int main(int argc, char** argv) {
   
   // Get application shortname from config file:
   std::string applicationShortname;
-  std::ifstream applicationShortnameFile;
-  applicationShortnameFile.open("application_shortname.txt");
-  std::getline(applicationShortnameFile, applicationShortname);
-  applicationShortnameFile.close();
-  std::string dataShortname {applicationShortname};
+  //std::ifstream applicationShortnameFile;
+  //applicationShortnameFile.open("application_shortname.txt");
+  //std::getline(applicationShortnameFile, applicationShortname);
+  //applicationShortnameFile.close();
+  //std::string dataShortname {applicationShortname};
   
+  std::string dataShortname = "tr_stsh_2016_03_test";
+
   // setup program options:
   
   boost::program_options::options_description optionsDesc("Options"); 
@@ -135,7 +137,6 @@ int main(int argc, char** argv) {
   algorithmParams.dataFetcher          = dataFetcher;
   
   calculator = TripBasedAlgorithm(algorithmParams);
-  int i = 0;
   
   /////////
   
@@ -162,7 +163,6 @@ int main(int argc, char** argv) {
       boost::split(parametersWithValues, request->path_match[1], boost::is_any_of("&"));
       
       float originLatitude, originLongitude, destinationLatitude, destinationLongitude;
-      long long startingStopId{-1}, endingStopId{-1};
       std::map<int, bool> onlyServiceIds;
       std::map<int, bool> exceptServiceIds;
       std::map<int, bool> onlyRouteIds;
@@ -455,12 +455,14 @@ int main(int argc, char** argv) {
   
   
   //Wait for server to start so that the client can connect
-  std::this_thread::sleep_for(std::chrono::seconds(1));
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
   
   std::cout << "ready." << std::endl;
-      
+  
   server_thread.join();
   
+  calculator.destroy();
+
   std::cout << "done..." << std::endl;
   
   return 0;

@@ -25,10 +25,10 @@ namespace TrRouting
     }
     
     // constructor including journey previous trip segments and new journey trip segment as a TripSegment object:
-    TripSegment(int _rpI, int _tripI, int _firstStopSeq, int _lastStopSeq, std::vector<std::shared_ptr<TripSegment>> _prevTripSegments, TripSegment _newTripSegment)
+    TripSegment(int _rpI, int _tripI, int _firstStopSeq, int _lastStopSeq, std::vector<std::shared_ptr<TripSegment>> _prevTripSegments, TripSegment* _newTripSegment)
     : rpI(_rpI), tripI(_tripI), firstStopSeq(_firstStopSeq), lastStopSeq(_lastStopSeq), prevTripSegments(_prevTripSegments)
     {
-      prevTripSegments.push_back(std::make_shared<TripSegment>(_newTripSegment));
+      prevTripSegments.push_back(std::make_shared<TripSegment>(*(_newTripSegment)));
     }
 
   };

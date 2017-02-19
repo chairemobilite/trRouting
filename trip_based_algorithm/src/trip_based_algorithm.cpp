@@ -23,11 +23,37 @@ namespace TrRouting
     maxAccessWalkingTravelTimeFromLastStopToDestinationMinutes = params.maxAccessWalkingTravelTimeFromLastStopToDestinationMinutes;
   }
   
+  // clean memory and destroy objects:
+  void TripBasedAlgorithm::destroy()
+  {
+    std::vector<std::vector<int>>().swap(footpathsIndex);
+    std::vector<Footpath>().swap(footpathsBySource);
+    std::vector<Footpath>().swap(footpathsByTarget);
+    std::vector<RoutePath>().swap(routePaths);
+    std::vector<int>().swap(routePathsIndexById);
+    std::vector<std::vector<std::vector<int>>>().swap(routePathsIndexByStop);
+    std::vector<Stop>().swap(stops);
+    std::vector<int>().swap(stopsIndexById);
+    std::vector<std::vector<int>>().swap(stopsIndexByRoutePath);
+
+    // by weekday:
+    std::vector<std::vector<int>>().swap(arrivalTimes);
+    std::vector<std::vector<int>>().swap(departureTimes);
+    std::vector<std::vector<std::vector<int>>>().swap(arrivalTimesIndex);
+    std::vector<std::vector<std::vector<int>>>().swap(departureTimesIndex);
+    std::vector<std::vector<Transfer>>().swap(transfers);
+    std::vector<std::vector<std::vector<int>>>().swap(transfersIndex);
+    std::vector<std::vector<Trip>>().swap(trips);
+    std::vector<std::vector<std::vector<int>>>().swap(tripsIndex);
+    std::vector<std::vector<int>>().swap(tripsIndexById);
+
+  }
+
   // call setup only once when starting the calculator. Use updateParams before each calculation.
   void TripBasedAlgorithm::setup()
   {
 
-    CalculationTime::algorithmCalculationTime.startStep();    
+    CalculationTime::algorithmCalculationTime.startStep();
 
     params.setDefaultValues();
     setParamsFromYaml("trRoutingTripBasedConfig.yml");

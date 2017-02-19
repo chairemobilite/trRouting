@@ -1,0 +1,142 @@
+//Added for the default_resource example
+#include <boost/filesystem.hpp>
+#include <boost/tokenizer.hpp>
+#include <boost/program_options.hpp>
+#include <boost/algorithm/string.hpp>
+
+#include <vector>
+#include <algorithm>
+#include <string>
+#include <fstream>
+#include <iostream>
+#include <iterator>
+#include <curses.h>
+
+#include "calculation_time.hpp"
+#include "parameters.hpp"
+#include "trip_based_algorithm.hpp"
+
+using namespace TrRouting;
+
+std::string consoleRed        = "";
+std::string consoleGreen      = "";
+std::string consoleYellow     = "";
+std::string consoleCyan       = "";
+std::string consoleMagenta    = "";
+std::string consoleResetColor = "";
+
+int main(int argc, char** argv) {
+  
+  std::string dataFetcher {"database"}; // csv, database
+  
+  // Get application shortname from config file:
+  std::string applicationShortname = "tr_stsh_2016_03_test";
+  //std::ifstream applicationShortnameFile;
+  //applicationShortnameFile.open("application_shortname.txt");
+  //std::getline(applicationShortnameFile, applicationShortname);
+  //applicationShortnameFile.close();
+  //std::string dataShortname {applicationShortname};
+  
+  std::string dataShortname = "tr_stsh_2016_03_test";
+
+  
+  std::cout << "Starting transit routing for the application: ";
+  std::cout << dataShortname << std::endl << std::endl;
+  
+  // Set params:
+  Parameters algorithmParams;
+  TripBasedAlgorithm calculator;
+  algorithmParams.applicationShortname = dataShortname;
+  algorithmParams.dataFetcher          = dataFetcher;
+  
+  calculator = TripBasedAlgorithm(algorithmParams);
+  
+  /////////
+  
+  
+  //HTTP-server using 1 thread
+  //Unless you do more heavy non-threaded processing in the resources,
+  //1 thread is usually faster than several threads
+  
+  CalculationTime::algorithmCalculationTime.startStep();
+  
+  std::cout << "calculating request..." << std::endl;
+  
+  std::string resultStr;
+  
+  if (true)
+  {
+    std::vector<std::string> parametersWithValues;
+    
+    std::map<int, bool> onlyServiceIds;
+    std::map<int, bool> exceptServiceIds;
+    std::map<int, bool> onlyRouteIds;
+    std::map<int, bool> exceptRouteIds;
+    std::map<int, bool> onlyRouteTypeIds;
+    std::map<int, bool> exceptRouteTypeIds;
+    std::map<int, bool> onlyAgencyIds;
+    std::map<int, bool> exceptAgencyIds;
+    
+    calculator.params.onlyServiceIds     = onlyServiceIds;
+    calculator.params.exceptServiceIds   = exceptServiceIds;
+    calculator.params.onlyRouteIds       = onlyRouteIds;
+    calculator.params.exceptRouteIds     = exceptRouteIds;
+    calculator.params.onlyRouteTypeIds   = onlyRouteTypeIds;
+    calculator.params.exceptRouteTypeIds = exceptRouteTypeIds;
+    calculator.params.onlyAgencyIds      = onlyAgencyIds;
+    calculator.params.exceptAgencyIds    = exceptAgencyIds;
+    
+    std::vector<std::string> parameterWithValueVector;
+    std::vector<std::string> latitudeLongitudeVector;
+    std::vector<std::string> dateVector;
+    std::vector<std::string> timeVector;
+    std::vector<std::string> onlyServiceIdsVector;
+    std::vector<std::string> exceptServiceIdsVector;
+    std::vector<std::string> onlyRouteIdsVector;
+    std::vector<std::string> exceptRouteIdsVector;
+    std::vector<std::string> onlyRouteTypeIdsVector;
+    std::vector<std::string> exceptRouteTypeIdsVector;
+    std::vector<std::string> onlyAgencyIdsVector;
+    std::vector<std::string> exceptAgencyIdsVector;
+    
+    calculator.params.forwardCalculation        = true;
+    calculator.params.detailedResults           = false;
+    calculator.params.returnAllStopsResult      = true;
+    calculator.params.transferOnlyAtSameStation = false;
+    calculator.params.transferBetweenSameRoute  = true;
+    calculator.params.startingPoint             = Point();
+    calculator.params.endingPoint               = Point();
+    calculator.params.routingDateYear           = 0;
+    calculator.params.routingDateMonth          = 0;
+    calculator.params.routingDateDay            = 0;
+    calculator.params.startingStopId            = 758;
+    calculator.params.endingStopId              = -1;
+    calculator.params.maxNumberOfTransfers      = 3;
+    calculator.params.minWaitingTimeMinutes     = 5;
+    calculator.params.departureTimeHour         = 9;
+    calculator.params.departureTimeMinutes      = 0;
+    calculator.params.arrivalTimeHour           = -1;
+    calculator.params.arrivalTimeMinutes        = -1;
+    
+    
+     
+    //std::cout << "-- parsing request -- " << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+    
+    //calculator.calculate();
+
+    std::cout << calculator.calculate().dump() << std::endl; // come as json object
+    //
+
+    calculator.destroy();
+    
+
+  }
+  else
+  {
+    resultStr = "{\"status\": \"failed\", \"error\": \"Wrong or malformed query\"}";
+  }
+  
+  std::cout << "finished!" << std::endl;
+  
+  return 0;
+}

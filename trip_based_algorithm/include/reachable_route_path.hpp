@@ -10,6 +10,8 @@ namespace TrRouting
     int stopSeq; // stop sequence
     int tt;      // footpath travel time (seconds)
 
+    ReachableRoutePath() {}
+
     ReachableRoutePath(int _rpI, int _stopSeq, int _tt) : rpI(_rpI), stopSeq(_stopSeq), tt(_tt) {}
 
   };

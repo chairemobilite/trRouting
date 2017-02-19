@@ -1,6 +1,6 @@
 # required libraries: yaml-cpp, boost, msgpack
 
-CC = clang++
+CC = clang++ -Wall -g
 CXXFLAGS += -std=c++11 -stdlib=libc++
 LOCAL_CPP_FILES := $(wildcard src/*.cpp)
 SPECIFIC_CPP_FILES := $(wildcard trip_based_algorithm/src/*.cpp)
