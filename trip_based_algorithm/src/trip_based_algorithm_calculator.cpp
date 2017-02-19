@@ -8,6 +8,7 @@ namespace TrRouting
   json TripBasedAlgorithm::calculate()
   {
 
+    CalculationTime::algorithmCalculationTime.start();
     std::cout << "start calculation" << std::endl;
 
     // prepare json content and refresh variables for calculation:
@@ -196,6 +197,9 @@ namespace TrRouting
       jsonResult["stops"].push_back(stopResult);
 
     }
+
+    CalculationTime::algorithmCalculationTime.stop();
+    jsonResult["calculatedInMilliseconds"] = CalculationTime::algorithmCalculationTime.getDurationMilliseconds();
 
     return jsonResult;
   }
