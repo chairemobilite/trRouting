@@ -35,7 +35,6 @@ namespace TrRouting
       tgtStopIs = std::vector<int>(1,stopsIndexById[params.endingStopId]);
     }
 
-
     // calculate for each stop index in the target stop indexes vector:
     for(const auto & tgtStopI : tgtStopIs)
     {
@@ -48,7 +47,6 @@ namespace TrRouting
       Footpath footpathToTarget;
       int stopToTargetI; // q
       int travelTimeToTarget;
-
 
       // fetch footpaths to target stop:
       for (auto it = footpathsByTarget.begin() + footpathsIndex[tgtStopI][0]; it != footpathsByTarget.begin() + footpathsIndex[tgtStopI][1] + 1; ++it) // (line 5)
@@ -72,7 +70,6 @@ namespace TrRouting
       int  stopSeq;
       int  arrivalTimeAtNextStop;
 
-
       // fetch footpaths from source stop:
       for (auto it = footpathsBySource.begin() + footpathsIndex[srcStopI][0]; it != footpathsBySource.begin() + footpathsIndex[srcStopI][1] + 1; ++it) // (line 9)
       {
@@ -80,17 +77,14 @@ namespace TrRouting
         stopFromSourceI     = footpathFromSource.srcI;
         readyTimeFromSource = footpathFromSource.tt + params.minWaitingTimeMinutes * 60; // (line 10)
 
-
         for (const auto & routePathIndexAndStopSeq : routePathsIndexByStop[stopFromSourceI]) // (line 11)
         {
           routePathIndex    = routePathIndexAndStopSeq[0];
           stopSeq           = routePathIndexAndStopSeq[1];
 
-
           if (tripsIndex[params.weekdayIndex][routePathIndex][0] != -1)
           {
             foundEarliestTrip = false;
-
 
             for (auto it = trips[params.weekdayIndex].begin() + tripsIndex[params.weekdayIndex][routePathIndex][0]; it != trips[params.weekdayIndex].begin() + tripsIndex[params.weekdayIndex][routePathIndex][1] + 1; ++it)
             {
@@ -136,7 +130,6 @@ namespace TrRouting
           Trip transferTrip;
           Transfer transfer;
 
-
           for(auto & reachableRoutePath : reachableRoutePaths) // (line 18)
           {
             if(reachableRoutePath.rpI == routeIndex && firstStopSeq < reachableRoutePath.stopSeq)
@@ -149,7 +142,6 @@ namespace TrRouting
               }
             }
           }
-
 
           nextStopSeqArrivalTimeIndex = arrivalTimesIndex[params.weekdayIndex][tripI][0] + firstStopSeq + 1;
           if (nextStopSeqArrivalTimeIndex <= arrivalTimesIndex[params.weekdayIndex][tripI][1])
@@ -184,6 +176,7 @@ namespace TrRouting
         }
       }
 
+      // add target stop results to json:
       int minArrivalTimeSecondForStop = infinite;
       for(int n = 0; n <= nMax; n++)
       {
