@@ -12,6 +12,8 @@ namespace TrRouting
     int lastStopSeq;  // last stop sequence
     std::vector<std::shared_ptr<TripSegment>> prevTripSegments; // journey previous trip segments (to recreate journey after calculation)
 
+    TripSegment(){}
+
     // constructor without journey previous trip segments and without new journey trip segment:
     TripSegment(int _rpI, int _tripI, int _firstStopSeq, int _lastStopSeq) : rpI(_rpI), tripI(_tripI), firstStopSeq(_firstStopSeq), lastStopSeq(_lastStopSeq) {}
     

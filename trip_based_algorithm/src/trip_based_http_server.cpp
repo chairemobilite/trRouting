@@ -390,10 +390,11 @@ int main(int argc, char** argv) {
         calculator.params.arrivalTimeHour    = timeHour;
         calculator.params.arrivalTimeMinutes = timeMinute;
       }
+      
+
+      //std::cout << "-- parsing request -- " << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
             
-      std::cout << "-- parsing request -- " << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
-            
-      resultStr = calculator.calculate();
+      resultStr = calculator.calculate().dump(); // come as json object
       
     }
     else
