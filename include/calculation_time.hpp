@@ -11,7 +11,7 @@ namespace TrRouting
     
     public:
       
-      static CalculationTime algorithmCalculationTime;
+      //static CalculationTime algorithmCalculationTime;
       long long getDurationMilliseconds();
       long long getEpoch();
       void startStep();

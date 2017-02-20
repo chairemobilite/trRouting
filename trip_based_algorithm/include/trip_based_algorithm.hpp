@@ -16,6 +16,7 @@
 #include <json.hpp>
 #include <yaml-cpp/yaml.h>
 #include <limits>
+#include <thread>
 
 #include "parameters.hpp"
 #include "footpath.hpp"
@@ -54,6 +55,7 @@ namespace TrRouting
     void updateParams(Parameters& theParams);
     Parameters params;
     void resetAccessEgressModes();
+    CalculationTime algorithmCalculationTime;
     
   private:
     

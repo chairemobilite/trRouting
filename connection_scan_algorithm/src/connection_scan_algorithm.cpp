@@ -942,7 +942,7 @@ namespace TrRouting
                 
                 if(enumMap[journeyStep->action] == "Ride")
                 {
-                  routeIdStopPairIdsStr += "{ \"route_id\": " + std::to_string(connection.routeId) + ", \"stop_ids_pair\": [" + std::to_string(connection.stopStartId) + "," + std::to_string(connection.stopEndId) +"]},";
+                  routeIdStopPairIdsStr += "{ \"routeId\": " + std::to_string(connection.routeId) + ", \"stopIdsPair\": [" + std::to_string(connection.stopStartId) + "," + std::to_string(connection.stopEndId) +"]},";
                 }
                 else if(enumMap[journeyStep->action] == "Unboard")
                 {

@@ -7,6 +7,7 @@ namespace TrRouting
   
   TripBasedAlgorithm::TripBasedAlgorithm(Parameters& theParams) : params(theParams)
   {
+    algorithmCalculationTime = CalculationTime();
     setup();
   }
   
@@ -48,15 +49,15 @@ namespace TrRouting
     std::vector<std::vector<int>>().swap(tripsIndexById);
 
   }
-
+  
   // call setup only once when starting the calculator. Use updateParams before each calculation.
   void TripBasedAlgorithm::setup()
   {
 
-    CalculationTime::algorithmCalculationTime.startStep();
+    algorithmCalculationTime.startStep();
 
     params.setDefaultValues();
-    setParamsFromYaml("trRoutingTripBasedConfig.yml");
+    //setParamsFromYaml("trRoutingTripBasedConfig.yml"); // disable yml config for now
     
     std::string          weekdayName  {"sunday"};
     params.weekdayIndex = 0; // 0 = sunday, 6 = saturday
@@ -163,7 +164,7 @@ namespace TrRouting
     stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
-    routePathsIndexByStop = jsonContent.get<std::vector<std::vector<std::vector<int>> >>();
+    routePathsIndexByStop = jsonContent.get<std::vector<std::vector<std::vector<int>>>>();
     //json dumpJson(routePathsIndexByStop);
     //std::cout << dumpJson.dump() << std::endl;
 
@@ -180,8 +181,8 @@ namespace TrRouting
     for (json::iterator it = jsonContent.begin(); it != jsonContent.end(); ++it) {
       jsonData = *it;
       stop->i     = jsonData["i"].get<int>();
-      stop->at    = 99999;
-      stop->tt    = -1;
+      //stop->at    = 99999;
+      //stop->tt    = -1;
       stop->id    = jsonData["id"].get<long long>();
       stop->code  = jsonData["code"].get<std::string>();
       stop->name  = jsonData["name"].get<std::string>();
@@ -314,8 +315,8 @@ namespace TrRouting
 
 
 
-    CalculationTime::algorithmCalculationTime.stopStep();
-    std::cout << "-- Fetching data from cache -- " << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+    algorithmCalculationTime.stopStep();
+    std::cout << "-- Fetching data from cache -- " << algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
     
 
 
@@ -324,30 +325,30 @@ namespace TrRouting
     
 
 
-    CalculationTime::algorithmCalculationTime.startStep();
+    algorithmCalculationTime.startStep();
     std::vector<std::vector<int>> containerVectors(100000, std::vector<int>(3));
     for (int i = 0; i < 100000; i++)
     {
       containerVectors[i] = *(new std::vector<int>{234,453,12});
     }
-    CalculationTime::algorithmCalculationTime.stopStep();
-    std::cout << "-- testing allocating vectors or int -- " << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
-    CalculationTime::algorithmCalculationTime.startStep();
+    algorithmCalculationTime.stopStep();
+    std::cout << "-- testing allocating vectors or int -- " << algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+    algorithmCalculationTime.startStep();
     // this is faster!
     std::vector<ReachableRoutePath> containerStructs;
     for (int i = 0; i < 100000; i++)
     {
       containerStructs.push_back(*(new ReachableRoutePath(234,453,12)));
     }
-    CalculationTime::algorithmCalculationTime.stopStep();
-    std::cout << "-- testing allocating structs -- " << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+    algorithmCalculationTime.stopStep();
+    std::cout << "-- testing allocating structs -- " << algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
     
 
 
 
 
     int a,b,c;
-    CalculationTime::algorithmCalculationTime.startStep();
+    algorithmCalculationTime.startStep();
     for (int i = 0; i < 1000; i++)
     {
       for(int j = 0; j < containerVectors.size(); j++)
@@ -357,9 +358,9 @@ namespace TrRouting
         c = containerVectors[j][2];
       }
     }
-    CalculationTime::algorithmCalculationTime.stopStep();
-    std::cout << "-- testing fetching vectors elements -- " << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
-    CalculationTime::algorithmCalculationTime.startStep();
+    algorithmCalculationTime.stopStep();
+    std::cout << "-- testing fetching vectors elements -- " << algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+    algorithmCalculationTime.startStep();
     // this is faster!
     for (int i = 0; i < 1000; i++)
     {
@@ -370,8 +371,8 @@ namespace TrRouting
         c = containerStructs[j].tt;
       }
     }
-    CalculationTime::algorithmCalculationTime.stopStep();
-    std::cout << "-- testing fetching structs elements -- " << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+    algorithmCalculationTime.stopStep();
+    std::cout << "-- testing fetching structs elements -- " << algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
 
 
 
@@ -384,16 +385,16 @@ namespace TrRouting
   void TripBasedAlgorithm::refresh()
   {
 
-    CalculationTime::algorithmCalculationTime.startStep();
+    //algorithmCalculationTime.startStep();
 
-    for(auto & stop : stops)
-    {
-      stop.at = 99999;
-      stop.tt = -1;
-    }
+    //for(auto & stop : stops)
+    //{
+    //  stop.at = 99999;
+    //  stop.tt = -1;
+    //}
 
-    CalculationTime::algorithmCalculationTime.stopStep();
-    std::cout << "-- Refresh -- " << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+    //algorithmCalculationTime.stopStep();
+    //std::cout << "-- Refresh -- " << algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
 
 
   }

@@ -33,6 +33,7 @@ namespace TrRouting
     
     int maxTotalTravelTimeMinutes;
     int maxNumberOfTransfers;
+    int transferPenaltyMinutes;
     int minWaitingTimeMinutes;
     long long maxAccessWalkingDistanceMeters;
     int maxAccessWalkingTravelTimeFromOriginToFirstStopMinutes;
@@ -86,11 +87,12 @@ namespace TrRouting
       cyclingSpeedMetersPerSecond                                = 25/3.6; // 25 km/h
       maxTotalTravelTimeMinutes                                  = -1; // -1 means no limit
       maxNumberOfTransfers                                       = 5; // -1 means no limit
+      transferPenaltyMinutes                                     = -1;
       minWaitingTimeMinutes                                      = 5;
       maxAccessWalkingTravelTimeFromOriginToFirstStopMinutes     = 20;
       maxAccessWalkingTravelTimeFromLastStopToDestinationMinutes = 20;
-      maxTransferWalkingTravelTimeMinutes                        = 15;
-      maxTotalWalkingTravelTimeMinutes                           = 60;
+      maxTransferWalkingTravelTimeMinutes                        = 5;
+      maxTotalWalkingTravelTimeMinutes                           = 30;
       connectionsSqlWhereClause                                  = "";
       transfersSqlWhereClause                                    = "true";
       databaseName                                               = "tr_all_dev";

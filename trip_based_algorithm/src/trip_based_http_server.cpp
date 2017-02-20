@@ -43,8 +43,9 @@ std::string consoleResetColor = "";
 //}
 
 //Added for the default_resource example
-void default_resource_send(const HttpServer &server, std::shared_ptr<HttpServer::Response> response,
-                           std::shared_ptr<std::ifstream> ifs, std::shared_ptr<std::vector<char> > buffer);
+void default_resource_send(const HttpServer &server, const std::shared_ptr<HttpServer::Response> &response,
+                           const std::shared_ptr<std::ifstream> &ifs);
+
 
 int main(int argc, char** argv) {
   
@@ -145,22 +146,24 @@ int main(int argc, char** argv) {
   //HTTP-server using 1 thread
   //Unless you do more heavy non-threaded processing in the resources,
   //1 thread is usually faster than several threads
-  HttpServer server(serverPort, 1);
-
+  HttpServer server;
+  server.config.port = serverPort;
+  
   server.resource["^/route/v1/transit[/]?\\?([0-9a-zA-Z&=_,:/.-]+)$"]["GET"]=[&server, &calculator](std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request) {
     
-    CalculationTime::algorithmCalculationTime.startStep();
+    //calculator.algorithmCalculationTime.startStep();
     
-    std::cout << "calculating request..." << std::endl;
+    //std::cout << "calculating request..." << std::endl;
     
     std::string resultStr;
-    
 
     if (request->path_match.size() >= 1)
     {
       std::vector<std::string> parametersWithValues;
       
-      boost::split(parametersWithValues, request->path_match[1], boost::is_any_of("&"));
+      std::string queryString = request->path_match[1];
+      
+      boost::split(parametersWithValues, queryString, boost::is_any_of("&"));
       
       float originLatitude, originLongitude, destinationLatitude, destinationLongitude;
       std::map<int, bool> onlyServiceIds;
@@ -210,6 +213,7 @@ int main(int argc, char** argv) {
       calculator.params.startingStopId            = -1;
       calculator.params.endingStopId              = -1;
       calculator.params.maxNumberOfTransfers      = -1;
+      calculator.params.transferPenaltyMinutes    = -1;
       calculator.params.minWaitingTimeMinutes     = 5;
       calculator.params.departureTimeHour         = -1;
       calculator.params.departureTimeMinutes      = -1;
@@ -377,6 +381,10 @@ int main(int argc, char** argv) {
         {
           if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1") { calculator.params.forwardCalculation = false; }
         }
+        else if (parameterWithValueVector[0] == "transfer_penalty_minutes")
+        {
+          calculator.params.transferPenaltyMinutes = std::stoi(parameterWithValueVector[1]);
+        }
         
       }
             
@@ -392,8 +400,8 @@ int main(int argc, char** argv) {
       }
       
 
-      //std::cout << "-- parsing request -- " << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
-            
+      //std::cout << "-- parsing request -- " << calculator.algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+      
       resultStr = calculator.calculate().dump(); // come as json object
       
     }
@@ -410,50 +418,49 @@ int main(int argc, char** argv) {
   //Will respond with content in the web/-directory, and its subdirectories.
   //Default file: index.html
   //Can for instance be used to retrieve an HTML 5 client that uses REST-resources on this server
-  server.default_resource["GET"]=[&server](std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request) {
-      const auto web_root_path=boost::filesystem::canonical("web");
-      boost::filesystem::path path=web_root_path;
-      path/=request->path;
-      if(boost::filesystem::exists(path)) {
-          path=boost::filesystem::canonical(path);
-          //Check if path is within web_root_path
-          if(std::distance(web_root_path.begin(), web_root_path.end())<=std::distance(path.begin(), path.end()) &&
-             std::equal(web_root_path.begin(), web_root_path.end(), path.begin())) {
-              if(boost::filesystem::is_directory(path))
-                  path/="index.html";
-              if(boost::filesystem::exists(path) && boost::filesystem::is_regular_file(path)) {
-                  auto ifs=std::make_shared<std::ifstream>();
-                  ifs->open(path.string(), std::ifstream::in | std::ios::binary);
-                  
-                  if(*ifs) {
-                      //read and send 128 KB at a time
-                      std::streamsize buffer_size=131072;
-                      auto buffer=std::make_shared<std::vector<char> >(buffer_size);
-                      
-                      ifs->seekg(0, std::ios::end);
-                      auto length=ifs->tellg();
-                      
-                      ifs->seekg(0, std::ios::beg);
-                      
-                      *response << "HTTP/1.1 200 OK\r\nContent-Length: " << length << "\r\n\r\n";
-                      default_resource_send(server, response, ifs, buffer);
-                      return;
-                  }
-              }
-          }
-      }
-      std::string content="Could not open path "+request->path;
-      *response << "HTTP/1.1 400 Bad Request\r\nContent-Length: " << content.length() << "\r\n\r\n" << content;
-  };
+  //server.default_resource["GET"]=[&server](std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request) {
+  //    const auto web_root_path=boost::filesystem::canonical("web");
+  //    boost::filesystem::path path=web_root_path;
+  //    path/=request->path;
+  //    if(boost::filesystem::exists(path)) {
+  //        path=boost::filesystem::canonical(path);
+  //        //Check if path is within web_root_path
+  //        if(std::distance(web_root_path.begin(), web_root_path.end())<=std::distance(path.begin(), path.end()) &&
+  //           std::equal(web_root_path.begin(), web_root_path.end(), path.begin())) {
+  //            if(boost::filesystem::is_directory(path))
+  //                path/="index.html";
+  //            if(boost::filesystem::exists(path) && boost::filesystem::is_regular_file(path)) {
+  //                auto ifs=std::make_shared<std::ifstream>();
+  //                ifs->open(path.string(), std::ifstream::in | std::ios::binary);
+  //                
+  //                if(*ifs) {
+  //                    //read and send 128 KB at a time
+  //                    std::streamsize buffer_size=131072;
+  //                    auto buffer=std::make_shared<std::vector<char> >(buffer_size);
+  //                    
+  //                    ifs->seekg(0, std::ios::end);
+  //                    auto length=ifs->tellg();
+  //                    
+  //                    ifs->seekg(0, std::ios::beg);
+  //                    
+  //                    *response << "HTTP/1.1 200 OK\r\nContent-Length: " << length << "\r\n\r\n";
+  //                    default_resource_send(server, response, ifs, buffer);
+  //                    return;
+  //                }
+  //            }
+  //        }
+  //    }
+  //    std::string content="Could not open path "+request->path;
+  //    *response << "HTTP/1.1 400 Bad Request\r\nContent-Length: " << content.length() << "\r\n\r\n" << content;
+  //};
   
   std::cout << "starting server..." << std::endl;
-  
+  //server.start();
   std::thread server_thread([&server](){
       //Start server
       server.start();
   });
-  
-  
+    
   //Wait for server to start so that the client can connect
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
   
@@ -461,25 +468,28 @@ int main(int argc, char** argv) {
   
   server_thread.join();
   
-  calculator.destroy();
+  //calculator.destroy();
 
   std::cout << "done..." << std::endl;
   
   return 0;
 }
 
-void default_resource_send(const HttpServer &server, std::shared_ptr<HttpServer::Response> response,
-                           std::shared_ptr<std::ifstream> ifs, std::shared_ptr<std::vector<char> > buffer) {
+void default_resource_send(const HttpServer &server, const std::shared_ptr<HttpServer::Response> &response,
+                           const std::shared_ptr<std::ifstream> &ifs) {
+    //read and send 128 KB at a time
+    static std::vector<char> buffer(131072); // Safe when server is running on one thread
     std::streamsize read_length;
-    if((read_length=ifs->read(&(*buffer)[0], buffer->size()).gcount())>0) {
-        response->write(&(*buffer)[0], read_length);
-        if(read_length==static_cast<std::streamsize>(buffer->size())) {
-            server.send(response, [&server, response, ifs, buffer](const boost::system::error_code &ec) {
+    if((read_length=ifs->read(&buffer[0], buffer.size()).gcount())>0) {
+        response->write(&buffer[0], read_length);
+        if(read_length==static_cast<std::streamsize>(buffer.size())) {
+            server.send(response, [&server, response, ifs](const boost::system::error_code &ec) {
                 if(!ec)
-                    default_resource_send(server, response, ifs, buffer);
+                    default_resource_send(server, response, ifs);
                 else
                     std::cerr << "Connection interrupted" << std::endl;
             });
         }
     }
 }
+

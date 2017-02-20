@@ -45,6 +45,6 @@ namespace TrRouting
     return endStepEpoch - startStepEpoch;
   }
   
-  CalculationTime CalculationTime::algorithmCalculationTime;
+  //CalculationTime CalculationTime::algorithmCalculationTime;
   
 }
