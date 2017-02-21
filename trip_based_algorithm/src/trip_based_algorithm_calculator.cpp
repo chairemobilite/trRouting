@@ -16,7 +16,7 @@ namespace TrRouting
     algorithmCalculationTime.start();
     
     
-    std::cerr << "start calculation" << std::endl;
+    //std::cerr << "start calculation" << std::endl;
     
     //std::cerr << "A1" << std::endl;
     
@@ -299,7 +299,7 @@ namespace TrRouting
       
       //std::cerr << "g" << std::endl;
       
-      if (params.detailedResults && (minArrivalTimeSecondForStop < infinite || tgtStopIs.size() == 1))
+      if (params.detailedResults && (minArrivalTimeSecondForStop < infinite || (tgtStopIs.size() == 1 && !params.returnAllStopsResult)))
       {
         
         //std::cerr << "g1" << std::endl;
@@ -403,7 +403,7 @@ namespace TrRouting
         
         //std::cerr << "g11" << std::endl;
         
-        std::cerr << "firstStopSeq=" << lastStep.firstStopSeq << " lastStopSeq=" << lastStep.lastStopSeq << " rpCount=" << stopsIndexByRoutePath[lastStep.rpI].size() << std::endl;
+        //std::cerr << "firstStopSeq=" << lastStep.firstStopSeq << " lastStopSeq=" << lastStep.lastStopSeq << " rpCount=" << stopsIndexByRoutePath[lastStep.rpI].size() << std::endl;
         
         for (int stopSeq = lastStep.firstStopSeq; stopSeq < lastStep.lastStopSeq; stopSeq++)
         {
@@ -432,7 +432,7 @@ namespace TrRouting
         //std::cerr << "g13" << std::endl;
          
       }
-      else if(minArrivalTimeSecondForStop < infinite || tgtStopIs.size() == 1) // no detailed results
+      else if(minArrivalTimeSecondForStop < infinite || (tgtStopIs.size() == 1 && !params.returnAllStopsResult)) // no detailed results
       {
         //std::cerr << "g14" << std::endl;
         
