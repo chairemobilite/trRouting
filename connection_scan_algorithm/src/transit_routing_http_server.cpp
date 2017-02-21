@@ -41,14 +41,14 @@ std::string consoleCyan       = "";
 std::string consoleMagenta    = "";
 std::string consoleResetColor = "";
 
-namespace 
-{ 
-  const size_t ERROR_IN_COMMAND_LINE = 1;
-}
+//namespace 
+//{ 
+//  const size_t ERROR_IN_COMMAND_LINE = 1;
+//}
 
 //Added for the default_resource example
-void default_resource_send(const HttpServer &server, std::shared_ptr<HttpServer::Response> response,
-                           std::shared_ptr<std::ifstream> ifs, std::shared_ptr<std::vector<char> > buffer);
+void default_resource_send(const HttpServer &server, const std::shared_ptr<HttpServer::Response> &response,
+                           const std::shared_ptr<std::ifstream> &ifs);
 
 int main(int argc, char** argv) {
   
@@ -148,11 +148,12 @@ int main(int argc, char** argv) {
   //HTTP-server using 1 thread
   //Unless you do more heavy non-threaded processing in the resources,
   //1 thread is usually faster than several threads
-  HttpServer server(serverPort, 1);
-
+  HttpServer server;
+  server.config.port = serverPort;
+  
   server.resource["^/route/v1/transit[/]?\\?([0-9a-zA-Z&=_,:/.-]+)$"]["GET"]=[&server, &calculator](std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request) {
-    
-    CalculationTime::algorithmCalculationTime.startStep();
+        
+    calculator.algorithmCalculationTime.startStep();
     
     std::cout << "calculating request..." << std::endl;
     
@@ -163,7 +164,9 @@ int main(int argc, char** argv) {
     {
       std::vector<std::string> parametersWithValues;
       
-      boost::split(parametersWithValues, request->path_match[1], boost::is_any_of("&"));
+      std::string queryString = request->path_match[1];
+      
+      boost::split(parametersWithValues, queryString, boost::is_any_of("&"));
       
       float originLatitude, originLongitude, destinationLatitude, destinationLongitude;
       long long startingStopId{-1}, endingStopId{-1};
@@ -395,24 +398,24 @@ int main(int argc, char** argv) {
         calculator.params.arrivalTimeMinutes = timeMinute;
       }
       
-      CalculationTime::algorithmCalculationTime.stopStep();
+      calculator.algorithmCalculationTime.stopStep();
       
-      std::cout << "-- parsing request -- " << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+      std::cout << "-- parsing request -- " << calculator.algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
       
       calculator.refresh();
       
-      CalculationTime::algorithmCalculationTime.stopStep();
-      CalculationTime::algorithmCalculationTime.startStep();
+      calculator.algorithmCalculationTime.stopStep();
+      calculator.algorithmCalculationTime.startStep();
       
       calculator.resetAccessEgressModes();
       
-      CalculationTime::algorithmCalculationTime.stopStep();
+      calculator.algorithmCalculationTime.stopStep();
       
-      std::cout << "-- reset access egress modes -- " << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+      std::cout << "-- reset access egress modes -- " << calculator.algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
       
       resultStr = calculator.calculate("1");
       
-      CalculationTime::algorithmCalculationTime.startStep();
+      calculator.algorithmCalculationTime.startStep();
 
     }
     else
@@ -420,83 +423,48 @@ int main(int argc, char** argv) {
       resultStr = "{\"status\": \"failed\", \"error\": \"Wrong or malformed query\"}";
     }
 
-    CalculationTime::algorithmCalculationTime.stopStep();
+    calculator.algorithmCalculationTime.stopStep();
       
-    std::cout << "-- returning response -- " << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+    std::cout << "-- returning response -- " << calculator.algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
     
     *response << "HTTP/1.1 200 OK\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << resultStr.length() << "\r\n\r\n" << resultStr;
   };
   
   
-  //Default GET-example. If no other matches, this anonymous function will be called. 
-  //Will respond with content in the web/-directory, and its subdirectories.
-  //Default file: index.html
-  //Can for instance be used to retrieve an HTML 5 client that uses REST-resources on this server
-  server.default_resource["GET"]=[&server](std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request) {
-      const auto web_root_path=boost::filesystem::canonical("web");
-      boost::filesystem::path path=web_root_path;
-      path/=request->path;
-      if(boost::filesystem::exists(path)) {
-          path=boost::filesystem::canonical(path);
-          //Check if path is within web_root_path
-          if(std::distance(web_root_path.begin(), web_root_path.end())<=std::distance(path.begin(), path.end()) &&
-             std::equal(web_root_path.begin(), web_root_path.end(), path.begin())) {
-              if(boost::filesystem::is_directory(path))
-                  path/="index.html";
-              if(boost::filesystem::exists(path) && boost::filesystem::is_regular_file(path)) {
-                  auto ifs=std::make_shared<std::ifstream>();
-                  ifs->open(path.string(), std::ifstream::in | std::ios::binary);
-                  
-                  if(*ifs) {
-                      //read and send 128 KB at a time
-                      std::streamsize buffer_size=131072;
-                      auto buffer=std::make_shared<std::vector<char> >(buffer_size);
-                      
-                      ifs->seekg(0, std::ios::end);
-                      auto length=ifs->tellg();
-                      
-                      ifs->seekg(0, std::ios::beg);
-                      
-                      *response << "HTTP/1.1 200 OK\r\nContent-Length: " << length << "\r\n\r\n";
-                      default_resource_send(server, response, ifs, buffer);
-                      return;
-                  }
-              }
-          }
-      }
-      std::string content="Could not open path "+request->path;
-      *response << "HTTP/1.1 400 Bad Request\r\nContent-Length: " << content.length() << "\r\n\r\n" << content;
-  };
+  
   
   std::cout << "starting server..." << std::endl;
-  
+  //server.start();
   std::thread server_thread([&server](){
       //Start server
       server.start();
   });
-  
-  
+    
   //Wait for server to start so that the client can connect
-  std::this_thread::sleep_for(std::chrono::seconds(1));
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
   
   std::cout << "ready." << std::endl;
-      
+  
   server_thread.join();
   
+  //calculator.destroy();
+
   std::cout << "done..." << std::endl;
   
   return 0;
 }
 
-void default_resource_send(const HttpServer &server, std::shared_ptr<HttpServer::Response> response,
-                           std::shared_ptr<std::ifstream> ifs, std::shared_ptr<std::vector<char> > buffer) {
+void default_resource_send(const HttpServer &server, const std::shared_ptr<HttpServer::Response> &response,
+                           const std::shared_ptr<std::ifstream> &ifs) {
+    //read and send 128 KB at a time
+    static std::vector<char> buffer(131072); // Safe when server is running on one thread
     std::streamsize read_length;
-    if((read_length=ifs->read(&(*buffer)[0], buffer->size()).gcount())>0) {
-        response->write(&(*buffer)[0], read_length);
-        if(read_length==static_cast<std::streamsize>(buffer->size())) {
-            server.send(response, [&server, response, ifs, buffer](const boost::system::error_code &ec) {
+    if((read_length=ifs->read(&buffer[0], buffer.size()).gcount())>0) {
+        response->write(&buffer[0], read_length);
+        if(read_length==static_cast<std::streamsize>(buffer.size())) {
+            server.send(response, [&server, response, ifs](const boost::system::error_code &ec) {
                 if(!ec)
-                    default_resource_send(server, response, ifs, buffer);
+                    default_resource_send(server, response, ifs);
                 else
                     std::cerr << "Connection interrupted" << std::endl;
             });

@@ -121,7 +121,7 @@ namespace TrRouting
   template<class T>
   void DbFetcher::saveToCacheFile(std::string applicationShortname, T& data, std::string cacheFileName)
   {
-    CalculationTime::algorithmCalculationTime.startStep();
+    //CalculationTime::algorithmCalculationTime.startStep();
     
     std::ofstream oCacheFile;
     
@@ -131,8 +131,8 @@ namespace TrRouting
     oarch << data;
     oCacheFile.close();
     
-    CalculationTime::algorithmCalculationTime.stopStep();
-    std::cout << "-- Saved cached data to file " << cacheFileName << " -- " << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+    //CalculationTime::algorithmCalculationTime.stopStep();
+    //std::cout << "-- Saved cached data to file " << cacheFileName << " -- " << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
   
   }
   
@@ -153,7 +153,7 @@ namespace TrRouting
   template<class T>
   const T DbFetcher::loadFromCacheFile(T& data, std::string applicationShortname, std::string cacheFileName)
   {
-    CalculationTime::algorithmCalculationTime.startStep();
+    //CalculationTime::algorithmCalculationTime.startStep();
     
     std::ifstream iCacheFile;
     
@@ -163,8 +163,8 @@ namespace TrRouting
     iarch >> data;
     iCacheFile.close();
     
-    CalculationTime::algorithmCalculationTime.stopStep();
-    std::cout << "-- Loaded cached data from file " << cacheFileName << " -- " << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+    //CalculationTime::algorithmCalculationTime.stopStep();
+    //std::cout << "-- Loaded cached data from file " << cacheFileName << " -- " << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
     
     return data;
   
@@ -178,7 +178,7 @@ namespace TrRouting
     {
       std::cout << "Fetching connections from cache..." << std::endl;
       connectionsById = loadFromCacheFile(connectionsById, applicationShortname, "connections");;
-      CalculationTime::algorithmCalculationTime.startStep();
+      //CalculationTime::algorithmCalculationTime.startStep();
       for (auto & connection : connectionsById)
       {
         std::vector<std::shared_ptr<SimplifiedJourneyStep> > journeySteps;
@@ -187,15 +187,15 @@ namespace TrRouting
         connection.second.journeySteps = journeySteps;
         //connection.second.journeySteps.reserve(10000);
       }
-      CalculationTime::algorithmCalculationTime.stopStep();
-      std::cout << "-- Input from connections cache file --" << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+      //CalculationTime::algorithmCalculationTime.stopStep();
+      //std::cout << "-- Input from connections cache file --" << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
       return connectionsById;
     }
     
     if (dataFetcher == "database")
     {
       
-      CalculationTime::algorithmCalculationTime.startStep();
+      //CalculationTime::algorithmCalculationTime.startStep();
       std::cout << "Fetching connections from database..." << std::endl;
       
       // query for connections:
@@ -207,7 +207,7 @@ namespace TrRouting
       if (isConnectionOpen())
       {
         
-        CalculationTime::algorithmCalculationTime.startStep();
+        //CalculationTime::algorithmCalculationTime.startStep();
         
         pqxx::nontransaction pgNonTransaction(*(getConnectionPtr()));
         pqxx::result pgResult( pgNonTransaction.exec( sqlQuery ));
@@ -218,9 +218,9 @@ namespace TrRouting
         std::cout << std::fixed;
         std::cout << std::setprecision(2);
         
-        CalculationTime::algorithmCalculationTime.stopStep();
-        std::cout << "-- Fetching connections data from database --" << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
-        CalculationTime::algorithmCalculationTime.startStep();
+        //CalculationTime::algorithmCalculationTime.stopStep();
+        //std::cout << "-- Fetching connections data from database --" << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+        //CalculationTime::algorithmCalculationTime.startStep();
         
         for (pqxx::result::const_iterator c = pgResult.begin(); c != pgResult.end(); ++c) {
           
@@ -261,8 +261,8 @@ namespace TrRouting
         }
         std::cout << std::endl;
         
-        CalculationTime::algorithmCalculationTime.stopStep();
-        std::cout << "-- Put connections data into a map --" << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+        //CalculationTime::algorithmCalculationTime.stopStep();
+        //std::cout << "-- Put connections data into a map --" << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
         
         // save connections to binary cache file:
         saveToCacheFile(applicationShortname, connectionsById, "connections");
@@ -275,7 +275,7 @@ namespace TrRouting
     else if(dataFetcher == "csv")
     {
       
-      CalculationTime::algorithmCalculationTime.startStep();
+      //CalculationTime::algorithmCalculationTime.startStep();
       std::cout << "Fetching connections from csv files..." << std::endl;
       
       std::string csvFilePath{applicationShortname + "_connections.csv"};
@@ -341,8 +341,8 @@ namespace TrRouting
       
       csvFile.close();
       
-      CalculationTime::algorithmCalculationTime.stopStep();
-      std::cout << "-- Put connections data into a map --" << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+      //CalculationTime::algorithmCalculationTime.stopStep();
+      //std::cout << "-- Put connections data into a map --" << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
       
       // save connections to binary cache file:
       saveToCacheFile(applicationShortname, connectionsById, "connections");
@@ -436,7 +436,7 @@ namespace TrRouting
     else if(dataFetcher == "csv")
     {
       
-      CalculationTime::algorithmCalculationTime.startStep();
+      //CalculationTime::algorithmCalculationTime.startStep();
       std::cout << "Fetching stops from csv files..." << std::endl;
       
       std::string csvFilePath{applicationShortname + "_stops.csv"};
@@ -494,8 +494,8 @@ namespace TrRouting
       
       csvFile.close();
       
-      CalculationTime::algorithmCalculationTime.stopStep();
-      std::cout << "-- Put stops data into a map --" << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+      //CalculationTime::algorithmCalculationTime.stopStep();
+      //std::cout << "-- Put stops data into a map --" << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
       
       // save connections to binary cache file:
       saveToCacheFile(applicationShortname, stopsById, "stops");
@@ -582,7 +582,7 @@ namespace TrRouting
     else if(dataFetcher == "csv")
     {
       
-      CalculationTime::algorithmCalculationTime.startStep();
+      //CalculationTime::algorithmCalculationTime.startStep();
       std::cout << "Fetching routes from csv files..." << std::endl;
       
       std::string csvFilePath{applicationShortname + "_routes.csv"};
@@ -636,8 +636,8 @@ namespace TrRouting
       
       csvFile.close();
       
-      CalculationTime::algorithmCalculationTime.stopStep();
-      std::cout << "-- Put routes data into a map --" << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+      //CalculationTime::algorithmCalculationTime.stopStep();
+      //std::cout << "-- Put routes data into a map --" << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
       
       // save connections to binary cache file:
       saveToCacheFile(applicationShortname, routesById, "routes");
@@ -657,7 +657,7 @@ namespace TrRouting
       std::cout << "Fetching path stop sequences from cache..." << std::endl;
       pathStopSequencesById = loadFromCacheFile(pathStopSequencesById, applicationShortname, "path_stop_sequences");
       
-      CalculationTime::algorithmCalculationTime.startStep();
+      //CalculationTime::algorithmCalculationTime.startStep();
       
       //for (auto & pathStopSequence : pathStopSequencesById)
       //{
@@ -667,8 +667,8 @@ namespace TrRouting
       //  //pathStopSequence.second.journeySteps                         = journeySteps; 
       //}
       
-      CalculationTime::algorithmCalculationTime.stopStep();
-      std::cout << "-- Input from path stop sequences cache file --" << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+      //CalculationTime::algorithmCalculationTime.stopStep();
+      //std::cout << "-- Input from path stop sequences cache file --" << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
       
       return pathStopSequencesById;
     }
@@ -676,7 +676,7 @@ namespace TrRouting
     if (dataFetcher == "database")
     {
     
-      CalculationTime::algorithmCalculationTime.startStep();
+      //CalculationTime::algorithmCalculationTime.startStep();
       std::cout << "Fetching path stop sequences from database..." << std::endl;
       
       // query for path stop sequences:
@@ -690,7 +690,7 @@ namespace TrRouting
       if (isConnectionOpen())
       {
         
-        CalculationTime::algorithmCalculationTime.startStep();
+        //CalculationTime::algorithmCalculationTime.startStep();
         
         pqxx::nontransaction pgNonTransaction(*(getConnectionPtr()));
         pqxx::result pgResult( pgNonTransaction.exec( sqlQuery ));
@@ -701,9 +701,9 @@ namespace TrRouting
         std::cout << std::fixed;
         std::cout << std::setprecision(2);
         
-        CalculationTime::algorithmCalculationTime.stopStep();
-        std::cout << "-- Fetching path stop sequences from database --" << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
-        CalculationTime::algorithmCalculationTime.startStep();
+        //CalculationTime::algorithmCalculationTime.stopStep();
+        //std::cout << "-- Fetching path stop sequences from database --" << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+        //CalculationTime::algorithmCalculationTime.startStep();
         
         for (pqxx::result::const_iterator c = pgResult.begin(); c != pgResult.end(); ++c) {
           
@@ -730,8 +730,8 @@ namespace TrRouting
         }
         std::cout << std::endl;
         
-        CalculationTime::algorithmCalculationTime.stopStep();
-        std::cout << "-- Put path stop sequences data into a map --" << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+        //CalculationTime::algorithmCalculationTime.stopStep();
+        //std::cout << "-- Put path stop sequences data into a map --" << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
         
         // save path stop sequences to binary cache file:
         saveToCacheFile(applicationShortname, pathStopSequencesById, "path_stop_sequences");
@@ -744,7 +744,7 @@ namespace TrRouting
     else if(dataFetcher == "csv")
     {
       
-      CalculationTime::algorithmCalculationTime.startStep();
+      //CalculationTime::algorithmCalculationTime.startStep();
       std::cout << "Fetching path stop sequences from csv files..." << std::endl;
       
       std::string csvFilePath{applicationShortname + "_path_stop_sequences.csv"};
@@ -797,8 +797,8 @@ namespace TrRouting
       
       csvFile.close();
       
-      CalculationTime::algorithmCalculationTime.stopStep();
-      std::cout << "-- Put path stop sequences data into a map --" << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+      //CalculationTime::algorithmCalculationTime.stopStep();
+      //std::cout << "-- Put path stop sequences data into a map --" << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
       
       // save connections to binary cache file:
       saveToCacheFile(applicationShortname, pathStopSequencesById, "path_stop_sequences");
@@ -818,14 +818,14 @@ namespace TrRouting
     if (isCacheFileNotEmpty(applicationShortname, "transfers"))
     {
       transferDurationsByStopId = loadFromCacheFile(transferDurationsByStopId, applicationShortname, "transfers");;
-      std::cout << "-- Input from transfers cache file --" << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+      //std::cout << "-- Input from transfers cache file --" << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
       return transferDurationsByStopId;
     }
     
     if (dataFetcher == "database")
     {
     
-      CalculationTime::algorithmCalculationTime.startStep();
+      //CalculationTime::algorithmCalculationTime.startStep();
       std::cout << "Fetching transfer walking durations from database..." << std::endl;
       std::cout << "max transfer time minutes: " << std::to_string(maxTransferWalkingTravelTimeMinutes) << std::endl;
       std::string sqlQuery = "SELECT "
@@ -844,7 +844,7 @@ namespace TrRouting
       if (isConnectionOpen())
       {
         
-        CalculationTime::algorithmCalculationTime.startStep();
+        //CalculationTime::algorithmCalculationTime.startStep();
         
         pqxx::nontransaction pgNonTransaction(*(getConnectionPtr()));
         pqxx::result pgResult( pgNonTransaction.exec( sqlQuery ));
@@ -854,9 +854,9 @@ namespace TrRouting
         std::cout << std::fixed;
         std::cout << std::setprecision(2);
         
-        CalculationTime::algorithmCalculationTime.stopStep();
-        std::cout << "-- Fetching transfers data from database --" << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
-        CalculationTime::algorithmCalculationTime.startStep();
+        //CalculationTime::algorithmCalculationTime.stopStep();
+        //std::cout << "-- Fetching transfers data from database --" << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+        //CalculationTime::algorithmCalculationTime.startStep();
         
         for (pqxx::result::const_iterator c = pgResult.begin(); c != pgResult.end(); ++c) {
           stopId1                = c[0].as<unsigned long long>();
@@ -872,8 +872,8 @@ namespace TrRouting
         }
         std::cout << std::endl;
         
-        CalculationTime::algorithmCalculationTime.stopStep();
-        std::cout << "-- Put transfers data into a map --" << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+        //CalculationTime::algorithmCalculationTime.stopStep();
+        //std::cout << "-- Put transfers data into a map --" << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
         
         saveToCacheFile(applicationShortname, transferDurationsByStopId, "transfers");
         
@@ -886,7 +886,7 @@ namespace TrRouting
     else if(dataFetcher == "csv")
     {
       
-      CalculationTime::algorithmCalculationTime.startStep();
+      //CalculationTime::algorithmCalculationTime.startStep();
       std::cout << "Fetching transfers from csv files..." << std::endl;
       
       std::string csvFilePath{applicationShortname + "_transfers.csv"};
@@ -933,8 +933,8 @@ namespace TrRouting
       
       csvFile.close();
       
-      CalculationTime::algorithmCalculationTime.stopStep();
-      std::cout << "-- Put transfers data into a map --" << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+      //CalculationTime::algorithmCalculationTime.stopStep();
+      //std::cout << "-- Put transfers data into a map --" << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
       
       // save connections to binary cache file:
       saveToCacheFile(applicationShortname, transferDurationsByStopId, "transfers");
@@ -1086,11 +1086,11 @@ namespace TrRouting
     if (isCacheFileNotEmpty(applicationShortname, "travel_time_by_stops_pair"))
     {
       travelTimeByStopsPair = loadFromCacheFile(travelTimeByStopsPair, applicationShortname, "travel_time_by_stops_pair");;
-      std::cout << "-- Input from travel_time_by_stops_pair cache file --" << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+      //std::cout << "-- Input from travel_time_by_stops_pair cache file --" << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
       return travelTimeByStopsPair;
     }
     
-    CalculationTime::algorithmCalculationTime.startStep();
+    //CalculationTime::algorithmCalculationTime.startStep();
     std::cout << "Fetching travel time from database..." << std::endl;
     std::cout << "using mode: " << mode << std::endl;
     std::string sqlQuery = "SELECT "
@@ -1106,7 +1106,7 @@ namespace TrRouting
     if (isConnectionOpen())
     {
       
-      CalculationTime::algorithmCalculationTime.startStep();
+      //CalculationTime::algorithmCalculationTime.startStep();
       
       pqxx::nontransaction pgNonTransaction(*(getConnectionPtr()));
       pqxx::result pgResult( pgNonTransaction.exec( sqlQuery ));
@@ -1116,9 +1116,9 @@ namespace TrRouting
       std::cout << std::fixed;
       std::cout << std::setprecision(2);
       
-      CalculationTime::algorithmCalculationTime.stopStep();
-      std::cout << "-- Fetching travel time data from database --" << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
-      CalculationTime::algorithmCalculationTime.startStep();
+      //CalculationTime::algorithmCalculationTime.stopStep();
+      //std::cout << "-- Fetching travel time data from database --" << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+      //CalculationTime::algorithmCalculationTime.startStep();
       
       std::pair<unsigned long long, unsigned long long> stopPair;
       
@@ -1134,8 +1134,8 @@ namespace TrRouting
       }
       std::cout << std::endl;
       
-      CalculationTime::algorithmCalculationTime.stopStep();
-      std::cout << "-- Put travel time data into a map --" << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+      //CalculationTime::algorithmCalculationTime.stopStep();
+      //std::cout << "-- Put travel time data into a map --" << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
       
       saveToCacheFile(applicationShortname, travelTimeByStopsPair, "travel_time_by_stops_pair");
       

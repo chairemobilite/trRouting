@@ -49,6 +49,7 @@ namespace TrRouting
     void updateParams(Parameters& theParams);
     Parameters params;
     void resetAccessEgressModes();
+    CalculationTime algorithmCalculationTime;
     
   private:
     

@@ -4,6 +4,7 @@ namespace TrRouting
 {
   ConnectionScanAlgorithm::ConnectionScanAlgorithm(Parameters& theParams) : params(theParams)
   {
+    algorithmCalculationTime = CalculationTime();
     setup();
   }
   
@@ -72,7 +73,7 @@ namespace TrRouting
     
     std::cout << "Creating map of connections by starting path stop sequence id..." << std::endl;
     
-    CalculationTime::algorithmCalculationTime.startStep();
+    algorithmCalculationTime.startStep();
     
     std::cout << std::fixed;
     std::cout << std::setprecision(2);
@@ -98,8 +99,8 @@ namespace TrRouting
       }
     }
     
-    CalculationTime::algorithmCalculationTime.stopStep();
-    std::cout << "-- Creating map of connections by starting path stop sequence id -- " << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+    algorithmCalculationTime.stopStep();
+    std::cout << "-- Creating map of connections by starting path stop sequence id -- " << algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
     
     return connectionsByStartPathStopSequenceId;
   }
@@ -110,7 +111,7 @@ namespace TrRouting
     
     std::cout << "Creating map of connections by ending path stop sequence id..." << std::endl;
     
-    CalculationTime::algorithmCalculationTime.startStep();
+    algorithmCalculationTime.startStep();
     
     std::cout << std::fixed;
     std::cout << std::setprecision(2);
@@ -137,8 +138,8 @@ namespace TrRouting
     
     std::cout << std::endl;
     
-    CalculationTime::algorithmCalculationTime.stopStep();
-    std::cout << "-- Creating map of connections by ending path stop sequence id -- " << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+    algorithmCalculationTime.stopStep();
+    std::cout << "-- Creating map of connections by ending path stop sequence id -- " << algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
     
     return connectionsByEndPathStopSequenceId;
   }
@@ -148,7 +149,7 @@ namespace TrRouting
     
     std::cout << "Creating map of path stop sequences by stop id..." << std::endl;
     
-    CalculationTime::algorithmCalculationTime.startStep();
+    algorithmCalculationTime.startStep();
     
     std::cout << std::fixed;
     std::cout << std::setprecision(2);
@@ -173,8 +174,8 @@ namespace TrRouting
     
     std::cout << std::endl;
     
-    CalculationTime::algorithmCalculationTime.stopStep();
-    std::cout << "-- Creating map of path stop sequences by stop id -- " << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+    algorithmCalculationTime.stopStep();
+    std::cout << "-- Creating map of path stop sequences by stop id -- " << algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
     
     return pathStopSequencesByStopId;
   }
@@ -302,7 +303,7 @@ namespace TrRouting
   void ConnectionScanAlgorithm::refresh()
   {
     
-    CalculationTime::algorithmCalculationTime.startStep();
+    algorithmCalculationTime.startStep();
     
     ++calculationId;
     journeyStepId = 1;
@@ -510,15 +511,15 @@ namespace TrRouting
     //params.newMaxAccessWalkingTravelTimeFromOriginToFirstStopMinutes     = params.maxAccessWalkingTravelTimeFromOriginToFirstStopMinutes;
     //params.newMaxAccessWalkingTravelTimeFromLastStopToDestinationMinutes = params.maxAccessWalkingTravelTimeFromLastStopToDestinationMinutes;
     
-    CalculationTime::algorithmCalculationTime.stopStep();
-    std::cout << "-- Resetting connections -- " << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+    algorithmCalculationTime.stopStep();
+    std::cout << "-- Resetting connections -- " << algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
     
   }
   
   std::string ConnectionScanAlgorithm::calculate(std::string tripIdentifier)
   {
     
-    CalculationTime::algorithmCalculationTime.start();
+    algorithmCalculationTime.start();
     
     std::map<std::string, long long> benchmarkTimes;
     std::vector<std::string> result;
@@ -1087,9 +1088,9 @@ namespace TrRouting
       jsonResult += "  \"numberOfReachableStops\": "                   + std::to_string(countReachableStops) + ",\n";
       jsonResult += "  \"percentOfReachableStops\": "                  + std::to_string(round(10000 * (float)countReachableStops / (float)(stopsById.size()))/100.0) + ",\n";
       
-      CalculationTime::algorithmCalculationTime.stop();
+      algorithmCalculationTime.stop();
 
-      jsonResult += "  \"calculatedInMilliseconds\": "                 + std::to_string(CalculationTime::algorithmCalculationTime.getDurationMilliseconds()) + ",\n";
+      jsonResult += "  \"calculatedInMilliseconds\": "                 + std::to_string(algorithmCalculationTime.getDurationMilliseconds()) + ",\n";
       jsonResult += "}";
       
       return jsonResult;
@@ -1414,9 +1415,9 @@ namespace TrRouting
         
       }
       
-      CalculationTime::algorithmCalculationTime.stop();
+      algorithmCalculationTime.stop();
       
-      jsonResult += "  \"calculatedInMilliseconds\": "                 + std::to_string(CalculationTime::algorithmCalculationTime.getDurationMilliseconds()) + "\n";
+      jsonResult += "  \"calculatedInMilliseconds\": "                 + std::to_string(algorithmCalculationTime.getDurationMilliseconds()) + "\n";
       
       jsonResult += "}";
     

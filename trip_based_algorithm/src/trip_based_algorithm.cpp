@@ -59,8 +59,8 @@ namespace TrRouting
     params.setDefaultValues();
     //setParamsFromYaml("trRoutingTripBasedConfig.yml"); // disable yml config for now
     
-    std::string          weekdayName  {"sunday"};
-    params.weekdayIndex = 0; // 0 = sunday, 6 = saturday
+    std::string          weekdayName  {"monday"};
+    params.weekdayIndex = 1; // 0 = sunday, 6 = saturday
 
     std::string          dataName;
     std::ifstream        stream;
