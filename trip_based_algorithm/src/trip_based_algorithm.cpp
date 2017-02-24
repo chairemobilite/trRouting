@@ -59,7 +59,7 @@ namespace TrRouting
     params.setDefaultValues();
     //setParamsFromYaml("trRoutingTripBasedConfig.yml"); // disable yml config for now
     
-    std::string          weekdayName  {"monday"};
+    std::string          weekdayName  {"sunday"};
     params.weekdayIndex = 1; // 0 = sunday, 6 = saturday
 
     std::string          dataName;
@@ -92,7 +92,7 @@ namespace TrRouting
       footpath->tt   = jsonData["tt"].get<int>();
       footpathsBySource.push_back(*footpath);
     }
-    //std::cout << footpathsBySource[345].tt << std::endl;
+    //std::cerr << footpathsBySource[10].tt << std::endl;
     
     
     
@@ -112,7 +112,7 @@ namespace TrRouting
       footpath->tt   = jsonData["tt"].get<int>();
       footpathsByTarget.push_back(*footpath);
     }
-    //std::cout << footpathsByTarget[345].tt << std::endl;
+    //std::cerr << footpathsByTarget[10].tt << std::endl;
     
     
     
@@ -122,7 +122,7 @@ namespace TrRouting
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
     footpathsIndex = jsonContent.get<std::vector<std::vector<int>> >();
-    //std::cout << footpathsIndexBySource[345][0] << std::endl;
+    //std::cerr << footpathsIndex[10][0] << std::endl;
     
     
     
@@ -145,7 +145,7 @@ namespace TrRouting
       routePath->aName = jsonData["agency_name"].get<std::string>();
       routePaths.push_back(*routePath);
     }
-    //std::cout << routePaths[21].aName << std::endl;
+    //std::cerr << routePaths[0].aName << std::endl;
     
     
 
@@ -155,7 +155,7 @@ namespace TrRouting
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
     routePathsIndexById = jsonContent.get<std::vector<int>>();
-    //std::cout << routePathsIndexById[3] << std::endl;
+    //std::cerr << routePathsIndexById[3] << std::endl;
     
     
 
@@ -166,7 +166,7 @@ namespace TrRouting
     jsonContent = json::from_msgpack(contents);
     routePathsIndexByStop = jsonContent.get<std::vector<std::vector<std::vector<int>>>>();
     //json dumpJson(routePathsIndexByStop);
-    //std::cout << dumpJson.dump() << std::endl;
+    //std::cerr << jsonContent.dump() << std::endl;
 
 
 
@@ -190,7 +190,7 @@ namespace TrRouting
       stop->point = *(new Point(jsonData["latitude"].get<float>(), jsonData["longitude"].get<float>()));
       stops.push_back(*stop);
     }
-    //std::cout << stops[21].name << std::endl;
+    //std::cerr << stops[0].name << std::endl;
 
     
 
@@ -200,7 +200,7 @@ namespace TrRouting
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
     stopsIndexById = jsonContent.get<std::vector<int>>();
-    //std::cout << stopsIndexById[3] << std::endl;
+    //std::cerr << stopsIndexById[3] << std::endl;
     
     
 
@@ -211,7 +211,7 @@ namespace TrRouting
     jsonContent = json::from_msgpack(contents);
     stopsIndexByRoutePath = jsonContent.get<std::vector<std::vector<int>> >();
     //json dumpJson(stopsIndexByRoutePath);
-    //std::cout << dumpJson.dump() << std::endl;
+    //std::cerr << jsonContent.dump() << std::endl;
 
 
 
@@ -220,8 +220,9 @@ namespace TrRouting
     stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + weekdayName + "__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
+    //std::cerr << jsonContent.dump() << std::endl;
     arrivalTimes[params.weekdayIndex] = jsonContent.get<std::vector<int>>();
-    //std::cout << arrivalTimes[params.weekdayIndex][3] << std::endl;
+    //std::cerr << arrivalTimes[params.weekdayIndex][3] << std::endl;
 
 
 
@@ -231,7 +232,7 @@ namespace TrRouting
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
     departureTimes[params.weekdayIndex] = jsonContent.get<std::vector<int>>();
-    //std::cout << departureTimes[params.weekdayIndex][3] << std::endl;
+    //std::cerr << departureTimes[params.weekdayIndex][3] << std::endl;
 
 
 
@@ -241,7 +242,7 @@ namespace TrRouting
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
     arrivalTimesIndex[params.weekdayIndex] = jsonContent.get<std::vector<std::vector<int>> >();
-    //std::cout << arrivalTimesIndex[params.weekdayIndex][3][0] << std::endl;
+    //std::cerr << arrivalTimesIndex[params.weekdayIndex][3][0] << std::endl;
 
 
 
@@ -251,7 +252,7 @@ namespace TrRouting
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
     departureTimesIndex[params.weekdayIndex] = jsonContent.get<std::vector<std::vector<int>> >();
-    //std::cout << departureTimesIndex[params.weekdayIndex][3][0] << std::endl;
+    //std::cerr << departureTimesIndex[params.weekdayIndex][3][0] << std::endl;
 
 
 
@@ -271,7 +272,7 @@ namespace TrRouting
       transfer->tgtTripI   = jsonData["target_trip_i"].get<int>();
       transfers[params.weekdayIndex].push_back(*transfer);
     }
-    //std::cout << transfers[params.weekdayIndex][3].tgtTripI << std::endl;
+    //std::cerr << transfers[params.weekdayIndex][3].tgtTripI << std::endl;
 
 
 
@@ -281,7 +282,7 @@ namespace TrRouting
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
     transfersIndex[params.weekdayIndex] = jsonContent.get<std::vector<std::vector<int>> >();
-    //std::cout << transfersIndex[params.weekdayIndex][3][1] << std::endl;
+    //std::cerr << transfersIndex[params.weekdayIndex][3][1] << std::endl;
 
 
 
@@ -301,7 +302,7 @@ namespace TrRouting
       trip->id   = jsonData["id"].get<long long>();
       trips[params.weekdayIndex].push_back(*trip);
     }
-    //std::cout << trips[params.weekdayIndex][3].rpI << std::endl;
+    //std::cerr << trips[params.weekdayIndex][3].rpI << std::endl;
 
 
 
@@ -311,12 +312,12 @@ namespace TrRouting
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
     tripsIndex[params.weekdayIndex] = jsonContent.get<std::vector<std::vector<int>> >();
-    //std::cout << tripsIndex[params.weekdayIndex][3][0] << std::endl;
+    //std::cerr << tripsIndex[params.weekdayIndex][3][0] << std::endl;
 
 
 
     algorithmCalculationTime.stopStep();
-    std::cout << "-- Fetching data from cache -- " << algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+    std::cerr << "-- Fetching data from cache -- " << algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
     
 
 
@@ -332,7 +333,7 @@ namespace TrRouting
       containerVectors[i] = *(new std::vector<int>{234,453,12});
     }
     algorithmCalculationTime.stopStep();
-    std::cout << "-- testing allocating vectors or int -- " << algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+    std::cerr << "-- testing allocating vectors or int -- " << algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
     algorithmCalculationTime.startStep();
     // this is faster!
     std::vector<ReachableRoutePath> containerStructs;
@@ -341,7 +342,7 @@ namespace TrRouting
       containerStructs.push_back(*(new ReachableRoutePath(234,453,12)));
     }
     algorithmCalculationTime.stopStep();
-    std::cout << "-- testing allocating structs -- " << algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+    std::cerr << "-- testing allocating structs -- " << algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
     
 
 
@@ -359,7 +360,7 @@ namespace TrRouting
       }
     }
     algorithmCalculationTime.stopStep();
-    std::cout << "-- testing fetching vectors elements -- " << algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+    std::cerr << "-- testing fetching vectors elements -- " << algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
     algorithmCalculationTime.startStep();
     // this is faster!
     for (int i = 0; i < 1000; i++)
@@ -372,7 +373,7 @@ namespace TrRouting
       }
     }
     algorithmCalculationTime.stopStep();
-    std::cout << "-- testing fetching structs elements -- " << algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+    std::cerr << "-- testing fetching structs elements -- " << algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
 
 
 
@@ -394,7 +395,7 @@ namespace TrRouting
     //}
 
     //algorithmCalculationTime.stopStep();
-    //std::cout << "-- Refresh -- " << algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+    //std::cerr << "-- Refresh -- " << algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
 
 
   }

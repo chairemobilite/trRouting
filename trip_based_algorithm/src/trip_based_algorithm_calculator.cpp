@@ -105,13 +105,17 @@ namespace TrRouting
       stopFromSourceI     = footpathFromSource.srcI;
       readyTimeFromSource = footpathFromSource.tt + params.minWaitingTimeMinutes * 60; // (line 10)
       
-      if(stopFromSourceI == -1)
+      if(stopFromSourceI == -1 || routePathsIndexByStop[stopFromSourceI].empty())
       {
         continue;
       }
       
       for (const auto & routePathIndexAndStopSeq : routePathsIndexByStop[stopFromSourceI]) // (line 11)
       {
+        if (routePathIndex == -1)
+        {
+          continue;
+        }
         routePathIndex    = routePathIndexAndStopSeq[0];
         stopSeq           = routePathIndexAndStopSeq[1];
 
@@ -189,7 +193,7 @@ namespace TrRouting
         
         //std::cerr << "c4" << std::endl;
         
-        if(stopToTargetI == -1)
+        if(stopToTargetI == -1 || routePathsIndexByStop[stopToTargetI].empty())
         {
           continue;
         }

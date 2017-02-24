@@ -60,7 +60,7 @@ int main(int argc, char** argv) {
   //applicationShortnameFile.close();
   //std::string dataShortname {applicationShortname};
   
-  std::string dataShortname = "tr_stsh_2016_03_test";
+  std::string dataShortname {""};
 
   // setup program options:
   
@@ -100,9 +100,9 @@ int main(int argc, char** argv) {
     dataShortname = variablesMap["sn"].as<std::string>();
   }
   
-  std::cout << "Using http port " << serverPort << std::endl;
-  std::cout << "Using data fetcher " << dataFetcher << std::endl;
-  std::cout << "Using data shortname " << dataShortname << std::endl;
+  std::cerr << "Using http port " << serverPort << std::endl;
+  std::cerr << "Using data fetcher " << dataFetcher << std::endl;
+  std::cerr << "Using data shortname " << dataShortname << std::endl;
   
   // setup console colors 
   // (this will create a new terminal window, check if the terminal is color-capable and then it will close the terminal window with endwin()):
@@ -128,8 +128,8 @@ int main(int argc, char** argv) {
   //}
   //endwin();
   
-  std::cout << "Starting transit routing for the application: ";
-  std::cout << dataShortname << std::endl << std::endl;
+  std::cerr << "Starting transit routing for the application: ";
+  std::cerr << dataShortname << std::endl << std::endl;
   
   // Set params:
   Parameters algorithmParams;
@@ -141,7 +141,7 @@ int main(int argc, char** argv) {
   
   /////////
   
-  std::cout << "preparing server..." << std::endl;
+  std::cerr << "preparing server..." << std::endl;
   
   //HTTP-server using 1 thread
   //Unless you do more heavy non-threaded processing in the resources,
