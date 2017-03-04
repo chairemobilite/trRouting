@@ -1066,9 +1066,10 @@ namespace TrRouting
             
             countReachableStops++;
             
-            jsonResult += "\n    { \"id\": " + std::to_string(stop.first) + ", \"" + (params.forwardCalculation ? "arrival_time" : "departure_time") + "\":"
+            jsonResult += "\n    { \"id\": " + std::to_string(stop.first) + ", \"" + (params.forwardCalculation ? "arrivalTime" : "departureTime") + "\":"
             + " \"" + boost::str(padWithZeros % (stopArrivalTime / 60)) + ":" + boost::str(padWithZeros % (stopArrivalTime % 60)) + "\","
-            + " \"travel_time_seconds\": " + std::to_string(travelTimeMinutes * 60) + " },";
+            + " \"totalTravelTimeSeconds\": " + std::to_string(travelTimeMinutes * 60) + ","
+            + " \"numberOfTransfers\": "      + std::to_string(stop.second.numBoardings - 1) + "},\n";
           
           }
           else // routing failed
