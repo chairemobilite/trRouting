@@ -890,6 +890,11 @@ namespace TrRouting
       for(auto & stop : stopsById)
       {
         
+        if (params.startingStopId != -1 && stop.first == params.startingStopId)
+        {
+          continue; // ignore travel time to same stop
+        }
+
         if (params.forwardCalculation)
         {
           stopArrivalTime   = stop.second.arrivalTimeMinuteOfDay;
