@@ -91,8 +91,8 @@ namespace TrRouting
       minWaitingTimeMinutes                                      = 5;
       maxAccessWalkingTravelTimeFromOriginToFirstStopMinutes     = 20;
       maxAccessWalkingTravelTimeFromLastStopToDestinationMinutes = 20;
-      maxTransferWalkingTravelTimeMinutes                        = 5;
-      maxTotalWalkingTravelTimeMinutes                           = 30;
+      maxTransferWalkingTravelTimeMinutes                        = 20; // depends of transfer data provided
+      maxTotalWalkingTravelTimeMinutes                           = 60; // not used right now
       connectionsSqlWhereClause                                  = "";
       transfersSqlWhereClause                                    = "true";
       databaseName                                               = "tr_all_dev";
