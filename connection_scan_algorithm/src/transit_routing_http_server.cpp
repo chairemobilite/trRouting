@@ -155,11 +155,11 @@ int main(int argc, char** argv) {
     
     calculator.algorithmCalculationTime.startStep();
     
-    std::cerr << "calculating request..." << std::endl;
+    std::cout << "calculating request..." << std::endl;
     
     std::string resultStr;
     
-    std::cerr << request->path << std::endl;
+    std::cout << request->path << std::endl;
     
     if (request->path_match.size() >= 1)
     {
