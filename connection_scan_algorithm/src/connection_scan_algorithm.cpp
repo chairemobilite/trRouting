@@ -560,6 +560,11 @@ namespace TrRouting
     
     int maxWalkingDurationAtEndingStops {0};
     int maxArrivalTimeAtEndingStops {maxTimeValue};
+    int maxArrivalTime {maxTimeValue};
+    if (params.forwardCalculation && params.maxTotalTravelTimeMinutes > 0)
+    {
+      maxArrivalTime = startTime + params.maxTotalTravelTimeMinutes;
+    }
     bool foundMaxArrivalTime {false};
     
     std::map<unsigned long long, int> nearestStopsIdsFromStartingPoint;
@@ -676,6 +681,12 @@ namespace TrRouting
         
         PathStopSequence pathStopSequence;
         
+        // stop calculating if max arrival time is reached
+        if (connection->departureFromOriginTimeMinuteOfDay > maxArrivalTime)
+        {
+          break;
+        }
+        
         // stop calculating if max arrival time at ending stop is reached
         if(foundMaxArrivalTime)
         {
@@ -738,7 +749,7 @@ namespace TrRouting
           stopsById[connection->stopEndId].journeySteps.push_back(std::make_shared<SimplifiedJourneyStep>(newUnboardJourneyStep));
           
           // get transferable stops:
-          // transfer only if max number of transfers has not been reached:
+          // transfer only if max number of transfers has not been reached: BUT THAT IS WRONG: we could get to that connection with less boardings. There is still no way to really set a maximum number of transfers in csa for now...
           if (params.maxNumberOfTransfers == -1 || (params.maxNumberOfTransfers >= 0 && params.maxNumberOfTransfers > connection->numBoardings - 1))
           {
             
@@ -899,11 +910,18 @@ namespace TrRouting
         {
           stopArrivalTime   = stop.second.arrivalTimeMinuteOfDay;
           travelTimeMinutes = stopArrivalTime - startTime;
+          
         }
         else
         {
           stopArrivalTime = maxTimeValue - stop.second.arrivalTimeMinuteOfDay;
           travelTimeMinutes = maxTimeValue - startTime - stopArrivalTime;
+          
+        }
+        
+        if (params.maxTotalTravelTimeMinutes > 0 && travelTimeMinutes > params.maxTotalTravelTimeMinutes)
+        {
+          continue; // ignore if travel time is too long
         }
         
         if (params.detailedResults)
@@ -1179,10 +1197,12 @@ namespace TrRouting
     }
     else
     {
-    
+      
+      bool foundResult = minArrivalTime < maxTimeValue && (params.maxTotalTravelTimeMinutes <= 0 || (params.maxTotalTravelTimeMinutes > 0 && (minArrivalTime - startTime) <= params.maxTotalTravelTimeMinutes));
+      
       jsonResult += "{\n";
       
-      if (minArrivalTime < maxTimeValue)
+      if (foundResult)
       {
         jsonResult += "  \"status\": \"success\",\n";
       }
@@ -1195,7 +1215,7 @@ namespace TrRouting
       jsonResult += "  \"destination\": [" + std::to_string(params.endingPoint.latitude) + "," + std::to_string(params.endingPoint.longitude) + "],\n";
       jsonResult += "  \"date\": \"" + std::to_string(params.routingDateYear) + "/" + boost::str(padWithZeros % (params.routingDateMonth)) + "/" + boost::str(padWithZeros % (params.routingDateDay)) + "\",\n";
       
-      if(minArrivalTime < maxTimeValue)
+      if (foundResult)
       {
       
         jsonResult += "  \"steps\":\n  [\n";

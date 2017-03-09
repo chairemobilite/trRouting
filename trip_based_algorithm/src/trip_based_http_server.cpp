@@ -151,9 +151,11 @@ int main(int argc, char** argv) {
   
   server.resource["^/route/v1/transit[/]?\\?([0-9a-zA-Z&=_,:/.-]+)$"]["GET"]=[&server, &calculator](std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request) {
     
-    //calculator.algorithmCalculationTime.startStep();
+    calculator.algorithmCalculationTime.startStep();
     
-    //std::cout << "calculating request..." << std::endl;
+    std::cerr << "calculating request..." << std::endl;
+    
+    std::cerr << request->path << std::endl;
     
     std::string resultStr;
 
@@ -402,7 +404,11 @@ int main(int argc, char** argv) {
 
       //std::cout << "-- parsing request -- " << calculator.algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
       
+      
+      std::cerr << "calculating..." << std::endl;
       resultStr = calculator.calculate().dump(); // come as json object
+      calculator.algorithmCalculationTime.stopStep();
+      std::cerr << "-- parsing request -- " << calculator.algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
       
     }
     else

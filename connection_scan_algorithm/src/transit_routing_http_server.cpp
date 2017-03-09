@@ -152,14 +152,15 @@ int main(int argc, char** argv) {
   server.config.port = serverPort;
   
   server.resource["^/route/v1/transit[/]?\\?([0-9a-zA-Z&=_,:/.-]+)$"]["GET"]=[&server, &calculator](std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request) {
-        
+    
     calculator.algorithmCalculationTime.startStep();
     
-    std::cout << "calculating request..." << std::endl;
+    std::cerr << "calculating request..." << std::endl;
     
     std::string resultStr;
     
-
+    std::cerr << request->path << std::endl;
+    
     if (request->path_match.size() >= 1)
     {
       std::vector<std::string> parametersWithValues;
@@ -351,6 +352,10 @@ int main(int argc, char** argv) {
         else if (parameterWithValueVector[0] == "min_waiting_time" || parameterWithValueVector[0] == "min_waiting_time_minutes")
         {
           calculator.params.minWaitingTimeMinutes = std::stoi(parameterWithValueVector[1]);
+        }
+        else if (parameterWithValueVector[0] == "max_travel_time" || parameterWithValueVector[0] == "max_travel_time_minutes")
+        {
+          calculator.params.maxTotalTravelTimeMinutes = std::stoi(parameterWithValueVector[1]);
         }
         else if (parameterWithValueVector[0] == "return_all_stops_results"
                  || parameterWithValueVector[0] == "return_all_stops_result"
