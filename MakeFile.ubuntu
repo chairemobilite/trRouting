@@ -15,13 +15,13 @@ LINKFLAGS = -pthread -lboost_thread -lboost_serialization -lboost_system -lboost
 all: trRouting
 
 trRouting: $(LOCAL_OBJS) $(SPECIFIC_OBJS)
-  $(CC) $(CXXFLAGS) $(LDFLAGS) $(LINKFLAGS) $^ -o $@
+	$(CC) $(CXXFLAGS) $(LDFLAGS) $(LINKFLAGS) $^ -o $@
 
 obj/%.o: src/%.cpp
-  $(CC) $(CXXFLAGS) $(LDFLAGS) $(LINKFLAGS) -c -o $@ $<
+	$(CC) $(CXXFLAGS) $(LDFLAGS) $(LINKFLAGS) -c -o $@ $<
 
 connection_scan_algorithm/obj/%.o: connection_scan_algorithm/src/%.cpp
-  $(CC) $(CXXFLAGS) $(LDFLAGS) $(LINKFLAGS) -c -o $@ $<
+	$(CC) $(CXXFLAGS) $(LDFLAGS) $(LINKFLAGS) -c -o $@ $<
 
 clean:
-  -rm connection_scan_algorithm/obj/*.o obj/*.o trRouting
+	-rm connection_scan_algorithm/obj/*.o obj/*.o trRouting
