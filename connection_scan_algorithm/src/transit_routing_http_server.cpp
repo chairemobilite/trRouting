@@ -153,6 +153,8 @@ int main(int argc, char** argv) {
   
   server.resource["^/route/v1/transit[/]?\\?([0-9a-zA-Z&=_,:/.-]+)$"]["GET"]=[&server, &calculator](std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request) {
     
+    calculator.algorithmCalculationTime.start();
+    
     calculator.algorithmCalculationTime.startStep();
     
     std::cout << "calculating request..." << std::endl;
@@ -428,9 +430,9 @@ int main(int argc, char** argv) {
       resultStr = "{\"status\": \"failed\", \"error\": \"Wrong or malformed query\"}";
     }
 
-    calculator.algorithmCalculationTime.stopStep();
+    calculator.algorithmCalculationTime.stop();
       
-    std::cout << "-- returning response -- " << calculator.algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+    std::cerr << "-- calculation time -- " << calculator.algorithmCalculationTime.getDurationMilliseconds() << " ms\n";
     
     *response << "HTTP/1.1 200 OK\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << resultStr.length() << "\r\n\r\n" << resultStr;
   };
