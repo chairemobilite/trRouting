@@ -155,7 +155,7 @@ int main(int argc, char** argv) {
     
     calculator.algorithmCalculationTime.start();
     
-    calculator.algorithmCalculationTime.startStep();
+    //calculator.algorithmCalculationTime.startStep();
     
     std::cout << "calculating request..." << std::endl;
     
@@ -405,24 +405,24 @@ int main(int argc, char** argv) {
         calculator.params.arrivalTimeMinutes = timeMinute;
       }
       
-      calculator.algorithmCalculationTime.stopStep();
+      //calculator.algorithmCalculationTime.stopStep();
       
       std::cout << "-- parsing request -- " << calculator.algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
       
       calculator.refresh();
       
-      calculator.algorithmCalculationTime.stopStep();
-      calculator.algorithmCalculationTime.startStep();
+      //calculator.algorithmCalculationTime.stopStep();
+      //calculator.algorithmCalculationTime.startStep();
       
       calculator.resetAccessEgressModes();
       
-      calculator.algorithmCalculationTime.stopStep();
+      //calculator.algorithmCalculationTime.stopStep();
       
       std::cout << "-- reset access egress modes -- " << calculator.algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
       
       resultStr = calculator.calculate("1");
       
-      calculator.algorithmCalculationTime.startStep();
+      //calculator.algorithmCalculationTime.startStep();
 
     }
     else
@@ -430,7 +430,7 @@ int main(int argc, char** argv) {
       resultStr = "{\"status\": \"failed\", \"error\": \"Wrong or malformed query\"}";
     }
 
-    calculator.algorithmCalculationTime.stop();
+    //calculator.algorithmCalculationTime.stop();
       
     std::cerr << "-- calculation time -- " << calculator.algorithmCalculationTime.getDurationMilliseconds() << " ms\n";
     
