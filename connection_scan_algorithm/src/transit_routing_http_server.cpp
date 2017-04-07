@@ -407,7 +407,7 @@ int main(int argc, char** argv) {
       
       //calculator.algorithmCalculationTime.stopStep();
       
-      std::cout << "-- parsing request -- " << calculator.algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+      //std::cout << "-- parsing request -- " << calculator.algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
       
       calculator.refresh();
       
@@ -418,7 +418,7 @@ int main(int argc, char** argv) {
       
       //calculator.algorithmCalculationTime.stopStep();
       
-      std::cout << "-- reset access egress modes -- " << calculator.algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+      //std::cout << "-- reset access egress modes -- " << calculator.algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
       
       resultStr = calculator.calculate("1");
       
@@ -429,10 +429,10 @@ int main(int argc, char** argv) {
     {
       resultStr = "{\"status\": \"failed\", \"error\": \"Wrong or malformed query\"}";
     }
-
+    
     //calculator.algorithmCalculationTime.stop();
       
-    std::cerr << "-- calculation time -- " << calculator.algorithmCalculationTime.getDurationMilliseconds() << " ms\n";
+    //std::cerr << "-- calculation time -- " << calculator.algorithmCalculationTime.getDurationMilliseconds() << " ms\n";
     
     *response << "HTTP/1.1 200 OK\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << resultStr.length() << "\r\n\r\n" << resultStr;
   };
