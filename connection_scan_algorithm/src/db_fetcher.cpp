@@ -977,48 +977,66 @@ namespace TrRouting
     std::cout << std::setprecision(6);
     
     std::map<unsigned long long, int> nearestStopsIds;
-      
-    if (dataFetcher == "database")
-    {
     
-      std::string sqlQuery = "SELECT tr_stops.id, CEIL((ST_DISTANCE(ST_GEOMFROMTEXT('" + point.asWKT() + "'), geography))/(" + std::to_string(speedMetersPerSecond) + "*60)) as ttm FROM " + applicationShortname + ".tr_stops WHERE CEIL((ST_DISTANCE(ST_GEOMFROMTEXT('" + point.asWKT() + "'), geography))/(" + std::to_string(speedMetersPerSecond) + "*60)) <= " + std::to_string(maxTravelTimeMinutes);
+    std::string queryString = "GET /table/v1/" + mode + "/" + std::to_string(point.longitude) +  "," + std::to_string(point.latitude);
+    
+    //if (dataFetcher == "database")
+    //{
+    //
+    //  std::string sqlQuery = "SELECT tr_stops.id, CEIL((ST_DISTANCE(ST_GEOMFROMTEXT('" + point.asWKT() + "'), geography))/(" + std::to_string(speedMetersPerSecond) + "*60)) as ttm FROM " + applicationShortname + ".tr_stops WHERE CEIL((ST_DISTANCE(ST_GEOMFROMTEXT('" + point.asWKT() + "'), geography))/(" + std::to_string(speedMetersPerSecond) + "*60)) <= " + std::to_string(maxTravelTimeMinutes);
+    //  
+    //  if (isConnectionOpen())
+    //  {
+    //    pqxx::nontransaction pgNonTransaction(*(getConnectionPtr()));
+    //    pqxx::result pgResult( pgNonTransaction.exec( sqlQuery ));
+    //    unsigned long long resultCount = pgResult.size();
+    //    unsigned long long i = 1;
+    //    unsigned long long stopId;
+    //    
+    //    for (pqxx::result::const_iterator c = pgResult.begin(); c != pgResult.end(); ++c) {
+    //      stopId                  = c[0].as<unsigned long long>();
+    //      nearestStopsIds[stopId] = c[1].as<int>();
+    //      queryString += ";" + std::to_string(stopsById[stopId].point.longitude) +  "," + std::to_string(stopsById[stopId].point.latitude);
+    //    }
+    //  
+    //  } else {
+    //    std::cout << "Can't open database" << std::endl;
+    //  }
+    //  
+    //}
+    //else
+    //{
       
-      if (isConnectionOpen())
-      {
-        pqxx::nontransaction pgNonTransaction(*(getConnectionPtr()));
-        pqxx::result pgResult( pgNonTransaction.exec( sqlQuery ));
-        unsigned long long resultCount = pgResult.size();
-        unsigned long long i = 1;
-        
-        for (pqxx::result::const_iterator c = pgResult.begin(); c != pgResult.end(); ++c) {
-          
-          nearestStopsIds[c[0].as<unsigned long long>()] = c[1].as<int>();
-          
-        }
+      // here we select stops within reasonable distance using degrees to meters conversion (simplified):
+      // https://knowledge.safe.com/articles/725/calculating-accurate-length-in-meters-for-lat-long.html
       
-      } else {
-        std::cout << "Can't open database" << std::endl;
-      }
-      
-    }
-    else if(dataFetcher == "csv")
-    {
+      float lengthOfOneDegreeOfLongitude = 111412.84 * cos(point.latitude * M_PI / 180) -93.5 * cos (3 * point.latitude * M_PI / 180);
+      float lengthOfOneDegreeOflatitude  = 111132.92 - 559.82 * cos(2 * point.latitude * M_PI / 180) + 1.175 * cos(4 * point.latitude * M_PI / 180);
+      float maxDistanceMeters            = maxTravelTimeMinutes * 60 * speedMetersPerSecond;
+      float distanceMeters;
+      float distanceXMeters;
+      float distanceYMeters;
+      Point stopPoint;
       
       for (auto & stopId : stopsById)
       {
-        nearestStopsIds[stopId.first] = 9999;
+        stopPoint       = stopsById[stopId.first].point;
+        distanceXMeters = (stopPoint.longitude - point.longitude) * lengthOfOneDegreeOfLongitude;
+        distanceYMeters = (stopPoint.latitude  - point.latitude)  * lengthOfOneDegreeOflatitude ;
+        distanceMeters  = sqrt(distanceXMeters * distanceXMeters + distanceYMeters * distanceYMeters);
+        //std::cerr << distanceMeters;
+        if (distanceMeters <= maxDistanceMeters)
+        {
+          nearestStopsIds[stopId.first] = (distanceMeters / speedMetersPerSecond) / 60; // in minutes
+          queryString += ";" + std::to_string(stopPoint.longitude) +  "," + std::to_string(stopPoint.latitude);
+        }
       }
       
-    }
+    //}
+    
         
     boost::asio::ip::tcp::iostream s;
     s.connect(routingHost, routingPort);
-    
-    std::string queryString = "GET /table/v1/" + mode + "/" + std::to_string(point.longitude) +  "," + std::to_string(point.latitude);
-    for (auto & stopId : nearestStopsIds)
-    {
-      queryString += ";" + std::to_string(stopsById[stopId.first].point.longitude) +  "," + std::to_string(stopsById[stopId.first].point.latitude);
-    }
     queryString += "?sources=0";
     queryString += " HTTP/1.1\r\n\r\n";
         
@@ -1037,8 +1055,7 @@ namespace TrRouting
     
     std::map<unsigned long long, int>::iterator iter = nearestStopsIds.begin();
     
-    
-    std::cout << "duration count = " << pt.count("durations") << std::endl;
+    //std::cout << "duration count = " << pt.count("durations") << std::endl;
     
     if (pt.count("durations") == 1)
     {
