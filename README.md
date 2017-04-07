@@ -32,7 +32,7 @@ brew install nlohmann/json/nlohmann_json
 ## Ubuntu 16.04 Install
 
 ```
-sudo apt-get install clang libboost-all-dev libjsoncpp-dev libpqxx-4.0 libpqxx-dev libmsgpack3 libmsgpack-dev libyaml-cpp-dev libncurses5-dev
+sudo apt-get install clang libboost-all-dev libexpat1-dev libjsoncpp-dev libpqxx-4.0 libpqxx-dev libmsgpack3 libmsgpack-dev libyaml-cpp-dev libncurses5-dev
 ```
 
 ## Compilation
