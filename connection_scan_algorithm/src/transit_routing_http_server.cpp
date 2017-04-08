@@ -63,6 +63,10 @@ int main(int argc, char** argv) {
   applicationShortnameFile.close();
   std::string dataShortname {applicationShortname};
   
+  // Set params:
+  Parameters algorithmParams;
+  algorithmParams.setDefaultValues();
+  
   // setup program options:
   
   boost::program_options::options_description optionsDesc("Options"); 
@@ -70,9 +74,11 @@ int main(int argc, char** argv) {
   optionsDesc.add_options() 
       ("port,p", boost::program_options::value<int>(), "http server port");
   optionsDesc.add_options() 
-      ("dataFetcher,data", boost::program_options::value<std::string>(), "data fetcher (csv or database)");
+      ("dataFetcher,data", boost::program_options::value<std::string>(), "data fetcher (csv or database or cache)");
   optionsDesc.add_options() 
       ("dataShortname,sn", boost::program_options::value<std::string>(), "data shortname (shortname of the application to use or data to use)");
+  optionsDesc.add_options() 
+      ("osrmWalkPort",     boost::program_options::value<std::string>(), "osrm walking port");
   
   boost::program_options::store(boost::program_options::parse_command_line(argc, argv, optionsDesc), variablesMap);
   
@@ -100,9 +106,15 @@ int main(int argc, char** argv) {
   {
     dataShortname = variablesMap["sn"].as<std::string>();
   }
+  if(variablesMap.count("osrmWalkPort") == 1)
+  {
+    algorithmParams.osrmRoutingWalkingPort = variablesMap["osrmWalkPort"].as<std::string>();
+  }
   
-  std::cout << "Using http port " << serverPort << std::endl;
-  std::cout << "Using data fetcher " << dataFetcher << std::endl;
+  
+  std::cout << "Using http port "      << serverPort << std::endl;
+  std::cout << "Using osrm walk port"  << algorithmParams.osrmRoutingWalkingPort << std::endl;
+  std::cout << "Using data fetcher "   << dataFetcher << std::endl;
   std::cout << "Using data shortname " << dataShortname << std::endl;
   
   // setup console colors 
@@ -132,8 +144,6 @@ int main(int argc, char** argv) {
   std::cout << "Starting transit routing for the application: ";
   std::cout << consoleGreen + dataShortname + consoleResetColor << std::endl << std::endl;
   
-  // Set params:
-  Parameters algorithmParams;
   ConnectionScanAlgorithm calculator;
   algorithmParams.applicationShortname = dataShortname;
   algorithmParams.dataFetcher          = dataFetcher;

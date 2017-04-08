@@ -25,7 +25,6 @@ namespace TrRouting
   void ConnectionScanAlgorithm::setup()
   {
     calculationId = 1;
-    params.setDefaultValues();
     resetAccessEgressModes();
     maxTimeValue = 9999; // that's almost 7 days. No travel time should take that long.
     //setParamsFromYaml("trRoutingConfig.yml"); // disable yml config for now
