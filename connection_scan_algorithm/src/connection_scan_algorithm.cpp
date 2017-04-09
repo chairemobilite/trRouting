@@ -62,7 +62,7 @@ namespace TrRouting
     });
     
     connectionsByStartPathStopSequenceId = getConnectionsByStartPathStopSequenceId(connectionsByDepartureTime);
-    connectionsByEndPathStopSequenceId   = getConnectionsByStartPathStopSequenceId(connectionsByArrivalTime);
+    connectionsByEndPathStopSequenceId   = getConnectionsByStartPathStopSequenceId(connectionsByArrivalTime); // really? by start? is this correct or we should replace by EndPathStopSequence?
     pathStopSequencesByStopId            = getPathStopSequencesByStopId(pathStopSequencesById);
   }
   

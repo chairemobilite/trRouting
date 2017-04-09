@@ -235,6 +235,17 @@ int main(int argc, char** argv) {
       calculator.params.departureTimeMinutes      = -1;
       calculator.params.arrivalTimeHour           = -1;
       calculator.params.arrivalTimeMinutes        = -1;
+      calculator.params.maxTotalTravelTimeMinutes = -1;
+      calculator.params.maxAccessWalkingTravelTimeFromOriginToFirstStopMinutes = 20;
+      calculator.params.maxAccessWalkingTravelTimeFromLastStopToDestinationMinutes = 20;
+      calculator.params.maxTransferWalkingTravelTimeMinutes = 20;
+      calculator.params.maxTotalWalkingTravelTimeMinutes = 60;
+      calculator.params.accessMode = "walking";
+      calculator.params.egressMode = "walking";
+      calculator.params.noResultSecondMode = "driving";
+      calculator.params.tryNextModeIfRoutingFails = false;
+      calculator.params.noResultNextAccessTimeMinutesIncrement   = 5;
+      calculator.params.maxNoResultNextAccessTimeMinutes = 40;
       
       for(auto & parameterWithValue : parametersWithValues)
       {
