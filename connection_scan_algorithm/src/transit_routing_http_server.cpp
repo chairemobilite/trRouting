@@ -380,6 +380,18 @@ int main(int argc, char** argv) {
         {
           calculator.params.maxTotalTravelTimeMinutes = std::stoi(parameterWithValueVector[1]);
         }
+        else if (parameterWithValueVector[0] == "max_access_travel_time" || parameterWithValueVector[0] == "max_access_travel_time_minutes")
+        {
+          calculator.params.maxAccessWalkingTravelTimeFromOriginToFirstStopMinutes = std::stoi(parameterWithValueVector[1]);
+        }
+        else if (parameterWithValueVector[0] == "max_egress_travel_time" || parameterWithValueVector[0] == "max_egress_travel_time_minutes")
+        {
+          calculator.params.maxAccessWalkingTravelTimeFromLastStopToDestinationMinutes = std::stoi(parameterWithValueVector[1]);
+        }
+        else if (parameterWithValueVector[0] == "max_transfer_travel_time" || parameterWithValueVector[0] == "max_transfer_travel_time_minutes")
+        {
+          calculator.params.maxTransferWalkingTravelTimeMinutes = std::stoi(parameterWithValueVector[1]);
+        }
         else if (parameterWithValueVector[0] == "return_all_stops_results"
                  || parameterWithValueVector[0] == "return_all_stops_result"
                  || parameterWithValueVector[0] == "all_stops"
