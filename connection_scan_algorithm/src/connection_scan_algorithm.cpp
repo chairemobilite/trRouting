@@ -329,27 +329,18 @@ namespace TrRouting
       }
       stop.second.canUnboardToDestination = false;
       stop.second.numBoardings = 0;
-      stop.second.journeySteps.clear();
+      std::vector<std::shared_ptr<SimplifiedJourneyStep> >().swap(stop.second.journeySteps);
       //stop.second.journeySteps.reserve(500);
     }
-    
-    std::map<int, bool> onlyServiceIds     = params.onlyServiceIds    ;
-    std::map<int, bool> exceptServiceIds   = params.exceptServiceIds  ;
-    std::map<int, bool> onlyRouteIds       = params.onlyRouteIds      ;
-    std::map<int, bool> exceptRouteIds     = params.exceptRouteIds    ;
-    std::map<int, bool> onlyRouteTypeIds   = params.onlyRouteTypeIds  ;
-    std::map<int, bool> exceptRouteTypeIds = params.exceptRouteTypeIds;
-    std::map<int, bool> onlyAgencyIds      = params.onlyAgencyIds     ;
-    std::map<int, bool> exceptAgencyIds    = params.exceptAgencyIds   ;
-    
-    bool hasOnlyServices     = !onlyServiceIds.empty();
-    bool hasOnlyRoutes       = !onlyRouteIds.empty();
-    bool hasOnlyRouteTypes   = !onlyRouteTypeIds.empty();
-    bool hasOnlyAgencies     = !onlyAgencyIds.empty();
-    bool hasExceptServices   = !exceptServiceIds.empty();
-    bool hasExceptRoutes     = !exceptRouteIds.empty();
-    bool hasExceptRouteTypes = !exceptRouteTypeIds.empty();
-    bool hasExceptAgencies   = !exceptAgencyIds.empty();
+
+    bool hasOnlyServices     = !params.onlyServiceIds.empty();
+    bool hasOnlyRoutes       = !params.onlyRouteIds.empty();
+    bool hasOnlyRouteTypes   = !params.onlyRouteTypeIds.empty();
+    bool hasOnlyAgencies     = !params.onlyAgencyIds.empty();
+    bool hasExceptServices   = !params.exceptServiceIds.empty();
+    bool hasExceptRoutes     = !params.exceptRouteIds.empty();
+    bool hasExceptRouteTypes = !params.exceptRouteTypeIds.empty();
+    bool hasExceptAgencies   = !params.exceptAgencyIds.empty();
     
     // refresh connections:
     if (params.forwardCalculation)
@@ -361,7 +352,7 @@ namespace TrRouting
         
         if (hasOnlyServices)
         {
-          if (onlyServiceIds.find(connection.second.serviceId) == onlyServiceIds.end())
+          if (params.onlyServiceIds.find(connection.second.serviceId) == params.onlyServiceIds.end())
           {
             connection.second.enabled = false;
           }
@@ -369,7 +360,7 @@ namespace TrRouting
         
         if (hasOnlyRoutes)
         {
-          if (connection.second.enabled && onlyRouteIds.find(connection.second.routeId) == onlyRouteIds.end())
+          if (connection.second.enabled && params.onlyRouteIds.find(connection.second.routeId) == params.onlyRouteIds.end())
           {
             connection.second.enabled = false;
           }
@@ -377,7 +368,7 @@ namespace TrRouting
         
         if (hasOnlyRouteTypes)
         {
-          if (connection.second.enabled && onlyRouteTypeIds.find(connection.second.routeTypeId) == onlyRouteTypeIds.end())
+          if (connection.second.enabled && params.onlyRouteTypeIds.find(connection.second.routeTypeId) == params.onlyRouteTypeIds.end())
           {
             connection.second.enabled = false;
           }
@@ -385,7 +376,7 @@ namespace TrRouting
         
         if (hasOnlyAgencies)
         {
-          if (connection.second.enabled && onlyAgencyIds.find(connection.second.agencyId) == onlyAgencyIds.end())
+          if (connection.second.enabled && params.onlyAgencyIds.find(connection.second.agencyId) == params.onlyAgencyIds.end())
           {
             connection.second.enabled = false;
           }
@@ -393,7 +384,7 @@ namespace TrRouting
         
         if (hasExceptServices)
         {
-          if (connection.second.enabled && exceptServiceIds.find(connection.second.serviceId) != exceptServiceIds.end())
+          if (connection.second.enabled && params.exceptServiceIds.find(connection.second.serviceId) != params.exceptServiceIds.end())
           {
             connection.second.enabled = false;
           }
@@ -401,7 +392,7 @@ namespace TrRouting
         
         if (hasExceptRoutes)
         {
-          if (connection.second.enabled && exceptRouteIds.find(connection.second.routeId) != exceptRouteIds.end())
+          if (connection.second.enabled && params.exceptRouteIds.find(connection.second.routeId) != params.exceptRouteIds.end())
           {
             connection.second.enabled = false;
           }
@@ -409,7 +400,7 @@ namespace TrRouting
         
         if (hasExceptRouteTypes)
         {
-          if (connection.second.enabled && exceptRouteTypeIds.find(connection.second.routeTypeId) != exceptRouteTypeIds.end())
+          if (connection.second.enabled && params.exceptRouteTypeIds.find(connection.second.routeTypeId) != params.exceptRouteTypeIds.end())
           {
             connection.second.enabled = false;
           }
@@ -417,14 +408,14 @@ namespace TrRouting
         
         if (hasExceptAgencies)
         {
-          if (connection.second.enabled && exceptAgencyIds.find(connection.second.agencyId) != exceptAgencyIds.end())
+          if (connection.second.enabled && params.exceptAgencyIds.find(connection.second.agencyId) != params.exceptAgencyIds.end())
           {
             connection.second.enabled = false;
           }
         }
         
         connection.second.numBoardings = 0;
-        connection.second.journeySteps.clear();
+        std::vector<std::shared_ptr<SimplifiedJourneyStep> >().swap(connection.second.journeySteps);
         //connection.second.journeySteps.reserve(500);
       }
     }
@@ -437,7 +428,7 @@ namespace TrRouting
         
         if (hasOnlyServices)
         {
-          if (onlyServiceIds.find(connection.second.serviceId) == onlyServiceIds.end())
+          if (params.onlyServiceIds.find(connection.second.serviceId) == params.onlyServiceIds.end())
           {
             connection.second.enabled = false;
           }
@@ -445,7 +436,7 @@ namespace TrRouting
         
         if (hasOnlyRoutes)
         {
-          if (connection.second.enabled && onlyRouteIds.find(connection.second.routeId) == onlyRouteIds.end())
+          if (connection.second.enabled && params.onlyRouteIds.find(connection.second.routeId) == params.onlyRouteIds.end())
           {
             connection.second.enabled = false;
           }
@@ -453,7 +444,7 @@ namespace TrRouting
         
         if (hasOnlyRouteTypes)
         {
-          if (connection.second.enabled && onlyRouteTypeIds.find(connection.second.routeTypeId) == onlyRouteTypeIds.end())
+          if (connection.second.enabled && params.onlyRouteTypeIds.find(connection.second.routeTypeId) == params.onlyRouteTypeIds.end())
           {
             connection.second.enabled = false;
           }
@@ -461,7 +452,7 @@ namespace TrRouting
         
         if (hasOnlyAgencies)
         {
-          if (connection.second.enabled && onlyAgencyIds.find(connection.second.agencyId) == onlyAgencyIds.end())
+          if (connection.second.enabled && params.onlyAgencyIds.find(connection.second.agencyId) == params.onlyAgencyIds.end())
           {
             connection.second.enabled = false;
           }
@@ -469,7 +460,7 @@ namespace TrRouting
         
         if (hasExceptServices)
         {
-          if (connection.second.enabled && exceptServiceIds.find(connection.second.serviceId) != exceptServiceIds.end())
+          if (connection.second.enabled && params.exceptServiceIds.find(connection.second.serviceId) != params.exceptServiceIds.end())
           {
             connection.second.enabled = false;
           }
@@ -477,7 +468,7 @@ namespace TrRouting
         
         if (hasExceptRoutes)
         {
-          if (connection.second.enabled && exceptRouteIds.find(connection.second.routeId) != exceptRouteIds.end())
+          if (connection.second.enabled && params.exceptRouteIds.find(connection.second.routeId) != params.exceptRouteIds.end())
           {
             connection.second.enabled = false;
           }
@@ -485,7 +476,7 @@ namespace TrRouting
         
         if (hasExceptRouteTypes)
         {
-          if (connection.second.enabled && exceptRouteTypeIds.find(connection.second.routeTypeId) != exceptRouteTypeIds.end())
+          if (connection.second.enabled && params.exceptRouteTypeIds.find(connection.second.routeTypeId) != params.exceptRouteTypeIds.end())
           {
             connection.second.enabled = false;
           }
@@ -493,14 +484,14 @@ namespace TrRouting
         
         if (hasExceptAgencies)
         {
-          if (connection.second.enabled && exceptAgencyIds.find(connection.second.agencyId) != exceptAgencyIds.end())
+          if (connection.second.enabled && params.exceptAgencyIds.find(connection.second.agencyId) != params.exceptAgencyIds.end())
           {
             connection.second.enabled = false;
           }
         }
         
         connection.second.numBoardings = 0;
-        connection.second.journeySteps.clear();
+        std::vector<std::shared_ptr<SimplifiedJourneyStep> >().swap(connection.second.journeySteps);
         //connection.second.journeySteps.reserve(500);
       }
     }
@@ -519,7 +510,7 @@ namespace TrRouting
   {
     
     //algorithmCalculationTime.start();
-    
+    Connection * possibleConnectionPtr;
     std::map<std::string, long long> benchmarkTimes;
     std::vector<std::string> result;
     std::map<unsigned long long,std::vector<Connection*> > connectionsByPathStopSequenceId;
@@ -620,6 +611,8 @@ namespace TrRouting
       });
     }
     
+    
+    
     for(auto & walkableStopFromStartingPoint : sortedNearestStopsIdsFromStartingPointPairs)
     {
       
@@ -639,29 +632,29 @@ namespace TrRouting
         for(auto & transferableConnection : connectionsByPathStopSequenceId[transferablePathStopSequenceId])
         {
           
-          Connection * possibleConnection = transferableConnection;
+          possibleConnectionPtr = transferableConnection;
           
-          if (possibleConnection->enabled 
-            && possibleConnection->departureFromOriginTimeMinuteOfDay >= walkableStopFromStartingPoint.second + startTime + forwardFlag * params.minWaitingTimeMinutes
-            && possibleConnection->canBoard
-            && std::find(accessTripIds.begin(), accessTripIds.end(), possibleConnection->tripId) == accessTripIds.end() // minimize walking access travel time
+          if (possibleConnectionPtr->enabled 
+            && possibleConnectionPtr->departureFromOriginTimeMinuteOfDay >= walkableStopFromStartingPoint.second + startTime + forwardFlag * params.minWaitingTimeMinutes
+            && possibleConnectionPtr->canBoard
+            && std::find(accessTripIds.begin(), accessTripIds.end(), possibleConnectionPtr->tripId) == accessTripIds.end() // minimize walking access travel time
           )
           {
-            accessTripIds.push_back(possibleConnection->tripId);
-            possibleConnection->reachable    = calculationId;
-            possibleConnection->numBoardings = stopsById[walkableStopFromStartingPoint.first].numBoardings;
-            possibleConnection->journeySteps = stopsById[walkableStopFromStartingPoint.first].journeySteps;
+            accessTripIds.push_back(possibleConnectionPtr->tripId);
+            possibleConnectionPtr->reachable    = calculationId;
+            possibleConnectionPtr->numBoardings = stopsById[walkableStopFromStartingPoint.first].numBoardings;
+            possibleConnectionPtr->journeySteps = stopsById[walkableStopFromStartingPoint.first].journeySteps;
             
             SimplifiedJourneyStep newBoardJourneyStep;
             newBoardJourneyStep.id                      = ++journeyStepId;
             newBoardJourneyStep.action                  = BOARD;
-            newBoardJourneyStep.connectionId            = possibleConnection->id;
+            newBoardJourneyStep.connectionId            = possibleConnectionPtr->id;
             newBoardJourneyStep.accessTimeMinutes       = -1;
             newBoardJourneyStep.accessFromStopId        = -1;
             newBoardJourneyStep.accessFromTripId        = -1;
             newBoardJourneyStep.readyToBoardMinuteOfDay = -1;
-            possibleConnection->numBoardings += 1;
-            possibleConnection->journeySteps.push_back(std::make_shared<SimplifiedJourneyStep>(newBoardJourneyStep));
+            possibleConnectionPtr->numBoardings += 1;
+            possibleConnectionPtr->journeySteps.push_back(std::make_shared<SimplifiedJourneyStep>(newBoardJourneyStep));
             break;
           }
         }
@@ -719,13 +712,13 @@ namespace TrRouting
         if (connection->nextConnectionId != -1)
         {
           
-          Connection& possibleConnection = (*connectionsById)[connection->nextConnectionId];
+          possibleConnectionPtr = &(*connectionsById)[connection->nextConnectionId];
         
-          if(possibleConnection.enabled)
+          if(possibleConnectionPtr->enabled)
           {
-            possibleConnection.reachable    = calculationId;
-            possibleConnection.numBoardings = connection->numBoardings;
-            possibleConnection.journeySteps = connection->journeySteps;
+            possibleConnectionPtr->reachable    = calculationId;
+            possibleConnectionPtr->numBoardings = connection->numBoardings;
+            possibleConnectionPtr->journeySteps = connection->journeySteps;
           }
         }
         
@@ -816,31 +809,31 @@ namespace TrRouting
                   for(auto & transferableConnection : connectionsByPathStopSequenceId[transferablePathStopSequenceId])
                   {
                     
-                    Connection * possibleConnection = transferableConnection;
+                    possibleConnectionPtr = transferableConnection;
                     
                     if (
-                       possibleConnection->enabled
-                       && possibleConnection->departureFromOriginTimeMinuteOfDay >= transferableStopId.second + connection->arrivalAtDestinationTimeMinuteOfDay + params.minWaitingTimeMinutes 
-                       && possibleConnection->canBoard
-                       && possibleConnection->tripId != connection->tripId
+                       possibleConnectionPtr->enabled
+                       && possibleConnectionPtr->departureFromOriginTimeMinuteOfDay >= transferableStopId.second + connection->arrivalAtDestinationTimeMinuteOfDay + params.minWaitingTimeMinutes 
+                       && possibleConnectionPtr->canBoard
+                       && possibleConnectionPtr->tripId != connection->tripId
                     ) // connection must be departing later, you should be able to board and you must not board the same trip again
                     {
                       
-                      possibleConnection->reachable    = calculationId;
-                      possibleConnection->numBoardings = stopsById[transferableStopId.first].numBoardings;
-                      possibleConnection->journeySteps = stopsById[transferableStopId.first].journeySteps;
+                      possibleConnectionPtr->reachable    = calculationId;
+                      possibleConnectionPtr->numBoardings = stopsById[transferableStopId.first].numBoardings;
+                      possibleConnectionPtr->journeySteps = stopsById[transferableStopId.first].journeySteps;
                       
                       SimplifiedJourneyStep newBoardJourneyStep;
                       
                       newBoardJourneyStep.id                      = ++journeyStepId;
                       newBoardJourneyStep.action                  = BOARD;
-                      newBoardJourneyStep.connectionId            = possibleConnection->id;
+                      newBoardJourneyStep.connectionId            = possibleConnectionPtr->id;
                       newBoardJourneyStep.accessTimeMinutes       = -1;
                       newBoardJourneyStep.accessFromStopId        = -1;
                       newBoardJourneyStep.accessFromTripId        = -1;
                       newBoardJourneyStep.readyToBoardMinuteOfDay = -1;
-                      possibleConnection->numBoardings += 1;
-                      possibleConnection->journeySteps.push_back(std::make_shared<SimplifiedJourneyStep>(newBoardJourneyStep));
+                      possibleConnectionPtr->numBoardings += 1;
+                      possibleConnectionPtr->journeySteps.push_back(std::make_shared<SimplifiedJourneyStep>(newBoardJourneyStep));
                       
                       break;
                     }

@@ -244,7 +244,7 @@ int main(int argc, char** argv) {
       calculator.params.egressMode = "walking";
       calculator.params.noResultSecondMode = "driving";
       calculator.params.tryNextModeIfRoutingFails = false;
-      calculator.params.noResultNextAccessTimeMinutesIncrement   = 5;
+      calculator.params.noResultNextAccessTimeMinutesIncrement = 5;
       calculator.params.maxNoResultNextAccessTimeMinutes = 40;
       
       for(auto & parameterWithValue : parametersWithValues)
