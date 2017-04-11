@@ -31,6 +31,7 @@ namespace TrRouting
     long long previousConnectionId;
     int numBoardings;
     std::vector<std::shared_ptr<SimplifiedJourneyStep> > journeySteps;
+    int lastJourneyStepIndex;
     
   private:
     friend class boost::serialization::access;

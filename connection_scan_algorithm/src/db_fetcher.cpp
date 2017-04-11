@@ -183,8 +183,9 @@ namespace TrRouting
       {
         std::vector<std::shared_ptr<SimplifiedJourneyStep> > journeySteps;
         
-        connection.second.reachable    = 0;
-        connection.second.journeySteps = journeySteps;
+        connection.second.reachable            = 0;
+        connection.second.journeySteps         = journeySteps;
+        connection.second.lastJourneyStepIndex = 0;
         //connection.second.journeySteps.reserve(10000);
       }
       //CalculationTime::algorithmCalculationTime.stopStep();
@@ -248,6 +249,7 @@ namespace TrRouting
           connection->nextConnectionId                    = c[13].as<long long>();
           connection->previousConnectionId                = c[14].as<long long>();
           connection->journeySteps                        = journeySteps;
+          connection->lastJourneyStepIndex                = 0;
           
           // add the trConnection to the connections vector:
           connectionsById[connection->id] = *connection;
@@ -325,6 +327,7 @@ namespace TrRouting
         connection->nextConnectionId                    = boost::lexical_cast<long long>          (*it); std::advance(it,1);
         connection->previousConnectionId                = boost::lexical_cast<long long>          (*it);
         connection->journeySteps                        = journeySteps;
+        connection->lastJourneyStepIndex                = 0;
         
         // add the trConnection to the connections vector:
         connectionsById[connection->id] = *connection;

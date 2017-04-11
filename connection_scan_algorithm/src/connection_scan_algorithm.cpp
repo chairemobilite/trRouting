@@ -41,7 +41,7 @@ namespace TrRouting
     
     for(auto & connection : forwardConnectionsById)
     {
-      connectionsByDepartureTime.push_back(&(connection.second));
+      connectionsByDepartureTime.emplace_back(&(connection.second));
     }
     
     // copy connections to create a new vector sorted by reversed arrival time instead of departure time (for reverse calculations using arrival time as input)
@@ -54,7 +54,7 @@ namespace TrRouting
       std::swap(connection.second.pathStopSequenceStartId, connection.second.pathStopSequenceEndId);
       connection.second.departureFromOriginTimeMinuteOfDay  = maxTimeValue - connection.second.departureFromOriginTimeMinuteOfDay;
       connection.second.arrivalAtDestinationTimeMinuteOfDay = maxTimeValue - connection.second.arrivalAtDestinationTimeMinuteOfDay;
-      connectionsByArrivalTime.push_back(&(connection.second));
+      connectionsByArrivalTime.emplace_back(&(connection.second));
     }
     std::sort(connectionsByArrivalTime.begin(), connectionsByArrivalTime.end(), [](Connection const* connectionA, Connection const* connectionB)
     {
@@ -90,7 +90,7 @@ namespace TrRouting
         std::vector<Connection*> connections;
         connectionsByStartPathStopSequenceId[connection->pathStopSequenceStartId] = connections;
       }
-      connectionsByStartPathStopSequenceId[connection->pathStopSequenceStartId].push_back(connection);
+      connectionsByStartPathStopSequenceId[connection->pathStopSequenceStartId].emplace_back(connection);
       i++;
       if (i % 1000 == 0)
       {
@@ -127,7 +127,7 @@ namespace TrRouting
         std::vector<Connection*> connections;
         connectionsByEndPathStopSequenceId[connection->pathStopSequenceEndId] = connections;
       }
-      connectionsByEndPathStopSequenceId[connection->pathStopSequenceEndId].push_back(connection);
+      connectionsByEndPathStopSequenceId[connection->pathStopSequenceEndId].emplace_back(connection);
       i++;
       if (i % 1000 == 0)
       {
@@ -163,7 +163,7 @@ namespace TrRouting
         std::vector<unsigned long long> pathStopSequencesforStop;
         pathStopSequencesByStopId[pathStopSequence.second.stopId] = pathStopSequencesforStop;
       }
-      pathStopSequencesByStopId[pathStopSequence.second.stopId].push_back(pathStopSequence.first);
+      pathStopSequencesByStopId[pathStopSequence.second.stopId].emplace_back(pathStopSequence.first);
       i++;
       if (i % 1000 == 0)
       {
@@ -302,6 +302,8 @@ namespace TrRouting
   void ConnectionScanAlgorithm::refresh()
   {
     
+    int totalNumberOfJourneySteps = 0;
+    
     //algorithmCalculationTime.startStep();
     
     ++calculationId;
@@ -329,7 +331,19 @@ namespace TrRouting
       }
       stop.second.canUnboardToDestination = false;
       stop.second.numBoardings = 0;
-      std::vector<std::shared_ptr<SimplifiedJourneyStep> >().swap(stop.second.journeySteps);
+      stop.second.journeySteps.resize(0);
+      stop.second.journeySteps.shrink_to_fit();
+      //if (stop.second.journeySteps.size() > 100)
+      //{
+      //  stop.second.journeySteps.shrink_to_fit();
+      //  std::cerr << "connection_size = " << stop.second.journeySteps.size() << std::endl;
+      //}
+      //else
+      //{
+      //  stop.second.journeySteps.clear();
+      //}
+      //stop.second.journeySteps.reserve(100);
+      //stop.second.journeySteps.shrink_to_fit();
       //stop.second.journeySteps.reserve(500);
     }
 
@@ -415,7 +429,20 @@ namespace TrRouting
         }
         
         connection.second.numBoardings = 0;
-        std::vector<std::shared_ptr<SimplifiedJourneyStep> >().swap(connection.second.journeySteps);
+        totalNumberOfJourneySteps += connection.second.journeySteps.size();
+        //if (connection.second.journeySteps.size() > 150)
+        //{
+        //  connection.second.journeySteps.shrink_to_fit();
+        //  //std::cerr << "connection_size = " << stop.second.journeySteps.size() << std::endl;
+        //}
+        //else
+        //{
+          connection.second.journeySteps.resize(0);
+          connection.second.journeySteps.shrink_to_fit();
+        //}
+        
+        //connection.second.journeySteps.resize(100);
+        //connection.second.journeySteps.shrink_to_fit();
         //connection.second.journeySteps.reserve(500);
       }
     }
@@ -491,10 +518,23 @@ namespace TrRouting
         }
         
         connection.second.numBoardings = 0;
-        std::vector<std::shared_ptr<SimplifiedJourneyStep> >().swap(connection.second.journeySteps);
+        //if (connection.second.journeySteps.size() > 150)
+        //{
+        //  connection.second.journeySteps.shrink_to_fit();
+        //  //std::cerr << "connection_size = " << stop.second.journeySteps.size() << std::endl;
+        //}
+        //else
+        //{
+          connection.second.journeySteps.resize(0);
+          connection.second.journeySteps.shrink_to_fit();
+        //}
+        //connection.second.journeySteps.resize(100);
+        //connection.second.journeySteps.shrink_to_fit();
         //connection.second.journeySteps.reserve(500);
       }
     }
+    
+    std::cerr << "number of journey steps = " << totalNumberOfJourneySteps << std::endl;
     
     //params.accessMode = "walking";
     //params.egressMode = "walking";
@@ -600,7 +640,7 @@ namespace TrRouting
     
     for(auto & walkableStopFromStartingPoint : nearestStopsIdsFromStartingPoint)
     {
-      sortedNearestStopsIdsFromStartingPointPairs.push_back(std::make_pair(walkableStopFromStartingPoint.first, walkableStopFromStartingPoint.second));
+      sortedNearestStopsIdsFromStartingPointPairs.emplace_back(std::make_pair(walkableStopFromStartingPoint.first, walkableStopFromStartingPoint.second));
     }
     if (params.startingStopId == -1)
     {
@@ -625,7 +665,7 @@ namespace TrRouting
       newWalkJourneyStep.accessFromStopId        = -1;
       newWalkJourneyStep.accessFromTripId        = -1;
       newWalkJourneyStep.readyToBoardMinuteOfDay = walkableStopFromStartingPoint.second + startTime + forwardFlag * params.minWaitingTimeMinutes;
-      stopsById[walkableStopFromStartingPoint.first].journeySteps.push_back(std::make_shared<SimplifiedJourneyStep>(newWalkJourneyStep));
+      stopsById[walkableStopFromStartingPoint.first].journeySteps.emplace_back(std::make_shared<SimplifiedJourneyStep>(newWalkJourneyStep));
       
       for(auto & transferablePathStopSequenceId : pathStopSequencesByStopId[walkableStopFromStartingPoint.first])
       {
@@ -640,7 +680,7 @@ namespace TrRouting
             && std::find(accessTripIds.begin(), accessTripIds.end(), possibleConnectionPtr->tripId) == accessTripIds.end() // minimize walking access travel time
           )
           {
-            accessTripIds.push_back(possibleConnectionPtr->tripId);
+            accessTripIds.emplace_back(possibleConnectionPtr->tripId);
             possibleConnectionPtr->reachable    = calculationId;
             possibleConnectionPtr->numBoardings = stopsById[walkableStopFromStartingPoint.first].numBoardings;
             possibleConnectionPtr->journeySteps = stopsById[walkableStopFromStartingPoint.first].journeySteps;
@@ -654,7 +694,7 @@ namespace TrRouting
             newBoardJourneyStep.accessFromTripId        = -1;
             newBoardJourneyStep.readyToBoardMinuteOfDay = -1;
             possibleConnectionPtr->numBoardings += 1;
-            possibleConnectionPtr->journeySteps.push_back(std::make_shared<SimplifiedJourneyStep>(newBoardJourneyStep));
+            possibleConnectionPtr->journeySteps.emplace_back(std::make_shared<SimplifiedJourneyStep>(newBoardJourneyStep));
             break;
           }
         }
@@ -707,7 +747,7 @@ namespace TrRouting
         newRideJourneyStep.accessFromStopId        = -1;
         newRideJourneyStep.accessFromTripId        = -1;
         newRideJourneyStep.readyToBoardMinuteOfDay = -1;
-        connection->journeySteps.push_back(std::make_shared<SimplifiedJourneyStep>(newRideJourneyStep));
+        connection->journeySteps.emplace_back(std::make_shared<SimplifiedJourneyStep>(newRideJourneyStep));
         
         if (connection->nextConnectionId != -1)
         {
@@ -738,7 +778,7 @@ namespace TrRouting
           newUnboardJourneyStep.accessFromTripId        = -1;
           newUnboardJourneyStep.readyToBoardMinuteOfDay = -1;
           
-          stopsById[connection->stopEndId].journeySteps.push_back(std::make_shared<SimplifiedJourneyStep>(newUnboardJourneyStep));
+          stopsById[connection->stopEndId].journeySteps.emplace_back(std::make_shared<SimplifiedJourneyStep>(newUnboardJourneyStep));
           
           // get transferable stops:
           // transfer only if max number of transfers has not been reached: BUT THAT IS WRONG: we could get to that connection with less boardings. There is still no way to really set a maximum number of transfers in csa for now...
@@ -783,7 +823,7 @@ namespace TrRouting
                   newWalkJourneyStep.accessFromStopId        = connection->stopEndId;
                   newWalkJourneyStep.accessFromTripId        = connection->tripId;
                   newWalkJourneyStep.readyToBoardMinuteOfDay = transferableStopId.second + params.minWaitingTimeMinutes + connection->arrivalAtDestinationTimeMinuteOfDay;
-                  stopsById[transferableStopId.first].journeySteps.push_back(std::make_shared<SimplifiedJourneyStep>(newWalkJourneyStep));
+                  stopsById[transferableStopId.first].journeySteps.emplace_back(std::make_shared<SimplifiedJourneyStep>(newWalkJourneyStep));
                   
                 }
                 
@@ -833,7 +873,7 @@ namespace TrRouting
                       newBoardJourneyStep.accessFromTripId        = -1;
                       newBoardJourneyStep.readyToBoardMinuteOfDay = -1;
                       possibleConnectionPtr->numBoardings += 1;
-                      possibleConnectionPtr->journeySteps.push_back(std::make_shared<SimplifiedJourneyStep>(newBoardJourneyStep));
+                      possibleConnectionPtr->journeySteps.emplace_back(std::make_shared<SimplifiedJourneyStep>(newBoardJourneyStep));
                       
                       break;
                     }
@@ -902,7 +942,6 @@ namespace TrRouting
         {
           stopArrivalTime   = stop.second.arrivalTimeMinuteOfDay;
           travelTimeMinutes = stopArrivalTime - startTime;
-          
         }
         else
         {
@@ -1164,7 +1203,7 @@ namespace TrRouting
       newWalkJourneyStep.accessFromStopId        = minTravelTimeStopId;
       newWalkJourneyStep.accessFromTripId        = -1;
       newWalkJourneyStep.readyToBoardMinuteOfDay = -1;
-      destinationJourneySteps.push_back(std::make_shared<SimplifiedJourneyStep>(newWalkJourneyStep));
+      destinationJourneySteps.emplace_back(std::make_shared<SimplifiedJourneyStep>(newWalkJourneyStep));
     }
     
     // save results to json:
