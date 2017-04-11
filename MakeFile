@@ -21,7 +21,7 @@ obj/%.o: src/%.cpp
 	$(CC) $(CXXFLAGS) $(LDFLAGS) $(LINKFLAGS) -O3 -c -o $@ $<
 
 connection_scan_algorithm/obj/%.o: connection_scan_algorithm/src/%.cpp
-	$(CC) $(CXXFLAGS) $(LDFLAGS) $(LINKFLAGS) -O3 -c -o  $@ $<
+	$(CC) $(CXXFLAGS) $(LDFLAGS) $(LINKFLAGS) -O3 -c -o $@ $<
 
 clean:
 	-rm connection_scan_algorithm/obj/*.o obj/*.o trRouting
