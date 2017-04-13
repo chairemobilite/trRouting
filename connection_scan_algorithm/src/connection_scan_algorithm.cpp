@@ -28,7 +28,14 @@ namespace TrRouting
     resetAccessEgressModes();
     maxTimeValue = 9999; // that's almost 7 days. No travel time should take that long.
     //setParamsFromYaml("trRoutingConfig.yml"); // disable yml config for now
-    DbFetcher::setDbSetupStr("dbname=" + params.databaseName + " user=" + params.databaseUser + " hostaddr=" + params.databaseHost + " port=" + params.databasePort + ""); // todo: add config to set this
+    if (params.databasePassword.size() > 0)
+    {
+      DbFetcher::setDbSetupStr("dbname=" + params.databaseName + " user=" + params.databaseUser + " hostaddr=" + params.databaseHost + " password=" + params.databasePassword + " port=" + params.databasePort + ""); // todo: add config to set this
+    }
+    else
+    {
+      DbFetcher::setDbSetupStr("dbname=" + params.databaseName + " user=" + params.databaseUser + " hostaddr=" + params.databaseHost + " port=" + params.databasePort + ""); // todo: add config to set this
+    }
     DbFetcher::disconnect();
     pickUpTypes                          = DbFetcher::getPickUpTypes(params.applicationShortname);
     dropOffTypes                         = DbFetcher::getDropOffTypes(params.applicationShortname);

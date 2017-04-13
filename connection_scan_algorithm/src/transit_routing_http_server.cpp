@@ -79,6 +79,16 @@ int main(int argc, char** argv) {
       ("dataShortname,sn", boost::program_options::value<std::string>(), "data shortname (shortname of the application to use or data to use)");
   optionsDesc.add_options() 
       ("osrmWalkPort",     boost::program_options::value<std::string>(), "osrm walking port");
+  optionsDesc.add_options() 
+      ("databaseUser",     boost::program_options::value<std::string>(), "database user");
+  optionsDesc.add_options() 
+      ("databaseName",     boost::program_options::value<std::string>(), "database name");
+  optionsDesc.add_options() 
+      ("databasePort",     boost::program_options::value<std::string>(), "database port");
+  optionsDesc.add_options() 
+      ("databaseHost",     boost::program_options::value<std::string>(), "database host");
+  optionsDesc.add_options() 
+      ("databasePassword", boost::program_options::value<std::string>(), "database password");
   
   boost::program_options::store(boost::program_options::parse_command_line(argc, argv, optionsDesc), variablesMap);
   
@@ -109,6 +119,26 @@ int main(int argc, char** argv) {
   if(variablesMap.count("osrmWalkPort") == 1)
   {
     algorithmParams.osrmRoutingWalkingPort = variablesMap["osrmWalkPort"].as<std::string>();
+  }
+  if(variablesMap.count("databasePort") == 1)
+  {
+    algorithmParams.databasePort = variablesMap["databasePort"].as<std::string>();
+  }
+  if(variablesMap.count("databaseHost") == 1)
+  {
+    algorithmParams.databaseHost = variablesMap["databaseHost"].as<std::string>();
+  }
+  if(variablesMap.count("databaseUser") == 1)
+  {
+    algorithmParams.databaseUser = variablesMap["databaseUser"].as<std::string>();
+  }
+  if(variablesMap.count("databaseName") == 1)
+  {
+    algorithmParams.databaseName = variablesMap["databaseName"].as<std::string>();
+  }
+  if(variablesMap.count("databasePassword") == 1)
+  {
+    algorithmParams.databasePassword = variablesMap["databasePassword"].as<std::string>();
   }
   
   

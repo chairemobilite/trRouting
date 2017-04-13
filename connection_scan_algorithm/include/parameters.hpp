@@ -57,6 +57,7 @@ namespace TrRouting
     std::string databaseHost;
     std::string databaseUser;
     std::string databasePort;
+    std::string databasePassword;
     std::string osrmRoutingWalkingPort;
     std::string osrmRoutingWalkingHost;
     std::string osrmRoutingDrivingPort;
@@ -95,6 +96,7 @@ namespace TrRouting
       databasePort                                               = "5432";
       databaseHost                                               = "127.0.0.1";
       databaseUser                                               = "postgres";
+      databasePassword                                           = "";
       osrmRoutingWalkingHost                                     = "localhost";
       osrmRoutingWalkingPort                                     = "5000";
       osrmRoutingDrivingHost                                     = "localhost";
