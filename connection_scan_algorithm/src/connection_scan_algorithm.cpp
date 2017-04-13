@@ -1005,6 +1005,8 @@ namespace TrRouting
                 if(enumMap[journeyStep->action] == "Ride")
                 {
                   routeIdStopPairIdsStr += "{ \"routeId\": " + std::to_string(connection.routeId) + ", \"stopIdsPair\": [" + std::to_string(connection.stopStartId) + "," + std::to_string(connection.stopEndId) +"]},";
+                  segmentInVehicleTimeMinutes += connection.arrivalAtDestinationTimeMinuteOfDay - connection.departureFromOriginTimeMinuteOfDay;
+                  totalInVehicleTimeMinutes   += connection.arrivalAtDestinationTimeMinuteOfDay - connection.departureFromOriginTimeMinuteOfDay;
                 }
                 else if(enumMap[journeyStep->action] == "Unboard")
                 {
@@ -1281,7 +1283,14 @@ namespace TrRouting
         {
           for(auto & journeyStep : destinationJourneySteps)
           {
-                        
+            
+            if(enumMap[journeyStep->action] == "Ride")
+            {
+              connection = (*connectionsById)[journeyStep->connectionId];
+              segmentInVehicleTimeMinutes += connection.arrivalAtDestinationTimeMinuteOfDay - connection.departureFromOriginTimeMinuteOfDay;
+              totalInVehicleTimeMinutes   += connection.arrivalAtDestinationTimeMinuteOfDay - connection.departureFromOriginTimeMinuteOfDay;
+            }
+                 
             if(journeyStep->connectionId != -1 && enumMap[journeyStep->action] == "Board")
             {
               
