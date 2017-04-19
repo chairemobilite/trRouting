@@ -974,7 +974,7 @@ namespace TrRouting
       routingHost          = params.osrmRoutingCyclingHost;
     }
     
-    std::cout << "mode = " << mode << " speed = " << speedMetersPerSecond << " maxTravelTime = " << maxTravelTimeMinutes << " port = " << routingPort << std::endl;
+    std::cout << "mode = " << mode << " speed = " << speedMetersPerSecond << " maxTravelTime = " << maxTravelTimeMinutes << " port = " << routingPort << " host = " << routingHost << " " << std::endl;
     
     std::cout << std::fixed;
     std::cout << std::setprecision(6);

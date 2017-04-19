@@ -143,7 +143,7 @@ int main(int argc, char** argv) {
   
   
   std::cout << "Using http port "      << serverPort << std::endl;
-  std::cout << "Using osrm walk port"  << algorithmParams.osrmRoutingWalkingPort << std::endl;
+  std::cout << "Using osrm walk port "  << algorithmParams.osrmRoutingWalkingPort << std::endl;
   std::cout << "Using data fetcher "   << dataFetcher << std::endl;
   std::cout << "Using data shortname " << dataShortname << std::endl;
   
