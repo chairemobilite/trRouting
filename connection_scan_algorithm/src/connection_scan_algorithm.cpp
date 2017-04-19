@@ -783,7 +783,7 @@ namespace TrRouting
           newUnboardJourneyStep.accessTimeMinutes       = -1;
           newUnboardJourneyStep.accessFromStopId        = -1;
           newUnboardJourneyStep.accessFromTripId        = -1;
-          newUnboardJourneyStep.readyToBoardMinuteOfDay = -1;
+          newUnboardJourneyStep.readyToBoardMinuteOfDay = connection->arrivalAtDestinationTimeMinuteOfDay + params.minWaitingTimeMinutes;
           
           stopsById[connection->stopEndId].journeySteps.emplace_back(std::make_shared<SimplifiedJourneyStep>(newUnboardJourneyStep));
           
@@ -1010,7 +1010,8 @@ namespace TrRouting
                 }
                 else if(enumMap[journeyStep->action] == "Unboard")
                 {
-                  transferFromRouteId = connection.routeId;
+                  transferFromRouteId            = connection.routeId;
+                  lastReadyToBoardAtMinuteOfDay  = journeyStep->readyToBoardMinuteOfDay;
                 }
                 else if(enumMap[journeyStep->action] == "Walk")
                 {
@@ -1059,14 +1060,12 @@ namespace TrRouting
                   
                   if (accessedFirstStop && lastReadyToBoardAtMinuteOfDay != -1)
                   {
-                    waitingTimeMinutes = params.minWaitingTimeMinutes + connection.departureFromOriginTimeMinuteOfDay - lastReadyToBoardAtMinuteOfDay;
-                    transferWaitingTimeMinutes += waitingTimeMinutes;
-                    totalWaitingTimeMinutes += waitingTimeMinutes;
+                    waitingTimeMinutes = connection.departureFromOriginTimeMinuteOfDay - lastReadyToBoardAtMinuteOfDay + params.minWaitingTimeMinutes;
                   }
                   else if (!accessedFirstStop && lastReadyToBoardAtMinuteOfDay != -1) 
                   {
-                    waitingTimeMinutes = params.minWaitingTimeMinutes + connection.departureFromOriginTimeMinuteOfDay - lastReadyToBoardAtMinuteOfDay;
-                    firstWaitingTimeMinutes = waitingTimeMinutes;
+                    waitingTimeMinutes = connection.departureFromOriginTimeMinuteOfDay - lastReadyToBoardAtMinuteOfDay + params.minWaitingTimeMinutes;
+                    firstWaitingTimeMinutes  = waitingTimeMinutes;
                     totalWaitingTimeMinutes += waitingTimeMinutes;
                   }
                   
