@@ -815,8 +815,10 @@ namespace TrRouting
                 
                 stopsById[transferableStopId.first].arrivalTimeMinuteOfDay = transferableStopId.second + connection->arrivalAtDestinationTimeMinuteOfDay;
                 
-                if(transferableStopId.first != connection->stopEndId)
-                {
+                // force walk even if transfer at same stop:
+                
+                //if(transferableStopId.first != connection->stopEndId)
+                //{
                   
                   stopsById[transferableStopId.first].numBoardings = stopsById[connection->stopEndId].numBoardings;
                   stopsById[transferableStopId.first].journeySteps = stopsById[connection->stopEndId].journeySteps;
@@ -832,7 +834,7 @@ namespace TrRouting
                   newWalkJourneyStep.readyToBoardMinuteOfDay = transferableStopId.second + params.minWaitingTimeMinutes + connection->arrivalAtDestinationTimeMinuteOfDay;
                   stopsById[transferableStopId.first].journeySteps.emplace_back(std::make_shared<SimplifiedJourneyStep>(newWalkJourneyStep));
                   
-                }
+                //}
                 
                 for(auto & transferablePathStopSequenceId : pathStopSequencesByStopId[transferableStopId.first])
                 {
