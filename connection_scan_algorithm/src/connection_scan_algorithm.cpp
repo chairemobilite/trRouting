@@ -815,10 +815,10 @@ namespace TrRouting
                 
                 stopsById[transferableStopId.first].arrivalTimeMinuteOfDay = transferableStopId.second + connection->arrivalAtDestinationTimeMinuteOfDay;
                 
-                // force walk even if transfer at same stop:
                 
-                //if(transferableStopId.first != connection->stopEndId)
-                //{
+                
+                if(transferableStopId.first != connection->stopEndId)
+                {
                   
                   stopsById[transferableStopId.first].numBoardings = stopsById[connection->stopEndId].numBoardings;
                   stopsById[transferableStopId.first].journeySteps = stopsById[connection->stopEndId].journeySteps;
@@ -834,7 +834,7 @@ namespace TrRouting
                   newWalkJourneyStep.readyToBoardMinuteOfDay = transferableStopId.second + params.minWaitingTimeMinutes + connection->arrivalAtDestinationTimeMinuteOfDay;
                   stopsById[transferableStopId.first].journeySteps.emplace_back(std::make_shared<SimplifiedJourneyStep>(newWalkJourneyStep));
                   
-                //}
+                }
                 
                 for(auto & transferablePathStopSequenceId : pathStopSequencesByStopId[transferableStopId.first])
                 {
@@ -1364,6 +1364,8 @@ namespace TrRouting
               stopEnd    = stopsById[connection.stopEndId];
               route      = routesById[connection.routeId];
               
+              lastReadyToBoardAtMinuteOfDay = journeyStep->readyToBoardMinuteOfDay;
+              
               numberOfBoardings = stopEnd.numBoardings;
               
               jsonResult += "\n    {\n";
@@ -1430,8 +1432,8 @@ namespace TrRouting
               
               lastReadyToBoardAtMinuteOfDay = journeyStep->readyToBoardMinuteOfDay;
               
-              jsonResult += "      \"TravelTimeMinutes\": " + std::to_string(journeyStep->accessTimeMinutes) + ",\n";
-              jsonResult += "      \"TravelTimeSeconds\": " + std::to_string(journeyStep->accessTimeMinutes * 60) + "\n";
+              jsonResult += "      \"travelTimeMinutes\": " + std::to_string(journeyStep->accessTimeMinutes) + ",\n";
+              jsonResult += "      \"travelTimeSeconds\": " + std::to_string(journeyStep->accessTimeMinutes * 60) + "\n";
     
               jsonResult += "    },";
     
