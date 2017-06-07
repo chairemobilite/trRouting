@@ -200,7 +200,7 @@ namespace TrRouting
       std::cout << "Fetching connections from database..." << std::endl;
       
       // query for connections:
-      std::string sqlQuery = "SELECT i, a_id, r_id, t_id, seq, rt_id, sv_id, pss_o, pss_d, can_board, can_unboard, atm_d, dtm_o, COALESCE(cs_next,-1), COALESCE(cs_prev,-1), s_o, s_d"
+      std::string sqlQuery = "SELECT i, a_id, r_id, t_id, seq, rt_id, sv_id, pss_o, pss_d, COALESCE(can_board,1), COALESCE(can_unboard,1), atm_d, dtm_o, COALESCE(cs_next,-1), COALESCE(cs_prev,-1), s_o, s_d"
       " FROM " + applicationShortname + ".mv_tr_connections_csa_with_single_next_and_prev " + connectionsSqlWhereClause + " ORDER BY i";
         
       std::cout << sqlQuery << std::endl;
