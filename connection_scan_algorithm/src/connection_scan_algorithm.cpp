@@ -895,6 +895,13 @@ namespace TrRouting
       }
     }
     
+    //for (auto & stop : stopsById)
+    //{
+    //    
+    //  std::cerr << "stop " << std::to_string(stop.first) << ":" << stop.second.journeySteps.size() << std::endl;
+    //
+    //}
+    
     std::string jsonResult = "";
      
     std::map<int, std::string> enumMap;
@@ -937,10 +944,12 @@ namespace TrRouting
       bool accessedFirstStop;
       int  waitingTimeMinutes;
       unsigned long long countReachableStops {0};
-      
+      //SimplifiedJourneyStep journeyStep;
       
       for (auto & stop : stopsById)
       {
+        
+        //std::cerr << "stop " << std::to_string(stop.first) << ":" << stop.second.journeySteps.size() << std::endl;
         
         if (params.startingStopId != -1 && stop.first == params.startingStopId)
         {
@@ -989,6 +998,8 @@ namespace TrRouting
           lastReadyToBoardAtMinuteOfDay = -1;
           accessedFirstStop             = false;
           waitingTimeMinutes            = 0;
+          
+          //std::cerr << std::endl << "stop " << std::to_string(stop.first) << " ";
 
           //std::cout << stop.second.name << ": " << stopArrivalTime << std::endl;
           if (stopArrivalTime < maxTimeValue && stop.second.journeySteps.size() > 0)
@@ -996,7 +1007,6 @@ namespace TrRouting
             
             countReachableStops++;
             
-            SimplifiedJourneyStep journeyStep;
             int numberOfTransfers{-1};
             for(auto & journeyStep : stop.second.journeySteps)
             {
@@ -1006,18 +1016,22 @@ namespace TrRouting
                 
                 if(enumMap[journeyStep->action] == "Ride")
                 {
+                  connection = (*connectionsById)[journeyStep->connectionId];
+                  //std::cerr << "r" << std::to_string(connection.stopStartId) << "|" << std::to_string(connection.stopEndId);
                   routeIdStopPairIdsStr += "{ \"routeId\": " + std::to_string(connection.routeId) + ", \"stopIdsPair\": [" + std::to_string(connection.stopStartId) + "," + std::to_string(connection.stopEndId) +"]},";
                   segmentInVehicleTimeMinutes += connection.arrivalAtDestinationTimeMinuteOfDay - connection.departureFromOriginTimeMinuteOfDay;
                   totalInVehicleTimeMinutes   += connection.arrivalAtDestinationTimeMinuteOfDay - connection.departureFromOriginTimeMinuteOfDay;
                 }
                 else if(enumMap[journeyStep->action] == "Unboard")
                 {
+                  connection = (*connectionsById)[journeyStep->connectionId];
+                  //std::cerr << "u";
                   transferFromRouteId            = connection.routeId;
                   lastReadyToBoardAtMinuteOfDay  = journeyStep->readyToBoardMinuteOfDay;
                 }
                 else if(enumMap[journeyStep->action] == "Walk")
                 {
-                  
+                  //std::cerr << "w";
                   if(!accessedFirstStop) // first walking
                   {
                     accessWalkingTimeMinutes = journeyStep->accessTimeMinutes;
@@ -1042,7 +1056,7 @@ namespace TrRouting
                 }
                 else if(enumMap[journeyStep->action] == "Board")
                 {
-                  
+                  //std::cerr << "b";
                   connection = (*connectionsById)[journeyStep->connectionId];
                   numRoutes++;
                   numberOfTransfers++;
@@ -1166,7 +1180,7 @@ namespace TrRouting
     }
     
     Connection connection;
-    SimplifiedJourneyStep journeyStep;
+    //SimplifiedJourneyStep journeyStep;
     Stop stopStart;
     Stop stopEnd;
     Route route;
