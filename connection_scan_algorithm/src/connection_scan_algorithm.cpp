@@ -51,6 +51,27 @@ namespace TrRouting
       connectionsByDepartureTime.emplace_back(&(connection.second));
     }
     
+    std::stable_sort(connectionsByDepartureTime.begin(), connectionsByDepartureTime.end(), [](Connection const* connectionA, Connection const* connectionB)
+    {
+      if (connectionA->departureFromOriginTimeMinuteOfDay < connectionB->departureFromOriginTimeMinuteOfDay)
+      {
+        return true;
+      }
+      else if (connectionA->departureFromOriginTimeMinuteOfDay > connectionB->departureFromOriginTimeMinuteOfDay)
+      {
+        return false;
+      }
+      if (connectionA->sequence < connectionB->sequence)
+      {
+        return true;
+      }
+      else if (connectionA->sequence > connectionB->sequence)
+      {
+        return false;
+      }
+      return false;
+    });
+    
     // copy connections to create a new vector sorted by reversed arrival time instead of departure time (for reverse calculations using arrival time as input)
     for(auto & connection : reverseConnectionsById)
     {
@@ -63,15 +84,33 @@ namespace TrRouting
       connection.second.arrivalAtDestinationTimeMinuteOfDay = maxTimeValue - connection.second.arrivalAtDestinationTimeMinuteOfDay;
       connectionsByArrivalTime.emplace_back(&(connection.second));
     }
-    std::sort(connectionsByArrivalTime.begin(), connectionsByArrivalTime.end(), [](Connection const* connectionA, Connection const* connectionB)
+    std::stable_sort(connectionsByArrivalTime.begin(), connectionsByArrivalTime.end(), [](Connection const* connectionA, Connection const* connectionB)
     {
-      return connectionA->departureFromOriginTimeMinuteOfDay < connectionB->departureFromOriginTimeMinuteOfDay;
+      if (connectionA->departureFromOriginTimeMinuteOfDay < connectionB->departureFromOriginTimeMinuteOfDay)
+      {
+        return true;
+      }
+      else if (connectionA->departureFromOriginTimeMinuteOfDay > connectionB->departureFromOriginTimeMinuteOfDay)
+      {
+        return false;
+      }
+      if (connectionA->sequence > connectionB->sequence) // here we need to reverse sequence!
+      {
+        return true;
+      }
+      else if (connectionA->sequence < connectionB->sequence)
+      {
+        return false;
+      }
+      return false;
     });
     
     connectionsByStartPathStopSequenceId = getConnectionsByStartPathStopSequenceId(connectionsByDepartureTime);
     connectionsByEndPathStopSequenceId   = getConnectionsByStartPathStopSequenceId(connectionsByArrivalTime); // really? by start? is this correct or we should replace by EndPathStopSequence?
     pathStopSequencesByStopId            = getPathStopSequencesByStopId(pathStopSequencesById);
   }
+  
+      
   
   // create a map of connection pointers by start path stop sequence id (key).
   std::map<unsigned long long, std::vector<Connection*> > ConnectionScanAlgorithm::getConnectionsByStartPathStopSequenceId(std::vector<Connection*> theConnectionsByDepartureTime)
@@ -598,16 +637,21 @@ namespace TrRouting
     int maxWalkingDurationAtEndingStops {0};
     int maxArrivalTimeAtEndingStops {maxTimeValue};
     int maxArrivalTime {maxTimeValue};
-    if (params.forwardCalculation && params.maxTotalTravelTimeMinutes > 0)
+    if (params.maxTotalTravelTimeMinutes > 0)
     {
       maxArrivalTime = startTime + params.maxTotalTravelTimeMinutes;
     }
+    if (maxArrivalTime > maxTimeValue)
+    {
+      maxArrivalTime = maxTimeValue;
+    }
+    
     bool foundMaxArrivalTime {false};
     
     std::map<unsigned long long, int> nearestStopsIdsFromStartingPoint;
     std::map<unsigned long long, int> nearestStopsIdsFromEndingPoint;
     
-    if(params.startingStopId == -1) // if starting point is set
+    if(params.startingStopId == -1) // if starting point is not set
     {
       nearestStopsIdsFromStartingPoint = DbFetcher::getNearestStopsIds(params.applicationShortname, params.dataFetcher, params.startingPoint, stopsById, params, accessMode, maxAccessWalkingTravelTimeFromOriginToFirstStopMinutes);
     }
@@ -658,8 +702,6 @@ namespace TrRouting
       });
     }
     
-    
-    
     for(auto & walkableStopFromStartingPoint : sortedNearestStopsIdsFromStartingPointPairs)
     {
       
@@ -676,6 +718,7 @@ namespace TrRouting
       
       for(auto & transferablePathStopSequenceId : pathStopSequencesByStopId[walkableStopFromStartingPoint.first])
       {
+        
         for(auto & transferableConnection : connectionsByPathStopSequenceId[transferablePathStopSequenceId])
         {
           
@@ -714,7 +757,7 @@ namespace TrRouting
     // main loop:
     for(auto & connection : *connections)
     {
-            
+      
       if (connection->reachable == calculationId && connection->enabled) // select reachable connections
       {
         
@@ -760,7 +803,7 @@ namespace TrRouting
         {
           
           possibleConnectionPtr = &(*connectionsById)[connection->nextConnectionId];
-        
+          
           if(possibleConnectionPtr->enabled)
           {
             possibleConnectionPtr->reachable    = calculationId;
@@ -895,13 +938,6 @@ namespace TrRouting
       }
     }
     
-    //for (auto & stop : stopsById)
-    //{
-    //    
-    //  std::cerr << "stop " << std::to_string(stop.first) << ":" << stop.second.journeySteps.size() << std::endl;
-    //
-    //}
-    
     std::string jsonResult = "";
      
     std::map<int, std::string> enumMap;
@@ -999,8 +1035,6 @@ namespace TrRouting
           accessedFirstStop             = false;
           waitingTimeMinutes            = 0;
           
-          //std::cerr << std::endl << "stop " << std::to_string(stop.first) << " ";
-
           //std::cout << stop.second.name << ": " << stopArrivalTime << std::endl;
           if (stopArrivalTime < maxTimeValue && stop.second.journeySteps.size() > 0)
           {
@@ -1017,7 +1051,6 @@ namespace TrRouting
                 if(enumMap[journeyStep->action] == "Ride")
                 {
                   connection = (*connectionsById)[journeyStep->connectionId];
-                  //std::cerr << "r" << std::to_string(connection.stopStartId) << "|" << std::to_string(connection.stopEndId);
                   routeIdStopPairIdsStr += "{ \"routeId\": " + std::to_string(connection.routeId) + ", \"stopIdsPair\": [" + std::to_string(connection.stopStartId) + "," + std::to_string(connection.stopEndId) +"]},";
                   segmentInVehicleTimeMinutes += connection.arrivalAtDestinationTimeMinuteOfDay - connection.departureFromOriginTimeMinuteOfDay;
                   totalInVehicleTimeMinutes   += connection.arrivalAtDestinationTimeMinuteOfDay - connection.departureFromOriginTimeMinuteOfDay;
@@ -1025,13 +1058,11 @@ namespace TrRouting
                 else if(enumMap[journeyStep->action] == "Unboard")
                 {
                   connection = (*connectionsById)[journeyStep->connectionId];
-                  //std::cerr << "u";
                   transferFromRouteId            = connection.routeId;
                   lastReadyToBoardAtMinuteOfDay  = journeyStep->readyToBoardMinuteOfDay;
                 }
                 else if(enumMap[journeyStep->action] == "Walk")
                 {
-                  //std::cerr << "w";
                   if(!accessedFirstStop) // first walking
                   {
                     accessWalkingTimeMinutes = journeyStep->accessTimeMinutes;
@@ -1056,7 +1087,6 @@ namespace TrRouting
                 }
                 else if(enumMap[journeyStep->action] == "Board")
                 {
-                  //std::cerr << "b";
                   connection = (*connectionsById)[journeyStep->connectionId];
                   numRoutes++;
                   numberOfTransfers++;
