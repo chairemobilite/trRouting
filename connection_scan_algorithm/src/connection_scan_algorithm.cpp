@@ -46,10 +46,35 @@ namespace TrRouting
     forwardConnectionsById               = DbFetcher::getConnectionsById(params.applicationShortname, params.dataFetcher, params.connectionsSqlWhereClause, params);
     reverseConnectionsById               = forwardConnectionsById;
     
+    std::cerr << "maxTimeValue: " << maxTimeValue << std::endl;
+    
     for(auto & connection : forwardConnectionsById)
     {
       connectionsByDepartureTime.emplace_back(&(connection.second));
+      
+      if (connection.first <= 100)
+      {
+        std::cerr << "F: " 
+        << connection.first
+        << " d:" << connection.second.departureFromOriginTimeMinuteOfDay 
+        << " a:" << connection.second.arrivalAtDestinationTimeMinuteOfDay 
+        << " ss:" << connection.second.stopStartId
+        << " es:" << connection.second.stopEndId
+        << " spss:" << connection.second.pathStopSequenceStartId
+        << " epss:" << connection.second.pathStopSequenceEndId
+        << " rch:" << connection.second.reachable
+        << " nc:" << connection.second.nextConnectionId
+        << " pc:" << connection.second.previousConnectionId
+        << " sv:" << connection.second.serviceId
+        << std::endl;
+      }
+      
     }
+    
+    std::stable_sort(connectionsByDepartureTime.begin(), connectionsByDepartureTime.end(), [](Connection const* connectionA, Connection const* connectionB)
+    {
+      return connectionA->id < connectionB->id;
+    });
     
     // copy connections to create a new vector sorted by reversed arrival time instead of departure time (for reverse calculations using arrival time as input)
     for(auto & connection : reverseConnectionsById)
@@ -62,14 +87,33 @@ namespace TrRouting
       connection.second.departureFromOriginTimeMinuteOfDay  = maxTimeValue - connection.second.departureFromOriginTimeMinuteOfDay;
       connection.second.arrivalAtDestinationTimeMinuteOfDay = maxTimeValue - connection.second.arrivalAtDestinationTimeMinuteOfDay;
       connectionsByArrivalTime.emplace_back(&(connection.second));
+      
+      if (connection.first <= 100)
+      {
+        std::cerr << "R: "
+        << connection.first
+        << " d:" << connection.second.departureFromOriginTimeMinuteOfDay 
+        << " a:" << connection.second.arrivalAtDestinationTimeMinuteOfDay 
+        << " ss:" << connection.second.stopStartId
+        << " es:" << connection.second.stopEndId
+        << " spss:" << connection.second.pathStopSequenceStartId
+        << " epss:" << connection.second.pathStopSequenceEndId
+        << " rch:" << connection.second.reachable
+        << " nc:" << connection.second.nextConnectionId
+        << " pc:" << connection.second.previousConnectionId
+        << " sv:" << connection.second.serviceId
+        << std::endl;
+      }
+      
     }
-    std::sort(connectionsByArrivalTime.begin(), connectionsByArrivalTime.end(), [](Connection const* connectionA, Connection const* connectionB)
+    
+    std::stable_sort(connectionsByArrivalTime.begin(), connectionsByArrivalTime.end(), [](Connection const* connectionA, Connection const* connectionB)
     {
       return connectionA->departureFromOriginTimeMinuteOfDay < connectionB->departureFromOriginTimeMinuteOfDay;
     });
     
     connectionsByStartPathStopSequenceId = getConnectionsByStartPathStopSequenceId(connectionsByDepartureTime);
-    connectionsByEndPathStopSequenceId   = getConnectionsByStartPathStopSequenceId(connectionsByArrivalTime); // really? by start? is this correct or we should replace by EndPathStopSequence?
+    connectionsByEndPathStopSequenceId   = getConnectionsByStartPathStopSequenceId(connectionsByArrivalTime); // Normal: by Start: they were swapped (reversed) before
     pathStopSequencesByStopId            = getPathStopSequencesByStopId(pathStopSequencesById);
   }
   
@@ -90,7 +134,6 @@ namespace TrRouting
     
     for(auto & connection : theConnectionsByDepartureTime)
     {
-      
       // add the path stop sequence id key does not exist:
       if (connectionsByStartPathStopSequenceId.find(connection->pathStopSequenceStartId) == connectionsByStartPathStopSequenceId.end())
       {
@@ -718,6 +761,8 @@ namespace TrRouting
       if (connection->reachable == calculationId && connection->enabled) // select reachable connections
       {
         
+        std::cerr << "C: " << connection->id << " d:" << connection->departureFromOriginTimeMinuteOfDay << " a:" << connection->arrivalAtDestinationTimeMinuteOfDay << std::endl;
+        
         PathStopSequence pathStopSequence;
         
         // stop calculating if max arrival time is reached
@@ -948,6 +993,8 @@ namespace TrRouting
       
       for (auto & stop : stopsById)
       {
+        
+        std::cerr << "stop " << std::to_string(stop.first) << ":" << stop.second.journeySteps.size() << "|" << stop.second.arrivalTimeMinuteOfDay << std::endl;
         
         //std::cerr << "stop " << std::to_string(stop.first) << ":" << stop.second.journeySteps.size() << std::endl;
         
@@ -1195,22 +1242,26 @@ namespace TrRouting
     Stop destinationStop;
     bool foundDestinationStop {false};
     
-    for(auto & walkableStopFromEndingPoint : nearestStopsIdsFromEndingPoint)
+    if(!params.returnAllStopsResult)
     {
-      
-      if(stopsById[walkableStopFromEndingPoint.first].journeySteps.size() > 0 && (stopsById[walkableStopFromEndingPoint.first].journeySteps.back())->action == WALK)
+    
+      for(auto & walkableStopFromEndingPoint : nearestStopsIdsFromEndingPoint)
       {
-        continue;
-        //stopsById[walkableStopFromEndingPoint.first].journeySteps = stopsById[walkableStopFromEndingPoint.first].previousJourneySteps;
+        
+        if(stopsById[walkableStopFromEndingPoint.first].journeySteps.size() > 0 && (stopsById[walkableStopFromEndingPoint.first].journeySteps.back())->action == WALK)
+        {
+          continue;
+          //stopsById[walkableStopFromEndingPoint.first].journeySteps = stopsById[walkableStopFromEndingPoint.first].previousJourneySteps;
+        }
+        
+        if(minArrivalTime > walkableStopFromEndingPoint.second + stopsById[walkableStopFromEndingPoint.first].arrivalTimeMinuteOfDay + reverseFlag * params.minWaitingTimeMinutes)
+        {
+          minArrivalTime      = walkableStopFromEndingPoint.second + stopsById[walkableStopFromEndingPoint.first].arrivalTimeMinuteOfDay + reverseFlag * params.minWaitingTimeMinutes;
+          minTravelTimeStopId = walkableStopFromEndingPoint.first;
+          accessTimeMinutes   = walkableStopFromEndingPoint.second;
+        }
       }
-      
-      if(minArrivalTime > walkableStopFromEndingPoint.second + stopsById[walkableStopFromEndingPoint.first].arrivalTimeMinuteOfDay + reverseFlag * params.minWaitingTimeMinutes)
-      {
-        minArrivalTime      = walkableStopFromEndingPoint.second + stopsById[walkableStopFromEndingPoint.first].arrivalTimeMinuteOfDay + reverseFlag * params.minWaitingTimeMinutes;
-        minTravelTimeStopId = walkableStopFromEndingPoint.first;
-        accessTimeMinutes   = walkableStopFromEndingPoint.second;
-      }
-    }
+    } 
     
     if (minTravelTimeStopId != -1)
     {
