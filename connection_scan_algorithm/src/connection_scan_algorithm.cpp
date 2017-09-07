@@ -616,6 +616,7 @@ namespace TrRouting
     
     std::map<unsigned long long, int> nearestStopsIdsFromStartingPoint;
     std::map<unsigned long long, int> nearestStopsIdsFromEndingPoint;
+    std::pair<int,int>                walkingTravelTimeAndDistance{std::make_pair(-1,-1)};
     
     if(params.startingStopId == -1) // if starting point is not set
     {
@@ -650,6 +651,10 @@ namespace TrRouting
         
       }
       std::cout << "-- Max walking duration from ending stop to destination: " << maxWalkingDurationAtEndingStops << " minutes --" << std::endl;
+      
+      // calculate walking travel time for the whole trip:
+      walkingTravelTimeAndDistance = DbFetcher::getTripTravelTimeAndDistance(params.startingPoint, params.endingPoint, "walking", params);
+      
     }
     
     std::vector<long long> accessTripIds;
@@ -1267,7 +1272,64 @@ namespace TrRouting
       jsonResult += "  \"destination\": [" + std::to_string(params.endingPoint.latitude) + "," + std::to_string(params.endingPoint.longitude) + "],\n";
       jsonResult += "  \"date\": \"" + std::to_string(params.routingDateYear) + "/" + boost::str(padWithZeros % (params.routingDateMonth)) + "/" + boost::str(padWithZeros % (params.routingDateDay)) + "\",\n";
       
-      if (foundResult)
+      std::cerr << "walkingTravelTimeMinutes: " << walkingTravelTimeAndDistance.first << std::endl; 
+      
+      // return single walking step if it is faster by walking:
+      if (walkingTravelTimeAndDistance.first >= 0 && walkingTravelTimeAndDistance.first <= maxAccessWalkingTravelTimeFromOriginToFirstStopMinutes * 2 && walkingTravelTimeAndDistance.first <= minArrivalTime - startTime)
+      {
+        
+        int totalWalkingTimeMinutes {walkingTravelTimeAndDistance.first};
+        
+        jsonResult += "  \"steps\":\n  [\n";
+        jsonResult += "\n    {\n";
+        jsonResult += "      \"action\": \"walking\",\n";
+        
+        jsonResult += "      \"travelTimeMinutes\": " + std::to_string(totalWalkingTimeMinutes) + ",\n";
+        jsonResult += "      \"travelTimeSeconds\": " + std::to_string(totalWalkingTimeMinutes * 60) + ",\n";
+        jsonResult += "      \"distanceMeters\": "    + std::to_string(walkingTravelTimeAndDistance.second) + "\n";
+        
+        jsonResult += "    }";
+        jsonResult += "\n  ],\n";
+        
+        if (params.forwardCalculation)
+        {
+          jsonResult += "  \"departureTime\": \"" + boost::str(padWithZeros % (startTime / 60))      + ":" + boost::str(padWithZeros % (startTime % 60))      + "\",\n";
+          jsonResult += "  \"arrivalTime\": \""   + boost::str(padWithZeros % (minArrivalTime / 60)) + ":" + boost::str(padWithZeros % (minArrivalTime % 60)) + "\",\n";
+        }
+        else
+        {
+          jsonResult += "  \"arrivalTime\": \"" + boost::str(padWithZeros % ((maxTimeValue - startTime) / 60))      + ":" + boost::str(padWithZeros % ((maxTimeValue - startTime) % 60))      + "\",\n";
+          jsonResult += "  \"departureTime\": \""   + boost::str(padWithZeros % ((maxTimeValue - minArrivalTime) / 60)) + ":" + boost::str(padWithZeros % ((maxTimeValue - minArrivalTime) % 60)) + "\",\n";
+        }
+        jsonResult += "  \"totalTravelTimeMinutes\": "                      + std::to_string(totalWalkingTimeMinutes) + ",\n";
+        jsonResult += "  \"totalTravelTimeSeconds\": "                      + std::to_string(totalWalkingTimeMinutes) + ",\n";
+        jsonResult += "  \"totalInVehicleTimeMinutes\": 0,\n";
+        jsonResult += "  \"totalInVehicleTimeSeconds\": 0,\n";
+        jsonResult += "  \"totalNonTransitTravelTimeMinutes\": "            + std::to_string(totalWalkingTimeMinutes) + ",\n";
+        jsonResult += "  \"totalNonTransitTravelTimeSeconds\": "            + std::to_string(totalWalkingTimeMinutes * 60) + ",\n";
+        jsonResult += "  \"numberOfBoardings\": 0,\n";
+        jsonResult += "  \"numberOfTransfers\": 0,\n";
+        jsonResult += "  \"maxNumberOfTransfers\": "                        + std::to_string(params.maxNumberOfTransfers) + ",\n";
+        jsonResult += "  \"transferWalkingTimeMinutes\": 0,\n";
+        jsonResult += "  \"transferWalkingTimeSeconds\": 0,\n";
+        jsonResult += "  \"accessTravelTimeMinutes\": "                     + std::to_string(totalWalkingTimeMinutes) + ",\n";
+        jsonResult += "  \"accessTravelTimeSeconds\": "                     + std::to_string(totalWalkingTimeMinutes * 60) + ",\n";
+        jsonResult += "  \"egressTravelTimeMinutes\": 0,\n";
+        jsonResult += "  \"egressTravelTimeSeconds\": 0,\n";
+        jsonResult += "  \"transferWaitingTimeMinutes\": 0,\n";
+        jsonResult += "  \"transferWaitingTimeSeconds\": 0,\n";
+        jsonResult += "  \"firstWaitingTimeMinutes\": 0,\n";
+        jsonResult += "  \"firstWaitingTimeSeconds\": 0,\n";
+        jsonResult += "  \"totalWaitingTimeMinutes\": 0,\n";
+        jsonResult += "  \"totalWaitingTimeSeconds\": 0,\n";
+        jsonResult += "  \"minimumWaitingTimeBeforeEachBoardingMinutes\": " + std::to_string(params.minWaitingTimeMinutes) + ",\n";
+        jsonResult += "  \"minimumWaitingTimeBeforeEachBoardingSeconds\": " + std::to_string(params.minWaitingTimeMinutes * 60) + ",\n";
+        jsonResult += "  \"departureTimeToMinimizeFirstWaitingTime\": \""   + boost::str(padWithZeros % ((maxTimeValue - minArrivalTime) / 60)) + ":" + boost::str(padWithZeros % ((maxTimeValue - minArrivalTime) % 60)) + "\",\n";
+        jsonResult += "  \"minimizedTotalTravelTimeMinutes\": "             + std::to_string(totalWalkingTimeMinutes) + ",\n";
+        jsonResult += "  \"minimizedTotalTravelTimeSeconds\": "             + std::to_string((totalWalkingTimeMinutes) * 60) + ",\n";
+        
+      }
+      else if (foundResult)
       {
       
         jsonResult += "  \"steps\":\n  [\n";

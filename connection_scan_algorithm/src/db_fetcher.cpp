@@ -948,6 +948,87 @@ namespace TrRouting
     
   }
   
+  const std::pair<int, int> DbFetcher::getTripTravelTimeAndDistance(Point startingPoint, Point endingPoint, std::string mode, Parameters& params)
+  {
+    //float speedMetersPerSecond;
+    std::string routingPort;
+    std::string routingHost;
+    
+    int travelTimeMinutes{-1};
+    int distanceMeters{-1};
+    
+    if (mode ==  "walking")
+    {
+      //speedMetersPerSecond = params.walkingSpeedMetersPerSecond;
+      routingPort          = params.osrmRoutingWalkingPort;
+      routingHost          = params.osrmRoutingWalkingHost;
+    }
+    else if (mode ==  "driving")
+    {
+      //speedMetersPerSecond = params.drivingSpeedMetersPerSecond;
+      routingPort          = params.osrmRoutingDrivingPort;
+      routingHost          = params.osrmRoutingDrivingHost;
+    }
+    else if (mode == "cycling")
+    {
+      //speedMetersPerSecond = params.cyclingSpeedMetersPerSecond;
+      routingPort          = params.osrmRoutingCyclingPort;
+      routingHost          = params.osrmRoutingCyclingHost;
+    }
+    else
+    {
+      return std::make_pair(travelTimeMinutes, distanceMeters);
+    }
+    
+    std::cout << "mode = " << mode << " port = " << routingPort << " host = " << routingHost << " " << std::endl;
+    
+    std::cout << std::fixed;
+    std::cout << std::setprecision(6);
+    
+    std::string queryString = "GET /route/v1/" + mode + "/" + std::to_string(startingPoint.longitude) +  "," + std::to_string(startingPoint.latitude) + ";" + std::to_string(endingPoint.longitude) +  "," + std::to_string(endingPoint.latitude);
+    
+    boost::asio::ip::tcp::iostream s;
+    s.connect(routingHost, routingPort);
+    queryString += " HTTP/1.1\r\n\r\n";
+        
+    s << queryString;
+    
+    std::string header;
+    while (std::getline(s, header) && header != "\r"){} // ignore first line
+    
+    std::stringstream responseJsonSs;
+    responseJsonSs << s.rdbuf();
+    
+    boost::property_tree::ptree pt;
+    boost::property_tree::read_json(responseJsonSs, pt);
+    
+    using boost::property_tree::ptree;
+    
+    //std::cout << "duration count = " << pt.count("durations") << std::endl;
+    
+    if (pt.count("routes") >= 1)
+    {
+      ptree routes = pt.get_child("routes");
+    
+      int i = 0;
+      
+      for (const auto& v : routes) {
+        for (const auto& v2 : v.second) {
+          
+          std::cerr << "     v.second:" << v.second.get<float>("duration", 0) << std::endl;
+          
+          travelTimeMinutes = (int)ceil(v.second.get<float>("duration", 0)/60);
+          distanceMeters    = (int)ceil(v.second.get<float>("distance", 0));
+          break; // We take only the first route
+          
+        }
+      }
+    }
+    
+    return std::make_pair(travelTimeMinutes, distanceMeters);
+    
+  }
+  
   const std::map<unsigned long long, int> DbFetcher::getNearestStopsIds(std::string applicationShortname, std::string dataFetcher, Point point, std::map<unsigned long long, Stop> stopsById, Parameters& params, std::string mode, int maxTravelTimeMinutes)
   {
         
