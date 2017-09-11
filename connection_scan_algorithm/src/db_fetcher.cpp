@@ -200,9 +200,8 @@ namespace TrRouting
       std::cout << "Fetching connections from database..." << std::endl;
       
       // query for connections:
-      std::string sqlQuery = "SELECT i, a_id, r_id, t_id, seq, rt_id, sv_id, pss_o, pss_d, COALESCE(can_board,1), COALESCE(can_unboard,1), atm_d, dtm_o, COALESCE(cs_next,-1), COALESCE(cs_prev,-1), s_o, s_d"
-      " FROM " + applicationShortname + ".mv_tr_connections_csa_with_single_next_and_prev " + connectionsSqlWhereClause + " ORDER BY i";
-        
+      std::string sqlQuery = "SELECT i, a_id, r_id, t_id, seq, rt_id, sv_id, pss_o, pss_d, COALESCE(can_board,1), COALESCE(can_unboard,1), atm_d, dtm_o, COALESCE(cs_next,-1), COALESCE(cs_prev,-1), s_o, s_d, (CASE (COALESCE(pss_enabled_o, TRUE) AND COALESCE(pss_enabled_d, TRUE)) WHEN FALSE THEN 0 ELSE 1 END) as enabled FROM " + applicationShortname + ".mv_tr_connections_csa_with_single_next_and_prev " + connectionsSqlWhereClause + " ORDER BY i";
+      
       std::cout << sqlQuery << std::endl;
       
       if (isConnectionOpen())
@@ -248,6 +247,7 @@ namespace TrRouting
           connection->reachable                           = 0;
           connection->nextConnectionId                    = c[13].as<long long>();
           connection->previousConnectionId                = c[14].as<long long>();
+          connection->enabled                             = c[17].as<unsigned long long>();
           connection->journeySteps                        = journeySteps;
           connection->lastJourneyStepIndex                = 0;
           
@@ -325,7 +325,8 @@ namespace TrRouting
         connection->canUnboard                          = boost::lexical_cast<unsigned long long> (*it); std::advance(it,1);
         connection->reachable                           = 0;
         connection->nextConnectionId                    = boost::lexical_cast<long long>          (*it); std::advance(it,1);
-        connection->previousConnectionId                = boost::lexical_cast<long long>          (*it);
+        connection->previousConnectionId                = boost::lexical_cast<long long>          (*it); std::advance(it,1);
+        connection->enabled                             = boost::lexical_cast<unsigned long long> (*it);
         connection->journeySteps                        = journeySteps;
         connection->lastJourneyStepIndex                = 0;
         

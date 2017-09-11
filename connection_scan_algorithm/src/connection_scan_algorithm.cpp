@@ -395,70 +395,70 @@ namespace TrRouting
     {
       for (auto & connection : forwardConnectionsById)
       {
-        connection.second.reachable    = 0;
-        connection.second.enabled      = true;
+        connection.second.reachable          = 0;
+        connection.second.calculationEnabled = connection.second.enabled == 1 ? true : false;
         
         if (hasOnlyServices)
         {
           if (params.onlyServiceIds.find(connection.second.serviceId) == params.onlyServiceIds.end())
           {
-            connection.second.enabled = false;
+            connection.second.calculationEnabled = false;
           }
         }
         
         if (hasOnlyRoutes)
         {
-          if (connection.second.enabled && params.onlyRouteIds.find(connection.second.routeId) == params.onlyRouteIds.end())
+          if (connection.second.calculationEnabled && params.onlyRouteIds.find(connection.second.routeId) == params.onlyRouteIds.end())
           {
-            connection.second.enabled = false;
+            connection.second.calculationEnabled = false;
           }
         }
         
         if (hasOnlyRouteTypes)
         {
-          if (connection.second.enabled && params.onlyRouteTypeIds.find(connection.second.routeTypeId) == params.onlyRouteTypeIds.end())
+          if (connection.second.calculationEnabled && params.onlyRouteTypeIds.find(connection.second.routeTypeId) == params.onlyRouteTypeIds.end())
           {
-            connection.second.enabled = false;
+            connection.second.calculationEnabled = false;
           }
         }
         
         if (hasOnlyAgencies)
         {
-          if (connection.second.enabled && params.onlyAgencyIds.find(connection.second.agencyId) == params.onlyAgencyIds.end())
+          if (connection.second.calculationEnabled && params.onlyAgencyIds.find(connection.second.agencyId) == params.onlyAgencyIds.end())
           {
-            connection.second.enabled = false;
+            connection.second.calculationEnabled = false;
           }
         }
         
         if (hasExceptServices)
         {
-          if (connection.second.enabled && params.exceptServiceIds.find(connection.second.serviceId) != params.exceptServiceIds.end())
+          if (connection.second.calculationEnabled && params.exceptServiceIds.find(connection.second.serviceId) != params.exceptServiceIds.end())
           {
-            connection.second.enabled = false;
+            connection.second.calculationEnabled = false;
           }
         }
         
         if (hasExceptRoutes)
         {
-          if (connection.second.enabled && params.exceptRouteIds.find(connection.second.routeId) != params.exceptRouteIds.end())
+          if (connection.second.calculationEnabled && params.exceptRouteIds.find(connection.second.routeId) != params.exceptRouteIds.end())
           {
-            connection.second.enabled = false;
+            connection.second.calculationEnabled = false;
           }
         }
         
         if (hasExceptRouteTypes)
         {
-          if (connection.second.enabled && params.exceptRouteTypeIds.find(connection.second.routeTypeId) != params.exceptRouteTypeIds.end())
+          if (connection.second.calculationEnabled && params.exceptRouteTypeIds.find(connection.second.routeTypeId) != params.exceptRouteTypeIds.end())
           {
-            connection.second.enabled = false;
+            connection.second.calculationEnabled = false;
           }
         }
         
         if (hasExceptAgencies)
         {
-          if (connection.second.enabled && params.exceptAgencyIds.find(connection.second.agencyId) != params.exceptAgencyIds.end())
+          if (connection.second.calculationEnabled && params.exceptAgencyIds.find(connection.second.agencyId) != params.exceptAgencyIds.end())
           {
-            connection.second.enabled = false;
+            connection.second.calculationEnabled = false;
           }
         }
         
@@ -472,70 +472,70 @@ namespace TrRouting
     {
       for (auto & connection : reverseConnectionsById)
       {
-        connection.second.reachable    = 0;
-        connection.second.enabled      = true;
+        connection.second.reachable          = 0;
+        connection.second.calculationEnabled = connection.second.enabled == 1 ? true : false;
         
         if (hasOnlyServices)
         {
           if (params.onlyServiceIds.find(connection.second.serviceId) == params.onlyServiceIds.end())
           {
-            connection.second.enabled = false;
+            connection.second.calculationEnabled = false;
           }
         }
         
         if (hasOnlyRoutes)
         {
-          if (connection.second.enabled && params.onlyRouteIds.find(connection.second.routeId) == params.onlyRouteIds.end())
+          if (connection.second.calculationEnabled && params.onlyRouteIds.find(connection.second.routeId) == params.onlyRouteIds.end())
           {
-            connection.second.enabled = false;
+            connection.second.calculationEnabled = false;
           }
         }
         
         if (hasOnlyRouteTypes)
         {
-          if (connection.second.enabled && params.onlyRouteTypeIds.find(connection.second.routeTypeId) == params.onlyRouteTypeIds.end())
+          if (connection.second.calculationEnabled && params.onlyRouteTypeIds.find(connection.second.routeTypeId) == params.onlyRouteTypeIds.end())
           {
-            connection.second.enabled = false;
+            connection.second.calculationEnabled = false;
           }
         }
         
         if (hasOnlyAgencies)
         {
-          if (connection.second.enabled && params.onlyAgencyIds.find(connection.second.agencyId) == params.onlyAgencyIds.end())
+          if (connection.second.calculationEnabled && params.onlyAgencyIds.find(connection.second.agencyId) == params.onlyAgencyIds.end())
           {
-            connection.second.enabled = false;
+            connection.second.calculationEnabled = false;
           }
         }
         
         if (hasExceptServices)
         {
-          if (connection.second.enabled && params.exceptServiceIds.find(connection.second.serviceId) != params.exceptServiceIds.end())
+          if (connection.second.calculationEnabled && params.exceptServiceIds.find(connection.second.serviceId) != params.exceptServiceIds.end())
           {
-            connection.second.enabled = false;
+            connection.second.calculationEnabled = false;
           }
         }
         
         if (hasExceptRoutes)
         {
-          if (connection.second.enabled && params.exceptRouteIds.find(connection.second.routeId) != params.exceptRouteIds.end())
+          if (connection.second.calculationEnabled && params.exceptRouteIds.find(connection.second.routeId) != params.exceptRouteIds.end())
           {
-            connection.second.enabled = false;
+            connection.second.calculationEnabled = false;
           }
         }
         
         if (hasExceptRouteTypes)
         {
-          if (connection.second.enabled && params.exceptRouteTypeIds.find(connection.second.routeTypeId) != params.exceptRouteTypeIds.end())
+          if (connection.second.calculationEnabled && params.exceptRouteTypeIds.find(connection.second.routeTypeId) != params.exceptRouteTypeIds.end())
           {
-            connection.second.enabled = false;
+            connection.second.calculationEnabled = false;
           }
         }
         
         if (hasExceptAgencies)
         {
-          if (connection.second.enabled && params.exceptAgencyIds.find(connection.second.agencyId) != params.exceptAgencyIds.end())
+          if (connection.second.calculationEnabled && params.exceptAgencyIds.find(connection.second.agencyId) != params.exceptAgencyIds.end())
           {
-            connection.second.enabled = false;
+            connection.second.calculationEnabled = false;
           }
         }
         
@@ -695,7 +695,7 @@ namespace TrRouting
           
           possibleConnectionPtr = transferableConnection;
           
-          if (possibleConnectionPtr->enabled 
+          if (possibleConnectionPtr->calculationEnabled
             && possibleConnectionPtr->departureFromOriginTimeMinuteOfDay >= walkableStopFromStartingPoint.second + startTime + forwardFlag * params.minWaitingTimeMinutes
             && possibleConnectionPtr->canBoard
             && std::find(accessTripIds.begin(), accessTripIds.end(), possibleConnectionPtr->tripId) == accessTripIds.end() // minimize walking access travel time
@@ -729,7 +729,7 @@ namespace TrRouting
     for(auto & connection : *connections)
     {
       
-      if (connection->reachable == calculationId && connection->enabled) // select reachable connections
+      if (connection->reachable == calculationId && connection->calculationEnabled) // select reachable connections
       {
         
         PathStopSequence pathStopSequence;
@@ -775,7 +775,7 @@ namespace TrRouting
           
           possibleConnectionPtr = &(*connectionsById)[connection->nextConnectionId];
           
-          if(possibleConnectionPtr->enabled)
+          if(possibleConnectionPtr->calculationEnabled)
           {
             possibleConnectionPtr->reachable    = calculationId;
             possibleConnectionPtr->numBoardings = connection->numBoardings;
@@ -875,7 +875,7 @@ namespace TrRouting
                     possibleConnectionPtr = transferableConnection;
                     
                     if (
-                       possibleConnectionPtr->enabled
+                       possibleConnectionPtr->calculationEnabled
                        && possibleConnectionPtr->departureFromOriginTimeMinuteOfDay >= transferableStopId.second + connection->arrivalAtDestinationTimeMinuteOfDay + params.minWaitingTimeMinutes 
                        && possibleConnectionPtr->canBoard
                        && possibleConnectionPtr->tripId != connection->tripId
@@ -1361,7 +1361,7 @@ namespace TrRouting
               segmentInVehicleTimeMinutes += connection.arrivalAtDestinationTimeMinuteOfDay - connection.departureFromOriginTimeMinuteOfDay;
               totalInVehicleTimeMinutes   += connection.arrivalAtDestinationTimeMinuteOfDay - connection.departureFromOriginTimeMinuteOfDay;
             }
-                 
+            
             if(journeyStep->connectionId != -1 && enumMap[journeyStep->action] == "Board")
             {
               

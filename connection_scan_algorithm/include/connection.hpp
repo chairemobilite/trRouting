@@ -26,7 +26,8 @@ namespace TrRouting
     bool canBoard;
     bool canUnboard;
     int reachable; // ConnectionScanAlgorithm::calculationId will be assigned for each reachable connections
-    bool enabled; // connection is enabled (after filtering route ids, route type ids, service ids, etc.)
+    bool enabled; // connection is enabled in database
+    bool calculationEnabled; // connection is enabled for a single calculation (after filtering route ids, route type ids, service ids, etc.)
     long long nextConnectionId;
     long long previousConnectionId;
     int numBoardings;
@@ -55,6 +56,7 @@ namespace TrRouting
         ar & canUnboard;
         ar & nextConnectionId;
         ar & previousConnectionId;
+        ar & enabled;
 
     }
   };
