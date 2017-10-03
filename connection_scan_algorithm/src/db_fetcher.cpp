@@ -1016,7 +1016,7 @@ namespace TrRouting
       for (const auto& v : routes) {
         for (const auto& v2 : v.second) {
           
-          std::cerr << "     v.second:" << v.second.get<float>("duration", 0) << std::endl;
+          //std::cerr << "     v.second:" << v.second.get<float>("duration", 0) << std::endl;
           
           travelTimeMinutes = (int)ceil(v.second.get<float>("duration", 0)/60);
           distanceMeters    = (int)ceil(v.second.get<float>("distance", 0));

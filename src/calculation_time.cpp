@@ -29,6 +29,13 @@ namespace TrRouting
     return endEpoch - startEpoch;
   }
   
+  long long CalculationTime::getDurationMillisecondsNoStop()
+  {
+    long long actualEpoch {getEpoch()};
+    assert(startEpoch && actualEpoch && startEpoch >= 0 && actualEpoch >= 0 && actualEpoch >= startEpoch);
+    return actualEpoch - startEpoch;
+  }
+  
   void CalculationTime::startStep()
   {
     startStepEpoch = getEpoch();

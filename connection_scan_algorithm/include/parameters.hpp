@@ -72,11 +72,12 @@ namespace TrRouting
     int noResultNextAccessTimeMinutesIncrement;
     int maxNoResultNextAccessTimeMinutes;
     
-    bool returnAllStopsResult;      // keep results for all stops (used in creating accessibility map)
-    bool forwardCalculation;        // forward calculation: default. if false: reverse calculation, will ride connections backward (useful when setting the arrival time)
-    bool detailedResults;           // return detailed results when using results for all stops
-    bool transferOnlyAtSameStation; // will transfer only between stops having the same station_id (better performance, but make sure your stations are well designed and specified)
-    bool transferBetweenSameRoute;  // allow transfers between the same route_id
+    bool returnAllStopsResult;         // keep results for all stops (used in creating accessibility map)
+    bool forwardCalculation;           // forward calculation: default. if false: reverse calculation, will ride connections backward (useful when setting the arrival time)
+    bool detailedResults;              // return detailed results when using results for all stops
+    bool transferOnlyAtSameStation;    // will transfer only between stops having the same station_id (better performance, but make sure your stations are well designed and specified)
+    bool transferBetweenSameRoute;     // allow transfers between the same route_id
+    bool calculateByNumberOfTransfers; // calculate first the fastest route, then calculate with decreasing number of transfers until no route is found, return results for each number of transfers.
     
     void setDefaultValues()
     {
@@ -114,6 +115,7 @@ namespace TrRouting
       detailedResults                                            = false;
       transferOnlyAtSameStation                                  = false;
       transferBetweenSameRoute                                   = true;
+      calculateByNumberOfTransfers                               = false;
     }
     
   };

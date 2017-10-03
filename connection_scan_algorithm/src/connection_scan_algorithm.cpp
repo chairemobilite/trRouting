@@ -558,7 +558,7 @@ namespace TrRouting
     
   }
   
-  std::string ConnectionScanAlgorithm::calculate(std::string tripIdentifier)
+  std::string ConnectionScanAlgorithm::calculate(std::string tripIdentifier, const std::map<unsigned long long, int>& cachedNearestStopsIdsFromStartingPoint, const std::map<unsigned long long, int>& cachedNearestStopsIdsFromEndingPoint)
   {
     
     //algorithmCalculationTime.start();
@@ -620,7 +620,14 @@ namespace TrRouting
     
     if(params.startingStopId == -1) // if starting point is not set
     {
-      nearestStopsIdsFromStartingPoint = DbFetcher::getNearestStopsIds(params.applicationShortname, params.dataFetcher, params.startingPoint, stopsById, params, accessMode, maxAccessWalkingTravelTimeFromOriginToFirstStopMinutes);
+      if (!cachedNearestStopsIdsFromStartingPoint.empty())
+      {
+        nearestStopsIdsFromStartingPoint = cachedNearestStopsIdsFromStartingPoint;
+      }
+      else
+      {
+        nearestStopsIdsFromStartingPoint = DbFetcher::getNearestStopsIds(params.applicationShortname, params.dataFetcher, params.startingPoint, stopsById, params, accessMode, maxAccessWalkingTravelTimeFromOriginToFirstStopMinutes);
+      }
     }
     else // if starting stop is forced
     {
@@ -631,7 +638,16 @@ namespace TrRouting
     {
       //if(params.endingStopId == -1)
       //{
-      nearestStopsIdsFromEndingPoint = DbFetcher::getNearestStopsIds(params.applicationShortname, params.dataFetcher, params.endingPoint, stopsById, params, egressMode, maxAccessWalkingTravelTimeFromLastStopToDestinationMinutes);
+      
+      if (!cachedNearestStopsIdsFromEndingPoint.empty())
+      {
+        nearestStopsIdsFromEndingPoint = cachedNearestStopsIdsFromEndingPoint;
+      }
+      else
+      {
+        nearestStopsIdsFromEndingPoint = DbFetcher::getNearestStopsIds(params.applicationShortname, params.dataFetcher, params.endingPoint, stopsById, params, egressMode, maxAccessWalkingTravelTimeFromLastStopToDestinationMinutes);
+      }
+      
       //}
       //else
       //{
@@ -910,7 +926,8 @@ namespace TrRouting
     }
     
     std::string jsonResult = "";
-     
+    std::string jsonResultWithNumberOfTransfers = "";
+    
     std::map<int, std::string> enumMap;
     enumMap[0] = "Walk";
     enumMap[1] = "Cycle";
@@ -1163,15 +1180,14 @@ namespace TrRouting
       jsonResult.pop_back(); // remove trailing comma
       jsonResult += "\n  ],\n";
       
-      jsonResult += "  \"numberOfReachableStops\": "                   + std::to_string(countReachableStops) + ",\n";
-      jsonResult += "  \"percentOfReachableStops\": "                  + std::to_string(round(10000 * (float)countReachableStops / (float)(stopsById.size()))/100.0) + ",\n";
+      jsonResult += "  \"numberOfReachableStops\": "  + std::to_string(countReachableStops) + ",\n";
+      jsonResult += "  \"percentOfReachableStops\": " + std::to_string(round(10000 * (float)countReachableStops / (float)(stopsById.size()))/100.0) + ",\n";
       
       algorithmCalculationTime.stop();
-
-      jsonResult += "  \"calculatedInMilliseconds\": "                 + std::to_string(algorithmCalculationTime.getDurationMilliseconds()) + "\n";
+      jsonResult += "  \"calculatedInMilliseconds\": " + std::to_string(algorithmCalculationTime.getDurationMillisecondsNoStop()) + "\n";
       jsonResult += "}";
       
-      std::cerr << "-- calculation time -- " << algorithmCalculationTime.getDurationMilliseconds() << " ms\n";
+      std::cerr << "-- calculation time -- " << algorithmCalculationTime.getDurationMillisecondsNoStop() << " ms\n";
 
       
       return jsonResult;
@@ -1229,6 +1245,9 @@ namespace TrRouting
       destinationJourneySteps.emplace_back(std::make_shared<SimplifiedJourneyStep>(newWalkJourneyStep));
     }
     
+    bool foundResult = minArrivalTime < maxTimeValue && (params.maxTotalTravelTimeMinutes <= 0 || (params.maxTotalTravelTimeMinutes > 0 && (minArrivalTime - startTime) <= params.maxTotalTravelTimeMinutes));
+    int  numberOfTransfers {-1};
+    
     // save results to json:
     
     // try another mode and farther access/egress time if routing failed:
@@ -1254,8 +1273,6 @@ namespace TrRouting
     }
     else
     {
-      
-      bool foundResult = minArrivalTime < maxTimeValue && (params.maxTotalTravelTimeMinutes <= 0 || (params.maxTotalTravelTimeMinutes > 0 && (minArrivalTime - startTime) <= params.maxTotalTravelTimeMinutes));
       
       jsonResult += "{\n";
       
@@ -1334,7 +1351,6 @@ namespace TrRouting
       
         jsonResult += "  \"steps\":\n  [\n";
         
-        int  numberOfTransfers {-1};
         int  numberOfBoardings {0};
         int  firstBoardingMinuteOfDay {-1};
         int  segmentInVehicleTimeMinutes {0};
@@ -1564,9 +1580,55 @@ namespace TrRouting
         
       }
       
+      if (numberOfTransfers == -1) // set number of transfers to 0 if failed or only using walking
+      {
+        numberOfTransfers = 0;
+      }
+      
+      if (params.calculateByNumberOfTransfers) // calculate by number of transfers and return result for each maximum number of transfers down to 0
+      {
+        std::cerr << "calculating by number of transfers" << std::endl;
+        params.calculateByNumberOfTransfers = false; // make sure we do not enter a nested loop
+        if (foundResult)
+        {
+          
+          std::cerr << "num transfers = " << numberOfTransfers << std::endl;
+          jsonResult += "  \"calculatedInMilliseconds\": " + std::to_string(algorithmCalculationTime.getDurationMillisecondsNoStop()) + "\n";
+          jsonResultWithNumberOfTransfers += "{\n \"" + std::to_string(numberOfTransfers) + "\": \n" + jsonResult + "\n}";
+          
+          
+          if (numberOfTransfers > 0)
+          {
+            for (int maxNumberOfTransfersI = numberOfTransfers - 1; maxNumberOfTransfersI >= 0; maxNumberOfTransfersI--)
+            {
+              std::string newJsonResult;
+              params.maxNumberOfTransfers = maxNumberOfTransfersI;
+              std::cerr << "num transfers = " << params.maxNumberOfTransfers << std::endl;
+              refresh();
+              newJsonResult = calculate(tripIdentifier, nearestStopsIdsFromStartingPoint, nearestStopsIdsFromEndingPoint);
+              //algorithmCalculationTime.stop();
+              std::string noRouteFoundString = "no_routing_found";
+              std::size_t found = newJsonResult.find(noRouteFoundString);
+              jsonResultWithNumberOfTransfers +=   ",\"" + std::to_string(maxNumberOfTransfersI) + "\": \n " + newJsonResult;
+              if (found != std::string::npos) // if not found (routing failed)
+              {
+                break;
+              }
+            }
+          }
+          
+          std::cerr << "-- calculation time -- " << algorithmCalculationTime.getDurationMillisecondsNoStop() << " ms\n";
+          
+          jsonResultWithNumberOfTransfers += "}";
+          algorithmCalculationTime.stop();
+
+          return jsonResultWithNumberOfTransfers;
+        }
+      }
+      
       algorithmCalculationTime.stop();
-      std::cerr << "-- calculation time -- " << algorithmCalculationTime.getDurationMilliseconds() << " ms\n";
-      jsonResult += "  \"calculatedInMilliseconds\": " + std::to_string(algorithmCalculationTime.getDurationMilliseconds()) + "\n";
+      std::cerr << "-- calculation time -- " << algorithmCalculationTime.getDurationMillisecondsNoStop() << " ms\n";
+      jsonResult += "  \"calculatedInMilliseconds\": " + std::to_string(algorithmCalculationTime.getDurationMillisecondsNoStop()) + "\n";
       
       jsonResult += "}";
     
