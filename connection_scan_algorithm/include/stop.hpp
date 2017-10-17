@@ -22,6 +22,8 @@ namespace TrRouting
     int arrivalTimeMinuteOfDay;
     std::vector<std::shared_ptr<SimplifiedJourneyStep> > journeySteps;
     int numBoardings;
+    int totalInVehicleTravelTimeMinutes;
+    int totalNotInVehicleTravelTimeMinutes;
     unsigned long long canUnboardToDestination; // ConnectionScanAlgorithm::calculationId will be assigned if the stop is unboardable to reach destination
   
   private:

@@ -375,8 +375,10 @@ namespace TrRouting
       {
         stop.second.arrivalTimeMinuteOfDay = maxTimeValue;
       }
-      stop.second.canUnboardToDestination = false;
-      stop.second.numBoardings = 0;
+      stop.second.canUnboardToDestination            = false;
+      stop.second.numBoardings                       = 0;
+      stop.second.totalInVehicleTravelTimeMinutes    = 0;
+      stop.second.totalNotInVehicleTravelTimeMinutes = 0;
       stop.second.journeySteps.resize(0);
       stop.second.journeySteps.shrink_to_fit();
     }
@@ -462,7 +464,9 @@ namespace TrRouting
           }
         }
         
-        connection.second.numBoardings = 0;
+        connection.second.numBoardings                       = 0;
+        connection.second.totalInVehicleTravelTimeMinutes    = 0;
+        connection.second.totalNotInVehicleTravelTimeMinutes = 0;
         totalNumberOfJourneySteps += connection.second.journeySteps.size();
         connection.second.journeySteps.resize(0);
         connection.second.journeySteps.shrink_to_fit();
@@ -539,7 +543,9 @@ namespace TrRouting
           }
         }
         
-        connection.second.numBoardings = 0;
+        connection.second.numBoardings                       = 0;
+        connection.second.totalInVehicleTravelTimeMinutes    = 0;
+        connection.second.totalNotInVehicleTravelTimeMinutes = 0;
         connection.second.journeySteps.resize(0);
         connection.second.journeySteps.shrink_to_fit();
         
@@ -702,6 +708,7 @@ namespace TrRouting
       newWalkJourneyStep.accessFromTripId        = -1;
       newWalkJourneyStep.readyToBoardMinuteOfDay = walkableStopFromStartingPoint.second + startTime + forwardFlag * params.minWaitingTimeMinutes;
       stopsById[walkableStopFromStartingPoint.first].journeySteps.emplace_back(std::make_shared<SimplifiedJourneyStep>(newWalkJourneyStep));
+      stopsById[walkableStopFromStartingPoint.first].totalNotInVehicleTravelTimeMinutes += walkableStopFromStartingPoint.second;
       
       for(auto & transferablePathStopSequenceId : pathStopSequencesByStopId[walkableStopFromStartingPoint.first])
       {
@@ -720,6 +727,8 @@ namespace TrRouting
             accessTripIds.emplace_back(possibleConnectionPtr->tripId);
             possibleConnectionPtr->reachable    = calculationId;
             possibleConnectionPtr->numBoardings = stopsById[walkableStopFromStartingPoint.first].numBoardings;
+            possibleConnectionPtr->totalInVehicleTravelTimeMinutes    = stopsById[walkableStopFromStartingPoint.first].totalInVehicleTravelTimeMinutes;
+            possibleConnectionPtr->totalNotInVehicleTravelTimeMinutes = stopsById[walkableStopFromStartingPoint.first].totalNotInVehicleTravelTimeMinutes;
             possibleConnectionPtr->journeySteps = stopsById[walkableStopFromStartingPoint.first].journeySteps;
             
             SimplifiedJourneyStep newBoardJourneyStep;
@@ -793,9 +802,21 @@ namespace TrRouting
           
           if(possibleConnectionPtr->calculationEnabled)
           {
-            possibleConnectionPtr->reachable    = calculationId;
-            possibleConnectionPtr->numBoardings = connection->numBoardings;
-            possibleConnectionPtr->journeySteps = connection->journeySteps;
+            
+            if (possibleConnectionPtr->reachable == calculationId) // we already rode that connection. Make sure this time, we can ride it with less boardings:
+            {
+              if (possibleConnectionPtr->numBoardings >= connection->numBoardings)
+              {
+                if ((possibleConnectionPtr->numBoardings == connection->numBoardings && possibleConnectionPtr->totalNotInVehicleTravelTimeMinutes > connection->totalNotInVehicleTravelTimeMinutes) || (possibleConnectionPtr->numBoardings > connection->numBoardings)) // if same number of boardings, minimize not in vehicle travel time
+                {
+                  possibleConnectionPtr->reachable    = calculationId;
+                  possibleConnectionPtr->numBoardings = connection->numBoardings;
+                  possibleConnectionPtr->totalInVehicleTravelTimeMinutes    = connection->totalInVehicleTravelTimeMinutes + possibleConnectionPtr->arrivalAtDestinationTimeMinuteOfDay - connection->arrivalAtDestinationTimeMinuteOfDay; // yes, arrival two times to keep dwell time into account
+                  possibleConnectionPtr->totalNotInVehicleTravelTimeMinutes = connection->totalNotInVehicleTravelTimeMinutes;
+                  possibleConnectionPtr->journeySteps = connection->journeySteps;
+                }
+              }
+            }
           }
         }
         
@@ -804,6 +825,8 @@ namespace TrRouting
          
           stopsById[connection->stopEndId].arrivalTimeMinuteOfDay = connection->arrivalAtDestinationTimeMinuteOfDay;
           stopsById[connection->stopEndId].numBoardings = connection->numBoardings;
+          stopsById[connection->stopEndId].totalInVehicleTravelTimeMinutes    = connection->totalInVehicleTravelTimeMinutes;
+          stopsById[connection->stopEndId].totalNotInVehicleTravelTimeMinutes = connection->totalNotInVehicleTravelTimeMinutes;
           stopsById[connection->stopEndId].journeySteps = connection->journeySteps;
           
           SimplifiedJourneyStep newUnboardJourneyStep;
@@ -851,6 +874,8 @@ namespace TrRouting
                 {
                   
                   stopsById[transferableStopId.first].numBoardings = stopsById[connection->stopEndId].numBoardings;
+                  stopsById[transferableStopId.first].totalInVehicleTravelTimeMinutes    = stopsById[connection->stopEndId].totalInVehicleTravelTimeMinutes;
+                  stopsById[transferableStopId.first].totalNotInVehicleTravelTimeMinutes = stopsById[connection->stopEndId].totalNotInVehicleTravelTimeMinutes;
                   stopsById[transferableStopId.first].journeySteps = stopsById[connection->stopEndId].journeySteps;
                   
                   SimplifiedJourneyStep newWalkJourneyStep;
@@ -863,6 +888,7 @@ namespace TrRouting
                   newWalkJourneyStep.accessFromTripId        = connection->tripId;
                   newWalkJourneyStep.readyToBoardMinuteOfDay = transferableStopId.second + params.minWaitingTimeMinutes + connection->arrivalAtDestinationTimeMinuteOfDay;
                   stopsById[transferableStopId.first].journeySteps.emplace_back(std::make_shared<SimplifiedJourneyStep>(newWalkJourneyStep));
+                  stopsById[transferableStopId.first].totalNotInVehicleTravelTimeMinutes += transferableStopId.second;
                   
                 }
                 
@@ -900,6 +926,8 @@ namespace TrRouting
                       
                       possibleConnectionPtr->reachable    = calculationId;
                       possibleConnectionPtr->numBoardings = stopsById[transferableStopId.first].numBoardings;
+                      possibleConnectionPtr->totalInVehicleTravelTimeMinutes    = stopsById[transferableStopId.first].totalInVehicleTravelTimeMinutes;
+                      possibleConnectionPtr->totalNotInVehicleTravelTimeMinutes = stopsById[transferableStopId.first].totalNotInVehicleTravelTimeMinutes;
                       possibleConnectionPtr->journeySteps = stopsById[transferableStopId.first].journeySteps;
                       
                       SimplifiedJourneyStep newBoardJourneyStep;

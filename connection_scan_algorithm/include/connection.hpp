@@ -31,6 +31,8 @@ namespace TrRouting
     long long nextConnectionId;
     long long previousConnectionId;
     int numBoardings;
+    int totalInVehicleTravelTimeMinutes;
+    int totalNotInVehicleTravelTimeMinutes;
     std::vector<std::shared_ptr<SimplifiedJourneyStep> > journeySteps;
     int lastJourneyStepIndex;
     
