@@ -986,7 +986,7 @@ namespace TrRouting
     std::cout << std::fixed;
     std::cout << std::setprecision(6);
     
-    std::string queryString = "GET /route/v1/" + mode + "/" + std::to_string(startingPoint.longitude) +  "," + std::to_string(startingPoint.latitude) + ";" + std::to_string(endingPoint.longitude) +  "," + std::to_string(endingPoint.latitude);
+    std::string queryString = "GET /route/v1/" + mode + "/" + std::to_string(startingPoint.longitude) +  "," + std::to_string(startingPoint.latitude) + ";" + std::to_string(endingPoint.longitude) +  "," + std::to_string(endingPoint.latitude) + "?alternatives=false&steps=false&overview=full&geometries=geojson";
     
     boost::asio::ip::tcp::iostream s;
     s.connect(routingHost, routingPort);

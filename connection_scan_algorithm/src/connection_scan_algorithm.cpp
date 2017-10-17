@@ -679,7 +679,7 @@ namespace TrRouting
       
     }
     
-    std::vector<long long> accessTripIds;
+    std::map<long long, int> accessedStartSequenceByTripIds;
     std::vector<std::pair<long long, int>> sortedNearestStopsIdsFromStartingPointPairs;
     
     for(auto & walkableStopFromStartingPoint : nearestStopsIdsFromStartingPoint)
@@ -721,10 +721,10 @@ namespace TrRouting
           if (possibleConnectionPtr->calculationEnabled
             && possibleConnectionPtr->departureFromOriginTimeMinuteOfDay >= walkableStopFromStartingPoint.second + startTime + forwardFlag * params.minWaitingTimeMinutes
             && possibleConnectionPtr->canBoard
-            && std::find(accessTripIds.begin(), accessTripIds.end(), possibleConnectionPtr->tripId) == accessTripIds.end() // minimize walking access travel time
+            //&& (!accessedStartSequenceByTripIds.count(possibleConnectionPtr->tripId) || (accessedStartSequenceByTripIds.count(possibleConnectionPtr->tripId) && accessedStartSequenceByTripIds[possibleConnectionPtr->tripId] > possibleConnectionPtr->sequence) ) // minimize walking access travel time
           )
           {
-            accessTripIds.emplace_back(possibleConnectionPtr->tripId);
+            //accessedStartSequenceByTripIds[possibleConnectionPtr->tripId] = possibleConnectionPtr->sequence;
             possibleConnectionPtr->reachable    = calculationId;
             possibleConnectionPtr->numBoardings = stopsById[walkableStopFromStartingPoint.first].numBoardings;
             possibleConnectionPtr->totalInVehicleTravelTimeMinutes    = stopsById[walkableStopFromStartingPoint.first].totalInVehicleTravelTimeMinutes;
@@ -748,7 +748,7 @@ namespace TrRouting
     }
     
     sortedNearestStopsIdsFromStartingPointPairs.empty();
-    accessTripIds.empty();
+    accessedStartSequenceByTripIds.clear();
     
     // main loop:
     for(auto & connection : *connections)
@@ -802,21 +802,41 @@ namespace TrRouting
           
           if(possibleConnectionPtr->calculationEnabled)
           {
-            
-            //if (possibleConnectionPtr->reachable == calculationId) // we already rode that connection. Make sure this time, we can ride it with less boardings:
-            //{
-            //  if (possibleConnectionPtr->numBoardings >= connection->numBoardings)
-            //  {
-            //    if ((possibleConnectionPtr->numBoardings == connection->numBoardings && possibleConnectionPtr->totalNotInVehicleTravelTimeMinutes > connection->totalNotInVehicleTravelTimeMinutes) || (possibleConnectionPtr->numBoardings > connection->numBoardings)) // if same number of boardings, minimize not in vehicle travel time
-            //    {
-                  possibleConnectionPtr->reachable    = calculationId;
+            if (possibleConnectionPtr->reachable == calculationId) // we already rode that connection. Make sure this time, we can ride it with less boardings:
+            {
+              if (possibleConnectionPtr->numBoardings >= connection->numBoardings)
+              {
+                if (possibleConnectionPtr->numBoardings == connection->numBoardings)
+                {
+                  if (possibleConnectionPtr->totalNotInVehicleTravelTimeMinutes > connection->totalNotInVehicleTravelTimeMinutes)
+                  {
+                    possibleConnectionPtr->numBoardings = connection->numBoardings;
+                    possibleConnectionPtr->totalInVehicleTravelTimeMinutes    = connection->totalInVehicleTravelTimeMinutes + possibleConnectionPtr->arrivalAtDestinationTimeMinuteOfDay - connection->arrivalAtDestinationTimeMinuteOfDay; // yes, arrival two times to keep dwell time into account
+                    possibleConnectionPtr->totalNotInVehicleTravelTimeMinutes = connection->totalNotInVehicleTravelTimeMinutes;
+                    possibleConnectionPtr->journeySteps = connection->journeySteps;
+                  }
+                  //else
+                  //{
+                  //  
+                  //}
+                }
+                else if (possibleConnectionPtr->numBoardings > connection->numBoardings)
+                {
                   possibleConnectionPtr->numBoardings = connection->numBoardings;
                   possibleConnectionPtr->totalInVehicleTravelTimeMinutes    = connection->totalInVehicleTravelTimeMinutes + possibleConnectionPtr->arrivalAtDestinationTimeMinuteOfDay - connection->arrivalAtDestinationTimeMinuteOfDay; // yes, arrival two times to keep dwell time into account
                   possibleConnectionPtr->totalNotInVehicleTravelTimeMinutes = connection->totalNotInVehicleTravelTimeMinutes;
                   possibleConnectionPtr->journeySteps = connection->journeySteps;
-            //    }
-            //  }
-            //}
+                }
+              }
+            }
+            else
+            {
+              possibleConnectionPtr->reachable    = calculationId;
+              possibleConnectionPtr->numBoardings = connection->numBoardings;
+              possibleConnectionPtr->totalInVehicleTravelTimeMinutes    = connection->totalInVehicleTravelTimeMinutes + possibleConnectionPtr->arrivalAtDestinationTimeMinuteOfDay - connection->arrivalAtDestinationTimeMinuteOfDay; // yes, arrival two times to keep dwell time into account
+              possibleConnectionPtr->totalNotInVehicleTravelTimeMinutes = connection->totalNotInVehicleTravelTimeMinutes;
+              possibleConnectionPtr->journeySteps = connection->journeySteps;
+            }
           }
         }
         
@@ -1304,26 +1324,22 @@ namespace TrRouting
       
       jsonResult += "{\n";
       
-      if (foundResult)
-      {
-        jsonResult += "  \"status\": \"success\",\n";
-      }
-      else
-      {
-        jsonResult += "  \"status\": \"no_routing_found\",\n";
-      }
-  
-      jsonResult += "  \"origin\": [" + std::to_string(params.startingPoint.latitude) + "," + std::to_string(params.startingPoint.longitude) + "],\n";
-      jsonResult += "  \"destination\": [" + std::to_string(params.endingPoint.latitude) + "," + std::to_string(params.endingPoint.longitude) + "],\n";
-      jsonResult += "  \"date\": \"" + std::to_string(params.routingDateYear) + "/" + boost::str(padWithZeros % (params.routingDateMonth)) + "/" + boost::str(padWithZeros % (params.routingDateDay)) + "\",\n";
-      
       std::cerr << "walkingTravelTimeMinutes: " << walkingTravelTimeAndDistance.first << std::endl; 
       
       // return single walking step if it is faster by walking:
-      if (walkingTravelTimeAndDistance.first >= 0 && walkingTravelTimeAndDistance.first <= maxAccessWalkingTravelTimeFromOriginToFirstStopMinutes * 2 && walkingTravelTimeAndDistance.first <= minArrivalTime - startTime)
+      if (walkingTravelTimeAndDistance.first >= 0 && walkingTravelTimeAndDistance.first <= maxAccessWalkingTravelTimeFromOriginToFirstStopMinutes * 1 && walkingTravelTimeAndDistance.first <= minArrivalTime - startTime)
       {
         
         int totalWalkingTimeMinutes {walkingTravelTimeAndDistance.first};
+        
+        minArrivalTime = startTime + totalWalkingTimeMinutes * 60;
+        
+        jsonResult += "  \"status\": \"success\",\n";
+        
+        jsonResult += "  \"origin\": [" + std::to_string(params.startingPoint.latitude) + "," + std::to_string(params.startingPoint.longitude) + "],\n";
+        jsonResult += "  \"destination\": [" + std::to_string(params.endingPoint.latitude) + "," + std::to_string(params.endingPoint.longitude) + "],\n";
+        jsonResult += "  \"date\": \"" + std::to_string(params.routingDateYear) + "/" + boost::str(padWithZeros % (params.routingDateMonth)) + "/" + boost::str(padWithZeros % (params.routingDateDay)) + "\",\n";
+      
         
         jsonResult += "  \"steps\":\n  [\n";
         jsonResult += "\n    {\n";
@@ -1372,10 +1388,14 @@ namespace TrRouting
         jsonResult += "  \"departureTimeToMinimizeFirstWaitingTime\": \""   + boost::str(padWithZeros % ((maxTimeValue - minArrivalTime) / 60)) + ":" + boost::str(padWithZeros % ((maxTimeValue - minArrivalTime) % 60)) + "\",\n";
         jsonResult += "  \"minimizedTotalTravelTimeMinutes\": "             + std::to_string(totalWalkingTimeMinutes) + ",\n";
         jsonResult += "  \"minimizedTotalTravelTimeSeconds\": "             + std::to_string((totalWalkingTimeMinutes) * 60) + ",\n";
-        
+        foundResult = true;
       }
       else if (foundResult)
       {
+        jsonResult += "  \"status\": \"success\",\n";
+        jsonResult += "  \"origin\": [" + std::to_string(params.startingPoint.latitude) + "," + std::to_string(params.startingPoint.longitude) + "],\n";
+        jsonResult += "  \"destination\": [" + std::to_string(params.endingPoint.latitude) + "," + std::to_string(params.endingPoint.longitude) + "],\n";
+        jsonResult += "  \"date\": \"" + std::to_string(params.routingDateYear) + "/" + boost::str(padWithZeros % (params.routingDateMonth)) + "/" + boost::str(padWithZeros % (params.routingDateDay)) + "\",\n";
       
         jsonResult += "  \"steps\":\n  [\n";
         
@@ -1606,6 +1626,10 @@ namespace TrRouting
           //}
         }
         
+      }
+      else if (!foundResult)
+      {
+        jsonResult += "  \"status\": \"no_routing_found\",\n";
       }
       
       if (numberOfTransfers == -1) // set number of transfers to 0 if failed or only using walking
