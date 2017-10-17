@@ -1332,7 +1332,7 @@ namespace TrRouting
         
         int totalWalkingTimeMinutes {walkingTravelTimeAndDistance.first};
         
-        minArrivalTime = startTime + totalWalkingTimeMinutes * 60;
+        minArrivalTime = startTime + totalWalkingTimeMinutes;
         
         jsonResult += "  \"status\": \"success\",\n";
         
