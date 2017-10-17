@@ -803,20 +803,20 @@ namespace TrRouting
           if(possibleConnectionPtr->calculationEnabled)
           {
             
-            if (possibleConnectionPtr->reachable == calculationId) // we already rode that connection. Make sure this time, we can ride it with less boardings:
-            {
-              if (possibleConnectionPtr->numBoardings >= connection->numBoardings)
-              {
-                if ((possibleConnectionPtr->numBoardings == connection->numBoardings && possibleConnectionPtr->totalNotInVehicleTravelTimeMinutes > connection->totalNotInVehicleTravelTimeMinutes) || (possibleConnectionPtr->numBoardings > connection->numBoardings)) // if same number of boardings, minimize not in vehicle travel time
-                {
+            //if (possibleConnectionPtr->reachable == calculationId) // we already rode that connection. Make sure this time, we can ride it with less boardings:
+            //{
+            //  if (possibleConnectionPtr->numBoardings >= connection->numBoardings)
+            //  {
+            //    if ((possibleConnectionPtr->numBoardings == connection->numBoardings && possibleConnectionPtr->totalNotInVehicleTravelTimeMinutes > connection->totalNotInVehicleTravelTimeMinutes) || (possibleConnectionPtr->numBoardings > connection->numBoardings)) // if same number of boardings, minimize not in vehicle travel time
+            //    {
                   possibleConnectionPtr->reachable    = calculationId;
                   possibleConnectionPtr->numBoardings = connection->numBoardings;
                   possibleConnectionPtr->totalInVehicleTravelTimeMinutes    = connection->totalInVehicleTravelTimeMinutes + possibleConnectionPtr->arrivalAtDestinationTimeMinuteOfDay - connection->arrivalAtDestinationTimeMinuteOfDay; // yes, arrival two times to keep dwell time into account
                   possibleConnectionPtr->totalNotInVehicleTravelTimeMinutes = connection->totalNotInVehicleTravelTimeMinutes;
                   possibleConnectionPtr->journeySteps = connection->journeySteps;
-                }
-              }
-            }
+            //    }
+            //  }
+            //}
           }
         }
         
