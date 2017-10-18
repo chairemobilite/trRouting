@@ -1253,6 +1253,15 @@ namespace TrRouting
     
     long long minTravelTimeStopId {-1};
     int minArrivalTime {maxTimeValue};
+    int totalOnlyWalkingTimeMinutes {-1};
+    
+    // get total walking travel time if available:
+    if (walkingTravelTimeAndDistance.first >= 0)
+    {
+      totalOnlyWalkingTimeMinutes = walkingTravelTimeAndDistance.first;
+    }
+    
+    bool atLeastOneRoutingFound {false};
     int accessTimeMinutes {-1};
     std::vector<std::shared_ptr<SimplifiedJourneyStep> > destinationJourneySteps;
     Stop destinationStop;
@@ -1324,29 +1333,25 @@ namespace TrRouting
       
       jsonResult += "{\n";
       
-      std::cerr << "walkingTravelTimeMinutes: " << walkingTravelTimeAndDistance.first << std::endl; 
+      //std::cerr << "walkingTravelTimeMinutes: " << walkingTravelTimeAndDistance.first << std::endl; 
       
       // return single walking step if it is faster by walking:
-      if (walkingTravelTimeAndDistance.first >= 0 && walkingTravelTimeAndDistance.first <= maxAccessWalkingTravelTimeFromOriginToFirstStopMinutes * 1 && walkingTravelTimeAndDistance.first <= minArrivalTime - startTime)
+      if ( totalOnlyWalkingTimeMinutes >= 0 && totalOnlyWalkingTimeMinutes <= ((int)round(maxAccessWalkingTravelTimeFromOriginToFirstStopMinutes * params.maxOnlyWalkingAccessTravelTimeRatio)) && totalOnlyWalkingTimeMinutes <= minArrivalTime - startTime)
       {
         
-        int totalWalkingTimeMinutes {walkingTravelTimeAndDistance.first};
-        
-        minArrivalTime = startTime + totalWalkingTimeMinutes;
-        
-        jsonResult += "  \"status\": \"success\",\n";
+        atLeastOneRoutingFound = true;
+        minArrivalTime = startTime + totalOnlyWalkingTimeMinutes;
         
         jsonResult += "  \"origin\": [" + std::to_string(params.startingPoint.latitude) + "," + std::to_string(params.startingPoint.longitude) + "],\n";
         jsonResult += "  \"destination\": [" + std::to_string(params.endingPoint.latitude) + "," + std::to_string(params.endingPoint.longitude) + "],\n";
         jsonResult += "  \"date\": \"" + std::to_string(params.routingDateYear) + "/" + boost::str(padWithZeros % (params.routingDateMonth)) + "/" + boost::str(padWithZeros % (params.routingDateDay)) + "\",\n";
       
-        
         jsonResult += "  \"steps\":\n  [\n";
         jsonResult += "\n    {\n";
         jsonResult += "      \"action\": \"walking\",\n";
         
-        jsonResult += "      \"travelTimeMinutes\": " + std::to_string(totalWalkingTimeMinutes) + ",\n";
-        jsonResult += "      \"travelTimeSeconds\": " + std::to_string(totalWalkingTimeMinutes * 60) + ",\n";
+        jsonResult += "      \"travelTimeMinutes\": " + std::to_string(totalOnlyWalkingTimeMinutes) + ",\n";
+        jsonResult += "      \"travelTimeSeconds\": " + std::to_string(totalOnlyWalkingTimeMinutes * 60) + ",\n";
         jsonResult += "      \"distanceMeters\": "    + std::to_string(walkingTravelTimeAndDistance.second) + "\n";
         
         jsonResult += "    }";
@@ -1362,19 +1367,20 @@ namespace TrRouting
           jsonResult += "  \"arrivalTime\": \"" + boost::str(padWithZeros % ((maxTimeValue - startTime) / 60))      + ":" + boost::str(padWithZeros % ((maxTimeValue - startTime) % 60))      + "\",\n";
           jsonResult += "  \"departureTime\": \""   + boost::str(padWithZeros % ((maxTimeValue - minArrivalTime) / 60)) + ":" + boost::str(padWithZeros % ((maxTimeValue - minArrivalTime) % 60)) + "\",\n";
         }
-        jsonResult += "  \"totalTravelTimeMinutes\": "                      + std::to_string(totalWalkingTimeMinutes) + ",\n";
-        jsonResult += "  \"totalTravelTimeSeconds\": "                      + std::to_string(totalWalkingTimeMinutes) + ",\n";
+        jsonResult += "  \"totalWalkingTimeMinutesIfWalkingOnly\": "        + std::to_string(totalOnlyWalkingTimeMinutes) + ",\n";
+        jsonResult += "  \"totalTravelTimeMinutes\": "                      + std::to_string(totalOnlyWalkingTimeMinutes) + ",\n";
+        jsonResult += "  \"totalTravelTimeSeconds\": "                      + std::to_string(totalOnlyWalkingTimeMinutes) + ",\n";
         jsonResult += "  \"totalInVehicleTimeMinutes\": 0,\n";
         jsonResult += "  \"totalInVehicleTimeSeconds\": 0,\n";
-        jsonResult += "  \"totalNonTransitTravelTimeMinutes\": "            + std::to_string(totalWalkingTimeMinutes) + ",\n";
-        jsonResult += "  \"totalNonTransitTravelTimeSeconds\": "            + std::to_string(totalWalkingTimeMinutes * 60) + ",\n";
+        jsonResult += "  \"totalNonTransitTravelTimeMinutes\": "            + std::to_string(totalOnlyWalkingTimeMinutes) + ",\n";
+        jsonResult += "  \"totalNonTransitTravelTimeSeconds\": "            + std::to_string(totalOnlyWalkingTimeMinutes * 60) + ",\n";
         jsonResult += "  \"numberOfBoardings\": 0,\n";
         jsonResult += "  \"numberOfTransfers\": 0,\n";
         jsonResult += "  \"maxNumberOfTransfers\": "                        + std::to_string(params.maxNumberOfTransfers) + ",\n";
         jsonResult += "  \"transferWalkingTimeMinutes\": 0,\n";
         jsonResult += "  \"transferWalkingTimeSeconds\": 0,\n";
-        jsonResult += "  \"accessTravelTimeMinutes\": "                     + std::to_string(totalWalkingTimeMinutes) + ",\n";
-        jsonResult += "  \"accessTravelTimeSeconds\": "                     + std::to_string(totalWalkingTimeMinutes * 60) + ",\n";
+        jsonResult += "  \"accessTravelTimeMinutes\": "                     + std::to_string(totalOnlyWalkingTimeMinutes) + ",\n";
+        jsonResult += "  \"accessTravelTimeSeconds\": "                     + std::to_string(totalOnlyWalkingTimeMinutes * 60) + ",\n";
         jsonResult += "  \"egressTravelTimeMinutes\": 0,\n";
         jsonResult += "  \"egressTravelTimeSeconds\": 0,\n";
         jsonResult += "  \"transferWaitingTimeMinutes\": 0,\n";
@@ -1386,13 +1392,13 @@ namespace TrRouting
         jsonResult += "  \"minimumWaitingTimeBeforeEachBoardingMinutes\": " + std::to_string(params.minWaitingTimeMinutes) + ",\n";
         jsonResult += "  \"minimumWaitingTimeBeforeEachBoardingSeconds\": " + std::to_string(params.minWaitingTimeMinutes * 60) + ",\n";
         jsonResult += "  \"departureTimeToMinimizeFirstWaitingTime\": \""   + boost::str(padWithZeros % ((maxTimeValue - minArrivalTime) / 60)) + ":" + boost::str(padWithZeros % ((maxTimeValue - minArrivalTime) % 60)) + "\",\n";
-        jsonResult += "  \"minimizedTotalTravelTimeMinutes\": "             + std::to_string(totalWalkingTimeMinutes) + ",\n";
-        jsonResult += "  \"minimizedTotalTravelTimeSeconds\": "             + std::to_string((totalWalkingTimeMinutes) * 60) + ",\n";
+        jsonResult += "  \"minimizedTotalTravelTimeMinutes\": "             + std::to_string(totalOnlyWalkingTimeMinutes) + ",\n";
+        jsonResult += "  \"minimizedTotalTravelTimeSeconds\": "             + std::to_string((totalOnlyWalkingTimeMinutes) * 60) + ",\n";
         foundResult = true;
       }
       else if (foundResult)
       {
-        jsonResult += "  \"status\": \"success\",\n";
+        atLeastOneRoutingFound = true;
         jsonResult += "  \"origin\": [" + std::to_string(params.startingPoint.latitude) + "," + std::to_string(params.startingPoint.longitude) + "],\n";
         jsonResult += "  \"destination\": [" + std::to_string(params.endingPoint.latitude) + "," + std::to_string(params.endingPoint.longitude) + "],\n";
         jsonResult += "  \"date\": \"" + std::to_string(params.routingDateYear) + "/" + boost::str(padWithZeros % (params.routingDateMonth)) + "/" + boost::str(padWithZeros % (params.routingDateDay)) + "\",\n";
@@ -1588,6 +1594,7 @@ namespace TrRouting
           jsonResult += "  \"arrivalTime\": \"" + boost::str(padWithZeros % ((maxTimeValue - startTime) / 60))      + ":" + boost::str(padWithZeros % ((maxTimeValue - startTime) % 60))      + "\",\n";
           jsonResult += "  \"departureTime\": \""   + boost::str(padWithZeros % ((maxTimeValue - minArrivalTime) / 60)) + ":" + boost::str(padWithZeros % ((maxTimeValue - minArrivalTime) % 60)) + "\",\n";
         }
+        jsonResult += "  \"totalWalkingTimeMinutesIfWalkingOnly\": "        + std::to_string(totalOnlyWalkingTimeMinutes) + ",\n";
         jsonResult += "  \"totalTravelTimeMinutes\": "                      + std::to_string(minArrivalTime - startTime) + ",\n";
         jsonResult += "  \"totalTravelTimeSeconds\": "                      + std::to_string((minArrivalTime - startTime) * 60) + ",\n";
         jsonResult += "  \"totalInVehicleTimeMinutes\": "                   + std::to_string(totalInVehicleTimeMinutes) + ",\n";
@@ -1627,27 +1634,40 @@ namespace TrRouting
         }
         
       }
-      else if (!foundResult)
-      {
-        jsonResult += "  \"status\": \"no_routing_found\",\n";
-      }
       
       if (numberOfTransfers == -1) // set number of transfers to 0 if failed or only using walking
       {
         numberOfTransfers = 0;
       }
       
+      if (atLeastOneRoutingFound)
+      {
+        jsonResult += "  \"status\": \"success\",\n";
+      }
+      else
+      {
+        jsonResult += "  \"status\": \"no_routing_found\",\n";
+      }
+      
       if (params.calculateByNumberOfTransfers) // calculate by number of transfers and return result for each maximum number of transfers down to 0
       {
-        std::cerr << "calculating by number of transfers" << std::endl;
+        
+        //std::cerr << "calculating by number of transfers" << std::endl;
         params.calculateByNumberOfTransfers = false; // make sure we do not enter a nested loop
+        
         if (foundResult)
         {
           
           std::cerr << "num transfers = " << numberOfTransfers << std::endl;
           jsonResult += "  \"calculatedInMilliseconds\": " + std::to_string(algorithmCalculationTime.getDurationMillisecondsNoStop()) + "\n";
+          
+          //int currentTotalCalculationTime = algorithmCalculationTime.getDurationMillisecondsNoStop();
+          
           jsonResultWithNumberOfTransfers += "{\n \"" + std::to_string(numberOfTransfers) + "\": \n" + jsonResult + "\n}";
           
+          int minRoutingNumberOfTransfers {numberOfTransfers};
+          int fastestRoutingNumberOfTransfers {numberOfTransfers};
+          //int numTransfersToMinimizeTravelTimeWithTransferPenalty {numberOfTransfers}; // not yet implemented. We need to find a way to return travel time value alongside the json result!
           
           if (numberOfTransfers > 0)
           {
@@ -1662,18 +1682,30 @@ namespace TrRouting
               std::string noRouteFoundString = "no_routing_found";
               std::size_t found = newJsonResult.find(noRouteFoundString);
               jsonResultWithNumberOfTransfers +=   ",\"" + std::to_string(maxNumberOfTransfersI) + "\": \n " + newJsonResult;
+              
+              //currentTotalCalculationTime = algorithmCalculationTime.getDurationMillisecondsNoStop();
               if (found != std::string::npos) // if not found (routing failed)
               {
                 break;
               }
+              else
+              {
+                minRoutingNumberOfTransfers = maxNumberOfTransfersI;
+              }
             }
+            
           }
           
-          std::cerr << "-- calculation time -- " << algorithmCalculationTime.getDurationMillisecondsNoStop() << " ms\n";
+          //std::cerr << "-- calculation time -- " << algorithmCalculationTime.getDurationMillisecondsNoStop() << " ms\n";
           
+          jsonResultWithNumberOfTransfers += ",\n  \"status\": \"success\",\n";
+          jsonResultWithNumberOfTransfers += "  \"totalWalkingTimeMinutesIfWalkingOnly\": " + std::to_string(totalOnlyWalkingTimeMinutes)                              + ",\n";
+          jsonResultWithNumberOfTransfers += "  \"minimumNumberOfTransfers\": "             + std::to_string(minRoutingNumberOfTransfers)                              + ",\n";
+          jsonResultWithNumberOfTransfers += "  \"fastestRoutingNumberOfTransfers\": "      + std::to_string(fastestRoutingNumberOfTransfers)                          + ",\n";
+          jsonResultWithNumberOfTransfers += "  \"calculatedInMilliseconds\": "             + std::to_string(algorithmCalculationTime.getDurationMillisecondsNoStop()) + "\n";
           jsonResultWithNumberOfTransfers += "}";
           algorithmCalculationTime.stop();
-
+          
           return jsonResultWithNumberOfTransfers;
         }
       }

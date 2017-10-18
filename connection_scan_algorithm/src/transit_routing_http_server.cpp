@@ -270,6 +270,8 @@ int main(int argc, char** argv) {
       calculator.params.maxAccessWalkingTravelTimeFromLastStopToDestinationMinutes = 20;
       calculator.params.maxTransferWalkingTravelTimeMinutes                        = 20;
       calculator.params.maxTotalWalkingTravelTimeMinutes                           = 60;
+      calculator.params.maxOnlyWalkingAccessTravelTimeRatio                        = 1.5;
+      calculator.params.transferPenaltyMinutes                                     = 0;
       calculator.params.accessMode                                                 = "walking";
       calculator.params.egressMode                                                 = "walking";
       calculator.params.noResultSecondMode                                         = "driving";
@@ -419,6 +421,10 @@ int main(int argc, char** argv) {
         {
           calculator.params.maxAccessWalkingTravelTimeFromOriginToFirstStopMinutes = std::stoi(parameterWithValueVector[1]);
         }
+        else if (parameterWithValueVector[0] == "max_only_walking_access_travel_time_ratio")
+        {
+          calculator.params.maxOnlyWalkingAccessTravelTimeRatio = std::stof(parameterWithValueVector[1]);
+        }
         else if (parameterWithValueVector[0] == "max_egress_travel_time" || parameterWithValueVector[0] == "max_egress_travel_time_minutes")
         {
           calculator.params.maxAccessWalkingTravelTimeFromLastStopToDestinationMinutes = std::stoi(parameterWithValueVector[1]);
@@ -426,6 +432,10 @@ int main(int argc, char** argv) {
         else if (parameterWithValueVector[0] == "max_transfer_travel_time" || parameterWithValueVector[0] == "max_transfer_travel_time_minutes")
         {
           calculator.params.maxTransferWalkingTravelTimeMinutes = std::stoi(parameterWithValueVector[1]);
+        }
+        else if (parameterWithValueVector[0] == "transfer_penalty" || parameterWithValueVector[0] == "transfer_penalty_minutes")
+        {
+          calculator.params.transferPenaltyMinutes = std::stoi(parameterWithValueVector[1]);
         }
         else if (parameterWithValueVector[0] == "return_all_stops_results"
                  || parameterWithValueVector[0] == "return_all_stops_result"
