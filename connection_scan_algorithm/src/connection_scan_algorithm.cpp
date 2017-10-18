@@ -1333,10 +1333,10 @@ namespace TrRouting
       
       jsonResult += "{\n";
       
-      //std::cerr << "walkingTravelTimeMinutes: " << walkingTravelTimeAndDistance.first << std::endl; 
+      std::cerr << "walkingTravelTimeMinutes: " << walkingTravelTimeAndDistance.first << std::endl; 
       
       // return single walking step if it is faster by walking:
-      if ( totalOnlyWalkingTimeMinutes >= 0 && totalOnlyWalkingTimeMinutes <= ((int)round(maxAccessWalkingTravelTimeFromOriginToFirstStopMinutes * params.maxOnlyWalkingAccessTravelTimeRatio)) && totalOnlyWalkingTimeMinutes <= minArrivalTime - startTime)
+      if ( totalOnlyWalkingTimeMinutes >= 0 && (double)totalOnlyWalkingTimeMinutes <= maxAccessWalkingTravelTimeFromOriginToFirstStopMinutes * params.maxOnlyWalkingAccessTravelTimeRatio && totalOnlyWalkingTimeMinutes <= minArrivalTime - startTime)
       {
         
         atLeastOneRoutingFound = true;
@@ -1647,6 +1647,7 @@ namespace TrRouting
       else
       {
         jsonResult += "  \"status\": \"no_routing_found\",\n";
+        jsonResult += "  \"totalWalkingTimeMinutesIfWalkingOnly\": " + std::to_string(totalOnlyWalkingTimeMinutes) + ",\n";
       }
       
       if (params.calculateByNumberOfTransfers) // calculate by number of transfers and return result for each maximum number of transfers down to 0
