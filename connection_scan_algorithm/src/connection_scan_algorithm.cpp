@@ -1369,7 +1369,7 @@ namespace TrRouting
         }
         jsonResult += "  \"totalWalkingTimeMinutesIfWalkingOnly\": "        + std::to_string(totalOnlyWalkingTimeMinutes) + ",\n";
         jsonResult += "  \"totalTravelTimeMinutes\": "                      + std::to_string(totalOnlyWalkingTimeMinutes) + ",\n";
-        jsonResult += "  \"totalTravelTimeSeconds\": "                      + std::to_string(totalOnlyWalkingTimeMinutes) + ",\n";
+        jsonResult += "  \"totalTravelTimeSeconds\": "                      + std::to_string(totalOnlyWalkingTimeMinutes * 60) + ",\n";
         jsonResult += "  \"totalInVehicleTimeMinutes\": 0,\n";
         jsonResult += "  \"totalInVehicleTimeSeconds\": 0,\n";
         jsonResult += "  \"totalNonTransitTravelTimeMinutes\": "            + std::to_string(totalOnlyWalkingTimeMinutes) + ",\n";
@@ -1393,7 +1393,7 @@ namespace TrRouting
         jsonResult += "  \"minimumWaitingTimeBeforeEachBoardingSeconds\": " + std::to_string(params.minWaitingTimeMinutes * 60) + ",\n";
         jsonResult += "  \"departureTimeToMinimizeFirstWaitingTime\": \""   + boost::str(padWithZeros % ((maxTimeValue - minArrivalTime) / 60)) + ":" + boost::str(padWithZeros % ((maxTimeValue - minArrivalTime) % 60)) + "\",\n";
         jsonResult += "  \"minimizedTotalTravelTimeMinutes\": "             + std::to_string(totalOnlyWalkingTimeMinutes) + ",\n";
-        jsonResult += "  \"minimizedTotalTravelTimeSeconds\": "             + std::to_string((totalOnlyWalkingTimeMinutes) * 60) + ",\n";
+        jsonResult += "  \"minimizedTotalTravelTimeSeconds\": "             + std::to_string(totalOnlyWalkingTimeMinutes * 60) + ",\n";
         foundResult = true;
       }
       else if (foundResult)
