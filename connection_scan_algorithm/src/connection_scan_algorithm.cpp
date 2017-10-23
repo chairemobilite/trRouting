@@ -21,7 +21,7 @@ namespace TrRouting
     maxAccessWalkingTravelTimeFromLastStopToDestinationMinutes = params.maxAccessWalkingTravelTimeFromLastStopToDestinationMinutes;
   }
   
-  // call setup only once when starting the calculator. Use updateParams before each calculation.
+  // call setup only once when starting the calculator. Use updateParams and refresh before each calculation.
   void ConnectionScanAlgorithm::setup()
   {
     calculationId = 1;
@@ -51,6 +51,7 @@ namespace TrRouting
       connectionsByDepartureTime.emplace_back(&(connection.second));
     }
     
+    // we need stable sort so we get the same order for connections with the same departure time, no matter which platform is used
     std::stable_sort(connectionsByDepartureTime.begin(), connectionsByDepartureTime.end(), [](Connection const* connectionA, Connection const* connectionB)
     {
       if (connectionA->departureFromOriginTimeMinuteOfDay < connectionB->departureFromOriginTimeMinuteOfDay)
@@ -106,19 +107,15 @@ namespace TrRouting
     });
     
     connectionsByStartPathStopSequenceId = getConnectionsByStartPathStopSequenceId(connectionsByDepartureTime);
-    connectionsByEndPathStopSequenceId   = getConnectionsByStartPathStopSequenceId(connectionsByArrivalTime); // really? by start? is this correct or we should replace by EndPathStopSequence?
+    connectionsByEndPathStopSequenceId   = getConnectionsByStartPathStopSequenceId(connectionsByArrivalTime); // Really: by start is correct because connections are reversed
     pathStopSequencesByStopId            = getPathStopSequencesByStopId(pathStopSequencesById);
   }
-  
-      
-  
+    
   // create a map of connection pointers by start path stop sequence id (key).
   std::map<unsigned long long, std::vector<Connection*> > ConnectionScanAlgorithm::getConnectionsByStartPathStopSequenceId(std::vector<Connection*> theConnectionsByDepartureTime)
   {
     
     std::cout << "Creating map of connections by starting path stop sequence id..." << std::endl;
-    
-    //algorithmCalculationTime.startStep();
     
     std::cout << std::fixed;
     std::cout << std::setprecision(2);
@@ -130,7 +127,7 @@ namespace TrRouting
     for(auto & connection : theConnectionsByDepartureTime)
     {
       
-      // add the path stop sequence id key does not exist:
+      // add the path stop sequence id key if it does not exist:
       if (connectionsByStartPathStopSequenceId.find(connection->pathStopSequenceStartId) == connectionsByStartPathStopSequenceId.end())
       {
         std::vector<Connection*> connections;
@@ -144,9 +141,6 @@ namespace TrRouting
       }
     }
     
-    //algorithmCalculationTime.stopStep();
-    //std::cout << "-- Creating map of connections by starting path stop sequence id -- " << algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
-    
     return connectionsByStartPathStopSequenceId;
   }
   
@@ -155,9 +149,7 @@ namespace TrRouting
   {
     
     std::cout << "Creating map of connections by ending path stop sequence id..." << std::endl;
-    
-    //algorithmCalculationTime.startStep();
-    
+        
     std::cout << std::fixed;
     std::cout << std::setprecision(2);
     
@@ -183,9 +175,6 @@ namespace TrRouting
     
     std::cout << std::endl;
     
-    //algorithmCalculationTime.stopStep();
-    //std::cout << "-- Creating map of connections by ending path stop sequence id -- " << algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
-    
     return connectionsByEndPathStopSequenceId;
   }
   
@@ -193,8 +182,6 @@ namespace TrRouting
   {
     
     std::cout << "Creating map of path stop sequences by stop id..." << std::endl;
-    
-    //algorithmCalculationTime.startStep();
     
     std::cout << std::fixed;
     std::cout << std::setprecision(2);
@@ -219,9 +206,6 @@ namespace TrRouting
     
     std::cout << std::endl;
     
-    //algorithmCalculationTime.stopStep();
-    //std::cout << "-- Creating map of path stop sequences by stop id -- " << algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
-    
     return pathStopSequencesByStopId;
   }
   
@@ -231,126 +215,10 @@ namespace TrRouting
     params = theParams;
   }
   
-  void ConnectionScanAlgorithm::setParamsFromYaml(std::string yamlFilePath)
-  {
-    
-    if(yamlFilePath == "")
-    {
-      yamlFilePath = "trRoutingConfig.yml";
-    }
-    
-    // Override params using yaml config file:
-    YAML::Node config = YAML::LoadFile(yamlFilePath);
-    
-    if (config["databaseName"])
-    {
-      params.databaseName = config["databaseName"].as<std::string>();
-    }
-    if (config["databaseHost"])
-    {
-      params.databaseHost = config["databaseHost"].as<std::string>();
-    }
-    if (config["databaseUser"])
-    {
-      params.databaseUser = config["databaseUser"].as<std::string>();
-    }
-    if (config["databasePort"])
-    {
-      params.databasePort = config["databasePort"].as<std::string>();
-    }
-    if (config["osrmRoutingWalkingPort"])
-    {
-      params.osrmRoutingWalkingPort = config["osrmRoutingWalkingPort"].as<std::string>();
-    }
-    if (config["osrmRoutingWalkingHost"])
-    {
-      params.osrmRoutingWalkingHost = config["osrmRoutingWalkingHost"].as<std::string>();
-    }
-    if (config["osrmRoutingDrivingPort"])
-    {
-      params.osrmRoutingDrivingPort = config["osrmRoutingDrivingPort"].as<std::string>();
-    }
-    if (config["osrmRoutingDrivingHost"])
-    {
-      params.osrmRoutingDrivingHost = config["osrmRoutingDrivingHost"].as<std::string>();
-    }
-    if (config["osrmRoutingCyclingPort"])
-    {
-      params.osrmRoutingCyclingPort = config["osrmRoutingCyclingPort"].as<std::string>();
-    }
-    if (config["osrmRoutingCyclingHost"])
-    {
-      params.osrmRoutingCyclingHost = config["osrmRoutingCyclingHost"].as<std::string>();
-    }
-    if (config["connectionsSqlWhereClause"])
-    {
-      params.connectionsSqlWhereClause = config["connectionsSqlWhereClause"].as<std::string>();
-    }
-    if (config["transfersSqlWhereClause"])
-    {
-      params.transfersSqlWhereClause = config["transfersSqlWhereClause"].as<std::string>();
-    }
-    if (config["maxAccessWalkingTravelTimeFromOriginToFirstStopMinutes"])
-    {
-      params.maxAccessWalkingTravelTimeFromOriginToFirstStopMinutes = config["maxAccessWalkingTravelTimeFromOriginToFirstStopMinutes"].as<int>();
-    }
-    if (config["maxAccessWalkingTravelTimeFromLastStopToDestinationMinutes"])
-    {
-      params.maxAccessWalkingTravelTimeFromLastStopToDestinationMinutes = config["maxAccessWalkingTravelTimeFromLastStopToDestinationMinutes"].as<int>();
-    }
-    if (config["maxTransferWalkingTravelTimeMinutes"])
-    {
-      params.maxTransferWalkingTravelTimeMinutes = config["maxTransferWalkingTravelTimeMinutes"].as<int>();
-    }
-    if (config["minWaitingTimeMinutes"])
-    {
-      params.minWaitingTimeMinutes = config["minWaitingTimeMinutes"].as<int>();
-    }
-    if (config["walkingSpeedMetersPerSecond"])
-    {
-      params.walkingSpeedMetersPerSecond = config["walkingSpeedMetersPerSecond"].as<float>();
-    }
-    if (config["drivingSpeedMetersPerSecond"])
-    {
-      params.drivingSpeedMetersPerSecond = config["drivingSpeedMetersPerSecond"].as<float>();
-    }
-    if (config["cyclingSpeedMetersPerSecond"])
-    {
-      params.cyclingSpeedMetersPerSecond = config["cyclingSpeedMetersPerSecond"].as<float>();
-    }
-    if (config["accessMode"])
-    {
-      params.accessMode = config["accessMode"].as<std::string>();
-    }
-    if (config["egressMode"])
-    {
-      params.egressMode = config["egressMode"].as<std::string>();
-    }
-    if (config["noResultSecondMode"])
-    {
-      params.noResultSecondMode = config["noResultSecondMode"].as<std::string>();
-    }
-    if (config["noResultNextAccessTimeMinutesIncrement"])
-    {
-      params.noResultNextAccessTimeMinutesIncrement = config["noResultNextAccessTimeMinutesIncrement"].as<int>();
-    }
-    if (config["tryNextModeIfRoutingFails"])
-    {
-      params.tryNextModeIfRoutingFails = config["tryNextModeIfRoutingFails"].as<bool>();
-    }
-    if (config["maxNoResultNextAccessTimeMinutes"])
-    {
-      params.maxNoResultNextAccessTimeMinutes = config["maxNoResultNextAccessTimeMinutes"].as<int>();
-    }
-    
-  }
-  
   void ConnectionScanAlgorithm::refresh()
   {
     
     int totalNumberOfJourneySteps = 0;
-    
-    //algorithmCalculationTime.startStep();
     
     ++calculationId;
     journeyStepId = 1;
@@ -559,15 +427,13 @@ namespace TrRouting
     //params.newMaxAccessWalkingTravelTimeFromOriginToFirstStopMinutes     = params.maxAccessWalkingTravelTimeFromOriginToFirstStopMinutes;
     //params.newMaxAccessWalkingTravelTimeFromLastStopToDestinationMinutes = params.maxAccessWalkingTravelTimeFromLastStopToDestinationMinutes;
     
-    //algorithmCalculationTime.stopStep();
-    //std::cout << "-- Resetting connections -- " << algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
-    
   }
   
   std::string ConnectionScanAlgorithm::calculate(std::string tripIdentifier, const std::map<unsigned long long, int>& cachedNearestStopsIdsFromStartingPoint, const std::map<unsigned long long, int>& cachedNearestStopsIdsFromEndingPoint)
   {
     
-    //algorithmCalculationTime.start();
+    
+      
     Connection * possibleConnectionPtr;
     std::map<std::string, long long> benchmarkTimes;
     std::vector<std::string> result;
@@ -624,6 +490,8 @@ namespace TrRouting
     std::map<unsigned long long, int> nearestStopsIdsFromEndingPoint;
     std::pair<int,int>                walkingTravelTimeAndDistance{std::make_pair(-1,-1)};
     
+      
+      
     if(params.startingStopId == -1) // if starting point is not set
     {
       if (!cachedNearestStopsIdsFromStartingPoint.empty())
@@ -640,6 +508,8 @@ namespace TrRouting
       nearestStopsIdsFromStartingPoint[params.startingStopId] = 0;
     }
     
+      
+      
     if(!params.returnAllStopsResult)
     {
       //if(params.endingStopId == -1)
@@ -679,6 +549,8 @@ namespace TrRouting
       
     }
     
+      
+      
     std::map<long long, int> accessedStartSequenceByTripIds;
     std::vector<std::pair<long long, int>> sortedNearestStopsIdsFromStartingPointPairs;
     
@@ -686,6 +558,10 @@ namespace TrRouting
     {
       sortedNearestStopsIdsFromStartingPointPairs.emplace_back(std::make_pair(walkableStopFromStartingPoint.first, walkableStopFromStartingPoint.second));
     }
+      
+      
+      
+      
     if (params.startingStopId == -1)
     {
       // sort stops by walking travel time, so we can minimize travel time for same trip boarding
@@ -695,6 +571,9 @@ namespace TrRouting
       });
     }
     
+      
+      
+      
     for(auto & walkableStopFromStartingPoint : sortedNearestStopsIdsFromStartingPointPairs)
     {
       
@@ -710,6 +589,8 @@ namespace TrRouting
       stopsById[walkableStopFromStartingPoint.first].journeySteps.emplace_back(std::make_shared<SimplifiedJourneyStep>(newWalkJourneyStep));
       stopsById[walkableStopFromStartingPoint.first].totalNotInVehicleTravelTimeMinutes += walkableStopFromStartingPoint.second;
       
+        
+        
       for(auto & transferablePathStopSequenceId : pathStopSequencesByStopId[walkableStopFromStartingPoint.first])
       {
         
