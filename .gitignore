@@ -1,8 +1,8 @@
 .DS_Store
-trRouting
-trRoutingConfig.yml
-trRoutingTripBased
-trRoutingTripBasedConfig.yml
+/trRouting
+/trRoutingConfig.yml
+/trRoutingTripBased
+/trRoutingTripBasedConfig.yml
 
 # Cache files
 *.cache

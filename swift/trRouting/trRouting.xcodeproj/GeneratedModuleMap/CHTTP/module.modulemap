@@ -1,0 +1,5 @@
+module CHTTP {
+    umbrella "/Library/WebServer/ws/trRouting/swift/trRouting/Packages/Engine-2.2.1/Sources/CHTTP/include"
+    link "CHTTP"
+    export *
+}

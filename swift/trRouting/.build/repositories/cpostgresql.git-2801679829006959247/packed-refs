@@ -1,0 +1,16 @@
+# pack-refs with: peeled fully-peeled 
+089b739b7d218e2e5e64a10e1750789e6ec250b4 refs/heads/master
+d08befe27dc07017e63eeaf29dcc535300e6fd3b refs/heads/pkgconfig
+d08befe27dc07017e63eeaf29dcc535300e6fd3b refs/pull/2/head
+a11ea8654c638e524ed112a25ed1eba541126465 refs/pull/3/head
+d78b62bd6b4d79a34ac26bd19f949ac83e91e1ef refs/pull/4/head
+87b86cca7cc3f14d937bddcf6efb1d8ea0f667c7 refs/pull/5/head
+c1943fffb92c0441e5b0789eb7a9173b71e0e255 refs/pull/5/merge
+87b86cca7cc3f14d937bddcf6efb1d8ea0f667c7 refs/pull/6/head
+fb61b35654c2adb57ce04ffbc8beb279fea21bb4 refs/tags/0.1.0
+9db79a5e1eddb30b37c5f666fe1d3f1a745d6343 refs/tags/0.1.1
+260deee95e6fa4b112666f66be97e3258d03ab88 refs/tags/1.0.0
+04794fa3b69d9f5f31f4511d803e265c5eaad4e0 refs/tags/2.0.0
+85d88845f7ab69147b07127a4ee40bad7cd19d01 refs/tags/2.0.0-alpha.1
+f6007972572a04830073833c47c0d8c9b3e0d67e refs/tags/2.0.0-beta.1
+33f0f94f023ab61ccd0ba2f076dd6a448be853e3 refs/tags/2.1.0
