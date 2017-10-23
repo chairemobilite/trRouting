@@ -4,7 +4,7 @@
 /trRoutingTripBased
 /trRoutingTripBasedConfig.yml
 
-.xcodeproj
+*.xcodeproj
 .build
 swift/trRouting/Packages
 swift/trRouting/Package.resolved
