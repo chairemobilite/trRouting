@@ -1,8 +1,13 @@
 .DS_Store
-trRouting
-trRoutingConfig.yml
-trRoutingTripBased
-trRoutingTripBasedConfig.yml
+/trRouting
+/trRoutingConfig.yml
+/trRoutingTripBased
+/trRoutingTripBasedConfig.yml
+
+*.xcodeproj
+.build
+swift/trRouting/Packages
+swift/trRouting/Package.resolved
 
 # Cache files
 *.cache
