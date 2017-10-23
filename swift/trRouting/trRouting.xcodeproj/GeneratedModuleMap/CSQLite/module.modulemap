@@ -1,5 +1,0 @@
-module CSQLite {
-    umbrella "/Library/WebServer/ws/trRouting/swift/trRouting/Packages/SQLite-2.3.1/Sources/CSQLite/include"
-    link "CSQLite"
-    export *
-}
