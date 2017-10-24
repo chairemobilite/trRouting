@@ -6,6 +6,8 @@
 //
 //
 
+import Foundation
+
 struct Point
 {
 

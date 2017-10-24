@@ -75,7 +75,7 @@ struct Parameters
   var transferBetweenSameRoute                                   : Bool // allow transfers between the same route_id
   var calculateByNumberOfTransfers                               : Bool // calculate first the fastest route, then calculate with decreasing number of transfers until no route is found, return results for each number of transfers.
   
-  setDefaultValues()
+  func setDefaultValues() -> Void
   {
     self.walkingSpeedMetersPerSecond                                = 5/3.6  // 5 km/h
     self.drivingSpeedMetersPerSecond                                = 90/3.6 // 90 km/h
