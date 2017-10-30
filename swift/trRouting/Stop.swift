@@ -25,6 +25,6 @@ struct Stop
   var numBoardings                       : Int
   var totalInVehicleTravelTimeMinutes    : Int
   var totalNotInVehicleTravelTimeMinutes : Int
-  var canUnboardToDestination            : Bool? // optional bool, can be null, true or false
+  var canUnboardToDestination            : Bool? // optional bool, can be nil, true or false
 }
   
