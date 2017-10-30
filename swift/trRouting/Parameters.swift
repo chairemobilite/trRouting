@@ -47,19 +47,19 @@ struct Parameters
   var startingStopId                                             : Int
   var endingStopId                                               : Int
   
-  var connectionsSqlWhereClause                                  : String
-  var transfersSqlWhereClause                                    : String
-  var databaseName                                               : String
-  var databaseHost                                               : String
-  var databaseUser                                               : String
-  var databasePort                                               : String
-  var databasePassword                                           : String
-  var osrmRoutingWalkingPort                                     : String
-  var osrmRoutingWalkingHost                                     : String
-  var osrmRoutingDrivingPort                                     : String
-  var osrmRoutingDrivingHost                                     : String
-  var osrmRoutingCyclingPort                                     : String
-  var osrmRoutingCyclingHost                                     : String
+  var connectionsSqlWhereClause                                  : String?
+  var transfersSqlWhereClause                                    : String?
+  var databaseName                                               : String?
+  var databaseHost                                               : String?
+  var databaseUser                                               : String?
+  var databasePort                                               : String?
+  var databasePassword                                           : String?
+  var osrmRoutingWalkingPort                                     : String?
+  var osrmRoutingWalkingHost                                     : String?
+  var osrmRoutingDrivingPort                                     : String?
+  var osrmRoutingDrivingHost                                     : String?
+  var osrmRoutingCyclingPort                                     : String?
+  var osrmRoutingCyclingHost                                     : String?
   
   var accessMode                                                 : String
   var egressMode                                                 : String
