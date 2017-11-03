@@ -40,7 +40,6 @@ namespace TrRouting
     ConnectionScanAlgorithm();
     ConnectionScanAlgorithm(Parameters& theParams);
     void setup();
-    void setParamsFromYaml(std::string yamlFilePath = "");
     std::string calculate(std::string tripIdentifier, const std::map<unsigned long long, int>& cachedNearestStopsIdsFromStartingPoint = std::map<unsigned long long, int>(), const std::map<unsigned long long, int>& cachedNearestStopsIdsFromEndingPoint = std::map<unsigned long long, int>());
     void refresh();
     std::map<unsigned long long, std::vector<Connection*> > getConnectionsByStartPathStopSequenceId(std::vector<Connection*> theConnectionsByDepartureTime);
