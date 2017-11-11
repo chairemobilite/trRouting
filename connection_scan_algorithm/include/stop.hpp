@@ -19,12 +19,6 @@ namespace TrRouting
     std::string name;
     long long stationId;
     Point point;
-    int arrivalTimeMinuteOfDay;
-    std::vector<std::shared_ptr<SimplifiedJourneyStep> > journeySteps;
-    int numBoardings;
-    int totalInVehicleTravelTimeMinutes;
-    int totalNotInVehicleTravelTimeMinutes;
-    unsigned long long canUnboardToDestination; // ConnectionScanAlgorithm::calculationId will be assigned if the stop is unboardable to reach destination
   
   private:
     friend class boost::serialization::access;
@@ -36,7 +30,6 @@ namespace TrRouting
         ar & name;
         ar & stationId;
         ar & point;
-        ar & arrivalTimeMinuteOfDay;
     }
   };
 

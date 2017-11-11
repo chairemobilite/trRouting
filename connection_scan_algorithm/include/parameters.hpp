@@ -10,7 +10,7 @@ namespace TrRouting
   struct Parameters {
     
     std::string applicationShortname;
-    std::string dataFetcher; // csv, database
+    std::string dataFetcher; // csv, database, cache
     
     int routingDateYear;   // not implemented, use onlyServiceIds or exceptServiceIds for now
     int routingDateMonth;  // not implemented, use onlyServiceIds or exceptServiceIds for now
@@ -29,15 +29,15 @@ namespace TrRouting
     int arrivalTimeHour;
     int arrivalTimeMinutes;
     
-    int maxTotalTravelTimeMinutes;
+    int maxTotalTravelTimeSeconds;
     int maxNumberOfTransfers;
-    int minWaitingTimeMinutes;
-    int transferPenaltyMinutes;
-    long long maxAccessWalkingDistanceMeters;
-    int maxAccessWalkingTravelTimeFromOriginToFirstStopMinutes;
-    int maxAccessWalkingTravelTimeFromLastStopToDestinationMinutes;
-    int maxTransferWalkingTravelTimeMinutes;
-    int maxTotalWalkingTravelTimeMinutes;
+    int minWaitingTimeSeconds;
+    int transferPenaltySeconds;
+    int maxAccessWalkingDistanceMeters;
+    int maxAccessWalkingTravelTimeFromOriginToFirstStopSeconds;
+    int maxAccessWalkingTravelTimeFromLastStopToDestinationSeconds;
+    int maxTransferWalkingTravelTimeSeconds;
+    int maxTotalWalkingTravelTimeSeconds;
     float maxOnlyWalkingAccessTravelTimeRatio;
     float walkingSpeedMetersPerSecond;
     float drivingSpeedMetersPerSecond;
@@ -71,8 +71,8 @@ namespace TrRouting
     std::string egressMode;
     bool tryNextModeIfRoutingFails;
     std::string noResultSecondMode;
-    int noResultNextAccessTimeMinutesIncrement;
-    int maxNoResultNextAccessTimeMinutes;
+    int noResultNextAccessTimeSecondsIncrement;
+    int maxNoResultNextAccessTimeSeconds;
     
     bool returnAllStopsResult;         // keep results for all stops (used in creating accessibility map)
     bool forwardCalculation;           // forward calculation: default. if false: reverse calculation, will ride connections backward (useful when setting the arrival time)
@@ -86,15 +86,15 @@ namespace TrRouting
       walkingSpeedMetersPerSecond                                = 5/3.6; // 5 km/h
       drivingSpeedMetersPerSecond                                = 90/3.6; // 90 km/h
       cyclingSpeedMetersPerSecond                                = 25/3.6; // 25 km/h
-      maxTotalTravelTimeMinutes                                  = -1; // -1 means no limit
+      maxTotalTravelTimeSeconds                                  = -1; // -1 means no limit
       maxNumberOfTransfers                                       = -1; // -1 means no limit
-      minWaitingTimeMinutes                                      = 5;
-      maxAccessWalkingTravelTimeFromOriginToFirstStopMinutes     = 20;
-      maxAccessWalkingTravelTimeFromLastStopToDestinationMinutes = 20;
-      maxTransferWalkingTravelTimeMinutes                        = 20; // depends of transfer data provided
-      maxTotalWalkingTravelTimeMinutes                           = 60; // not used right now
-      maxOnlyWalkingAccessTravelTimeRatio                        = 1.5; // prefer walking only if it is faster than transit and total only walking travel time <= maxAccessWalkingTravelTimeFromOriginToFirstStopMinutes * this ratio
-      transferPenaltyMinutes                                     = 0; // not used right now
+      minWaitingTimeSeconds                                      = 5*60;
+      maxAccessWalkingTravelTimeFromOriginToFirstStopSeconds     = 20*60;
+      maxAccessWalkingTravelTimeFromLastStopToDestinationSeconds = 20*60;
+      maxTransferWalkingTravelTimeSeconds                        = 20*60; // depends of transfer data provided
+      maxTotalWalkingTravelTimeSeconds                           = 60*60; // not used right now
+      maxOnlyWalkingAccessTravelTimeRatio                        = 1.5; // prefer walking only if it is faster than transit and total only walking travel time <= maxAccessWalkingTravelTimeFromOriginToFirstStopSeconds * this ratio
+      transferPenaltySeconds                                     = 0; // not used right now
       connectionsSqlWhereClause                                  = "";
       transfersSqlWhereClause                                    = "true";
       databaseName                                               = "tr_all_dev";
@@ -112,8 +112,8 @@ namespace TrRouting
       egressMode                                                 = "walking";
       noResultSecondMode                                         = "driving";
       tryNextModeIfRoutingFails                                  = false;
-      noResultNextAccessTimeMinutesIncrement                     = 5;
-      maxNoResultNextAccessTimeMinutes                           = 40;
+      noResultNextAccessTimeSecondsIncrement                     = 5*60;
+      maxNoResultNextAccessTimeSeconds                           = 40*60;
       returnAllStopsResult                                       = false;
       forwardCalculation                                         = true;
       detailedResults                                            = false;

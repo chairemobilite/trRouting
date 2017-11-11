@@ -1,23 +1,43 @@
 #ifndef TR_CONNECTION_SCAN_ALGORITHM
 #define TR_CONNECTION_SCAN_ALGORITHM
 
+
+#include <pqxx/pqxx> 
 #include <string>
 #include <ctime>
 #include <utility>
 #include <iostream>
+#include <iomanip>
+#include <fstream>
+#include <sstream>
+#include <iterator>
 #include <vector>
+#include <math.h>
 #include <algorithm>
+#include <boost/algorithm/string.hpp>
+#include <boost/serialization/map.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
 #include <boost/format.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/compute.hpp>
-#include <yaml-cpp/yaml.h>
+#include <boost/tokenizer.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/asio/ip/tcp.hpp>
 #include <limits>
+#include <stdlib.h>
 
+#include "stop.hpp"
+#include "route.hpp"
+#include "trip.hpp"
+#include "point.hpp"
 #include "parameters.hpp"
-#include "db_fetcher.hpp"
+#include "routing_result.hpp"
 #include "calculation_time.hpp"
 
 extern int stepCount;
@@ -38,16 +58,11 @@ namespace TrRouting
     
     std::string applicationShortname;
     int calculationId; // used to set reachable connections without having to reset a bool every time
-    long long journeyStepId; // used as ids for journey steps (will increment)
-    std::map<long long, SimplifiedJourneyStep*> journeyStepsById; // map of all journey steps by id
     ConnectionScanAlgorithm();
     ConnectionScanAlgorithm(Parameters& theParams);
-    void setup();
-    std::string calculate(std::string tripIdentifier, const std::map<unsigned long long, int>& cachedNearestStopsIdsFromStartingPoint = std::map<unsigned long long, int>(), const std::map<unsigned long long, int>& cachedNearestStopsIdsFromEndingPoint = std::map<unsigned long long, int>());
+    void prepare();
+    std::pair<RoutingResult, std::string> calculate();
     void refresh();
-    std::map<unsigned long long, std::vector<Connection*> > getConnectionsByStartPathStopSequenceId(std::vector<Connection*> theConnectionsByDepartureTime);
-    std::map<unsigned long long, std::vector<Connection*> > getConnectionsByEndPathStopSequenceId(std::vector<Connection*> theConnectionsByArrivalTime);
-    std::map<unsigned long long, std::vector<unsigned long long> > getPathStopSequencesByStopId(std::map<unsigned long long,PathStopSequence> thePathStopSequencesById);
     void updateParams(Parameters& theParams);
     Parameters params;
     void resetAccessEgressModes();
@@ -55,25 +70,42 @@ namespace TrRouting
     
   private:
     
-    int                                                                   maxUnboardingTimeMinutes; // the maximum unboarding time possible, according to parameters
-    std::map<std::string,int>                                             pickUpTypes;
-    std::map<std::string,int>                                             dropOffTypes;
-    std::map<unsigned long long,std::map<unsigned long long, int> >       transferDurationsByStopId;
-    std::map<unsigned long long,PathStopSequence>                         pathStopSequencesById;
-    std::map<unsigned long long,std::vector<unsigned long long> >         pathStopSequencesByStopId;
-    std::map<unsigned long long,Stop>                                     stopsById;
-    std::map<unsigned long long,Route>                                    routesById;
-    std::map<unsigned long long,Connection>                               forwardConnectionsById;
-    std::map<unsigned long long,Connection>                               reverseConnectionsById;
-    std::vector<Connection*>                                              connectionsByArrivalTime;
-    std::vector<Connection*>                                              connectionsByDepartureTime;
-    std::map<unsigned long long,std::vector<Connection*> >                connectionsByStartPathStopSequenceId;
-    std::map<unsigned long long,std::vector<Connection*> >                connectionsByEndPathStopSequenceId;
-    int                                                                   maxTimeValue;
-    std::string                                                           accessMode;
-    std::string                                                           egressMode;
-    int                                                                   maxAccessWalkingTravelTimeFromOriginToFirstStopMinutes;
-    int                                                                   maxAccessWalkingTravelTimeFromLastStopToDestinationMinutes;
+    void prepareStops();
+    void prepareRoutes();
+    void prepareTrips();
+    void prepareConnections();
+
+    void resetStopsTentativeArrivalTimes();
+    void resetStopsEgressFootpathTravelTimesSeconds();
+    void resetTripsEnterConnection();
+    void resetJourneys();
+    void resetVariables();
+    void getAccessFoothpaths(Point& origin);
+    void getEgressFootpaths(Point& destination);
+
+    int                                               maxUnboardingTimeSeconds; // the maximum unboarding time possible, according to parameters
+    std::map<std::string,int>                         pickUpTypes;
+    std::map<std::string,int>                         dropOffTypes;
+    std::vector<Stop>                                 stops;
+    std::map<long long, int>                          stopIndexesById;
+    std::vector<Route>                                routes;
+    std::map<long long, int>                          routeIndexesById;
+    std::vector<Trip>                                 trips;
+    std::map<long long, int>                          tripIndexesById;
+    std::vector<std::vector<std::tuple<int,int,int>>> footpaths; // tuple: departingStopIndex, arrivalStopIndex, walkingTravelTimeSeconds
+    std::vector<int>                                  stopsTentativeArrivalTimesSeconds;
+    std::vector<int>                                  stopsEgressFootpathTravelTimesSeconds;
+    std::vector<int>                                  tripsEnterConnection; // index of the entering connection for each trip index  
+    std::vector<std::tuple<int,int,int,int,int>>      forwardConnections; // tuple: departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex
+    std::vector<std::tuple<int,int,int,int,int>>      reverseConnections; // tuple: departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex
+    std::vector<std::pair<int,int>>                   accessFootpaths; // tuple: accessStopIndex, walkingTravelTimeSeconds
+    std::vector<std::pair<int,int>>                   egressFootpaths; // tuple: egressStopIndex, walkingTravelTimeSeconds
+    std::vector<std::tuple<int,int,int>>              journeys; // index = stop index, tuple: final enter connection, final exit connection, final footpath
+    int                                               maxTimeValue;
+    std::string                                       accessMode;
+    std::string                                       egressMode;
+    int                                               maxAccessWalkingTravelTimeFromOriginToFirstStopSeconds;
+    int                                               maxAccessWalkingTravelTimeFromLastStopToDestinationSeconds;
   };
   
 }
