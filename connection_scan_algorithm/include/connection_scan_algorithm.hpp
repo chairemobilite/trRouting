@@ -62,7 +62,7 @@ namespace TrRouting
     ConnectionScanAlgorithm(Parameters& theParams);
     void prepare();
     std::pair<RoutingResult, std::string> calculate();
-    void refresh();
+    void reset();
     void updateParams(Parameters& theParams);
     Parameters params;
     void resetAccessEgressModes();

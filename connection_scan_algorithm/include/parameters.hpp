@@ -43,8 +43,8 @@ namespace TrRouting
     float drivingSpeedMetersPerSecond;
     float cyclingSpeedMetersPerSecond;
     
-    Point startingPoint;
-    Point endingPoint;
+    Point origin;
+    Point destination;
     
     long long startingStopId;
     long long endingStopId;

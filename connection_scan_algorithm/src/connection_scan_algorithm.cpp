@@ -2,16 +2,6 @@
 
 namespace TrRouting
 {
-  ConnectionScanAlgorithm::ConnectionScanAlgorithm(Parameters& theParams) : params(theParams)
-  {
-    algorithmCalculationTime = CalculationTime();
-    setup();
-  }
-  
-  ConnectionScanAlgorithm::ConnectionScanAlgorithm()
-  {
-    
-  }
   
   void ConnectionScanAlgorithm::resetAccessEgressModes()
   {
