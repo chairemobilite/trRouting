@@ -9,7 +9,7 @@ namespace TrRouting
     ConnectionScanAlgorithm::ConnectionScanAlgorithm(Parameters& theParams) : params(theParams)
     {
       algorithmCalculationTime = CalculationTime();
-      setup();
+      prepare();
     }
     
     ConnectionScanAlgorithm::ConnectionScanAlgorithm()
