@@ -107,8 +107,8 @@ namespace TrRouting
     std::map<unsigned long long, int>    tripIndexesById;
     std::vector<std::tuple<int,int,int>> footpaths; // tuple: departingStopIndex, arrivalStopIndex, walkingTravelTimeSeconds
     std::vector<std::pair<int,int>>      footpathsRanges; // index: stopIndex, pair: index of first footpath, index of last footpath
-    std::vector<int>                     stopsTentativeArrivalTimesSeconds;
-    std::vector<int>                     stopsEgressFootpathTravelTimesSeconds;
+    std::vector<int>                     stopsTentativeTimes;
+    //std::vector<int>                     stopsEgressFootpathTravelTimesSeconds; // not sure we need this...
     std::vector<int>                     tripsEnterConnection; // index of the entering connection for each trip index  
     std::vector<std::tuple<int,int,int,int,int,short,short>> forwardConnections; // tuple: departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard
     std::vector<std::tuple<int,int,int,int,int,short,short>> reverseConnections; // tuple: departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard
