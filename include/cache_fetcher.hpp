@@ -21,10 +21,6 @@ namespace TrRouting
       
     }
     
-    static bool isCacheFileNotEmpty(std::string applicationShortname, std::string cacheFileName) {
-      
-    }
-    
   private:
     
   };

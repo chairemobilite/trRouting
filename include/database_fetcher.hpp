@@ -28,12 +28,6 @@ namespace TrRouting
     //static const std::map<std::pair<unsigned long long, unsigned long long>, double> getTravelTimeByStopsPair(std::string applicationShortname, std::string mode);
     //static const std::pair<int, int> getTripTravelTimeAndDistance(Point startingPoint, Point endingPoint, std::string mode, Parameters& params);
     
-    //static pqxx::connection* getConnectionPtr();
-    //template<class T>
-    //static void saveToCacheFile(std::string applicationShortname, T& data, std::string cacheFileName);
-    //template<class T>
-    //static const T loadFromCacheFile(T& data, std::string applicationShortname, std::string cacheFileName);
-    //static bool isCacheFileNotEmpty(std::string applicationShortname, std::string cacheFileName);
     void disconnect();
     bool isConnectionOpen();
     //static void setDbSetupStr(std::string customDbSetupStr);

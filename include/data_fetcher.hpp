@@ -36,7 +36,16 @@ namespace TrRouting
     public:
     
       DataFetcher() {}
-    
+      
+      template<class T>
+      static void saveToCacheFile(std::string applicationShortname, T& data, std::string cacheFileName) {
+        
+      }
+      
+      static bool isCacheFileNotEmpty(std::string applicationShortname, std::string cacheFileName) {
+        
+      }
+      
   };
   
 }
