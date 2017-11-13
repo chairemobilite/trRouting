@@ -12,7 +12,7 @@ namespace TrRouting
   struct Parameters {
     
     std::string applicationShortname;
-    DataFetcher dataFetcher; // csv, database, cache
+    std::shared_ptr<DataFetcher> dataFetcher; // csv, database, cache, gtfs
     
     int routingDateYear;   // not implemented, use onlyServiceIds or exceptServiceIds for now
     int routingDateMonth;  // not implemented, use onlyServiceIds or exceptServiceIds for now

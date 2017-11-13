@@ -179,28 +179,29 @@ int main(int argc, char** argv) {
   std::cout << "Starting transit routing for the application: ";
   std::cout << consoleGreen + dataShortname + consoleResetColor << std::endl << std::endl;
   
-  DataFetcher dataFetcher;
   Calculator  calculator;
   algorithmParams.applicationShortname = dataShortname;
   
   if (dataFetcherStr == "database")
   {
-    dataFetcher = DatabaseFetcher("dbname=" + algorithmParams.databaseName + " user=" + algorithmParams.databaseUser + " hostaddr=" + algorithmParams.databaseHost + " port=" + algorithmParams.databasePort + "");
+    DatabaseFetcher dataFetcher = DatabaseFetcher("dbname=" + algorithmParams.databaseName + " user=" + algorithmParams.databaseUser + " hostaddr=" + algorithmParams.databaseHost + " port=" + algorithmParams.databasePort + "");
+    algorithmParams.dataFetcher = std::make_shared<DatabaseFetcher>(dataFetcher);
   }
   else if (dataFetcherStr == "gtfs")
   {
-    dataFetcher = GtfsFetcher();
+    GtfsFetcher dataFetcher = GtfsFetcher();
+    algorithmParams.dataFetcher = std::make_shared<GtfsFetcher>(dataFetcher);
   }
   else if (dataFetcherStr == "csv")
   {
-    dataFetcher = CsvFetcher();
+    CsvFetcher dataFetcher = CsvFetcher();
+    algorithmParams.dataFetcher = std::make_shared<CsvFetcher>(dataFetcher);
   }
   else if (dataFetcherStr == "cache")
   {
-    dataFetcher = CacheFetcher();
+    CacheFetcher dataFetcher = CacheFetcher();
+    algorithmParams.dataFetcher = std::make_shared<CacheFetcher>(dataFetcher);
   }
-  
-  algorithmParams.dataFetcher = dataFetcher;
   
   calculator = Calculator(algorithmParams);
   int i = 0;

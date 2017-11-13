@@ -11,10 +11,11 @@ namespace TrRouting
   
   public:
    
-    long long id;
-    long long routeId;
-    long long routeTypeId;
-    long long agencyId;
+    unsigned long long id;
+    unsigned long long routeId;
+    unsigned long long routeTypeId;
+    unsigned long long agencyId;
+    unsigned long long serviceId;
   
   private:
     friend class boost::serialization::access;
@@ -25,6 +26,7 @@ namespace TrRouting
         ar & routeId;
         ar & routeTypeId;
         ar & agencyId;
+        ar & serviceId;
     }
   };
 

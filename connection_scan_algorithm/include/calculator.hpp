@@ -97,11 +97,11 @@ namespace TrRouting
     };
     int                                               maxUnboardingTimeSeconds; // the maximum unboarding time possible, according to parameters
     std::vector<Stop>                                 stops;
-    std::map<long long, int>                          stopIndexesById;
+    std::map<unsigned long long, int>                 stopIndexesById;
     std::vector<Route>                                routes;
-    std::map<long long, int>                          routeIndexesById;
+    std::map<unsigned long long, int>                 routeIndexesById;
     std::vector<Trip>                                 trips;
-    std::map<long long, int>                          tripIndexesById;
+    std::map<unsigned long long, int>                 tripIndexesById;
     std::vector<std::vector<std::tuple<int,int,int>>> footpaths; // tuple: departingStopIndex, arrivalStopIndex, walkingTravelTimeSeconds
     std::vector<int>                                  stopsTentativeArrivalTimesSeconds;
     std::vector<int>                                  stopsEgressFootpathTravelTimesSeconds;

@@ -11,9 +11,9 @@ namespace TrRouting
   
   public:
    
-    long long id;
-    long long agencyId;
-    long long routeTypeId;
+    unsigned long long id;
+    unsigned long long agencyId;
+    unsigned long long routeTypeId;
     std::string agencyAcronym;
     std::string agencyName;
     std::string shortname;
@@ -21,9 +21,9 @@ namespace TrRouting
     std::string routeTypeName;
   
   private:
-    //friend class boost::serialization::access;
+    friend class boost::serialization::access;
     template<class Archive>
-    void serialize(Archive&ar)//, const unsigned int version)
+    void serialize(Archive&ar, const unsigned int version)
     {
         ar & id;
         ar & agencyId;

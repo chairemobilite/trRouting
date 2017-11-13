@@ -13,7 +13,7 @@ namespace TrRouting
   
   public:
    
-    long long id;
+    unsigned long long id;
     std::string code;
     std::string name;
     long long stationId;

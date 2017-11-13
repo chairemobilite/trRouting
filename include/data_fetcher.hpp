@@ -39,10 +39,31 @@ namespace TrRouting
   
     public:
     
-      DataFetcher() {}
+      DataFetcher() {};
+      
+      virtual const std::pair<std::vector<Stop>, std::map<unsigned long long, int>> getStops(std::string applicationShortname)
+      {
+        std::vector<Stop> stops;
+        std::map<unsigned long long, int> stopIndexesById;
+        return std::make_pair(stops, stopIndexesById);
+      }
+      
+      virtual const std::pair<std::vector<Route>, std::map<unsigned long long, int>> getRoutes(std::string applicationShortname)
+      {
+        std::vector<Route> routes;
+        std::map<unsigned long long, int> routeIndexesById;
+        return std::make_pair(routes, routeIndexesById);
+      }
+      
+      virtual const std::pair<std::vector<Trip>, std::map<unsigned long long, int>> getTrips(std::string applicationShortname)
+      {
+        std::vector<Trip> trips;
+        std::map<unsigned long long, int> tripIndexesById;
+        return std::make_pair(trips, tripIndexesById);
+      }
       
       template<class T>
-      static void saveToCacheFile(std::string applicationShortname, T& data, std::string cacheFileName) {
+      void saveToCacheFile(std::string applicationShortname, T& data, std::string cacheFileName) {
         std::ofstream oCacheFile;
         oCacheFile.open(applicationShortname + "_" + cacheFileName + ".cache", std::ios::out | std::ios::trunc | std::ios::binary);
         boost::archive::binary_oarchive oarch(oCacheFile);
@@ -50,7 +71,7 @@ namespace TrRouting
         oCacheFile.close();
       }
       
-      static bool cacheFileExists(std::string applicationShortname, std::string cacheFileName) {
+      bool cacheFileExists(std::string applicationShortname, std::string cacheFileName) {
         std::ifstream iCacheFile;
         bool notEmpty = false;
         iCacheFile.open(applicationShortname + "_" + cacheFileName + ".cache", std::ios::in | std::ios::binary | std::ios::ate);

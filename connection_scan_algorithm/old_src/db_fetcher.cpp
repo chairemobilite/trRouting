@@ -211,66 +211,6 @@ namespace TrRouting
       return stopsById;
     }
     
-    if (dataFetcher == "database")
-    {
-      
-      std::cout << "Fetching stops from database..." << std::endl;
-      
-      // query for stops:
-      std::string sqlQuery = "SELECT s.id, COALESCE(s.code,'?'), COALESCE(s.name,'?'), COALESCE(s.station_id, -1), ST_Y(s.geography::geometry), ST_X(s.geography::geometry)"
-      " FROM " + applicationShortname + ".tr_stops s "
-      " ORDER BY s.id";
-      
-      if (isConnectionOpen())
-      {
-        
-        pqxx::nontransaction pgNonTransaction(*(getConnectionPtr()));
-        pqxx::result pgResult( pgNonTransaction.exec( sqlQuery ));
-        unsigned long long resultCount = pgResult.size();
-        unsigned long long i = 0;
-        
-        // set cout number of decimals to 2 for displaying progress percentage:
-        std::cout << std::fixed;
-        std::cout << std::setprecision(2);
-        
-        for (pqxx::result::const_iterator c = pgResult.begin(); c != pgResult.end(); ++c) {
-          
-          // create a new Stop for each row:
-          Stop * stop = new Stop();
-          Point * point = new Point();
-          std::vector<std::shared_ptr<SimplifiedJourneyStep> > journeySteps;
-          // set Stop attributes from row:
-          stop->id                                  = c[0].as<unsigned long long>();
-          stop->code                                = c[1].as<std::string>();
-          stop->name                                = c[2].as<std::string>();
-          stop->stationId                           = c[3].as<long long>();
-          stop->point                               = *point;
-          stop->point.latitude                      = c[4].as<double>();
-          stop->point.longitude                     = c[5].as<double>();
-          stop->arrivalTimeMinuteOfDay              = maxTimeValue;
-          stop->journeySteps                        = journeySteps;
-          stop->canUnboardToDestination             = false;
-          
-          // add the stop to the map:
-          stopsById[stop->id] = *stop;
-          
-          // show loading progress in percentage:
-          i++;
-          if (i % 1000 == 0)
-          {
-            std::cout << ((((double) i) / resultCount) * 100) << "%\r"; // \r is used to stay on the same line
-          }
-        }
-        std::cout << std::endl;
-              
-        // save stops to binary cache file:
-        saveToCacheFile(applicationShortname, stopsById, "stops");
-      
-      } else {
-        std::cout << "Can't open database" << std::endl;
-      }
-    
-    }
     else if(dataFetcher == "csv")
     {
       
