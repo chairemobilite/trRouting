@@ -314,7 +314,9 @@ namespace TrRouting
       "WHERE CEIL(COALESCE(network_walking_duration_seconds::float, network_distance::float/1.38, distance::float/1.38)) <= " + std::to_string(maxTransferWalkingTravelTimeSeconds) + "::float "
       "GROUP BY stop_1_id, stop_2_id "
       "ORDER BY stop_1_id, MAX(CEIL(COALESCE(network_walking_duration_seconds::float, network_distance::float/1.38, distance::float/1.38))) ";
-        
+    
+    std::cout << sqlQuery << std::endl;
+    
     if (isConnectionOpen())
     {
       
