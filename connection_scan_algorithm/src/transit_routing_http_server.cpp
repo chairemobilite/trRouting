@@ -21,6 +21,8 @@
 #include <iterator>
 #include <curses.h>
 
+#include "data_fetcher.hpp"
+#include "database_fetcher.hpp"
 #include "calculation_time.hpp"
 #include "parameters.hpp"
 #include "calculator.hpp"
@@ -53,7 +55,7 @@ void default_resource_send(const HttpServer &server, const std::shared_ptr<HttpS
 int main(int argc, char** argv) {
   
   int serverPort {4000};
-  std::string dataFetcher {"database"}; // csv, database
+  std::string dataFetcherStr {"database"}; // csv, database
   
   // Get application shortname from config file:
   std::string applicationShortname;
@@ -102,11 +104,11 @@ int main(int argc, char** argv) {
   }
   if(variablesMap.count("dataFetcher") == 1)
   {
-    dataFetcher = variablesMap["dataFetcher"].as<std::string>();
+    dataFetcherStr = variablesMap["dataFetcher"].as<std::string>();
   }
   else if (variablesMap.count("data") == 1)
   {
-    dataFetcher = variablesMap["data"].as<std::string>();
+    dataFetcherStr = variablesMap["data"].as<std::string>();
   }
   if(variablesMap.count("dataShortname") == 1)
   {
@@ -144,7 +146,7 @@ int main(int argc, char** argv) {
   
   std::cout << "Using http port "      << serverPort << std::endl;
   std::cout << "Using osrm walk port "  << algorithmParams.osrmRoutingWalkingPort << std::endl;
-  std::cout << "Using data fetcher "   << dataFetcher << std::endl;
+  std::cout << "Using data fetcher "   << dataFetcherStr << std::endl;
   std::cout << "Using data shortname " << dataShortname << std::endl;
   
   // setup console colors 
@@ -174,9 +176,16 @@ int main(int argc, char** argv) {
   std::cout << "Starting transit routing for the application: ";
   std::cout << consoleGreen + dataShortname + consoleResetColor << std::endl << std::endl;
   
-  Calculator calculator;
+  DataFetcher dataFetcher;
+  Calculator  calculator;
   algorithmParams.applicationShortname = dataShortname;
-  algorithmParams.dataFetcher          = dataFetcher;
+  
+  if (dataFetcherStr == "database")
+  {
+    dataFetcher = DatabaseFetcher("dbname=" + algorithmParams.databaseName + " user=" + algorithmParams.databaseUser + " hostaddr=" + algorithmParams.databaseHost + " port=" + algorithmParams.databasePort + "");
+  }
+  
+  algorithmParams.dataFetcher = dataFetcher;
   
   calculator = Calculator(algorithmParams);
   int i = 0;

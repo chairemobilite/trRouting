@@ -1,16 +1,18 @@
-#ifndef TR_TRANSIT_ROUTING_PARAMETERS
-#define TR_TRANSIT_ROUTING_PARAMETERS
+#ifndef TR_PARAMETERS
+#define TR_PARAMETERS
 
 #include <vector>
 #include <string>
 #include "point.hpp"
+#include "data_fetcher.hpp"
+#include "database_fetcher.hpp"
 
 namespace TrRouting
 {
   struct Parameters {
     
     std::string applicationShortname;
-    std::string dataFetcher; // csv, database, cache
+    DataFetcher dataFetcher; // csv, database, cache
     
     int routingDateYear;   // not implemented, use onlyServiceIds or exceptServiceIds for now
     int routingDateMonth;  // not implemented, use onlyServiceIds or exceptServiceIds for now
@@ -127,4 +129,4 @@ namespace TrRouting
 }
 
 
-#endif // TR_TRANSIT_ROUTING_PARAMETERS
+#endif // TR_PARAMETERS

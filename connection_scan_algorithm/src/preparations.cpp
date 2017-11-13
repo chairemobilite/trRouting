@@ -13,7 +13,7 @@ namespace TrRouting
 
   void Calculator::prepareStops()
   {
-
+    
   }
 
   void Calculator::prepareRoutes()
