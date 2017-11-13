@@ -1,5 +1,5 @@
-#ifndef TR_CONNECTION_SCAN_ALGORITHM
-#define TR_CONNECTION_SCAN_ALGORITHM
+#ifndef TR_CALCULATOR
+#define TR_CALCULATOR
 
 
 #include <pqxx/pqxx> 
@@ -52,16 +52,16 @@ extern std::string consoleResetColor;
 namespace TrRouting
 {
   
-  class ConnectionScanAlgorithm {
+  class Calculator {
   
   public:
     
     std::string applicationShortname;
     int calculationId; // used to set reachable connections without having to reset a bool every time
-    ConnectionScanAlgorithm();
-    ConnectionScanAlgorithm(Parameters& theParams);
+    Calculator();
+    Calculator(Parameters& theParams);
     void prepare();
-    std::pair<RoutingResult, std::string> calculate();
+    RoutingResult calculate();
     void reset();
     void updateParams(Parameters& theParams);
     Parameters params;
@@ -74,18 +74,28 @@ namespace TrRouting
     void prepareRoutes();
     void prepareTrips();
     void prepareConnections();
-
+    void prepareAccessFoothpaths();
+    void prepareEgressFootpaths();
+    
     void resetStopsTentativeArrivalTimes();
     void resetStopsEgressFootpathTravelTimesSeconds();
     void resetTripsEnterConnection();
     void resetJourneys();
     void resetVariables();
-    void getAccessFoothpaths(Point& origin);
-    void getEgressFootpaths(Point& destination);
 
+    std::map<std::string,int>                         pickUpTypes = {
+      {"regular", 0},
+      {"no_pickup", 1},
+      {"must_phone", 2},
+      {"must_coordinate_with_driver", 3}
+    };
+    std::map<std::string,int>                         dropOffTypes = {
+      {"regular", 0},
+      {"no_drop_off", 1},
+      {"must_phone", 2},
+      {"must_coordinate_with_driver", 3}
+    };
     int                                               maxUnboardingTimeSeconds; // the maximum unboarding time possible, according to parameters
-    std::map<std::string,int>                         pickUpTypes;
-    std::map<std::string,int>                         dropOffTypes;
     std::vector<Stop>                                 stops;
     std::map<long long, int>                          stopIndexesById;
     std::vector<Route>                                routes;
@@ -110,4 +120,4 @@ namespace TrRouting
   
 }
 
-#endif
+#endif // TR_CALCULATOR

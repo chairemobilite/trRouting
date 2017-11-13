@@ -419,7 +419,7 @@ namespace TrRouting
     
   }
   
-  std::string ConnectionScanAlgorithm::calculate(std::string tripIdentifier, const std::map<unsigned long long, int>& cachedNearestStopsIdsFromStartingPoint, const std::map<unsigned long long, int>& cachedNearestStopsIdsFromEndingPoint)
+  RoutingResult ConnectionScanAlgorithm::calculate(std::string tripIdentifier, const std::map<unsigned long long, int>& cachedNearestStopsIdsFromStartingPoint, const std::map<unsigned long long, int>& cachedNearestStopsIdsFromEndingPoint)
   {
     
     

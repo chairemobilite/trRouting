@@ -5,7 +5,6 @@
 #include <boost/serialization/access.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include "point.hpp"
-#include "simplified_journey_step.hpp"
 
 namespace TrRouting
 {

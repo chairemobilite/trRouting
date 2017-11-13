@@ -1,21 +1,16 @@
-#include "connection_scan_algorithm.hpp"
+#include "calculator.hpp"
 
 namespace TrRouting
 {
   
-  void ConnectionScanAlgorithm::prepare()
+  Calculator::Calculator(Parameters& theParams) : params(theParams)
   {
-
-    ConnectionScanAlgorithm::ConnectionScanAlgorithm(Parameters& theParams) : params(theParams)
-    {
-      algorithmCalculationTime = CalculationTime();
-      prepare();
-    }
-    
-    ConnectionScanAlgorithm::ConnectionScanAlgorithm()
-    {
-      
-    }
+    algorithmCalculationTime = CalculationTime();
+    prepare();
+  }
+  
+  Calculator::Calculator()
+  {
     
   }
 

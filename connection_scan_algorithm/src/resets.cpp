@@ -1,50 +1,38 @@
-#include "connection_scan_algorithm.hpp"
+#include "calculator.hpp"
 
 namespace TrRouting
 {
   
-  void ConnectionScanAlgorithm::reset()
+  void Calculator::reset()
   {
     resetStopsTentativeArrivalTimes();
     resetStopsEgressFootpathTravelTimesSeconds();
     resetTripsEnterConnection();
     resetJourneys();
     resetVariables();
-    //getAccessFoothpaths(Point& origin);
-    //getEgressFootpaths(Point& destination);
   }
 
-  void ConnectionScanAlgorithm::resetStopsTentativeArrivalTimes()
+  void Calculator::resetStopsTentativeArrivalTimes()
   {
 
   }
 
-  void ConnectionScanAlgorithm::resetStopsEgressFootpathTravelTimesSeconds()
+  void Calculator::resetStopsEgressFootpathTravelTimesSeconds()
   {
 
   }
 
-  void ConnectionScanAlgorithm::resetTripsEnterConnection()
+  void Calculator::resetTripsEnterConnection()
   {
 
   }
 
-  void ConnectionScanAlgorithm::resetJourneys()
+  void Calculator::resetJourneys()
   {
 
   }
 
-  void ConnectionScanAlgorithm::resetVariables()
-  {
-
-  }
-
-  void ConnectionScanAlgorithm::getAccessFoothpaths(Point& origin)
-  {
-
-  }
-
-  void ConnectionScanAlgorithm::getEgressFootpaths(Point& destination)
+  void Calculator::resetVariables()
   {
 
   }

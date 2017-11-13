@@ -13,6 +13,7 @@ namespace TrRouting
     int numberOfTransfers;
     int calculationTimeMilliseconds;
     std::string status;
+    std::string json;
     
   };
   

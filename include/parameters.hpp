@@ -46,8 +46,8 @@ namespace TrRouting
     Point origin;
     Point destination;
     
-    long long startingStopId;
-    long long endingStopId;
+    long long originStopId;
+    long long destinationStopId;
     
     std::vector<unsigned long long> serviceIds;
     std::vector<unsigned long long> ignoreRouteIds;

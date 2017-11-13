@@ -1,9 +1,9 @@
-#include "connection_scan_algorithm.hpp"
+#include "calculator.hpp"
 
 namespace TrRouting
 {
   
-  void ConnectionScanAlgorithm::prepare()
+  void Calculator::prepare()
   {
     prepareStops();
     prepareRoutes();
@@ -11,24 +11,34 @@ namespace TrRouting
     prepareConnections();
   }
 
-  void ConnectionScanAlgorithm::prepareStops()
+  void Calculator::prepareStops()
   {
 
   }
 
-  void ConnectionScanAlgorithm::prepareRoutes()
-  {
-    
-  }
-
-  void ConnectionScanAlgorithm::prepareTrips()
+  void Calculator::prepareRoutes()
   {
     
   }
 
-  void ConnectionScanAlgorithm::prepareConnections()
+  void Calculator::prepareTrips()
   {
     
   }
 
+  void Calculator::prepareConnections()
+  {
+    
+  }
+  
+  void Calculator::prepareAccessFoothpaths()
+  {
+    
+  }
+
+  void Calculator::prepareEgressFootpaths()
+  {
+    
+  }
+  
 }
