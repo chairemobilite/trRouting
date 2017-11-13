@@ -256,11 +256,7 @@ namespace TrRouting
       // set cout number of decimals to 2 for displaying progress percentage:
       std::cout << std::fixed;
       std::cout << std::setprecision(2);
-      
-      //CalculationTime::algorithmCalculationTime.stopStep();
-      //std::cout << "-- Fetching connections data from database --" << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
-      //CalculationTime::algorithmCalculationTime.startStep();
-      
+
       for (pqxx::result::const_iterator c = pgResult.begin(); c != pgResult.end(); ++c) {
         
         forwardConnections.push_back(std::make_tuple(stopIndexesById[c[5].as<unsigned long long>()], stopIndexesById[c[6].as<unsigned long long>()], c[4].as<int>()*60, c[3].as<int>()* 60, tripIndexesById[c[0].as<unsigned long long>()], c[1].as<short>(), c[2].as<short>())); // departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard
@@ -320,8 +316,6 @@ namespace TrRouting
     if (isConnectionOpen())
     {
       
-      //CalculationTime::algorithmCalculationTime.startStep();
-      
       pqxx::nontransaction pgNonTransaction(*(getConnectionPtr()));
       pqxx::result pgResult( pgNonTransaction.exec( sqlQuery ));
       unsigned long long resultCount = pgResult.size();
@@ -329,15 +323,7 @@ namespace TrRouting
       
       std::cout << std::fixed;
       std::cout << std::setprecision(2);
-      
-      //CalculationTime::algorithmCalculationTime.stopStep();
-      //std::cout << "-- Fetching transfers data from database --" << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
-      //CalculationTime::algorithmCalculationTime.startStep();
-      
       int stop1Index              = -1;
-      //int lastStop1Index          = -1;
-      //int firstStop1FootpathIndex = -1;
-      //int lastStop1FootpathIndex  = -1;
       int footpathIndex           = -1;
       
       for (pqxx::result::const_iterator c = pgResult.begin(); c != pgResult.end(); ++c) {
@@ -351,21 +337,6 @@ namespace TrRouting
           footpathsRanges[stop1Index].first = footpathIndex;
         }
         footpathsRanges[stop1Index].second = footpathIndex;
-        
-        //if (lastStop1Index != stop1Index)
-        //{
-        //  if (firstStop1FootpathIndex >= 0)
-        //  {
-        //    footpathsRanges[lastStop1Index] = std::make_pair(firstStop1FootpathIndex, lastStop1FootpathIndex);
-        //  }
-        //  firstStop1FootpathIndex = footpathIndex;
-        //}
-        //lastStop1Index         = stop1Index;
-        //lastStop1FootpathIndex = footpathIndex;
-        //if (c == pgResult.end() - 1)
-        //{
-        //  footpathsRanges[lastStop1Index] = std::make_pair(firstStop1FootpathIndex, lastStop1FootpathIndex);
-        //}
         
         i++;
         
