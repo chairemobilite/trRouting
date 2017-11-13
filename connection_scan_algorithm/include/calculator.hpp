@@ -74,6 +74,7 @@ namespace TrRouting
     void prepareRoutes();
     void prepareTrips();
     void prepareConnections();
+    void prepareFootpaths();
     void prepareAccessFoothpaths();
     void prepareEgressFootpaths();
     
@@ -82,40 +83,43 @@ namespace TrRouting
     void resetTripsEnterConnection();
     void resetJourneys();
     void resetVariables();
-
-    std::map<std::string,int>                         pickUpTypes = {
+    
+    enum connectionIndexes : short { STOP_DEP = 0, STOP_ARR = 1, TIME_DEP = 2, TIME_ARR = 3, TRIP = 4, CAN_BOARD = 5, CAN_UNBOARD = 6 };
+    std::map<std::string,int> pickUpTypes = {
       {"regular", 0},
       {"no_pickup", 1},
       {"must_phone", 2},
       {"must_coordinate_with_driver", 3}
     };
-    std::map<std::string,int>                         dropOffTypes = {
+    std::map<std::string,int> dropOffTypes = {
       {"regular", 0},
       {"no_drop_off", 1},
       {"must_phone", 2},
       {"must_coordinate_with_driver", 3}
     };
-    int                                               maxUnboardingTimeSeconds; // the maximum unboarding time possible, according to parameters
-    std::vector<Stop>                                 stops;
-    std::map<unsigned long long, int>                 stopIndexesById;
-    std::vector<Route>                                routes;
-    std::map<unsigned long long, int>                 routeIndexesById;
-    std::vector<Trip>                                 trips;
-    std::map<unsigned long long, int>                 tripIndexesById;
-    std::vector<std::vector<std::tuple<int,int,int>>> footpaths; // tuple: departingStopIndex, arrivalStopIndex, walkingTravelTimeSeconds
-    std::vector<int>                                  stopsTentativeArrivalTimesSeconds;
-    std::vector<int>                                  stopsEgressFootpathTravelTimesSeconds;
-    std::vector<int>                                  tripsEnterConnection; // index of the entering connection for each trip index  
-    std::vector<std::tuple<int,int,int,int,int>>      forwardConnections; // tuple: departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex
-    std::vector<std::tuple<int,int,int,int,int>>      reverseConnections; // tuple: departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex
-    std::vector<std::pair<int,int>>                   accessFootpaths; // tuple: accessStopIndex, walkingTravelTimeSeconds
-    std::vector<std::pair<int,int>>                   egressFootpaths; // tuple: egressStopIndex, walkingTravelTimeSeconds
-    std::vector<std::tuple<int,int,int>>              journeys; // index = stop index, tuple: final enter connection, final exit connection, final footpath
-    int                                               maxTimeValue;
-    std::string                                       accessMode;
-    std::string                                       egressMode;
-    int                                               maxAccessWalkingTravelTimeFromOriginToFirstStopSeconds;
-    int                                               maxAccessWalkingTravelTimeFromLastStopToDestinationSeconds;
+    
+    int                                  maxUnboardingTimeSeconds; // the maximum unboarding time possible, according to parameters
+    std::vector<Stop>                    stops;
+    std::map<unsigned long long, int>    stopIndexesById;
+    std::vector<Route>                   routes;
+    std::map<unsigned long long, int>    routeIndexesById;
+    std::vector<Trip>                    trips;
+    std::map<unsigned long long, int>    tripIndexesById;
+    std::vector<std::tuple<int,int,int>> footpaths; // tuple: departingStopIndex, arrivalStopIndex, walkingTravelTimeSeconds
+    std::vector<std::pair<int,int>>      footpathsRanges; // index: stopIndex, pair: index of first footpath, index of last footpath
+    std::vector<int>                     stopsTentativeArrivalTimesSeconds;
+    std::vector<int>                     stopsEgressFootpathTravelTimesSeconds;
+    std::vector<int>                     tripsEnterConnection; // index of the entering connection for each trip index  
+    std::vector<std::tuple<int,int,int,int,int,short,short>> forwardConnections; // tuple: departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard
+    std::vector<std::tuple<int,int,int,int,int,short,short>> reverseConnections; // tuple: departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard
+    std::vector<std::pair<int,int>>      accessFootpaths; // tuple: accessStopIndex, walkingTravelTimeSeconds
+    std::vector<std::pair<int,int>>      egressFootpaths; // tuple: egressStopIndex, walkingTravelTimeSeconds
+    std::vector<std::tuple<int,int,int>> journeys; // index = stop index, tuple: final enter connection, final exit connection, final footpath
+    int                                  maxTimeValue;
+    std::string                          accessMode;
+    std::string                          egressMode;
+    int                                  maxAccessWalkingTravelTimeFromOriginToFirstStopSeconds;
+    int                                  maxAccessWalkingTravelTimeFromLastStopToDestinationSeconds;
   };
   
 }

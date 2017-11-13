@@ -9,13 +9,14 @@ namespace TrRouting
     prepareRoutes();
     prepareTrips();
     prepareConnections();
+    prepareFootpaths();
   }
 
   void Calculator::prepareStops()
   {
     
     std::cerr << "preparing stops..." << std::endl;
-    std::tie(stops, stopIndexesById)   = params.dataFetcher->getStops(params.applicationShortname);
+    std::tie(stops, stopIndexesById) = params.dataFetcher->getStops(params.applicationShortname);
     
   }
 
@@ -31,12 +32,23 @@ namespace TrRouting
   {
     
     std::cerr << "preparing trips..." << std::endl;
-    std::tie(trips, tripIndexesById)   = params.dataFetcher->getTrips(params.applicationShortname);
+    std::tie(trips, tripIndexesById) = params.dataFetcher->getTrips(params.applicationShortname);
     
   }
 
   void Calculator::prepareConnections()
   {
+    
+    std::cerr << "preparing connections..." << std::endl;
+    std::tie(forwardConnections, reverseConnections) = params.dataFetcher->getConnections(params.applicationShortname, stopIndexesById, tripIndexesById);
+    
+  }
+  
+  void Calculator::prepareFootpaths()
+  {
+    
+    std::cerr << "preparing footpaths..." << std::endl;
+    std::tie(footpaths, footpathsRanges) = params.dataFetcher->getFootpaths(params.applicationShortname, stopIndexesById, params.maxTransferWalkingTravelTimeSeconds);
     
   }
   

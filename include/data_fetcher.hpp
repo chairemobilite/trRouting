@@ -30,6 +30,7 @@
 #include "route.hpp"
 #include "point.hpp"
 #include "trip.hpp"
+#include "tuple_boost_serialize.hpp"
 
 namespace TrRouting
 {
@@ -40,6 +41,24 @@ namespace TrRouting
     public:
     
       DataFetcher() {};
+      
+      template<class T>
+      void saveToCacheFile(std::string applicationShortname, T& data, std::string cacheFileName) {
+        std::ofstream oCacheFile;
+        oCacheFile.open(applicationShortname + "_" + cacheFileName + ".cache", std::ios::out | std::ios::trunc | std::ios::binary);
+        boost::archive::binary_oarchive oarch(oCacheFile);
+        oarch << data;
+        oCacheFile.close();
+      }
+      
+      bool cacheFileExists(std::string applicationShortname, std::string cacheFileName) {
+        std::ifstream iCacheFile;
+        bool notEmpty = false;
+        iCacheFile.open(applicationShortname + "_" + cacheFileName + ".cache", std::ios::in | std::ios::binary | std::ios::ate);
+        notEmpty = iCacheFile.tellg() > 0;
+        iCacheFile.close();
+        return notEmpty;
+      }
       
       virtual const std::pair<std::vector<Stop>, std::map<unsigned long long, int>> getStops(std::string applicationShortname)
       {
@@ -62,23 +81,20 @@ namespace TrRouting
         return std::make_pair(trips, tripIndexesById);
       }
       
-      template<class T>
-      void saveToCacheFile(std::string applicationShortname, T& data, std::string cacheFileName) {
-        std::ofstream oCacheFile;
-        oCacheFile.open(applicationShortname + "_" + cacheFileName + ".cache", std::ios::out | std::ios::trunc | std::ios::binary);
-        boost::archive::binary_oarchive oarch(oCacheFile);
-        oarch << data;
-        oCacheFile.close();
+      virtual const std::pair<std::vector<std::tuple<int,int,int,int,int,short,short>>, std::vector<std::tuple<int,int,int,int,int,short,short>>> getConnections(std::string applicationShortname, std::map<unsigned long long, int> stopIndexesById, std::map<unsigned long long, int> tripIndexesById)
+      {
+        std::vector<std::tuple<int,int,int,int,int,short,short>> forwardConnections;
+        std::vector<std::tuple<int,int,int,int,int,short,short>> reverseConnections;
+        return std::make_pair(forwardConnections, reverseConnections);
       }
       
-      bool cacheFileExists(std::string applicationShortname, std::string cacheFileName) {
-        std::ifstream iCacheFile;
-        bool notEmpty = false;
-        iCacheFile.open(applicationShortname + "_" + cacheFileName + ".cache", std::ios::in | std::ios::binary | std::ios::ate);
-        notEmpty = iCacheFile.tellg() > 0;
-        iCacheFile.close();
-        return notEmpty;
+      virtual const std::pair<std::vector<std::tuple<int,int,int>>, std::vector<std::pair<int,int>>> getFootpaths(std::string applicationShortname, std::map<unsigned long long, int> stopIndexesById, int maxTransferWalkingTravelTimeSeconds)
+      {
+        std::vector<std::tuple<int,int,int>> footpaths;
+        std::vector<std::pair<int,int>>      footpathsRanges;
+        return std::make_pair(footpaths, footpathsRanges);
       }
+
       
   };
   

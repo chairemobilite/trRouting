@@ -55,8 +55,6 @@ namespace TrRouting
     std::vector<unsigned long long> ignoreRouteIds;
     std::vector<unsigned long long> ignoreRouteTypeIds;
     
-    std::string connectionsSqlWhereClause;
-    std::string transfersSqlWhereClause;
     std::string databaseName;
     std::string databaseHost;
     std::string databaseUser;
@@ -97,8 +95,6 @@ namespace TrRouting
       maxTotalWalkingTravelTimeSeconds                           = 60*60; // not used right now
       maxOnlyWalkingAccessTravelTimeRatio                        = 1.5; // prefer walking only if it is faster than transit and total only walking travel time <= maxAccessWalkingTravelTimeFromOriginToFirstStopSeconds * this ratio
       transferPenaltySeconds                                     = 0; // not used right now
-      connectionsSqlWhereClause                                  = "";
-      transfersSqlWhereClause                                    = "true";
       databaseName                                               = "tr_all_dev";
       databasePort                                               = "5432";
       databaseHost                                               = "127.0.0.1";
