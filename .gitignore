@@ -1,5 +1,6 @@
 .DS_Store
 /trRouting
+/trRoutingCSA
 /trRoutingConfig.yml
 /trRoutingTripBased
 /trRoutingTripBasedConfig.yml
