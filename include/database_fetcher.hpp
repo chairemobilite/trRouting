@@ -30,7 +30,6 @@ namespace TrRouting
     
     void disconnect();
     bool isConnectionOpen();
-    //static void setDbSetupStr(std::string customDbSetupStr);
     
   private:
     

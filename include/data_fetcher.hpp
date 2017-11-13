@@ -13,6 +13,10 @@
 #include <math.h>
 #include <boost/algorithm/string.hpp>
 #include <cereal/archives/binary.hpp>
+#include <boost/serialization/map.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/tokenizer.hpp>
@@ -39,11 +43,20 @@ namespace TrRouting
       
       template<class T>
       static void saveToCacheFile(std::string applicationShortname, T& data, std::string cacheFileName) {
-        
+        std::ofstream oCacheFile;
+        oCacheFile.open(applicationShortname + "_" + cacheFileName + ".cache", std::ios::out | std::ios::trunc | std::ios::binary);
+        boost::archive::binary_oarchive oarch(oCacheFile);
+        oarch << data;
+        oCacheFile.close();
       }
       
-      static bool isCacheFileNotEmpty(std::string applicationShortname, std::string cacheFileName) {
-        
+      static bool cacheFileExists(std::string applicationShortname, std::string cacheFileName) {
+        std::ifstream iCacheFile;
+        bool notEmpty = false;
+        iCacheFile.open(applicationShortname + "_" + cacheFileName + ".cache", std::ios::in | std::ios::binary | std::ios::ate);
+        notEmpty = iCacheFile.tellg() > 0;
+        iCacheFile.close();
+        return notEmpty;
       }
       
   };

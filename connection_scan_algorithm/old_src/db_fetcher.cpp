@@ -3,57 +3,6 @@
 namespace TrRouting
 {
   
-  template<class T>
-  void DbFetcher::saveToCacheFile(std::string applicationShortname, T& data, std::string cacheFileName)
-  {
-    //CalculationTime::algorithmCalculationTime.startStep();
-    
-    std::ofstream oCacheFile;
-    
-    oCacheFile.open(applicationShortname + "_" + cacheFileName + ".cache", std::ios::out | std::ios::trunc | std::ios::binary);
-    boost::archive::binary_oarchive oarch(oCacheFile);
-    
-    oarch << data;
-    oCacheFile.close();
-    
-    //CalculationTime::algorithmCalculationTime.stopStep();
-    //std::cout << "-- Saved cached data to file " << cacheFileName << " -- " << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
-  
-  }
-  
-  bool DbFetcher::isCacheFileNotEmpty(std::string applicationShortname, std::string cacheFileName)
-  {
-    std::ifstream iCacheFile;
-    bool notEmpty = false;
-    
-    iCacheFile.open(applicationShortname + "_" + cacheFileName + ".cache", std::ios::in | std::ios::binary | std::ios::ate);
-
-    notEmpty = iCacheFile.tellg() > 0;
-    iCacheFile.close();
-    
-    return notEmpty;
-  
-  }
-  
-  template<class T>
-  const T DbFetcher::loadFromCacheFile(T& data, std::string applicationShortname, std::string cacheFileName)
-  {
-    //CalculationTime::algorithmCalculationTime.startStep();
-    
-    std::ifstream iCacheFile;
-    
-    iCacheFile.open(applicationShortname + "_" + cacheFileName + ".cache", std::ios::in | std::ios::binary);
-    
-    boost::archive::binary_iarchive iarch(iCacheFile);
-    iarch >> data;
-    iCacheFile.close();
-    
-    //CalculationTime::algorithmCalculationTime.stopStep();
-    //std::cout << "-- Loaded cached data from file " << cacheFileName << " -- " << CalculationTime::algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
-    
-    return data;
-  
-  }
   
   const std::map<unsigned long long,Connection> DbFetcher::getConnectionsById(std::string applicationShortname, std::string dataFetcher, std::string connectionsSqlWhereClause, Parameters& params)
   {

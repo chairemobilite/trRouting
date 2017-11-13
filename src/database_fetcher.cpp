@@ -2,7 +2,6 @@
 
 namespace TrRouting
 {
-
     
   void DatabaseFetcher::disconnect()
   {
@@ -18,7 +17,5 @@ namespace TrRouting
   {
     return (*pgConnectionPtr).is_open();
   }
-    
-  
 
 }
