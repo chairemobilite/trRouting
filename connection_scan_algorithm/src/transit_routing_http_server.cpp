@@ -23,6 +23,9 @@
 
 #include "data_fetcher.hpp"
 #include "database_fetcher.hpp"
+#include "gtfs_fetcher.hpp"
+#include "csv_fetcher.hpp"
+#include "cache_fetcher.hpp"
 #include "calculation_time.hpp"
 #include "parameters.hpp"
 #include "calculator.hpp"
@@ -183,6 +186,18 @@ int main(int argc, char** argv) {
   if (dataFetcherStr == "database")
   {
     dataFetcher = DatabaseFetcher("dbname=" + algorithmParams.databaseName + " user=" + algorithmParams.databaseUser + " hostaddr=" + algorithmParams.databaseHost + " port=" + algorithmParams.databasePort + "");
+  }
+  else if (dataFetcherStr == "gtfs")
+  {
+    dataFetcher = GtfsFetcher();
+  }
+  else if (dataFetcherStr == "csv")
+  {
+    dataFetcher = CsvFetcher();
+  }
+  else if (dataFetcherStr == "cache")
+  {
+    dataFetcher = CacheFetcher();
   }
   
   algorithmParams.dataFetcher = dataFetcher;
