@@ -19,7 +19,11 @@ namespace TrRouting
     CacheFetcher(std::string applicationShortname) {
       
     }
-
+    
+    const std::pair<std::vector<Stop> , std::map<unsigned long long, int>> getStops( std::string applicationShortname);
+    const std::pair<std::vector<Route>, std::map<unsigned long long, int>> getRoutes(std::string applicationShortname);
+    const std::pair<std::vector<Trip> , std::map<unsigned long long, int>> getTrips( std::string applicationShortname);
+    
     template<class T>
     static const T loadFromCacheFile(T& data, std::string applicationShortname, std::string cacheFileName) {
       std::ifstream iCacheFile;

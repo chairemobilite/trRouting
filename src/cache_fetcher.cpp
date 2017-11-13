@@ -1,0 +1,81 @@
+#include "cache_fetcher.hpp"
+
+namespace TrRouting
+{
+  
+  const std::pair<std::vector<Stop>, std::map<unsigned long long, int>> CacheFetcher::getStops(std::string applicationShortname)
+  {
+    std::vector<Stop> stops;
+    std::map<unsigned long long, int> stopIndexesById;
+    
+    std::cout << "Fetching stops from cache..." << std::endl;
+    if (cacheFileExists(applicationShortname, "stops"))
+    {
+      stops = loadFromCacheFile(stops, applicationShortname, "stops");
+    }
+    else
+    {
+      std::cerr << "missing stops cache file!" << std::endl;
+    }
+    if (cacheFileExists(applicationShortname, "stop_indexes"))
+    {
+      stopIndexesById = loadFromCacheFile(stopIndexesById, applicationShortname, "stop_indexes");
+    }
+    else
+    {
+      std::cerr << "missing stop_indexes cache file!" << std::endl;
+    }
+    return std::make_pair(stops, stopIndexesById);
+  }
+  
+  const std::pair<std::vector<Route>, std::map<unsigned long long, int>> CacheFetcher::getRoutes(std::string applicationShortname)
+  {
+    std::vector<Route> routes;
+    std::map<unsigned long long, int> routeIndexesById;
+    
+    std::cout << "Fetching routes from cache..." << std::endl;
+    if (cacheFileExists(applicationShortname, "routes"))
+    {
+      routes = loadFromCacheFile(routes, applicationShortname, "routes");
+    }
+    else
+    {
+      std::cerr << "missing routes cache file!" << std::endl;
+    }
+    if (cacheFileExists(applicationShortname, "route_indexes"))
+    {
+      routeIndexesById = loadFromCacheFile(routeIndexesById, applicationShortname, "route_indexes");
+    }
+    else
+    {
+      std::cerr << "missing route_indexes cache file!" << std::endl;
+    }
+    return std::make_pair(routes, routeIndexesById);
+  }
+  
+  const std::pair<std::vector<Trip>, std::map<unsigned long long, int>> CacheFetcher::getTrips(std::string applicationShortname)
+  {
+    std::vector<Trip> trips;
+    std::map<unsigned long long, int> tripIndexesById;
+    
+    std::cout << "Fetching trips from cache..." << std::endl;
+    if (cacheFileExists(applicationShortname, "trips"))
+    {
+      trips = loadFromCacheFile(trips, applicationShortname, "trips");
+    }
+    else
+    {
+      std::cerr << "missing trips cache file!" << std::endl;
+    }
+    if (cacheFileExists(applicationShortname, "trip_indexes"))
+    {
+      tripIndexesById = loadFromCacheFile(tripIndexesById, applicationShortname, "trip_indexes");
+    }
+    else
+    {
+      std::cerr << "missing trip_indexes cache file!" << std::endl;
+    }
+    return std::make_pair(trips, tripIndexesById);
+  }
+  
+}
