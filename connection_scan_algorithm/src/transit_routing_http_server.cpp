@@ -512,7 +512,7 @@ int main(int argc, char** argv) {
       
       //std::cout << "-- parsing request -- " << calculator.algorithmCalculationTime.getStepDurationMicroseconds() << " microseconds\n";
       
-      calculator.reset();
+      //calculator.reset();
       
       //calculator.algorithmCalculationTime.stopStep();
       //calculator.algorithmCalculationTime.startStep();

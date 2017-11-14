@@ -107,9 +107,9 @@ namespace TrRouting
     
     for (auto & arrivalTime : stopsTentativeTime)
     {
-      if (arrivalTime < MAX_INT)
+      if (arrivalTime < MAX_INT && stopsEgressTravelTime[i] >= 0)
       {
-        result.json += "stop " + stops[i].name + " index " + std::to_string(i) + " - " + " arrival: " + std::to_string(arrivalTime / 3600) + ":" + std::to_string((arrivalTime % 3600) / 60) + "\n";
+        result.json += "stop " + stops[i].name + " code " + stops[i].code + " index " + std::to_string(i) + " - " + " arrival: " + std::to_string(arrivalTime / 3600) + ":" + std::to_string((arrivalTime % 3600) / 60) + "\n";
       }
       i++;
     }

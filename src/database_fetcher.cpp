@@ -338,12 +338,12 @@ namespace TrRouting
         }
         footpathsRanges[stop1Index].second = footpathIndex;
         
-        i++;
-        
         if (i % 1000 == 0)
         {
           std::cout << ((((double) i) / resultCount) * 100) << "%\r";
         }
+        
+        i++;
       }
       std::cout << std::endl;
       
