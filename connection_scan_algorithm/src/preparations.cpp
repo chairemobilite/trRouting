@@ -2,7 +2,7 @@
 
 namespace TrRouting
 {
-  
+    
   void Calculator::prepare()
   {
     prepareStops();
@@ -13,12 +13,11 @@ namespace TrRouting
     
     std::cout << "preparing stops tentative times, trips enter connections and journeys..." << std::endl;
     
-    stopsTentativeTimes  = std::vector<int>(stops.size());
-    tripsEnterConnection = std::vector<int>(trips.size());
-    journeys             = std::vector<std::tuple<int,int,int>>(stops.size());
-    std::fill(stopsTentativeTimes.begin(), stopsTentativeTimes.end(), std::numeric_limits<int>::max());
-    std::fill(stopsTentativeTimes.begin(), stopsTentativeTimes.end(), -1);
-    std::fill(journeys.begin(), journeys.end(), std::make_tuple(-1,-1,-1));
+    stopsTentativeTime    = std::vector<int>(stops.size());
+    stopsEgressTravelTime = std::vector<int>(stops.size());
+    tripsEnterConnection  = std::vector<int>(trips.size());
+    tripsEnabled          = std::vector<int>(trips.size());
+    journeys              = std::vector<std::tuple<int,int,int>>(stops.size());
     
   }
 

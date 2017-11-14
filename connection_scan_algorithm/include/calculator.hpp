@@ -38,6 +38,7 @@
 #include "point.hpp"
 #include "parameters.hpp"
 #include "routing_result.hpp"
+#include "osrm_fetcher.hpp"
 #include "calculation_time.hpp"
 
 extern int stepCount;
@@ -51,6 +52,8 @@ extern std::string consoleResetColor;
 
 namespace TrRouting
 {
+  
+  constexpr int MAX_INT {std::numeric_limits<int>::max()};
   
   class Calculator {
   
@@ -78,12 +81,6 @@ namespace TrRouting
     void prepareAccessFoothpaths();
     void prepareEgressFootpaths();
     
-    void resetStopsTentativeArrivalTimes();
-    void resetStopsEgressFootpathTravelTimesSeconds();
-    void resetTripsEnterConnection();
-    void resetJourneys();
-    void resetVariables();
-    
     enum connectionIndexes : short { STOP_DEP = 0, STOP_ARR = 1, TIME_DEP = 2, TIME_ARR = 3, TRIP = 4, CAN_BOARD = 5, CAN_UNBOARD = 6 };
     std::map<std::string,int> pickUpTypes = {
       {"regular", 0},
@@ -98,6 +95,7 @@ namespace TrRouting
       {"must_coordinate_with_driver", 3}
     };
     
+    int                                  departureTimeSeconds;
     int                                  maxUnboardingTimeSeconds; // the maximum unboarding time possible, according to parameters
     std::vector<Stop>                    stops;
     std::map<unsigned long long, int>    stopIndexesById;
@@ -107,9 +105,11 @@ namespace TrRouting
     std::map<unsigned long long, int>    tripIndexesById;
     std::vector<std::tuple<int,int,int>> footpaths; // tuple: departingStopIndex, arrivalStopIndex, walkingTravelTimeSeconds
     std::vector<std::pair<int,int>>      footpathsRanges; // index: stopIndex, pair: index of first footpath, index of last footpath
-    std::vector<int>                     stopsTentativeTimes;
+    std::vector<int>                     stopsTentativeTime; // arrival time at stop (MAX_INT if not yet reached or unreachable)
+    std::vector<int>                     stopsEgressTravelTime; // travel time to reach destination (-1 if unreachable by egress mode)
     //std::vector<int>                     stopsEgressFootpathTravelTimesSeconds; // not sure we need this...
-    std::vector<int>                     tripsEnterConnection; // index of the entering connection for each trip index  
+    std::vector<int>                     tripsEnterConnection; // index of the entering connection for each trip index 
+    std::vector<int>                     tripsEnabled; // allow/disallow use of this trip during calculation
     std::vector<std::tuple<int,int,int,int,int,short,short>> forwardConnections; // tuple: departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard
     std::vector<std::tuple<int,int,int,int,int,short,short>> reverseConnections; // tuple: departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard
     std::vector<std::pair<int,int>>      accessFootpaths; // tuple: accessStopIndex, walkingTravelTimeSeconds

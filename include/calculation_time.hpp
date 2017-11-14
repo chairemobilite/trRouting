@@ -12,12 +12,12 @@ namespace TrRouting
     public:
       
       //static CalculationTime algorithmCalculationTime;
-      long long getDurationMilliseconds();
-      long long getDurationMillisecondsNoStop();
+      long long getDurationMicroseconds();
+      long long getDurationMicrosecondsNoStop();
       long long getEpoch();
       void startStep();
       void stopStep();
-      long long getStepDurationMilliseconds();
+      long long getStepDurationMicroseconds();
       void start();
       void stop();
       
@@ -27,7 +27,7 @@ namespace TrRouting
       long long startStepEpoch;
       long long endEpoch;
       long long endStepEpoch;
-      std::chrono::milliseconds calculationEpoch;
+      std::chrono::microseconds calculationEpoch;
     
   };
   

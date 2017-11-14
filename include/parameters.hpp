@@ -36,8 +36,8 @@ namespace TrRouting
     int minWaitingTimeSeconds;
     int transferPenaltySeconds;
     int maxAccessWalkingDistanceMeters;
-    int maxAccessWalkingTravelTimeFromOriginToFirstStopSeconds;
-    int maxAccessWalkingTravelTimeFromLastStopToDestinationSeconds;
+    int maxAccessWalkingTravelTimeSeconds;
+    int maxEgressWalkingTravelTimeSeconds;
     int maxTransferWalkingTravelTimeSeconds;
     int maxTotalWalkingTravelTimeSeconds;
     float maxOnlyWalkingAccessTravelTimeRatio;
@@ -83,41 +83,41 @@ namespace TrRouting
     
     void setDefaultValues()
     {
-      walkingSpeedMetersPerSecond                                = 5/3.6; // 5 km/h
-      drivingSpeedMetersPerSecond                                = 90/3.6; // 90 km/h
-      cyclingSpeedMetersPerSecond                                = 25/3.6; // 25 km/h
-      maxTotalTravelTimeSeconds                                  = -1; // -1 means no limit
-      maxNumberOfTransfers                                       = -1; // -1 means no limit
-      minWaitingTimeSeconds                                      = 5*60;
-      maxAccessWalkingTravelTimeFromOriginToFirstStopSeconds     = 20*60;
-      maxAccessWalkingTravelTimeFromLastStopToDestinationSeconds = 20*60;
-      maxTransferWalkingTravelTimeSeconds                        = 20*60; // depends of transfer data provided
-      maxTotalWalkingTravelTimeSeconds                           = 60*60; // not used right now
-      maxOnlyWalkingAccessTravelTimeRatio                        = 1.5; // prefer walking only if it is faster than transit and total only walking travel time <= maxAccessWalkingTravelTimeFromOriginToFirstStopSeconds * this ratio
-      transferPenaltySeconds                                     = 0; // not used right now
-      databaseName                                               = "tr_all_dev";
-      databasePort                                               = "5432";
-      databaseHost                                               = "127.0.0.1";
-      databaseUser                                               = "postgres";
-      databasePassword                                           = "";
-      osrmRoutingWalkingHost                                     = "localhost";
-      osrmRoutingWalkingPort                                     = "5000";
-      osrmRoutingDrivingHost                                     = "localhost";
-      osrmRoutingDrivingPort                                     = "7000";
-      osrmRoutingCyclingHost                                     = "localhost";
-      osrmRoutingCyclingPort                                     = "8000";
-      accessMode                                                 = "walking";
-      egressMode                                                 = "walking";
-      noResultSecondMode                                         = "driving";
-      tryNextModeIfRoutingFails                                  = false;
-      noResultNextAccessTimeSecondsIncrement                     = 5*60;
-      maxNoResultNextAccessTimeSeconds                           = 40*60;
-      returnAllStopsResult                                       = false;
-      forwardCalculation                                         = true;
-      detailedResults                                            = false;
-      transferOnlyAtSameStation                                  = false;
-      transferBetweenSameRoute                                   = true;
-      calculateByNumberOfTransfers                               = false;
+      walkingSpeedMetersPerSecond            = 5/3.6; // 5 km/h
+      drivingSpeedMetersPerSecond            = 90/3.6; // 90 km/h
+      cyclingSpeedMetersPerSecond            = 25/3.6; // 25 km/h
+      maxTotalTravelTimeSeconds              = -1; // -1 means no limit
+      maxNumberOfTransfers                   = -1; // -1 means no limit
+      minWaitingTimeSeconds                  = 5*60;
+      maxAccessWalkingTravelTimeSeconds      = 20*60;
+      maxEgressWalkingTravelTimeSeconds      = 20*60;
+      maxTransferWalkingTravelTimeSeconds    = 20*60; // depends of transfer data provided
+      maxTotalWalkingTravelTimeSeconds       = 60*60; // not used right now
+      maxOnlyWalkingAccessTravelTimeRatio    = 1.5; // prefer walking only if it is faster than transit and total only walking travel time <= maxAccessWalkingTravelTimeSeconds * this ratio
+      transferPenaltySeconds                 = 0; // not used right now
+      databaseName                           = "tr_all_dev";
+      databasePort                           = "5432";
+      databaseHost                           = "127.0.0.1";
+      databaseUser                           = "postgres";
+      databasePassword                       = "";
+      osrmRoutingWalkingHost                 = "localhost";
+      osrmRoutingWalkingPort                 = "5000";
+      osrmRoutingDrivingHost                 = "localhost";
+      osrmRoutingDrivingPort                 = "7000";
+      osrmRoutingCyclingHost                 = "localhost";
+      osrmRoutingCyclingPort                 = "8000";
+      accessMode                             = "walking";
+      egressMode                             = "walking";
+      noResultSecondMode                     = "driving";
+      tryNextModeIfRoutingFails              = false;
+      noResultNextAccessTimeSecondsIncrement = 5*60;
+      maxNoResultNextAccessTimeSeconds       = 40*60;
+      returnAllStopsResult                   = false;
+      forwardCalculation                     = true;
+      detailedResults                        = false;
+      transferOnlyAtSameStation              = false;
+      transferBetweenSameRoute               = true;
+      calculateByNumberOfTransfers           = false;
     }
     
   };

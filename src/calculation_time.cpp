@@ -7,7 +7,7 @@ namespace TrRouting
 
   long long CalculationTime::getEpoch()
   {
-    calculationEpoch = std::chrono::duration_cast< std::chrono::milliseconds >(
+    calculationEpoch = std::chrono::duration_cast< std::chrono::microseconds >(
       std::chrono::system_clock::now().time_since_epoch()
     );
     return calculationEpoch.count();
@@ -23,13 +23,13 @@ namespace TrRouting
     endEpoch = getEpoch();
   }
   
-  long long CalculationTime::getDurationMilliseconds()
+  long long CalculationTime::getDurationMicroseconds()
   {
     assert(startEpoch && endEpoch && startEpoch >= 0 && endEpoch >= 0 && endEpoch >= startEpoch);
     return endEpoch - startEpoch;
   }
   
-  long long CalculationTime::getDurationMillisecondsNoStop()
+  long long CalculationTime::getDurationMicrosecondsNoStop()
   {
     long long actualEpoch {getEpoch()};
     assert(startEpoch && actualEpoch && startEpoch >= 0 && actualEpoch >= 0 && actualEpoch >= startEpoch);
@@ -46,7 +46,7 @@ namespace TrRouting
     endStepEpoch = getEpoch();
   }
   
-  long long CalculationTime::getStepDurationMilliseconds()
+  long long CalculationTime::getStepDurationMicroseconds()
   {
     assert(startStepEpoch && endStepEpoch && startStepEpoch >= 0 && endStepEpoch >= 0 && endStepEpoch >= startStepEpoch);
     return endStepEpoch - startStepEpoch;

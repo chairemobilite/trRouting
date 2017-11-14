@@ -272,38 +272,38 @@ int main(int argc, char** argv) {
       int timeHour;
       int timeMinute;
       
-      calculator.params.forwardCalculation                                         = true;
-      calculator.params.detailedResults                                            = false;
-      calculator.params.returnAllStopsResult                                       = false;
-      calculator.params.transferOnlyAtSameStation                                  = false;
-      calculator.params.transferBetweenSameRoute                                   = true;
-      calculator.params.origin                                                     = Point();
-      calculator.params.destination                                                = Point();
-      calculator.params.routingDateYear                                            = 0;
-      calculator.params.routingDateMonth                                           = 0;
-      calculator.params.routingDateDay                                             = 0;
-      calculator.params.originStopId                                               = -1;
-      calculator.params.destinationStopId                                          = -1;
-      calculator.params.maxNumberOfTransfers                                       = -1;
-      calculator.params.minWaitingTimeSeconds                                      = 5 * 60;
-      calculator.params.departureTimeHour                                          = -1;
-      calculator.params.departureTimeMinutes                                       = -1;
-      calculator.params.arrivalTimeHour                                            = -1;
-      calculator.params.arrivalTimeMinutes                                         = -1;
-      calculator.params.maxTotalTravelTimeSeconds                                  = -1;
-      calculator.params.maxAccessWalkingTravelTimeFromOriginToFirstStopSeconds     = 20 * 60;
-      calculator.params.maxAccessWalkingTravelTimeFromLastStopToDestinationSeconds = 20 * 60;
-      calculator.params.maxTransferWalkingTravelTimeSeconds                        = 20 * 60;
-      calculator.params.maxTotalWalkingTravelTimeSeconds                           = 60 * 60;
-      calculator.params.maxOnlyWalkingAccessTravelTimeRatio                        = 1.5;
-      calculator.params.transferPenaltySeconds                                     = 0;
-      calculator.params.accessMode                                                 = "walking";
-      calculator.params.egressMode                                                 = "walking";
-      calculator.params.noResultSecondMode                                         = "driving";
-      calculator.params.tryNextModeIfRoutingFails                                  = false;
-      calculator.params.noResultNextAccessTimeSecondsIncrement                     = 5 * 60;
-      calculator.params.maxNoResultNextAccessTimeSeconds                           = 40 * 60;
-      calculator.params.calculateByNumberOfTransfers                               = false;
+      calculator.params.forwardCalculation                     = true;
+      calculator.params.detailedResults                        = false;
+      calculator.params.returnAllStopsResult                   = false;
+      calculator.params.transferOnlyAtSameStation              = false;
+      calculator.params.transferBetweenSameRoute               = true;
+      calculator.params.origin                                 = Point();
+      calculator.params.destination                            = Point();
+      calculator.params.routingDateYear                        = 0;
+      calculator.params.routingDateMonth                       = 0;
+      calculator.params.routingDateDay                         = 0;
+      calculator.params.originStopId                           = -1;
+      calculator.params.destinationStopId                      = -1;
+      calculator.params.maxNumberOfTransfers                   = -1;
+      calculator.params.minWaitingTimeSeconds                  = 5 * 60;
+      calculator.params.departureTimeHour                      = -1;
+      calculator.params.departureTimeMinutes                   = -1;
+      calculator.params.arrivalTimeHour                        = -1;
+      calculator.params.arrivalTimeMinutes                     = -1;
+      calculator.params.maxTotalTravelTimeSeconds              = -1;
+      calculator.params.maxAccessWalkingTravelTimeSeconds      = 20 * 60;
+      calculator.params.maxEgressWalkingTravelTimeSeconds      = 20 * 60;
+      calculator.params.maxTransferWalkingTravelTimeSeconds    = 20 * 60;
+      calculator.params.maxTotalWalkingTravelTimeSeconds       = 60 * 60;
+      calculator.params.maxOnlyWalkingAccessTravelTimeRatio    = 1.5;
+      calculator.params.transferPenaltySeconds                 = 0;
+      calculator.params.accessMode                             = "walking";
+      calculator.params.egressMode                             = "walking";
+      calculator.params.noResultSecondMode                     = "driving";
+      calculator.params.tryNextModeIfRoutingFails              = false;
+      calculator.params.noResultNextAccessTimeSecondsIncrement = 5 * 60;
+      calculator.params.maxNoResultNextAccessTimeSeconds       = 40 * 60;
+      calculator.params.calculateByNumberOfTransfers           = false;
       
       for(auto & parameterWithValue : parametersWithValues)
       {
@@ -444,7 +444,7 @@ int main(int argc, char** argv) {
         }
         else if (parameterWithValueVector[0] == "max_access_travel_time" || parameterWithValueVector[0] == "max_access_travel_time_minutes")
         {
-          calculator.params.maxAccessWalkingTravelTimeFromOriginToFirstStopSeconds = std::stoi(parameterWithValueVector[1]) * 60;
+          calculator.params.maxAccessWalkingTravelTimeSeconds = std::stoi(parameterWithValueVector[1]) * 60;
         }
         else if (parameterWithValueVector[0] == "max_only_walking_access_travel_time_ratio")
         {
@@ -452,7 +452,7 @@ int main(int argc, char** argv) {
         }
         else if (parameterWithValueVector[0] == "max_egress_travel_time" || parameterWithValueVector[0] == "max_egress_travel_time_minutes")
         {
-          calculator.params.maxAccessWalkingTravelTimeFromLastStopToDestinationSeconds = std::stoi(parameterWithValueVector[1]) * 60;
+          calculator.params.maxEgressWalkingTravelTimeSeconds = std::stoi(parameterWithValueVector[1]) * 60;
         }
         else if (parameterWithValueVector[0] == "max_transfer_travel_time" || parameterWithValueVector[0] == "max_transfer_travel_time_minutes")
         {
@@ -510,7 +510,7 @@ int main(int argc, char** argv) {
       
       //calculator.algorithmCalculationTime.stopStep();
       
-      //std::cout << "-- parsing request -- " << calculator.algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+      //std::cout << "-- parsing request -- " << calculator.algorithmCalculationTime.getStepDurationMicroseconds() << " microseconds\n";
       
       calculator.reset();
       
@@ -521,7 +521,7 @@ int main(int argc, char** argv) {
       
       //calculator.algorithmCalculationTime.stopStep();
       
-      //std::cout << "-- reset access egress modes -- " << calculator.algorithmCalculationTime.getStepDurationMilliseconds() << " ms\n";
+      //std::cout << "-- reset access egress modes -- " << calculator.algorithmCalculationTime.getStepDurationMicroseconds() << " microseconds\n";
       
       resultStr = calculator.calculate().json;
       
@@ -535,7 +535,7 @@ int main(int argc, char** argv) {
     
     //calculator.algorithmCalculationTime.stop();
       
-    //std::cerr << "-- calculation time -- " << calculator.algorithmCalculationTime.getDurationMilliseconds() << " ms\n";
+    //std::cerr << "-- calculation time -- " << calculator.algorithmCalculationTime.getDurationMicroseconds() << " microseconds\n";
     
     *response << "HTTP/1.1 200 OK\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << resultStr.length() << "\r\n\r\n" << resultStr;
   };
