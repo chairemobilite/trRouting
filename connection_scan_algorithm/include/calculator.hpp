@@ -32,6 +32,7 @@
 #include <limits>
 #include <stdlib.h>
 
+#include "toolbox.hpp"
 #include "stop.hpp"
 #include "route.hpp"
 #include "trip.hpp"
@@ -110,6 +111,7 @@ namespace TrRouting
     std::vector<int>                     stopsEgressTravelTime; // travel time to reach destination (-1 if unreachable by egress mode)
     //std::vector<int>                     stopsEgressFootpathTravelTimesSeconds; // not sure we need this...
     std::vector<int>                     tripsEnterConnection; // index of the entering connection for each trip index 
+    std::vector<int>                     tripsEnterConnectionTransferTravelTime; // index of the entering connection for each trip index 
     std::vector<int>                     tripsEnabled; // allow/disallow use of this trip during calculation
     std::vector<std::tuple<int,int,int,int,int,short,short>> forwardConnections; // tuple: departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard
     std::vector<std::tuple<int,int,int,int,int,short,short>> reverseConnections; // tuple: departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard

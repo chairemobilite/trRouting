@@ -17,6 +17,7 @@ namespace TrRouting
     stopsAccessTravelTime = std::vector<int>(stops.size());
     stopsEgressTravelTime = std::vector<int>(stops.size());
     tripsEnterConnection  = std::vector<int>(trips.size());
+    tripsEnterConnectionTransferTravelTime = std::vector<int>(trips.size());
     tripsEnabled          = std::vector<int>(trips.size());
     journeys              = std::vector<std::tuple<int,int,int>>(stops.size());
     
