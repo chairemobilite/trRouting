@@ -238,7 +238,7 @@ int main(int argc, char** argv) {
       
       float originLatitude, originLongitude, destinationLatitude, destinationLongitude;
       long long startingStopId{-1}, endingStopId{-1};
-      std::map<int, bool> onlyServiceIds;
+      std::vector<int> onlyServiceIds;
       std::map<int, bool> exceptServiceIds;
       std::map<int, bool> onlyRouteIds;
       std::map<int, bool> exceptRouteIds;
@@ -345,7 +345,7 @@ int main(int argc, char** argv) {
           boost::split(onlyServiceIdsVector, parameterWithValueVector[1], boost::is_any_of(","));
           for(std::string onlyServiceId : onlyServiceIdsVector)
           {
-            onlyServiceIds[std::stoi(onlyServiceId)] = true;
+            onlyServiceIds.push_back(std::stoi(onlyServiceId));
           }
           calculator.params.onlyServiceIds = onlyServiceIds;
         }

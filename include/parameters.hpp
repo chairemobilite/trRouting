@@ -17,7 +17,7 @@ namespace TrRouting
     int routingDateYear;   // not implemented, use onlyServiceIds or exceptServiceIds for now
     int routingDateMonth;  // not implemented, use onlyServiceIds or exceptServiceIds for now
     int routingDateDay;    // not implemented, use onlyServiceIds or exceptServiceIds for now
-    std::map<int, bool> onlyServiceIds;
+    std::vector<int> onlyServiceIds;
     std::map<int, bool> exceptServiceIds;
     std::map<int, bool> onlyRouteIds;
     std::map<int, bool> exceptRouteIds;
@@ -50,10 +50,6 @@ namespace TrRouting
     
     long long originStopId;
     long long destinationStopId;
-    
-    std::vector<unsigned long long> serviceIds;
-    std::vector<unsigned long long> ignoreRouteIds;
-    std::vector<unsigned long long> ignoreRouteTypeIds;
     
     std::string databaseName;
     std::string databaseHost;

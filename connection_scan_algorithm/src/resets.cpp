@@ -7,6 +7,7 @@ namespace TrRouting
   {
     
     std::fill(stopsTentativeTime.begin(), stopsTentativeTime.end(), MAX_INT);
+    std::fill(stopsAccessTravelTime.begin(), stopsAccessTravelTime.end(), -1);
     std::fill(stopsEgressTravelTime.begin(), stopsEgressTravelTime.end(), -1);
     std::fill(tripsEnterConnection.begin(), tripsEnterConnection.end(), -1);
     std::fill(tripsEnabled.begin(), tripsEnabled.end(), 1);
@@ -15,7 +16,7 @@ namespace TrRouting
     departureTimeSeconds = params.departureTimeHour * 3600 + params.departureTimeMinutes * 60;
     
     // disable trips according to parameters:
-    bool hasOnlyServices     = !params.onlyServiceIds.empty();
+    //bool hasOnlyServices     = !params.onlyServiceIds.empty();
     bool hasOnlyRoutes       = !params.onlyRouteIds.empty();
     bool hasOnlyRouteTypes   = !params.onlyRouteTypeIds.empty();
     bool hasOnlyAgencies     = !params.onlyAgencyIds.empty();
@@ -24,12 +25,14 @@ namespace TrRouting
     bool hasExceptRouteTypes = !params.exceptRouteTypeIds.empty();
     bool hasExceptAgencies   = !params.exceptAgencyIds.empty();
     
+    std::cerr << "params only service first" << params.onlyServiceIds[1] << std::endl;
+    
     int i {0};
     for (auto & trip : trips)
     {
-      if (hasOnlyServices)
+      if (params.onlyServiceIds.size() > 0)
       {
-        if (params.onlyServiceIds.find(trip.serviceId) == params.onlyServiceIds.end())
+        if (std::find(params.onlyServiceIds.begin(), params.onlyServiceIds.end(), trip.serviceId) == params.onlyServiceIds.end())
         {
           tripsEnabled[i] = -1;
         }

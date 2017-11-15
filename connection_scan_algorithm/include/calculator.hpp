@@ -106,6 +106,7 @@ namespace TrRouting
     std::vector<std::tuple<int,int,int>> footpaths; // tuple: departingStopIndex, arrivalStopIndex, walkingTravelTimeSeconds
     std::vector<std::pair<int,int>>      footpathsRanges; // index: stopIndex, pair: index of first footpath, index of last footpath
     std::vector<int>                     stopsTentativeTime; // arrival time at stop (MAX_INT if not yet reached or unreachable)
+    std::vector<int>                     stopsAccessTravelTime; // travel time from origin to accessible stops (-1 if unreachable by access mode)
     std::vector<int>                     stopsEgressTravelTime; // travel time to reach destination (-1 if unreachable by egress mode)
     //std::vector<int>                     stopsEgressFootpathTravelTimesSeconds; // not sure we need this...
     std::vector<int>                     tripsEnterConnection; // index of the entering connection for each trip index 
@@ -114,7 +115,7 @@ namespace TrRouting
     std::vector<std::tuple<int,int,int,int,int,short,short>> reverseConnections; // tuple: departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard
     std::vector<std::pair<int,int>>      accessFootpaths; // tuple: accessStopIndex, walkingTravelTimeSeconds
     std::vector<std::pair<int,int>>      egressFootpaths; // tuple: egressStopIndex, walkingTravelTimeSeconds
-    std::vector<std::tuple<int,int,int>> journeys; // index = stop index, tuple: final enter connection, final exit connection, final footpath
+    std::vector<std::tuple<int,int,int>> journeys; // index = stop index, tuple: final enter connection, final exit connection, final footpath (last value = access travel time with first and second values = -1 for access and egress journeys)
     int                                  maxTimeValue;
     std::string                          accessMode;
     std::string                          egressMode;

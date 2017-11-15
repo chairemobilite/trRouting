@@ -14,13 +14,14 @@ namespace TrRouting
     std::cout << "preparing stops tentative times, trips enter connections and journeys..." << std::endl;
     
     stopsTentativeTime    = std::vector<int>(stops.size());
+    stopsAccessTravelTime = std::vector<int>(stops.size());
     stopsEgressTravelTime = std::vector<int>(stops.size());
     tripsEnterConnection  = std::vector<int>(trips.size());
     tripsEnabled          = std::vector<int>(trips.size());
     journeys              = std::vector<std::tuple<int,int,int>>(stops.size());
     
   }
-
+  
   void Calculator::prepareStops()
   {
     
