@@ -105,7 +105,7 @@ namespace TrRouting
     
   }
   
-  const std::pair<std::vector<std::tuple<int,int,int>>, std::vector<std::pair<int,int>>> CacheFetcher::getFootpaths(std::string applicationShortname, std::map<unsigned long long, int> stopIndexesById, int maxTransferWalkingTravelTimeSeconds)
+  const std::pair<std::vector<std::tuple<int,int,int>>, std::vector<std::pair<int,int>>> CacheFetcher::getFootpaths(std::string applicationShortname, std::map<unsigned long long, int> stopIndexesById)
   {
     std::vector<std::tuple<int,int,int>> footpaths;
     std::vector<std::pair<int,int>>      footpathsRanges;

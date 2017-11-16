@@ -5,11 +5,40 @@ namespace TrRouting
     
   void Calculator::prepare()
   {
-    prepareStops();
-    prepareRoutes();
-    prepareTrips();
-    prepareConnections();
-    prepareFootpaths();
+    
+    std::cerr << "preparing stops, routes, trips, connections and footpaths..." << std::endl;
+    if (params.dataFetcherShortname == "database")
+    {
+      std::tie(stops, stopIndexesById)                 = params.databaseFetcher->getStops(params.applicationShortname);
+      std::tie(routes, routeIndexesById)               = params.databaseFetcher->getRoutes(params.applicationShortname);
+      std::tie(trips, tripIndexesById)                 = params.databaseFetcher->getTrips(params.applicationShortname);
+      std::tie(forwardConnections, reverseConnections) = params.databaseFetcher->getConnections(params.applicationShortname, stopIndexesById, tripIndexesById);
+      std::tie(footpaths, footpathsRanges)             = params.databaseFetcher->getFootpaths(params.applicationShortname, stopIndexesById);
+    }
+    else if (params.dataFetcherShortname == "cache")
+    {
+      std::tie(stops, stopIndexesById)                 = params.cacheFetcher->getStops(params.applicationShortname);
+      std::tie(routes, routeIndexesById)               = params.cacheFetcher->getRoutes(params.applicationShortname);
+      std::tie(trips, tripIndexesById)                 = params.cacheFetcher->getTrips(params.applicationShortname);
+      std::tie(forwardConnections, reverseConnections) = params.cacheFetcher->getConnections(params.applicationShortname, stopIndexesById, tripIndexesById);
+      std::tie(footpaths, footpathsRanges)             = params.cacheFetcher->getFootpaths(params.applicationShortname, stopIndexesById);
+    }
+    else if (params.dataFetcherShortname == "gtfs")
+    {
+      std::tie(stops, stopIndexesById)                 = params.gtfsFetcher->getStops(params.applicationShortname);
+      std::tie(routes, routeIndexesById)               = params.gtfsFetcher->getRoutes(params.applicationShortname);
+      std::tie(trips, tripIndexesById)                 = params.gtfsFetcher->getTrips(params.applicationShortname);
+      std::tie(forwardConnections, reverseConnections) = params.gtfsFetcher->getConnections(params.applicationShortname, stopIndexesById, tripIndexesById);
+      std::tie(footpaths, footpathsRanges)             = params.gtfsFetcher->getFootpaths(params.applicationShortname, stopIndexesById);
+    }
+    else if (params.dataFetcherShortname == "csv")
+    {
+      std::tie(stops, stopIndexesById)                 = params.csvFetcher->getStops(params.applicationShortname);
+      std::tie(routes, routeIndexesById)               = params.csvFetcher->getRoutes(params.applicationShortname);
+      std::tie(trips, tripIndexesById)                 = params.csvFetcher->getTrips(params.applicationShortname);
+      std::tie(forwardConnections, reverseConnections) = params.csvFetcher->getConnections(params.applicationShortname, stopIndexesById, tripIndexesById);
+      std::tie(footpaths, footpathsRanges)             = params.csvFetcher->getFootpaths(params.applicationShortname, stopIndexesById);
+    }
     
     std::cout << "preparing stops tentative times, trips enter connections and journeys..." << std::endl;
     
@@ -19,57 +48,7 @@ namespace TrRouting
     tripsEnterConnection  = std::vector<int>(trips.size());
     tripsEnterConnectionTransferTravelTime = std::vector<int>(trips.size());
     tripsEnabled          = std::vector<int>(trips.size());
-    journeys              = std::vector<std::tuple<int,int,int>>(stops.size());
-    
-  }
-  
-  void Calculator::prepareStops()
-  {
-    
-    std::cerr << "preparing stops..." << std::endl;
-    std::tie(stops, stopIndexesById) = params.dataFetcher->getStops(params.applicationShortname);
-    
-  }
-
-  void Calculator::prepareRoutes()
-  {
-    
-    std::cerr << "preparing routes..." << std::endl;
-    std::tie(routes, routeIndexesById) = params.dataFetcher->getRoutes(params.applicationShortname);
-    
-  }
-
-  void Calculator::prepareTrips()
-  {
-    
-    std::cerr << "preparing trips..." << std::endl;
-    std::tie(trips, tripIndexesById) = params.dataFetcher->getTrips(params.applicationShortname);
-    
-  }
-
-  void Calculator::prepareConnections()
-  {
-    
-    std::cerr << "preparing connections..." << std::endl;
-    std::tie(forwardConnections, reverseConnections) = params.dataFetcher->getConnections(params.applicationShortname, stopIndexesById, tripIndexesById);
-    
-  }
-  
-  void Calculator::prepareFootpaths()
-  {
-    
-    std::cerr << "preparing footpaths..." << std::endl;
-    std::tie(footpaths, footpathsRanges) = params.dataFetcher->getFootpaths(params.applicationShortname, stopIndexesById, params.maxTransferWalkingTravelTimeSeconds);
-    
-  }
-  
-  void Calculator::prepareAccessFoothpaths()
-  {
-    
-  }
-
-  void Calculator::prepareEgressFootpaths()
-  {
+    journeys              = std::vector<std::tuple<int,int,int,int,int>>(stops.size());
     
   }
   

@@ -12,8 +12,7 @@ namespace TrRouting
     std::fill(tripsEnterConnection.begin(), tripsEnterConnection.end(), -1);
     std::fill(tripsEnterConnectionTransferTravelTime.begin(), tripsEnterConnectionTransferTravelTime.end(), MAX_INT);
     std::fill(tripsEnabled.begin(), tripsEnabled.end(), 1);
-    std::fill(journeys.begin(), journeys.end(), std::make_tuple(-1,-1,-1));
-    
+    std::fill(journeys.begin(), journeys.end(), std::make_tuple(-1,-1,-1,-1,-1));
     
     departureTimeSeconds = params.departureTimeHour * 3600 + params.departureTimeMinutes * 60;
     
@@ -26,8 +25,6 @@ namespace TrRouting
     bool hasExceptRoutes     = !params.exceptRouteIds.empty();
     bool hasExceptRouteTypes = !params.exceptRouteTypeIds.empty();
     bool hasExceptAgencies   = !params.exceptAgencyIds.empty();
-    
-    std::cerr << "params only service first" << params.onlyServiceIds[1] << std::endl;
     
     int i {0};
     for (auto & trip : trips)

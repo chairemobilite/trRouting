@@ -6,13 +6,23 @@
 #include "point.hpp"
 #include "data_fetcher.hpp"
 #include "database_fetcher.hpp"
+#include "cache_fetcher.hpp"
+#include "gtfs_fetcher.hpp"
+#include "csv_fetcher.hpp"
 
 namespace TrRouting
 {
+  
+  constexpr int MAX_INT {std::numeric_limits<int>::max()};
+  
   struct Parameters {
     
     std::string applicationShortname;
-    std::shared_ptr<DataFetcher> dataFetcher; // csv, database, cache, gtfs
+    std::string dataFetcherShortname; // csv, database, cache, gtfs
+    DatabaseFetcher* databaseFetcher;
+    CacheFetcher*    cacheFetcher;
+    GtfsFetcher*     gtfsFetcher;
+    CsvFetcher*      csvFetcher;
     
     int routingDateYear;   // not implemented, use onlyServiceIds or exceptServiceIds for now
     int routingDateMonth;  // not implemented, use onlyServiceIds or exceptServiceIds for now
@@ -25,6 +35,10 @@ namespace TrRouting
     std::map<int, bool> exceptRouteTypeIds;
     std::map<int, bool> onlyAgencyIds;
     std::map<int, bool> exceptAgencyIds;
+    std::vector<unsigned long long> accessStopIds;
+    std::vector<int>                accessStopTravelTimesSeconds;
+    std::vector<unsigned long long> egressStopIds;
+    std::vector<int>                egressStopTravelTimesSeconds;
     
     int departureTimeHour;
     int departureTimeMinutes;
@@ -82,7 +96,7 @@ namespace TrRouting
       walkingSpeedMetersPerSecond            = 5/3.6; // 5 km/h
       drivingSpeedMetersPerSecond            = 90/3.6; // 90 km/h
       cyclingSpeedMetersPerSecond            = 25/3.6; // 25 km/h
-      maxTotalTravelTimeSeconds              = -1; // -1 means no limit
+      maxTotalTravelTimeSeconds              = MAX_INT;
       maxNumberOfTransfers                   = -1; // -1 means no limit
       minWaitingTimeSeconds                  = 5*60;
       maxAccessWalkingTravelTimeSeconds      = 20*60;

@@ -288,7 +288,7 @@ namespace TrRouting
     
   }
   
-  const std::pair<std::vector<std::tuple<int,int,int>>, std::vector<std::pair<int,int>>> DatabaseFetcher::getFootpaths(std::string applicationShortname, std::map<unsigned long long, int> stopIndexesById, int maxTransferWalkingTravelTimeSeconds)
+  const std::pair<std::vector<std::tuple<int,int,int>>, std::vector<std::pair<int,int>>> DatabaseFetcher::getFootpaths(std::string applicationShortname, std::map<unsigned long long, int> stopIndexesById)
   {
     std::vector<std::tuple<int,int,int>> footpaths;
     std::vector<std::pair<int,int>>      footpathsRanges(stopIndexesById.size());
@@ -301,13 +301,13 @@ namespace TrRouting
     openConnection();
     
     std::cout << "Fetching transfer walking durations from database..." << std::endl;
-    std::cout << "max transfer time seconds: " << std::to_string(maxTransferWalkingTravelTimeSeconds) << std::endl;
+    std::cout << "max transfer time seconds: 1200" << std::endl;
     std::string sqlQuery = "SELECT "
       "stop_1_id as s1, "
       "stop_2_id as s2, "
       "MAX(CEIL(COALESCE(network_walking_duration_seconds::float, network_distance::float/1.38, distance::float/1.38))) as tts "
       "FROM " + applicationShortname + ".tr_matrix_stop_distances "
-      "WHERE CEIL(COALESCE(network_walking_duration_seconds::float, network_distance::float/1.38, distance::float/1.38)) <= " + std::to_string(maxTransferWalkingTravelTimeSeconds) + "::float "
+      "WHERE CEIL(COALESCE(network_walking_duration_seconds::float, network_distance::float/1.38, distance::float/1.38)) <= 1200 "
       "GROUP BY stop_1_id, stop_2_id "
       "ORDER BY stop_1_id, MAX(CEIL(COALESCE(network_walking_duration_seconds::float, network_distance::float/1.38, distance::float/1.38))) ";
     

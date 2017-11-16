@@ -54,8 +54,6 @@ extern std::string consoleResetColor;
 namespace TrRouting
 {
   
-  constexpr int MAX_INT {std::numeric_limits<int>::max()};
-  
   class Calculator {
   
   public:
@@ -73,14 +71,6 @@ namespace TrRouting
     CalculationTime algorithmCalculationTime;
     
   private:
-    
-    void prepareStops();
-    void prepareRoutes();
-    void prepareTrips();
-    void prepareConnections();
-    void prepareFootpaths();
-    void prepareAccessFoothpaths();
-    void prepareEgressFootpaths();
     
     enum connectionIndexes : short { STOP_DEP = 0, STOP_ARR = 1, TIME_DEP = 2, TIME_ARR = 3, TRIP = 4, CAN_BOARD = 5, CAN_UNBOARD = 6 };
     std::map<std::string,int> pickUpTypes = {
@@ -117,7 +107,7 @@ namespace TrRouting
     std::vector<std::tuple<int,int,int,int,int,short,short>> reverseConnections; // tuple: departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard
     std::vector<std::pair<int,int>>      accessFootpaths; // tuple: accessStopIndex, walkingTravelTimeSeconds
     std::vector<std::pair<int,int>>      egressFootpaths; // tuple: egressStopIndex, walkingTravelTimeSeconds
-    std::vector<std::tuple<int,int,int>> journeys; // index = stop index, tuple: final enter connection, final exit connection, final footpath (last value = access travel time with first and second values = -1 for access and egress journeys)
+    std::vector<std::tuple<int,int,int,int,int>> journeys; // index = stop index, tuple: final enter connection, final exit connection, final footpath, final exit trip index, transfer travel time (first, second, third and fourth values = -1 for access and egress journeys)
     int                                  maxTimeValue;
     std::string                          accessMode;
     std::string                          egressMode;

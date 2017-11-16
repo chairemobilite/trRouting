@@ -181,27 +181,16 @@ int main(int argc, char** argv) {
   
   Calculator  calculator;
   algorithmParams.applicationShortname = dataShortname;
+  algorithmParams.dataFetcherShortname = dataFetcherStr;
   
-  if (dataFetcherStr == "database")
-  {
-    DatabaseFetcher dataFetcher = DatabaseFetcher("dbname=" + algorithmParams.databaseName + " user=" + algorithmParams.databaseUser + " hostaddr=" + algorithmParams.databaseHost + " port=" + algorithmParams.databasePort + "");
-    algorithmParams.dataFetcher = std::make_shared<DatabaseFetcher>(dataFetcher);
-  }
-  else if (dataFetcherStr == "gtfs")
-  {
-    GtfsFetcher dataFetcher = GtfsFetcher();
-    algorithmParams.dataFetcher = std::make_shared<GtfsFetcher>(dataFetcher);
-  }
-  else if (dataFetcherStr == "csv")
-  {
-    CsvFetcher dataFetcher = CsvFetcher();
-    algorithmParams.dataFetcher = std::make_shared<CsvFetcher>(dataFetcher);
-  }
-  else if (dataFetcherStr == "cache")
-  {
-    CacheFetcher dataFetcher = CacheFetcher();
-    algorithmParams.dataFetcher = std::make_shared<CacheFetcher>(dataFetcher);
-  }
+  DatabaseFetcher databaseFetcher = DatabaseFetcher("dbname=" + algorithmParams.databaseName + " user=" + algorithmParams.databaseUser + " hostaddr=" + algorithmParams.databaseHost + " port=" + algorithmParams.databasePort + "");
+  algorithmParams.databaseFetcher = &databaseFetcher;
+  GtfsFetcher gtfsFetcher         = GtfsFetcher();
+  algorithmParams.gtfsFetcher     = &gtfsFetcher;
+  CsvFetcher csvFetcher           = CsvFetcher();
+  algorithmParams.csvFetcher      = &csvFetcher;
+  CacheFetcher cacheFetcher       = CacheFetcher();
+  algorithmParams.cacheFetcher    = &cacheFetcher;
   
   calculator = Calculator(algorithmParams);
   int i = 0;
@@ -246,6 +235,11 @@ int main(int argc, char** argv) {
       std::map<int, bool> exceptRouteTypeIds;
       std::map<int, bool> onlyAgencyIds;
       std::map<int, bool> exceptAgencyIds;
+      std::vector<unsigned long long> accessStopIds;
+      std::vector<unsigned long long> egressStopIds;
+      std::vector<int> accessStopTravelTimesSeconds;
+      std::vector<int> egressStopTravelTimesSeconds;
+      
       
       calculator.params.onlyServiceIds     = onlyServiceIds;
       calculator.params.exceptServiceIds   = exceptServiceIds;
@@ -268,6 +262,10 @@ int main(int argc, char** argv) {
       std::vector<std::string> exceptRouteTypeIdsVector;
       std::vector<std::string> onlyAgencyIdsVector;
       std::vector<std::string> exceptAgencyIdsVector;
+      std::vector<std::string> accessStopIdsVector;
+      std::vector<std::string> accessStopTravelTimesSecondsVector;
+      std::vector<std::string> egressStopIdsVector;
+      std::vector<std::string> egressStopTravelTimesSecondsVector;
       
       int timeHour;
       int timeMinute;
@@ -290,7 +288,7 @@ int main(int argc, char** argv) {
       calculator.params.departureTimeMinutes                   = -1;
       calculator.params.arrivalTimeHour                        = -1;
       calculator.params.arrivalTimeMinutes                     = -1;
-      calculator.params.maxTotalTravelTimeSeconds              = -1;
+      calculator.params.maxTotalTravelTimeSeconds              = MAX_INT;
       calculator.params.maxAccessWalkingTravelTimeSeconds      = 20 * 60;
       calculator.params.maxEgressWalkingTravelTimeSeconds      = 20 * 60;
       calculator.params.maxTransferWalkingTravelTimeSeconds    = 20 * 60;
@@ -339,6 +337,51 @@ int main(int argc, char** argv) {
           boost::split(timeVector, parameterWithValueVector[1], boost::is_any_of(":"));
           timeHour      = std::stoi(timeVector[0]);
           timeMinute    = std::stoi(timeVector[1]);
+        }
+        else if (parameterWithValueVector[0] == "access_stop_ids")
+        {
+          boost::split(accessStopIdsVector, parameterWithValueVector[1], boost::is_any_of(","));
+          for(std::string accessStopId : accessStopIdsVector)
+          {
+            accessStopIds.push_back(std::stoi(accessStopId));
+          }
+          calculator.params.accessStopIds = accessStopIds;
+        }
+        else if (parameterWithValueVector[0] == "egress_stop_ids")
+        {
+          boost::split(egressStopIdsVector, parameterWithValueVector[1], boost::is_any_of(","));
+          for(std::string egressStopId : egressStopIdsVector)
+          {
+            egressStopIds.push_back(std::stoi(egressStopId));
+          }
+          calculator.params.egressStopIds = egressStopIds;
+        }
+        else if (parameterWithValueVector[0] == "access_stop_travel_times_seconds" || parameterWithValueVector[0] == "access_stop_travel_times")
+        {
+          boost::split(accessStopTravelTimesSecondsVector, parameterWithValueVector[1], boost::is_any_of(","));
+          for(std::string accessStopTravelTimeSeconds : accessStopTravelTimesSecondsVector)
+          {
+            accessStopTravelTimesSeconds.push_back(std::stoi(accessStopTravelTimeSeconds));
+          }
+          calculator.params.accessStopTravelTimesSeconds = accessStopTravelTimesSeconds;
+        }
+        else if (parameterWithValueVector[0] == "egress_stop_travel_times_seconds" || parameterWithValueVector[0] == "egress_stop_travel_times")
+        {
+          boost::split(egressStopTravelTimesSecondsVector, parameterWithValueVector[1], boost::is_any_of(","));
+          for(std::string egressStopTravelTimeSeconds : egressStopTravelTimesSecondsVector)
+          {
+            egressStopTravelTimesSeconds.push_back(std::stoi(egressStopTravelTimeSeconds));
+          }
+          calculator.params.egressStopTravelTimesSeconds = egressStopTravelTimesSeconds;
+        }
+        else if (parameterWithValueVector[0] == "only_service_ids")
+        {
+          boost::split(onlyServiceIdsVector, parameterWithValueVector[1], boost::is_any_of(","));
+          for(std::string onlyServiceId : onlyServiceIdsVector)
+          {
+            onlyServiceIds.push_back(std::stoi(onlyServiceId));
+          }
+          calculator.params.onlyServiceIds = onlyServiceIds;
         }
         else if (parameterWithValueVector[0] == "only_service_ids")
         {
@@ -532,6 +575,8 @@ int main(int argc, char** argv) {
     {
       resultStr = "{\"status\": \"failed\", \"error\": \"Wrong or malformed query\"}";
     }
+    
+    std::cerr << "-- total -- " << calculator.algorithmCalculationTime.getDurationMicrosecondsNoStop() << " microseconds\n";
     
     //calculator.algorithmCalculationTime.stop();
       
