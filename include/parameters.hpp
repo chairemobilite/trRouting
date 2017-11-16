@@ -4,17 +4,15 @@
 #include <vector>
 #include <string>
 #include "point.hpp"
-#include "data_fetcher.hpp"
 #include "database_fetcher.hpp"
 #include "cache_fetcher.hpp"
 #include "gtfs_fetcher.hpp"
 #include "csv_fetcher.hpp"
+#include "toolbox.hpp"
 
 namespace TrRouting
 {
-  
-  constexpr int MAX_INT {std::numeric_limits<int>::max()};
-  
+    
   struct Parameters {
     
     std::string applicationShortname;

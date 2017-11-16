@@ -6,6 +6,8 @@
 namespace TrRouting
 {
   
+  constexpr int MAX_INT {std::numeric_limits<int>::max()};
+  
   class Toolbox {
   
   public:

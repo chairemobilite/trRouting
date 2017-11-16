@@ -10,7 +10,7 @@ namespace TrRouting
     std::map<unsigned long long, int> stopIndexesById;
     
     std::cout << "Fetching stops from cache..." << std::endl;
-    if (cacheFileExists(applicationShortname, "stops"))
+    if (DataFetcher::cacheFileExists(applicationShortname, "stops"))
     {
       stops = loadFromCacheFile(stops, applicationShortname, "stops");
     }
@@ -18,7 +18,7 @@ namespace TrRouting
     {
       std::cerr << "missing stops cache file!" << std::endl;
     }
-    if (cacheFileExists(applicationShortname, "stop_indexes"))
+    if (DataFetcher::cacheFileExists(applicationShortname, "stop_indexes"))
     {
       stopIndexesById = loadFromCacheFile(stopIndexesById, applicationShortname, "stop_indexes");
     }
@@ -35,7 +35,7 @@ namespace TrRouting
     std::map<unsigned long long, int> routeIndexesById;
     
     std::cout << "Fetching routes from cache..." << std::endl;
-    if (cacheFileExists(applicationShortname, "routes"))
+    if (DataFetcher::cacheFileExists(applicationShortname, "routes"))
     {
       routes = loadFromCacheFile(routes, applicationShortname, "routes");
     }
@@ -43,7 +43,7 @@ namespace TrRouting
     {
       std::cerr << "missing routes cache file!" << std::endl;
     }
-    if (cacheFileExists(applicationShortname, "route_indexes"))
+    if (DataFetcher::cacheFileExists(applicationShortname, "route_indexes"))
     {
       routeIndexesById = loadFromCacheFile(routeIndexesById, applicationShortname, "route_indexes");
     }
@@ -60,7 +60,7 @@ namespace TrRouting
     std::map<unsigned long long, int> tripIndexesById;
     
     std::cout << "Fetching trips from cache..." << std::endl;
-    if (cacheFileExists(applicationShortname, "trips"))
+    if (DataFetcher::cacheFileExists(applicationShortname, "trips"))
     {
       trips = loadFromCacheFile(trips, applicationShortname, "trips");
     }
@@ -68,7 +68,7 @@ namespace TrRouting
     {
       std::cerr << "missing trips cache file!" << std::endl;
     }
-    if (cacheFileExists(applicationShortname, "trip_indexes"))
+    if (DataFetcher::cacheFileExists(applicationShortname, "trip_indexes"))
     {
       tripIndexesById = loadFromCacheFile(tripIndexesById, applicationShortname, "trip_indexes");
     }
@@ -85,7 +85,7 @@ namespace TrRouting
     std::vector<std::tuple<int,int,int,int,int,short,short>> reverseConnections;
     
     std::cout << "Fetching connections from cache..." << std::endl;
-    if (cacheFileExists(applicationShortname, "connections_forward"))
+    if (DataFetcher::cacheFileExists(applicationShortname, "connections_forward"))
     {
       forwardConnections = loadFromCacheFile(forwardConnections, applicationShortname, "connections_forward");
     }
@@ -93,7 +93,7 @@ namespace TrRouting
     {
       std::cerr << "missing connections_forward cache file!" << std::endl;
     }
-    if (cacheFileExists(applicationShortname, "connections_forward"))
+    if (DataFetcher::cacheFileExists(applicationShortname, "connections_forward"))
     {
       reverseConnections = loadFromCacheFile(reverseConnections, applicationShortname, "connections_reverse");
     }
@@ -111,7 +111,7 @@ namespace TrRouting
     std::vector<std::pair<int,int>>      footpathsRanges;
     
     std::cout << "Fetching footpaths from cache..." << std::endl;
-    if (cacheFileExists(applicationShortname, "footpaths"))
+    if (DataFetcher::cacheFileExists(applicationShortname, "footpaths"))
     {
       footpaths = loadFromCacheFile(footpaths, applicationShortname, "footpaths");
     }
@@ -119,7 +119,7 @@ namespace TrRouting
     {
       std::cerr << "missing footpaths cache file!" << std::endl;
     }
-    if (cacheFileExists(applicationShortname, "footpaths_ranges"))
+    if (DataFetcher::cacheFileExists(applicationShortname, "footpaths_ranges"))
     {
       footpathsRanges = loadFromCacheFile(footpathsRanges, applicationShortname, "footpaths_ranges");
     }

@@ -11,7 +11,7 @@
 namespace TrRouting
 {
   
-  class CacheFetcher: public DataFetcher
+  class CacheFetcher
   {
   
   public:

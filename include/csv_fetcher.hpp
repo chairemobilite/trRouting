@@ -6,7 +6,7 @@
 namespace TrRouting
 {
   
-  class CsvFetcher: public DataFetcher
+  class CsvFetcher
   {
   
   public:

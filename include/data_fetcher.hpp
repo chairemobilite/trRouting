@@ -31,6 +31,7 @@
 #include "point.hpp"
 #include "trip.hpp"
 #include "tuple_boost_serialize.hpp"
+#include "toolbox.hpp"
 
 namespace TrRouting
 {
@@ -43,7 +44,7 @@ namespace TrRouting
       DataFetcher() {};
       
       template<class T>
-      void saveToCacheFile(std::string applicationShortname, T& data, std::string cacheFileName) {
+      static void saveToCacheFile(std::string applicationShortname, T& data, std::string cacheFileName) {
         std::ofstream oCacheFile;
         oCacheFile.open(applicationShortname + "_" + cacheFileName + ".cache", std::ios::out | std::ios::trunc | std::ios::binary);
         boost::archive::binary_oarchive oarch(oCacheFile);
@@ -51,7 +52,7 @@ namespace TrRouting
         oCacheFile.close();
       }
       
-      bool cacheFileExists(std::string applicationShortname, std::string cacheFileName) {
+      static bool cacheFileExists(std::string applicationShortname, std::string cacheFileName) {
         std::ifstream iCacheFile;
         bool notEmpty = false;
         iCacheFile.open(applicationShortname + "_" + cacheFileName + ".cache", std::ios::in | std::ios::binary | std::ios::ate);

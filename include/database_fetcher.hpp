@@ -6,7 +6,7 @@
 namespace TrRouting
 {
   
-  class DatabaseFetcher: public DataFetcher
+  class DatabaseFetcher
   {
   
   public:

@@ -154,8 +154,31 @@ namespace TrRouting
               footpathIndex = footpathsRangeStart;
               while (footpathIndex <= footpathsRangeEnd)
               {
+                
                 footpathStopArrivalIndex = std::get<1>(footpaths[footpathIndex]);
                 footpathTravelTime       = std::get<2>(footpaths[footpathIndex]);
+                
+                Stop departureStop {stops[stopArrivalIndex]};
+                Stop arrivalStop {stops[footpathStopArrivalIndex]};
+                
+                if (arrivalStop.code == "50501" && departureStop.code == "50501")
+                {
+                  result.json += "connectionI: " + std::to_string(i) + "\n";
+                  result.json += "routeId: " + std::to_string(trips[tripIndex].routeId) + "\n";
+                  result.json += "stop1Id: " + std::to_string(departureStop.id) + "\n";
+                  result.json += "stop2Id: " + std::to_string(arrivalStop.id) + "\n";
+                  result.json += "footpathDepartureStopIndex: " + std::to_string(std::get<0>(footpaths[footpathIndex])) + "\n";
+                  result.json += "footpathStopDepartureIndex: " + std::to_string(footpathStopArrivalIndex) + "\n";
+                  result.json += "footpathStopArrivalIndex: " + std::to_string(footpathStopArrivalIndex) + "\n";
+                  result.json += "travelTimeSeconds: " + std::to_string(footpathTravelTime) + "\n";
+                  result.json += "tripIndex: " + std::to_string(tripIndex) + "\n";
+                  result.json += "tripId: " + std::to_string(trips[tripIndex].id) + "\n";
+                  result.json += "arrivalTripIndex: " + std::to_string(std::get<3>(journeys[footpathStopArrivalIndex])) + "\n";
+                  result.json += "params.minWaitingTimeSeconds: " + std::to_string(params.minWaitingTimeSeconds) + "\n";
+                  result.json += "connectionArrivalTime: " + std::to_string(connectionArrivalTime) + "\n";
+                  result.json += "stopsTentativeTime[footpathStopArrivalIndex]: " + std::to_string(stopsTentativeTime[footpathStopArrivalIndex]) + "\n\n";
+                }
+                
                 if (footpathTravelTime <= params.maxTransferWalkingTravelTimeSeconds
                     && (footpathTravelTime + params.minWaitingTimeSeconds + connectionArrivalTime < stopsTentativeTime[footpathStopArrivalIndex])
                     && (std::get<0>(journeys[footpathStopArrivalIndex]) == -1 || std::get<3>(journeys[footpathStopArrivalIndex]) != tripIndex)

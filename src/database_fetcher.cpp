@@ -260,7 +260,7 @@ namespace TrRouting
       for (pqxx::result::const_iterator c = pgResult.begin(); c != pgResult.end(); ++c) {
         
         forwardConnections.push_back(std::make_tuple(stopIndexesById[c[5].as<unsigned long long>()], stopIndexesById[c[6].as<unsigned long long>()], c[4].as<int>()*60, c[3].as<int>()* 60, tripIndexesById[c[0].as<unsigned long long>()], c[1].as<short>(), c[2].as<short>())); // departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard
-        reverseConnections.push_back(std::make_tuple(stopIndexesById[c[6].as<unsigned long long>()], stopIndexesById[c[5].as<unsigned long long>()], std::numeric_limits<int>::max() - c[3].as<int>()*60, std::numeric_limits<int>::max() - c[4].as<int>()* 60, tripIndexesById[c[0].as<unsigned long long>()], c[2].as<short>(), c[1].as<short>())); // departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard
+        reverseConnections.push_back(std::make_tuple(stopIndexesById[c[6].as<unsigned long long>()], stopIndexesById[c[5].as<unsigned long long>()], MAX_INT - c[3].as<int>()*60, MAX_INT - c[4].as<int>()* 60, tripIndexesById[c[0].as<unsigned long long>()], c[2].as<short>(), c[1].as<short>())); // departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard
         
         // show loading progress in percentage:
         i++;

@@ -6,7 +6,7 @@
 namespace TrRouting
 {
   
-  class GtfsFetcher: public DataFetcher
+  class GtfsFetcher
   {
   
   public:
