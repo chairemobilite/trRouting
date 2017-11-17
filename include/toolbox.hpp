@@ -20,6 +20,11 @@ namespace TrRouting
       formattedTime += (hour <= 9 ? "0" : "") + std::to_string(hour) + ":" + (minute <= 9 ? "0" : "") + std::to_string(minute);
       return formattedTime;
     }
+    
+    static const int convertSecondsToMinutes(int timeInSeconds)
+    {
+      return (int)ceil((float)timeInSeconds / 60.0);
+    }
   
   
   };
