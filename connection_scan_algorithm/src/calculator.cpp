@@ -300,7 +300,7 @@ namespace TrRouting
         "      \"action\": \"walk\",\n"
         "      \"departureTime\": \"" + Toolbox::convertSecondsToFormattedTime(arrivalTime) + "\",\n"
         "      \"arrivingAtStopAt\":"  + Toolbox::convertSecondsToFormattedTime(transferArrivalTime) + ",\n"
-        "      \"readyToBoardAt\":"  + Toolbox::convertSecondsToFormattedTime(transferReadyTime) + ",\n"
+        "      \"readyToBoardAt\":"  + Toolbox::convertSecondsToFormattedTime(transferReadyTime) + "\n"
         "    },";
         
         //result.json += "\n\n  enter stop: " + journeyStepStopDeparture.name + " [" + journeyStepStopDeparture.code + "] @ " + std::to_string(std::get<connectionIndexes::TIME_DEP>(journeyStepEnterConnection)) + " (" + Toolbox::convertSecondsToFormattedTime(std::get<connectionIndexes::TIME_DEP>(journeyStepEnterConnection)) + ") on route " + journeyStepRoute.shortname + " " + journeyStepRoute.longname + "\n";
@@ -320,7 +320,7 @@ namespace TrRouting
           "      \"action\": \"walk\",\n"
           "      \"departureTime\": \"" + Toolbox::convertSecondsToFormattedTime(departureTimeSeconds) + "\",\n"
           "      \"arrivingAtStopAt\":"  + Toolbox::convertSecondsToFormattedTime(transferArrivalTime) + ",\n"
-          "      \"readyToBoardAt\":"  + Toolbox::convertSecondsToFormattedTime(transferReadyTime) + ",\n"
+          "      \"readyToBoardAt\":"  + Toolbox::convertSecondsToFormattedTime(transferReadyTime) + "\n"
           "    },\n";
         }
         else // egress
