@@ -107,7 +107,7 @@ namespace TrRouting
     std::vector<std::tuple<int,int,int,int,int,short,short>> reverseConnections; // tuple: departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard
     std::vector<std::pair<int,int>>      accessFootpaths; // tuple: accessStopIndex, walkingTravelTimeSeconds
     std::vector<std::pair<int,int>>      egressFootpaths; // tuple: egressStopIndex, walkingTravelTimeSeconds
-    std::vector<std::tuple<int,int,int,int,int>> journeys; // index = stop index, tuple: final enter connection, final exit connection, final footpath, final exit trip index, transfer travel time (first, second, third and fourth values = -1 for access and egress journeys)
+    std::vector<std::tuple<int,int,int,int,int,short>> journeys; // index = stop index, tuple: final enter connection, final exit connection, final footpath, final exit trip index, transfer travel time, is same stop transfer (first, second, third and fourth values = -1 for access and egress journeys)
     int                                  maxTimeValue;
     std::string                          accessMode;
     std::string                          egressMode;

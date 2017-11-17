@@ -10,9 +10,9 @@ namespace TrRouting
     reset();
     
     RoutingResult result;
-    std::deque<std::tuple<int,int,int,int,int>> journey;
-    std::tuple<int,int,int,int,int> subJourney;
-    std::tuple<int,int,int,int,int> emptyJourney {-1,-1,-1,-1,-1};
+    std::deque<std::tuple<int,int,int,int,int,short>> journey;
+    std::tuple<int,int,int,int,int,short> subJourney;
+    std::tuple<int,int,int,int,int,short> emptyJourney {-1,-1,-1,-1,-1,-1};
     
     result.json = "";
     
@@ -63,7 +63,7 @@ namespace TrRouting
     for (auto & accessFootpath : accessFootpaths)
     {
       stopsAccessTravelTime[accessFootpath.first] = accessFootpath.second + params.minWaitingTimeSeconds;
-      journeys[accessFootpath.first]              = std::make_tuple(-1, -1, -1, -1, accessFootpath.second);
+      journeys[accessFootpath.first]              = std::make_tuple(-1, -1, -1, -1, accessFootpath.second,-1);
       stopsTentativeTime[accessFootpath.first]    = departureTimeSeconds + accessFootpath.second + params.minWaitingTimeSeconds;
       if (accessFootpath.second < minAccessTravelTime)
       {
@@ -130,7 +130,7 @@ namespace TrRouting
           // reachable connections only here:
           if(tripEnterConnectionIndex != -1 || (stopDepartureTentativeTime <= connectionDepartureTime))
           {
-            if (tripEnterConnectionIndex == -1 || std::get<4>(journeys[stopDepartureIndex]) < tripsEnterConnectionTransferTravelTime[tripIndex]) // make sure we transfer with the shortest footpath
+            if (tripEnterConnectionIndex == -1 || (std::get<5>(journeys[stopDepartureIndex]) != 1 && std::get<4>(journeys[stopDepartureIndex]) < tripsEnterConnectionTransferTravelTime[tripIndex])) // make sure we transfer with the shortest footpath
             {
               tripsEnterConnection[tripIndex]                   = i;
               tripsEnterConnectionTransferTravelTime[tripIndex] = std::get<4>(journeys[stopDepartureIndex]);
@@ -145,12 +145,9 @@ namespace TrRouting
             {
               reachedAtLeastOneEgressStop    = true;
               tentativeEgressStopArrivalTime = connectionArrivalTime;
-              //std::cerr << "-- egress stop = " << stops[stopArrivalIndex].name << std::endl;
-              //std::cerr << "-- egress time = " << tentativeEgressStopArrivalTime + maxEgressTravelTime << std::endl;
             }
             if (footpathsRangeStart >= 0 && footpathsRangeEnd >= 0)
             {
-              //stopArrivalTentativeTime = stopsTentativeTime[stopArrivalIndex];
               footpathIndex = footpathsRangeStart;
               while (footpathIndex <= footpathsRangeEnd)
               {
@@ -158,36 +155,11 @@ namespace TrRouting
                 footpathStopArrivalIndex = std::get<1>(footpaths[footpathIndex]);
                 footpathTravelTime       = std::get<2>(footpaths[footpathIndex]);
                 
-                Stop departureStop {stops[stopArrivalIndex]};
-                Stop arrivalStop {stops[footpathStopArrivalIndex]};
-                
-                if (tripIndex == 27691)
-                {
-                  result.json += "connectionI: " + std::to_string(i) + "\n";
-                  result.json += "routeId: " + std::to_string(trips[tripIndex].routeId) + "\n";
-                  result.json += "stop1Id: " + std::to_string(departureStop.id) + "\n";
-                  result.json += "stop2Id: " + std::to_string(arrivalStop.id) + "\n";
-                  result.json += "footpathDepartureStopIndex: " + std::to_string(std::get<0>(footpaths[footpathIndex])) + "\n";
-                  result.json += "footpathStopDepartureIndex: " + std::to_string(footpathStopArrivalIndex) + "\n";
-                  result.json += "footpathStopArrivalIndex: " + std::to_string(footpathStopArrivalIndex) + "\n";
-                  result.json += "travelTimeSeconds: " + std::to_string(footpathTravelTime) + "\n";
-                  result.json += "tripIndex: " + std::to_string(tripIndex) + "\n";
-                  result.json += "tripId: " + std::to_string(trips[tripIndex].id) + "\n";
-                  result.json += "arrivalTripIndex: " + std::to_string(std::get<3>(journeys[footpathStopArrivalIndex])) + "\n";
-                  result.json += "params.minWaitingTimeSeconds: " + std::to_string(params.minWaitingTimeSeconds) + "\n";
-                  result.json += "connectionArrivalTime: " + std::to_string(connectionArrivalTime) + "\n";
-                  result.json += "std::get<0>(journeys[footpathStopArrivalIndex])" + std::to_string(std::get<0>(journeys[footpathStopArrivalIndex])) + "\n";
-                  result.json += "std::get<3>(journeys[footpathStopArrivalIndex])" + std::to_string(std::get<3>(journeys[footpathStopArrivalIndex])) + "\n";
-                  result.json += "stopsTentativeTime[footpathStopArrivalIndex]: " + std::to_string(stopsTentativeTime[footpathStopArrivalIndex]) + "\n\n";
-                }
-                
-                if (footpathTravelTime <= params.maxTransferWalkingTravelTimeSeconds
-                    && (footpathTravelTime + params.minWaitingTimeSeconds + connectionArrivalTime < stopsTentativeTime[footpathStopArrivalIndex])
-                    && (std::get<0>(journeys[footpathStopArrivalIndex]) == -1 || std::get<3>(journeys[footpathStopArrivalIndex]) != tripIndex)
+                if (footpathTravelTime <= params.maxTransferWalkingTravelTimeSeconds && footpathTravelTime + params.minWaitingTimeSeconds + connectionArrivalTime < stopsTentativeTime[footpathStopArrivalIndex]
                 )
                 {
                   stopsTentativeTime[footpathStopArrivalIndex] = footpathTravelTime + params.minWaitingTimeSeconds + connectionArrivalTime;
-                  journeys[footpathStopArrivalIndex]           = std::make_tuple(tripsEnterConnection[tripIndex], i, footpathIndex, tripIndex, footpathTravelTime);
+                  journeys[footpathStopArrivalIndex]           = std::make_tuple(tripsEnterConnection[tripIndex], i, footpathIndex, tripIndex, footpathTravelTime, (stopArrivalIndex == footpathStopArrivalIndex ? 1 : -1));
                 }
                 footpathIndex++;
               }
@@ -221,19 +193,23 @@ namespace TrRouting
       i++;
     }
     
+    //return result;
+    
     std::cerr << "-- find best journey -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
     calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
     
     // recreate journey:
     subJourney = journeys[bestEgressStopIndex];
-    while (std::get<0>(subJourney) != -1 && std::get<1>(subJourney) != -1)
+    i = 0;
+    while ((std::get<0>(subJourney) != -1 && std::get<1>(subJourney) != -1) && i < 20)
     {
       journey.push_front(subJourney);
       bestAccessStopIndex = std::get<connectionIndexes::STOP_DEP>(forwardConnections[std::get<0>(subJourney)]);
       subJourney          = journeys[bestAccessStopIndex];
+      i++;
     }
-    journey.push_back(std::make_tuple(-1,-1,-1,-1,stopsEgressTravelTime[bestEgressStopIndex]));
-    journey.push_front(std::make_tuple(-1,-1,-1,-1,stopsAccessTravelTime[bestAccessStopIndex]));
+    journey.push_back(std::make_tuple(-1,-1,-1,-1,stopsEgressTravelTime[bestEgressStopIndex],-1));
+    journey.push_front(std::make_tuple(-1,-1,-1,-1,stopsAccessTravelTime[bestAccessStopIndex],-1));
     
     Stop  journeyStepStopDeparture;
     Stop  journeyStepStopArrival;
@@ -264,7 +240,7 @@ namespace TrRouting
         journeyStepRoute           = routes[routeIndexesById[journeyStepTrip.routeId]];
         transferTime               = std::get<4>(journeyStep) + params.minWaitingTimeSeconds;
         result.json += "  enter stop: " + journeyStepStopDeparture.name + " [" + journeyStepStopDeparture.code + "] @ " + std::to_string(std::get<connectionIndexes::TIME_DEP>(journeyStepEnterConnection)) + " (" + Toolbox::convertSecondsToFormattedTime(std::get<connectionIndexes::TIME_DEP>(journeyStepEnterConnection)) + ") on route " + journeyStepRoute.shortname + " " + journeyStepRoute.longname + "\n";
-        result.json += "  exit stop: "  + journeyStepStopArrival.name   + " [" + journeyStepStopArrival.code   + "] @ " + std::to_string(std::get<connectionIndexes::TIME_ARR>(journeyStepExitConnection))  + " (" + Toolbox::convertSecondsToFormattedTime(std::get<connectionIndexes::TIME_DEP>(journeyStepExitConnection))  + ") on route " + journeyStepRoute.shortname + " " + journeyStepRoute.longname + "\n";
+        result.json += "  exit stop: "  + journeyStepStopArrival.name   + " [" + journeyStepStopArrival.code   + "] @ " + std::to_string(std::get<connectionIndexes::TIME_ARR>(journeyStepExitConnection))  + " (" + Toolbox::convertSecondsToFormattedTime(std::get<connectionIndexes::TIME_ARR>(journeyStepExitConnection))  + ") on route " + journeyStepRoute.shortname + " " + journeyStepRoute.longname + "\n";
         result.json += "  trip id: "  + std::to_string(journeyStepTrip.id) + "\n";
 
         result.json += "  transfer: " + std::to_string(transferTime) + "\n";

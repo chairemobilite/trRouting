@@ -12,7 +12,7 @@ namespace TrRouting
     std::fill(tripsEnterConnection.begin(), tripsEnterConnection.end(), -1);
     std::fill(tripsEnterConnectionTransferTravelTime.begin(), tripsEnterConnectionTransferTravelTime.end(), MAX_INT);
     std::fill(tripsEnabled.begin(), tripsEnabled.end(), 1);
-    std::fill(journeys.begin(), journeys.end(), std::make_tuple(-1,-1,-1,-1,-1));
+    std::fill(journeys.begin(), journeys.end(), std::make_tuple(-1,-1,-1,-1,-1,-1));
     
     departureTimeSeconds = params.departureTimeHour * 3600 + params.departureTimeMinutes * 60;
     
