@@ -161,7 +161,7 @@ namespace TrRouting
                 Stop departureStop {stops[stopArrivalIndex]};
                 Stop arrivalStop {stops[footpathStopArrivalIndex]};
                 
-                if (arrivalStop.code == "50501" && departureStop.code == "50501")
+                if (tripIndex == 27691)
                 {
                   result.json += "connectionI: " + std::to_string(i) + "\n";
                   result.json += "routeId: " + std::to_string(trips[tripIndex].routeId) + "\n";
@@ -176,6 +176,8 @@ namespace TrRouting
                   result.json += "arrivalTripIndex: " + std::to_string(std::get<3>(journeys[footpathStopArrivalIndex])) + "\n";
                   result.json += "params.minWaitingTimeSeconds: " + std::to_string(params.minWaitingTimeSeconds) + "\n";
                   result.json += "connectionArrivalTime: " + std::to_string(connectionArrivalTime) + "\n";
+                  result.json += "std::get<0>(journeys[footpathStopArrivalIndex])" + std::to_string(std::get<0>(journeys[footpathStopArrivalIndex])) + "\n";
+                  result.json += "std::get<3>(journeys[footpathStopArrivalIndex])" + std::to_string(std::get<3>(journeys[footpathStopArrivalIndex])) + "\n";
                   result.json += "stopsTentativeTime[footpathStopArrivalIndex]: " + std::to_string(stopsTentativeTime[footpathStopArrivalIndex]) + "\n\n";
                 }
                 
@@ -263,6 +265,8 @@ namespace TrRouting
         transferTime               = std::get<4>(journeyStep) + params.minWaitingTimeSeconds;
         result.json += "  enter stop: " + journeyStepStopDeparture.name + " [" + journeyStepStopDeparture.code + "] @ " + std::to_string(std::get<connectionIndexes::TIME_DEP>(journeyStepEnterConnection)) + " (" + Toolbox::convertSecondsToFormattedTime(std::get<connectionIndexes::TIME_DEP>(journeyStepEnterConnection)) + ") on route " + journeyStepRoute.shortname + " " + journeyStepRoute.longname + "\n";
         result.json += "  exit stop: "  + journeyStepStopArrival.name   + " [" + journeyStepStopArrival.code   + "] @ " + std::to_string(std::get<connectionIndexes::TIME_ARR>(journeyStepExitConnection))  + " (" + Toolbox::convertSecondsToFormattedTime(std::get<connectionIndexes::TIME_DEP>(journeyStepExitConnection))  + ") on route " + journeyStepRoute.shortname + " " + journeyStepRoute.longname + "\n";
+        result.json += "  trip id: "  + std::to_string(journeyStepTrip.id) + "\n";
+
         result.json += "  transfer: " + std::to_string(transferTime) + "\n";
       }
       else // access or egress journey step
