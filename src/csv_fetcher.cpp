@@ -25,10 +25,10 @@ namespace TrRouting
     return std::make_pair(trips, tripIndexesById);
   }
   
-  const std::pair<std::vector<std::tuple<int,int,int,int,int,short,short>>, std::vector<std::tuple<int,int,int,int,int,short,short>>> CsvFetcher::getConnections(std::string applicationShortname, std::map<unsigned long long, int> stopIndexesById, std::map<unsigned long long, int> tripIndexesById)
+  const std::pair<std::vector<std::tuple<int,int,int,int,int,short,short,int>>, std::vector<std::tuple<int,int,int,int,int,short,short,int>>> CsvFetcher::getConnections(std::string applicationShortname, std::map<unsigned long long, int> stopIndexesById, std::map<unsigned long long, int> tripIndexesById)
   {
-    std::vector<std::tuple<int,int,int,int,int,short,short>> forwardConnections;
-    std::vector<std::tuple<int,int,int,int,int,short,short>> reverseConnections;
+    std::vector<std::tuple<int,int,int,int,int,short,short,int>> forwardConnections;
+    std::vector<std::tuple<int,int,int,int,int,short,short,int>> reverseConnections;
     return std::make_pair(forwardConnections, reverseConnections);
     
   }

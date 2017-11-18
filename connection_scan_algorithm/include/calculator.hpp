@@ -72,7 +72,7 @@ namespace TrRouting
     
   private:
     
-    enum connectionIndexes : short { STOP_DEP = 0, STOP_ARR = 1, TIME_DEP = 2, TIME_ARR = 3, TRIP = 4, CAN_BOARD = 5, CAN_UNBOARD = 6 };
+    enum connectionIndexes : short { STOP_DEP = 0, STOP_ARR = 1, TIME_DEP = 2, TIME_ARR = 3, TRIP = 4, CAN_BOARD = 5, CAN_UNBOARD = 6, SEQUENCE = 7 };
     std::map<std::string,int> pickUpTypes = {
       {"regular", 0},
       {"no_pickup", 1},
@@ -103,8 +103,8 @@ namespace TrRouting
     std::vector<int>                     tripsEnterConnection; // index of the entering connection for each trip index 
     std::vector<int>                     tripsEnterConnectionTransferTravelTime; // index of the entering connection for each trip index 
     std::vector<int>                     tripsEnabled; // allow/disallow use of this trip during calculation
-    std::vector<std::tuple<int,int,int,int,int,short,short>> forwardConnections; // tuple: departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard
-    std::vector<std::tuple<int,int,int,int,int,short,short>> reverseConnections; // tuple: departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard
+    std::vector<std::tuple<int,int,int,int,int,short,short,int>> forwardConnections; // tuple: departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequence in trip
+    std::vector<std::tuple<int,int,int,int,int,short,short,int>> reverseConnections; // tuple: departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequence in trip
     std::vector<std::pair<int,int>>      accessFootpaths; // tuple: accessStopIndex, walkingTravelTimeSeconds
     std::vector<std::pair<int,int>>      egressFootpaths; // tuple: egressStopIndex, walkingTravelTimeSeconds
     std::vector<std::tuple<int,int,int,int,int,short>> journeys; // index = stop index, tuple: final enter connection, final exit connection, final footpath, final exit trip index, transfer travel time, is same stop transfer (first, second, third and fourth values = -1 for access and egress journeys)

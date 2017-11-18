@@ -21,6 +21,7 @@
 #include <iterator>
 #include <curses.h>
 
+#include "toolbox.hpp"
 #include "data_fetcher.hpp"
 #include "database_fetcher.hpp"
 #include "gtfs_fetcher.hpp"
@@ -488,6 +489,10 @@ int main(int argc, char** argv) {
         else if (parameterWithValueVector[0] == "max_travel_time" || parameterWithValueVector[0] == "max_travel_time_minutes")
         {
           calculator.params.maxTotalTravelTimeSeconds = std::stoi(parameterWithValueVector[1]) * 60;
+          if (calculator.params.maxTotalTravelTimeSeconds == 0)
+          {
+            calculator.params.maxTotalTravelTimeSeconds = MAX_INT;
+          }
         }
         else if (parameterWithValueVector[0] == "max_access_travel_time" || parameterWithValueVector[0] == "max_access_travel_time_minutes")
         {
