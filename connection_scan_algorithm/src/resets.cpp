@@ -14,6 +14,9 @@ namespace TrRouting
     std::fill(tripsEnabled.begin(), tripsEnabled.end(), 1);
     std::fill(journeys.begin(), journeys.end(), std::make_tuple(-1,-1,-1,-1,-1,-1));
     
+    accessFootpaths.clear();
+    egressFootpaths.clear();
+
     departureTimeSeconds = params.departureTimeHour * 3600 + params.departureTimeMinutes * 60;
     
     // disable trips according to parameters:

@@ -302,7 +302,11 @@ int main(int argc, char** argv) {
       calculator.params.noResultNextAccessTimeSecondsIncrement = 5 * 60;
       calculator.params.maxNoResultNextAccessTimeSeconds       = 40 * 60;
       calculator.params.calculateByNumberOfTransfers           = false;
-      
+      calculator.params.accessStopIds.clear();
+      calculator.params.egressStopIds.clear();
+      calculator.params.accessStopTravelTimesSeconds.clear();
+      calculator.params.egressStopTravelTimesSeconds.clear();
+
       for(auto & parameterWithValue : parametersWithValues)
       {
         boost::split(parameterWithValueVector, parameterWithValue, boost::is_any_of("="));
