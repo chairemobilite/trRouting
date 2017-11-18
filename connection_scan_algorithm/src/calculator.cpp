@@ -125,9 +125,11 @@ namespace TrRouting
           stopDepartureTentativeTime = stopsTentativeTime[stopDepartureIndex];
           
           // reachable connections only here:
-          if ((tripEnterConnectionIndex != -1 || (stopDepartureTentativeTime <= connectionDepartureTime)) && std::get<connectionIndexes::CAN_BOARD>(connection) == 1)
+          if (tripEnterConnectionIndex != -1 || stopDepartureTentativeTime <= connectionDepartureTime)
           {
-            if (tripEnterConnectionIndex == -1 || (std::get<5>(journeys[stopDepartureIndex]) != 1 && std::get<0>(journeys[stopDepartureIndex]) == -1 && std::get<4>(journeys[stopDepartureIndex]) < tripsEnterConnectionTransferTravelTime[tripIndex])) // make sure we transfer with the shortest footpath
+            if (std::get<connectionIndexes::CAN_BOARD>(connection) == 1 && 
+            ( tripEnterConnectionIndex == -1  || (std::get<5>(journeys[stopDepartureIndex]) != 1 && std::get<0>(journeys[stopDepartureIndex]) == -1 && std::get<4>(journeys[stopDepartureIndex]) < tripsEnterConnectionTransferTravelTime[tripIndex]))
+            ) // make sure we transfer with the shortest footpath
             {
               tripsEnterConnection[tripIndex]                   = i;
               tripsEnterConnectionTransferTravelTime[tripIndex] = std::get<4>(journeys[stopDepartureIndex]);
@@ -199,6 +201,8 @@ namespace TrRouting
         }
         i++;
       }
+      
+      std::cerr << bestEgressStopIndex << std::endl;
       
       if (bestEgressStopIndex == -1) // no routing found
       {
