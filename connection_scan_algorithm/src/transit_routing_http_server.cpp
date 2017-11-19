@@ -22,7 +22,6 @@
 #include <curses.h>
 
 #include "toolbox.hpp"
-#include "data_fetcher.hpp"
 #include "database_fetcher.hpp"
 #include "gtfs_fetcher.hpp"
 #include "csv_fetcher.hpp"

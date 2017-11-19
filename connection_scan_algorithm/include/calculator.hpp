@@ -32,6 +32,7 @@
 #include <limits>
 #include <stdlib.h>
 
+#include "forward_declarations.hpp"
 #include "toolbox.hpp"
 #include "stop.hpp"
 #include "route.hpp"

@@ -1,7 +1,6 @@
 #ifndef TR_ROUTE
 #define TR_ROUTE
 
-#include <vector>
 #include <boost/serialization/access.hpp>
 
 namespace TrRouting
@@ -25,14 +24,14 @@ namespace TrRouting
     template<class Archive>
     void serialize(Archive&ar, const unsigned int version)
     {
-        ar & id;
-        ar & agencyId;
-        ar & routeTypeId;
-        ar & agencyAcronym;
-        ar & agencyName;
-        ar & shortname;
-        ar & longname;
-        ar & routeTypeName;
+      ar & id;
+      ar & agencyId;
+      ar & routeTypeId;
+      ar & agencyAcronym;
+      ar & agencyName;
+      ar & shortname;
+      ar & longname;
+      ar & routeTypeName;
     }
   };
 

@@ -1,18 +1,23 @@
 #ifndef TR_PARAMETERS
 #define TR_PARAMETERS
 
-#include <vector>
 #include <string>
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+#include <sstream>
+#include <algorithm>
+#include <iterator>
+#include <vector>
+#include <map>
+#include <math.h>
+#include "forward_declarations.hpp"
 #include "point.hpp"
-#include "database_fetcher.hpp"
-#include "cache_fetcher.hpp"
-#include "gtfs_fetcher.hpp"
-#include "csv_fetcher.hpp"
 #include "toolbox.hpp"
 
 namespace TrRouting
 {
-    
+  
   struct Parameters {
     
     std::string applicationShortname;

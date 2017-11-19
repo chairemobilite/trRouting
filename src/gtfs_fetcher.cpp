@@ -1,4 +1,3 @@
-#include "data_fetcher.hpp"
 #include "gtfs_fetcher.hpp"
 
 namespace TrRouting
@@ -33,7 +32,7 @@ namespace TrRouting
     
   }
   
-  const std::pair<std::vector<std::tuple<int,int,int>>, std::vector<std::pair<int,int>>> GtfsFetcher::getFootpaths(std::string applicationShortname, std::map<unsigned long long, int> stopIndexesById)
+  const std::pair<std::vector<std::tuple<int,int,int>>, std::vector<std::pair<int,int>>> GtfsFetcher::getFootpaths(std::string applicationShortname, std::vector<Stop> stops)
   {
     std::vector<std::tuple<int,int,int>> footpaths;
     std::vector<std::pair<int,int>>      footpathsRanges;

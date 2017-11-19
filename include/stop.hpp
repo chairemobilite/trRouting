@@ -1,9 +1,7 @@
 #ifndef TR_STOP
 #define TR_STOP
 
-#include <vector>
 #include <boost/serialization/access.hpp>
-#include <boost/ptr_container/ptr_vector.hpp>
 #include "point.hpp"
 
 namespace TrRouting
@@ -24,11 +22,11 @@ namespace TrRouting
     template<class Archive>
     void serialize(Archive&ar, const unsigned int version)
     {
-        ar & id;
-        ar & code;
-        ar & name;
-        ar & stationId;
-        ar & point;
+      ar & id;
+      ar & code;
+      ar & name;
+      ar & stationId;
+      ar & point;
     }
   };
 

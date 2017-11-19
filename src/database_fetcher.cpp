@@ -2,7 +2,7 @@
 
 namespace TrRouting
 {
-    
+  
   void DatabaseFetcher::disconnect()
   {
     if (pgConnectionPtr)
@@ -86,8 +86,8 @@ namespace TrRouting
       std::cout << std::endl;
       
       // save stops and stop indexes to binary cache file:
-      DataFetcher::saveToCacheFile(applicationShortname, stops, "stops");
-      DataFetcher::saveToCacheFile(applicationShortname, stopIndexesById, "stop_indexes");
+      CacheFetcher::saveToCacheFile(applicationShortname, stops, "stops");
+      CacheFetcher::saveToCacheFile(applicationShortname, stopIndexesById, "stop_indexes");
       
     } else {
       std::cerr << "Can't open database" << std::endl;
@@ -153,8 +153,8 @@ namespace TrRouting
       std::cout << std::endl;
       
       // save routes and stop indexes to binary cache file:
-      DataFetcher::saveToCacheFile(applicationShortname, routes, "routes");
-      DataFetcher::saveToCacheFile(applicationShortname, routeIndexesById, "route_indexes");
+      CacheFetcher::saveToCacheFile(applicationShortname, routes, "routes");
+      CacheFetcher::saveToCacheFile(applicationShortname, routeIndexesById, "route_indexes");
     
     } else {
       std::cout << "Can't open database" << std::endl;
@@ -217,8 +217,8 @@ namespace TrRouting
       std::cout << std::endl;
       
       // save trips and stop indexes to binary cache file:
-      DataFetcher::saveToCacheFile(applicationShortname, trips, "trips");
-      DataFetcher::saveToCacheFile(applicationShortname, tripIndexesById, "trip_indexes");
+      CacheFetcher::saveToCacheFile(applicationShortname, trips, "trips");
+      CacheFetcher::saveToCacheFile(applicationShortname, tripIndexesById, "trip_indexes");
     
     } else {
       std::cout << "Can't open database" << std::endl;
@@ -276,9 +276,9 @@ namespace TrRouting
       
       // save connections to binary cache files:
       std::cout << "Saving forward connections to cache..." << std::endl;
-      DataFetcher::saveToCacheFile(applicationShortname, forwardConnections, "connections_forward");
+      CacheFetcher::saveToCacheFile(applicationShortname, forwardConnections, "connections_forward");
       std::cout << "Saving reverse connections to cache..." << std::endl;
-      DataFetcher::saveToCacheFile(applicationShortname, reverseConnections, "connections_reverse");
+      CacheFetcher::saveToCacheFile(applicationShortname, reverseConnections, "connections_reverse");
   
     } else {
       std::cout << "Can't open database" << std::endl;
@@ -348,15 +348,94 @@ namespace TrRouting
       std::cout << std::endl;
       
       std::cout << "Saving footpaths to cache..." << std::endl;
-      DataFetcher::saveToCacheFile(applicationShortname, footpaths, "footpaths");
+      CacheFetcher::saveToCacheFile(applicationShortname, footpaths, "footpaths");
       std::cout << "Saving footpaths_ranges to cache..." << std::endl;
-      DataFetcher::saveToCacheFile(applicationShortname, footpathsRanges, "footpaths_ranges");
+      CacheFetcher::saveToCacheFile(applicationShortname, footpathsRanges, "footpaths_ranges");
       
     } else {
       std::cout << "Can't open database" << std::endl;
     }
     
     return std::make_pair(footpaths, footpathsRanges);
+  }
+  
+  const std::pair<std::vector<OdTrip>, std::map<unsigned long long, int>> DatabaseFetcher::getOdTrips(std::string applicationShortname, std::vector<Stop> stops, Parameters& params)
+  {
+    
+    std::vector<OdTrip> odTrips;
+    std::map<unsigned long long, int> odTripIndexesById;
+    
+    openConnection();
+    
+    std::cout << "Fetching od trips from database..." << std::endl;
+    
+    // query for connections:
+    std::string sqlQuery = "SELECT id, user_interview_id, household_interview_id, COALSECE(age,-1), origin_lat, origin_lon, destination_lat, destination_lon, gender_sn, mode_sn, start_at_seconds FROM " + applicationShortname + ".tr_od_trips ORDER BY id";
+    
+    std::cout << sqlQuery << std::endl;
+    
+    if (isConnectionOpen())
+    {
+      
+      
+      pqxx::nontransaction pgNonTransaction(*(getConnectionPtr()));
+      pqxx::result pgResult( pgNonTransaction.exec( sqlQuery ));
+      unsigned long long resultCount = pgResult.size();
+      unsigned long long i = 0;
+      
+      // set cout number of decimals to 2 for displaying progress percentage:
+      std::cout << std::fixed;
+      std::cout << std::setprecision(2);
+    
+      for (pqxx::result::const_iterator c = pgResult.begin(); c != pgResult.end(); ++c) {
+        
+        // create a new trip for each row:
+        OdTrip * odTrip     = new OdTrip();
+        Point * origin      = new Point();
+        Point * destination = new Point();
+
+        // set trip attributes from row:
+        odTrip->id                    = c[0].as<unsigned long long>();
+        odTrip->personId              = c[1].as<unsigned long long>();
+        odTrip->householdId           = c[2].as<unsigned long long>();
+        odTrip->age                   = c[3].as<unsigned long long>();
+        odTrip->origin                = *origin;
+        odTrip->origin.latitude       = c[4].as<double>();
+        odTrip->origin.longitude      = c[5].as<double>();
+        odTrip->destination           = *destination;
+        odTrip->destination.latitude  = c[6].as<double>();
+        odTrip->destination.longitude = c[7].as<double>();
+        odTrip->gender                = c[8].as<std::string>();
+        odTrip->mode                  = c[9].as<std::string>();
+        odTrip->departureTimeSeconds  = c[10].as<int>();
+        
+        odTrip->accessFootpaths       = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(odTrip->origin, stops, params, "walking", 1200);
+        odTrip->egressFootpaths       = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(odTrip->origin, stops, params, "walking", 1200);
+        
+        // append trip:
+        odTrips.push_back(*odTrip);
+        odTripIndexesById[odTrip->id] = odTrips.size() - 1;
+        
+        // show loading progress in percentage:
+        i++;
+        if (i % 1000 == 0)
+        {
+          std::cout << ((((double) i) / resultCount) * 100) << "%\r"; // \r is used to stay on the same line
+        }
+      }
+      std::cout << std::endl;
+      
+      // save trips and stop indexes to binary cache file:
+      CacheFetcher::saveToCacheFile(applicationShortname, odTrips, "od_trips");
+      CacheFetcher::saveToCacheFile(applicationShortname, odTripIndexesById, "od_trip_indexes");
+    
+    } else {
+      std::cout << "Can't open database" << std::endl;
+    }
+    
+    return std::make_tuple(odTrips, odTripIndexesById);
+    
+    
   }
   
 }

@@ -1,10 +1,20 @@
 #ifndef TR_TOOLBOX
 #define TR_TOOLBOX
 
+#include <string>
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+#include <sstream>
+#include <algorithm>
+#include <iterator>
 #include <vector>
+#include <math.h>
 
 namespace TrRouting
 {
+  
+  class Parameters;
   
   constexpr int MAX_INT {std::numeric_limits<int>::max()};
   
