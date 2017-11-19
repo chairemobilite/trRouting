@@ -67,8 +67,8 @@ namespace TrRouting
       {
         minAccessTravelTime = accessFootpath.second;
       }
-      //result.json += "origin_stop: " + stops[accessFootpath.first].name + " - " + Toolbox::convertSecondsToFormattedTime(stopsTentativeTime[accessFootpath.first]) + "\n";
-      //result.json += std::to_string(stops[accessFootpath.first].id) + ",";
+      result.json += "origin_stop: " + stops[accessFootpath.first].name + " - " + Toolbox::convertSecondsToFormattedTime(stopsTentativeTime[accessFootpath.first]) + "\n";
+      result.json += std::to_string(stops[accessFootpath.first].id) + ",";
     }
     // fetch stops footpaths accessible to destination using params or osrm fetcher if not provided:
     if (params.egressStopIds.size() > 0 && params.egressStopTravelTimesSeconds.size() == params.egressStopIds.size())
@@ -105,6 +105,7 @@ namespace TrRouting
     i = 0;
     for(auto & connection : forwardConnections)
     {
+
       // ignore connections before departure time + minimum access travel time:
       if (std::get<connectionIndexes::TIME_DEP>(connection) >= departureTimeSeconds + minAccessTravelTime)
       {
@@ -434,6 +435,8 @@ namespace TrRouting
             "      \"departureTimeSeconds\": " + std::to_string(arrivalTime) + ",\n"
             "      \"arrivalTimeSeconds\": "   + std::to_string(arrivalTime + transferTime) + "\n"
             "    }\n";
+            arrivalTime = transferArrivalTime;
+
           }
         }
         i++;
