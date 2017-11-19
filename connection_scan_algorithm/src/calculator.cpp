@@ -61,39 +61,43 @@ namespace TrRouting
     for (auto & accessFootpath : accessFootpaths)
     {
       stopsAccessTravelTime[accessFootpath.first] = accessFootpath.second;
-      journeys[accessFootpath.first]              = std::make_tuple(-1, -1, -1, -1, accessFootpath.second,-1);
+      journeys[accessFootpath.first]              = std::make_tuple(-1, -1, -1, -1, accessFootpath.second, -1);
       stopsTentativeTime[accessFootpath.first]    = departureTimeSeconds + accessFootpath.second + params.minWaitingTimeSeconds;
       if (accessFootpath.second < minAccessTravelTime)
       {
         minAccessTravelTime = accessFootpath.second;
       }
-      result.json += "origin_stop: " + stops[accessFootpath.first].name + " - " + Toolbox::convertSecondsToFormattedTime(stopsTentativeTime[accessFootpath.first]) + "\n";
-      result.json += std::to_string(stops[accessFootpath.first].id) + ",";
-    }
-    // fetch stops footpaths accessible to destination using params or osrm fetcher if not provided:
-    if (params.egressStopIds.size() > 0 && params.egressStopTravelTimesSeconds.size() == params.egressStopIds.size())
-    {
-      egressFootpaths.reserve(params.egressStopIds.size());
-      i = 0;
-      for (auto & egressStopId : params.egressStopIds)
-      {
-        egressFootpaths.push_back(std::make_pair(stopIndexesById[egressStopId], params.egressStopTravelTimesSeconds[i]));
-        i++;
-      }
-    }
-    else
-    {
-      egressFootpaths = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(params.destination, stops, params, params.accessMode, params.maxEgressWalkingTravelTimeSeconds);
-    }
-    for (auto & egressFootpath : egressFootpaths)
-    {
-      if (egressFootpath.second > maxEgressTravelTime)
-      {
-        maxEgressTravelTime = egressFootpath.second;
-      }
-      stopsEgressTravelTime[egressFootpath.first] = egressFootpath.second;
       //result.json += "origin_stop: " + stops[accessFootpath.first].name + " - " + Toolbox::convertSecondsToFormattedTime(stopsTentativeTime[accessFootpath.first]) + "\n";
-      //result.json += std::to_string((int)(ceil(egressFootpath.second))) + ",";
+      //result.json += std::to_string(stops[accessFootpath.first].id) + ",";
+    }
+    
+    if (!params.returnAllStopsResult)
+    {
+      // fetch stops footpaths accessible to destination using params or osrm fetcher if not provided:
+      if (params.egressStopIds.size() > 0 && params.egressStopTravelTimesSeconds.size() == params.egressStopIds.size())
+      {
+        egressFootpaths.reserve(params.egressStopIds.size());
+        i = 0;
+        for (auto & egressStopId : params.egressStopIds)
+        {
+          egressFootpaths.push_back(std::make_pair(stopIndexesById[egressStopId], params.egressStopTravelTimesSeconds[i]));
+          i++;
+        }
+      }
+      else
+      {
+        egressFootpaths = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(params.destination, stops, params, params.accessMode, params.maxEgressWalkingTravelTimeSeconds);
+      }
+      for (auto & egressFootpath : egressFootpaths)
+      {
+        if (egressFootpath.second > maxEgressTravelTime)
+        {
+          maxEgressTravelTime = egressFootpath.second;
+        }
+        stopsEgressTravelTime[egressFootpath.first] = egressFootpath.second;
+        //result.json += "origin_stop: " + stops[accessFootpath.first].name + " - " + Toolbox::convertSecondsToFormattedTime(stopsTentativeTime[accessFootpath.first]) + "\n";
+        //result.json += std::to_string((int)(ceil(egressFootpath.second))) + ",";
+      }
     }
     
     std::cerr << "-- access and egress footpaths -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
@@ -117,7 +121,7 @@ namespace TrRouting
           connectionDepartureTime = std::get<connectionIndexes::TIME_DEP>(connection);
           
           // no need to parse next connections if already reached destination from all egress stops:
-          if ((reachedAtLeastOneEgressStop && maxEgressTravelTime >= 0 && connectionDepartureTime > tentativeEgressStopArrivalTime + maxEgressTravelTime) || (connectionDepartureTime - departureTimeSeconds > params.maxTotalTravelTimeSeconds))
+          if ( (!params.returnAllStopsResult && reachedAtLeastOneEgressStop && maxEgressTravelTime >= 0 && connectionDepartureTime > tentativeEgressStopArrivalTime + maxEgressTravelTime) || (connectionDepartureTime - departureTimeSeconds > params.maxTotalTravelTimeSeconds))
           {
             break;
           }
@@ -128,38 +132,48 @@ namespace TrRouting
           // reachable connections only here:
           if (tripEnterConnectionIndex != -1 || stopDepartureTentativeTime <= connectionDepartureTime)
           {
-            if (std::get<connectionIndexes::CAN_BOARD>(connection) == 1 && 
-            ( tripEnterConnectionIndex == -1  || (std::get<5>(journeys[stopDepartureIndex]) != 1 && std::get<0>(journeys[stopDepartureIndex]) == -1 && std::get<4>(journeys[stopDepartureIndex]) < tripsEnterConnectionTransferTravelTime[tripIndex]))
-            ) // make sure we transfer with the shortest footpath
+            
+            //std::get<5>(journeys[stopDepartureIndex]) != 1 
+            
+            if (std::get<connectionIndexes::CAN_BOARD>(connection) == 1 && (tripEnterConnectionIndex == -1 || (std::get<0>(journeys[stopDepartureIndex]) == -1 && std::get<4>(journeys[stopDepartureIndex]) >= 0 && std::get<4>(journeys[stopDepartureIndex]) < tripsEnterConnectionTransferTravelTime[tripIndex])))
+            //( tripEnterConnectionIndex == -1) || (std::get<5>(journeys[stopDepartureIndex]) != 1 && (std::get<0>(journeys[stopDepartureIndex]) == -1 || std::get<connectionIndexes::TRIP>(forwardConnections[std::get<0>(journeys[stopDepartureIndex])]) == tripIndex) && std::get<4>(journeys[stopDepartureIndex]) >= 0 && std::get<4>(journeys[stopDepartureIndex]) < tripsEnterConnectionTransferTravelTime[tripIndex]))
+            //)
             {
+              //if (tripEnterConnectionIndex != -1)
+              //{
+              //  std::cerr << "from_stop: " << stops[std::get<0>(footpaths[std::get<2>(journeys[stopDepartureIndex])])].name << " route:" << routes[routeIndexesById[trips[tripIndex].routeId]].shortname << " " << routes[routeIndexesById[trips[tripIndex].routeId]].longname << " old stop:" << stops[std::get<connectionIndexes::STOP_DEP>(forwardConnections[std::get<0>(journeys[stopDepartureIndex])])].name << " stop:" << stops[stopDepartureIndex].name << " tec:" <<  tripEnterConnectionIndex << " i:" <<  i << " jss:" <<  std::get<5>(journeys[stopDepartureIndex]) << " jenterc:" << std::get<0>(journeys[stopDepartureIndex]) << " jexitc:" << std::get<1>(journeys[stopDepartureIndex]) << " jtt:" << std::get<4>(journeys[stopDepartureIndex]) << " tectt:" << tripsEnterConnectionTransferTravelTime[tripIndex] << std::endl;
+              //}
               tripsEnterConnection[tripIndex]                   = i;
               tripsEnterConnectionTransferTravelTime[tripIndex] = std::get<4>(journeys[stopDepartureIndex]);
             }
             
-            // get footpaths for the arrival stop to get transferable stops:
-            stopArrivalIndex      = std::get<connectionIndexes::STOP_ARR>(connection);
-            connectionArrivalTime = std::get<connectionIndexes::TIME_ARR>(connection);
-            footpathsRangeStart   = footpathsRanges[stopArrivalIndex].first;
-            footpathsRangeEnd     = footpathsRanges[stopArrivalIndex].second;
-            if (!reachedAtLeastOneEgressStop && stopsEgressTravelTime[stopArrivalIndex] != -1) // check if the arrival stop is egressable
+            if (std::get<connectionIndexes::CAN_UNBOARD>(connection) == 1 && tripsEnterConnection[tripIndex] != -1)
             {
-              reachedAtLeastOneEgressStop    = true;
-              tentativeEgressStopArrivalTime = connectionArrivalTime;
-            }
-            if (footpathsRangeStart >= 0 && footpathsRangeEnd >= 0 && std::get<connectionIndexes::CAN_UNBOARD>(connection) == 1)
-            {
-              footpathIndex = footpathsRangeStart;
-              while (footpathIndex <= footpathsRangeEnd)
+              // get footpaths for the arrival stop to get transferable stops:
+              stopArrivalIndex      = std::get<connectionIndexes::STOP_ARR>(connection);
+              connectionArrivalTime = std::get<connectionIndexes::TIME_ARR>(connection);
+              footpathsRangeStart   = footpathsRanges[stopArrivalIndex].first;
+              footpathsRangeEnd     = footpathsRanges[stopArrivalIndex].second;
+              if (!params.returnAllStopsResult && !reachedAtLeastOneEgressStop && stopsEgressTravelTime[stopArrivalIndex] != -1) // check if the arrival stop is egressable
               {
-                footpathStopArrivalIndex = std::get<1>(footpaths[footpathIndex]);
-                footpathTravelTime       = std::get<2>(footpaths[footpathIndex]);
-                
-                if (footpathTravelTime <= params.maxTransferWalkingTravelTimeSeconds && footpathTravelTime + params.minWaitingTimeSeconds + connectionArrivalTime < stopsTentativeTime[footpathStopArrivalIndex])
+                reachedAtLeastOneEgressStop    = true;
+                tentativeEgressStopArrivalTime = connectionArrivalTime;
+              }
+              if (footpathsRangeStart >= 0 && footpathsRangeEnd >= 0)
+              {
+                footpathIndex = footpathsRangeStart;
+                while (footpathIndex <= footpathsRangeEnd)
                 {
-                  stopsTentativeTime[footpathStopArrivalIndex] = footpathTravelTime + connectionArrivalTime + params.minWaitingTimeSeconds;
-                  journeys[footpathStopArrivalIndex]           = std::make_tuple(tripsEnterConnection[tripIndex], i, footpathIndex, tripIndex, footpathTravelTime, (stopArrivalIndex == footpathStopArrivalIndex ? 1 : -1));
+                  footpathStopArrivalIndex = std::get<1>(footpaths[footpathIndex]);
+                  footpathTravelTime       = std::get<2>(footpaths[footpathIndex]);
+                  
+                  if (footpathTravelTime <= params.maxTransferWalkingTravelTimeSeconds && footpathTravelTime + params.minWaitingTimeSeconds + connectionArrivalTime < stopsTentativeTime[footpathStopArrivalIndex])
+                  {
+                    stopsTentativeTime[footpathStopArrivalIndex] = footpathTravelTime + connectionArrivalTime + params.minWaitingTimeSeconds;
+                    journeys[footpathStopArrivalIndex]           = std::make_tuple(tripsEnterConnection[tripIndex], i, footpathIndex, tripIndex, footpathTravelTime, (stopArrivalIndex == footpathStopArrivalIndex ? 1 : -1));
+                  }
+                  footpathIndex++;
                 }
-                footpathIndex++;
               }
             }
             reachableConnectionsCount++;
@@ -173,14 +187,7 @@ namespace TrRouting
     
     std::cerr << "-- main calculation -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
     calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
-    
-    i = 0;
-    int hour = -1;
-    int minute = -1;
-    
-    std::cerr << "-- find best journey -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
-    calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
-    
+        
     std::vector<int> resultingStops(stopsCount);
     
     if (params.returnAllStopsResult)
@@ -192,6 +199,7 @@ namespace TrRouting
     }
     else
     {
+      i = 0;
       resultingStops = std::vector<int>(1);
       for (auto & arrivalTime : stopsTentativeTime)
       {
@@ -203,8 +211,6 @@ namespace TrRouting
         i++;
       }
       
-      std::cerr << bestEgressStopIndex << std::endl;
-      
       if (bestEgressStopIndex == -1) // no routing found
       {
         result.json += "{\n"
@@ -213,14 +219,20 @@ namespace TrRouting
         "  \"destination\": ["                                + std::to_string(params.destination.latitude) + "," + std::to_string(params.destination.longitude) + "],\n"
         //"  \"totalWalkingTimeMinutesIfWalkingOnly\": "        + std::to_string(totalOnlyWalkingTimeMinutes) + ",\n"
         "  \"departureTime\": "                                + Toolbox::convertSecondsToFormattedTime(departureTimeSeconds) + "\n"
-        "\n}\n";
+        "\n}";
         return result;
       }
       else
       {
         resultingStops[0] = bestEgressStopIndex;
       }
+      
+      std::cerr << "-- find best journey -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
+      calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
+      
     }
+    
+    
     
     std::deque<std::tuple<int,int,int,int,int,short>> journey;
     std::tuple<int,int,int,int,int,short>             subJourney;
@@ -251,9 +263,15 @@ namespace TrRouting
     int   minimizedDepartureTime   {-1};
     int   numberOfTransfers        {-1};
     int   bestAccessStopIndex      {-1};
+    int   reachableStopsCount      { 0};
+    
+    std::cerr << "-- start parsing stops -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
+    calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
     
     for (auto & resultingStopIndex : resultingStops)
     {
+      
+      //std::cerr << stops[resultingStopIndex].name;
       
       journey.clear();
       journeyStepTravelTime    = -1;
@@ -286,13 +304,16 @@ namespace TrRouting
       }
       
       i = 0;
-      while ((std::get<0>(subJourney) != -1 && std::get<1>(subJourney) != -1) && i < 20)
+      while ((std::get<0>(subJourney) != -1 && std::get<1>(subJourney) != -1))
       {
         journey.push_front(subJourney);
         bestAccessStopIndex = std::get<connectionIndexes::STOP_DEP>(forwardConnections[std::get<0>(subJourney)]);
-        subJourney          = journeys[bestAccessStopIndex];
+        //std::cerr << "sequence: " << std::get<connectionIndexes::SEQUENCE>(forwardConnections[std::get<0>(subJourney)]) << " sequence2: " << std::get<connectionIndexes::SEQUENCE>(forwardConnections[std::get<1>(subJourney)]) << " stop:" << stops[bestAccessStopIndex].name << " tenterc:" <<  std::get<0>(subJourney) << " texitc:" <<  std::get<1>(subJourney) << " jss:" <<  std::get<5>(subJourney) << " jtt:" << std::get<4>(subJourney) << " tectt:" << tripsEnterConnectionTransferTravelTime[std::get<3>(subJourney)] << std::endl;
+        //std::cerr << stops[bestAccessStopIndex].name << " > " << stops[std::get<connectionIndexes::STOP_ARR>(forwardConnections[std::get<1>(subJourney)])].name << std::endl;
+        subJourney = journeys[bestAccessStopIndex];
         i++;
       }
+      
       if (!params.returnAllStopsResult)
       {
         journey.push_back(std::make_tuple(-1,-1,-1,-1,stopsEgressTravelTime[resultingStopIndex],-1));
@@ -300,12 +321,11 @@ namespace TrRouting
       journey.push_front(std::make_tuple(-1,-1,-1,-1,stopsAccessTravelTime[bestAccessStopIndex],-1));
       
       std::string stepsJson = "  \"steps\":\n  [\n";
-      
+     
       i = 0;
       int journeyStepsCount = journey.size();
       for (auto & journeyStep : journey)
       {
-        //result.json += "step:\n";
         
         if (std::get<0>(journeyStep) != -1 && std::get<1>(journeyStep) != -1)
         {
@@ -337,70 +357,77 @@ namespace TrRouting
             totalTransferWaitingTime += waitingTime;
           }
           
-          stepsJson += "\n    {\n"
-          "      \"action\": \"board\",\n"
-          "      \"agencyAcronym\": \""             + journeyStepRoute.agencyAcronym + "\",\n"
-          "      \"agencyName\": \""                + journeyStepRoute.agencyName + "\",\n"
-          "      \"agencyId\": "                    + std::to_string(journeyStepRoute.agencyId) + ",\n"
-          "      \"routeShortname\": \""            + journeyStepRoute.shortname + "\",\n"
-          "      \"routeLongname\": \""             + journeyStepRoute.longname + "\",\n"
-          "      \"routeId\": "                     + std::to_string(journeyStepRoute.id) + ",\n"
-          "      \"routeTypeName\": \""             + journeyStepRoute.routeTypeName + "\",\n"
-          "      \"routeTypeId\": "                 + std::to_string(journeyStepRoute.routeTypeId) + ",\n"
-          "      \"tripId\": "                      + std::to_string(journeyStepTrip.id) + ",\n"
-          "      \"sequenceInTrip\": "              + std::to_string(std::get<connectionIndexes::SEQUENCE>(journeyStepEnterConnection)) + ",\n"
-          "      \"stopName\": \""                  + journeyStepStopDeparture.name + "\",\n"
-          "      \"stopCode\": \""                  + journeyStepStopDeparture.code + "\",\n"
-          "      \"stopId\": "                      + std::to_string(journeyStepStopDeparture.id) + ",\n"
-          "      \"stopCoordinates\": ["            + std::to_string(journeyStepStopDeparture.point.latitude) + "," + std::to_string(journeyStepStopDeparture.point.longitude) + "],\n"
-          "      \"departureTime\": \""             + Toolbox::convertSecondsToFormattedTime(departureTime) + "\",\n"
-          "      \"departureTimeSeconds\": "        + std::to_string(departureTime) + ",\n"
-          //"      \"enterConnectionI\": \"" + std::to_string(std::get<0>(journeyStep)) + "\",\n"
-          "      \"waitingTimeSeconds\":"           + std::to_string(waitingTime) + ",\n"
-          "      \"waitingTimeMinutes\":"           + std::to_string(Toolbox::convertSecondsToMinutes(waitingTime)) + "\n"
-          "    },\n"
-          "    {\n"
-          "      \"action\": \"unboard\",\n"
-          "      \"agencyAcronym\": \""             + journeyStepRoute.agencyAcronym + "\",\n"
-          "      \"agencyName\": \""                + journeyStepRoute.agencyName + "\",\n"
-          "      \"agencyId\": "                    + std::to_string(journeyStepRoute.agencyId) + ",\n"
-          "      \"routeShortname\": \""            + journeyStepRoute.shortname + "\",\n"
-          "      \"routeLongname\": \""             + journeyStepRoute.longname + "\",\n"
-          "      \"routeId\": "                     + std::to_string(journeyStepRoute.id) + ",\n"
-          "      \"routeTypeName\": \""             + journeyStepRoute.routeTypeName + "\",\n"
-          "      \"routeTypeId\": "                 + std::to_string(journeyStepRoute.routeTypeId) + ",\n"
-          "      \"tripId\": "                      + std::to_string(journeyStepTrip.id) + ",\n"
-          "      \"sequenceInTrip\":"               + std::to_string(std::get<connectionIndexes::SEQUENCE>(journeyStepExitConnection)) + ",\n"
-          "      \"stopName\": \""                  + journeyStepStopArrival.name + "\",\n"
-          "      \"stopCode\": \""                  + journeyStepStopArrival.code + "\",\n"
-          "      \"stopId\": "                      + std::to_string(journeyStepStopArrival.id) + ",\n"
-          "      \"stopCoordinates\": ["            + std::to_string(journeyStepStopArrival.point.latitude) + "," + std::to_string(journeyStepStopArrival.point.longitude) + "],\n"
-          "      \"arrivalTime\": \""               + Toolbox::convertSecondsToFormattedTime(arrivalTime) + "\",\n"
-          "      \"arrivalTimeSeconds\": "          + std::to_string(arrivalTime) + ",\n"
-          //"      \"exitConnectionI\": \"" + std::to_string(std::get<1>(journeyStep)) + "\",\n"
-          "      \"segmentInVehicleTimeMinutes\":"  + std::to_string(Toolbox::convertSecondsToMinutes(inVehicleTime)) + ",\n"
-          "      \"segmentInVehicleTimeSeconds\":"  + std::to_string(inVehicleTime) + "\n"
-          "    },";
-          
-          if ((!params.returnAllStopsResult && i < journeyStepsCount - 2) || params.returnAllStopsResult) // if not the last transit leg
+          if (!params.returnAllStopsResult)
+          {
+            stepsJson += "    {\n"
+            "      \"action\": \"board\",\n"
+            "      \"agencyAcronym\": \""             + journeyStepRoute.agencyAcronym + "\",\n"
+            "      \"agencyName\": \""                + journeyStepRoute.agencyName + "\",\n"
+            "      \"agencyId\": "                    + std::to_string(journeyStepRoute.agencyId) + ",\n"
+            "      \"routeShortname\": \""            + journeyStepRoute.shortname + "\",\n"
+            "      \"routeLongname\": \""             + journeyStepRoute.longname + "\",\n"
+            "      \"routeId\": "                     + std::to_string(journeyStepRoute.id) + ",\n"
+            "      \"routeTypeName\": \""             + journeyStepRoute.routeTypeName + "\",\n"
+            "      \"routeTypeId\": "                 + std::to_string(journeyStepRoute.routeTypeId) + ",\n"
+            "      \"tripId\": "                      + std::to_string(journeyStepTrip.id) + ",\n"
+            "      \"sequenceInTrip\": "              + std::to_string(std::get<connectionIndexes::SEQUENCE>(journeyStepEnterConnection)) + ",\n"
+            "      \"stopName\": \""                  + journeyStepStopDeparture.name + "\",\n"
+            "      \"stopCode\": \""                  + journeyStepStopDeparture.code + "\",\n"
+            "      \"stopId\": "                      + std::to_string(journeyStepStopDeparture.id) + ",\n"
+            "      \"stopCoordinates\": ["            + std::to_string(journeyStepStopDeparture.point.latitude) + "," + std::to_string(journeyStepStopDeparture.point.longitude) + "],\n"
+            "      \"departureTime\": \""             + Toolbox::convertSecondsToFormattedTime(departureTime) + "\",\n"
+            "      \"departureTimeSeconds\": "        + std::to_string(departureTime) + ",\n"
+            //"      \"enterConnectionI\": \"" + std::to_string(std::get<0>(journeyStep)) + "\",\n"
+            "      \"waitingTimeSeconds\":"           + std::to_string(waitingTime) + ",\n"
+            "      \"waitingTimeMinutes\":"           + std::to_string(Toolbox::convertSecondsToMinutes(waitingTime)) + "\n"
+            "    },\n"
+            "    {\n"
+            "      \"action\": \"unboard\",\n"
+            "      \"agencyAcronym\": \""             + journeyStepRoute.agencyAcronym + "\",\n"
+            "      \"agencyName\": \""                + journeyStepRoute.agencyName + "\",\n"
+            "      \"agencyId\": "                    + std::to_string(journeyStepRoute.agencyId) + ",\n"
+            "      \"routeShortname\": \""            + journeyStepRoute.shortname + "\",\n"
+            "      \"routeLongname\": \""             + journeyStepRoute.longname + "\",\n"
+            "      \"routeId\": "                     + std::to_string(journeyStepRoute.id) + ",\n"
+            "      \"routeTypeName\": \""             + journeyStepRoute.routeTypeName + "\",\n"
+            "      \"routeTypeId\": "                 + std::to_string(journeyStepRoute.routeTypeId) + ",\n"
+            "      \"tripId\": "                      + std::to_string(journeyStepTrip.id) + ",\n"
+            "      \"sequenceInTrip\": "              + std::to_string(std::get<connectionIndexes::SEQUENCE>(journeyStepExitConnection)) + ",\n"
+            "      \"stopName\": \""                  + journeyStepStopArrival.name + "\",\n"
+            "      \"stopCode\": \""                  + journeyStepStopArrival.code + "\",\n"
+            "      \"stopId\": "                      + std::to_string(journeyStepStopArrival.id) + ",\n"
+            "      \"stopCoordinates\": ["            + std::to_string(journeyStepStopArrival.point.latitude) + "," + std::to_string(journeyStepStopArrival.point.longitude) + "],\n"
+            "      \"arrivalTime\": \""               + Toolbox::convertSecondsToFormattedTime(arrivalTime) + "\",\n"
+            "      \"arrivalTimeSeconds\": "          + std::to_string(arrivalTime) + ",\n"
+            //"      \"exitConnectionI\": \"" + std::to_string(std::get<1>(journeyStep)) + "\",\n"
+            "      \"segmentInVehicleTimeMinutes\":"  + std::to_string(Toolbox::convertSecondsToMinutes(inVehicleTime)) + ",\n"
+            "      \"segmentInVehicleTimeSeconds\":"  + std::to_string(inVehicleTime) + "\n"
+            "    },\n";
+            
+          }
+          if (i < journeyStepsCount - 2) // if not the last transit leg
           {
             totalTransferWalkingTime += transferTime;
             totalWalkingTime         += transferTime;
-            stepsJson += "    {\n"
-            "      \"action\": \"walking\",\n"
-            "      \"type\": \"transfer\",\n"
-            "      \"travelTimeSeconds\": "    + std::to_string(transferTime) + ",\n"
-            "      \"travelTimeMinutes\": "    + std::to_string(Toolbox::convertSecondsToMinutes(transferTime)) + ",\n"
-            "      \"departureTime\": \""      + Toolbox::convertSecondsToFormattedTime(arrivalTime) + "\",\n"
-            "      \"arrivalTime\": \""        + Toolbox::convertSecondsToFormattedTime(transferArrivalTime) + "\",\n"
-            "      \"departureTimeSeconds\": " + std::to_string(arrivalTime) + ",\n"
-            "      \"arrivalTimeSeconds\": "   + std::to_string(transferArrivalTime) + ",\n"
-            "      \"readyToBoardAt\": \""     + Toolbox::convertSecondsToFormattedTime(transferReadyTime + params.minWaitingTimeSeconds) + "\"\n"
-            "    }" + (params.returnAllStopsResult && i == journeyStepsCount - 1 ? "" : ",");
+            if (!params.returnAllStopsResult)
+            {
+              stepsJson += "    {\n"
+              "      \"action\": \"walking\",\n"
+              "      \"type\": \"transfer\",\n"
+              "      \"travelTimeSeconds\": "    + std::to_string(transferTime) + ",\n"
+              "      \"travelTimeMinutes\": "    + std::to_string(Toolbox::convertSecondsToMinutes(transferTime)) + ",\n"
+              "      \"departureTime\": \""      + Toolbox::convertSecondsToFormattedTime(arrivalTime) + "\",\n"
+              "      \"arrivalTime\": \""        + Toolbox::convertSecondsToFormattedTime(transferArrivalTime) + "\",\n"
+              "      \"departureTimeSeconds\": " + std::to_string(arrivalTime) + ",\n"
+              "      \"arrivalTimeSeconds\": "   + std::to_string(transferArrivalTime) + ",\n"
+              "      \"readyToBoardAt\": \""     + Toolbox::convertSecondsToFormattedTime(transferReadyTime + params.minWaitingTimeSeconds) + "\"\n"
+              "    },\n";
+            }
           }
         }
         else // access or egress journey step
         {
+          
           transferTime = std::get<4>(journeyStep);
           if (i == 0) // access
           {
@@ -408,35 +435,40 @@ namespace TrRouting
             transferReadyTime    = transferArrivalTime;
             totalWalkingTime    += transferTime;
             accessWalkingTime    = transferTime;
-            stepsJson += "\n    {\n"
-            "      \"action\": \"walking\",\n"
-            "      \"type\": \"access\",\n"
-            "      \"travelTimeSeconds\": "    + std::to_string(transferTime) + ",\n"
-            "      \"travelTimeMinutes\": "    + std::to_string(Toolbox::convertSecondsToMinutes(transferTime)) + ",\n"
-            "      \"departureTime\": \""      + Toolbox::convertSecondsToFormattedTime(departureTimeSeconds) + "\",\n"
-            "      \"arrivalTime\": \""        + Toolbox::convertSecondsToFormattedTime(transferArrivalTime) + "\",\n"
-            "      \"departureTimeSeconds\": " + std::to_string(departureTimeSeconds) + ",\n"
-            "      \"arrivalTimeSeconds\": "   + std::to_string(transferArrivalTime) + ",\n"
-            "      \"readyToBoardAt\": \""     + Toolbox::convertSecondsToFormattedTime(transferReadyTime + params.minWaitingTimeSeconds) + "\"\n"
-            "    },";
+            if (!params.returnAllStopsResult)
+            {
+              stepsJson += "    {\n"
+              "      \"action\": \"walking\",\n"
+              "      \"type\": \"access\",\n"
+              "      \"travelTimeSeconds\": "    + std::to_string(transferTime) + ",\n"
+              "      \"travelTimeMinutes\": "    + std::to_string(Toolbox::convertSecondsToMinutes(transferTime)) + ",\n"
+              "      \"departureTime\": \""      + Toolbox::convertSecondsToFormattedTime(departureTimeSeconds) + "\",\n"
+              "      \"arrivalTime\": \""        + Toolbox::convertSecondsToFormattedTime(transferArrivalTime) + "\",\n"
+              "      \"departureTimeSeconds\": " + std::to_string(departureTimeSeconds) + ",\n"
+              "      \"arrivalTimeSeconds\": "   + std::to_string(transferArrivalTime) + ",\n"
+              "      \"readyToBoardAt\": \""     + Toolbox::convertSecondsToFormattedTime(transferReadyTime + params.minWaitingTimeSeconds) + "\"\n"
+              "    },\n";
+            }
           }
           else // egress
           {
             totalWalkingTime   += transferTime;
             egressWalkingTime   = transferTime;
             transferArrivalTime = arrivalTime + transferTime;
-            stepsJson += "\n    {\n"
-            "      \"action\": \"walking\",\n"
-            "      \"type\": \"egress\",\n"
-            "      \"travelTimeSeconds\": "    + std::to_string(transferTime) + ",\n"
-            "      \"travelTimeMinutes\": "    + std::to_string(Toolbox::convertSecondsToMinutes(transferTime)) + ",\n"
-            "      \"departureTime\": \""      + Toolbox::convertSecondsToFormattedTime(arrivalTime) + "\",\n"
-            "      \"arrivalTime\": \""        + Toolbox::convertSecondsToFormattedTime(arrivalTime + transferTime) + "\",\n"
-            "      \"departureTimeSeconds\": " + std::to_string(arrivalTime) + ",\n"
-            "      \"arrivalTimeSeconds\": "   + std::to_string(arrivalTime + transferTime) + "\n"
-            "    }\n";
+            if (!params.returnAllStopsResult)
+            {
+              stepsJson += "    {\n"
+              "      \"action\": \"walking\",\n"
+              "      \"type\": \"egress\",\n"
+              "      \"travelTimeSeconds\": "    + std::to_string(transferTime) + ",\n"
+              "      \"travelTimeMinutes\": "    + std::to_string(Toolbox::convertSecondsToMinutes(transferTime)) + ",\n"
+              "      \"departureTime\": \""      + Toolbox::convertSecondsToFormattedTime(arrivalTime) + "\",\n"
+              "      \"arrivalTime\": \""        + Toolbox::convertSecondsToFormattedTime(arrivalTime + transferTime) + "\",\n"
+              "      \"departureTimeSeconds\": " + std::to_string(arrivalTime) + ",\n"
+              "      \"arrivalTimeSeconds\": "   + std::to_string(arrivalTime + transferTime) + "\n"
+              "    }\n";
+            }
             arrivalTime = transferArrivalTime;
-
           }
         }
         i++;
@@ -444,67 +476,82 @@ namespace TrRouting
       
       minimizedDepartureTime = firstDepartureTime - accessWalkingTime - params.minWaitingTimeSeconds;
       
-      result.json += "{\n";
+      if (params.returnAllStopsResult && numberOfTransfers >= 0)
+      {
+        arrivalTime = stopsTentativeTime[resultingStopIndex] - params.minWaitingTimeSeconds;
+        if (arrivalTime - departureTimeSeconds <= params.maxTotalTravelTimeSeconds)
+        {
+          reachableStopsCount++;
+          result.json += "    { "
+          " \"id\": " + std::to_string(stops[resultingStopIndex].id) + ", "
+          " \"arrivalTime\": \""   + Toolbox::convertSecondsToFormattedTime(arrivalTime) + "\", "
+          " \"totalTravelTimeSeconds\": " + std::to_string(arrivalTime - departureTimeSeconds) + ", "
+          " \"numberOfTransfers\": " + std::to_string(numberOfTransfers) + "},\n";
+        }
+      }
+      else if (!params.returnAllStopsResult)
+      {
+        if (numberOfTransfers >= 0)
+        {
+          result.json += "{\n  \"status\": \"success\",\n"
+          "  \"origin\": ["      + std::to_string(params.origin.latitude) + "," + std::to_string(params.origin.longitude) + "],\n"
+          "  \"destination\": [" + std::to_string(params.destination.latitude) + "," + std::to_string(params.destination.longitude) + "],\n"
+          //"  \"totalWalkingTimeMinutesIfWalkingOnly\": "        + std::to_string(totalOnlyWalkingTimeMinutes) + ",\n"
+          "  \"departureTime\": \""                             + Toolbox::convertSecondsToFormattedTime(departureTimeSeconds) + "\",\n"
+          "  \"arrivalTime\": \""                               + Toolbox::convertSecondsToFormattedTime(arrivalTime) + "\",\n"
+          "  \"departureTimeSeconds\": "                        + std::to_string(departureTimeSeconds) + ",\n"
+          "  \"arrivalTimeSeconds\": "                          + std::to_string(arrivalTime) + ",\n"
+          "  \"totalTravelTimeMinutes\": "                      + std::to_string(Toolbox::convertSecondsToMinutes(arrivalTime - departureTimeSeconds)) + ",\n"
+          "  \"totalTravelTimeSeconds\": "                      + std::to_string(arrivalTime - departureTimeSeconds) + ",\n"
+          "  \"totalInVehicleTimeMinutes\": "                   + std::to_string(Toolbox::convertSecondsToMinutes(totalInVehicleTime)) + ",\n"
+          "  \"totalInVehicleTimeSeconds\": "                   + std::to_string(totalInVehicleTime) + ",\n"
+          "  \"totalNonTransitTravelTimeMinutes\": "            + std::to_string(Toolbox::convertSecondsToMinutes(totalWalkingTime)) + ",\n"
+          "  \"totalNonTransitTravelTimeSeconds\": "            + std::to_string(totalWalkingTime) + ",\n"
+          "  \"numberOfBoardings\": "                           + std::to_string(numberOfTransfers + 1) + ",\n"
+          "  \"numberOfTransfers\": "                           + std::to_string(numberOfTransfers) + ",\n"
+          //"  \"maxNumberOfTransfers\": "                        + std::to_string(params.maxNumberOfTransfers) + ",\n"
+          "  \"transferWalkingTimeMinutes\": "                  + std::to_string(Toolbox::convertSecondsToMinutes(totalTransferWalkingTime)) + ",\n"
+          "  \"transferWalkingTimeSeconds\": "                  + std::to_string(totalTransferWalkingTime) + ",\n"
+          "  \"accessTravelTimeMinutes\": "                     + std::to_string(Toolbox::convertSecondsToMinutes(accessWalkingTime)) + ",\n"
+          "  \"accessTravelTimeSeconds\": "                     + std::to_string(accessWalkingTime) + ",\n"
+          "  \"egressTravelTimeMinutes\": "                     + std::to_string(Toolbox::convertSecondsToMinutes(egressWalkingTime)) + ",\n"
+          "  \"egressTravelTimeSeconds\": "                     + std::to_string(egressWalkingTime) + ",\n"
+          "  \"transferWaitingTimeMinutes\": "                  + std::to_string(Toolbox::convertSecondsToMinutes(totalTransferWaitingTime)) + ",\n"
+          "  \"transferWaitingTimeSeconds\": "                  + std::to_string(totalTransferWaitingTime) + ",\n"
+          "  \"firstWaitingTimeMinutes\": "                     + std::to_string(Toolbox::convertSecondsToMinutes(accessWaitingTime)) + ",\n"
+          "  \"firstWaitingTimeSeconds\": "                     + std::to_string(accessWaitingTime) + ",\n"
+          "  \"totalWaitingTimeMinutes\": "                     + std::to_string(Toolbox::convertSecondsToMinutes(totalWaitingTime)) + ",\n"
+          "  \"totalWaitingTimeSeconds\": "                     + std::to_string(totalWaitingTime) + ",\n"
+          "  \"departureTimeToMinimizeFirstWaitingTime\": \""   + Toolbox::convertSecondsToFormattedTime(minimizedDepartureTime) + "\",\n"
+          "  \"minimizedTotalTravelTimeMinutes\": "             + std::to_string(Toolbox::convertSecondsToMinutes(arrivalTime - minimizedDepartureTime)) + ",\n"
+          "  \"minimizedTotalTravelTimeSeconds\": "             + std::to_string(arrivalTime - minimizedDepartureTime) + ",\n"
+          "  \"minimumWaitingTimeBeforeEachBoardingMinutes\": " + std::to_string(Toolbox::convertSecondsToMinutes(params.minWaitingTimeSeconds)) + ",\n"
+          "  \"minimumWaitingTimeBeforeEachBoardingSeconds\": " + std::to_string(params.minWaitingTimeSeconds) + ",\n";
+          result.json += stepsJson + "\n  ]\n}";
+        }
+        else
+        {
+          result.json += "{\n"
+          "  \"status\": \"no_routing_found\",\n"
+          "  \"origin\": ["                                     + std::to_string(params.origin.latitude) + "," + std::to_string(params.origin.longitude) + "],\n"
+          "  \"destination\": ["                                + std::to_string(params.destination.latitude) + "," + std::to_string(params.destination.longitude) + "],\n"
+          //"  \"totalWalkingTimeMinutesIfWalkingOnly\": "        + std::to_string(totalOnlyWalkingTimeMinutes) + ",\n"
+          "  \"departureTime\": "                                + Toolbox::convertSecondsToFormattedTime(departureTimeSeconds) + "\n"
+          "\n}";
+        }
+        
+      }
       
-      if (params.returnAllStopsResult)
-      {
-        result.json += "  \"id\": " + std::to_string(stops[resultingStopIndex].id) + ",\n"
-        "  \"code\": \""            + stops[resultingStopIndex].code + "\",\n"
-        "  \"name\": \""            + stops[resultingStopIndex].name + "\",\n"
-        "  \"origin\": ["           + std::to_string(params.origin.latitude) + "," + std::to_string(params.origin.longitude) + "],\n";
-      }
-      else
-      {
-        result.json += "  \"status\": \"success\",\n"
-        "  \"origin\": ["      + std::to_string(params.origin.latitude) + "," + std::to_string(params.origin.longitude) + "],\n"
-        "  \"destination\": [" + std::to_string(params.destination.latitude) + "," + std::to_string(params.destination.longitude) + "],\n";
-        //"  \"totalWalkingTimeMinutesIfWalkingOnly\": "        + std::to_string(totalOnlyWalkingTimeMinutes) + ",\n"
-      }
-      
-      result.json += "  \"departureTime\": \""              + Toolbox::convertSecondsToFormattedTime(departureTimeSeconds) + "\",\n"
-      "  \"arrivalTime\": \""                               + Toolbox::convertSecondsToFormattedTime(arrivalTime) + "\",\n"
-      "  \"departureTimeSeconds\": "                        + std::to_string(departureTimeSeconds) + ",\n"
-      "  \"arrivalTimeSeconds\": "                          + std::to_string(arrivalTime) + ",\n"
-      "  \"totalTravelTimeMinutes\": "                      + std::to_string(Toolbox::convertSecondsToMinutes(arrivalTime - departureTimeSeconds)) + ",\n"
-      "  \"totalTravelTimeSeconds\": "                      + std::to_string(arrivalTime - departureTimeSeconds) + ",\n"
-      "  \"totalInVehicleTimeMinutes\": "                   + std::to_string(Toolbox::convertSecondsToMinutes(totalInVehicleTime)) + ",\n"
-      "  \"totalInVehicleTimeSeconds\": "                   + std::to_string(totalInVehicleTime) + ",\n"
-      "  \"totalNonTransitTravelTimeMinutes\": "            + std::to_string(Toolbox::convertSecondsToMinutes(totalWalkingTime)) + ",\n"
-      "  \"totalNonTransitTravelTimeSeconds\": "            + std::to_string(totalWalkingTime) + ",\n"
-      "  \"numberOfBoardings\": "                           + std::to_string(numberOfTransfers + 1) + ",\n"
-      "  \"numberOfTransfers\": "                           + std::to_string(numberOfTransfers) + ",\n"
-      //"  \"maxNumberOfTransfers\": "                        + std::to_string(params.maxNumberOfTransfers) + ",\n"
-      "  \"transferWalkingTimeMinutes\": "                  + std::to_string(Toolbox::convertSecondsToMinutes(totalTransferWalkingTime)) + ",\n"
-      "  \"transferWalkingTimeSeconds\": "                  + std::to_string(totalTransferWalkingTime) + ",\n"
-      "  \"accessTravelTimeMinutes\": "                     + std::to_string(Toolbox::convertSecondsToMinutes(accessWalkingTime)) + ",\n"
-      "  \"accessTravelTimeSeconds\": "                     + std::to_string(accessWalkingTime) + ",\n"
-      "  \"egressTravelTimeMinutes\": "                     + std::to_string(Toolbox::convertSecondsToMinutes(egressWalkingTime)) + ",\n"
-      "  \"egressTravelTimeSeconds\": "                     + std::to_string(egressWalkingTime) + ",\n"
-      "  \"transferWaitingTimeMinutes\": "                  + std::to_string(Toolbox::convertSecondsToMinutes(totalTransferWaitingTime)) + ",\n"
-      "  \"transferWaitingTimeSeconds\": "                  + std::to_string(totalTransferWaitingTime) + ",\n"
-      "  \"firstWaitingTimeMinutes\": "                     + std::to_string(Toolbox::convertSecondsToMinutes(accessWaitingTime)) + ",\n"
-      "  \"firstWaitingTimeSeconds\": "                     + std::to_string(accessWaitingTime) + ",\n"
-      "  \"totalWaitingTimeMinutes\": "                     + std::to_string(Toolbox::convertSecondsToMinutes(totalWaitingTime)) + ",\n"
-      "  \"totalWaitingTimeSeconds\": "                     + std::to_string(totalWaitingTime) + ",\n"
-      "  \"departureTimeToMinimizeFirstWaitingTime\": \""   + Toolbox::convertSecondsToFormattedTime(minimizedDepartureTime) + "\",\n"
-      "  \"minimizedTotalTravelTimeMinutes\": "             + std::to_string(Toolbox::convertSecondsToMinutes(arrivalTime - minimizedDepartureTime)) + ",\n"
-      "  \"minimizedTotalTravelTimeSeconds\": "             + std::to_string(arrivalTime - minimizedDepartureTime) + ",\n";
-      
-      result.json += stepsJson + "\n  ]";
-      if (params.returnAllStopsResult)
-      {
-        result.json += "\n]\n},\n";
-      }
-      else
-      {
-        result.json += ",";
-      }
-    
     }
     
-    result.json += "  \"minimumWaitingTimeBeforeEachBoardingMinutes\": " + std::to_string(Toolbox::convertSecondsToMinutes(params.minWaitingTimeSeconds)) + ",\n"
-    "  \"minimumWaitingTimeBeforeEachBoardingSeconds\": " + std::to_string(params.minWaitingTimeSeconds) + "\n"
-    "\n}\n";
+    if (params.returnAllStopsResult)
+    {
+      result.json.pop_back(); result.json.pop_back(); // remove trailing comma and newline
+      result.json += "\n  ],\n"
+      "  \"numberOfReachableStops\": "  + std::to_string(reachableStopsCount) + ",\n"
+      "  \"percentOfReachableStops\": " + std::to_string(round(10000 * (float)reachableStopsCount / (float)(stopsCount))/100.0) + "\n"
+      "}";
+    }
     
     std::cerr << "-- journey conversion -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
     calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();

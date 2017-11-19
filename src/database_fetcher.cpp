@@ -239,7 +239,7 @@ namespace TrRouting
     std::cout << "Fetching connections from database..." << std::endl;
     
     // query for connections:
-    std::string sqlQuery = "SELECT trip_id, COALESCE(can_board,1), COALESCE(can_unboard,1), arrival_time_seconds, departure_time_seconds, stop_arrival_id, stop_departure_id, sequence FROM " + applicationShortname + ".mv_tr_connections_v2 WHERE COALESCE(stop_arrival_enabled, TRUE) IS TRUE AND COALESCE(stop_departure_enabled, TRUE) IS TRUE ORDER BY departure_time_seconds, trip_id, sequence";
+    std::string sqlQuery = "SELECT trip_id, COALESCE(can_board,1), COALESCE(can_unboard,1), departure_time_seconds, arrival_time_seconds, stop_departure_id, stop_arrival_id, sequence FROM " + applicationShortname + ".mv_tr_connections_v2 WHERE COALESCE(stop_arrival_enabled, TRUE) IS TRUE AND COALESCE(stop_departure_enabled, TRUE) IS TRUE ORDER BY departure_time_seconds, trip_id, sequence";
     
     std::cout << sqlQuery << std::endl;
     
@@ -259,8 +259,8 @@ namespace TrRouting
 
       for (pqxx::result::const_iterator c = pgResult.begin(); c != pgResult.end(); ++c) {
         
-        forwardConnections.push_back(std::make_tuple(stopIndexesById[c[5].as<unsigned long long>()], stopIndexesById[c[6].as<unsigned long long>()], c[4].as<int>(), c[3].as<int>(), tripIndexesById[c[0].as<unsigned long long>()], c[1].as<short>(), c[2].as<short>(), c[7].as<int>())); // departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequence in trip
-        reverseConnections.push_back(std::make_tuple(stopIndexesById[c[6].as<unsigned long long>()], stopIndexesById[c[5].as<unsigned long long>()], MAX_INT - c[3].as<int>(), MAX_INT - c[4].as<int>(), tripIndexesById[c[0].as<unsigned long long>()], c[2].as<short>(), c[1].as<short>(), c[7].as<int>())); // departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequence in trip
+        forwardConnections.push_back(std::make_tuple(stopIndexesById[c[5].as<unsigned long long>()], stopIndexesById[c[6].as<unsigned long long>()], c[3].as<int>(), c[4].as<int>(), tripIndexesById[c[0].as<unsigned long long>()], c[1].as<short>(), c[2].as<short>(), c[7].as<int>())); // departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequence in trip
+        reverseConnections.push_back(std::make_tuple(stopIndexesById[c[6].as<unsigned long long>()], stopIndexesById[c[5].as<unsigned long long>()], MAX_INT - c[4].as<int>(), MAX_INT - c[3].as<int>(), tripIndexesById[c[0].as<unsigned long long>()], c[2].as<short>(), c[1].as<short>(), c[7].as<int>())); // departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequence in trip
         
         // show loading progress in percentage:
         i++;
