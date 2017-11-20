@@ -237,6 +237,7 @@ int main(int argc, char** argv) {
       std::map<int, bool> exceptAgencyIds;
       std::vector<unsigned long long> accessStopIds;
       std::vector<unsigned long long> egressStopIds;
+      std::vector<unsigned long long> odTripIds;
       std::vector<int> accessStopTravelTimesSeconds;
       std::vector<int> egressStopTravelTimesSeconds;
       
@@ -266,7 +267,8 @@ int main(int argc, char** argv) {
       std::vector<std::string> accessStopTravelTimesSecondsVector;
       std::vector<std::string> egressStopIdsVector;
       std::vector<std::string> egressStopTravelTimesSecondsVector;
-      
+      std::vector<std::string> odTripIdsVector;
+
       int timeHour;
       int timeMinute;
       
@@ -282,6 +284,7 @@ int main(int argc, char** argv) {
       calculator.params.routingDateDay                         = 0;
       calculator.params.originStopId                           = -1;
       calculator.params.destinationStopId                      = -1;
+      calculator.params.odTrip                                 = NULL;
       calculator.params.maxNumberOfTransfers                   = -1;
       calculator.params.minWaitingTimeSeconds                  = 5 * 60;
       calculator.params.departureTimeHour                      = -1;
@@ -359,6 +362,14 @@ int main(int argc, char** argv) {
             egressStopIds.push_back(std::stoi(egressStopId));
           }
           calculator.params.egressStopIds = egressStopIds;
+        }
+        else if (parameterWithValueVector[0] == "od_trip_ids")
+        {
+          boost::split(odTripIdsVector, parameterWithValueVector[1], boost::is_any_of(","));
+          for(std::string odTripId : odTripIdsVector)
+          {
+            odTripIds.push_back(std::stoi(odTripId));
+          }
         }
         else if (parameterWithValueVector[0] == "access_stop_travel_times_seconds" || parameterWithValueVector[0] == "access_stop_travel_times")
         {
@@ -559,6 +570,19 @@ int main(int argc, char** argv) {
         calculator.params.arrivalTimeMinutes = timeMinute;
       }
       
+      if (true /*odTripIds.size() > 0 */)
+      {
+        for (auto & odTrip : calculator.odTrips)
+        {
+          calculator.params.odTrip = &odTrip;
+          resultStr += "id:" + std::to_string(calculator.calculate().travelTimeSeconds) + "\n";
+        }
+      }
+      else
+      {
+        resultStr = calculator.calculate().json;
+      }
+
       //calculator.algorithmCalculationTime.stopStep();
       
       //std::cout << "-- parsing request -- " << calculator.algorithmCalculationTime.getStepDurationMicroseconds() << " microseconds\n";
@@ -574,7 +598,6 @@ int main(int argc, char** argv) {
       
       //std::cout << "-- reset access egress modes -- " << calculator.algorithmCalculationTime.getStepDurationMicroseconds() << " microseconds\n";
       
-      resultStr = calculator.calculate().json;
       
       //calculator.algorithmCalculationTime.startStep();
 

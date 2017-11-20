@@ -25,7 +25,6 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <stdlib.h>
 
-#include "forward_declarations.hpp"
 #include "calculation_time.hpp"
 #include "stop.hpp"
 #include "route.hpp"
@@ -36,6 +35,7 @@
 #include "toolbox.hpp"
 #include "cache_fetcher.hpp"
 #include "osrm_fetcher.hpp"
+#include "parameters.hpp"
 
 namespace TrRouting
 {

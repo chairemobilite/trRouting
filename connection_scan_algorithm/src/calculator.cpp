@@ -9,6 +9,11 @@ namespace TrRouting
     
     reset();
     
+    if(params.odTrip != NULL)
+    {
+      departureTimeSeconds = params.odTrip->departureTimeSeconds;
+    }
+
     RoutingResult result;
     
     result.json = "";
@@ -44,7 +49,11 @@ namespace TrRouting
     calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
     
     // fetch stops footpaths accessible from origin using params or osrm fetcher if not provided:
-    if (params.accessStopIds.size() > 0 && params.accessStopTravelTimesSeconds.size() == params.accessStopIds.size())
+    if(params.odTrip != NULL)
+    {
+      accessFootpaths = params.odTrip->accessFootpaths;
+    }
+    else if (params.accessStopIds.size() > 0 && params.accessStopTravelTimesSeconds.size() == params.accessStopIds.size())
     {
       i = 0;
       for (auto & accessStopId : params.accessStopIds)
@@ -55,7 +64,7 @@ namespace TrRouting
     }
     else
     {
-      accessFootpaths = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(params.origin, stops, params, params.accessMode, params.maxAccessWalkingTravelTimeSeconds);
+      accessFootpaths = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(params.origin, stops, params.accessMode, params.maxAccessWalkingTravelTimeSeconds, params.walkingSpeedMetersPerSecond, params.osrmRoutingWalkingHost, params.osrmRoutingWalkingPort);
     }
 
     for (auto & accessFootpath : accessFootpaths)
@@ -74,7 +83,11 @@ namespace TrRouting
     if (!params.returnAllStopsResult)
     {
       // fetch stops footpaths accessible to destination using params or osrm fetcher if not provided:
-      if (params.egressStopIds.size() > 0 && params.egressStopTravelTimesSeconds.size() == params.egressStopIds.size())
+      if(params.odTrip != NULL)
+      {
+        egressFootpaths = params.odTrip->egressFootpaths;
+      }
+      else if (params.egressStopIds.size() > 0 && params.egressStopTravelTimesSeconds.size() == params.egressStopIds.size())
       {
         egressFootpaths.reserve(params.egressStopIds.size());
         i = 0;
@@ -86,7 +99,7 @@ namespace TrRouting
       }
       else
       {
-        egressFootpaths = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(params.destination, stops, params, params.accessMode, params.maxEgressWalkingTravelTimeSeconds);
+        egressFootpaths = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(params.destination, stops, params.accessMode, params.maxEgressWalkingTravelTimeSeconds, params.walkingSpeedMetersPerSecond, params.osrmRoutingWalkingHost, params.osrmRoutingWalkingPort);
       }
       for (auto & egressFootpath : egressFootpaths)
       {
@@ -213,6 +226,8 @@ namespace TrRouting
       
       if (bestEgressStopIndex == -1) // no routing found
       {
+        result.status = "no_routing_found";
+        result.travelTimeSeconds = -1;
         result.json += "{\n"
         "  \"status\": \"no_routing_found\",\n"
         "  \"origin\": ["                                     + std::to_string(params.origin.latitude) + "," + std::to_string(params.origin.longitude) + "],\n"
@@ -528,9 +543,17 @@ namespace TrRouting
           "  \"minimumWaitingTimeBeforeEachBoardingMinutes\": " + std::to_string(Toolbox::convertSecondsToMinutes(params.minWaitingTimeSeconds)) + ",\n"
           "  \"minimumWaitingTimeBeforeEachBoardingSeconds\": " + std::to_string(params.minWaitingTimeSeconds) + ",\n";
           result.json += stepsJson + "\n  ]\n}";
+          result.travelTimeSeconds    = arrivalTime - departureTimeSeconds;
+          result.arrivalTimeSeconds   = arrivalTime;
+          result.departureTimeSeconds = departureTimeSeconds;
+          result.numberOfTransfers    = numberOfTransfers;
+          result.status               = "success";
+          
         }
         else
         {
+          result.status = "no_routing_found";
+          result.travelTimeSeconds = -1;
           result.json += "{\n"
           "  \"status\": \"no_routing_found\",\n"
           "  \"origin\": ["                                     + std::to_string(params.origin.latitude) + "," + std::to_string(params.origin.longitude) + "],\n"

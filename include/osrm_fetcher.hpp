@@ -14,8 +14,6 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/asio/ip/tcp.hpp>
 
-#include "forward_declarations.hpp"
-#include "parameters.hpp"
 #include "point.hpp"
 #include "stop.hpp"
 
@@ -32,7 +30,7 @@ namespace TrRouting
       
     }
     
-    static std::vector<std::pair<int,int>> getAccessibleStopsFootpathsFromPoint(const Point point, const std::vector<Stop> stops, Parameters& params, std::string mode, int maxTravelTimeSeconds);
+    static std::vector<std::pair<int,int>> getAccessibleStopsFootpathsFromPoint(const Point point, const std::vector<Stop> stops, std::string mode, int maxTravelTimeSeconds, float defaultSpeedMetersPerSecond, std::string osrmHost, std::string osrmPort);
     
   };
     

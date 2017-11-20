@@ -11,13 +11,18 @@
 #include <vector>
 #include <map>
 #include <math.h>
-#include "forward_declarations.hpp"
 #include "point.hpp"
 #include "toolbox.hpp"
+#include "od_trip.hpp"
 
 namespace TrRouting
 {
   
+  class DatabaseFetcher;
+  class CacheFetcher;
+  class GtfsFetcher;
+  class CsvFetcher;
+
   struct Parameters {
     
     std::string applicationShortname;
@@ -43,6 +48,7 @@ namespace TrRouting
     std::vector<unsigned long long> egressStopIds;
     std::vector<int>                egressStopTravelTimesSeconds;
     
+
     int departureTimeHour;
     int departureTimeMinutes;
     int arrivalTimeHour;
@@ -67,6 +73,7 @@ namespace TrRouting
     
     long long originStopId;
     long long destinationStopId;
+    OdTrip* odTrip;
     
     std::string databaseName;
     std::string databaseHost;
@@ -96,6 +103,7 @@ namespace TrRouting
     
     void setDefaultValues()
     {
+      odTrip                                 = NULL;
       walkingSpeedMetersPerSecond            = 5/3.6; // 5 km/h
       drivingSpeedMetersPerSecond            = 90/3.6; // 90 km/h
       cyclingSpeedMetersPerSecond            = 25/3.6; // 25 km/h

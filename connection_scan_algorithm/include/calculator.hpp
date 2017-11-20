@@ -32,7 +32,6 @@
 #include <limits>
 #include <stdlib.h>
 
-#include "forward_declarations.hpp"
 #include "toolbox.hpp"
 #include "stop.hpp"
 #include "route.hpp"
@@ -42,6 +41,10 @@
 #include "routing_result.hpp"
 #include "osrm_fetcher.hpp"
 #include "calculation_time.hpp"
+#include "database_fetcher.hpp"
+#include "cache_fetcher.hpp"
+#include "gtfs_fetcher.hpp"
+#include "csv_fetcher.hpp"
 
 extern int stepCount;
 
@@ -70,7 +73,9 @@ namespace TrRouting
     Parameters params;
     void resetAccessEgressModes();
     CalculationTime algorithmCalculationTime;
-    
+    std::vector<OdTrip>                  odTrips;
+    std::map<unsigned long long, int>    odTripIndexesById;
+
   private:
     
     enum connectionIndexes : short { STOP_DEP = 0, STOP_ARR = 1, TIME_DEP = 2, TIME_ARR = 3, TRIP = 4, CAN_BOARD = 5, CAN_UNBOARD = 6, SEQUENCE = 7 };

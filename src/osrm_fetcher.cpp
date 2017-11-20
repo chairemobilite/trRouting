@@ -3,36 +3,13 @@
 namespace TrRouting
 {
   
-  std::vector<std::pair<int,int>> OsrmFetcher::getAccessibleStopsFootpathsFromPoint(const Point point, const std::vector<Stop> stops, Parameters& params, std::string mode, int maxTravelTimeSeconds)
+  std::vector<std::pair<int,int>> OsrmFetcher::getAccessibleStopsFootpathsFromPoint(const Point point, const std::vector<Stop> stops, std::string mode, int maxTravelTimeSeconds, float defaultSpeedMetersPerSecond, std::string osrmHost, std::string osrmPort)
   {
     
     std::vector<int>                birdDistanceAccessibleStopIndexes;
     std::vector<std::pair<int,int>> accessibleStopsFootpaths;
     
-    float speedMetersPerSecond;
-    std::string routingPort;
-    std::string routingHost;
-    
-    if (mode ==  "walking")
-    {
-      speedMetersPerSecond = params.walkingSpeedMetersPerSecond;
-      routingPort          = params.osrmRoutingWalkingPort;
-      routingHost          = params.osrmRoutingWalkingHost;
-    }
-    else if (mode ==  "driving")
-    {
-      speedMetersPerSecond = params.drivingSpeedMetersPerSecond;
-      routingPort          = params.osrmRoutingDrivingPort;
-      routingHost          = params.osrmRoutingDrivingHost;
-    }
-    else if (mode == "cycling")
-    {
-      speedMetersPerSecond = params.cyclingSpeedMetersPerSecond;
-      routingPort          = params.osrmRoutingCyclingPort;
-      routingHost          = params.osrmRoutingCyclingHost;
-    }
-    
-    std::cout << "mode = " << mode << " speed = " << speedMetersPerSecond << " maxTravelTime = " << maxTravelTimeSeconds << " port = " << routingPort << " host = " << routingHost << " " << std::endl;
+    //std::cout << "mode = " << mode << " speed = " << defaultSpeedMetersPerSecond << " maxTravelTime = " << maxTravelTimeSeconds << " port = " << osrmPort << " host = " << osrmHost << " " << std::endl;
     
     std::cout << std::fixed;
     std::cout << std::setprecision(6);
@@ -41,7 +18,7 @@ namespace TrRouting
     
     float lengthOfOneDegreeOfLongitude = 111412.84 * cos(point.latitude * M_PI / 180) -93.5 * cos (3 * point.latitude * M_PI / 180);
     float lengthOfOneDegreeOflatitude  = 111132.92 - 559.82 * cos(2 * point.latitude * M_PI / 180) + 1.175 * cos(4 * point.latitude * M_PI / 180);
-    float maxDistanceMetersSquared     = (maxTravelTimeSeconds * speedMetersPerSecond) * (maxTravelTimeSeconds * speedMetersPerSecond);
+    float maxDistanceMetersSquared     = (maxTravelTimeSeconds * defaultSpeedMetersPerSecond) * (maxTravelTimeSeconds * defaultSpeedMetersPerSecond);
     float distanceMetersSquared;
     float distanceXMeters;
     float distanceYMeters;
@@ -66,7 +43,7 @@ namespace TrRouting
     
     // call osrm on bird distance accessible stops for further filtering by network travel time:
     boost::asio::ip::tcp::iostream s;
-    s.connect(routingHost, routingPort);
+    s.connect(osrmHost, osrmPort);
     queryString += "?sources=0";
     queryString += " HTTP/1.1\r\n\r\n";
         

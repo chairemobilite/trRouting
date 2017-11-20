@@ -370,7 +370,7 @@ namespace TrRouting
     std::cout << "Fetching od trips from database..." << std::endl;
     
     // query for connections:
-    std::string sqlQuery = "SELECT id, user_interview_id, household_interview_id, COALSECE(age,-1), origin_lat, origin_lon, destination_lat, destination_lon, gender_sn, mode_sn, start_at_seconds FROM " + applicationShortname + ".tr_od_trips ORDER BY id";
+    std::string sqlQuery = "SELECT id, user_interview_id, household_interview_id, COALESCE(age,-1), origin_lat, origin_lon, destination_lat, destination_lon, COALESCE(gender_sn, 'unknown'), COALESCE(mode_sn, 'unknown'), start_at_seconds FROM " + applicationShortname + ".tr_od_trips WHERE id <= 100 ORDER BY id";
     
     std::cout << sqlQuery << std::endl;
     
@@ -391,14 +391,14 @@ namespace TrRouting
         
         // create a new trip for each row:
         OdTrip * odTrip     = new OdTrip();
-        Point * origin      = new Point();
-        Point * destination = new Point();
+        Point  * origin      = new Point();
+        Point  * destination = new Point();
 
         // set trip attributes from row:
         odTrip->id                    = c[0].as<unsigned long long>();
         odTrip->personId              = c[1].as<unsigned long long>();
         odTrip->householdId           = c[2].as<unsigned long long>();
-        odTrip->age                   = c[3].as<unsigned long long>();
+        odTrip->age                   = c[3].as<int>();
         odTrip->origin                = *origin;
         odTrip->origin.latitude       = c[4].as<double>();
         odTrip->origin.longitude      = c[5].as<double>();
@@ -409,8 +409,8 @@ namespace TrRouting
         odTrip->mode                  = c[9].as<std::string>();
         odTrip->departureTimeSeconds  = c[10].as<int>();
         
-        odTrip->accessFootpaths       = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(odTrip->origin, stops, params, "walking", 1200);
-        odTrip->egressFootpaths       = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(odTrip->origin, stops, params, "walking", 1200);
+        odTrip->accessFootpaths       = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(odTrip->origin,      stops, "walking", 900, params.walkingSpeedMetersPerSecond, params.osrmRoutingWalkingHost, params.osrmRoutingWalkingPort);
+        odTrip->egressFootpaths       = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(odTrip->destination, stops, "walking", 900, params.walkingSpeedMetersPerSecond, params.osrmRoutingWalkingHost, params.osrmRoutingWalkingPort);
         
         // append trip:
         odTrips.push_back(*odTrip);
@@ -418,10 +418,10 @@ namespace TrRouting
         
         // show loading progress in percentage:
         i++;
-        if (i % 1000 == 0)
-        {
-          std::cout << ((((double) i) / resultCount) * 100) << "%\r"; // \r is used to stay on the same line
-        }
+        //if (i % 1000 == 0)
+        //{
+          std::cerr << ((((double) i) / resultCount) * 100) << "%\r"; // \r is used to stay on the same line
+        //}
       }
       std::cout << std::endl;
       

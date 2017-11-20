@@ -104,7 +104,7 @@ namespace TrRouting
     
   }
   
-  const std::pair<std::vector<std::tuple<int,int,int>>, std::vector<std::pair<int,int>>> CacheFetcher::getFootpaths(std::string applicationShortname, std::vector<Stop> stops)
+  const std::pair<std::vector<std::tuple<int,int,int>>, std::vector<std::pair<int,int>>> CacheFetcher::getFootpaths(std::string applicationShortname, std::map<unsigned long long, int> stopIndexesById)
   {
     std::vector<std::tuple<int,int,int>> footpaths;
     std::vector<std::pair<int,int>>      footpathsRanges;
@@ -127,6 +127,32 @@ namespace TrRouting
       std::cerr << "missing footpaths_ranges cache file!" << std::endl;
     }
     return std::make_pair(footpaths, footpathsRanges);
+    
+  }
+
+  const std::pair<std::vector<OdTrip>, std::map<unsigned long long, int>> CacheFetcher::getOdTrips(std::string applicationShortname, std::vector<Stop> stops, Parameters& params)
+  {
+    std::vector<OdTrip> odTrips;
+    std::map<unsigned long long, int> odTripIndexesById;
+    
+    std::cout << "Fetching od trips from cache..." << std::endl;
+    if (CacheFetcher::cacheFileExists(applicationShortname, "od_trips"))
+    {
+      odTrips = loadFromCacheFile(odTrips, applicationShortname, "od_trips");
+    }
+    else
+    {
+      std::cerr << "missing od trips cache file!" << std::endl;
+    }
+    if (CacheFetcher::cacheFileExists(applicationShortname, "od_trip_indexes"))
+    {
+      odTripIndexesById = loadFromCacheFile(odTripIndexesById, applicationShortname, "od_trip_indexes");
+    }
+    else
+    {
+      std::cerr << "missing od trip indexes cache file!" << std::endl;
+    }
+    return std::make_pair(odTrips, odTripIndexesById);
     
   }
   
