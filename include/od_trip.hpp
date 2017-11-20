@@ -18,6 +18,10 @@ namespace TrRouting
     unsigned long long householdId;
     int age; // -1: unknown or nil
     int departureTimeSeconds;
+    int walkingTravelTimeSeconds;
+    int cyclingTravelTimeSeconds;
+    int drivingTravelTimeSeconds;
+    float expansionFactor;
     std::string ageGroup;
     std::string gender;
     std::string mode;
@@ -38,6 +42,9 @@ namespace TrRouting
       ar & householdId;
       ar & age;
       ar & departureTimeSeconds;
+      ar & walkingTravelTimeSeconds;
+      ar & cyclingTravelTimeSeconds;
+      ar & drivingTravelTimeSeconds;
       ar & ageGroup;
       ar & gender;
       ar & mode;
@@ -47,6 +54,7 @@ namespace TrRouting
       ar & egressFootpaths;
       ar & origin;
       ar & destination;
+      ar & expansionFactor;
     }
   };
 

@@ -197,12 +197,12 @@ namespace TrRouting
         // create a new trip for each row:
         Trip * trip = new Trip();
         // set trip attributes from row:
-        trip->id          = c[0].as<unsigned long long>();
-        trip->routeId     = c[1].as<unsigned long long>();
-        trip->routePathId = c[2].as<unsigned long long>();
-        trip->routeTypeId = c[3].as<unsigned long long>();
-        trip->agencyId    = c[4].as<unsigned long long>();
-        trip->serviceId   = c[5].as<unsigned long long>();
+        trip->id              = c[0].as<unsigned long long>();
+        trip->routeId         = c[1].as<unsigned long long>();
+        trip->routePathId     = c[2].as<unsigned long long>();
+        trip->routeTypeId     = c[3].as<unsigned long long>();
+        trip->agencyId        = c[4].as<unsigned long long>();
+        trip->serviceId       = c[5].as<unsigned long long>();
         
         // append trip:
         trips.push_back(*trip);
@@ -374,7 +374,7 @@ namespace TrRouting
     std::cout << "Fetching od trips from database..." << std::endl;
     
     // query for connections:
-    std::string sqlQuery = "SELECT id, user_interview_id, household_interview_id, COALESCE(age,-1), origin_lat, origin_lon, destination_lat, destination_lon, COALESCE(age_group_sn, 'unknown'), COALESCE(occupation_sn, 'unknown'), COALESCE(activity_sn, 'unknown'),  COALESCE(gender_sn, 'unknown'), COALESCE(mode_sn, 'unknown'), start_at_seconds FROM " + applicationShortname + ".tr_od_trips WHERE mode_sn = 'transit' ORDER BY id";
+    std::string sqlQuery = "SELECT id, user_interview_id, household_interview_id, COALESCE(age,-1), origin_lat, origin_lon, destination_lat, destination_lon, COALESCE(age_group_sn, 'unknown'), COALESCE(occupation_sn, 'unknown'), COALESCE(activity_sn, 'unknown'),  COALESCE(gender_sn, 'unknown'), COALESCE(mode_sn, 'unknown'), start_at_seconds, COALESCE(expansion_factor,1), COALESCE(walking_travel_time_seconds,-1), COALESCE(cycling_travel_time_seconds,-1), COALESCE(driving_travel_time_seconds,-1) FROM " + applicationShortname + ".tr_od_trips WHERE mode_sn = 'transit' ORDER BY id";
     
     std::cout << sqlQuery << std::endl;
     
@@ -408,25 +408,29 @@ namespace TrRouting
         Point  * origin      = new Point();
         Point  * destination = new Point();
         
-        odTrip->id                    = odTripId;
-        odTrip->personId              = c[1].as<unsigned long long>();
-        odTrip->householdId           = c[2].as<unsigned long long>();
-        odTrip->age                   = c[3].as<int>();
-        odTrip->origin                = *origin;
-        odTrip->origin.latitude       = c[4].as<double>();
-        odTrip->origin.longitude      = c[5].as<double>();
-        odTrip->destination           = *destination;
-        odTrip->destination.latitude  = c[6].as<double>();
-        odTrip->destination.longitude = c[7].as<double>();
-        odTrip->ageGroup              = c[8].as<std::string>();
-        odTrip->occupation            = c[9].as<std::string>();
-        odTrip->activity              = c[10].as<std::string>();
-        odTrip->gender                = c[11].as<std::string>();
-        odTrip->mode                  = c[12].as<std::string>();
-        odTrip->departureTimeSeconds  = c[13].as<int>();
+        odTrip->id                       = odTripId;
+        odTrip->origin                   = *origin;
+        odTrip->destination              = *destination;
+        odTrip->personId                 = c[1 ].as<unsigned long long>();
+        odTrip->householdId              = c[2 ].as<unsigned long long>();
+        odTrip->age                      = c[3 ].as<int>();
+        odTrip->origin.latitude          = c[4 ].as<double>();
+        odTrip->origin.longitude         = c[5 ].as<double>();
+        odTrip->destination.latitude     = c[6 ].as<double>();
+        odTrip->destination.longitude    = c[7 ].as<double>();
+        odTrip->ageGroup                 = c[8 ].as<std::string>();
+        odTrip->occupation               = c[9 ].as<std::string>();
+        odTrip->activity                 = c[10].as<std::string>();
+        odTrip->gender                   = c[11].as<std::string>();
+        odTrip->mode                     = c[12].as<std::string>();
+        odTrip->departureTimeSeconds     = c[13].as<int>();
+        odTrip->expansionFactor          = c[14].as<float>();
+        odTrip->walkingTravelTimeSeconds = c[15].as<int>();
+        odTrip->cyclingTravelTimeSeconds = c[16].as<int>();
+        odTrip->drivingTravelTimeSeconds = c[17].as<int>();
         
-        odTrip->accessFootpaths       = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(odTrip->origin,      stops, "walking", 900, params.walkingSpeedMetersPerSecond, params.osrmRoutingWalkingHost, params.osrmRoutingWalkingPort);
-        odTrip->egressFootpaths       = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(odTrip->destination, stops, "walking", 900, params.walkingSpeedMetersPerSecond, params.osrmRoutingWalkingHost, params.osrmRoutingWalkingPort);
+        odTrip->accessFootpaths = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(odTrip->origin,      stops, "walking", 900, params.walkingSpeedMetersPerSecond, params.osrmRoutingWalkingHost, params.osrmRoutingWalkingPort);
+        odTrip->egressFootpaths = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(odTrip->destination, stops, "walking", 900, params.walkingSpeedMetersPerSecond, params.osrmRoutingWalkingHost, params.osrmRoutingWalkingPort);
         
         // append trip:
         odTrips.push_back(*odTrip);
