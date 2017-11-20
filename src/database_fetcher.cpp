@@ -172,7 +172,7 @@ namespace TrRouting
     openConnection();
     
     std::cout << "Fetching trips from database..." << std::endl;
-    std::string sqlQuery = "SELECT t.id, r.id, r.type_id, r.agency_id, t.service_id"
+    std::string sqlQuery = "SELECT t.id, r.id, t.path_id, r.type_id, r.agency_id, t.service_id"
     " FROM " + applicationShortname + ".tr_trips t "
     " LEFT JOIN " + applicationShortname + ".tr_route_paths rp ON rp.id = t.path_id "
     " LEFT JOIN " + applicationShortname + ".tr_routes r ON r.id = rp.route_id"
@@ -199,9 +199,10 @@ namespace TrRouting
         // set trip attributes from row:
         trip->id          = c[0].as<unsigned long long>();
         trip->routeId     = c[1].as<unsigned long long>();
-        trip->routeTypeId = c[2].as<unsigned long long>();
-        trip->agencyId    = c[3].as<unsigned long long>();
-        trip->serviceId   = c[4].as<unsigned long long>();
+        trip->routePathId = c[2].as<unsigned long long>();
+        trip->routeTypeId = c[3].as<unsigned long long>();
+        trip->agencyId    = c[4].as<unsigned long long>();
+        trip->serviceId   = c[5].as<unsigned long long>();
         
         // append trip:
         trips.push_back(*trip);
@@ -365,18 +366,20 @@ namespace TrRouting
     std::vector<OdTrip> odTrips;
     std::map<unsigned long long, int> odTripIndexesById;
     
+    // fetch existing so we can append:
+    std::tie(odTrips, odTripIndexesById) = params.cacheFetcher->getOdTrips(params.applicationShortname, stops, params);
+    
     openConnection();
     
     std::cout << "Fetching od trips from database..." << std::endl;
     
     // query for connections:
-    std::string sqlQuery = "SELECT id, user_interview_id, household_interview_id, COALESCE(age,-1), origin_lat, origin_lon, destination_lat, destination_lon, COALESCE(gender_sn, 'unknown'), COALESCE(mode_sn, 'unknown'), start_at_seconds FROM " + applicationShortname + ".tr_od_trips WHERE mode_sn = 'transit' ORDER BY id";
+    std::string sqlQuery = "SELECT id, user_interview_id, household_interview_id, COALESCE(age,-1), origin_lat, origin_lon, destination_lat, destination_lon, COALESCE(age_group_sn, 'unknown'), COALESCE(occupation_sn, 'unknown'), COALESCE(activity_sn, 'unknown'),  COALESCE(gender_sn, 'unknown'), COALESCE(mode_sn, 'unknown'), start_at_seconds FROM " + applicationShortname + ".tr_od_trips WHERE mode_sn = 'transit' ORDER BY id";
     
     std::cout << sqlQuery << std::endl;
     
     if (isConnectionOpen())
     {
-      
       
       pqxx::nontransaction pgNonTransaction(*(getConnectionPtr()));
       pqxx::result pgResult( pgNonTransaction.exec( sqlQuery ));
@@ -386,16 +389,26 @@ namespace TrRouting
       // set cout number of decimals to 2 for displaying progress percentage:
       std::cout << std::fixed;
       std::cout << std::setprecision(2);
-    
+      
+      unsigned long long odTripId;
+      
       for (pqxx::result::const_iterator c = pgResult.begin(); c != pgResult.end(); ++c) {
         
+        // set trip attributes from row:
+        odTripId = c[0].as<unsigned long long>();
+        
+        if (odTripIndexesById.find(odTripId) != odTripIndexesById.end()) // ignore if already saved
+        {
+          i++;
+          continue;
+        }
+        
         // create a new trip for each row:
-        OdTrip * odTrip     = new OdTrip();
+        OdTrip * odTrip      = new OdTrip();
         Point  * origin      = new Point();
         Point  * destination = new Point();
-
-        // set trip attributes from row:
-        odTrip->id                    = c[0].as<unsigned long long>();
+        
+        odTrip->id                    = odTripId;
         odTrip->personId              = c[1].as<unsigned long long>();
         odTrip->householdId           = c[2].as<unsigned long long>();
         odTrip->age                   = c[3].as<int>();
@@ -405,9 +418,12 @@ namespace TrRouting
         odTrip->destination           = *destination;
         odTrip->destination.latitude  = c[6].as<double>();
         odTrip->destination.longitude = c[7].as<double>();
-        odTrip->gender                = c[8].as<std::string>();
-        odTrip->mode                  = c[9].as<std::string>();
-        odTrip->departureTimeSeconds  = c[10].as<int>();
+        odTrip->ageGroup              = c[8].as<std::string>();
+        odTrip->occupation            = c[9].as<std::string>();
+        odTrip->activity              = c[10].as<std::string>();
+        odTrip->gender                = c[11].as<std::string>();
+        odTrip->mode                  = c[12].as<std::string>();
+        odTrip->departureTimeSeconds  = c[13].as<int>();
         
         odTrip->accessFootpaths       = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(odTrip->origin,      stops, "walking", 900, params.walkingSpeedMetersPerSecond, params.osrmRoutingWalkingHost, params.osrmRoutingWalkingPort);
         odTrip->egressFootpaths       = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(odTrip->destination, stops, "walking", 900, params.walkingSpeedMetersPerSecond, params.osrmRoutingWalkingHost, params.osrmRoutingWalkingPort);
@@ -418,23 +434,27 @@ namespace TrRouting
         
         // show loading progress in percentage:
         i++;
-        //if (i % 1000 == 0)
-        //{
-          std::cerr << ((((double) i) / resultCount) * 100) << "%\r"; // \r is used to stay on the same line
-        //}
+        if (i % 10 == 0)
+        {
+          std::cerr << ((((double) i) / resultCount) * 100) << "% (" << i << "/" << resultCount << ")             \r"; // \r is used to stay on the same line
+        }
+        if (i % 100 == 0)
+        {
+          CacheFetcher::saveToCacheFile(applicationShortname, odTrips, "od_trips");
+          CacheFetcher::saveToCacheFile(applicationShortname, odTripIndexesById, "od_trip_indexes");
+        }
       }
-      std::cout << std::endl;
+      std::cerr << std::endl;
       
       // save trips and stop indexes to binary cache file:
       CacheFetcher::saveToCacheFile(applicationShortname, odTrips, "od_trips");
       CacheFetcher::saveToCacheFile(applicationShortname, odTripIndexesById, "od_trip_indexes");
     
     } else {
-      std::cout << "Can't open database" << std::endl;
+      std::cerr << "Can't open database" << std::endl;
     }
     
     return std::make_tuple(odTrips, odTripIndexesById);
-    
     
   }
   

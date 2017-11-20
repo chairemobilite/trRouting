@@ -18,8 +18,11 @@ namespace TrRouting
     unsigned long long householdId;
     int age; // -1: unknown or nil
     int departureTimeSeconds;
+    std::string ageGroup;
     std::string gender;
     std::string mode;
+    std::string occupation;
+    std::string activity;
     std::vector<std::pair<int,int>> accessFootpaths;
     std::vector<std::pair<int,int>> egressFootpaths;
     Point origin;
@@ -34,9 +37,12 @@ namespace TrRouting
       ar & personId;
       ar & householdId;
       ar & age;
+      ar & departureTimeSeconds;
+      ar & ageGroup;
       ar & gender;
       ar & mode;
-      ar & departureTimeSeconds;
+      ar & occupation;
+      ar & activity;
       ar & accessFootpaths;
       ar & egressFootpaths;
       ar & origin;

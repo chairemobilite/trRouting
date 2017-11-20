@@ -237,10 +237,16 @@ int main(int argc, char** argv) {
       std::map<int, bool> exceptAgencyIds;
       std::vector<unsigned long long> accessStopIds;
       std::vector<unsigned long long> egressStopIds;
-      std::vector<unsigned long long> odTripIds;
       std::vector<int> accessStopTravelTimesSeconds;
       std::vector<int> egressStopTravelTimesSeconds;
+      std::vector<std::pair<int,int>> odTripsPeriods; // pair: start_at_seconds, end_at_seconds
+      std::vector<std::string> odTripsGenders;
+      std::vector<std::string> odTripsAgeGroups;
+      std::vector<std::string> odTripsOccupations;
+      std::vector<std::string> odTripsActivities;
+      std::vector<std::string> odTripsModes;
       
+      int odTripsSampleSize {-1}; // for testing only
       bool calculaterAllOdTrips {false};
       
       calculator.params.onlyServiceIds     = onlyServiceIds;
@@ -251,6 +257,12 @@ int main(int argc, char** argv) {
       calculator.params.exceptRouteTypeIds = exceptRouteTypeIds;
       calculator.params.onlyAgencyIds      = onlyAgencyIds;
       calculator.params.exceptAgencyIds    = exceptAgencyIds;
+      calculator.params.odTripsPeriods     = odTripsPeriods;
+      calculator.params.odTripsGenders     = odTripsGenders;
+      calculator.params.odTripsAgeGroups   = odTripsAgeGroups;
+      calculator.params.odTripsOccupations = odTripsOccupations;
+      calculator.params.odTripsActivities  = odTripsActivities;
+      calculator.params.odTripsModes       = odTripsModes;
       
       std::vector<std::string> parameterWithValueVector;
       std::vector<std::string> latitudeLongitudeVector;
@@ -268,7 +280,12 @@ int main(int argc, char** argv) {
       std::vector<std::string> accessStopTravelTimesSecondsVector;
       std::vector<std::string> egressStopIdsVector;
       std::vector<std::string> egressStopTravelTimesSecondsVector;
-      std::vector<std::string> odTripIdsVector;
+      std::vector<std::string> odTripsPeriodsVector;
+      std::vector<std::string> odTripsGendersVector;
+      std::vector<std::string> odTripsAgeGroupsVector;
+      std::vector<std::string> odTripsOccupationsVector;
+      std::vector<std::string> odTripsActivitiesVector;
+      std::vector<std::string> odTripsModesVector;
 
       int timeHour;
       int timeMinute;
@@ -364,9 +381,79 @@ int main(int argc, char** argv) {
           }
           calculator.params.egressStopIds = egressStopIds;
         }
-        else if (parameterWithValueVector[0] == "all_od_trips")
+        else if (parameterWithValueVector[0] == "od_trips")
         {
           if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1") { calculaterAllOdTrips = true; }
+        }
+        else if (parameterWithValueVector[0] == "od_trips_sample_size")
+        {
+          odTripsSampleSize = std::stoi(parameterWithValueVector[1]);
+        }
+        else if (parameterWithValueVector[0] == "od_trips_periods")
+        {
+          boost::split(odTripsPeriodsVector, parameterWithValueVector[1], boost::is_any_of(","));
+          int periodIndex {0};
+          int startAtSeconds;
+          int endAtSeconds;
+          for(std::string odTripsTime : odTripsPeriodsVector)
+          {
+            if (periodIndex % 2 == 0)
+            {
+              startAtSeconds = std::stoi(odTripsTime);
+            }
+            else
+            {
+              endAtSeconds = std::stoi(odTripsTime);
+              odTripsPeriods.push_back(std::make_pair(startAtSeconds, endAtSeconds));
+            }
+            periodIndex++;
+          }
+          calculator.params.odTripsPeriods = odTripsPeriods;
+        }
+        else if (parameterWithValueVector[0] == "od_trips_age_grouops")
+        {
+          boost::split(odTripsAgeGroupsVector, parameterWithValueVector[1], boost::is_any_of(","));
+          for(std::string odTripsAgeGroup : odTripsAgeGroupsVector)
+          {
+            odTripsAgeGroups.push_back(odTripsAgeGroup);
+          }
+          calculator.params.odTripsAgeGroups = odTripsAgeGroups;
+        }
+        else if (parameterWithValueVector[0] == "od_trips_genders")
+        {
+          boost::split(odTripsGendersVector, parameterWithValueVector[1], boost::is_any_of(","));
+          for(std::string odTripsGender : odTripsGendersVector)
+          {
+            odTripsGenders.push_back(odTripsGender);
+          }
+          calculator.params.odTripsGenders = odTripsGenders;
+        }
+        else if (parameterWithValueVector[0] == "od_trips_occupations")
+        {
+          boost::split(odTripsOccupationsVector, parameterWithValueVector[1], boost::is_any_of(","));
+          for(std::string odTripsOccupation : odTripsOccupationsVector)
+          {
+            odTripsOccupations.push_back(odTripsOccupation);
+          }
+          calculator.params.odTripsOccupations = odTripsOccupations;
+        }
+        else if (parameterWithValueVector[0] == "od_trips_activities")
+        {
+          boost::split(odTripsActivitiesVector, parameterWithValueVector[1], boost::is_any_of(","));
+          for(std::string odTripsActivity : odTripsActivitiesVector)
+          {
+            odTripsActivities.push_back(odTripsActivity);
+          }
+          calculator.params.odTripsActivities = odTripsActivities;
+        }
+        else if (parameterWithValueVector[0] == "od_trips_modes")
+        {
+          boost::split(odTripsModesVector, parameterWithValueVector[1], boost::is_any_of(","));
+          for(std::string odTripsMode : odTripsModesVector)
+          {
+            odTripsModes.push_back(odTripsMode);
+          }
+          calculator.params.odTripsModes = odTripsModes;
         }
         else if (parameterWithValueVector[0] == "access_stop_travel_times_seconds" || parameterWithValueVector[0] == "access_stop_travel_times")
         {
@@ -569,15 +656,122 @@ int main(int argc, char** argv) {
       
       if (calculaterAllOdTrips)
       {
-        resultStr += "{\n";
+        RoutingResult routingResult;
+        std::map<unsigned long long, std::map<int, int>> tripsLegsProfile; // parent map key: trip id, nested map key: connection sequence, value: number of trips using this connection
+        std::map<unsigned long long, std::map<int, int>> routePathsLegsProfile; // parent map key: trip id, nested map key: connection sequence, value: number of trips using this connection
+        std::map<unsigned long long, int> routesOdTripsCount; // key: route id, value: count od trips using this route
+        unsigned long long legTripId;
+        unsigned long long legRouteId;
+        unsigned long long legRoutePathId;
+        bool atLeastOneOdTrip {false};
+        int odTripsCount = calculator.odTrips.size();
+        
+        int legBoardingSequence;
+        int legUnboardingSequence;
+        
+        resultStr += "{\n\"od_trips\": [\n";
+        int i = 0;
         for (auto & odTrip : calculator.odTrips)
         {
-          calculator.params.odTrip = &odTrip;
-          resultStr += "  \"id\":" + std::to_string(odTrip.id) + ", \"travelTimeSeconds\": " + std::to_string(calculator.calculate().travelTimeSeconds) + ",\n";
+          std::cout << "od trip id " << odTrip.id << " (" << (i+1) << "/" << odTripsCount << std::endl;
+          routingResult = calculator.calculate();
+          if (true/*routingResult.status == "success"*/)
+          {
+            atLeastOneOdTrip = true;
+            calculator.params.odTrip = &odTrip;
+            if (routingResult.legs.size() > 0)
+            {
+              for (auto & leg : routingResult.legs)
+              {
+                legTripId             = std::get<0>(leg);
+                legRouteId            = std::get<1>(leg);
+                legRoutePathId        = std::get<2>(leg);
+                legBoardingSequence   = std::get<3>(leg);
+                legUnboardingSequence = std::get<4>(leg);
+                if (routesOdTripsCount.find(legRouteId) == routesOdTripsCount.end())
+                {
+                  routesOdTripsCount[legRouteId] = 1;
+                }
+                else
+                {
+                  routesOdTripsCount[legRouteId] += 1;
+                }
+                if (tripsLegsProfile.find(legTripId) == tripsLegsProfile.end()) // initialize legs for this trip if not already set
+                {
+                  tripsLegsProfile[legTripId] = std::map<int, int>();
+                }
+                if (routePathsLegsProfile.find(legRoutePathId) == routePathsLegsProfile.end()) // initialize legs for this trip if not already set
+                {
+                  routePathsLegsProfile[legRoutePathId] = std::map<int, int>();
+                }
+                for (int sequence = legBoardingSequence; sequence <= legUnboardingSequence; sequence++) // loop each connection sequence between boarding and unboarding sequences
+                {
+                  // increment in trip profile:
+                  if (tripsLegsProfile[legTripId].find(sequence) == tripsLegsProfile[legTripId].end())
+                  {
+                    tripsLegsProfile[legTripId][sequence] = 1; // create the first od_trip for this connection
+                  }
+                  else
+                  {
+                    tripsLegsProfile[legTripId][sequence] += 1; // increment od_trips for this connection
+                  }
+                  // increment in route path profile:
+                  if (routePathsLegsProfile[legRoutePathId].find(sequence) == routePathsLegsProfile[legRoutePathId].end())
+                  {
+                    routePathsLegsProfile[legRoutePathId][sequence] = 1; // create the first od_trip for this connection
+                  }
+                  else
+                  {
+                    routePathsLegsProfile[legRoutePathId][sequence] += 1; // increment od_trips for this connection
+                  }
+                }
+              }
+            }
+            resultStr += "    {\"id\":" + std::to_string(odTrip.id) + ", \"status\": \"" + routingResult.status + "\", \"travelTimeSeconds\": " + std::to_string(routingResult.travelTimeSeconds) + ", \"numberOfTransfers\": " + std::to_string(routingResult.numberOfTransfers) + "},\n";
+          }
+          i++;
+          if (odTripsSampleSize >= 0 && i == odTripsSampleSize)
+          {
+            break;
+          }
         }
-        resultStr.pop_back();
-        resultStr.pop_back();
-        resultStr += "\n}";
+        if (atLeastOneOdTrip)
+        {
+          resultStr.pop_back();
+          resultStr.pop_back();
+          resultStr += "\n  ],\n  \"routesOdTripsCount\": {\n";
+          for (auto & routeCount : routesOdTripsCount)
+          {
+            resultStr += "    \"" + std::to_string(routeCount.first) + "\": " + std::to_string(routeCount.second) + ",\n";
+          }
+          if (routesOdTripsCount.size() > 0)
+          {
+            resultStr.pop_back();
+            resultStr.pop_back();
+          }
+          resultStr += "\n  },\n  \"routePathsOdTripsProfiles\": {\n";
+          for (auto & routePathProfile : routePathsLegsProfile)
+          {
+            resultStr += "    \"" + std::to_string(routePathProfile.first) + "\": {";
+            
+            for (auto & sequenceProfile : routePathProfile.second)
+            {
+              resultStr += " \"" + std::to_string(sequenceProfile.first) + "\":" + std::to_string(sequenceProfile.second) + ",";
+            }
+            if (routePathProfile.second.size() > 0)
+            {
+              resultStr.pop_back();
+            }
+            resultStr += "},\n";
+          }
+          if (routePathsLegsProfile.size() > 0)
+          {
+            resultStr.pop_back();
+            resultStr.pop_back();
+          }
+        }
+        resultStr += "\n  }\n}";
+        
       }
       else
       {

@@ -11,9 +11,6 @@ namespace TrRouting
     
     //std::cout << "mode = " << mode << " speed = " << defaultSpeedMetersPerSecond << " maxTravelTime = " << maxTravelTimeSeconds << " port = " << osrmPort << " host = " << osrmHost << " " << std::endl;
     
-    std::cout << std::fixed;
-    std::cout << std::setprecision(6);
-    
     std::string queryString = "GET /table/v1/" + mode + "/" + std::to_string(point.longitude) +  "," + std::to_string(point.latitude);
     
     float lengthOfOneDegreeOfLongitude = 111412.84 * cos(point.latitude * M_PI / 180) -93.5 * cos (3 * point.latitude * M_PI / 180);
@@ -22,20 +19,20 @@ namespace TrRouting
     float distanceMetersSquared;
     float distanceXMeters;
     float distanceYMeters;
-    Point stopPoint;
     
     int i {0};
     for (auto & stop : stops)
     {
-      stopPoint             = stop.point;
-      distanceXMeters       = (stopPoint.longitude - point.longitude) * lengthOfOneDegreeOfLongitude;
-      distanceYMeters       = (stopPoint.latitude  - point.latitude)  * lengthOfOneDegreeOflatitude ;
+      //birdDistanceAccessibleStopIndexes.push_back(i);
+      //queryString += ";" + std::to_string(stop.point.longitude) +  "," + std::to_string(stop.point.latitude);
+      distanceXMeters       = (stop.point.longitude - point.longitude) * lengthOfOneDegreeOfLongitude;
+      distanceYMeters       = (stop.point.latitude  - point.latitude)  * lengthOfOneDegreeOflatitude ;
       distanceMetersSquared = distanceXMeters * distanceXMeters + distanceYMeters * distanceYMeters;
       //std::cerr << distanceMeters;
       if (distanceMetersSquared <= maxDistanceMetersSquared)
       {
         birdDistanceAccessibleStopIndexes.push_back(i);
-        queryString += ";" + std::to_string(stopPoint.longitude) +  "," + std::to_string(stopPoint.latitude);
+        queryString += ";" + std::to_string(stop.point.longitude) +  "," + std::to_string(stop.point.latitude);
       }
       i++;
     }
@@ -46,6 +43,8 @@ namespace TrRouting
     s.connect(osrmHost, osrmPort);
     queryString += "?sources=0";
     queryString += " HTTP/1.1\r\n\r\n";
+    
+   // std::cerr << queryString << std::endl;
         
     s << queryString;
     
@@ -58,8 +57,10 @@ namespace TrRouting
     boost::property_tree::ptree pt;
     boost::property_tree::read_json(responseJsonSs, pt);
     
+    //std::cerr << responseJsonSs.str() << std::endl;
+    
     using boost::property_tree::ptree;
-        
+    
     //std::cout << "duration count = " << pt.count("durations") << std::endl;
     
     i = -1;
@@ -72,7 +73,7 @@ namespace TrRouting
       
       for (const auto& v : durations) {
         for (const auto& v2 : v.second) {
-          if(i >= 0) // first value is duration with starting stop, we must ignore it (i was initialized with -1)
+          if(i >= 0) // first value is duration with self, we must ignore it (i was initialized with -1)
           {
             travelTimeSeconds = (int)ceil(std::stod(v2.second.data()));
             if (travelTimeSeconds <= maxTravelTimeSeconds)

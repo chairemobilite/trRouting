@@ -258,6 +258,7 @@ namespace TrRouting
     Route journeyStepRoute;
     std::tuple<int,int,int,int,int,short,short,int> journeyStepEnterConnection; // connection tuple: departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequenceinTrip
     std::tuple<int,int,int,int,int,short,short,int> journeyStepExitConnection;
+    std::vector<std::tuple<unsigned long long, unsigned long long, unsigned long long, int, int>> legs; // tuple: tripId, routeId, routePathId, boarding sequence, unboarding sequence
     int   journeyStepTravelTime    {-1};
     int   transferTime             {-1};
     int   waitingTime              {-1};
@@ -279,6 +280,8 @@ namespace TrRouting
     int   numberOfTransfers        {-1};
     int   bestAccessStopIndex      {-1};
     int   reachableStopsCount      { 0};
+    int   boardingSequence         {-1};
+    int   unboardingSequence       {-1};
     
     std::cerr << "-- start parsing stops -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
     calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
@@ -288,6 +291,7 @@ namespace TrRouting
       
       //std::cerr << stops[resultingStopIndex].name;
       
+      legs.clear();
       journey.clear();
       journeyStepTravelTime    = -1;
       transferTime             = -1;
@@ -309,6 +313,8 @@ namespace TrRouting
       minimizedDepartureTime   = -1;
       numberOfTransfers        = -1;
       bestAccessStopIndex      = -1;
+      boardingSequence         = -1;
+      unboardingSequence       = -1;
       
       // recreate journey:
       subJourney = journeys[resultingStopIndex];
@@ -354,6 +360,8 @@ namespace TrRouting
           transferTime               = std::get<4>(journeyStep);
           departureTime              = std::get<connectionIndexes::TIME_DEP>(journeyStepEnterConnection);
           arrivalTime                = std::get<connectionIndexes::TIME_ARR>(journeyStepExitConnection);
+          boardingSequence           = std::get<connectionIndexes::SEQUENCE>(journeyStepEnterConnection);
+          unboardingSequence         = std::get<connectionIndexes::SEQUENCE>(journeyStepExitConnection);
           inVehicleTime              = arrivalTime - departureTime;
           waitingTime                = departureTime - transferArrivalTime;
           transferArrivalTime        = arrivalTime + transferTime;
@@ -361,6 +369,7 @@ namespace TrRouting
           totalInVehicleTime         += inVehicleTime;
           totalWaitingTime           += waitingTime;
           numberOfTransfers          += 1;
+          legs.push_back(std::make_tuple(journeyStepTrip.id, journeyStepTrip.routeId, journeyStepTrip.routePathId, boardingSequence, unboardingSequence));
           
           if (i == 1) // first leg
           {
@@ -385,7 +394,7 @@ namespace TrRouting
             "      \"routeTypeName\": \""             + journeyStepRoute.routeTypeName + "\",\n"
             "      \"routeTypeId\": "                 + std::to_string(journeyStepRoute.routeTypeId) + ",\n"
             "      \"tripId\": "                      + std::to_string(journeyStepTrip.id) + ",\n"
-            "      \"sequenceInTrip\": "              + std::to_string(std::get<connectionIndexes::SEQUENCE>(journeyStepEnterConnection)) + ",\n"
+            "      \"sequenceInTrip\": "              + std::to_string(boardingSequence) + ",\n"
             "      \"stopName\": \""                  + journeyStepStopDeparture.name + "\",\n"
             "      \"stopCode\": \""                  + journeyStepStopDeparture.code + "\",\n"
             "      \"stopId\": "                      + std::to_string(journeyStepStopDeparture.id) + ",\n"
@@ -407,7 +416,7 @@ namespace TrRouting
             "      \"routeTypeName\": \""             + journeyStepRoute.routeTypeName + "\",\n"
             "      \"routeTypeId\": "                 + std::to_string(journeyStepRoute.routeTypeId) + ",\n"
             "      \"tripId\": "                      + std::to_string(journeyStepTrip.id) + ",\n"
-            "      \"sequenceInTrip\": "              + std::to_string(std::get<connectionIndexes::SEQUENCE>(journeyStepExitConnection)) + ",\n"
+            "      \"sequenceInTrip\": "              + std::to_string(unboardingSequence) + ",\n"
             "      \"stopName\": \""                  + journeyStepStopArrival.name + "\",\n"
             "      \"stopCode\": \""                  + journeyStepStopArrival.code + "\",\n"
             "      \"stopId\": "                      + std::to_string(journeyStepStopArrival.id) + ",\n"
@@ -547,6 +556,7 @@ namespace TrRouting
           result.arrivalTimeSeconds   = arrivalTime;
           result.departureTimeSeconds = departureTimeSeconds;
           result.numberOfTransfers    = numberOfTransfers;
+          result.legs                 = legs;
           result.status               = "success";
           
         }

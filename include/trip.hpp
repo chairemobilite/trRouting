@@ -13,6 +13,7 @@ namespace TrRouting
    
     unsigned long long id;
     unsigned long long routeId;
+    unsigned long long routePathId;
     unsigned long long routeTypeId;
     unsigned long long agencyId;
     unsigned long long serviceId;
@@ -24,6 +25,7 @@ namespace TrRouting
     {
         ar & id;
         ar & routeId;
+        ar & routePathId;
         ar & routeTypeId;
         ar & agencyId;
         ar & serviceId;

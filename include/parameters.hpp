@@ -48,12 +48,17 @@ namespace TrRouting
     std::vector<unsigned long long> egressStopIds;
     std::vector<int>                egressStopTravelTimesSeconds;
     
+    std::vector<std::pair<int,int>> odTripsPeriods; // pair: start_at_seconds, end_at_seconds
+    std::vector<std::string>        odTripsGenders;
+    std::vector<std::string>        odTripsAgeGroups;
+    std::vector<std::string>        odTripsOccupations;
+    std::vector<std::string>        odTripsActivities;
+    std::vector<std::string>        odTripsModes;
 
     int departureTimeHour;
     int departureTimeMinutes;
     int arrivalTimeHour;
     int arrivalTimeMinutes;
-    
     int maxTotalTravelTimeSeconds;
     int maxNumberOfTransfers;
     int minWaitingTimeSeconds;
@@ -70,7 +75,6 @@ namespace TrRouting
     
     Point origin;
     Point destination;
-    
     long long originStopId;
     long long destinationStopId;
     OdTrip* odTrip;
