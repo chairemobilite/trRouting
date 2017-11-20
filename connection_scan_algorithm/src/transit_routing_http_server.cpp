@@ -727,7 +727,7 @@ int main(int argc, char** argv) {
                 }
               }
             }
-            resultStr += "    {\"id\":" + std::to_string(odTrip.id) + ", \"status\": \"" + routingResult.status + "\", \"travelTimeSeconds\": " + std::to_string(routingResult.travelTimeSeconds) + ", \"numberOfTransfers\": " + std::to_string(routingResult.numberOfTransfers) + "},\n";
+            resultStr += "    {\"id\":" + std::to_string(odTrip.id) + ", \"status\": \"" + routingResult.status + "\", \"expansionFactor\": " + std::to_string(odTrip.expansionFactor) + ", \"travelTimeSeconds\": " + std::to_string(routingResult.travelTimeSeconds) + ", \"numberOfTransfers\": " + std::to_string(routingResult.numberOfTransfers) + "},\n";
           }
           i++;
           if (odTripsSampleSize >= 0 && i == odTripsSampleSize)
