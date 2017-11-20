@@ -370,7 +370,7 @@ namespace TrRouting
     std::cout << "Fetching od trips from database..." << std::endl;
     
     // query for connections:
-    std::string sqlQuery = "SELECT id, user_interview_id, household_interview_id, COALESCE(age,-1), origin_lat, origin_lon, destination_lat, destination_lon, COALESCE(gender_sn, 'unknown'), COALESCE(mode_sn, 'unknown'), start_at_seconds FROM " + applicationShortname + ".tr_od_trips WHERE id <= 100 ORDER BY id";
+    std::string sqlQuery = "SELECT id, user_interview_id, household_interview_id, COALESCE(age,-1), origin_lat, origin_lon, destination_lat, destination_lon, COALESCE(gender_sn, 'unknown'), COALESCE(mode_sn, 'unknown'), start_at_seconds FROM " + applicationShortname + ".tr_od_trips WHERE mode_sn = 'transit' ORDER BY id";
     
     std::cout << sqlQuery << std::endl;
     

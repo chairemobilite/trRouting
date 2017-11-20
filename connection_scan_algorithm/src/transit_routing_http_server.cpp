@@ -351,7 +351,7 @@ int main(int argc, char** argv) {
           boost::split(accessStopIdsVector, parameterWithValueVector[1], boost::is_any_of(","));
           for(std::string accessStopId : accessStopIdsVector)
           {
-            accessStopIds.push_back(std::stoi(accessStopId));
+            accessStopIds.push_back(std::stoll(accessStopId));
           }
           calculator.params.accessStopIds = accessStopIds;
         }
@@ -360,7 +360,7 @@ int main(int argc, char** argv) {
           boost::split(egressStopIdsVector, parameterWithValueVector[1], boost::is_any_of(","));
           for(std::string egressStopId : egressStopIdsVector)
           {
-            egressStopIds.push_back(std::stoi(egressStopId));
+            egressStopIds.push_back(std::stoll(egressStopId));
           }
           calculator.params.egressStopIds = egressStopIds;
         }
@@ -391,7 +391,7 @@ int main(int argc, char** argv) {
           boost::split(onlyServiceIdsVector, parameterWithValueVector[1], boost::is_any_of(","));
           for(std::string onlyServiceId : onlyServiceIdsVector)
           {
-            onlyServiceIds.push_back(std::stoi(onlyServiceId));
+            onlyServiceIds.push_back(std::stoll(onlyServiceId));
           }
           calculator.params.onlyServiceIds = onlyServiceIds;
         }
@@ -400,7 +400,7 @@ int main(int argc, char** argv) {
           boost::split(onlyServiceIdsVector, parameterWithValueVector[1], boost::is_any_of(","));
           for(std::string onlyServiceId : onlyServiceIdsVector)
           {
-            onlyServiceIds.push_back(std::stoi(onlyServiceId));
+            onlyServiceIds.push_back(std::stoll(onlyServiceId));
           }
           calculator.params.onlyServiceIds = onlyServiceIds;
         }
@@ -409,7 +409,7 @@ int main(int argc, char** argv) {
           boost::split(exceptServiceIdsVector, parameterWithValueVector[1], boost::is_any_of(","));
           for(std::string exceptServiceId : exceptServiceIdsVector)
           {
-            exceptServiceIds[std::stoi(exceptServiceId)] = true;
+            exceptServiceIds[std::stoll(exceptServiceId)] = true;
           }
           calculator.params.exceptServiceIds = exceptServiceIds;
         }
@@ -418,7 +418,7 @@ int main(int argc, char** argv) {
           boost::split(onlyRouteIdsVector, parameterWithValueVector[1], boost::is_any_of(","));
           for(std::string onlyRouteId : onlyRouteIdsVector)
           {
-            onlyRouteIds[std::stoi(onlyRouteId)] = true;
+            onlyRouteIds[std::stoll(onlyRouteId)] = true;
           }
           calculator.params.onlyRouteIds = onlyRouteIds;
         }
@@ -427,7 +427,7 @@ int main(int argc, char** argv) {
           boost::split(exceptRouteIdsVector, parameterWithValueVector[1], boost::is_any_of(","));
           for(std::string exceptRouteId : exceptRouteIdsVector)
           {
-            exceptRouteIds[std::stoi(exceptRouteId)] = true;
+            exceptRouteIds[std::stoll(exceptRouteId)] = true;
           }
           calculator.params.exceptRouteIds = exceptRouteIds;
         }
@@ -436,7 +436,7 @@ int main(int argc, char** argv) {
           boost::split(onlyRouteTypeIdsVector, parameterWithValueVector[1], boost::is_any_of(","));
           for(std::string onlyRouteTypeId : onlyRouteTypeIdsVector)
           {
-            onlyRouteTypeIds[std::stoi(onlyRouteTypeId)] = true;
+            onlyRouteTypeIds[std::stoll(onlyRouteTypeId)] = true;
           }
           calculator.params.onlyRouteTypeIds = onlyRouteTypeIds;
         }
@@ -445,7 +445,7 @@ int main(int argc, char** argv) {
           boost::split(exceptRouteTypeIdsVector, parameterWithValueVector[1], boost::is_any_of(","));
           for(std::string exceptRouteTypeId : exceptRouteTypeIdsVector)
           {
-            exceptRouteTypeIds[std::stoi(exceptRouteTypeId)] = true;
+            exceptRouteTypeIds[std::stoll(exceptRouteTypeId)] = true;
           }
           calculator.params.exceptRouteTypeIds = exceptRouteTypeIds;
         }
@@ -454,7 +454,7 @@ int main(int argc, char** argv) {
           boost::split(onlyAgencyIdsVector, parameterWithValueVector[1], boost::is_any_of(","));
           for(std::string onlyAgencyId : onlyAgencyIdsVector)
           {
-            onlyAgencyIds[std::stoi(onlyAgencyId)] = true;
+            onlyAgencyIds[std::stoll(onlyAgencyId)] = true;
           }
           calculator.params.onlyAgencyIds = onlyAgencyIds;
         }
@@ -463,7 +463,7 @@ int main(int argc, char** argv) {
           boost::split(exceptAgencyIdsVector, parameterWithValueVector[1], boost::is_any_of(","));
           for(std::string exceptAgencyId : exceptAgencyIdsVector)
           {
-            exceptAgencyIds[std::stoi(exceptAgencyId)] = true;
+            exceptAgencyIds[std::stoll(exceptAgencyId)] = true;
           }
           calculator.params.exceptAgencyIds = exceptAgencyIds;
         }
@@ -472,14 +472,14 @@ int main(int argc, char** argv) {
                  || parameterWithValueVector[0] == "origin_stop_id"
                 )
         {
-          calculator.params.originStopId = std::stoi(parameterWithValueVector[1]);
+          calculator.params.originStopId = std::stoll(parameterWithValueVector[1]);
         }
         else if (parameterWithValueVector[0] == "ending_stop_id"
                  || parameterWithValueVector[0] == "end_stop_id"
                  || parameterWithValueVector[0] == "destination_stop_id"
                 )
         {
-          calculator.params.destinationStopId = std::stoi(parameterWithValueVector[1]);
+          calculator.params.destinationStopId = std::stoll(parameterWithValueVector[1]);
         }
         else if (parameterWithValueVector[0] == "max_number_of_transfers" || parameterWithValueVector[0] == "max_transfers")
         {
