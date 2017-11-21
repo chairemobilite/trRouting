@@ -657,9 +657,9 @@ int main(int argc, char** argv) {
       if (calculaterAllOdTrips)
       {
         RoutingResult routingResult;
-        std::map<unsigned long long, std::map<int, int>> tripsLegsProfile; // parent map key: trip id, nested map key: connection sequence, value: number of trips using this connection
-        std::map<unsigned long long, std::map<int, int>> routePathsLegsProfile; // parent map key: trip id, nested map key: connection sequence, value: number of trips using this connection
-        std::map<unsigned long long, int> routesOdTripsCount; // key: route id, value: count od trips using this route
+        std::map<unsigned long long, std::map<int, float>> tripsLegsProfile; // parent map key: trip id, nested map key: connection sequence, value: number of trips using this connection
+        std::map<unsigned long long, std::map<int, float>> routePathsLegsProfile; // parent map key: trip id, nested map key: connection sequence, value: number of trips using this connection
+        std::map<unsigned long long, float> routesOdTripsCount; // key: route id, value: count od trips using this route
         unsigned long long legTripId;
         unsigned long long legRouteId;
         unsigned long long legRoutePathId;
@@ -669,7 +669,7 @@ int main(int argc, char** argv) {
         int legBoardingSequence;
         int legUnboardingSequence;
         
-        resultStr += "{\n\"od_trips\": [\n";
+        resultStr += "{\n\"odTrips\": [\n";
         int i = 0;
         for (auto & odTrip : calculator.odTrips)
         {
@@ -690,44 +690,44 @@ int main(int argc, char** argv) {
                 legUnboardingSequence = std::get<4>(leg);
                 if (routesOdTripsCount.find(legRouteId) == routesOdTripsCount.end())
                 {
-                  routesOdTripsCount[legRouteId] = 1;
+                  routesOdTripsCount[legRouteId] = odTrip.expansionFactor;
                 }
                 else
                 {
-                  routesOdTripsCount[legRouteId] += 1;
+                  routesOdTripsCount[legRouteId] += odTrip.expansionFactor;
                 }
                 if (tripsLegsProfile.find(legTripId) == tripsLegsProfile.end()) // initialize legs for this trip if not already set
                 {
-                  tripsLegsProfile[legTripId] = std::map<int, int>();
+                  tripsLegsProfile[legTripId] = std::map<int, float>();
                 }
                 if (routePathsLegsProfile.find(legRoutePathId) == routePathsLegsProfile.end()) // initialize legs for this trip if not already set
                 {
-                  routePathsLegsProfile[legRoutePathId] = std::map<int, int>();
+                  routePathsLegsProfile[legRoutePathId] = std::map<int, float>();
                 }
                 for (int sequence = legBoardingSequence; sequence <= legUnboardingSequence; sequence++) // loop each connection sequence between boarding and unboarding sequences
                 {
                   // increment in trip profile:
                   if (tripsLegsProfile[legTripId].find(sequence) == tripsLegsProfile[legTripId].end())
                   {
-                    tripsLegsProfile[legTripId][sequence] = 1; // create the first od_trip for this connection
+                    tripsLegsProfile[legTripId][sequence] = odTrip.expansionFactor; // create the first od_trip for this connection
                   }
                   else
                   {
-                    tripsLegsProfile[legTripId][sequence] += 1; // increment od_trips for this connection
+                    tripsLegsProfile[legTripId][sequence] += odTrip.expansionFactor; // increment od_trips for this connection
                   }
                   // increment in route path profile:
                   if (routePathsLegsProfile[legRoutePathId].find(sequence) == routePathsLegsProfile[legRoutePathId].end())
                   {
-                    routePathsLegsProfile[legRoutePathId][sequence] = 1; // create the first od_trip for this connection
+                    routePathsLegsProfile[legRoutePathId][sequence] = odTrip.expansionFactor; // create the first od_trip for this connection
                   }
                   else
                   {
-                    routePathsLegsProfile[legRoutePathId][sequence] += 1; // increment od_trips for this connection
+                    routePathsLegsProfile[legRoutePathId][sequence] += odTrip.expansionFactor; // increment od_trips for this connection
                   }
                 }
               }
             }
-            resultStr += "    {\"id\":" + std::to_string(odTrip.id) + ", \"status\": \"" + routingResult.status + "\", \"expansionFactor\": " + std::to_string(odTrip.expansionFactor) + ", \"travelTimeSeconds\": " + std::to_string(routingResult.travelTimeSeconds) + ", \"numberOfTransfers\": " + std::to_string(routingResult.numberOfTransfers) + "},\n";
+            resultStr += "    {\"id\":" + std::to_string(odTrip.id) + ", \"status\": \"" + routingResult.status + "\", \"expansionFactor\": " + std::to_string(odTrip.expansionFactor) + ", \"travelTimeSeconds\": " + std::to_string(routingResult.travelTimeSeconds) + ", \"walkingTravelTimeSeconds\": " + std::to_string(odTrip.walkingTravelTimeSeconds) + ", \"numberOfTransfers\": " + std::to_string(routingResult.numberOfTransfers) + "},\n";
           }
           i++;
           if (odTripsSampleSize >= 0 && i == odTripsSampleSize)
