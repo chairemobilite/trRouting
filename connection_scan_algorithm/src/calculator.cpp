@@ -500,7 +500,7 @@ namespace TrRouting
       
       minimizedDepartureTime = firstDepartureTime - accessWalkingTime - params.minWaitingTimeSeconds;
       
-      if (params.returnAllStopsResult && numberOfTransfers >= 0)
+      if (params.returnAllStopsResult)
       {
         arrivalTime = stopsTentativeTime[resultingStopIndex] - params.minWaitingTimeSeconds;
         if (arrivalTime - departureTimeSeconds <= params.maxTotalTravelTimeSeconds)
