@@ -697,11 +697,14 @@ int main(int argc, char** argv) {
           if (attributesMatches && atLeastOneCompatiblePeriod)
           {
             std::cout << "od trip id " << odTrip.id << " (" << (i+1) << "/" << odTripsCount << ")" << std::endl;// << " dts: " << odTrip.departureTimeSeconds << " atLeastOneCompatiblePeriod: " << (atLeastOneCompatiblePeriod ? "true " : "false ") << "attributesMatches: " << (attributesMatches ? "true " : "false ") << std::endl;
+            
+            calculator.params.origin = odTrip.origin;
+            calculator.params.destination = odTrip.destination;
+            calculator.params.odTrip = &odTrip;
             routingResult = calculator.calculate();
             if (true/*routingResult.status == "success"*/)
             {
               atLeastOneOdTrip = true;
-              calculator.params.odTrip = &odTrip;
               if (routingResult.legs.size() > 0)
               {
                 for (auto & leg : routingResult.legs)
