@@ -56,7 +56,6 @@ extern std::string consoleCyan;
 extern std::string consoleMagenta;
 extern std::string consoleResetColor;
 
-
 namespace TrRouting
 {
   

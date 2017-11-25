@@ -94,7 +94,7 @@ namespace TrRouting
                   if (footpathTravelTime <= params.maxTransferWalkingTravelTimeSeconds && footpathTravelTime + params.minWaitingTimeSeconds + connectionArrivalTime < stopsTentativeTime[footpathStopArrivalIndex])
                   {
                     stopsTentativeTime[footpathStopArrivalIndex] = footpathTravelTime + connectionArrivalTime + params.minWaitingTimeSeconds;
-                    forwardJourneys[footpathStopArrivalIndex]           = std::make_tuple(tripsEnterConnection[tripIndex], i, footpathIndex, tripIndex, footpathTravelTime, (stopArrivalIndex == footpathStopArrivalIndex ? 1 : -1));
+                    forwardJourneys[footpathStopArrivalIndex]    = std::make_tuple(tripsEnterConnection[tripIndex], i, footpathIndex, tripIndex, footpathTravelTime, (stopArrivalIndex == footpathStopArrivalIndex ? 1 : -1));
                   }
                   footpathIndex++;
                 }
