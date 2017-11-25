@@ -14,13 +14,21 @@ namespace TrRouting
     std::tuple<int,int,int> forwardResult;
     std::tuple<int,int,int> reverseResult;
 
+
+    int bestEgressStopIndex {-1};
+    int bestEgressTravelTime {-1};
+    int bestArrivalTime {MAX_INT};
+    int bestAccessStopIndex {-1};
+    int bestAccessTravelTime {-1};
+    int bestDepartureTime {-1};
+
     if (arrivalTimeSeconds > -1)
     {
-      forwardResult = Calculator::forwardCalculation();
+      std::tie(bestArrivalTime, bestEgressStopIndex, bestEgressTravelTime)   = Calculator::forwardCalculation();
     }
     else if (departureTimeSeconds > -1)
     {
-      reverseResult = Calculator::reverseCalculation();
+      std::tie(bestDepartureTime, bestAccessStopIndex, bestAccessTravelTime) = Calculator::reverseCalculation();
     }
 
     //if (!params.returnAllStopsResult && bestArrivalTime < MAX_INT && bestEgressStopIndex != -1)
