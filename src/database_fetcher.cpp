@@ -261,8 +261,9 @@ namespace TrRouting
       for (pqxx::result::const_iterator c = pgResult.begin(); c != pgResult.end(); ++c) {
         
         forwardConnections.push_back(std::make_tuple(stopIndexesById[c[5].as<unsigned long long>()], stopIndexesById[c[6].as<unsigned long long>()], c[3].as<int>(), c[4].as<int>(), tripIndexesById[c[0].as<unsigned long long>()], c[1].as<short>(), c[2].as<short>(), c[7].as<int>())); // departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequence in trip
-        reverseConnections.push_back(std::make_tuple(stopIndexesById[c[6].as<unsigned long long>()], stopIndexesById[c[5].as<unsigned long long>()], MAX_INT - c[4].as<int>(), MAX_INT - c[3].as<int>(), tripIndexesById[c[0].as<unsigned long long>()], c[2].as<short>(), c[1].as<short>(), c[7].as<int>())); // departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequence in trip
-        
+        //reverseConnections.push_back(std::make_tuple(stopIndexesById[c[6].as<unsigned long long>()], stopIndexesById[c[5].as<unsigned long long>()], MAX_INT - c[4].as<int>(), MAX_INT - c[3].as<int>(), tripIndexesById[c[0].as<unsigned long long>()], c[2].as<short>(), c[1].as<short>(), c[7].as<int>())); // departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequence in trip
+        reverseConnections = forwardConnections;
+
         // show loading progress in percentage:
         i++;
         if (i % 1000 == 0)
@@ -273,8 +274,37 @@ namespace TrRouting
       std::cerr << std::endl;
       
       std::cout << "Sorting reverse connections..." << std::endl;
-      std::reverse(reverseConnections.begin(), reverseConnections.end());
+      //std::reverse(reverseConnections.begin(), reverseConnections.end());
       
+      std::stable_sort(reverseConnections.begin(), reverseConnections.end(), [](std::tuple<int,int,int,int,int,short,short,int> connectionA, std::tuple<int,int,int,int,int,short,short,int> connectionB)
+      {
+        if (std::get<connectionsIndexes::TIME_ARR>(connectionA) > std::get<connectionsIndexes::TIME_ARR>(connectionB))
+        {
+          return true;
+        }
+        else if (std::get<connectionsIndexes::TIME_ARR>(connectionA) < std::get<connectionsIndexes::TIME_ARR>(connectionB))
+        {
+          return false;
+        }
+        if (std::get<connectionsIndexes::TRIP>(connectionA) > std::get<connectionsIndexes::TRIP>(connectionB)) // here we need to reverse sequence!
+        {
+          return true;
+        }
+        else if (std::get<connectionsIndexes::TRIP>(connectionA) < std::get<connectionsIndexes::TRIP>(connectionB))
+        {
+          return false;
+        }
+        if (std::get<connectionsIndexes::SEQ>(connectionA) > std::get<connectionsIndexes::SEQ>(connectionB)) // here we need to reverse sequence!
+        {
+          return true;
+        }
+        else if (std::get<connectionsIndexes::SEQ>(connectionA) < std::get<connectionsIndexes::SEQ>(connectionB))
+        {
+          return false;
+        }
+        return false;
+      });
+
       // save connections to binary cache files:
       std::cout << "Saving forward connections to cache..." << std::endl;
       CacheFetcher::saveToCacheFile(applicationShortname, forwardConnections, "connections_forward");
