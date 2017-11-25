@@ -114,7 +114,6 @@ namespace TrRouting
     if (!params.returnAllStopsResult)
     {
       i = 0;
-      resultingStops = std::vector<int>(1);
       for (auto & arrivalTime : stopsTentativeTime)
       {
         if (stopsEgressTravelTime[i] >= 0 && arrivalTime < MAX_INT && arrivalTime + stopsEgressTravelTime[i] < bestArrivalTime)

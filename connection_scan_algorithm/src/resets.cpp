@@ -40,10 +40,6 @@ namespace TrRouting
     }
     if(params.arrivalTimeHour != -1 && params.arrivalTimeMinutes != -1)
     {
-      arrivalTimeSeconds = params.odTrip->arrivalTimeSeconds;
-    }
-    else
-    {
       arrivalTimeSeconds = params.arrivalTimeHour * 3600 + params.arrivalTimeMinutes * 60;
     }
 
@@ -63,46 +59,52 @@ namespace TrRouting
     maxEgressTravelTime = -1;
     minEgressTravelTime = MAX_INT;
     maxAccessTravelTime = -1;
+    int i {0};
 
-    if(params.odTrip != NULL)
+
+
+    if (!params.returnAllStopsResult && departureTimeSeconds >= -1)
     {
-      accessFootpaths = params.odTrip->accessFootpaths;
-    }
-    else if (params.accessStopIds.size() > 0 && params.accessStopTravelTimesSeconds.size() == params.accessStopIds.size())
-    {
-      i = 0;
-      for (auto & accessStopId : params.accessStopIds)
+      if(params.odTrip != NULL)
       {
-        accessFootpaths.push_back(std::make_pair(stopIndexesById[accessStopId], params.accessStopTravelTimesSeconds[i]));
-        i++;
+        accessFootpaths = params.odTrip->accessFootpaths;
+      }
+      else if (params.accessStopIds.size() > 0 && params.accessStopTravelTimesSeconds.size() == params.accessStopIds.size())
+      {
+        i = 0;
+        for (auto & accessStopId : params.accessStopIds)
+        {
+          accessFootpaths.push_back(std::make_pair(stopIndexesById[accessStopId], params.accessStopTravelTimesSeconds[i]));
+          i++;
+        }
+      }
+      else
+      {
+        accessFootpaths = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(params.origin, stops, params.accessMode, params.maxAccessWalkingTravelTimeSeconds, params.walkingSpeedMetersPerSecond, params.osrmRoutingWalkingHost, params.osrmRoutingWalkingPort);
+      }
+  
+      for (auto & accessFootpath : accessFootpaths)
+      {
+        stopsAccessTravelTime[accessFootpath.first] = accessFootpath.second;
+        forwardJourneys[accessFootpath.first]       = std::make_tuple(-1, -1, -1, -1, accessFootpath.second, -1);
+        stopsTentativeTime[accessFootpath.first]    = departureTimeSeconds + accessFootpath.second + params.minWaitingTimeSeconds;
+        if (accessFootpath.second < minAccessTravelTime)
+        {
+          minAccessTravelTime = accessFootpath.second;
+        }
+        if (accessFootpath.second > maxAccessTravelTime)
+        {
+          maxAccessTravelTime = accessFootpath.second;
+        }
+        //result.json += "origin_stop: " + stops[accessFootpath.first].name + " - " + Toolbox::convertSecondsToFormattedTime(stopsTentativeTime[accessFootpath.first]) + "\n";
+        //result.json += std::to_string(stops[accessFootpath.first].id) + ",";
       }
     }
-    else
-    {
-      accessFootpaths = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(params.origin, stops, params.accessMode, params.maxAccessWalkingTravelTimeSeconds, params.walkingSpeedMetersPerSecond, params.osrmRoutingWalkingHost, params.osrmRoutingWalkingPort);
-    }
-
-    for (auto & accessFootpath : accessFootpaths)
-    {
-      stopsAccessTravelTime[accessFootpath.first] = accessFootpath.second;
-      journeys[accessFootpath.first]              = std::make_tuple(-1, -1, -1, -1, accessFootpath.second, -1);
-      stopsTentativeTime[accessFootpath.first]    = departureTimeSeconds + accessFootpath.second + params.minWaitingTimeSeconds;
-      if (accessFootpath.second < minAccessTravelTime)
-      {
-        minAccessTravelTime = accessFootpath.second;
-      }
-      if (accessFootpath.second > maxAccessTravelTime)
-      {
-        maxAccessTravelTime = accessFootpath.second;
-      }
-      //result.json += "origin_stop: " + stops[accessFootpath.first].name + " - " + Toolbox::convertSecondsToFormattedTime(stopsTentativeTime[accessFootpath.first]) + "\n";
-      //result.json += std::to_string(stops[accessFootpath.first].id) + ",";
-    }
 
 
 
 
-    if (!params.returnAllStopsResult)
+    if (!params.returnAllStopsResult && arrivalTimeSeconds >= -1)
     {
       // fetch stops footpaths accessible to destination using params or osrm fetcher if not provided:
       if(params.odTrip != NULL)
@@ -125,6 +127,9 @@ namespace TrRouting
       }
       for (auto & egressFootpath : egressFootpaths)
       {
+        stopsEgressTravelTime[egressFootpath.first]     = egressFootpath.second;
+        reverseJourneys[egressFootpath.first]           = std::make_tuple(-1, -1, -1, -1, egressFootpath.second, -1);
+        stopsReverseTentativeTime[egressFootpath.first] = arrivalTimeSeconds - egressFootpath.second;
         if (egressFootpath.second > maxEgressTravelTime)
         {
           maxEgressTravelTime = egressFootpath.second;
@@ -164,7 +169,7 @@ namespace TrRouting
     bool hasExceptRouteTypes = !params.exceptRouteTypeIds.empty();
     bool hasExceptAgencies   = !params.exceptAgencyIds.empty();
     
-    int i {0};
+    i = 0;
     for (auto & trip : trips)
     {
       if (params.onlyServiceIds.size() > 0)

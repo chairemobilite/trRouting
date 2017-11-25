@@ -19,9 +19,9 @@ namespace TrRouting
     int  footpathsRangeStart {-1};
     int  footpathsRangeEnd {-1};
     int  footpathIndex {-1};
-    int  footpathStopArrivalIndex {-1};
+    int  footpathStopDepartureIndex {-1};
     int  footpathTravelTime {-1};
-    int  tentativeEgressStopArrivalTime {MAX_INT};
+    int  tentativeAccessStopDepartureTime {-1};
     bool reachedAtLeastOneAccessStop {false};
     int  bestAccessStopIndex {-1};
     int  bestAccessTravelTime {-1};
@@ -49,7 +49,7 @@ namespace TrRouting
           connectionArrivalTime = std::get<connectionIndexes::TIME_ARR>(connection);
           
           // no need to parse next connections if already reached destination from all egress stops, except if max travel time is set, so we can get a reverse profile in the next loop calculation:
-          if ( (!params.returnAllStopsResult && reachedAtLeastOneAccessStop && maxAccessTravelTime >= 0 && connectionArrivalTime < tentativeAccessStopArrivalTime + maxAccessTravelTime) || (arrivalTimeSeconds - connectionArrivalTime > params.maxTotalTravelTimeSeconds))
+          if ( (!params.returnAllStopsResult && reachedAtLeastOneAccessStop && maxAccessTravelTime >= 0 && connectionArrivalTime < tentativeAccessStopDepartureTime - maxAccessTravelTime) || (arrivalTimeSeconds - connectionArrivalTime > params.maxTotalTravelTimeSeconds))
           {
             break;
           }
@@ -110,7 +110,6 @@ namespace TrRouting
     if (!params.returnAllStopsResult)
     {
       i = 0;
-      resultingStops = std::vector<int>(1);
       for (auto & departureTime : stopsReverseTentativeTime)
       {
         if (stopsAccessTravelTime[i] >= 0 && departureTime > -1 && departureTime - stopsAccessTravelTime[i] < bestDepartureTime)

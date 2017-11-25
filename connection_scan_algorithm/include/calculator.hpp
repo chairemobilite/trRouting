@@ -32,6 +32,7 @@
 #include <limits>
 #include <stdlib.h>
 
+#include "json.hpp"
 #include "toolbox.hpp"
 #include "stop.hpp"
 #include "route.hpp"
@@ -55,6 +56,7 @@ extern std::string consoleCyan;
 extern std::string consoleMagenta;
 extern std::string consoleResetColor;
 
+
 namespace TrRouting
 {
   
@@ -63,17 +65,17 @@ namespace TrRouting
   public:
     
     std::string applicationShortname;
-    int calculationId; // used to set reachable connections without having to reset a bool every time
     Calculator();
     Calculator(Parameters& theParams);
-    void prepare();
-    RoutingResult calculate();
-    void reset();
+    void                    prepare();
+    void                    reset();
+    RoutingResult           calculate();
     std::tuple<int,int,int> forwardCalculation(); // best arrival time,   best egress stop index, best egress travel time: MAX_INT,-1,-1 if non routable, too long or all stops result
     std::tuple<int,int,int> reverseCalculation(); // best departure time, best access stop index, best access travel time: -1,-1,-1 if non routable, too long or all stops result
-    void updateParams(Parameters& theParams);
+    RoutingResult           forwardJourney(int bestArrivalTime, int bestEgressStopIndex, int bestEgressTravelTime);
+    RoutingResult           reverseJourney(int bestDepartureTime, int bestAccessStopIndex, int bestAccessTravelTime);
+
     Parameters params;
-    void resetAccessEgressModes();
     CalculationTime algorithmCalculationTime;
     std::vector<OdTrip>                  odTrips;
     std::map<unsigned long long, int>    odTripIndexesById;

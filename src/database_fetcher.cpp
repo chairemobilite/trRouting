@@ -262,8 +262,7 @@ namespace TrRouting
         
         forwardConnections.push_back(std::make_tuple(stopIndexesById[c[5].as<unsigned long long>()], stopIndexesById[c[6].as<unsigned long long>()], c[3].as<int>(), c[4].as<int>(), tripIndexesById[c[0].as<unsigned long long>()], c[1].as<short>(), c[2].as<short>(), c[7].as<int>())); // departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequence in trip
         //reverseConnections.push_back(std::make_tuple(stopIndexesById[c[6].as<unsigned long long>()], stopIndexesById[c[5].as<unsigned long long>()], MAX_INT - c[4].as<int>(), MAX_INT - c[3].as<int>(), tripIndexesById[c[0].as<unsigned long long>()], c[2].as<short>(), c[1].as<short>(), c[7].as<int>())); // departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequence in trip
-        reverseConnections = forwardConnections;
-
+        
         // show loading progress in percentage:
         i++;
         if (i % 1000 == 0)
@@ -275,30 +274,31 @@ namespace TrRouting
       
       std::cout << "Sorting reverse connections..." << std::endl;
       //std::reverse(reverseConnections.begin(), reverseConnections.end());
-      
+      reverseConnections = forwardConnections;
       std::stable_sort(reverseConnections.begin(), reverseConnections.end(), [](std::tuple<int,int,int,int,int,short,short,int> connectionA, std::tuple<int,int,int,int,int,short,short,int> connectionB)
       {
-        if (std::get<connectionsIndexes::TIME_ARR>(connectionA) > std::get<connectionsIndexes::TIME_ARR>(connectionB))
+        // { STOP_DEP = 0, STOP_ARR = 1, TIME_DEP = 2, TIME_ARR = 3, TRIP = 4, CAN_BOARD = 5, CAN_UNBOARD = 6, SEQUENCE = 7 };
+        if (std::get<3>(connectionA) > std::get<3>(connectionB))
         {
           return true;
         }
-        else if (std::get<connectionsIndexes::TIME_ARR>(connectionA) < std::get<connectionsIndexes::TIME_ARR>(connectionB))
+        else if (std::get<3>(connectionA) < std::get<3>(connectionB))
         {
           return false;
         }
-        if (std::get<connectionsIndexes::TRIP>(connectionA) > std::get<connectionsIndexes::TRIP>(connectionB)) // here we need to reverse sequence!
+        if (std::get<4>(connectionA) > std::get<4>(connectionB)) // here we need to reverse sequence!
         {
           return true;
         }
-        else if (std::get<connectionsIndexes::TRIP>(connectionA) < std::get<connectionsIndexes::TRIP>(connectionB))
+        else if (std::get<4>(connectionA) < std::get<4>(connectionB))
         {
           return false;
         }
-        if (std::get<connectionsIndexes::SEQ>(connectionA) > std::get<connectionsIndexes::SEQ>(connectionB)) // here we need to reverse sequence!
+        if (std::get<7>(connectionA) > std::get<7>(connectionB)) // here we need to reverse sequence!
         {
           return true;
         }
-        else if (std::get<connectionsIndexes::SEQ>(connectionA) < std::get<connectionsIndexes::SEQ>(connectionB))
+        else if (std::get<7>(connectionA) < std::get<7>(connectionB))
         {
           return false;
         }
@@ -397,14 +397,14 @@ namespace TrRouting
     std::map<unsigned long long, int> odTripIndexesById;
     
     // fetch existing so we can append:
-    //std::tie(odTrips, odTripIndexesById) = params.cacheFetcher->getOdTrips(params.applicationShortname, stops, params);
+    std::tie(odTrips, odTripIndexesById) = params.cacheFetcher->getOdTrips(params.applicationShortname, stops, params);
     
     openConnection();
     
     std::cout << "Fetching od trips from database..." << std::endl;
     
     // query for connections:
-    std::string sqlQuery = "SELECT id, user_interview_id, household_interview_id, COALESCE(age,-1), origin_lat, origin_lon, destination_lat, destination_lon, COALESCE(age_group_sn, 'unknown'), COALESCE(occupation_sn, 'unknown'), COALESCE(activity_sn, 'unknown'),  COALESCE(gender_sn, 'unknown'), COALESCE(mode_sn, 'unknown'), start_at_seconds, COALESCE(expansion_factor,1), COALESCE(walking_travel_time_seconds,-1), COALESCE(cycling_travel_time_seconds,-1), COALESCE(driving_travel_time_seconds,-1) FROM " + applicationShortname + ".tr_od_trips WHERE id < 5000 AND mode_sn = 'transit' ORDER BY id";
+    std::string sqlQuery = "SELECT id, user_interview_id, household_interview_id, COALESCE(age,-1), origin_lat, origin_lon, destination_lat, destination_lon, COALESCE(age_group_sn, 'unknown'), COALESCE(occupation_sn, 'unknown'), COALESCE(activity_sn, 'unknown'),  COALESCE(gender_sn, 'unknown'), COALESCE(mode_sn, 'unknown'), start_at_seconds, COALESCE(expansion_factor,1), COALESCE(walking_travel_time_seconds,-1), COALESCE(cycling_travel_time_seconds,-1), COALESCE(driving_travel_time_seconds,-1) FROM " + applicationShortname + ".tr_od_trips WHERE mode_sn = 'transit' ORDER BY id";
     
     std::cout << sqlQuery << std::endl;
     

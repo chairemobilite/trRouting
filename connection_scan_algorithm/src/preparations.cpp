@@ -69,16 +69,19 @@ namespace TrRouting
     std::cout << "preparing stops tentative times, trips enter connections and journeys..." << std::endl;
     
     stopsTentativeTime                     = std::vector<int>(stops.size());
-    stopsReverseTentativeTime              = std::vector<std::deque<std::pair<int,int>>>(stops.size());
-    stopsD                                 = std::vector<int>(stops.size());
+    stopsReverseTentativeTime              = std::vector<int>(stops.size()); //std::vector<std::deque<std::pair<int,int>>>(stops.size());
+    //stopsD                                 = std::vector<int>(stops.size());
     stopsAccessTravelTime                  = std::vector<int>(stops.size());
     stopsEgressTravelTime                  = std::vector<int>(stops.size());
     tripsEnterConnection                   = std::vector<int>(trips.size());
-    tripsReverseTime                       = std::vector<int>(trips.size());
+    tripsExitConnection                    = std::vector<int>(trips.size());
+    //tripsReverseTime                       = std::vector<int>(trips.size());
     tripsEnterConnectionTransferTravelTime = std::vector<int>(trips.size());
+    tripsExitConnectionTransferTravelTime  = std::vector<int>(trips.size());
     tripsEnabled                           = std::vector<int>(trips.size());
     tripsUsable                            = std::vector<int>(trips.size());
-    journeys                               = std::vector<std::tuple<int,int,int,int,int,short>>(stops.size());
+    forwardJourneys                        = std::vector<std::tuple<int,int,int,int,int,short>>(stops.size());
+    reverseJourneys                        = std::vector<std::tuple<int,int,int,int,int,short>>(stops.size());
     
   }
   
