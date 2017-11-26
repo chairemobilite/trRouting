@@ -63,7 +63,7 @@ namespace TrRouting
 
 
 
-    if (!params.returnAllStopsResult && departureTimeSeconds >= -1)
+    if (!params.returnAllStopsResult || departureTimeSeconds >= -1)
     {
       if(params.odTrip != NULL)
       {
@@ -104,7 +104,7 @@ namespace TrRouting
 
 
 
-    if (!params.returnAllStopsResult && arrivalTimeSeconds >= -1)
+    if (!params.returnAllStopsResult || arrivalTimeSeconds >= -1)
     {
       // fetch stops footpaths accessible to destination using params or osrm fetcher if not provided:
       if(params.odTrip != NULL)

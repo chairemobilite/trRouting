@@ -14,7 +14,6 @@ namespace TrRouting
     bool             foundRoute           {false};
     
     std::vector<int> resultingStops;
-
     if (params.returnAllStopsResult)
     {
       stopsCount     = stops.size();
@@ -69,18 +68,13 @@ namespace TrRouting
         transferTime             = -1; egressWalkingTime   = -1; 
         waitingTime              = -1; accessWaitingTime   = -1; 
         
-        std::cerr << stops[resultingStopIndex].name << " : " << std::get<0>(forwardJourneys[resultingStopIndex]) << std::endl; 
+        //std::cerr << stops[resultingStopIndex].name << " : " << std::get<0>(forwardJourneys[resultingStopIndex]) << std::endl; 
         // recreate journey:
         resultingStopJourneyStep = forwardJourneys[resultingStopIndex];
         
         if (resultingStopJourneyStep == emptyJourneyStep) // ignore stops with no route
         {
-          std::cerr << "empty" << std::endl;
           continue;
-        }
-        else
-        {
-          std::cerr << "not_empty" << std::endl;
         }
         
         i = 0;
@@ -122,9 +116,9 @@ namespace TrRouting
             arrivalTime                = std::get<connectionIndexes::TIME_ARR>(journeyStepExitConnection);
             boardingSequence           = std::get<connectionIndexes::SEQUENCE>(journeyStepEnterConnection);
             unboardingSequence         = std::get<connectionIndexes::SEQUENCE>(journeyStepExitConnection);
-            inVehicleTime              = arrivalTime - departureTime;
+            inVehicleTime              = arrivalTime   - departureTime;
             waitingTime                = departureTime - transferArrivalTime;
-            transferArrivalTime        = arrivalTime + transferTime;
+            transferArrivalTime        = arrivalTime   + transferTime;
             transferReadyTime          = transferArrivalTime;
             totalInVehicleTime         += inVehicleTime;
             totalWaitingTime           += waitingTime;
@@ -244,9 +238,9 @@ namespace TrRouting
                 stepJson["type"]                 = "egress";
                 stepJson["travelTimeSeconds"]    = transferTime;
                 stepJson["travelTimeMinutes"]    = Toolbox::convertSecondsToMinutes(transferTime);
-                stepJson["departureTime"]        = Toolbox::convertSecondsToFormattedTime(arrivalTime);
+                stepJson["departureTime"]        = Toolbox::convertSecondsToFormattedTime(departureTimeSeconds);
                 stepJson["arrivalTime"]          = Toolbox::convertSecondsToFormattedTime(arrivalTime + transferTime);
-                stepJson["departureTimeSeconds"] = arrivalTime;
+                stepJson["departureTimeSeconds"] = departureTimeSeconds;
                 stepJson["arrivalTimeSeconds"]   = arrivalTime + transferTime;
                 json["steps"].push_back(stepJson);
               }

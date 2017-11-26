@@ -26,8 +26,7 @@ namespace TrRouting
     int  bestAccessStopIndex {-1};
     int  bestAccessTravelTime {-1};
     int  bestDepartureTime {-1};
-    
-    
+
     // reverse calculation:
     //int time1 {-1};
     //int time2 {-1};
@@ -67,7 +66,7 @@ namespace TrRouting
               tripsExitConnectionTransferTravelTime[tripIndex] = std::get<4>(reverseJourneys[stopArrivalIndex]);
             }
             
-            if (std::get<connectionIndexes::CAN_UNBOARD>(connection) == 1 && tripsExitConnection[tripIndex] != -1)
+            if (std::get<connectionIndexes::CAN_BOARD>(connection) == 1 && tripsExitConnection[tripIndex] != -1)
             {
               // get footpaths for the arrival stop to get transferable stops:
               stopDepartureIndex      = std::get<connectionIndexes::STOP_DEP>(connection);
@@ -103,16 +102,13 @@ namespace TrRouting
       i++;
     }
 
-
-    std::cerr << "-- " << reachableConnectionsCount << " reverse connections parsed on " << connectionsCount << std::endl;
-
     // find best egress stop:
     if (!params.returnAllStopsResult)
     {
       i = 0;
       for (auto & departureTime : stopsReverseTentativeTime)
       {
-        if (stopsAccessTravelTime[i] >= 0 && departureTime > -1 && departureTime - stopsAccessTravelTime[i] < bestDepartureTime)
+        if (stopsAccessTravelTime[i] >= 0 && departureTime >= 0 && departureTime - stopsAccessTravelTime[i] > bestDepartureTime)
         {
           bestDepartureTime    = departureTime - stopsAccessTravelTime[i];
           bestAccessStopIndex  = i;

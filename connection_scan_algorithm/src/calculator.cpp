@@ -24,7 +24,7 @@ namespace TrRouting
 
     if (departureTimeSeconds > -1)
     {
-      std::tie(bestArrivalTime, bestEgressStopIndex, bestEgressTravelTime)   = forwardCalculation();
+      std::tie(bestArrivalTime, bestEgressStopIndex, bestEgressTravelTime) = forwardCalculation();
 
       std::cerr << "-- forward calculation -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
       calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
