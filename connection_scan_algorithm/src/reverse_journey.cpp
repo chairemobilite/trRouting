@@ -76,12 +76,13 @@ namespace TrRouting
         {
           continue;
         }
-        
+        std::cerr << stops[bestEgressStopIndex].name << std::endl;
         i = 0;
         while ((std::get<0>(resultingStopJourneyStep) != -1 && std::get<1>(resultingStopJourneyStep) != -1))
         {
-          journey.push_front(resultingStopJourneyStep);
-          bestEgressStopIndex      = std::get<connectionIndexes::STOP_ARR>(reverseConnections[std::get<0>(resultingStopJourneyStep)]);
+          journey.push_back(resultingStopJourneyStep);
+          bestEgressStopIndex      = std::get<connectionIndexes::STOP_DEP>(reverseConnections[std::get<0>(resultingStopJourneyStep)]);
+          std::cerr << stops[std::get<connectionIndexes::STOP_DEP>(reverseConnections[std::get<0>(resultingStopJourneyStep)])].name << " > "  << stops[std::get<connectionIndexes::STOP_ARR>(reverseConnections[std::get<1>(resultingStopJourneyStep)])].name << std::endl;
           resultingStopJourneyStep = reverseJourneys[bestEgressStopIndex];
           i++;
         }
@@ -103,8 +104,8 @@ namespace TrRouting
           if (std::get<0>(journeyStep) != -1 && std::get<1>(journeyStep) != -1)
           {
             // journey tuple: final enter connection, final exit connection, final footpath
-            journeyStepEnterConnection = forwardConnections[std::get<0>(journeyStep)];
-            journeyStepExitConnection  = forwardConnections[std::get<1>(journeyStep)];
+            journeyStepEnterConnection = reverseConnections[std::get<0>(journeyStep)];
+            journeyStepExitConnection  = reverseConnections[std::get<1>(journeyStep)];
             journeyStepStopDeparture   = stops[std::get<connectionIndexes::STOP_DEP>(journeyStepEnterConnection)];
             journeyStepStopArrival     = stops[std::get<connectionIndexes::STOP_ARR>(journeyStepExitConnection)];
             journeyStepTrip            = trips[std::get<3>(journeyStep)];

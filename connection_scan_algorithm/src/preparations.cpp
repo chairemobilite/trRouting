@@ -81,6 +81,7 @@ namespace TrRouting
     tripsEnabled                           = std::vector<int>(trips.size());
     tripsUsable                            = std::vector<int>(trips.size());
     forwardJourneys                        = std::vector<std::tuple<int,int,int,int,int,short>>(stops.size());
+    forwardEgressJourneys                  = std::vector<std::tuple<int,int,int,int,int,short>>(stops.size());
     reverseJourneys                        = std::vector<std::tuple<int,int,int,int,int,short>>(stops.size());
     
   }

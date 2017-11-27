@@ -121,9 +121,10 @@ namespace TrRouting
     std::vector<int>                     tripsUsable; // after forwarrd calculation, keep a list of usable trips in time range for reverse calculation
     std::vector<std::tuple<int,int,int,int,int,short,short,int>> forwardConnections; // tuple: departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequence in trip
     std::vector<std::tuple<int,int,int,int,int,short,short,int>> reverseConnections; // tuple: departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequence in trip
-    std::vector<std::pair<int,int>>      accessFootpaths; // tuple: accessStopIndex, walkingTravelTimeSeconds
-    std::vector<std::pair<int,int>>      egressFootpaths; // tuple: egressStopIndex, walkingTravelTimeSeconds
+    std::vector<std::pair<int,int>>      accessFootpaths; // pair: accessStopIndex, walkingTravelTimeSeconds
+    std::vector<std::pair<int,int>>      egressFootpaths; // pair: egressStopIndex, walkingTravelTimeSeconds
     std::vector<std::tuple<int,int,int,int,int,short>> forwardJourneys; // index = stop index, tuple: final enter connection, final exit connection, final footpath, final exit trip index, transfer travel time, is same stop transfer (first, second, third and fourth values = -1 for access and egress journeys)
+    std::vector<std::tuple<int,int,int,int,int,short>> forwardEgressJourneys; // index = stop index, tuple: final enter connection, final exit connection, final footpath, final exit trip index, transfer travel time, is same stop transfer (first, second, third and fourth values = -1 for access and egress journeys)
     std::vector<std::tuple<int,int,int,int,int,short>> reverseJourneys; // index = stop index, tuple: final enter connection, final exit connection, final footpath, final exit trip index, transfer travel time, is same stop transfer (first, second, third and fourth values = -1 for access and egress journeys)
     int                                  maxTimeValue;
     int                                  minAccessTravelTime;

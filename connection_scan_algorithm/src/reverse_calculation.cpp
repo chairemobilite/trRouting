@@ -59,8 +59,8 @@ namespace TrRouting
           // reachable connections only here:
           if (tripExitConnectionIndex != -1 || stopArrivalTentativeTime >= connectionArrivalTime)
           {
-                        
-            if (std::get<connectionIndexes::CAN_UNBOARD>(connection) == 1 && (tripExitConnectionIndex == -1 || (std::get<0>(reverseJourneys[stopArrivalIndex]) == -1 && std::get<4>(reverseJourneys[stopArrivalIndex]) >= 0 && std::get<4>(reverseJourneys[stopArrivalIndex]) < tripsExitConnectionTransferTravelTime[tripIndex])))
+            
+            if (std::get<connectionIndexes::CAN_UNBOARD>(connection) == 1 && (tripExitConnectionIndex == -1/* || (std::get<0>(reverseJourneys[stopArrivalIndex]) == -1 && std::get<4>(reverseJourneys[stopArrivalIndex]) >= 0 && std::get<4>(reverseJourneys[stopArrivalIndex]) < tripsExitConnectionTransferTravelTime[tripIndex])*/))
             {
               tripsExitConnection[tripIndex]                   = i;
               tripsExitConnectionTransferTravelTime[tripIndex] = std::get<4>(reverseJourneys[stopArrivalIndex]);

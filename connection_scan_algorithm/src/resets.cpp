@@ -8,21 +8,22 @@ namespace TrRouting
     
     calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
 
-    std::fill(stopsTentativeTime.begin(), stopsTentativeTime.end(), MAX_INT);
+    std::fill(stopsTentativeTime.begin(),        stopsTentativeTime.end(),   MAX_INT);
     std::fill(stopsReverseTentativeTime.begin(), stopsReverseTentativeTime.end(), -1);
     //std::fill(stopsD.begin(), stopsD.end(), MAX_INT);
     //std::fill(stopsReverseTentativeTime.begin(), stopsReverseTentativeTime.end(), std::deque<std::pair<int,int>>(1, std::make_pair(MAX_INT, MAX_INT));
-    std::fill(stopsAccessTravelTime.begin(),  stopsAccessTravelTime.end(), -1);
-    std::fill(stopsEgressTravelTime.begin(),  stopsEgressTravelTime.end(), -1);
-    std::fill(tripsEnterConnection.begin(),   tripsEnterConnection.end(), -1);
-    std::fill(tripsExitConnection.begin(),    tripsExitConnection.end(), -1);
+    std::fill(stopsAccessTravelTime.begin(),     stopsAccessTravelTime.end(),     -1);
+    std::fill(stopsEgressTravelTime.begin(),     stopsEgressTravelTime.end(),     -1);
+    std::fill(tripsEnterConnection.begin(),      tripsEnterConnection.end(),      -1);
+    std::fill(tripsExitConnection.begin(),       tripsExitConnection.end(),       -1);
     std::fill(tripsEnterConnectionTransferTravelTime.begin(), tripsEnterConnectionTransferTravelTime.end(), MAX_INT);
-    std::fill(tripsExitConnectionTransferTravelTime.begin(),  tripsExitConnectionTransferTravelTime.end(), MAX_INT);
+    std::fill(tripsExitConnectionTransferTravelTime.begin(),  tripsExitConnectionTransferTravelTime.end(),  MAX_INT);
     //std::fill(tripsReverseTime.begin(), tripsReverseTime.end(), MAX_INT);
-    std::fill(tripsEnabled.begin(),    tripsEnabled.end(), 1);
-    std::fill(tripsUsable.begin(),     tripsUsable.end(),  0);
-    std::fill(forwardJourneys.begin(), forwardJourneys.end(), std::make_tuple(-1,-1,-1,-1,-1,-1));
-    std::fill(reverseJourneys.begin(), reverseJourneys.end(), std::make_tuple(-1,-1,-1,-1,-1,-1));
+    std::fill(tripsEnabled.begin(),          tripsEnabled.end(), 1);
+    std::fill(tripsUsable.begin(),           tripsUsable.end(),  0);
+    std::fill(forwardJourneys.begin(),       forwardJourneys.end(),       std::make_tuple(-1,-1,-1,-1,-1,-1));
+    std::fill(forwardEgressJourneys.begin(), forwardEgressJourneys.end(), std::make_tuple(-1,-1,-1,-1,-1,-1));
+    std::fill(reverseJourneys.begin(),       reverseJourneys.end(),       std::make_tuple(-1,-1,-1,-1,-1,-1));
 
     accessFootpaths.clear();
     egressFootpaths.clear();
@@ -96,8 +97,8 @@ namespace TrRouting
         {
           maxAccessTravelTime = accessFootpath.second;
         }
-        //result.json += "origin_stop: " + stops[accessFootpath.first].name + " - " + Toolbox::convertSecondsToFormattedTime(stopsTentativeTime[accessFootpath.first]) + "\n";
-        //result.json += std::to_string(stops[accessFootpath.first].id) + ",";
+        //std::cerr << "origin_stop: " << stops[accessFootpath.first].name << " - " << Toolbox::convertSecondsToFormattedTime(stopsTentativeTime[accessFootpath.first]) << std::endl;
+        //std::cerr << std::to_string(stops[accessFootpath.first].id) + ",";
       }
     }
 

@@ -70,7 +70,7 @@ namespace TrRouting
         
         //std::cerr << stops[resultingStopIndex].name << " : " << std::get<0>(forwardJourneys[resultingStopIndex]) << std::endl; 
         // recreate journey:
-        resultingStopJourneyStep = forwardJourneys[resultingStopIndex];
+        resultingStopJourneyStep = forwardEgressJourneys[resultingStopIndex];
         
         if (resultingStopJourneyStep == emptyJourneyStep) // ignore stops with no route
         {
@@ -238,9 +238,9 @@ namespace TrRouting
                 stepJson["type"]                 = "egress";
                 stepJson["travelTimeSeconds"]    = transferTime;
                 stepJson["travelTimeMinutes"]    = Toolbox::convertSecondsToMinutes(transferTime);
-                stepJson["departureTime"]        = Toolbox::convertSecondsToFormattedTime(departureTimeSeconds);
+                stepJson["departureTime"]        = Toolbox::convertSecondsToFormattedTime(arrivalTime);
                 stepJson["arrivalTime"]          = Toolbox::convertSecondsToFormattedTime(arrivalTime + transferTime);
-                stepJson["departureTimeSeconds"] = departureTimeSeconds;
+                stepJson["departureTimeSeconds"] = arrivalTime;
                 stepJson["arrivalTimeSeconds"]   = arrivalTime + transferTime;
                 json["steps"].push_back(stepJson);
               }
