@@ -21,7 +21,9 @@ use -DBOOST_ROOT option to choose boost path if not default (ex: /usr/lib or /us
 ```
 brew install boost
 brew install libpqxx
+brew install yaml-cpp
 brew install msgpack
+brew install cereal
 brew tap nlohmann/json
 brew install nlohmann/json/nlohmann_json
 ```
