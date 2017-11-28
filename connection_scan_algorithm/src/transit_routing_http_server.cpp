@@ -668,7 +668,14 @@ int main(int argc, char** argv) {
         int legBoardingSequence;
         int legUnboardingSequence;
         
-        resultStr += "{\n  \"odTrips\": [\n";
+        nlohmann::json json;
+        nlohmann::json odTripJson;
+        nlohmann::json routesOdTripsCountJson;
+        nlohmann::json routePathsOdTripsProfilesJson;
+        nlohmann::json routePathsOdTripsProfilesSequenceJson;
+        //std::vector<unsigned long long> routePathsOdTripsProfilesOdTripIds;
+        
+        json["odTrips"] = nlohmann::json::array();
         int i = 0;
         for (auto & odTrip : calculator.odTrips)
         {
@@ -694,7 +701,7 @@ int main(int argc, char** argv) {
             }
           }
           
-          if (attributesMatches && atLeastOneCompatiblePeriod)
+          if (attributesMatches && (atLeastOneCompatiblePeriod || odTripsPeriods.size() == 0))
           {
             std::cout << "od trip id " << odTrip.id << " (" << (i+1) << "/" << odTripsCount << ")" << std::endl;// << " dts: " << odTrip.departureTimeSeconds << " atLeastOneCompatiblePeriod: " << (atLeastOneCompatiblePeriod ? "true " : "false ") << "attributesMatches: " << (attributesMatches ? "true " : "false ") << std::endl;
             
@@ -756,17 +763,34 @@ int main(int argc, char** argv) {
                   }
                 }
               }
-              resultStr += "    {\"id\":" + std::to_string(odTrip.id) + ", "
-              "\"status\": \"" + routingResult.status + "\", "
-              "\"ageGroup\": \"" + odTrip.ageGroup + "\", "
-              "\"gender\": \"" + odTrip.gender + "\", "
-              "\"occupation\": \"" + odTrip.occupation + "\", "
-              "\"activity\": \"" + odTrip.activity + "\", "
-              "\"mode\": \"" + odTrip.mode + "\", "
-              "\"expansionFactor\": " + std::to_string(odTrip.expansionFactor) + ", "
-              "\"travelTimeSeconds\": " + std::to_string(routingResult.travelTimeSeconds) + ", "
-              "\"walkingTravelTimeSeconds\": " + std::to_string(odTrip.walkingTravelTimeSeconds) + ", "
-              "\"numberOfTransfers\": " + std::to_string(routingResult.numberOfTransfers) + "},\n";
+              
+              odTripJson = {};
+              odTripJson["id"] = odTrip.id;
+              odTripJson["status"] = routingResult.status;
+              odTripJson["ageGroup"] = odTrip.ageGroup;
+              odTripJson["gender"] = odTrip.gender;
+              odTripJson["occupation"] = odTrip.occupation;
+              odTripJson["activity"] = odTrip.activity;
+              odTripJson["mode"] = odTrip.mode;
+              odTripJson["expansionFactor"] = odTrip.expansionFactor;
+              odTripJson["travelTimeSeconds"] = routingResult.travelTimeSeconds;
+              odTripJson["onlyWalkingTravelTimeSeconds"] = odTrip.walkingTravelTimeSeconds;
+              odTripJson["departureTimeSeconds"] = routingResult.departureTimeSeconds;
+              odTripJson["arrivalTimeSeconds"] = routingResult.arrivalTimeSeconds;
+              odTripJson["numberOfTransfers"] = routingResult.numberOfTransfers;
+              odTripJson["inVehicleTravelTimeSeconds"] = routingResult.inVehicleTravelTimeSeconds;
+              odTripJson["transferTravelTimeSeconds"] = routingResult.transferTravelTimeSeconds;
+              odTripJson["waitingTimeSeconds"] = routingResult.waitingTimeSeconds;
+              odTripJson["accessTravelTimeSeconds"] = routingResult.accessTravelTimeSeconds;
+              odTripJson["egressTravelTimeSeconds"] = routingResult.egressTravelTimeSeconds;
+              odTripJson["transferWaitingTimeSeconds"] = routingResult.transferWaitingTimeSeconds;
+              odTripJson["firstWaitingTimeSeconds"] = routingResult.firstWaitingTimeSeconds;
+              odTripJson["nonTransitTravelTimeSeconds"] = routingResult.nonTransitTravelTimeSeconds;
+              odTripJson["routeIds"] = routingResult.routeIds;
+              odTripJson["routeTypeIds"] = routingResult.routeTypeIds;
+              odTripJson["agencyIds"] = routingResult.agencyIds;
+              json["odTrips"].push_back(odTripJson);
+              
             }
           }
           i++;
@@ -775,51 +799,31 @@ int main(int argc, char** argv) {
             break;
           }
         }
-        
-        if (atLeastOneOdTrip)
-        {
-          resultStr.pop_back();
-        }
-        
-        resultStr.pop_back();
-        resultStr += "\n  ],\n  \"routesOdTripsCount\": {\n";
+        routesOdTripsCountJson = {};
         for (auto & routeCount : routesOdTripsCount)
         {
-          resultStr += "    \"" + std::to_string(routeCount.first) + "\": " + std::to_string(routeCount.second) + ",\n";
+          routesOdTripsCountJson[std::to_string(routeCount.first)] = routeCount.second;
         }
-        if (routesOdTripsCount.size() > 0)
-        {
-          resultStr.pop_back();
-          resultStr.pop_back();
-        }
-        resultStr += "\n  },\n  \"routePathsOdTripsProfiles\": {\n";
+        json["routesOdTripsCount"] = routesOdTripsCountJson;
+        
+        routePathsOdTripsProfilesJson = {};
         for (auto & routePathProfile : routePathsLegsProfile)
         {
-          resultStr += "    \"" + std::to_string(routePathProfile.first) + "\": {";
-          
+          routePathsOdTripsProfilesSequenceJson = {};
           for (auto & sequenceProfile : routePathProfile.second)
           {
-            resultStr += " \"" + std::to_string(sequenceProfile.first) + "\": { \"demand\": " + std::to_string(std::get<0>(sequenceProfile.second)) + ", \"odTripIds\": [";
-            
-            for (auto & odTripId : std::get<1>(sequenceProfile.second))
-            {
-              resultStr += std::to_string(odTripId) + ",";
-            }
-            resultStr.pop_back();
-            resultStr += "]},";
+            //routePathsOdTripsProfilesOdTripIds.clear();
+            //for (auto & odTripId : std::get<1>(sequenceProfile.second))
+            //{
+            //  routePathsOdTripsProfilesOdTripIds.push_back()
+            //}
+            routePathsOdTripsProfilesSequenceJson[std::to_string(sequenceProfile.first)] = {{"demand", std::get<0>(sequenceProfile.second)}, {"odTripIds", std::get<1>(sequenceProfile.second)}};
           }
-          if (routePathProfile.second.size() > 0)
-          {
-            resultStr.pop_back();
-          }
-          resultStr += "},\n";
+          routePathsOdTripsProfilesJson[std::to_string(routePathProfile.first)] = routePathsOdTripsProfilesSequenceJson;
         }
-        if (routePathsLegsProfile.size() > 0)
-        {
-          resultStr.pop_back();
-          resultStr.pop_back();
-        }
-        resultStr += "\n  }\n}";
+        json["routePathsOdTripsProfiles"] = routePathsOdTripsProfilesJson;
+        
+        resultStr = json.dump(2);
         
       }
       else

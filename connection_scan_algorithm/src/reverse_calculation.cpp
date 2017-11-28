@@ -40,11 +40,13 @@ namespace TrRouting
       // ignore connections before departure time + minimum access travel time:
       if (std::get<connectionIndexes::TIME_ARR>(connection) <= arrivalTimeSeconds - minEgressTravelTime)
       {
+        
         tripIndex = std::get<connectionIndexes::TRIP>(connection);
         
         // enabled trips only here:
-        if (/*tripsUsable[tripIndex] != -1 && */tripsEnabled[tripIndex] != -1)
+        if (tripsUsable[tripIndex] == 1 && tripsEnabled[tripIndex] != -1)
         {
+          
           connectionArrivalTime = std::get<connectionIndexes::TIME_ARR>(connection);
           
           // no need to parse next connections if already reached destination from all egress stops, except if max travel time is set, so we can get a reverse profile in the next loop calculation:
@@ -55,6 +57,8 @@ namespace TrRouting
           tripExitConnectionIndex  = tripsExitConnection[tripIndex];
           stopArrivalIndex         = std::get<connectionIndexes::STOP_ARR>(connection);
           stopArrivalTentativeTime = stopsReverseTentativeTime[stopArrivalIndex];
+          
+          //std::cerr << "stopArrivalTentativeTime: " << stopArrivalTentativeTime << " connectionArrivalTime: " << connectionArrivalTime << " tripExitConnectionIndex: " << tripExitConnectionIndex << std::endl;
           
           // reachable connections only here:
           if (tripExitConnectionIndex != -1 || stopArrivalTentativeTime >= connectionArrivalTime)
@@ -108,7 +112,10 @@ namespace TrRouting
       }
       i++;
     }
+    
+    std::cerr << "-- " << reachableConnectionsCount << " reverse connections parsed on " << connectionsCount << std::endl;
 
+    
     int accessStopDepartureTime {-1};
     int accessEnterConnection   {-1};
     int accessTravelTime        {-1};
@@ -123,7 +130,7 @@ namespace TrRouting
         {
           accessTravelTime        = stopsAccessTravelTime[accessFootpath.first];
           accessStopDepartureTime = std::get<connectionIndexes::TIME_DEP>(reverseConnections[accessEnterConnection]) - accessTravelTime - params.minWaitingTimeSeconds;
-          std::cerr << stops[accessFootpath.first].name << ": " << accessTravelTime << " t: " << trips[std::get<connectionIndexes::TRIP>(reverseConnections[accessEnterConnection])].id << " - " << Toolbox::convertSecondsToFormattedTime(accessStopDepartureTime) << std::endl;
+          //std::cerr << stops[accessFootpath.first].name << ": " << accessTravelTime << " t: " << trips[std::get<connectionIndexes::TRIP>(reverseConnections[accessEnterConnection])].id << " - " << Toolbox::convertSecondsToFormattedTime(accessStopDepartureTime) << std::endl;
           if (accessStopDepartureTime >= 0 && accessStopDepartureTime < MAX_INT && accessStopDepartureTime > bestDepartureTime)
           {
             bestDepartureTime    = accessStopDepartureTime;

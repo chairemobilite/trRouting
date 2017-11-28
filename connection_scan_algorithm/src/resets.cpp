@@ -7,7 +7,7 @@ namespace TrRouting
   {
     
     calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
-
+    
     std::fill(stopsTentativeTime.begin(),        stopsTentativeTime.end(),   MAX_INT);
     std::fill(stopsReverseTentativeTime.begin(), stopsReverseTentativeTime.end(), -1);
     //std::fill(stopsD.begin(), stopsD.end(), MAX_INT);
@@ -20,18 +20,18 @@ namespace TrRouting
     std::fill(tripsExitConnectionTransferTravelTime.begin(),  tripsExitConnectionTransferTravelTime.end(),  MAX_INT);
     //std::fill(tripsReverseTime.begin(), tripsReverseTime.end(), MAX_INT);
     std::fill(tripsEnabled.begin(),          tripsEnabled.end(), 1);
-    std::fill(tripsUsable.begin(),           tripsUsable.end(),  0);
+    std::fill(tripsUsable.begin(),           tripsUsable.end(),  -1);
     std::fill(forwardJourneys.begin(),       forwardJourneys.end(),       std::make_tuple(-1,-1,-1,-1,-1,-1));
     std::fill(forwardEgressJourneys.begin(), forwardEgressJourneys.end(), std::make_tuple(-1,-1,-1,-1,-1,-1));
     std::fill(reverseJourneys.begin(),       reverseJourneys.end(),       std::make_tuple(-1,-1,-1,-1,-1,-1));
     std::fill(reverseAccessJourneys.begin(), reverseAccessJourneys.end(), std::make_tuple(-1,-1,-1,-1,-1,-1));
-
+    
     accessFootpaths.clear();
     egressFootpaths.clear();
     
     departureTimeSeconds = -1;
     arrivalTimeSeconds   = -1;
-
+    
     if(params.odTrip != NULL)
     {
       departureTimeSeconds = params.odTrip->departureTimeSeconds;

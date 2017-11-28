@@ -28,15 +28,55 @@ namespace TrRouting
 
       std::cerr << "-- forward calculation -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
       calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
-
-      result = forwardJourney(bestArrivalTime, bestEgressStopIndex, bestEgressTravelTime);
-
-      std::cerr << "-- forward journey -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
-      calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
-
+      
+      if (params.returnAllStopsResult)
+      {
+        result = forwardJourney(bestArrivalTime, bestEgressStopIndex, bestEgressTravelTime);
+        
+        std::cerr << "-- forward journey -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
+        calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
+      }
+      else
+      {
+        
+        if (bestArrivalTime < MAX_INT)
+        {
+          departureTimeSeconds = -1;
+          arrivalTimeSeconds   = bestArrivalTime;
+          
+          for (auto & egressFootpath : egressFootpaths) // reset stops reverse tentative times with new arrival time:
+          {
+            stopsReverseTentativeTime[egressFootpath.first] = arrivalTimeSeconds - egressFootpath.second;
+          }
+          
+          std::tie(bestDepartureTime, bestAccessStopIndex, bestAccessTravelTime) = reverseCalculation();
+      
+          std::cerr << "-- reverse calculation -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
+          calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
+          
+          result = reverseJourney(bestDepartureTime, bestAccessStopIndex, bestAccessTravelTime);
+          
+          std::cerr << "-- reverse journey -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
+          calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
+          
+        }
+        else
+        {
+          
+          result = forwardJourney(bestArrivalTime, bestEgressStopIndex, bestEgressTravelTime);
+          
+          std::cerr << "-- forward journey -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
+          calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
+          
+        }
+        
+      }
     }
     else if (arrivalTimeSeconds > -1)
     {
+      
+      std::fill(tripsUsable.begin(), tripsUsable.end(), 1); // we need to make all trips usable when not coming from forward result because reverse calculation, by default, checks for usableTrips == 1
+      
       std::tie(bestDepartureTime, bestAccessStopIndex, bestAccessTravelTime) = reverseCalculation();
 
       std::cerr << "-- reverse calculation -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
@@ -48,15 +88,6 @@ namespace TrRouting
       calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
 
     }
-
-    //if (!params.returnAllStopsResult && bestArrivalTime < MAX_INT && bestEgressStopIndex != -1)
-    //{
-    //  arrivalTimeSeconds = bestArrivalTime;
-    //  
-    //  
-    //  Calculator::reverseCalculation();
-    //      
-    //}
 
     return result;
     
