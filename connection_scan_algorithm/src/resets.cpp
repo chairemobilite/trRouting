@@ -24,6 +24,7 @@ namespace TrRouting
     std::fill(forwardJourneys.begin(),       forwardJourneys.end(),       std::make_tuple(-1,-1,-1,-1,-1,-1));
     std::fill(forwardEgressJourneys.begin(), forwardEgressJourneys.end(), std::make_tuple(-1,-1,-1,-1,-1,-1));
     std::fill(reverseJourneys.begin(),       reverseJourneys.end(),       std::make_tuple(-1,-1,-1,-1,-1,-1));
+    std::fill(reverseAccessJourneys.begin(), reverseAccessJourneys.end(), std::make_tuple(-1,-1,-1,-1,-1,-1));
 
     accessFootpaths.clear();
     egressFootpaths.clear();
@@ -139,7 +140,6 @@ namespace TrRouting
         {
           minEgressTravelTime = egressFootpath.second;
         }
-        stopsEgressTravelTime[egressFootpath.first] = egressFootpath.second;
         //stopsD[egressFootpath.first]                = egressFootpath.second;
         //result.json += "origin_stop: " + stops[accessFootpath.first].name + " - " + Toolbox::convertSecondsToFormattedTime(stopsTentativeTime[accessFootpath.first]) + "\n";
         //result.json += std::to_string((int)(ceil(egressFootpath.second))) + ",";

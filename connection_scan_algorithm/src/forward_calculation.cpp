@@ -90,14 +90,16 @@ namespace TrRouting
                 {
                   footpathStopArrivalIndex = std::get<1>(footpaths[footpathIndex]);
                   footpathTravelTime       = std::get<2>(footpaths[footpathIndex]);
-                  
-                  if (footpathTravelTime <= params.maxTransferWalkingTravelTimeSeconds && footpathTravelTime + params.minWaitingTimeSeconds + connectionArrivalTime < stopsTentativeTime[footpathStopArrivalIndex])
+                  if (footpathTravelTime <= params.maxTransferWalkingTravelTimeSeconds)
                   {
-                    stopsTentativeTime[footpathStopArrivalIndex] = footpathTravelTime + connectionArrivalTime + params.minWaitingTimeSeconds;
-                    forwardJourneys[footpathStopArrivalIndex]    = std::make_tuple(tripsEnterConnection[tripIndex], i, footpathIndex, tripIndex, footpathTravelTime, (stopArrivalIndex == footpathStopArrivalIndex ? 1 : -1));
-                    if (stopArrivalIndex == footpathStopArrivalIndex)
+                    if (footpathTravelTime + params.minWaitingTimeSeconds + connectionArrivalTime < stopsTentativeTime[footpathStopArrivalIndex])
                     {
-                      forwardEgressJourneys[footpathStopArrivalIndex] = forwardJourneys[footpathStopArrivalIndex];
+                      stopsTentativeTime[footpathStopArrivalIndex] = footpathTravelTime + connectionArrivalTime + params.minWaitingTimeSeconds;
+                      forwardJourneys[footpathStopArrivalIndex]    = std::make_tuple(tripsEnterConnection[tripIndex], i, footpathIndex, tripIndex, footpathTravelTime, (stopArrivalIndex == footpathStopArrivalIndex ? 1 : -1));
+                    }
+                    if (stopArrivalIndex == footpathStopArrivalIndex && (std::get<4>(forwardEgressJourneys[footpathStopArrivalIndex]) == -1 || std::get<connectionIndexes::TIME_ARR>(forwardConnections[std::get<1>(forwardEgressJourneys[footpathStopArrivalIndex])]) > connectionArrivalTime))
+                    {
+                      forwardEgressJourneys[footpathStopArrivalIndex] = std::make_tuple(tripsEnterConnection[tripIndex], i, footpathIndex, tripIndex, footpathTravelTime, 1);
                     }
                   }
                   footpathIndex++;
@@ -128,7 +130,7 @@ namespace TrRouting
         {
           egressTravelTime      = stopsEgressTravelTime[egressFootpath.first];
           egressStopArrivalTime = std::get<connectionIndexes::TIME_ARR>(forwardConnections[egressExitConnection]) + egressTravelTime;
-          //std::cerr << egressTravelTime << " - " << egressStopArrivalTime << std::endl;
+          std::cerr << stops[egressFootpath.first].name << ": " << egressTravelTime << " - " << Toolbox::convertSecondsToFormattedTime(egressStopArrivalTime) << std::endl;
           if (egressStopArrivalTime >= 0 && egressStopArrivalTime < MAX_INT && egressStopArrivalTime < bestArrivalTime)
           {
             bestArrivalTime      = egressStopArrivalTime;

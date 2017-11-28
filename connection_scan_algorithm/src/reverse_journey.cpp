@@ -13,6 +13,9 @@ namespace TrRouting
     int              reachableStopsCount  {0};
     bool             foundRoute           {false};
     
+
+    //return result;
+
     std::vector<int> resultingStops;
     if (params.returnAllStopsResult)
     {
@@ -44,7 +47,7 @@ namespace TrRouting
       Trip  journeyStepTrip;
       Route journeyStepRoute;
       
-      int totalInVehicleTime       { 0}; int transferArrivalTime   {-1}; int firstArrivalTime       {-1};
+      int totalInVehicleTime       { 0}; int transferArrivalTime   {-1}; int firstDepartureTime     {-1};
       int totalWalkingTime         { 0}; int transferReadyTime     {-1}; int numberOfTransfers      {-1};
       int totalWaitingTime         { 0}; int departureTime         {-1}; int boardingSequence       {-1};
       int totalTransferWalkingTime { 0}; int arrivalTime           {-1}; int unboardingSequence     {-1};
@@ -59,7 +62,7 @@ namespace TrRouting
         legs.clear();
         journey.clear();
         
-        totalInVehicleTime       =  0; transferArrivalTime   = -1; firstArrivalTime    = -1;
+        totalInVehicleTime       =  0; transferArrivalTime   = -1; firstDepartureTime  = -1;
         totalWalkingTime         =  0; transferReadyTime     = -1; numberOfTransfers   = -1;
         totalWaitingTime         =  0; departureTime         = -1; boardingSequence    = -1;
         totalTransferWalkingTime =  0; arrivalTime           = -1; unboardingSequence  = -1;
@@ -68,25 +71,29 @@ namespace TrRouting
         transferTime             = -1; egressWalkingTime     = -1; 
         waitingTime              = -1; accessWaitingTime     = -1; 
         
-        //std::cerr << stops[resultingStopIndex].name << " : " << std::get<0>(forwardJourneys[resultingStopIndex]) << std::endl; 
+        std::cerr << stops[resultingStopIndex].name << " : " << std::get<0>(reverseAccessJourneys[resultingStopIndex]) << " tt: " << std::get<4>(reverseAccessJourneys[resultingStopIndex]) << std::endl; 
         // recreate journey:
-        resultingStopJourneyStep = reverseJourneys[resultingStopIndex];
+        resultingStopJourneyStep = reverseAccessJourneys[resultingStopIndex];
         
         if (resultingStopJourneyStep == emptyJourneyStep) // ignore stops with no route
         {
           continue;
         }
-        std::cerr << stops[bestEgressStopIndex].name << std::endl;
+        //std::cerr << stops[bestEgressStopIndex].name << std::endl;
         i = 0;
         while ((std::get<0>(resultingStopJourneyStep) != -1 && std::get<1>(resultingStopJourneyStep) != -1))
         {
+          if (journey.size() > 0)
+          {
+            std::get<4>(journey[journey.size()-1]) = std::get<4>(resultingStopJourneyStep);
+          }
           journey.push_back(resultingStopJourneyStep);
-          bestEgressStopIndex      = std::get<connectionIndexes::STOP_DEP>(reverseConnections[std::get<0>(resultingStopJourneyStep)]);
-          std::cerr << stops[std::get<connectionIndexes::STOP_DEP>(reverseConnections[std::get<0>(resultingStopJourneyStep)])].name << " > "  << stops[std::get<connectionIndexes::STOP_ARR>(reverseConnections[std::get<1>(resultingStopJourneyStep)])].name << std::endl;
+          bestEgressStopIndex      = std::get<connectionIndexes::STOP_ARR>(reverseConnections[std::get<1>(resultingStopJourneyStep)]);
+          std::cerr << stops[std::get<connectionIndexes::STOP_DEP>(reverseConnections[std::get<0>(resultingStopJourneyStep)])].name << " tt: " << std::get<4>(resultingStopJourneyStep) << " > "  << stops[std::get<connectionIndexes::STOP_ARR>(reverseConnections[std::get<1>(resultingStopJourneyStep)])].name << std::endl;
           resultingStopJourneyStep = reverseJourneys[bestEgressStopIndex];
+          
           i++;
         }
-        
         if (!params.returnAllStopsResult)
         {
           json["steps"] = nlohmann::json::array();
@@ -124,10 +131,10 @@ namespace TrRouting
             numberOfTransfers          += 1;
             legs.push_back(std::make_tuple(journeyStepTrip.id, journeyStepTrip.routeId, journeyStepTrip.routePathId, boardingSequence, unboardingSequence));
             
-            if (i == journeyStepsCount - 1) // last leg
+            if (i == 1) // first leg
             {
-              accessWaitingTime = waitingTime;
-              firstArrivalTime  = arrivalTime;
+              accessWaitingTime  = waitingTime;
+              firstDepartureTime = departureTime;
             }
             else
             {
@@ -179,7 +186,7 @@ namespace TrRouting
               stepJson["inVehicleTimeMinutes"] = Toolbox::convertSecondsToMinutes(inVehicleTime);
               json["steps"].push_back(stepJson);
             }
-            if (i > 0) // if not the first transit leg
+            if (i < journeyStepsCount - 2) // if not the last transit leg
             {
               totalTransferWalkingTime += transferTime;
               totalWalkingTime         += transferTime;
@@ -203,9 +210,9 @@ namespace TrRouting
           {
             
             transferTime = std::get<4>(journeyStep);
-            if (i == journeyStepsCount - 1) // access
+            if (i == 0) // access
             {
-              transferArrivalTime  = departureTimeSeconds + transferTime;
+              transferArrivalTime  = bestDepartureTime + transferTime;
               transferReadyTime    = transferArrivalTime;
               totalWalkingTime    += transferTime;
               accessWalkingTime    = transferTime;
@@ -216,9 +223,9 @@ namespace TrRouting
                 stepJson["type"]                 = "access";
                 stepJson["travelTimeSeconds"]    = transferTime;
                 stepJson["travelTimeMinutes"]    = Toolbox::convertSecondsToMinutes(transferTime);
-                stepJson["departureTime"]        = Toolbox::convertSecondsToFormattedTime(departureTimeSeconds);
+                stepJson["departureTime"]        = Toolbox::convertSecondsToFormattedTime(bestDepartureTime);
                 stepJson["arrivalTime"]          = Toolbox::convertSecondsToFormattedTime(transferArrivalTime);
-                stepJson["departureTimeSeconds"] = departureTimeSeconds;
+                stepJson["departureTimeSeconds"] = bestDepartureTime;
                 stepJson["arrivalTimeSeconds"]   = transferArrivalTime;
                 stepJson["readyToBoardAt"]       = Toolbox::convertSecondsToFormattedTime(transferReadyTime + params.minWaitingTimeSeconds);
                 json["steps"].push_back(stepJson);
@@ -251,14 +258,14 @@ namespace TrRouting
                 
         if (params.returnAllStopsResult)
         {
-          departureTime = stopsTentativeTime[resultingStopIndex];
+          arrivalTime = stopsTentativeTime[resultingStopIndex] - params.minWaitingTimeSeconds;
           if (arrivalTime - departureTimeSeconds <= params.maxTotalTravelTimeSeconds)
           {
             reachableStopsCount++;
             stopJson                           = {};
             stopJson["id"]                     = stops[resultingStopIndex].id;
-            stopJson["departureTime"]          = Toolbox::convertSecondsToFormattedTime(departureTime);
-            stopJson["totalTravelTimeSeconds"] = arrivalTimeSeconds - departureTime;
+            stopJson["arrivalTime"]            = Toolbox::convertSecondsToFormattedTime(arrivalTime);
+            stopJson["totalTravelTimeSeconds"] = arrivalTime - departureTimeSeconds;
             stopJson["numberOfTransfers"]      = numberOfTransfers;
             json["stops"].push_back(stopJson);
           }
@@ -271,12 +278,12 @@ namespace TrRouting
             json["status"]                                      = "success";
             json["origin"]                                      = {params.origin.longitude, params.origin.latitude};
             json["destination"]                                 = {params.destination.longitude, params.destination.latitude};
-            json["departureTime"]                               = Toolbox::convertSecondsToFormattedTime(departureTime);
-            json["arrivalTime"]                                 = Toolbox::convertSecondsToFormattedTime(arrivalTimeSeconds);
-            json["departureTimeSeconds"]                        = departureTime;
-            json["arrivalTimeSeconds"]                          = arrivalTimeSeconds;
-            json["totalTravelTimeMinutes"]                      = Toolbox::convertSecondsToMinutes(arrivalTimeSeconds - departureTime);
-            json["totalTravelTimeSeconds"]                      = arrivalTimeSeconds - departureTime;
+            json["departureTime"]                               = Toolbox::convertSecondsToFormattedTime(bestDepartureTime);
+            json["arrivalTime"]                                 = Toolbox::convertSecondsToFormattedTime(arrivalTime);
+            json["departureTimeSeconds"]                        = bestDepartureTime;
+            json["arrivalTimeSeconds"]                          = arrivalTime;
+            json["totalTravelTimeMinutes"]                      = Toolbox::convertSecondsToMinutes(arrivalTime - bestDepartureTime);
+            json["totalTravelTimeSeconds"]                      = arrivalTime - bestDepartureTime;
             json["totalInVehicleTimeMinutes"]                   = Toolbox::convertSecondsToMinutes(totalInVehicleTime);
             json["totalInVehicleTimeSeconds"]                   = totalInVehicleTime;
             json["totalNonTransitTravelTimeMinutes"]            = Toolbox::convertSecondsToMinutes(totalWalkingTime);
@@ -295,12 +302,10 @@ namespace TrRouting
             json["firstWaitingTimeSeconds"]                     = accessWaitingTime;
             json["totalWaitingTimeMinutes"]                     = Toolbox::convertSecondsToMinutes(totalWaitingTime);
             json["totalWaitingTimeSeconds"]                     = totalWaitingTime;
-            json["minimumWaitingTimeBeforeEachBoardingMinutes"] = Toolbox::convertSecondsToMinutes(params.minWaitingTimeSeconds);
-            json["minimumWaitingTimeBeforeEachBoardingSeconds"] = params.minWaitingTimeSeconds;
-
-            result.travelTimeSeconds    = arrivalTimeSeconds - departureTime;
-            result.arrivalTimeSeconds   = arrivalTimeSeconds;
-            result.departureTimeSeconds = departureTime;
+            
+            result.travelTimeSeconds    = arrivalTime - bestDepartureTime;
+            result.arrivalTimeSeconds   = arrivalTime;
+            result.departureTimeSeconds = bestDepartureTime;
             result.numberOfTransfers    = numberOfTransfers;
             result.legs                 = legs;
             result.status               = "success";
