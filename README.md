@@ -1,9 +1,12 @@
 # trRouting
-Transit routing server app written in C++ using the Connection Scan or Trip-Based algorithms and including flexible parameters.
+Transit routing server app written in C++ using the Connection Scan including flexible parameters.
+
+## Performance
+With random origin and destination (multiple accessible stops at origin and destination): ~150 ms for access and egress footpaths calculation, ~8 ms for CSA two-way calculation (tested with montreal area GTFS data including all urban and suburban transit agencies, with transfer footpaths between stops of 10 minutes walking or less)
 
 ## References
-[Connection Scan Algorithm (CSA)][1]  
-[Trib-Based Algorithm (TBA)][2]
+[Connection Scan Algorithm (CSA)][1] (working version)
+[Trib-Based Algorithm (TBA)][2] (not yet released)
 
 ## Dependencies
 [Open Source Routing Machine (OSRM)][3] (must be installed separately, see [install and usage instructions in OSRM Wiki][4])
@@ -14,16 +17,10 @@ use -DBOOST_ROOT option to choose boost path if not default (ex: /usr/lib or /us
 [3]: https://github.com/Project-OSRM/osrm-backend/ "Open Source Routing Machine Github Repository"
 [4]: https://github.com/Project-OSRM/osrm-backend/wiki "OSRM Wiki"
 
-## Preparation
-Create a trRoutingConfig.yml file (copy from the example trRoutingConfig.example.yml provided) for the Connection Scan Algorithm  
-Create a trRoutingTripBasedConfig.yml file (copy from the example trRoutingConfig.example.yml provided) for the Trip Based Algorithm
-
-
 ## Mac OS X Install with homebrew
 ```
 brew install boost
 brew install libpqxx
-brew install yaml-cpp
 brew install msgpack
 brew tap nlohmann/json
 brew install nlohmann/json/nlohmann_json
@@ -38,13 +35,7 @@ sudo apt-get install clang libboost-all-dev libexpat1-dev libjsoncpp-dev libpqxx
 ## Compilation
 ### Connection Scan Algorithm
 
-Use the .ubuntu version under Linux
-
 ```
-make -f MakeFile
-```
-### Trip-Based Algorithm
-```
-make -f TripBasedMakeFile
+make -f MakeFileCSA
 ```
 
