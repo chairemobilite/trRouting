@@ -775,6 +775,7 @@ int main(int argc, char** argv) {
               odTripJson["expansionFactor"] = odTrip.expansionFactor;
               odTripJson["travelTimeSeconds"] = routingResult.travelTimeSeconds;
               odTripJson["onlyWalkingTravelTimeSeconds"] = odTrip.walkingTravelTimeSeconds;
+              odTripJson["declaredDepartureTimeSeconds"] = odTrip.departureTimeSeconds;
               odTripJson["departureTimeSeconds"] = routingResult.departureTimeSeconds;
               odTripJson["arrivalTimeSeconds"] = routingResult.arrivalTimeSeconds;
               odTripJson["numberOfTransfers"] = routingResult.numberOfTransfers;
