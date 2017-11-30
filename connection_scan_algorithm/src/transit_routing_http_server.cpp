@@ -222,6 +222,10 @@ int main(int argc, char** argv) {
     
     std::cout << request->path << std::endl;
     
+    bool saveToFile {false}; // save result to file instead of returning it in response
+    std::string calculationName {"trRoutingResult"};
+    std::string fileFormat {"json"}; // csv can be used, but only with calculateAllTrips = true
+    
     if (request->path_match.size() >= 1)
     {
       std::vector<std::string> parametersWithValues;
@@ -253,9 +257,6 @@ int main(int argc, char** argv) {
       
       int odTripsSampleSize {-1}; // for testing only
       bool calculateAllOdTrips {false}; // fetch all od trips from cache or database and calculate for all these trips
-      bool saveToFile {false}; // save result to file instead of returning it in response
-      std::string calculationName {"trRoutingResult"};
-      std::string fileFormat {"json"}; // csv can be used, but only with calculateAllTrips = true
       int batchNumber  {1}; // when using multiple batches (parallele calculations)
       int batchesCount {1};
       
@@ -935,14 +936,18 @@ int main(int argc, char** argv) {
         if (calculateAllOdTrips && fileFormat == "csv")
         {
           
-          calculationName += "__batch_" + std::to_string(batchNumber) + "_of_" + std::to_string(batchesCount);
-          std::cerr << "writing csv file" << std::endl;
-          std::ofstream csvFile;
-          //csvFile.imbue(std::locale("en_US.UTF8"));
-          csvFile.open(calculationName + ".csv", std::ios_base::trunc);
-          csvFile << csv;
-          csvFile.close();
-          resultStr = "{\"status\": \"success\", \"format\": \"csv\", \"filename\": \"" + calculationName + ".csv\"}";
+          
+          if (saveToFile)
+          {
+            calculationName += "__batch_" + std::to_string(batchNumber) + "_of_" + std::to_string(batchesCount);
+            std::cerr << "writing csv file" << std::endl;
+            std::ofstream csvFile;
+            //csvFile.imbue(std::locale("en_US.UTF8"));
+            csvFile.open(calculationName + ".csv", std::ios_base::trunc);
+            csvFile << csv;
+            csvFile.close();
+            resultStr = "{\"status\": \"success\", \"format\": \"csv\", \"filename\": \"" + calculationName + ".csv\"}";
+          }
         }
       }
       else
@@ -989,7 +994,15 @@ int main(int argc, char** argv) {
       
     //std::cerr << "-- calculation time -- " << calculator.algorithmCalculationTime.getDurationMicroseconds() << " microseconds\n";
     
-    *response << "HTTP/1.1 200 OK\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << resultStr.length() << "\r\n\r\n" << resultStr;
+    if (!saveToFile && fileFormat == "csv")
+    {
+      *response << "HTTP/1.1 200 OK\r\nContent-Type: application/csv; charset=utf-8\r\nContent-Length: " << csv.length() << "\r\n\r\n" << csv;
+    }
+    else
+    {
+      *response << "HTTP/1.1 200 OK\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << resultStr.length() << "\r\n\r\n" << resultStr;
+    }
+    
   };
   
   
