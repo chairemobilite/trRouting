@@ -488,7 +488,7 @@ namespace TrRouting
       std::cerr << "Can't open database" << std::endl;
     }
     
-    return std::make_tuple(odTrips, odTripIndexesById);
+    return std::make_pair(odTrips, odTripIndexesById);
     
   }
   
