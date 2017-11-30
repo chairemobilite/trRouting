@@ -253,6 +253,8 @@ int main(int argc, char** argv) {
       bool saveToFile {false}; // save result to file instead of returning it in response
       std::string calculationName {"trRoutingResult"};
       std::string fileFormat {"json"}; // csv can be used, but only with calculateAllTrips = true
+      int batchNumber  {1}; // when using multiple batches (parallele calculations)
+      int batchesCount {1};
       
       calculator.params.onlyServiceIds     = onlyServiceIds;
       calculator.params.exceptServiceIds   = exceptServiceIds;
@@ -358,6 +360,14 @@ int main(int argc, char** argv) {
         else if (parameterWithValueVector[0] == "file_format")
         {
           fileFormat = parameterWithValueVector[1];
+        }
+        else if (parameterWithValueVector[0] == "batch")
+        {
+          batchNumber = std::stoi(parameterWithValueVector[1]);
+        }
+        else if (parameterWithValueVector[0] == "num_batches")
+        {
+          batchesCount = std::stoi(parameterWithValueVector[1]);
         }
         else if (parameterWithValueVector[0] == "date")
         {
@@ -694,7 +704,7 @@ int main(int argc, char** argv) {
         nlohmann::json routePathsOdTripsProfilesSequenceJson;
         //std::vector<unsigned long long> routePathsOdTripsProfilesOdTripIds;
         
-        if (fileFormat == "csv")
+        if (fileFormat == "csv" && batchNumber == 1) // write header only on first batch, so we can easily append subsequent batches to the same csv file
         {
           // write csv header:
           csv += "id,status,ageGroup,gender,occupation,activity,mode,expansionFactor,travelTimeSeconds,onlyWalkingTravelTimeSeconds,"
@@ -711,6 +721,12 @@ int main(int argc, char** argv) {
         int j = 0;
         for (auto & odTrip : calculator.odTrips)
         {
+          
+          if ( i % batchesCount != batchNumber - 1) // when using multiple parallel calculators
+          {
+            continue;
+          }
+          
           attributesMatches          = true;
           atLeastOneCompatiblePeriod = false;
           
@@ -914,6 +930,8 @@ int main(int argc, char** argv) {
         }
         if (calculateAllOdTrips && fileFormat == "csv")
         {
+          
+          calculationName += "__batch_" + st::to_string(batchNumber) + "_of_" + st::to_string(batchesCount);
           std::cerr << "writing csv file" << std::endl;
           std::ofstream csvFile;
           //csvFile.imbue(std::locale("en_US.UTF8"));
