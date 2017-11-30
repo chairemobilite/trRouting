@@ -187,7 +187,7 @@ int main(int argc, char** argv) {
   if (dataFetcherStr == "database")
   {
     DatabaseFetcher databaseFetcher = DatabaseFetcher("dbname=" + algorithmParams.databaseName + " user=" + algorithmParams.databaseUser + " hostaddr=" + algorithmParams.databaseHost + " port=" + algorithmParams.databasePort + "");
-    algorithmParams.databaseFetcher = &databaseFetcher;  }
+    algorithmParams.databaseFetcher = &databaseFetcher;
   }
   GtfsFetcher gtfsFetcher         = GtfsFetcher();
   algorithmParams.gtfsFetcher     = &gtfsFetcher;
@@ -932,7 +932,7 @@ int main(int argc, char** argv) {
           resultStr = json.dump(2);
         }
         if (calculateAllOdTrips && fileFormat == "csv")
-        {DatabaseFetcher
+        {
           
           calculationName += "__batch_" + std::to_string(batchNumber) + "_of_" + std::to_string(batchesCount);
           std::cerr << "writing csv file" << std::endl;
