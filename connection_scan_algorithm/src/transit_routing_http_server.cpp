@@ -719,7 +719,7 @@ int main(int argc, char** argv) {
         {
           json["odTrips"] = nlohmann::json::array();
         }
-        
+                
         int i = 0;
         int j = 0;
         for (auto & odTrip : calculator.odTrips)
@@ -727,6 +727,7 @@ int main(int argc, char** argv) {
           
           if ( i % batchesCount != batchNumber - 1) // when using multiple parallel calculators
           {
+            i++;
             continue;
           }
           
