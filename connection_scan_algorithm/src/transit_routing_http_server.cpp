@@ -946,7 +946,7 @@ int main(int argc, char** argv) {
             csvFile.open(calculationName + ".csv", std::ios_base::trunc);
             csvFile << csv;
             csvFile.close();
-            resultStr = "{\"status\": \"success\", \"format\": \"csv\", \"filename\": \"" + calculationName + ".csv\"}";
+            //resultStr = "{\"status\": \"success\", \"format\": \"csv\", \"filename\": \"" + calculationName + ".csv\"}";
           }
         }
       }
@@ -994,7 +994,7 @@ int main(int argc, char** argv) {
       
     //std::cerr << "-- calculation time -- " << calculator.algorithmCalculationTime.getDurationMicroseconds() << " microseconds\n";
     
-    if (!saveToFile && fileFormat == "csv")
+    if (fileFormat == "csv")
     {
       *response << "HTTP/1.1 200 OK\r\nContent-Type: application/csv; charset=utf-8\r\nContent-Length: " << csv.length() << "\r\n\r\n" << csv;
     }
