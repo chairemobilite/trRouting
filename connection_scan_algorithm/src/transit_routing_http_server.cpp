@@ -602,6 +602,10 @@ int main(int argc, char** argv) {
         else if (parameterWithValueVector[0] == "min_waiting_time" || parameterWithValueVector[0] == "min_waiting_time_minutes")
         {
           calculator.params.minWaitingTimeSeconds = std::stoi(parameterWithValueVector[1]) * 60;
+          if (calculator.params.minWaitingTimeSeconds < 0)
+          {
+            calculator.params.minWaitingTimeSeconds = 0;
+          }
         }
         else if (parameterWithValueVector[0] == "max_travel_time" || parameterWithValueVector[0] == "max_travel_time_minutes")
         {
