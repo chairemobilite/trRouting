@@ -114,21 +114,21 @@ namespace TrRouting
           if (std::get<0>(journeyStep) != -1 && std::get<1>(journeyStep) != -1)
           {
             // journey tuple: final enter connection, final exit connection, final footpath
-            journeyStepEnterConnection = reverseConnections[std::get<0>(journeyStep)];
-            journeyStepExitConnection  = reverseConnections[std::get<1>(journeyStep)];
-            journeyStepStopDeparture   = stops[std::get<connectionIndexes::STOP_DEP>(journeyStepEnterConnection)];
-            journeyStepStopArrival     = stops[std::get<connectionIndexes::STOP_ARR>(journeyStepExitConnection)];
-            journeyStepTrip            = trips[std::get<3>(journeyStep)];
-            journeyStepRoute           = routes[routeIndexesById[journeyStepTrip.routeId]];
-            transferTime               = std::get<4>(journeyStep);
-            departureTime              = std::get<connectionIndexes::TIME_DEP>(journeyStepEnterConnection);
-            arrivalTime                = std::get<connectionIndexes::TIME_ARR>(journeyStepExitConnection);
-            boardingSequence           = std::get<connectionIndexes::SEQUENCE>(journeyStepEnterConnection);
-            unboardingSequence         = std::get<connectionIndexes::SEQUENCE>(journeyStepExitConnection);
-            inVehicleTime              = arrivalTime   - departureTime;
-            waitingTime                = departureTime - transferArrivalTime;
-            transferArrivalTime        = arrivalTime   + transferTime;
-            transferReadyTime          = transferArrivalTime;
+            journeyStepEnterConnection  = reverseConnections[std::get<0>(journeyStep)];
+            journeyStepExitConnection   = reverseConnections[std::get<1>(journeyStep)];
+            journeyStepStopDeparture    = stops[std::get<connectionIndexes::STOP_DEP>(journeyStepEnterConnection)];
+            journeyStepStopArrival      = stops[std::get<connectionIndexes::STOP_ARR>(journeyStepExitConnection)];
+            journeyStepTrip             = trips[std::get<3>(journeyStep)];
+            journeyStepRoute            = routes[routeIndexesById[journeyStepTrip.routeId]];
+            transferTime                = std::get<4>(journeyStep);
+            departureTime               = std::get<connectionIndexes::TIME_DEP>(journeyStepEnterConnection);
+            arrivalTime                 = std::get<connectionIndexes::TIME_ARR>(journeyStepExitConnection);
+            boardingSequence            = std::get<connectionIndexes::SEQUENCE>(journeyStepEnterConnection);
+            unboardingSequence          = std::get<connectionIndexes::SEQUENCE>(journeyStepExitConnection);
+            inVehicleTime               = arrivalTime   - departureTime;
+            waitingTime                 = departureTime - transferArrivalTime;
+            transferArrivalTime         = arrivalTime   + transferTime;
+            transferReadyTime           = transferArrivalTime;
             totalInVehicleTime         += inVehicleTime;
             totalWaitingTime           += waitingTime;
             numberOfTransfers          += 1;
@@ -139,8 +139,8 @@ namespace TrRouting
             
             if (i == 1) // first leg
             {
-              accessWaitingTime  = waitingTime;
-              firstDepartureTime = departureTime;
+              firstDepartureTime  = departureTime;
+              accessWaitingTime   = waitingTime;
             }
             else
             {
@@ -218,7 +218,7 @@ namespace TrRouting
             transferTime = std::get<4>(journeyStep);
             if (i == 0) // access
             {
-              transferArrivalTime  = bestDepartureTime + transferTime;
+              transferArrivalTime  = initialDepartureTimeSeconds + transferTime;
               transferReadyTime    = transferArrivalTime;
               totalWalkingTime    += transferTime;
               accessWalkingTime    = transferTime;
@@ -229,7 +229,7 @@ namespace TrRouting
                 stepJson["type"]                 = "access";
                 stepJson["travelTimeSeconds"]    = transferTime;
                 stepJson["travelTimeMinutes"]    = Toolbox::convertSecondsToMinutes(transferTime);
-                stepJson["departureTime"]        = Toolbox::convertSecondsToFormattedTime(bestDepartureTime);
+                stepJson["departureTime"]        = Toolbox::convertSecondsToFormattedTime(initialDepartureTimeSeconds);
                 stepJson["arrivalTime"]          = Toolbox::convertSecondsToFormattedTime(transferArrivalTime);
                 stepJson["departureTimeSeconds"] = bestDepartureTime;
                 stepJson["arrivalTimeSeconds"]   = transferArrivalTime;
@@ -284,37 +284,43 @@ namespace TrRouting
           if (numberOfTransfers >= 0)
           {
 
-            json["status"]                                      = "success";
-            json["origin"]                                      = {params.origin.longitude, params.origin.latitude};
-            json["destination"]                                 = {params.destination.longitude, params.destination.latitude};
-            json["departureTime"]                               = Toolbox::convertSecondsToFormattedTime(bestDepartureTime);
-            json["arrivalTime"]                                 = Toolbox::convertSecondsToFormattedTime(arrivalTime);
-            json["departureTimeSeconds"]                        = bestDepartureTime;
-            json["arrivalTimeSeconds"]                          = arrivalTime;
-            json["totalTravelTimeMinutes"]                      = Toolbox::convertSecondsToMinutes(arrivalTime - bestDepartureTime);
-            json["totalTravelTimeSeconds"]                      = arrivalTime - bestDepartureTime;
-            json["totalInVehicleTimeMinutes"]                   = Toolbox::convertSecondsToMinutes(totalInVehicleTime);
-            json["totalInVehicleTimeSeconds"]                   = totalInVehicleTime;
-            json["totalNonTransitTravelTimeMinutes"]            = Toolbox::convertSecondsToMinutes(totalWalkingTime);
-            json["totalNonTransitTravelTimeSeconds"]            = totalWalkingTime;
-            json["numberOfBoardings"]                           = numberOfTransfers + 1;
-            json["numberOfTransfers"]                           = numberOfTransfers;
-            json["transferWalkingTimeMinutes"]                  = Toolbox::convertSecondsToMinutes(totalTransferWalkingTime);
-            json["transferWalkingTimeSeconds"]                  = totalTransferWalkingTime;
-            json["accessTravelTimeMinutes"]                     = Toolbox::convertSecondsToMinutes(accessWalkingTime);
-            json["accessTravelTimeSeconds"]                     = accessWalkingTime;
-            json["egressTravelTimeMinutes"]                     = Toolbox::convertSecondsToMinutes(egressWalkingTime);
-            json["egressTravelTimeSeconds"]                     = egressWalkingTime;
-            json["transferWaitingTimeMinutes"]                  = Toolbox::convertSecondsToMinutes(totalTransferWaitingTime);
-            json["transferWaitingTimeSeconds"]                  = totalTransferWaitingTime;
-            json["firstWaitingTimeMinutes"]                     = Toolbox::convertSecondsToMinutes(accessWaitingTime);
-            json["firstWaitingTimeSeconds"]                     = accessWaitingTime;
-            json["totalWaitingTimeMinutes"]                     = Toolbox::convertSecondsToMinutes(totalWaitingTime);
-            json["totalWaitingTimeSeconds"]                     = totalWaitingTime;
+            json["status"]                                         = "success";
+            json["origin"]                                         = {params.origin.longitude, params.origin.latitude};
+            json["destination"]                                    = {params.destination.longitude, params.destination.latitude};
+            json["departureTime"]                                  = Toolbox::convertSecondsToFormattedTime(initialDepartureTimeSeconds);
+            json["arrivalTime"]                                    = Toolbox::convertSecondsToFormattedTime(arrivalTime);
+            json["departureTimeSeconds"]                           = initialDepartureTimeSeconds;
+            json["arrivalTimeSeconds"]                             = arrivalTime;
+            json["totalTravelTimeMinutes"]                         = Toolbox::convertSecondsToMinutes(arrivalTime - initialDepartureTimeSeconds);
+            json["totalTravelTimeSeconds"]                         = arrivalTime - initialDepartureTimeSeconds;
+            json["totalInVehicleTimeMinutes"]                      = Toolbox::convertSecondsToMinutes(totalInVehicleTime);
+            json["totalInVehicleTimeSeconds"]                      = totalInVehicleTime;
+            json["totalNonTransitTravelTimeMinutes"]               = Toolbox::convertSecondsToMinutes(totalWalkingTime);
+            json["totalNonTransitTravelTimeSeconds"]               = totalWalkingTime;
+            json["numberOfBoardings"]                              = numberOfTransfers + 1;
+            json["numberOfTransfers"]                              = numberOfTransfers;
+            json["transferWalkingTimeMinutes"]                     = Toolbox::convertSecondsToMinutes(totalTransferWalkingTime);
+            json["transferWalkingTimeSeconds"]                     = totalTransferWalkingTime;
+            json["accessTravelTimeMinutes"]                        = Toolbox::convertSecondsToMinutes(accessWalkingTime);
+            json["accessTravelTimeSeconds"]                        = accessWalkingTime;
+            json["egressTravelTimeMinutes"]                        = Toolbox::convertSecondsToMinutes(egressWalkingTime);
+            json["egressTravelTimeSeconds"]                        = egressWalkingTime;
+            json["transferWaitingTimeMinutes"]                     = Toolbox::convertSecondsToMinutes(totalTransferWaitingTime);
+            json["transferWaitingTimeSeconds"]                     = totalTransferWaitingTime;
+            json["firstWaitingTimeMinutes"]                        = Toolbox::convertSecondsToMinutes(accessWaitingTime);
+            json["firstWaitingTimeSeconds"]                        = accessWaitingTime;
+            json["totalWaitingTimeMinutes"]                        = Toolbox::convertSecondsToMinutes(totalWaitingTime);
+            json["totalWaitingTimeSeconds"]                        = totalWaitingTime;
+            json["departureTimeToMinimizeFirstWaitingTime"]        = Toolbox::convertSecondsToFormattedTime(bestDepartureTime);
+            json["departureTimeSecondsToMinimizeFirstWaitingTime"] = bestDepartureTime;
+            json["minimizedTotalTravelTimeMinutes"]                = Toolbox::convertSecondsToMinutes(arrivalTime - bestDepartureTime);
+            json["minimizedTotalTravelTimeSeconds"]                = arrivalTime - bestDepartureTime;
+            json["minimumWaitingTimeBeforeEachBoardingMinutes"]    = Toolbox::convertSecondsToMinutes(params.minWaitingTimeSeconds);
+            json["minimumWaitingTimeBeforeEachBoardingSeconds"]    = params.minWaitingTimeSeconds;
             
-            result.travelTimeSeconds           = arrivalTime - bestDepartureTime;
+            result.travelTimeSeconds           = arrivalTime - initialDepartureTimeSeconds;
             result.arrivalTimeSeconds          = arrivalTime;
-            result.departureTimeSeconds        = bestDepartureTime;
+            result.departureTimeSeconds        = initialDepartureTimeSeconds;
             result.numberOfTransfers           = numberOfTransfers;
             result.inVehicleTravelTimeSeconds  = totalInVehicleTime;
             result.transferTravelTimeSeconds   = totalTransferWalkingTime;

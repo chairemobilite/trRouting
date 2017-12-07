@@ -184,9 +184,14 @@ int main(int argc, char** argv) {
   algorithmParams.applicationShortname = dataShortname;
   algorithmParams.dataFetcherShortname = dataFetcherStr;
   
+  DatabaseFetcher databaseFetcher;
   if (dataFetcherStr == "database")
   {
-    DatabaseFetcher databaseFetcher = DatabaseFetcher("dbname=" + algorithmParams.databaseName + " user=" + algorithmParams.databaseUser + " hostaddr=" + algorithmParams.databaseHost + " port=" + algorithmParams.databasePort + "");
+    databaseFetcher = DatabaseFetcher("dbname=" + algorithmParams.databaseName + " user=" + algorithmParams.databaseUser + " hostaddr=" + algorithmParams.databaseHost + " port=" + algorithmParams.databasePort + "");
+    algorithmParams.databaseFetcher = &databaseFetcher;
+  }
+  else
+  {
     algorithmParams.databaseFetcher = &databaseFetcher;
   }
   GtfsFetcher gtfsFetcher         = GtfsFetcher();

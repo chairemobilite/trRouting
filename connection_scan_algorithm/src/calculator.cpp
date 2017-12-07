@@ -24,6 +24,9 @@ namespace TrRouting
 
     if (departureTimeSeconds > -1)
     {
+      
+      initialDepartureTimeSeconds = departureTimeSeconds; // set initial departure time so we can find the latest possible departure time with reverse calculation later and still know the initial waiting time
+      
       std::tie(bestArrivalTime, bestEgressStopIndex, bestEgressTravelTime) = forwardCalculation();
 
       std::cerr << "-- forward calculation -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
