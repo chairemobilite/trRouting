@@ -38,6 +38,9 @@ namespace TrRouting
       std::vector<unsigned long long>                   routeIds;
       std::vector<unsigned long long>                   routeTypeIds;
       std::vector<unsigned long long>                   agencyIds;
+      std::vector<unsigned long long>                   unboardingStopIds;
+      std::vector<unsigned long long>                   boardingStopIds;
+      std::vector<unsigned long long>                   tripIds;
       std::vector<std::tuple<unsigned long long, unsigned long long, unsigned long long, int, int>> legs; // tuple: tripId, routeId, routePathId, boarding sequence, unboarding sequence
       nlohmann::json stepJson = {};
       nlohmann::json stopJson = {};
@@ -62,6 +65,9 @@ namespace TrRouting
         legs.clear();
         journey.clear();
         routeIds.clear();
+        boardingStopIds.clear();
+        unboardingStopIds.clear();
+        tripIds.clear();
         routeTypeIds.clear();
         
         totalInVehicleTime       =  0; transferArrivalTime = -1; firstDepartureTime     = -1;
@@ -131,6 +137,9 @@ namespace TrRouting
             routeIds.push_back(journeyStepRoute.id);
             routeTypeIds.push_back(journeyStepRoute.routeTypeId);
             agencyIds.push_back(journeyStepRoute.agencyId);
+            boardingStopIds.push_back(journeyStepStopDeparture.id);
+            unboardingStopIds.push_back(journeyStepStopArrival.id);
+            tripIds.push_back(journeyStepTrip.id);
             legs.push_back(std::make_tuple(journeyStepTrip.id, journeyStepTrip.routeId, journeyStepTrip.routePathId, boardingSequence, unboardingSequence));
             
             if (i == 1) // first leg
@@ -332,6 +341,9 @@ namespace TrRouting
             result.routeIds                    = routeIds;
             result.routeTypeIds                = routeTypeIds;
             result.agencyIds                   = agencyIds;
+            result.boardingStopIds             = boardingStopIds;
+            result.unboardingStopIds           = unboardingStopIds;
+            result.tripIds                     = tripIds;
             result.status                      = "success";
             
           }

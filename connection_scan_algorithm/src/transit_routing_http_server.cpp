@@ -723,7 +723,7 @@ int main(int argc, char** argv) {
           csv += "id,status,ageGroup,gender,occupation,activity,mode,expansionFactor,travelTimeSeconds,onlyWalkingTravelTimeSeconds,"
                  "declaredDepartureTimeSeconds,departureTimeSeconds,arrivalTimeSeconds,numberOfTransfers,inVehicleTravelTimeSeconds,"
                  "transferTravelTimeSeconds,waitingTimeSeconds,accessTravelTimeSeconds,egressTravelTimeSeconds,transferWaitingTimeSeconds,"
-                 "firstWaitingTimeSeconds,nonTransitTravelTimeSeconds,routeIds,routeTypeIds,agencyIds\n";
+                 "firstWaitingTimeSeconds,nonTransitTravelTimeSeconds,routeIds,routeTypeIds,agencyIds,boardingStopIds,unboardingStopIds,tripIds\n";
         }
         else
         {
@@ -875,6 +875,39 @@ int main(int argc, char** argv) {
                   }
                   j++;
                 }
+                csv += ",";
+                j = 0;
+                for (auto & boardingStopId : routingResult.boardingStopIds)
+                {
+                  csv += std::to_string(boardingStopId);
+                  if (j < countRouteIds - 1)
+                  {
+                    csv += "|";
+                  }
+                  j++;
+                }
+                csv += ",";
+                j = 0;
+                for (auto & unboardingStopId : routingResult.unboardingStopIds)
+                {
+                  csv += std::to_string(unboardingStopId);
+                  if (j < countRouteIds - 1)
+                  {
+                    csv += "|";
+                  }
+                  j++;
+                }
+                csv += ",";
+                j = 0;
+                for (auto & tripId : routingResult.tripIds)
+                {
+                  csv += std::to_string(tripId);
+                  if (j < countRouteIds - 1)
+                  {
+                    csv += "|";
+                  }
+                  j++;
+                }
                 csv += "\n";
               }
               else
@@ -905,6 +938,9 @@ int main(int argc, char** argv) {
                 odTripJson["routeIds"]                     = routingResult.routeIds;
                 odTripJson["routeTypeIds"]                 = routingResult.routeTypeIds;
                 odTripJson["agencyIds"]                    = routingResult.agencyIds;
+                odTripJson["boardingStopIds"]              = routingResult.boardingStopIds;
+                odTripJson["unboardingStopIds"]            = routingResult.unboardingStopIds;
+                odTripJson["tripIds"]                      = routingResult.tripIds;
                 json["odTrips"].push_back(odTripJson);
               }
             }
