@@ -472,7 +472,7 @@ namespace TrRouting
         {
           std::cerr << ((((double) i) / resultCount) * 100) << "% (" << i << "/" << resultCount << ")             \r"; // \r is used to stay on the same line
         }
-        if (i % 100 == 0)
+        if (i % 5000 == 0)
         {
           CacheFetcher::saveToCacheFile(applicationShortname, odTrips, "od_trips");
           CacheFetcher::saveToCacheFile(applicationShortname, odTripIndexesById, "od_trip_indexes");
