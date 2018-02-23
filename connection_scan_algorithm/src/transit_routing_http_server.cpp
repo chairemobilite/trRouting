@@ -264,6 +264,7 @@ int main(int argc, char** argv) {
       bool calculateAllOdTrips {false}; // fetch all od trips from cache or database and calculate for all these trips
       int batchNumber  {1}; // when using multiple batches (parallele calculations)
       int batchesCount {1};
+      int odTripId {-1}; // when calculating for only one trip
       
       calculator.params.onlyServiceIds     = onlyServiceIds;
       calculator.params.exceptServiceIds   = exceptServiceIds;
@@ -412,6 +413,10 @@ int main(int argc, char** argv) {
             egressStopIds.push_back(std::stoll(egressStopId));
           }
           calculator.params.egressStopIds = egressStopIds;
+        }
+        else if (parameterWithValueVector[0] == "od_trip_id")
+        {
+          odTripId = std::stoi(parameterWithValueVector[1]);
         }
         else if (parameterWithValueVector[0] == "od_trips")
         {
@@ -692,7 +697,7 @@ int main(int argc, char** argv) {
       //}
       
       
-      if (calculateAllOdTrips)
+      if (calculateAllOdTrips || odTripId >= 0)
       {
         RoutingResult routingResult;
         std::map<unsigned long long, std::map<int, float>> tripsLegsProfile; // parent map key: trip id, nested map key: connection sequence, value: number of trips using this connection
@@ -764,7 +769,7 @@ int main(int argc, char** argv) {
             }
           }
           
-          if (attributesMatches && (atLeastOneCompatiblePeriod || odTripsPeriods.size() == 0))
+          if (attributesMatches && (atLeastOneCompatiblePeriod || odTripsPeriods.size() == 0) && (odTripId == -1 || odTripId == odTrip.id) )
           {
             std::cout << "od trip id " << odTrip.id << " (" << (i+1) << "/" << odTripsCount << ")" << std::endl;// << " dts: " << odTrip.departureTimeSeconds << " atLeastOneCompatiblePeriod: " << (atLeastOneCompatiblePeriod ? "true " : "false ") << "attributesMatches: " << (attributesMatches ? "true " : "false ") << std::endl;
             
