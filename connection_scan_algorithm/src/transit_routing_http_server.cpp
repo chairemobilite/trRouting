@@ -30,6 +30,7 @@
 #include "calculation_time.hpp"
 #include "parameters.hpp"
 #include "calculator.hpp"
+#include "combinations.hpp"
 
 //Added for the json-example:
 using namespace boost::property_tree;
@@ -242,13 +243,13 @@ int main(int argc, char** argv) {
       float originLatitude, originLongitude, destinationLatitude, destinationLongitude;
       long long startingStopId{-1}, endingStopId{-1};
       std::vector<int> onlyServiceIds;
-      std::map<int, bool> exceptServiceIds;
-      std::map<int, bool> onlyRouteIds;
-      std::map<int, bool> exceptRouteIds;
-      std::map<int, bool> onlyRouteTypeIds;
-      std::map<int, bool> exceptRouteTypeIds;
-      std::map<int, bool> onlyAgencyIds;
-      std::map<int, bool> exceptAgencyIds;
+      std::vector<unsigned long long> exceptServiceIds;
+      std::vector<unsigned long long> onlyRouteIds;
+      std::vector<unsigned long long> exceptRouteIds;
+      std::vector<unsigned long long> onlyRouteTypeIds;
+      std::vector<unsigned long long> exceptRouteTypeIds;
+      std::vector<unsigned long long> onlyAgencyIds;
+      std::vector<unsigned long long> exceptAgencyIds;
       std::vector<unsigned long long> accessStopIds;
       std::vector<unsigned long long> egressStopIds;
       std::vector<int> accessStopTravelTimesSeconds;
@@ -265,6 +266,7 @@ int main(int argc, char** argv) {
       int batchNumber  {1}; // when using multiple batches (parallele calculations)
       int batchesCount {1};
       int odTripId {-1}; // when calculating for only one trip
+      bool alternatives {false}; // calculate alternatives or not
       
       calculator.params.onlyServiceIds     = onlyServiceIds;
       calculator.params.exceptServiceIds   = exceptServiceIds;
@@ -340,6 +342,7 @@ int main(int argc, char** argv) {
       calculator.params.noResultNextAccessTimeSecondsIncrement = 5 * 60;
       calculator.params.maxNoResultNextAccessTimeSeconds       = 40 * 60;
       calculator.params.calculateByNumberOfTransfers           = false;
+      calculator.params.alternatives                           = false;
       calculator.params.accessStopIds.clear();
       calculator.params.egressStopIds.clear();
       calculator.params.accessStopTravelTimesSeconds.clear();
@@ -525,7 +528,7 @@ int main(int argc, char** argv) {
           boost::split(exceptServiceIdsVector, parameterWithValueVector[1], boost::is_any_of(","));
           for(std::string exceptServiceId : exceptServiceIdsVector)
           {
-            exceptServiceIds[std::stoll(exceptServiceId)] = true;
+            exceptServiceIds.push_back(std::stoll(exceptServiceId));
           }
           calculator.params.exceptServiceIds = exceptServiceIds;
         }
@@ -534,7 +537,7 @@ int main(int argc, char** argv) {
           boost::split(onlyRouteIdsVector, parameterWithValueVector[1], boost::is_any_of(","));
           for(std::string onlyRouteId : onlyRouteIdsVector)
           {
-            onlyRouteIds[std::stoll(onlyRouteId)] = true;
+            onlyRouteIds.push_back(std::stoll(onlyRouteId));
           }
           calculator.params.onlyRouteIds = onlyRouteIds;
         }
@@ -543,7 +546,7 @@ int main(int argc, char** argv) {
           boost::split(exceptRouteIdsVector, parameterWithValueVector[1], boost::is_any_of(","));
           for(std::string exceptRouteId : exceptRouteIdsVector)
           {
-            exceptRouteIds[std::stoll(exceptRouteId)] = true;
+            exceptRouteIds.push_back(std::stoll(exceptRouteId));
           }
           calculator.params.exceptRouteIds = exceptRouteIds;
         }
@@ -552,7 +555,7 @@ int main(int argc, char** argv) {
           boost::split(onlyRouteTypeIdsVector, parameterWithValueVector[1], boost::is_any_of(","));
           for(std::string onlyRouteTypeId : onlyRouteTypeIdsVector)
           {
-            onlyRouteTypeIds[std::stoll(onlyRouteTypeId)] = true;
+            onlyRouteTypeIds.push_back(std::stoll(onlyRouteTypeId));
           }
           calculator.params.onlyRouteTypeIds = onlyRouteTypeIds;
         }
@@ -561,7 +564,7 @@ int main(int argc, char** argv) {
           boost::split(exceptRouteTypeIdsVector, parameterWithValueVector[1], boost::is_any_of(","));
           for(std::string exceptRouteTypeId : exceptRouteTypeIdsVector)
           {
-            exceptRouteTypeIds[std::stoll(exceptRouteTypeId)] = true;
+            exceptRouteTypeIds.push_back(std::stoll(exceptRouteTypeId));
           }
           calculator.params.exceptRouteTypeIds = exceptRouteTypeIds;
         }
@@ -570,7 +573,7 @@ int main(int argc, char** argv) {
           boost::split(onlyAgencyIdsVector, parameterWithValueVector[1], boost::is_any_of(","));
           for(std::string onlyAgencyId : onlyAgencyIdsVector)
           {
-            onlyAgencyIds[std::stoll(onlyAgencyId)] = true;
+            onlyAgencyIds.push_back(std::stoll(onlyAgencyId));
           }
           calculator.params.onlyAgencyIds = onlyAgencyIds;
         }
@@ -579,7 +582,7 @@ int main(int argc, char** argv) {
           boost::split(exceptAgencyIdsVector, parameterWithValueVector[1], boost::is_any_of(","));
           for(std::string exceptAgencyId : exceptAgencyIdsVector)
           {
-            exceptAgencyIds[std::stoll(exceptAgencyId)] = true;
+            exceptAgencyIds.push_back(std::stoll(exceptAgencyId));
           }
           calculator.params.exceptAgencyIds = exceptAgencyIds;
         }
@@ -645,6 +648,10 @@ int main(int argc, char** argv) {
         {
           calculator.params.transferPenaltySeconds = std::stoi(parameterWithValueVector[1]) * 60;
         }
+        else if (parameterWithValueVector[0] == "alternatives" || parameterWithValueVector[0] == "alt")
+        {
+          if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1") { calculator.params.alternatives = true; }
+        }
         else if (parameterWithValueVector[0] == "return_all_stops_results"
                  || parameterWithValueVector[0] == "return_all_stops_result"
                  || parameterWithValueVector[0] == "all_stops"
@@ -695,6 +702,92 @@ int main(int argc, char** argv) {
       //{
       //  std::cerr << ageGroup << std::endl;
       //}
+      
+      if (calculator.params.alternatives)
+      {
+        RoutingResult routingResult;
+        
+        std::vector<unsigned long long>                 possibleRouteIds;
+        std::vector< std::vector<unsigned long long> >  allCombinations;
+        std::map<std::vector<unsigned long long>, bool> alreadyCalculatedCombinations;
+        std::vector<int> combinationsKs;
+        int maxTravelTime;
+        int numAlternatives = 0;
+        int maxAlternatives = 100;
+        
+        routingResult = calculator.calculate();
+        numAlternatives += 1;
+        maxTravelTime = 3.0 * routingResult.travelTimeSeconds;
+        calculator.params.maxTotalTravelTimeSeconds = maxTravelTime;
+        std::cout << std::endl << "maxTravelTimeSeconds: " << maxTravelTime << " route Ids: ";
+        for (auto routeId : routingResult.routeIds)
+        {
+          std::cout << calculator.routes[calculator.routeIndexesById[routeId]].shortname << " ";
+        }
+        std::cout << std::endl;
+        combinationsKs.clear();
+        for (int i = 1; i <= routingResult.routeIds.size(); i++) { combinationsKs.push_back(i); }
+        for (auto k : combinationsKs)
+        {
+          Combinations<unsigned long long> combinations(routingResult.routeIds, k);
+          //std::cout << "\nk = " << k << std::endl;
+          for (auto newCombination : combinations)
+          {
+            std::sort(newCombination.begin(), newCombination.end());
+            allCombinations.push_back(newCombination);
+            alreadyCalculatedCombinations[newCombination] = true;
+          }
+        }
+        
+        std::vector<unsigned long long> combination;
+        for (int i = 0; i < allCombinations.size(); i++)
+        {
+          if (numAlternatives <= maxAlternatives)
+          {
+            combination = allCombinations.at(i);
+            calculator.params.exceptRouteIds = combination;
+            std::cout << std::endl << "except route Ids: ";
+            for (auto routeId : combination)
+            {
+              std::cout << calculator.routes[calculator.routeIndexesById[routeId]].shortname << " ";
+            }
+            std::cout << std::endl;
+            routingResult = calculator.calculate(false);
+            numAlternatives += 1;
+            std:: cout << std::endl << std::endl << std::endl << numAlternatives << "." << std::endl;
+            std::cout << std::endl << "travelTimeSeconds: " << routingResult.travelTimeSeconds << " route Ids: ";
+            for (auto routeId : routingResult.routeIds)
+            {
+              std::cout << calculator.routes[calculator.routeIndexesById[routeId]].shortname << " ";
+            }
+            std::cout << std::endl;
+            combinationsKs.clear();
+            if (numAlternatives <= maxAlternatives && routingResult.routeIds.size() > 0)
+            {
+              for (int i = 1; i <= routingResult.routeIds.size(); i++) { combinationsKs.push_back(i); }
+              for (auto k : combinationsKs)
+              {
+                Combinations<unsigned long long> combinations(routingResult.routeIds, k);
+                //std::cout << "\nk = " << k << std::endl;
+                for (auto newCombination : combinations)
+                {
+                  newCombination.insert( newCombination.end(), combination.begin(), combination.end() );
+                  std::sort(newCombination.begin(), newCombination.end());
+                  if (alreadyCalculatedCombinations.count(newCombination) == 0)
+                  {
+                    allCombinations.push_back(newCombination);
+                    alreadyCalculatedCombinations[newCombination] = true;
+                  }
+                }
+              }
+            }
+            combination.clear();
+          }
+        }
+        
+        //return 0;
+        resultStr = routingResult.json;
+      }
       
       
       if (calculateAllOdTrips || odTripId >= 0)
@@ -750,11 +843,11 @@ int main(int argc, char** argv) {
           atLeastOneCompatiblePeriod = false;
           
           // verify that od trip matches selected attributes:
-          if ( (odTripsAgeGroups.size() > 0 && std::find(odTripsAgeGroups.begin(), odTripsAgeGroups.end(), odTrip.ageGroup) == odTripsAgeGroups.end()) 
-            || (odTripsGenders.size() > 0 && std::find(odTripsGenders.begin(), odTripsGenders.end(), odTrip.gender) == odTripsGenders.end())
+          if ( (odTripsAgeGroups.size()   > 0 && std::find(odTripsAgeGroups.begin(), odTripsAgeGroups.end(), odTrip.ageGroup)       == odTripsAgeGroups.end()) 
+            || (odTripsGenders.size()     > 0 && std::find(odTripsGenders.begin(), odTripsGenders.end(), odTrip.gender)             == odTripsGenders.end())
             || (odTripsOccupations.size() > 0 && std::find(odTripsOccupations.begin(), odTripsOccupations.end(), odTrip.occupation) == odTripsOccupations.end())
-            || (odTripsActivities.size() > 0 && std::find(odTripsActivities.begin(), odTripsActivities.end(), odTrip.activity) == odTripsActivities.end())
-            || (odTripsModes.size() > 0 && std::find(odTripsModes.begin(), odTripsModes.end(), odTrip.mode) == odTripsModes.end())
+            || (odTripsActivities.size()  > 0 && std::find(odTripsActivities.begin(), odTripsActivities.end(), odTrip.activity)     == odTripsActivities.end())
+            || (odTripsModes.size()       > 0 && std::find(odTripsModes.begin(), odTripsModes.end(), odTrip.mode)                   == odTripsModes.end())
           )
           {
             attributesMatches = false;
@@ -1000,7 +1093,7 @@ int main(int argc, char** argv) {
           }
         }
       }
-      else
+      else if (!calculator.params.alternatives)
       {
         resultStr = calculator.calculate().json;
       }

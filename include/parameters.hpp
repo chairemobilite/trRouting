@@ -36,13 +36,13 @@ namespace TrRouting
     int routingDateMonth;  // not implemented, use onlyServiceIds or exceptServiceIds for now
     int routingDateDay;    // not implemented, use onlyServiceIds or exceptServiceIds for now
     std::vector<int> onlyServiceIds;
-    std::map<int, bool> exceptServiceIds;
-    std::map<int, bool> onlyRouteIds;
-    std::map<int, bool> exceptRouteIds;
-    std::map<int, bool> onlyRouteTypeIds;
-    std::map<int, bool> exceptRouteTypeIds;
-    std::map<int, bool> onlyAgencyIds;
-    std::map<int, bool> exceptAgencyIds;
+    std::vector<unsigned long long> exceptServiceIds;
+    std::vector<unsigned long long> onlyRouteIds;
+    std::vector<unsigned long long> exceptRouteIds;
+    std::vector<unsigned long long> onlyRouteTypeIds;
+    std::vector<unsigned long long> exceptRouteTypeIds;
+    std::vector<unsigned long long> onlyAgencyIds;
+    std::vector<unsigned long long> exceptAgencyIds;
     std::vector<unsigned long long> accessStopIds;
     std::vector<int>                accessStopTravelTimesSeconds;
     std::vector<unsigned long long> egressStopIds;
@@ -104,6 +104,7 @@ namespace TrRouting
     bool transferOnlyAtSameStation;    // will transfer only between stops having the same station_id (better performance, but make sure your stations are well designed and specified)
     bool transferBetweenSameRoute;     // allow transfers between the same route_id
     bool calculateByNumberOfTransfers; // calculate first the fastest route, then calculate with decreasing number of transfers until no route is found, return results for each number of transfers.
+    bool alternatives;                 // calculate alternatives or not
     
     void setDefaultValues()
     {
@@ -143,6 +144,7 @@ namespace TrRouting
       transferOnlyAtSameStation              = false;
       transferBetweenSameRoute               = true;
       calculateByNumberOfTransfers           = false;
+      alternatives                           = false;
     }
     
   };

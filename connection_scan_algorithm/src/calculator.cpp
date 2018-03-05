@@ -3,9 +3,9 @@
 namespace TrRouting
 {
   
-  RoutingResult Calculator::calculate() {
+  RoutingResult Calculator::calculate(bool resetAccessPaths) {
     
-    reset();
+    reset(resetAccessPaths);
 
     RoutingResult result;
     
