@@ -93,10 +93,14 @@ namespace TrRouting
     
     std::string accessMode;
     std::string egressMode;
+    bool debugDisplay; // display performance and debug info when set to true
     bool tryNextModeIfRoutingFails;
     std::string noResultSecondMode;
     int noResultNextAccessTimeSecondsIncrement;
     int maxNoResultNextAccessTimeSeconds;
+    int maxAlternatives; // number of alternatives to calculate before returning results (when alternatives parameter is set to true)
+    float alternativesMaxTravelTimeRatio; // travel time of fastest route is multiplied by this ratio to find plausible alternative with a max travel time.
+    float minAlternativeMaxTravelTimeSeconds; // if multiplying max travel time ratio with max travel time is too small, keep max travel time to this minimum.
     
     bool returnAllStopsResult;         // keep results for all stops (used in creating accessibility map)
     bool forwardCalculation;           // forward calculation: default. if false: reverse calculation, will ride connections backward (useful when setting the arrival time)
@@ -145,6 +149,10 @@ namespace TrRouting
       transferBetweenSameRoute               = true;
       calculateByNumberOfTransfers           = false;
       alternatives                           = false;
+      maxAlternatives                        = 100;
+      debugDisplay                           = false;
+      alternativesMaxTravelTimeRatio         = 1.5;
+      minAlternativeMaxTravelTimeSeconds     = 60*60;
     }
     
   };

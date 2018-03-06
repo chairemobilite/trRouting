@@ -113,7 +113,8 @@ namespace TrRouting
       i++;
     }
     
-    std::cerr << "-- " << reachableConnectionsCount << " reverse connections parsed on " << connectionsCount << std::endl;
+    if (params.debugDisplay)
+      std::cerr << "-- " << reachableConnectionsCount << " reverse connections parsed on " << connectionsCount << std::endl;
 
     
     int accessStopDepartureTime {-1};

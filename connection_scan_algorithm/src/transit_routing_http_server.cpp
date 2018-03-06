@@ -636,6 +636,14 @@ int main(int argc, char** argv) {
         {
           calculator.params.maxOnlyWalkingAccessTravelTimeRatio = std::stof(parameterWithValueVector[1]);
         }
+        else if (parameterWithValueVector[0] == "alternatives_max_travel_time_ratio" || parameterWithValueVector[0] == "alt_max_ratio")
+        {
+          calculator.params.alternativesMaxTravelTimeRatio = std::stof(parameterWithValueVector[1]);
+        }
+        else if (parameterWithValueVector[0] == "alternatives_min_max_travel_time_minutes" || parameterWithValueVector[0] == "alt_min_max_travel_time")
+        {
+          calculator.params.minAlternativeMaxTravelTimeSeconds = std::stoi(parameterWithValueVector[1]) * 60;
+        }
         else if (parameterWithValueVector[0] == "max_egress_travel_time" || parameterWithValueVector[0] == "max_egress_travel_time_minutes")
         {
           calculator.params.maxEgressWalkingTravelTimeSeconds = std::stoi(parameterWithValueVector[1]) * 60;
@@ -647,6 +655,10 @@ int main(int argc, char** argv) {
         else if (parameterWithValueVector[0] == "transfer_penalty" || parameterWithValueVector[0] == "transfer_penalty_minutes")
         {
           calculator.params.transferPenaltySeconds = std::stoi(parameterWithValueVector[1]) * 60;
+        }
+        else if (parameterWithValueVector[0] == "max_alternatives" || parameterWithValueVector[0] == "max_alt")
+        {
+          calculator.params.maxAlternatives = std::stoi(parameterWithValueVector[1]);
         }
         else if (parameterWithValueVector[0] == "alternatives" || parameterWithValueVector[0] == "alt")
         {
@@ -707,33 +719,49 @@ int main(int argc, char** argv) {
       {
         RoutingResult routingResult;
         
-        std::vector<unsigned long long>                 possibleRouteIds;
+        std::vector<unsigned long long>                 foundRouteIds;
         std::vector< std::vector<unsigned long long> >  allCombinations;
         std::map<std::vector<unsigned long long>, bool> alreadyCalculatedCombinations;
+        std::map<std::vector<unsigned long long>, bool> alreadyFoundRouteIds;
         std::vector<int> combinationsKs;
         int maxTravelTime;
-        int numAlternatives = 0;
-        int maxAlternatives = 100;
+        int numAlternatives = 1;
+        int maxAlternatives = calculator.params.maxAlternatives;
+        int lastFoundedAtNum = 0;
         
+        std:: cout << numAlternatives << "." << std::endl;
         routingResult = calculator.calculate();
         numAlternatives += 1;
-        maxTravelTime = 3.0 * routingResult.travelTimeSeconds;
-        calculator.params.maxTotalTravelTimeSeconds = maxTravelTime;
-        std::cout << std::endl << "maxTravelTimeSeconds: " << maxTravelTime << " route Ids: ";
-        for (auto routeId : routingResult.routeIds)
+        maxTravelTime = calculator.params.alternativesMaxTravelTimeRatio * routingResult.travelTimeSeconds;
+        if (maxTravelTime < calculator.params.minAlternativeMaxTravelTimeSeconds)
+        {
+          calculator.params.maxTotalTravelTimeSeconds = calculator.params.minAlternativeMaxTravelTimeSeconds;
+        }
+        else
+        {
+          calculator.params.maxTotalTravelTimeSeconds = maxTravelTime;
+        }
+        
+        
+        foundRouteIds = routingResult.routeIds;
+        std::stable_sort(foundRouteIds.begin(),foundRouteIds.end());
+        alreadyFoundRouteIds[foundRouteIds] = true;
+        lastFoundedAtNum = 1;
+        std::cout << "maxTravelTimeSeconds: " << maxTravelTime << " route Ids: ";
+        for (auto routeId : foundRouteIds)
         {
           std::cout << calculator.routes[calculator.routeIndexesById[routeId]].shortname << " ";
         }
         std::cout << std::endl;
         combinationsKs.clear();
-        for (int i = 1; i <= routingResult.routeIds.size(); i++) { combinationsKs.push_back(i); }
+        for (int i = 1; i <= foundRouteIds.size(); i++) { combinationsKs.push_back(i); }
         for (auto k : combinationsKs)
         {
-          Combinations<unsigned long long> combinations(routingResult.routeIds, k);
+          Combinations<unsigned long long> combinations(foundRouteIds, k);
           //std::cout << "\nk = " << k << std::endl;
           for (auto newCombination : combinations)
           {
-            std::sort(newCombination.begin(), newCombination.end());
+            std::stable_sort(newCombination.begin(), newCombination.end());
             allCombinations.push_back(newCombination);
             alreadyCalculatedCombinations[newCombination] = true;
           }
@@ -744,35 +772,39 @@ int main(int argc, char** argv) {
         {
           if (numAlternatives <= maxAlternatives)
           {
+            std:: cout << std::endl << numAlternatives << "." << std::endl;
             combination = allCombinations.at(i);
             calculator.params.exceptRouteIds = combination;
-            std::cout << std::endl << "except route Ids: ";
+            std::cout << "except route Ids: ";
             for (auto routeId : combination)
             {
               std::cout << calculator.routes[calculator.routeIndexesById[routeId]].shortname << " ";
             }
             std::cout << std::endl;
             routingResult = calculator.calculate(false);
+            foundRouteIds = routingResult.routeIds;
+            std::stable_sort(foundRouteIds.begin(),foundRouteIds.end());
             numAlternatives += 1;
-            std:: cout << std::endl << std::endl << std::endl << numAlternatives << "." << std::endl;
-            std::cout << std::endl << "travelTimeSeconds: " << routingResult.travelTimeSeconds << " route Ids: ";
-            for (auto routeId : routingResult.routeIds)
+            std::cout << "travelTimeSeconds: " << routingResult.travelTimeSeconds << " route Ids: ";
+            for (auto routeId : foundRouteIds)
             {
               std::cout << calculator.routes[calculator.routeIndexesById[routeId]].shortname << " ";
             }
             std::cout << std::endl;
             combinationsKs.clear();
-            if (numAlternatives <= maxAlternatives && routingResult.routeIds.size() > 0)
+            if (numAlternatives <= maxAlternatives && foundRouteIds.size() > 0 && alreadyFoundRouteIds.count(foundRouteIds) == 0)
             {
-              for (int i = 1; i <= routingResult.routeIds.size(); i++) { combinationsKs.push_back(i); }
+              lastFoundedAtNum = numAlternatives;
+              alreadyFoundRouteIds[foundRouteIds] = true;
+              for (int i = 1; i <= foundRouteIds.size(); i++) { combinationsKs.push_back(i); }
               for (auto k : combinationsKs)
               {
-                Combinations<unsigned long long> combinations(routingResult.routeIds, k);
+                Combinations<unsigned long long> combinations(foundRouteIds, k);
                 //std::cout << "\nk = " << k << std::endl;
                 for (auto newCombination : combinations)
                 {
                   newCombination.insert( newCombination.end(), combination.begin(), combination.end() );
-                  std::sort(newCombination.begin(), newCombination.end());
+                  std::stable_sort(newCombination.begin(), newCombination.end());
                   if (alreadyCalculatedCombinations.count(newCombination) == 0)
                   {
                     allCombinations.push_back(newCombination);
@@ -784,6 +816,21 @@ int main(int argc, char** argv) {
             combination.clear();
           }
         }
+        
+        std::cout << std::endl;
+        int i {1};
+        for (auto foundRouteIds : alreadyFoundRouteIds)
+        {
+          std::cout << i << ". ";
+          for(auto routeId : foundRouteIds.first)
+          {
+            std::cout << calculator.routes[calculator.routeIndexesById[routeId]].shortname << " ";
+          }
+          i++;
+          std::cout << std::endl;
+        }
+        
+        std::cout << "last founded at num: " << lastFoundedAtNum << std::endl;
         
         //return 0;
         resultStr = routingResult.json;

@@ -113,7 +113,8 @@ namespace TrRouting
       i++;
     }
     
-    std::cerr << "-- " << reachableConnectionsCount << " forward connections parsed on " << connectionsCount << std::endl;
+    if (params.debugDisplay)
+      std::cerr << "-- " << reachableConnectionsCount << " forward connections parsed on " << connectionsCount << std::endl;
     
     int egressStopArrivalTime {-1};
     int egressExitConnection  {-1};

@@ -6,7 +6,8 @@ namespace TrRouting
   void Calculator::prepare()
   {
     
-    std::cerr << "preparing stops, routes, trips, connections and footpaths..." << std::endl;
+    if (params.debugDisplay)
+      std::cerr << "preparing stops, routes, trips, connections and footpaths..." << std::endl;
     if (params.dataFetcherShortname == "database")
     {
       std::tie(stops, stopIndexesById)                 = params.databaseFetcher->getStops(params.applicationShortname);
