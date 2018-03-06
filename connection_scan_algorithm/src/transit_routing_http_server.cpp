@@ -632,6 +632,10 @@ int main(int argc, char** argv) {
         {
           calculator.params.maxAccessWalkingTravelTimeSeconds = std::stoi(parameterWithValueVector[1]) * 60;
         }
+        else if (parameterWithValueVector[0] == "alternatives_max_added_travel_time_minutes" || parameterWithValueVector[0] == "alt_max_added_travel_time")
+        {
+          calculator.params.alternativesMaxAddedTravelTimeSeconds = std::stoi(parameterWithValueVector[1]) * 60;
+        }
         else if (parameterWithValueVector[0] == "max_only_walking_access_travel_time_ratio")
         {
           calculator.params.maxOnlyWalkingAccessTravelTimeRatio = std::stof(parameterWithValueVector[1]);
@@ -723,6 +727,7 @@ int main(int argc, char** argv) {
         std::vector< std::vector<unsigned long long> >  allCombinations;
         std::map<std::vector<unsigned long long>, bool> alreadyCalculatedCombinations;
         std::map<std::vector<unsigned long long>, bool> alreadyFoundRouteIds;
+        std::map<std::vector<unsigned long long>, int>  foundRouteIdsTravelTimeSeconds;
         std::vector<int> combinationsKs;
         int maxTravelTime;
         int numAlternatives = 1;
@@ -730,24 +735,39 @@ int main(int argc, char** argv) {
         int lastFoundedAtNum = 0;
         
         std:: cout << numAlternatives << "." << std::endl;
+        std::cout << "initialMaxTotalTravelTimeSeconds: " << calculator.params.maxTotalTravelTimeSeconds << std::endl;
+        
         routingResult = calculator.calculate();
         numAlternatives += 1;
+        
+        
+        
         maxTravelTime = calculator.params.alternativesMaxTravelTimeRatio * routingResult.travelTimeSeconds;
         if (maxTravelTime < calculator.params.minAlternativeMaxTravelTimeSeconds)
         {
           calculator.params.maxTotalTravelTimeSeconds = calculator.params.minAlternativeMaxTravelTimeSeconds;
+        }
+        else if (maxTravelTime > routingResult.travelTimeSeconds + calculator.params.alternativesMaxAddedTravelTimeSeconds)
+        {
+          calculator.params.maxTotalTravelTimeSeconds = routingResult.travelTimeSeconds + calculator.params.alternativesMaxAddedTravelTimeSeconds;
         }
         else
         {
           calculator.params.maxTotalTravelTimeSeconds = maxTravelTime;
         }
         
+        std::cout << "minAlternativeMaxTravelTimeSeconds: " << calculator.params.minAlternativeMaxTravelTimeSeconds << std::endl;
+        std::cout << "alternativesMaxAddedTravelTimeSeconds: " << calculator.params.alternativesMaxAddedTravelTimeSeconds << std::endl;
+        std::cout << "alternativesMaxTravelTimeRatio: " << calculator.params.alternativesMaxTravelTimeRatio << std::endl;
+        std::cout << "fastestTravelTimeSeconds: " << routingResult.travelTimeSeconds << std::endl;
+        std::cout << "maxTotalTravelTimeSeconds: " << calculator.params.maxTotalTravelTimeSeconds << std::endl;
         
         foundRouteIds = routingResult.routeIds;
         std::stable_sort(foundRouteIds.begin(),foundRouteIds.end());
         alreadyFoundRouteIds[foundRouteIds] = true;
+        foundRouteIdsTravelTimeSeconds[foundRouteIds] = routingResult.travelTimeSeconds;
         lastFoundedAtNum = 1;
-        std::cout << "maxTravelTimeSeconds: " << maxTravelTime << " route Ids: ";
+        std::cout << "fastest route ids: ";
         for (auto routeId : foundRouteIds)
         {
           std::cout << calculator.routes[calculator.routeIndexesById[routeId]].shortname << " ";
@@ -796,6 +816,7 @@ int main(int argc, char** argv) {
             {
               lastFoundedAtNum = numAlternatives;
               alreadyFoundRouteIds[foundRouteIds] = true;
+              foundRouteIdsTravelTimeSeconds[foundRouteIds] = routingResult.travelTimeSeconds;
               for (int i = 1; i <= foundRouteIds.size(); i++) { combinationsKs.push_back(i); }
               for (auto k : combinationsKs)
               {
@@ -826,6 +847,7 @@ int main(int argc, char** argv) {
           {
             std::cout << calculator.routes[calculator.routeIndexesById[routeId]].shortname << " ";
           }
+          std::cout << " tt: " << (foundRouteIdsTravelTimeSeconds[foundRouteIds.first] / 60);
           i++;
           std::cout << std::endl;
         }

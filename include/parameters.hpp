@@ -101,6 +101,7 @@ namespace TrRouting
     int maxAlternatives; // number of alternatives to calculate before returning results (when alternatives parameter is set to true)
     float alternativesMaxTravelTimeRatio; // travel time of fastest route is multiplied by this ratio to find plausible alternative with a max travel time.
     float minAlternativeMaxTravelTimeSeconds; // if multiplying max travel time ratio with max travel time is too small, keep max travel time to this minimum.
+    int   alternativesMaxAddedTravelTimeSeconds; // how many seconds to add to fastest travel time to limit alternatives travel time.
     
     bool returnAllStopsResult;         // keep results for all stops (used in creating accessibility map)
     bool forwardCalculation;           // forward calculation: default. if false: reverse calculation, will ride connections backward (useful when setting the arrival time)
@@ -152,7 +153,8 @@ namespace TrRouting
       maxAlternatives                        = 100;
       debugDisplay                           = false;
       alternativesMaxTravelTimeRatio         = 1.5;
-      minAlternativeMaxTravelTimeSeconds     = 60*60;
+      minAlternativeMaxTravelTimeSeconds     = 30*60;
+      alternativesMaxAddedTravelTimeSeconds  = 30*60;
     }
     
   };

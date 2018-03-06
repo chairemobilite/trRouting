@@ -132,7 +132,7 @@ namespace TrRouting
           accessTravelTime        = stopsAccessTravelTime[accessFootpath.first];
           accessStopDepartureTime = std::get<connectionIndexes::TIME_DEP>(reverseConnections[accessEnterConnection]) - accessTravelTime - params.minWaitingTimeSeconds;
           //std::cerr << stops[accessFootpath.first].name << ": " << accessTravelTime << " t: " << trips[std::get<connectionIndexes::TRIP>(reverseConnections[accessEnterConnection])].id << " - " << Toolbox::convertSecondsToFormattedTime(accessStopDepartureTime) << std::endl;
-          if (accessStopDepartureTime >= 0 && accessStopDepartureTime < MAX_INT && accessStopDepartureTime > bestDepartureTime)
+          if (accessStopDepartureTime >= 0 && arrivalTimeSeconds - accessStopDepartureTime <= params.maxTotalTravelTimeSeconds && accessStopDepartureTime > bestDepartureTime && accessStopDepartureTime < MAX_INT)
           {
             bestDepartureTime    = accessStopDepartureTime;
             bestAccessStopIndex  = accessFootpath.first;
