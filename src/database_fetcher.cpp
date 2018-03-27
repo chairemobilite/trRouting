@@ -459,8 +459,8 @@ namespace TrRouting
         odTrip->cyclingTravelTimeSeconds = c[16].as<int>();
         odTrip->drivingTravelTimeSeconds = c[17].as<int>();
         
-        odTrip->accessFootpaths = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(odTrip->origin,      stops, "walking", 900, params.walkingSpeedMetersPerSecond, params.osrmRoutingWalkingHost, params.osrmRoutingWalkingPort);
-        odTrip->egressFootpaths = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(odTrip->destination, stops, "walking", 900, params.walkingSpeedMetersPerSecond, params.osrmRoutingWalkingHost, params.osrmRoutingWalkingPort);
+        odTrip->accessFootpaths = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(odTrip->origin,      stops, "walking", 1200, params.walkingSpeedMetersPerSecond, params.osrmRoutingWalkingHost, params.osrmRoutingWalkingPort);
+        odTrip->egressFootpaths = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(odTrip->destination, stops, "walking", 1200, params.walkingSpeedMetersPerSecond, params.osrmRoutingWalkingHost, params.osrmRoutingWalkingPort);
         
         // append trip:
         odTrips.push_back(*odTrip);

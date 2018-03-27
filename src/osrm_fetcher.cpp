@@ -23,12 +23,9 @@ namespace TrRouting
     int i {0};
     for (auto & stop : stops)
     {
-      //birdDistanceAccessibleStopIndexes.push_back(i);
-      //queryString += ";" + std::to_string(stop.point.longitude) +  "," + std::to_string(stop.point.latitude);
       distanceXMeters       = (stop.point.longitude - point.longitude) * lengthOfOneDegreeOfLongitude;
       distanceYMeters       = (stop.point.latitude  - point.latitude)  * lengthOfOneDegreeOflatitude ;
       distanceMetersSquared = distanceXMeters * distanceXMeters + distanceYMeters * distanceYMeters;
-      //std::cerr << distanceMeters;
       if (distanceMetersSquared <= maxDistanceMetersSquared)
       {
         birdDistanceAccessibleStopIndexes.push_back(i);
