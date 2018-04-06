@@ -10,7 +10,7 @@ namespace TrRouting
 {
 namespace Util
 {
-    
+  
   // From https://gist.github.com/cbsmith/5538174
   template <typename RandomGenerator = std::mt19937>
   struct random_selector

@@ -113,7 +113,8 @@ namespace TrRouting
       i++;
     }
     
-    std::cerr << "-- " << reachableConnectionsCount << " forward connections parsed on " << connectionsCount << std::endl;
+    if (params.debugDisplay)
+      std::cerr << "-- " << reachableConnectionsCount << " forward connections parsed on " << connectionsCount << std::endl;
     
     int egressStopArrivalTime {-1};
     int egressExitConnection  {-1};
@@ -131,7 +132,7 @@ namespace TrRouting
           egressTravelTime      = stopsEgressTravelTime[egressFootpath.first];
           egressStopArrivalTime = std::get<connectionIndexes::TIME_ARR>(forwardConnections[egressExitConnection]) + egressTravelTime;
           //std::cerr << stops[egressFootpath.first].name << ": " << egressTravelTime << " - " << Toolbox::convertSecondsToFormattedTime(egressStopArrivalTime) << std::endl;
-          if (egressStopArrivalTime >= 0 && egressStopArrivalTime < MAX_INT && egressStopArrivalTime < bestArrivalTime)
+          if (egressStopArrivalTime >= 0 && egressStopArrivalTime - departureTimeSeconds <= params.maxTotalTravelTimeSeconds && egressStopArrivalTime < bestArrivalTime && egressStopArrivalTime < MAX_INT)
           {
             bestArrivalTime      = egressStopArrivalTime;
             bestEgressStopIndex  = egressFootpath.first;
