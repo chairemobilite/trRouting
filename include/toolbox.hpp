@@ -19,7 +19,7 @@ namespace TrRouting
   class Toolbox {
   
   public:
-   
+    
     static const std::string convertSecondsToFormattedTime(int timeInSeconds)
     {
       std::string formattedTime {""};
