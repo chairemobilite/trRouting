@@ -5,9 +5,6 @@
 /trRoutingTripBased
 /trRoutingTripBasedConfig.yml
 
-*.csv
-*.json
-
 *.xcodeproj
 .build
 swift/trRouting/Packages

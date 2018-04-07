@@ -23,9 +23,6 @@ namespace TrRouting
     std::string status;
     std::string json;
     std::vector<unsigned long long> routeIds;
-    std::vector<unsigned long long> tripIds;
-    std::vector<unsigned long long> boardingStopIds;
-    std::vector<unsigned long long> unboardingStopIds;
     std::vector<unsigned long long> routeTypeIds;
     std::vector<unsigned long long> agencyIds;
     std::vector<std::tuple<unsigned long long, unsigned long long, unsigned long long, int, int>> legs; // tuple: tripId, routeId, routePathId, boarding sequence, unboarding sequence
