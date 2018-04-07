@@ -96,8 +96,6 @@ int main(int argc, char** argv) {
       ("databaseHost",     boost::program_options::value<std::string>(), "database host");
   optionsDesc.add_options() 
       ("databasePassword", boost::program_options::value<std::string>(), "database password");
-  optionsDesc.add_options() 
-      ("updateOdTrips", boost::program_options::value<std::string>(), "update od trips access and egress stops or not (1 or 0)");
   
   boost::program_options::store(boost::program_options::parse_command_line(argc, argv, optionsDesc), variablesMap);
   
@@ -148,10 +146,6 @@ int main(int argc, char** argv) {
   if(variablesMap.count("databasePassword") == 1)
   {
     algorithmParams.databasePassword = variablesMap["databasePassword"].as<std::string>();
-  }
-  if(variablesMap.count("updateOdTrips") == 1)
-  {
-    algorithmParams.updateOdTrips = variablesMap["updateOdTrips"].as<int>();
   }
   
   

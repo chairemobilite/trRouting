@@ -90,7 +90,6 @@ namespace TrRouting
     std::string osrmRoutingDrivingHost;
     std::string osrmRoutingCyclingPort;
     std::string osrmRoutingCyclingHost;
-    int updateOdTrips; // if 1: update od trips access and egress stops from database. Set to 1 only if stops and/or od trips were modified.
     
     std::string accessMode;
     std::string egressMode;
@@ -132,7 +131,6 @@ namespace TrRouting
       databaseHost                           = "127.0.0.1";
       databaseUser                           = "postgres";
       databasePassword                       = "";
-      updateOdTrips                          = 0;
       osrmRoutingWalkingHost                 = "localhost";
       osrmRoutingWalkingPort                 = "5000";
       osrmRoutingDrivingHost                 = "localhost";
