@@ -404,7 +404,7 @@ namespace TrRouting
     std::cout << "Fetching od trips from database..." << std::endl;
     
     // query for connections:
-    std::string sqlQuery = "SELECT id, user_interview_id, household_interview_id, COALESCE(age,-1), origin_lat, origin_lon, destination_lat, destination_lon, COALESCE(age_group_sn, 'unknown'), COALESCE(occupation_sn, 'unknown'), COALESCE(activity_sn, 'unknown'),  COALESCE(gender_sn, 'unknown'), COALESCE(mode_sn, 'unknown'), start_at_seconds, COALESCE(expansion_factor,1), COALESCE(walking_travel_time_seconds,-1), COALESCE(cycling_travel_time_seconds,-1), COALESCE(driving_travel_time_seconds,-1) FROM " + applicationShortname + ".tr_od_trips /*WHERE mode_sn = 'transit'*/ ORDER BY id";
+    std::string sqlQuery = "SELECT id, user_interview_id, household_interview_id, COALESCE(age,-1), origin_lat, origin_lon, destination_lat, destination_lon, COALESCE(age_group_sn, 'unknown'), COALESCE(occupation_sn, 'unknown'), COALESCE(activity_sn, 'unknown'),  COALESCE(gender_sn, 'unknown'), COALESCE(mode_sn, 'unknown'), start_at_seconds, COALESCE(expansion_factor,1), COALESCE(walking_travel_time_seconds,-1), COALESCE(cycling_travel_time_seconds,-1), COALESCE(driving_travel_time_seconds,-1) FROM " + applicationShortname + ".tr_od_trips WHERE origin_geography IS NOT NULL AND destination_geography IS NOT NULL AND start_at_seconds >= 0 AND user_interview_id iS NOT NULL AND household_interview_id IS NOT NULL ORDER BY id";
     
     std::cout << sqlQuery << std::endl;
     
@@ -472,7 +472,7 @@ namespace TrRouting
         {
           std::cerr << ((((double) i) / resultCount) * 100) << "% (" << i << "/" << resultCount << ")             \r"; // \r is used to stay on the same line
         }
-        if (i % 100 == 0)
+        if (i % 5000 == 0)
         {
           CacheFetcher::saveToCacheFile(applicationShortname, odTrips, "od_trips");
           CacheFetcher::saveToCacheFile(applicationShortname, odTripIndexesById, "od_trip_indexes");
@@ -488,7 +488,7 @@ namespace TrRouting
       std::cerr << "Can't open database" << std::endl;
     }
     
-    return std::make_tuple(odTrips, odTripIndexesById);
+    return std::make_pair(odTrips, odTripIndexesById);
     
   }
   

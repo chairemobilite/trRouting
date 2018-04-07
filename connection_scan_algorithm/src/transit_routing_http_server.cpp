@@ -20,6 +20,7 @@
 #include <iostream>
 #include <iterator>
 #include <curses.h>
+#include <locale>
 
 #include "toolbox.hpp"
 #include "database_fetcher.hpp"
@@ -190,8 +191,16 @@ int main(int argc, char** argv) {
   algorithmParams.applicationShortname = dataShortname;
   algorithmParams.dataFetcherShortname = dataFetcherStr;
   
-  DatabaseFetcher databaseFetcher = DatabaseFetcher("dbname=" + algorithmParams.databaseName + " user=" + algorithmParams.databaseUser + " hostaddr=" + algorithmParams.databaseHost + " port=" + algorithmParams.databasePort + "");
-  algorithmParams.databaseFetcher = &databaseFetcher;
+  DatabaseFetcher databaseFetcher;
+  if (dataFetcherStr == "database")
+  {
+    databaseFetcher = DatabaseFetcher("dbname=" + algorithmParams.databaseName + " user=" + algorithmParams.databaseUser + " hostaddr=" + algorithmParams.databaseHost + " port=" + algorithmParams.databasePort + "");
+    algorithmParams.databaseFetcher = &databaseFetcher;
+  }
+  else
+  {
+    algorithmParams.databaseFetcher = &databaseFetcher;
+  }
   GtfsFetcher gtfsFetcher         = GtfsFetcher();
   algorithmParams.gtfsFetcher     = &gtfsFetcher;
   CsvFetcher csvFetcher           = CsvFetcher();
@@ -221,8 +230,13 @@ int main(int argc, char** argv) {
     std::cout << "calculating request..." << std::endl;
     
     std::string resultStr;
+    std::string csv;
     
     std::cout << request->path << std::endl;
+    
+    bool saveToFile {false}; // save result to file instead of returning it in response
+    std::string calculationName {"trRoutingResult"};
+    std::string fileFormat {"json"}; // csv can be used, but only with calculateAllTrips = true
     
     if (request->path_match.size() >= 1)
     {
@@ -358,6 +372,22 @@ int main(int argc, char** argv) {
           destinationLongitude          = std::stof(latitudeLongitudeVector[1]);
           calculator.params.destination = Point(destinationLatitude, destinationLongitude);
         }
+        else if (parameterWithValueVector[0] == "calculation_name")
+        {
+          calculationName = parameterWithValueVector[1];
+        }
+        else if (parameterWithValueVector[0] == "file_format")
+        {
+          fileFormat = parameterWithValueVector[1];
+        }
+        else if (parameterWithValueVector[0] == "batch")
+        {
+          batchNumber = std::stoi(parameterWithValueVector[1]);
+        }
+        else if (parameterWithValueVector[0] == "num_batches")
+        {
+          batchesCount = std::stoi(parameterWithValueVector[1]);
+        }
         else if (parameterWithValueVector[0] == "date")
         {
           boost::split(dateVector, parameterWithValueVector[1], boost::is_any_of("/"));
@@ -393,9 +423,13 @@ int main(int argc, char** argv) {
           }
           calculator.params.egressStopIds = egressStopIds;
         }
+        else if (parameterWithValueVector[0] == "od_trip_id")
+        {
+          odTripId = std::stoi(parameterWithValueVector[1]);
+        }
         else if (parameterWithValueVector[0] == "od_trips")
         {
-          if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1") { calculaterAllOdTrips = true; }
+          if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1") { calculateAllOdTrips = true; }
         }
         else if (parameterWithValueVector[0] == "od_trips_sample_size")
         {
@@ -467,6 +501,7 @@ int main(int argc, char** argv) {
           }
           //calculator.params.odTripsModes = odTripsModes;
         }
+        
         else if (parameterWithValueVector[0] == "access_stop_travel_times_seconds" || parameterWithValueVector[0] == "access_stop_travel_times")
         {
           boost::split(accessStopTravelTimesSecondsVector, parameterWithValueVector[1], boost::is_any_of(","));
@@ -579,9 +614,17 @@ int main(int argc, char** argv) {
         {
           if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1") { calculator.params.calculateByNumberOfTransfers = true; }
         }
+        else if (parameterWithValueVector[0] == "save_to_file")
+        {
+          if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1") { saveToFile = true; }
+        }
         else if (parameterWithValueVector[0] == "min_waiting_time" || parameterWithValueVector[0] == "min_waiting_time_minutes")
         {
           calculator.params.minWaitingTimeSeconds = std::stoi(parameterWithValueVector[1]) * 60;
+          if (calculator.params.minWaitingTimeSeconds < 0)
+          {
+            calculator.params.minWaitingTimeSeconds = 0;
+          }
         }
         else if (parameterWithValueVector[0] == "max_travel_time" || parameterWithValueVector[0] == "max_travel_time_minutes")
         {
@@ -822,7 +865,7 @@ int main(int argc, char** argv) {
       }
       
       
-      if (calculaterAllOdTrips)
+      if (calculateAllOdTrips || odTripId >= 0)
       {
         RoutingResult routingResult;
         std::map<unsigned long long, std::map<int, float>> tripsLegsProfile; // parent map key: trip id, nested map key: connection sequence, value: number of trips using this connection
@@ -835,6 +878,7 @@ int main(int argc, char** argv) {
         bool atLeastOneCompatiblePeriod {false};
         bool attributesMatches {true};
         int odTripsCount = calculator.odTrips.size();
+        std::string ageGroup;
         
         int legBoardingSequence;
         int legUnboardingSequence;
@@ -846,10 +890,30 @@ int main(int argc, char** argv) {
         nlohmann::json routePathsOdTripsProfilesSequenceJson;
         //std::vector<unsigned long long> routePathsOdTripsProfilesOdTripIds;
         
-        json["odTrips"] = nlohmann::json::array();
+        if (fileFormat == "csv" && batchNumber == 1) // write header only on first batch, so we can easily append subsequent batches to the same csv file
+        {
+          // write csv header:
+          csv += "id,status,ageGroup,gender,occupation,activity,mode,expansionFactor,travelTimeSeconds,onlyWalkingTravelTimeSeconds,"
+                 "declaredDepartureTimeSeconds,departureTimeSeconds,arrivalTimeSeconds,numberOfTransfers,inVehicleTravelTimeSeconds,"
+                 "transferTravelTimeSeconds,waitingTimeSeconds,accessTravelTimeSeconds,egressTravelTimeSeconds,transferWaitingTimeSeconds,"
+                 "firstWaitingTimeSeconds,nonTransitTravelTimeSeconds,routeIds,routeTypeIds,agencyIds,boardingStopIds,unboardingStopIds,tripIds\n";
+        }
+        else
+        {
+          json["odTrips"] = nlohmann::json::array();
+        }
+                
         int i = 0;
+        int j = 0;
         for (auto & odTrip : calculator.odTrips)
         {
+          
+          if ( i % batchesCount != batchNumber - 1) // when using multiple parallel calculators
+          {
+            i++;
+            continue;
+          }
+          
           attributesMatches          = true;
           atLeastOneCompatiblePeriod = false;
           
@@ -863,6 +927,7 @@ int main(int argc, char** argv) {
           {
             attributesMatches = false;
           }
+
           // verify that od trip matches at least one selected period:
           for (auto & period : odTripsPeriods)
           {
@@ -872,7 +937,7 @@ int main(int argc, char** argv) {
             }
           }
           
-          if (attributesMatches && (atLeastOneCompatiblePeriod || odTripsPeriods.size() == 0))
+          if (attributesMatches && (atLeastOneCompatiblePeriod || odTripsPeriods.size() == 0) && (odTripId == -1 || odTripId == odTrip.id) )
           {
             std::cout << "od trip id " << odTrip.id << " (" << (i+1) << "/" << odTripsCount << ")" << std::endl;// << " dts: " << odTrip.departureTimeSeconds << " atLeastOneCompatiblePeriod: " << (atLeastOneCompatiblePeriod ? "true " : "false ") << "attributesMatches: " << (attributesMatches ? "true " : "false ") << std::endl;
             
@@ -885,84 +950,172 @@ int main(int argc, char** argv) {
               atLeastOneOdTrip = true;
               if (routingResult.legs.size() > 0)
               {
-                for (auto & leg : routingResult.legs)
+                if (fileFormat != "csv")
                 {
-                  legTripId             = std::get<0>(leg);
-                  legRouteId            = std::get<1>(leg);
-                  legRoutePathId        = std::get<2>(leg);
-                  legBoardingSequence   = std::get<3>(leg);
-                  legUnboardingSequence = std::get<4>(leg);
-                  if (routesOdTripsCount.find(legRouteId) == routesOdTripsCount.end())
+                  for (auto & leg : routingResult.legs)
                   {
-                    routesOdTripsCount[legRouteId] = odTrip.expansionFactor;
-                  }
-                  else
-                  {
-                    routesOdTripsCount[legRouteId] += odTrip.expansionFactor;
-                  }
-                  if (tripsLegsProfile.find(legTripId) == tripsLegsProfile.end()) // initialize legs for this trip if not already set
-                  {
-                    tripsLegsProfile[legTripId] = std::map<int, float>();
-                  }
-                  if (routePathsLegsProfile.find(legRoutePathId) == routePathsLegsProfile.end()) // initialize legs for this trip if not already set
-                  {
-                    routePathsLegsProfile[legRoutePathId] = std::map<int, std::pair<float, std::vector<unsigned long long>>>();
-                  }
-                  for (int sequence = legBoardingSequence; sequence <= legUnboardingSequence; sequence++) // loop each connection sequence between boarding and unboarding sequences
-                  {
-                    // increment in trip profile:
-                    if (tripsLegsProfile[legTripId].find(sequence) == tripsLegsProfile[legTripId].end())
+                    legTripId             = std::get<0>(leg);
+                    legRouteId            = std::get<1>(leg);
+                    legRoutePathId        = std::get<2>(leg);
+                    legBoardingSequence   = std::get<3>(leg);
+                    legUnboardingSequence = std::get<4>(leg);
+                    if (routesOdTripsCount.find(legRouteId) == routesOdTripsCount.end())
                     {
-                      tripsLegsProfile[legTripId][sequence] = odTrip.expansionFactor; // create the first od_trip for this connection
+                      routesOdTripsCount[legRouteId] = odTrip.expansionFactor;
                     }
                     else
                     {
-                      tripsLegsProfile[legTripId][sequence] += odTrip.expansionFactor; // increment od_trips for this connection
+                      routesOdTripsCount[legRouteId] += odTrip.expansionFactor;
                     }
-                    // increment in route path profile:
-                    if (routePathsLegsProfile[legRoutePathId].find(sequence) == routePathsLegsProfile[legRoutePathId].end())
+                    if (tripsLegsProfile.find(legTripId) == tripsLegsProfile.end()) // initialize legs for this trip if not already set
                     {
-                      std::vector<unsigned long long> odTripIds;
-                      odTripIds.push_back(odTrip.id);
-                      routePathsLegsProfile[legRoutePathId][sequence] = std::make_pair(odTrip.expansionFactor, odTripIds); // create the first od_trip for this connection
+                      tripsLegsProfile[legTripId] = std::map<int, float>();
                     }
-                    else
+                    if (routePathsLegsProfile.find(legRoutePathId) == routePathsLegsProfile.end()) // initialize legs for this trip if not already set
                     {
-                      std::get<0>(routePathsLegsProfile[legRoutePathId][sequence]) += odTrip.expansionFactor; // increment od_trips for this connection
-                      std::get<1>(routePathsLegsProfile[legRoutePathId][sequence]).push_back(odTrip.id);
+                      routePathsLegsProfile[legRoutePathId] = std::map<int, std::pair<float, std::vector<unsigned long long>>>();
+                    }
+                    for (int sequence = legBoardingSequence; sequence <= legUnboardingSequence; sequence++) // loop each connection sequence between boarding and unboarding sequences
+                    {
+                      // increment in trip profile:
+                      if (tripsLegsProfile[legTripId].find(sequence) == tripsLegsProfile[legTripId].end())
+                      {
+                        tripsLegsProfile[legTripId][sequence] = odTrip.expansionFactor; // create the first od_trip for this connection
+                      }
+                      else
+                      {
+                        tripsLegsProfile[legTripId][sequence] += odTrip.expansionFactor; // increment od_trips for this connection
+                      }
+                      // increment in route path profile:
+                      if (routePathsLegsProfile[legRoutePathId].find(sequence) == routePathsLegsProfile[legRoutePathId].end())
+                      {
+                        std::vector<unsigned long long> odTripIds;
+                        odTripIds.push_back(odTrip.id);
+                        routePathsLegsProfile[legRoutePathId][sequence] = std::make_pair(odTrip.expansionFactor, odTripIds); // create the first od_trip for this connection
+                      }
+                      else
+                      {
+                        std::get<0>(routePathsLegsProfile[legRoutePathId][sequence]) += odTrip.expansionFactor; // increment od_trips for this connection
+                        std::get<1>(routePathsLegsProfile[legRoutePathId][sequence]).push_back(odTrip.id);
+                      }
                     }
                   }
                 }
               }
               
-              odTripJson = {};
-              odTripJson["id"] = odTrip.id;
-              odTripJson["status"] = routingResult.status;
-              odTripJson["ageGroup"] = odTrip.ageGroup;
-              odTripJson["gender"] = odTrip.gender;
-              odTripJson["occupation"] = odTrip.occupation;
-              odTripJson["activity"] = odTrip.activity;
-              odTripJson["mode"] = odTrip.mode;
-              odTripJson["expansionFactor"] = odTrip.expansionFactor;
-              odTripJson["travelTimeSeconds"] = routingResult.travelTimeSeconds;
-              odTripJson["onlyWalkingTravelTimeSeconds"] = odTrip.walkingTravelTimeSeconds;
-              odTripJson["declaredDepartureTimeSeconds"] = odTrip.departureTimeSeconds;
-              odTripJson["departureTimeSeconds"] = routingResult.departureTimeSeconds;
-              odTripJson["arrivalTimeSeconds"] = routingResult.arrivalTimeSeconds;
-              odTripJson["numberOfTransfers"] = routingResult.numberOfTransfers;
-              odTripJson["inVehicleTravelTimeSeconds"] = routingResult.inVehicleTravelTimeSeconds;
-              odTripJson["transferTravelTimeSeconds"] = routingResult.transferTravelTimeSeconds;
-              odTripJson["waitingTimeSeconds"] = routingResult.waitingTimeSeconds;
-              odTripJson["accessTravelTimeSeconds"] = routingResult.accessTravelTimeSeconds;
-              odTripJson["egressTravelTimeSeconds"] = routingResult.egressTravelTimeSeconds;
-              odTripJson["transferWaitingTimeSeconds"] = routingResult.transferWaitingTimeSeconds;
-              odTripJson["firstWaitingTimeSeconds"] = routingResult.firstWaitingTimeSeconds;
-              odTripJson["nonTransitTravelTimeSeconds"] = routingResult.nonTransitTravelTimeSeconds;
-              odTripJson["routeIds"] = routingResult.routeIds;
-              odTripJson["routeTypeIds"] = routingResult.routeTypeIds;
-              odTripJson["agencyIds"] = routingResult.agencyIds;
-              json["odTrips"].push_back(odTripJson);
-              
+              if (fileFormat == "csv")
+              {
+                ageGroup = odTrip.ageGroup;
+                std::replace( ageGroup.begin(), ageGroup.end(), '-', '_' ); // remove dash so Excel does not convert to age groups to numbers...
+                csv += std::to_string(odTrip.id) + ",\"" + routingResult.status + "\",\"" + ageGroup + "\",\"" + odTrip.gender + "\",\"" + odTrip.occupation + "\",\"";
+                csv += odTrip.activity + "\",\"" + odTrip.mode + "\"," + std::to_string(odTrip.expansionFactor) + "," + std::to_string(routingResult.travelTimeSeconds) + ",";
+                csv += std::to_string(odTrip.walkingTravelTimeSeconds) + "," + std::to_string(odTrip.departureTimeSeconds) + "," + std::to_string(routingResult.departureTimeSeconds) + ",";
+                csv += std::to_string(routingResult.arrivalTimeSeconds) + "," + std::to_string(routingResult.numberOfTransfers) + "," + std::to_string(routingResult.inVehicleTravelTimeSeconds) + ",";
+                csv += std::to_string(routingResult.transferTravelTimeSeconds) + "," + std::to_string(routingResult.waitingTimeSeconds) + "," + std::to_string(routingResult.accessTravelTimeSeconds) + ",";
+                csv += std::to_string(routingResult.egressTravelTimeSeconds) + "," + std::to_string(routingResult.transferWaitingTimeSeconds) + "," + std::to_string(routingResult.firstWaitingTimeSeconds) + ",";
+                csv += std::to_string(routingResult.nonTransitTravelTimeSeconds) + ",";
+                
+                int countRouteIds = routingResult.routeIds.size();
+                j = 0;
+                for (auto & routeId : routingResult.routeIds)
+                {
+                  csv += std::to_string(routeId);
+                  if (j < countRouteIds - 1)
+                  {
+                    csv += "|";
+                  }
+                  j++;
+                }
+                csv += ",";
+                j = 0;
+                for (auto & routeTypeId : routingResult.routeTypeIds)
+                {
+                  csv += std::to_string(routeTypeId);
+                  if (j < countRouteIds - 1)
+                  {
+                    csv += "|";
+                  }
+                  j++;
+                }
+                csv += ",";
+                j = 0;
+                for (auto & agencyId : routingResult.agencyIds)
+                {
+                  csv += std::to_string(agencyId);
+                  if (j < countRouteIds - 1)
+                  {
+                    csv += "|";
+                  }
+                  j++;
+                }
+                csv += ",";
+                j = 0;
+                for (auto & boardingStopId : routingResult.boardingStopIds)
+                {
+                  csv += std::to_string(boardingStopId);
+                  if (j < countRouteIds - 1)
+                  {
+                    csv += "|";
+                  }
+                  j++;
+                }
+                csv += ",";
+                j = 0;
+                for (auto & unboardingStopId : routingResult.unboardingStopIds)
+                {
+                  csv += std::to_string(unboardingStopId);
+                  if (j < countRouteIds - 1)
+                  {
+                    csv += "|";
+                  }
+                  j++;
+                }
+                csv += ",";
+                j = 0;
+                for (auto & tripId : routingResult.tripIds)
+                {
+                  csv += std::to_string(tripId);
+                  if (j < countRouteIds - 1)
+                  {
+                    csv += "|";
+                  }
+                  j++;
+                }
+                csv += "\n";
+              }
+              else
+              {
+                odTripJson = {};
+                odTripJson["id"]                           = odTrip.id;
+                odTripJson["status"]                       = routingResult.status;
+                odTripJson["ageGroup"]                     = odTrip.ageGroup;
+                odTripJson["gender"]                       = odTrip.gender;
+                odTripJson["occupation"]                   = odTrip.occupation;
+                odTripJson["activity"]                     = odTrip.activity;
+                odTripJson["mode"]                         = odTrip.mode;
+                odTripJson["expansionFactor"]              = odTrip.expansionFactor;
+                odTripJson["travelTimeSeconds"]            = routingResult.travelTimeSeconds;
+                odTripJson["onlyWalkingTravelTimeSeconds"] = odTrip.walkingTravelTimeSeconds;
+                odTripJson["declaredDepartureTimeSeconds"] = odTrip.departureTimeSeconds;
+                odTripJson["departureTimeSeconds"]         = routingResult.departureTimeSeconds;
+                odTripJson["arrivalTimeSeconds"]           = routingResult.arrivalTimeSeconds;
+                odTripJson["numberOfTransfers"]            = routingResult.numberOfTransfers;
+                odTripJson["inVehicleTravelTimeSeconds"]   = routingResult.inVehicleTravelTimeSeconds;
+                odTripJson["transferTravelTimeSeconds"]    = routingResult.transferTravelTimeSeconds;
+                odTripJson["waitingTimeSeconds"]           = routingResult.waitingTimeSeconds;
+                odTripJson["accessTravelTimeSeconds"]      = routingResult.accessTravelTimeSeconds;
+                odTripJson["egressTravelTimeSeconds"]      = routingResult.egressTravelTimeSeconds;
+                odTripJson["transferWaitingTimeSeconds"]   = routingResult.transferWaitingTimeSeconds;
+                odTripJson["firstWaitingTimeSeconds"]      = routingResult.firstWaitingTimeSeconds;
+                odTripJson["nonTransitTravelTimeSeconds"]  = routingResult.nonTransitTravelTimeSeconds;
+                odTripJson["routeIds"]                     = routingResult.routeIds;
+                odTripJson["routeTypeIds"]                 = routingResult.routeTypeIds;
+                odTripJson["agencyIds"]                    = routingResult.agencyIds;
+                odTripJson["boardingStopIds"]              = routingResult.boardingStopIds;
+                odTripJson["unboardingStopIds"]            = routingResult.unboardingStopIds;
+                odTripJson["tripIds"]                      = routingResult.tripIds;
+                json["odTrips"].push_back(odTripJson);
+              }
             }
           }
           i++;
@@ -971,32 +1124,49 @@ int main(int argc, char** argv) {
             break;
           }
         }
-        routesOdTripsCountJson = {};
-        for (auto & routeCount : routesOdTripsCount)
+        if (fileFormat != "csv")
         {
-          routesOdTripsCountJson[std::to_string(routeCount.first)] = routeCount.second;
-        }
-        json["routesOdTripsCount"] = routesOdTripsCountJson;
-        
-        routePathsOdTripsProfilesJson = {};
-        for (auto & routePathProfile : routePathsLegsProfile)
-        {
-          routePathsOdTripsProfilesSequenceJson = {};
-          for (auto & sequenceProfile : routePathProfile.second)
+          routesOdTripsCountJson = {};
+          for (auto & routeCount : routesOdTripsCount)
           {
-            //routePathsOdTripsProfilesOdTripIds.clear();
-            //for (auto & odTripId : std::get<1>(sequenceProfile.second))
-            //{
-            //  routePathsOdTripsProfilesOdTripIds.push_back()
-            //}
-            routePathsOdTripsProfilesSequenceJson[std::to_string(sequenceProfile.first)] = {{"demand", std::get<0>(sequenceProfile.second)}, {"odTripIds", std::get<1>(sequenceProfile.second)}};
+            routesOdTripsCountJson[std::to_string(routeCount.first)] = routeCount.second;
           }
-          routePathsOdTripsProfilesJson[std::to_string(routePathProfile.first)] = routePathsOdTripsProfilesSequenceJson;
+          json["routesOdTripsCount"] = routesOdTripsCountJson;
+          
+          routePathsOdTripsProfilesJson = {};
+          for (auto & routePathProfile : routePathsLegsProfile)
+          {
+            routePathsOdTripsProfilesSequenceJson = {};
+            for (auto & sequenceProfile : routePathProfile.second)
+            {
+              //routePathsOdTripsProfilesOdTripIds.clear();
+              //for (auto & odTripId : std::get<1>(sequenceProfile.second))
+              //{
+              //  routePathsOdTripsProfilesOdTripIds.push_back()
+              //}
+              routePathsOdTripsProfilesSequenceJson[std::to_string(sequenceProfile.first)] = {{"demand", std::get<0>(sequenceProfile.second)}, {"odTripIds", std::get<1>(sequenceProfile.second)}};
+            }
+            routePathsOdTripsProfilesJson[std::to_string(routePathProfile.first)] = routePathsOdTripsProfilesSequenceJson;
+          }
+          json["routePathsOdTripsProfiles"] = routePathsOdTripsProfilesJson;
+          resultStr = json.dump(2);
         }
-        json["routePathsOdTripsProfiles"] = routePathsOdTripsProfilesJson;
-        
-        resultStr = json.dump(2);
-        
+        if (calculateAllOdTrips && fileFormat == "csv")
+        {
+          
+          
+          if (saveToFile)
+          {
+            calculationName += "__batch_" + std::to_string(batchNumber) + "_of_" + std::to_string(batchesCount);
+            std::cerr << "writing csv file" << std::endl;
+            std::ofstream csvFile;
+            //csvFile.imbue(std::locale("en_US.UTF8"));
+            csvFile.open(calculationName + ".csv", std::ios_base::trunc);
+            csvFile << csv;
+            csvFile.close();
+            //resultStr = "{\"status\": \"success\", \"format\": \"csv\", \"filename\": \"" + calculationName + ".csv\"}";
+          }
+        }
       }
       else if (!calculator.params.alternatives)
       {
@@ -1020,7 +1190,16 @@ int main(int argc, char** argv) {
       
       
       //calculator.algorithmCalculationTime.startStep();
-
+      if (saveToFile && fileFormat != "csv")
+      {
+        std::cerr << "writing json file" << std::endl;
+        std::ofstream jsonFile;
+        //jsonFile.imbue(std::locale("en_US.UTF8"));
+        jsonFile.open(calculationName + ".json", std::ios_base::trunc);
+        jsonFile << resultStr;
+        jsonFile.close();
+      }
+      
     }
     else
     {
@@ -1033,7 +1212,15 @@ int main(int argc, char** argv) {
       
     //std::cerr << "-- calculation time -- " << calculator.algorithmCalculationTime.getDurationMicroseconds() << " microseconds\n";
     
-    *response << "HTTP/1.1 200 OK\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << resultStr.length() << "\r\n\r\n" << resultStr;
+    if (fileFormat == "csv")
+    {
+      *response << "HTTP/1.1 200 OK\r\nContent-Type: application/csv; charset=utf-8\r\nContent-Length: " << csv.length() << "\r\n\r\n" << csv;
+    }
+    else
+    {
+      *response << "HTTP/1.1 200 OK\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << resultStr.length() << "\r\n\r\n" << resultStr;
+    }
+    
   };
   
   
