@@ -800,6 +800,7 @@ int main(int argc, char** argv) {
           alternativeJson["unboardingStopIds"]            = routingResult.unboardingStopIds;
           alternativeJson["tripIds"]                      = routingResult.tripIds;
           json["alternatives"].push_back(alternativeJson);
+          json["status"] = "success";
         }
                 
         maxTravelTime = calculator.params.alternativesMaxTravelTimeRatio * routingResult.travelTimeSeconds;
