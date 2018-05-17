@@ -41,6 +41,7 @@ namespace TrRouting
       std::vector<unsigned long long>                   unboardingStopIds;
       std::vector<unsigned long long>                   boardingStopIds;
       std::vector<unsigned long long>                   tripIds;
+      std::vector<int>                                  inVehicleTravelTimesSeconds; // the in vehicle travel time for each segment
       std::vector<std::tuple<unsigned long long, unsigned long long, unsigned long long, int, int>> legs; // tuple: tripId, routeId, routePathId, boarding sequence, unboarding sequence
       nlohmann::json stepJson = {};
       nlohmann::json stopJson = {};
@@ -69,6 +70,7 @@ namespace TrRouting
         unboardingStopIds.clear();
         tripIds.clear();
         routeTypeIds.clear();
+        inVehicleTravelTimesSeconds.clear();
         
         totalInVehicleTime       =  0; transferArrivalTime = -1; firstDepartureTime  = -1;
         totalWalkingTime         =  0; transferReadyTime   = -1; numberOfTransfers   = -1;
@@ -140,6 +142,7 @@ namespace TrRouting
             numberOfTransfers          += 1;
             routeIds.push_back(journeyStepRoute.id);
             routeTypeIds.push_back(journeyStepRoute.routeTypeId);
+            inVehicleTravelTimesSeconds.push_back(inVehicleTime);
             agencyIds.push_back(journeyStepRoute.agencyId);
             boardingStopIds.push_back(journeyStepStopDeparture.id);
             unboardingStopIds.push_back(journeyStepStopArrival.id);
@@ -346,6 +349,7 @@ namespace TrRouting
             result.boardingStopIds             = boardingStopIds;
             result.unboardingStopIds           = unboardingStopIds;
             result.tripIds                     = tripIds;
+            result.inVehicleTravelTimesSeconds = inVehicleTravelTimesSeconds;
             result.status                      = "success";
             
           }

@@ -90,6 +90,28 @@ namespace TrRouting
     reverseJourneys                        = std::vector<std::tuple<int,int,int,int,int,short>>(stops.size());
     reverseAccessJourneys                  = std::vector<std::tuple<int,int,int,int,int,short>>(stops.size());
     
+    // uncomment this to see max access footpath travel time found in all odTrips:
+    //int maxAccessTravelTime = 0;
+    //for (auto & odTrip : odTrips)
+    //{
+    //  for (auto & accessFootpath : odTrip.accessFootpaths)
+    //  {
+    //    if (maxAccessTravelTime < accessFootpath.second)
+    //    {
+    //      maxAccessTravelTime = accessFootpath.second;
+    //    }
+    //  }
+    //  for (auto & egressFootpath : odTrip.egressFootpaths)
+    //  {
+    //    if (maxAccessTravelTime < egressFootpath.second)
+    //    {
+    //      maxAccessTravelTime = egressFootpath.second;
+    //    }
+    //  }
+    //}
+    //std::cerr << "maxAccessTravelTime = " << maxAccessTravelTime << std::endl;
+
+    
   }
   
 }

@@ -28,6 +28,7 @@ namespace TrRouting
     std::vector<unsigned long long> unboardingStopIds;
     std::vector<unsigned long long> routeTypeIds;
     std::vector<unsigned long long> agencyIds;
+    std::vector<int>                inVehicleTravelTimesSeconds;
     std::vector<std::tuple<unsigned long long, unsigned long long, unsigned long long, int, int>> legs; // tuple: tripId, routeId, routePathId, boarding sequence, unboarding sequence
     
   };
