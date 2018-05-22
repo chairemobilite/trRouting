@@ -57,8 +57,10 @@ namespace TrRouting
 
     int departureTimeHour;
     int departureTimeMinutes;
+    int departureTimeSeconds;
     int arrivalTimeHour;
     int arrivalTimeMinutes;
+    int arrivalTimeSeconds;
     int maxTotalTravelTimeSeconds;
     int maxNumberOfTransfers;
     int minWaitingTimeSeconds;
@@ -120,6 +122,8 @@ namespace TrRouting
       cyclingSpeedMetersPerSecond            = 25/3.6; // 25 km/h
       maxTotalTravelTimeSeconds              = MAX_INT;
       maxNumberOfTransfers                   = -1; // -1 means no limit
+      departureTimeSeconds                   = -1;
+      arrivalTimeSeconds                     = -1;
       minWaitingTimeSeconds                  = 5*60;
       maxAccessWalkingTravelTimeSeconds      = 20*60;
       maxEgressWalkingTravelTimeSeconds      = 20*60;

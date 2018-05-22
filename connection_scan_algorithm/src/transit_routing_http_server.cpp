@@ -332,8 +332,10 @@ int main(int argc, char** argv) {
       calculator.params.minWaitingTimeSeconds                  = 5 * 60;
       calculator.params.departureTimeHour                      = -1;
       calculator.params.departureTimeMinutes                   = -1;
+      calculator.params.departureTimeSeconds                   = -1;
       calculator.params.arrivalTimeHour                        = -1;
       calculator.params.arrivalTimeMinutes                     = -1;
+      calculator.params.arrivalTimeSeconds                     = -1;
       calculator.params.maxTotalTravelTimeSeconds              = MAX_INT;
       calculator.params.maxAccessWalkingTravelTimeSeconds      = 20 * 60;
       calculator.params.maxEgressWalkingTravelTimeSeconds      = 20 * 60;
@@ -768,6 +770,8 @@ int main(int argc, char** argv) {
         int numAlternatives = 1;
         int maxAlternatives = calculator.params.maxAlternatives;
         int lastFoundedAtNum = 0;
+        int departureTimeSeconds = -1;
+        std::vector<std::string> routeShortnames;
         
         std:: cout << numAlternatives << "." << std::endl;
         std::cout << "initialMaxTotalTravelTimeSeconds: " << calculator.params.maxTotalTravelTimeSeconds << std::endl;
@@ -777,6 +781,12 @@ int main(int argc, char** argv) {
         
         if (routingResult.status == "success")
         {
+          routeShortnames.clear();
+          for(auto routeId : routingResult.routeIds)
+          {
+            routeShortnames.push_back(calculator.routes[calculator.routeIndexesById[routeId]].shortname);
+          }
+          
           alternativeJson = {};
           alternativeJson["status"]                       = routingResult.status;
           alternativeJson["travelTimeSeconds"]            = routingResult.travelTimeSeconds;
@@ -794,137 +804,159 @@ int main(int argc, char** argv) {
           alternativeJson["nonTransitTravelTimeSeconds"]  = routingResult.nonTransitTravelTimeSeconds;
           alternativeJson["inVehicleTravelTimesSeconds"]  = routingResult.inVehicleTravelTimesSeconds;
           alternativeJson["routeIds"]                     = routingResult.routeIds;
+          alternativeJson["routeShortnames"]              = routeShortnames;
           alternativeJson["routeTypeIds"]                 = routingResult.routeTypeIds;
           alternativeJson["agencyIds"]                    = routingResult.agencyIds;
           alternativeJson["boardingStopIds"]              = routingResult.boardingStopIds;
           alternativeJson["unboardingStopIds"]            = routingResult.unboardingStopIds;
           alternativeJson["tripIds"]                      = routingResult.tripIds;
+          alternativeJson["alternativeSequence"]          = 1;
           json["alternatives"].push_back(alternativeJson);
           json["status"] = "success";
-        }
+          departureTimeSeconds = routingResult.departureTimeSeconds + routingResult.firstWaitingTimeSeconds - calculator.params.minWaitingTimeSeconds;
                 
-        maxTravelTime = calculator.params.alternativesMaxTravelTimeRatio * routingResult.travelTimeSeconds;
-        if (maxTravelTime < calculator.params.minAlternativeMaxTravelTimeSeconds)
-        {
-          calculator.params.maxTotalTravelTimeSeconds = calculator.params.minAlternativeMaxTravelTimeSeconds;
-        }
-        else if (maxTravelTime > routingResult.travelTimeSeconds + calculator.params.alternativesMaxAddedTravelTimeSeconds)
-        {
-          calculator.params.maxTotalTravelTimeSeconds = routingResult.travelTimeSeconds + calculator.params.alternativesMaxAddedTravelTimeSeconds;
-        }
-        else
-        {
-          calculator.params.maxTotalTravelTimeSeconds = maxTravelTime;
-        }
-        
-        std::cout << "minAlternativeMaxTravelTimeSeconds: " << calculator.params.minAlternativeMaxTravelTimeSeconds << std::endl;
-        std::cout << "alternativesMaxAddedTravelTimeSeconds: " << calculator.params.alternativesMaxAddedTravelTimeSeconds << std::endl;
-        std::cout << "alternativesMaxTravelTimeRatio: " << calculator.params.alternativesMaxTravelTimeRatio << std::endl;
-        std::cout << "fastestTravelTimeSeconds: " << routingResult.travelTimeSeconds << std::endl;
-        std::cout << "maxTotalTravelTimeSeconds: " << calculator.params.maxTotalTravelTimeSeconds << std::endl;
-        
-        foundRouteIds = routingResult.routeIds;
-        std::stable_sort(foundRouteIds.begin(),foundRouteIds.end());
-        alreadyFoundRouteIds[foundRouteIds] = true;
-        foundRouteIdsTravelTimeSeconds[foundRouteIds] = routingResult.travelTimeSeconds;
-        lastFoundedAtNum = 1;
-        //std::cout << "fastest route ids: ";
-        //for (auto routeId : foundRouteIds)
-        //{
-        //  std::cout << calculator.routes[calculator.routeIndexesById[routeId]].shortname << " ";
-        //}
-        //std::cout << std::endl;
-        combinationsKs.clear();
-        for (int i = 1; i <= foundRouteIds.size(); i++) { combinationsKs.push_back(i); }
-        for (auto k : combinationsKs)
-        {
-          Combinations<unsigned long long> combinations(foundRouteIds, k);
-          //std::cout << "\nk = " << k << std::endl;
-          for (auto newCombination : combinations)
+          maxTravelTime = calculator.params.alternativesMaxTravelTimeRatio * routingResult.travelTimeSeconds;
+          if (maxTravelTime < calculator.params.minAlternativeMaxTravelTimeSeconds)
           {
-            std::stable_sort(newCombination.begin(), newCombination.end());
-            allCombinations.push_back(newCombination);
-            alreadyCalculatedCombinations[newCombination] = true;
+            calculator.params.maxTotalTravelTimeSeconds = calculator.params.minAlternativeMaxTravelTimeSeconds;
           }
-        }
-        
-        std::vector<unsigned long long> combination;
-        for (int i = 0; i < allCombinations.size(); i++)
-        {
-          if (numAlternatives <= maxAlternatives)
+          else if (maxTravelTime > routingResult.travelTimeSeconds + calculator.params.alternativesMaxAddedTravelTimeSeconds)
           {
-            //std:: cout << std::endl << numAlternatives << "." << std::endl;
-            combination = allCombinations.at(i);
-            calculator.params.exceptRouteIds = combination;
-            //std::cout << "except route Ids: ";
-            //for (auto routeId : combination)
-            //{
-            //  std::cout << calculator.routes[calculator.routeIndexesById[routeId]].shortname << " ";
-            //}
-            //std::cout << std::endl;
-            routingResult = calculator.calculate(false);
-            
-            if (routingResult.status == "success")
+            calculator.params.maxTotalTravelTimeSeconds = routingResult.travelTimeSeconds + calculator.params.alternativesMaxAddedTravelTimeSeconds;
+          }
+          else
+          {
+            calculator.params.maxTotalTravelTimeSeconds = maxTravelTime;
+          }
+          
+          calculator.params.departureTimeSeconds = departureTimeSeconds;
+          
+          std::cout << "minAlternativeMaxTravelTimeSeconds: " << calculator.params.minAlternativeMaxTravelTimeSeconds << std::endl;
+          std::cout << "alternativesMaxAddedTravelTimeSeconds: " << calculator.params.alternativesMaxAddedTravelTimeSeconds << std::endl;
+          std::cout << "alternativesMaxTravelTimeRatio: " << calculator.params.alternativesMaxTravelTimeRatio << std::endl;
+          std::cout << "fastestTravelTimeSeconds: " << routingResult.travelTimeSeconds << std::endl;
+          std::cout << "maxTotalTravelTimeSeconds: " << calculator.params.maxTotalTravelTimeSeconds << std::endl;
+          
+          foundRouteIds = routingResult.routeIds;
+          std::stable_sort(foundRouteIds.begin(),foundRouteIds.end());
+          alreadyFoundRouteIds[foundRouteIds] = true;
+          foundRouteIdsTravelTimeSeconds[foundRouteIds] = routingResult.travelTimeSeconds;
+          lastFoundedAtNum = 1;
+          //std::cout << "fastest route ids: ";
+          //for (auto routeId : foundRouteIds)
+          //{
+          //  std::cout << calculator.routes[calculator.routeIndexesById[routeId]].shortname << " ";
+          //}
+          //std::cout << std::endl;
+          combinationsKs.clear();
+          for (int i = 1; i <= foundRouteIds.size(); i++) { combinationsKs.push_back(i); }
+          for (auto k : combinationsKs)
+          {
+            Combinations<unsigned long long> combinations(foundRouteIds, k);
+            //std::cout << "\nk = " << k << std::endl;
+            for (auto newCombination : combinations)
             {
-              alternativeJson = {};
-              alternativeJson["status"]                       = routingResult.status;
-              alternativeJson["travelTimeSeconds"]            = routingResult.travelTimeSeconds;
-              alternativeJson["minimizedTravelTimeSeconds"]   = routingResult.travelTimeSeconds - routingResult.firstWaitingTimeSeconds + calculator.params.minWaitingTimeSeconds;
-              alternativeJson["departureTimeSeconds"]         = routingResult.departureTimeSeconds;
-              alternativeJson["arrivalTimeSeconds"]           = routingResult.arrivalTimeSeconds;
-              alternativeJson["numberOfTransfers"]            = routingResult.numberOfTransfers;
-              alternativeJson["inVehicleTravelTimeSeconds"]   = routingResult.inVehicleTravelTimeSeconds;
-              alternativeJson["transferTravelTimeSeconds"]    = routingResult.transferTravelTimeSeconds;
-              alternativeJson["waitingTimeSeconds"]           = routingResult.waitingTimeSeconds;
-              alternativeJson["accessTravelTimeSeconds"]      = routingResult.accessTravelTimeSeconds;
-              alternativeJson["egressTravelTimeSeconds"]      = routingResult.egressTravelTimeSeconds;
-              alternativeJson["transferWaitingTimeSeconds"]   = routingResult.transferWaitingTimeSeconds;
-              alternativeJson["firstWaitingTimeSeconds"]      = routingResult.firstWaitingTimeSeconds;
-              alternativeJson["nonTransitTravelTimeSeconds"]  = routingResult.nonTransitTravelTimeSeconds;
-              alternativeJson["inVehicleTravelTimesSeconds"]  = routingResult.inVehicleTravelTimesSeconds;
-              alternativeJson["routeIds"]                     = routingResult.routeIds;
-              alternativeJson["routeTypeIds"]                 = routingResult.routeTypeIds;
-              alternativeJson["agencyIds"]                    = routingResult.agencyIds;
-              alternativeJson["boardingStopIds"]              = routingResult.boardingStopIds;
-              alternativeJson["unboardingStopIds"]            = routingResult.unboardingStopIds;
-              alternativeJson["tripIds"]                      = routingResult.tripIds;
-              json["alternatives"].push_back(alternativeJson);
+              std::stable_sort(newCombination.begin(), newCombination.end());
+              allCombinations.push_back(newCombination);
+              alreadyCalculatedCombinations[newCombination] = true;
             }
-            
-            foundRouteIds = routingResult.routeIds;
-            std::stable_sort(foundRouteIds.begin(),foundRouteIds.end());
-            numAlternatives += 1;
-            //std::cout << "travelTimeSeconds: " << routingResult.travelTimeSeconds << " route Ids: ";
-            //for (auto routeId : foundRouteIds)
-            //{
-            //  std::cout << calculator.routes[calculator.routeIndexesById[routeId]].shortname << " ";
-            //}
-            //std::cout << std::endl;
-            combinationsKs.clear();
-            if (numAlternatives <= maxAlternatives && foundRouteIds.size() > 0 && alreadyFoundRouteIds.count(foundRouteIds) == 0)
+          }
+          
+          std::vector<unsigned long long> combination;
+          for (int i = 0; i < allCombinations.size(); i++)
+          {
+            if (numAlternatives <= maxAlternatives)
             {
-              lastFoundedAtNum = numAlternatives;
-              alreadyFoundRouteIds[foundRouteIds] = true;
-              foundRouteIdsTravelTimeSeconds[foundRouteIds] = routingResult.travelTimeSeconds;
-              for (int i = 1; i <= foundRouteIds.size(); i++) { combinationsKs.push_back(i); }
-              for (auto k : combinationsKs)
+              //std:: cout << std::endl << numAlternatives << "." << std::endl;
+              combination = allCombinations.at(i);
+              calculator.params.exceptRouteIds = combination;
+              //std::cout << "except route Ids: ";
+              //for (auto routeId : combination)
+              //{
+              //  std::cout << calculator.routes[calculator.routeIndexesById[routeId]].shortname << " ";
+              //}
+              //std::cout << std::endl;
+              routingResult = calculator.calculate(false);
+              
+              if (routingResult.status == "success")
               {
-                Combinations<unsigned long long> combinations(foundRouteIds, k);
-                //std::cout << "\nk = " << k << std::endl;
-                for (auto newCombination : combinations)
+              
+                foundRouteIds = routingResult.routeIds;
+                std::stable_sort(foundRouteIds.begin(),foundRouteIds.end());
+                
+                if (foundRouteIds.size() > 0 && alreadyFoundRouteIds.count(foundRouteIds) == 0)
                 {
-                  newCombination.insert( newCombination.end(), combination.begin(), combination.end() );
-                  std::stable_sort(newCombination.begin(), newCombination.end());
-                  if (alreadyCalculatedCombinations.count(newCombination) == 0)
+                  routeShortnames.clear();
+                  for(auto routeId : routingResult.routeIds)
                   {
-                    allCombinations.push_back(newCombination);
-                    alreadyCalculatedCombinations[newCombination] = true;
+                    routeShortnames.push_back(calculator.routes[calculator.routeIndexesById[routeId]].shortname);
                   }
+                  
+                  numAlternatives += 1;
+                  
+                  alternativeJson = {};
+                  alternativeJson["status"]                       = routingResult.status;
+                  alternativeJson["travelTimeSeconds"]            = routingResult.travelTimeSeconds;
+                  alternativeJson["minimizedTravelTimeSeconds"]   = routingResult.travelTimeSeconds - routingResult.firstWaitingTimeSeconds + calculator.params.minWaitingTimeSeconds;
+                  alternativeJson["departureTimeSeconds"]         = routingResult.departureTimeSeconds;
+                  alternativeJson["arrivalTimeSeconds"]           = routingResult.arrivalTimeSeconds;
+                  alternativeJson["numberOfTransfers"]            = routingResult.numberOfTransfers;
+                  alternativeJson["inVehicleTravelTimeSeconds"]   = routingResult.inVehicleTravelTimeSeconds;
+                  alternativeJson["transferTravelTimeSeconds"]    = routingResult.transferTravelTimeSeconds;
+                  alternativeJson["waitingTimeSeconds"]           = routingResult.waitingTimeSeconds;
+                  alternativeJson["accessTravelTimeSeconds"]      = routingResult.accessTravelTimeSeconds;
+                  alternativeJson["egressTravelTimeSeconds"]      = routingResult.egressTravelTimeSeconds;
+                  alternativeJson["transferWaitingTimeSeconds"]   = routingResult.transferWaitingTimeSeconds;
+                  alternativeJson["firstWaitingTimeSeconds"]      = routingResult.firstWaitingTimeSeconds;
+                  alternativeJson["nonTransitTravelTimeSeconds"]  = routingResult.nonTransitTravelTimeSeconds;
+                  alternativeJson["inVehicleTravelTimesSeconds"]  = routingResult.inVehicleTravelTimesSeconds;
+                  alternativeJson["routeIds"]                     = routingResult.routeIds;
+                  alternativeJson["routeTypeIds"]                 = routingResult.routeTypeIds;
+                  alternativeJson["routeShortnames"]              = routeShortnames;
+                  alternativeJson["agencyIds"]                    = routingResult.agencyIds;
+                  alternativeJson["boardingStopIds"]              = routingResult.boardingStopIds;
+                  alternativeJson["unboardingStopIds"]            = routingResult.unboardingStopIds;
+                  alternativeJson["tripIds"]                      = routingResult.tripIds;
+                  alternativeJson["alternativeSequence"]          = numAlternatives;
+                  json["alternatives"].push_back(alternativeJson);
+                
+                  //std::cout << "travelTimeSeconds: " << routingResult.travelTimeSeconds << " route Ids: ";
+                  //for (auto routeId : foundRouteIds)
+                  //{
+                  //  std::cout << calculator.routes[calculator.routeIndexesById[routeId]].shortname << " ";
+                  //}
+                  //std::cout << std::endl;
+                  combinationsKs.clear();
+                  
+                  lastFoundedAtNum = numAlternatives;
+                  alreadyFoundRouteIds[foundRouteIds] = true;
+                  foundRouteIdsTravelTimeSeconds[foundRouteIds] = routingResult.travelTimeSeconds;
+                  for (int i = 1; i <= foundRouteIds.size(); i++) { combinationsKs.push_back(i); }
+                  for (auto k : combinationsKs)
+                  {
+                    Combinations<unsigned long long> combinations(foundRouteIds, k);
+                    //std::cout << "\nk = " << k << std::endl;
+                    for (auto newCombination : combinations)
+                    {
+                      newCombination.insert( newCombination.end(), combination.begin(), combination.end() );
+                      std::stable_sort(newCombination.begin(), newCombination.end());
+                      if (alreadyCalculatedCombinations.count(newCombination) == 0)
+                      {
+                        allCombinations.push_back(newCombination);
+                        alreadyCalculatedCombinations[newCombination] = true;
+                      }
+                    }
+                  }
+                  
+                  combination.clear();
                 }
               }
             }
-            combination.clear();
           }
+        }
+        else
+        {
+          json["status"] = "failed";
         }
         
         std::cout << std::endl;
