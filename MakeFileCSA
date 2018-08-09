@@ -14,7 +14,7 @@ ifeq ($(OS),Darwin)
 	LINKFLAGS = -lboost_thread-mt -lboost_serialization -lboost_system -lboost_filesystem -lboost_regex -lboost_program_options
 else
 	# linux or other (only linux ubuntu and debian are supported right now)
-	CXXFLAGS += -std=c++11 -stdlib=libstdc++
+	CXXFLAGS += -std=c++14 -stdlib=libstdc++
 	LINKFLAGS = -pthread -lboost_thread -lboost_serialization -lboost_system -lboost_filesystem -lboost_regex -lboost_program_options
 endif
 
