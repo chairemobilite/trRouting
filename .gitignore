@@ -15,6 +15,7 @@ swift/trRouting/Package.resolved
 
 # Cache files
 *.cache
+*.pb
 *.msgpack
 
 # Compiled Object files
