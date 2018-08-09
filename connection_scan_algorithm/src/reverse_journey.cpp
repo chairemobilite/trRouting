@@ -230,7 +230,7 @@ namespace TrRouting
             transferTime = std::get<4>(journeyStep);
             if (i == 0) // access
             {
-              transferArrivalTime  = initialDepartureTimeSeconds + transferTime;
+              transferArrivalTime  = (initialDepartureTimeSeconds != 0-1 ? initialDepartureTimeSeconds : bestDepartureTime) + transferTime;
               transferReadyTime    = transferArrivalTime;
               totalWalkingTime    += transferTime;
               accessWalkingTime    = transferTime;
@@ -241,7 +241,7 @@ namespace TrRouting
                 stepJson["type"]                 = "access";
                 stepJson["travelTimeSeconds"]    = transferTime;
                 stepJson["travelTimeMinutes"]    = Toolbox::convertSecondsToMinutes(transferTime);
-                stepJson["departureTime"]        = Toolbox::convertSecondsToFormattedTime(initialDepartureTimeSeconds);
+                stepJson["departureTime"]        = Toolbox::convertSecondsToFormattedTime((initialDepartureTimeSeconds != 0-1 ? initialDepartureTimeSeconds : bestDepartureTime));
                 stepJson["arrivalTime"]          = Toolbox::convertSecondsToFormattedTime(transferArrivalTime);
                 stepJson["departureTimeSeconds"] = bestDepartureTime;
                 stepJson["arrivalTimeSeconds"]   = transferArrivalTime;
@@ -299,12 +299,12 @@ namespace TrRouting
             json["status"]                                         = "success";
             json["origin"]                                         = {params.origin.longitude, params.origin.latitude};
             json["destination"]                                    = {params.destination.longitude, params.destination.latitude};
-            json["departureTime"]                                  = Toolbox::convertSecondsToFormattedTime(initialDepartureTimeSeconds);
+            json["departureTime"]                                  = initialDepartureTimeSeconds != -1 ? Toolbox::convertSecondsToFormattedTime(initialDepartureTimeSeconds) : Toolbox::convertSecondsToFormattedTime(bestDepartureTime);
             json["arrivalTime"]                                    = Toolbox::convertSecondsToFormattedTime(arrivalTime);
-            json["departureTimeSeconds"]                           = initialDepartureTimeSeconds;
+            json["departureTimeSeconds"]                           = initialDepartureTimeSeconds != -1 ? initialDepartureTimeSeconds : bestDepartureTime;
             json["arrivalTimeSeconds"]                             = arrivalTime;
-            json["totalTravelTimeMinutes"]                         = Toolbox::convertSecondsToMinutes(arrivalTime - initialDepartureTimeSeconds);
-            json["totalTravelTimeSeconds"]                         = arrivalTime - initialDepartureTimeSeconds;
+            json["totalTravelTimeMinutes"]                         = Toolbox::convertSecondsToMinutes(arrivalTime - (initialDepartureTimeSeconds != -1 ? initialDepartureTimeSeconds : bestDepartureTime));
+            json["totalTravelTimeSeconds"]                         = arrivalTime - (initialDepartureTimeSeconds != -1 ? initialDepartureTimeSeconds : bestDepartureTime);
             json["totalInVehicleTimeMinutes"]                      = Toolbox::convertSecondsToMinutes(totalInVehicleTime);
             json["totalInVehicleTimeSeconds"]                      = totalInVehicleTime;
             json["totalNonTransitTravelTimeMinutes"]               = Toolbox::convertSecondsToMinutes(totalWalkingTime);
@@ -330,9 +330,9 @@ namespace TrRouting
             json["minimumWaitingTimeBeforeEachBoardingMinutes"]    = Toolbox::convertSecondsToMinutes(params.minWaitingTimeSeconds);
             json["minimumWaitingTimeBeforeEachBoardingSeconds"]    = params.minWaitingTimeSeconds;
             
-            result.travelTimeSeconds           = arrivalTime - initialDepartureTimeSeconds;
+            result.travelTimeSeconds           = arrivalTime - (initialDepartureTimeSeconds != -1 ? initialDepartureTimeSeconds : bestDepartureTime);
             result.arrivalTimeSeconds          = arrivalTime;
-            result.departureTimeSeconds        = initialDepartureTimeSeconds;
+            result.departureTimeSeconds        = (initialDepartureTimeSeconds != -1 ? initialDepartureTimeSeconds : bestDepartureTime);
             result.numberOfTransfers           = numberOfTransfers;
             result.inVehicleTravelTimeSeconds  = totalInVehicleTime;
             result.transferTravelTimeSeconds   = totalTransferWalkingTime;

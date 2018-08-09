@@ -8,7 +8,7 @@ namespace TrRouting
     reset(resetAccessPaths);
 
     RoutingResult result;
-    
+        
     result.json = "";
     
     std::tuple<int,int,int> forwardResult;
@@ -21,8 +21,10 @@ namespace TrRouting
     int bestAccessStopIndex {-1};
     int bestAccessTravelTime {-1};
     int bestDepartureTime {-1};
-
-    if (departureTimeSeconds > -1)
+    
+    
+    
+    if (departureTimeSeconds > -1 && params.forwardCalculation == true)
     {
       
       initialDepartureTimeSeconds = departureTimeSeconds; // set initial departure time so we can find the latest possible departure time with reverse calculation later and still know the initial waiting time
@@ -78,7 +80,8 @@ namespace TrRouting
     }
     else if (arrivalTimeSeconds > -1)
     {
-      
+      departureTimeSeconds = -1;
+      initialDepartureTimeSeconds = -1;
       std::fill(tripsUsable.begin(), tripsUsable.end(), 1); // we need to make all trips usable when not coming from forward result because reverse calculation, by default, checks for usableTrips == 1
       
       std::tie(bestDepartureTime, bestAccessStopIndex, bestAccessTravelTime) = reverseCalculation();
