@@ -35,6 +35,7 @@ namespace TrRouting
   const std::pair<std::vector<Stop>, std::map<unsigned long long, int>> DatabaseFetcher::getStops(std::string applicationShortname)
   {
     std::vector<Stop> stops;
+    ProtoStops protoStops;
     std::map<unsigned long long, int> stopIndexesById;
     
     openConnection();
@@ -61,8 +62,10 @@ namespace TrRouting
       for (pqxx::result::const_iterator c = pgResult.begin(); c != pgResult.end(); ++c) {
         
         // create a new stop for each row:
-        Stop * stop   = new Stop();
-        Point * point = new Point();
+        Stop * stop           = new Stop();
+        ProtoStop * protoStop = protoStops.add_stops();
+        Point * point         = new Point();
+        ProtoPoint protoPoint = protoStop->point();
         // set stop attributes from row:
         stop->id                                  = c[0].as<unsigned long long>();
         stop->code                                = c[1].as<std::string>();
@@ -72,9 +75,17 @@ namespace TrRouting
         stop->point.latitude                      = c[4].as<double>();
         stop->point.longitude                     = c[5].as<double>();
         
+        protoStop->set_id(stop->id);
+        protoStop->set_code(stop->code);
+        protoStop->set_name(stop->name);
+        protoStop->set_station_id(stop->stationId);
+        protoPoint.set_latitude(stop->point.latitude);
+        protoPoint.set_longitude(stop->point.longitude);
+
         // append stop:
         stops.push_back(*stop);
-        stopIndexesById[stop->id] = stops.size() - 1;
+        stopIndexesById[stop->id]             = stops.size() - 1;
+        (*protoStops.mutable_indexes_by_id())[stop->id] = stopIndexesById[stop->id];
         
         // show loading progress in percentage:
         i++;
@@ -86,8 +97,7 @@ namespace TrRouting
       std::cout << std::endl;
       
       // save stops and stop indexes to binary cache file:
-      CacheFetcher::saveToCacheFile(applicationShortname, stops, "stops");
-      CacheFetcher::saveToCacheFile(applicationShortname, stopIndexesById, "stop_indexes");
+      CacheFetcher::saveToProtobufCacheFile(applicationShortname, protoStops, "stops");
       
     } else {
       std::cerr << "Can't open database" << std::endl;

@@ -1,0 +1,10 @@
+syntax = "proto3";
+import 'proto_point.proto';
+
+message ProtoStop {
+  int64 id = 1;
+  string code = 2;
+  string name = 3;
+  ProtoPoint point = 4;
+  int64 station_id = 5;
+}

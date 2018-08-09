@@ -27,8 +27,11 @@
 
 #include "calculation_time.hpp"
 #include "stop.hpp"
+#include "proto/proto_stop.pb.h"
+#include "proto/proto_stops.pb.h"
 #include "route.hpp"
 #include "point.hpp"
+#include "proto/proto_point.pb.h"
 #include "trip.hpp"
 #include "od_trip.hpp"
 #include "tuple_boost_serialize.hpp"

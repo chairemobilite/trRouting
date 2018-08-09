@@ -6,24 +6,35 @@ namespace TrRouting
   const std::pair<std::vector<Stop>, std::map<unsigned long long, int>> CacheFetcher::getStops(std::string applicationShortname)
   {
     std::vector<Stop> stops;
+    ProtoStops protoStops;
     std::map<unsigned long long, int> stopIndexesById;
     
     std::cout << "Fetching stops from cache..." << std::endl;
-    if (CacheFetcher::cacheFileExists(applicationShortname, "stops"))
+    if (CacheFetcher::protobufCacheFileExists(applicationShortname, "stops"))
     {
-      stops = loadFromCacheFile(stops, applicationShortname, "stops");
+      protoStops = loadFromProtobufCacheFile(protoStops, applicationShortname, "stops");
+      for (int i = 0; i < protoStops.stops_size(); i++)
+      {
+        const ProtoStop&  protoStop  = protoStops.stops(i);
+        const ProtoPoint& protoPoint = protoStop.point();
+
+        Stop  * stop          = new Stop();
+        Point * point         = new Point();
+        stop->id              = protoStop.id();
+        stop->code            = protoStop.code();
+        stop->name            = protoStop.name();
+        stop->stationId       = protoStop.station_id();
+        stop->point           = *point;
+        stop->point.latitude  = protoPoint.latitude();
+        stop->point.longitude = protoPoint.longitude();
+
+        stops.push_back(*stop);
+        stopIndexesById[stop->id] = stops.size() - 1;
+      }
     }
     else
     {
       std::cerr << "missing stops cache file!" << std::endl;
-    }
-    if (CacheFetcher::cacheFileExists(applicationShortname, "stop_indexes"))
-    {
-      stopIndexesById = loadFromCacheFile(stopIndexesById, applicationShortname, "stop_indexes");
-    }
-    else
-    {
-      std::cerr << "missing stop_indexes cache file!" << std::endl;
     }
     return std::make_pair(stops, stopIndexesById);
   }

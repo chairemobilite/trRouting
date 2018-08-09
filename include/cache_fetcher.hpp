@@ -26,14 +26,17 @@
 #include <stdlib.h>
 
 #include "calculation_time.hpp"
-#include "stop.hpp"
 #include "route.hpp"
-#include "point.hpp"
 #include "trip.hpp"
+#include "stop.hpp"
+#include "point.hpp"
 #include "od_trip.hpp"
 #include "tuple_boost_serialize.hpp"
 #include "toolbox.hpp"
 #include "parameters.hpp"
+#include "proto/proto_point.pb.h"
+#include "proto/proto_stop.pb.h"
+#include "proto/proto_stops.pb.h"
 
 namespace TrRouting
 {
@@ -66,11 +69,39 @@ namespace TrRouting
       oarch << data;
       oCacheFile.close();
     }
-    
+
     static bool cacheFileExists(std::string applicationShortname, std::string cacheFileName) {
       std::ifstream iCacheFile;
       bool notEmpty = false;
       iCacheFile.open(applicationShortname + "_" + cacheFileName + ".cache", std::ios::in | std::ios::binary | std::ios::ate);
+      notEmpty = iCacheFile.tellg() > 0;
+      iCacheFile.close();
+      return notEmpty;
+    }
+    
+    template<class T>
+    static const T loadFromProtobufCacheFile(T& data, std::string applicationShortname, std::string cacheFileName) {
+      std::ifstream iCacheFile;
+      iCacheFile.open(applicationShortname + "_" + cacheFileName + ".pb", std::ios::in | std::ios::binary);
+      data.ParseFromIstream(&iCacheFile);
+      iCacheFile.close();
+      google::protobuf::ShutdownProtobufLibrary();
+      return data;
+    }
+
+    template<class T>
+    static void saveToProtobufCacheFile(std::string applicationShortname, T& data, std::string cacheFileName) {
+      std::ofstream oCacheFile;
+      oCacheFile.open(applicationShortname + "_" + cacheFileName + ".pb", std::ios::out | std::ios::trunc | std::ios::binary);
+      data.SerializeToOstream(&oCacheFile);
+      oCacheFile.close();
+      google::protobuf::ShutdownProtobufLibrary();
+    }
+    
+    static bool protobufCacheFileExists(std::string applicationShortname, std::string cacheFileName) {
+      std::ifstream iCacheFile;
+      bool notEmpty = false;
+      iCacheFile.open(applicationShortname + "_" + cacheFileName + ".pb", std::ios::in | std::ios::binary | std::ios::ate);
       notEmpty = iCacheFile.tellg() > 0;
       iCacheFile.close();
       return notEmpty;
