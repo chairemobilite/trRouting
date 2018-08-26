@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+message ProtoOdTrip {
+  int64 id = 1;
+  int64 agency_id = 2;
+  int64 route_type_id = 3;
+  string agency_acronym = 4;
+  string agency_name = 5;
+  string shortname = 6;
+  string longname = 7;
+  string route_type_name = 8;
+}

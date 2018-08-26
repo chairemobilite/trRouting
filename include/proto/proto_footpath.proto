@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+message ProtoFootpath {
+  int32 stop_1_idx = 1;
+  int32 stop_2_idx = 2;
+  int32 travel_time = 3;
+}

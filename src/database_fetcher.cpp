@@ -97,6 +97,7 @@ namespace TrRouting
       std::cout << std::endl;
       
       // save stops and stop indexes to binary cache file:
+      std::cout << "Saving stops to cache..." << std::endl;
       CacheFetcher::saveToProtobufCacheFile(applicationShortname, protoStops, "stops");
       
     } else {
@@ -110,6 +111,7 @@ namespace TrRouting
   const std::pair<std::vector<Route>, std::map<unsigned long long, int>> DatabaseFetcher::getRoutes(std::string applicationShortname)
   {
     std::vector<Route> routes;
+    ProtoRoutes protoRoutes;
     std::map<unsigned long long, int> routeIndexesById;
     
     openConnection();
@@ -138,7 +140,9 @@ namespace TrRouting
       for (pqxx::result::const_iterator c = pgResult.begin(); c != pgResult.end(); ++c) {
         
         // create a new route for each row:
-        Route * route = new Route();
+        Route      * route      = new Route();
+        ProtoRoute * protoRoute = protoRoutes.add_routes();
+
         // set route attributes from row:
         route->id                                  = c[0].as<unsigned long long>();
         route->agencyId                            = c[1].as<unsigned long long>();
@@ -149,9 +153,19 @@ namespace TrRouting
         route->longname                            = c[6].as<std::string>();
         route->routeTypeName                       = c[7].as<std::string>();
         
+        protoRoute->set_id(route->id);
+        protoRoute->set_agency_id(route->agencyId);
+        protoRoute->set_route_type_id(route->routeTypeId);
+        protoRoute->set_agency_acronym(route->agencyAcronym);
+        protoRoute->set_agency_name(route->agencyName);
+        protoRoute->set_shortname(route->shortname);
+        protoRoute->set_longname(route->longname);
+        protoRoute->set_route_type_name(route->routeTypeName);
+
         // append route:
         routes.push_back(*route);
         routeIndexesById[route->id] = routes.size() - 1;
+        (*protoRoutes.mutable_indexes_by_id())[route->id] = routeIndexesById[route->id];
         
         // show loading progress in percentage:
         i++;
@@ -162,9 +176,9 @@ namespace TrRouting
       }
       std::cout << std::endl;
       
-      // save routes and stop indexes to binary cache file:
-      CacheFetcher::saveToCacheFile(applicationShortname, routes, "routes");
-      CacheFetcher::saveToCacheFile(applicationShortname, routeIndexesById, "route_indexes");
+      // save routes and route indexes to binary cache file:
+      std::cout << "Saving routes to cache..." << std::endl;
+      CacheFetcher::saveToProtobufCacheFile(applicationShortname, protoRoutes, "routes");
     
     } else {
       std::cout << "Can't open database" << std::endl;
@@ -177,8 +191,9 @@ namespace TrRouting
   const std::pair<std::vector<Trip>, std::map<unsigned long long, int>> DatabaseFetcher::getTrips(std::string applicationShortname)
   {
     std::vector<Trip> trips;
+    ProtoTrips protoTrips;
     std::map<unsigned long long, int> tripIndexesById;
-    
+
     openConnection();
     
     std::cout << "Fetching trips from database..." << std::endl;
@@ -205,7 +220,9 @@ namespace TrRouting
       for (pqxx::result::const_iterator c = pgResult.begin(); c != pgResult.end(); ++c) {
         
         // create a new trip for each row:
-        Trip * trip = new Trip();
+        Trip      * trip      = new Trip();
+        ProtoTrip * protoTrip = protoTrips.add_trips();
+
         // set trip attributes from row:
         trip->id              = c[0].as<unsigned long long>();
         trip->routeId         = c[1].as<unsigned long long>();
@@ -213,10 +230,18 @@ namespace TrRouting
         trip->routeTypeId     = c[3].as<unsigned long long>();
         trip->agencyId        = c[4].as<unsigned long long>();
         trip->serviceId       = c[5].as<unsigned long long>();
-        
+
+        protoTrip->set_id(trip->id);
+        protoTrip->set_route_id(trip->routeId);
+        protoTrip->set_route_path_id(trip->routePathId);
+        protoTrip->set_route_type_id(trip->routeTypeId);
+        protoTrip->set_agency_id(trip->agencyId);
+        protoTrip->set_service_id(trip->serviceId);
+
         // append trip:
         trips.push_back(*trip);
         tripIndexesById[trip->id] = trips.size() - 1;
+        (*protoTrips.mutable_indexes_by_id())[trip->id] = tripIndexesById[trip->id];
         
         // show loading progress in percentage:
         i++;
@@ -227,9 +252,9 @@ namespace TrRouting
       }
       std::cout << std::endl;
       
-      // save trips and stop indexes to binary cache file:
-      CacheFetcher::saveToCacheFile(applicationShortname, trips, "trips");
-      CacheFetcher::saveToCacheFile(applicationShortname, tripIndexesById, "trip_indexes");
+      // save trips and trip indexes to binary cache file:
+      std::cout << "Saving trips to cache..." << std::endl;
+      CacheFetcher::saveToProtobufCacheFile(applicationShortname, protoTrips, "trips");
     
     } else {
       std::cout << "Can't open database" << std::endl;
@@ -244,7 +269,9 @@ namespace TrRouting
   {
     std::vector<std::tuple<int,int,int,int,int,short,short,int>> forwardConnections;
     std::vector<std::tuple<int,int,int,int,int,short,short,int>> reverseConnections;
-    
+    ProtoConnections protoConnections;
+    enum connectionIndexes : short { STOP_DEP = 0, STOP_ARR = 1, TIME_DEP = 2, TIME_ARR = 3, TRIP = 4, CAN_BOARD = 5, CAN_UNBOARD = 6, SEQUENCE = 7 };
+
     openConnection();
     
     std::cout << "Fetching connections from database..." << std::endl;
@@ -315,12 +342,36 @@ namespace TrRouting
         return false;
       });
 
-      // save connections to binary cache files:
-      std::cout << "Saving forward connections to cache..." << std::endl;
-      CacheFetcher::saveToCacheFile(applicationShortname, forwardConnections, "connections_forward");
-      std::cout << "Saving reverse connections to cache..." << std::endl;
-      CacheFetcher::saveToCacheFile(applicationShortname, reverseConnections, "connections_reverse");
-  
+      for(auto & connection : forwardConnections)
+      {
+        ProtoConnection * protoConnection = protoConnections.add_forward_connections();
+        protoConnection->set_stop_dep_idx(std::get<connectionIndexes::STOP_DEP>   (connection));
+        protoConnection->set_stop_arr_idx(std::get<connectionIndexes::STOP_ARR>   (connection));
+        protoConnection->set_time_dep    (std::get<connectionIndexes::TIME_DEP>   (connection));
+        protoConnection->set_time_arr    (std::get<connectionIndexes::TIME_ARR>   (connection));
+        protoConnection->set_trip_idx    (std::get<connectionIndexes::TRIP>       (connection));
+        protoConnection->set_can_board   (std::get<connectionIndexes::CAN_BOARD>  (connection));
+        protoConnection->set_can_unboard (std::get<connectionIndexes::CAN_UNBOARD>(connection));
+        protoConnection->set_sequence    (std::get<connectionIndexes::SEQUENCE>   (connection));
+      }
+
+      for(auto & connection : reverseConnections)
+      {
+        ProtoConnection * protoConnection = protoConnections.add_reverse_connections();
+        protoConnection->set_stop_dep_idx(std::get<connectionIndexes::STOP_DEP>   (connection));
+        protoConnection->set_stop_arr_idx(std::get<connectionIndexes::STOP_ARR>   (connection));
+        protoConnection->set_time_dep    (std::get<connectionIndexes::TIME_DEP>   (connection));
+        protoConnection->set_time_arr    (std::get<connectionIndexes::TIME_ARR>   (connection));
+        protoConnection->set_trip_idx    (std::get<connectionIndexes::TRIP>       (connection));
+        protoConnection->set_can_board   (std::get<connectionIndexes::CAN_BOARD>  (connection));
+        protoConnection->set_can_unboard (std::get<connectionIndexes::CAN_UNBOARD>(connection));
+        protoConnection->set_sequence    (std::get<connectionIndexes::SEQUENCE>   (connection));
+      }
+
+      // save connections to binary cache file:
+      std::cout << "Saving connections to cache..." << std::endl;
+      CacheFetcher::saveToProtobufCacheFile(applicationShortname, protoConnections, "connections");
+      
     } else {
       std::cout << "Can't open database" << std::endl;
     }
@@ -332,6 +383,7 @@ namespace TrRouting
   const std::pair<std::vector<std::tuple<int,int,int>>, std::vector<std::pair<int,int>>> DatabaseFetcher::getFootpaths(std::string applicationShortname, std::map<unsigned long long, int> stopIndexesById)
   {
     std::vector<std::tuple<int,int,int>> footpaths;
+    ProtoFootpaths protoFootpaths;
     std::vector<std::pair<int,int>>      footpathsRanges(stopIndexesById.size());
     
     for (auto & stop : stopIndexesById)
@@ -365,12 +417,23 @@ namespace TrRouting
       std::cout << std::fixed;
       std::cout << std::setprecision(2);
       int stop1Index              = -1;
+      int stop2Index              = -1;
+      int travelTimeSeconds       = -1;
       int footpathIndex           = -1;
+      ProtoFootpathRange * protoFootpathRange;
       
       for (pqxx::result::const_iterator c = pgResult.begin(); c != pgResult.end(); ++c) {
         
-        stop1Index = stopIndexesById[c[0].as<unsigned long long>()];
-        footpaths.push_back(std::make_tuple(stop1Index, stopIndexesById[c[1].as<unsigned long long>()], c[2].as<int>()));
+        stop1Index                    = stopIndexesById[c[0].as<unsigned long long>()];
+        stop2Index                    = stopIndexesById[c[1].as<unsigned long long>()];
+        travelTimeSeconds             = c[2].as<int>();
+        ProtoFootpath * protoFootpath = protoFootpaths.add_footpaths();
+
+        protoFootpath->set_stop_1_idx(stop1Index);
+        protoFootpath->set_stop_2_idx(stop1Index);
+        protoFootpath->set_travel_time(travelTimeSeconds);
+
+        footpaths.push_back(std::make_tuple(stop1Index, stop2Index, travelTimeSeconds));
         footpathIndex = footpaths.size() - 1;
                 
         if (footpathsRanges[stop1Index].first == -1)
@@ -388,10 +451,15 @@ namespace TrRouting
       }
       std::cout << std::endl;
       
+      for(auto & footpathRange : footpathsRanges)
+      {
+        ProtoFootpathRange * protoFootpathRange = protoFootpaths.add_footpath_ranges();
+        protoFootpathRange->set_footpaths_start_idx(std::get<0>(footpathRange));
+        protoFootpathRange->set_footpaths_end_idx(std::get<1>(footpathRange));
+      }
+      
       std::cout << "Saving footpaths to cache..." << std::endl;
-      CacheFetcher::saveToCacheFile(applicationShortname, footpaths, "footpaths");
-      std::cout << "Saving footpaths_ranges to cache..." << std::endl;
-      CacheFetcher::saveToCacheFile(applicationShortname, footpathsRanges, "footpaths_ranges");
+      CacheFetcher::saveToProtobufCacheFile(applicationShortname, protoFootpaths, "footpaths");
       
     } else {
       std::cout << "Can't open database" << std::endl;

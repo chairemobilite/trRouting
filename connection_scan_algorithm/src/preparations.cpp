@@ -24,35 +24,35 @@ namespace TrRouting
     else if (params.dataFetcherShortname == "cache")
     {
       std::tie(stops, stopIndexesById)                   = params.cacheFetcher->getStops(params.applicationShortname);
-      if (stops.size() == 0)
-      {
-        std::tie(stops, stopIndexesById)                 = params.databaseFetcher->getStops(params.applicationShortname);
-      }
+      //if (stops.size() == 0)
+      //{
+      //  std::tie(stops, stopIndexesById)                 = params.databaseFetcher->getStops(params.applicationShortname);
+      //}
       std::tie(routes, routeIndexesById)                 = params.cacheFetcher->getRoutes(params.applicationShortname);
-      if (routes.size() == 0)
-      {
-        std::tie(routes, routeIndexesById)               = params.databaseFetcher->getRoutes(params.applicationShortname);
-      }
+      //if (routes.size() == 0)
+      //{
+      //  std::tie(routes, routeIndexesById)               = params.databaseFetcher->getRoutes(params.applicationShortname);
+      //}
       std::tie(trips, tripIndexesById)                   = params.cacheFetcher->getTrips(params.applicationShortname);
-      if (trips.size() == 0)
-      {
-        std::tie(trips, tripIndexesById)                 = params.databaseFetcher->getTrips(params.applicationShortname);
-      }
+      //if (trips.size() == 0)
+      //{
+      //  std::tie(trips, tripIndexesById)                 = params.databaseFetcher->getTrips(params.applicationShortname);
+      //}
       std::tie(forwardConnections, reverseConnections)   = params.cacheFetcher->getConnections(params.applicationShortname, stopIndexesById, tripIndexesById);
-      if (forwardConnections.size() == 0)
-      {
-        std::tie(forwardConnections, reverseConnections) = params.databaseFetcher->getConnections(params.applicationShortname, stopIndexesById, tripIndexesById);
-      }
+      //if (forwardConnections.size() == 0)
+      //{
+      //  std::tie(forwardConnections, reverseConnections) = params.databaseFetcher->getConnections(params.applicationShortname, stopIndexesById, tripIndexesById);
+      //}
       std::tie(footpaths, footpathsRanges)               = params.cacheFetcher->getFootpaths(params.applicationShortname, stopIndexesById);
-      if (footpaths.size() == 0)
-      {
-        std::tie(footpaths, footpathsRanges)             = params.databaseFetcher->getFootpaths(params.applicationShortname, stopIndexesById);
-      }
+      //if (footpaths.size() == 0)
+      //{
+      //  std::tie(footpaths, footpathsRanges)             = params.databaseFetcher->getFootpaths(params.applicationShortname, stopIndexesById);
+      //}
       std::tie(odTrips, odTripIndexesById)               = params.cacheFetcher->getOdTrips(params.applicationShortname, stops, params);
-      if (odTrips.size() == 0)
-      {
-        std::tie(odTrips, odTripIndexesById)             = params.databaseFetcher->getOdTrips(params.applicationShortname, stops, params);
-      }
+      //if (odTrips.size() == 0)
+      //{
+      //  std::tie(odTrips, odTripIndexesById)             = params.databaseFetcher->getOdTrips(params.applicationShortname, stops, params);
+      //}
     }
     else if (params.dataFetcherShortname == "gtfs")
     {

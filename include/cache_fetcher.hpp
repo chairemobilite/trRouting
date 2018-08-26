@@ -34,9 +34,18 @@
 #include "tuple_boost_serialize.hpp"
 #include "toolbox.hpp"
 #include "parameters.hpp"
-#include "proto/proto_point.pb.h"
 #include "proto/proto_stop.pb.h"
 #include "proto/proto_stops.pb.h"
+#include "proto/proto_point.pb.h"
+#include "proto/proto_route.pb.h"
+#include "proto/proto_routes.pb.h"
+#include "proto/proto_trip.pb.h"
+#include "proto/proto_trips.pb.h"
+#include "proto/proto_connection.pb.h"
+#include "proto/proto_connections.pb.h"
+#include "proto/proto_footpath.pb.h"
+#include "proto/proto_footpath_range.pb.h"
+#include "proto/proto_footpaths.pb.h"
 
 namespace TrRouting
 {

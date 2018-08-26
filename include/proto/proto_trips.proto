@@ -1,0 +1,7 @@
+syntax = "proto3";
+import 'proto_trip.proto';
+
+message ProtoTrips {
+  repeated ProtoTrip trips = 1;
+  map<int64, int64> indexes_by_id = 2;
+}

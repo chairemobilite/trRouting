@@ -1,0 +1,6 @@
+syntax = "proto3";
+
+message ProtoFootpathRange {
+  int32 footpaths_start_idx = 2;
+  int32 footpaths_end_idx = 3;
+}
