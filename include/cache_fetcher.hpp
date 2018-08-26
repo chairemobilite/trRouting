@@ -46,6 +46,8 @@
 #include "proto/proto_footpath.pb.h"
 #include "proto/proto_footpath_range.pb.h"
 #include "proto/proto_footpaths.pb.h"
+#include "proto/proto_od_trip_footpath.pb.h"
+#include "proto/proto_od_trips.pb.h"
 
 namespace TrRouting
 {
