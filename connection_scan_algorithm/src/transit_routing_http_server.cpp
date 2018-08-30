@@ -87,6 +87,10 @@ int main(int argc, char** argv) {
   optionsDesc.add_options() 
       ("osrmWalkPort",     boost::program_options::value<std::string>(), "osrm walking port");
   optionsDesc.add_options() 
+      ("osrmFilePath",     boost::program_options::value<std::string>(), "osrm file path (PATH_TO_ROUTING_FILE.osrm)");
+  optionsDesc.add_options() 
+      ("osrmUseLib",       boost::program_options::value<std::string>(), "osrm use libosrm instead of server (1 or 0)");
+  optionsDesc.add_options() 
       ("databaseUser",     boost::program_options::value<std::string>(), "database user");
   optionsDesc.add_options() 
       ("databaseName",     boost::program_options::value<std::string>(), "database name");
@@ -128,6 +132,14 @@ int main(int argc, char** argv) {
   if(variablesMap.count("osrmWalkPort") == 1)
   {
     algorithmParams.osrmRoutingWalkingPort = variablesMap["osrmWalkPort"].as<std::string>();
+  }
+  if(variablesMap.count("osrmFilePath") == 1)
+  {
+    algorithmParams.osrmFilePath = variablesMap["osrmFilePath"].as<std::string>();
+  }
+  if(variablesMap.count("osrmUseLib") == 1)
+  {
+    algorithmParams.osrmUseLib = (variablesMap["osrmUseLib"].as<std::string>() == "1") ? true : false;
   }
   if(variablesMap.count("databasePort") == 1)
   {

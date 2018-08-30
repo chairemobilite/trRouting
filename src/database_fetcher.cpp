@@ -500,12 +500,10 @@ namespace TrRouting
       std::cout << std::setprecision(2);
       
       unsigned long long odTripId;
-      
       for (pqxx::result::const_iterator c = pgResult.begin(); c != pgResult.end(); ++c) {
         
         // set trip attributes from row:
         odTripId = c[0].as<unsigned long long>();
-        
         if (odTripIndexesById.find(odTripId) != odTripIndexesById.end()) // ignore if already saved
         {
           i++;
@@ -571,8 +569,8 @@ namespace TrRouting
         protoOdTrip->set_cycling_travel_time_seconds(odTrip->cyclingTravelTimeSeconds);
         protoOdTrip->set_driving_travel_time_seconds(odTrip->drivingTravelTimeSeconds);
 
-        odTrip->accessFootpaths = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(odTrip->origin,      stops, "walking", 1200, params.walkingSpeedMetersPerSecond, params.osrmRoutingWalkingHost, params.osrmRoutingWalkingPort);
-        odTrip->egressFootpaths = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(odTrip->destination, stops, "walking", 1200, params.walkingSpeedMetersPerSecond, params.osrmRoutingWalkingHost, params.osrmRoutingWalkingPort);
+        odTrip->accessFootpaths = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(odTrip->origin,      stops, "walking", 1200, params.walkingSpeedMetersPerSecond, params.osrmUseLib, params.osrmFilePath, params.osrmRoutingWalkingHost, params.osrmRoutingWalkingPort);
+        odTrip->egressFootpaths = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(odTrip->destination, stops, "walking", 1200, params.walkingSpeedMetersPerSecond, params.osrmUseLib, params.osrmFilePath, params.osrmRoutingWalkingHost, params.osrmRoutingWalkingPort);
         
         for (auto & accessFootpath : odTrip->accessFootpaths)
         {

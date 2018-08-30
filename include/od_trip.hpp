@@ -60,7 +60,7 @@ namespace TrRouting
   //    ar & destination;
   //    ar & expansionFactor;
   //  }
-  //};
+  };
 
 }
 

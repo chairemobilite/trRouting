@@ -92,6 +92,8 @@ namespace TrRouting
     std::string osrmRoutingDrivingHost;
     std::string osrmRoutingCyclingPort;
     std::string osrmRoutingCyclingHost;
+    std::string osrmFilePath; // path to .osrm file
+    bool osrmUseLib;
     int updateOdTrips; // if 1: update od trips access and egress stops from database. Set to 1 only if stops and/or od trips were modified.
     
     std::string accessMode;
@@ -143,6 +145,8 @@ namespace TrRouting
       osrmRoutingDrivingPort                 = "7000";
       osrmRoutingCyclingHost                 = "localhost";
       osrmRoutingCyclingPort                 = "8000";
+      osrmUseLib                             = false;
+      osrmFilePath                           = "data.osrm";
       accessMode                             = "walking";
       egressMode                             = "walking";
       noResultSecondMode                     = "driving";
