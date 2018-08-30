@@ -43,6 +43,7 @@
 #include "proto/proto_footpath_range.pb.h"
 #include "proto/proto_footpaths.pb.h"
 #include "proto/proto_od_trip_footpath.pb.h"
+#include "proto/proto_od_trip.pb.h"
 #include "proto/proto_od_trips.pb.h"
 #include "od_trip.hpp"
 #include "tuple_boost_serialize.hpp"

@@ -200,21 +200,79 @@ namespace TrRouting
   const std::pair<std::vector<OdTrip>, std::map<unsigned long long, int>> CacheFetcher::getOdTrips(std::string applicationShortname, std::vector<Stop> stops, Parameters& params)
   {
     std::vector<OdTrip> odTrips;
+    ProtoOdTrips protoOdTrips;
     std::map<unsigned long long, int> odTripIndexesById;
     
     std::cout << "Fetching od trips from cache..." << std::endl;
-    if (CacheFetcher::cacheFileExists(applicationShortname, "od_trips"))
+    if (CacheFetcher::protobufCacheFileExists(applicationShortname, "footpaths"))
     {
-      odTrips = loadFromCacheFile(odTrips, applicationShortname, "od_trips");
+      protoOdTrips = loadFromProtobufCacheFile(protoOdTrips, applicationShortname, "od_trips");
+      for (int i = 0; i < protoOdTrips.od_trips_size(); i++)
+      {
+        const ProtoOdTrip& protoOdTrip      = protoOdTrips.od_trips(i);
+        const ProtoPoint& protoOrigin       = protoOdTrip.origin();
+        const ProtoPoint& protoDestination  = protoOdTrip.destination();
+        const ProtoPoint& protoHomeLocation = protoOdTrip.home_location();
+
+        OdTrip * odTrip       = new OdTrip();
+        Point  * origin       = new Point();
+        Point  * destination  = new Point();
+        Point  * homeLocation = new Point();
+        std::vector<std::pair<int,int>> accessFootpaths;
+        std::vector<std::pair<int,int>> egressFootpaths;
+
+        odTrip->id                       = protoOdTrip.id();
+        odTrip->origin                   = *origin;
+        odTrip->destination              = *destination;
+        odTrip->homeLocation             = *homeLocation;
+        odTrip->personId                 = protoOdTrip.person_id();
+        odTrip->householdId              = protoOdTrip.household_id();
+        odTrip->age                      = protoOdTrip.age();
+        odTrip->origin.latitude          = protoOrigin.latitude();
+        odTrip->origin.longitude         = protoOrigin.longitude();
+        odTrip->destination.latitude     = protoDestination.latitude();
+        odTrip->destination.longitude    = protoDestination.longitude();
+        odTrip->homeLocation.latitude    = protoHomeLocation.latitude();
+        odTrip->homeLocation.longitude   = protoHomeLocation.longitude();
+        odTrip->ageGroup                 = protoOdTrip.age_group();
+        odTrip->occupation               = protoOdTrip.occupation();
+        odTrip->originActivity           = protoOdTrip.activity_origin();
+        odTrip->destinationActivity      = protoOdTrip.activity_destination();
+        odTrip->gender                   = protoOdTrip.gender();
+        odTrip->mode                     = protoOdTrip.mode();
+        odTrip->departureTimeSeconds     = protoOdTrip.departure_time_seconds();
+        odTrip->arrivalTimeSeconds       = protoOdTrip.arrival_time_seconds();
+        odTrip->expansionFactor          = protoOdTrip.expansion_factor();
+        odTrip->walkingTravelTimeSeconds = protoOdTrip.walking_travel_time_seconds();
+        odTrip->cyclingTravelTimeSeconds = protoOdTrip.cycling_travel_time_seconds();
+        odTrip->drivingTravelTimeSeconds = protoOdTrip.driving_travel_time_seconds();
+
+        for (int j = 0; j < protoOdTrip.access_footpaths_size(); j++)
+        {
+          const ProtoOdTripFootpath& protoOdTripFootpath = protoOdTrip.access_footpaths(j);
+          accessFootpaths.push_back(std::make_pair(
+            protoOdTripFootpath.stop_idx(),
+            protoOdTripFootpath.travel_time()
+          ));
+        }
+        odTrip->accessFootpaths = accessFootpaths;
+
+        for (int j = 0; j < protoOdTrip.egress_footpaths_size(); j++)
+        {
+          const ProtoOdTripFootpath& protoOdTripFootpath = protoOdTrip.egress_footpaths(j);
+          egressFootpaths.push_back(std::make_pair(
+            protoOdTripFootpath.stop_idx(),
+            protoOdTripFootpath.travel_time()
+          ));
+        }
+        odTrip->egressFootpaths = accessFootpaths;
+
+        odTrips.push_back(*odTrip);
+        odTripIndexesById[odTrip->id] = odTrips.size() - 1;
+      }
+
     }
-    else
-    {
-      std::cerr << "missing od trips cache file!" << std::endl;
-    }
-    if (CacheFetcher::cacheFileExists(applicationShortname, "od_trip_indexes"))
-    {
-      odTripIndexesById = loadFromCacheFile(odTripIndexesById, applicationShortname, "od_trip_indexes");
-    }
+
     else
     {
       std::cerr << "missing od trip indexes cache file!" << std::endl;

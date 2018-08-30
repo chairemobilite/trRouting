@@ -1,31 +1,7 @@
 syntax = "proto3";
-import 'proto_point.proto';
-import 'proto_od_trip_footpath.proto';
+import 'proto_od_trip.proto';
 
-message ProtoOdTrip {
-  int64  id                          = 1;
-  int64  person_id                   = 2;
-  int64  household_id                = 3;
-  int64  age                         = 4;
-  int64  departure_time_seconds      = 5;
-  int64  arrival_time_seconds        = 6;
-  int64  walking_travel_time_seconds = 7;
-  int64  cycling_travel_time_seconds = 8;
-  int64  driving_travel_time_seconds = 9;
-  double expansion_factor            = 10;
-
-  string age_group            = 11;
-  string gender               = 12;
-  string mode                 = 13;
-  string occupation           = 14;
-  string activity_origin      = 15;
-  string activity_destination = 16;
-  
-  repeated ProtoOdTripFootpath access_footpaths = 17;
-  repeated ProtoOdTripFootpath egress_footpaths = 18;
-
-  ProtoPoint origin        = 19;
-  ProtoPoint destination   = 20;
-  ProtoPoint home_location = 21;
-
+message ProtoOdTrips {
+  repeated ProtoOdTrip od_trips = 1;
+  map<int64, int64> indexes_by_id = 2;
 }
