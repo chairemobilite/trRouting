@@ -1,6 +1,0 @@
-syntax = "proto3";
-
-message ProtoPoint {
-  double latitude = 1;
-  double longitude = 2;
-}

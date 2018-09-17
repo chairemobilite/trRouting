@@ -19,23 +19,20 @@
 #include <utility>
 #include <cstdlib>
 
-#include "osrm/match_parameters.hpp"
-#include "osrm/nearest_parameters.hpp"
-#include "osrm/route_parameters.hpp"
-#include "osrm/table_parameters.hpp"
-#include "osrm/trip_parameters.hpp"
-#include "osrm/coordinate.hpp"
-#include "osrm/engine_config.hpp"
-#include "osrm/json_container.hpp"
-#include "osrm/osrm.hpp"
-#include "osrm/status.hpp"
+#include <osrm/osrm.hpp>
+#include <osrm/status.hpp>
+#include <osrm/json_container.hpp>
+#include <osrm/engine_config.hpp>
+#include <osrm/table_parameters.hpp>
 
 #include "point.hpp"
 #include "stop.hpp"
+#include "parameters.hpp"
+
+using namespace osrm;
 
 namespace TrRouting
 {
-  
   class OsrmFetcher
   {
   
@@ -46,10 +43,10 @@ namespace TrRouting
       
     }
     
-    static std::vector<std::pair<int,int>> getAccessibleStopsFootpathsFromPoint(const Point point, const std::vector<Stop> stops, std::string mode, int maxTravelTimeSeconds, float defaultSpeedMetersPerSecond, bool osrmUseLib, std::string osrmFilePath, std::string osrmHost, std::string osrmPort);
+    static std::vector<std::pair<int,int>> getAccessibleStopsFootpathsFromPoint(const Point point, const std::vector<Stop> stops, std::string mode, Parameters& params);
     
   };
-    
+  
 }
 
 #endif // TR_OSRM_FETCHER

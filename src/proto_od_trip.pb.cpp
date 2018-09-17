@@ -22,9 +22,6 @@
 namespace protobuf_proto_5fod_5ftrip_5ffootpath_2eproto {
 extern PROTOBUF_INTERNAL_EXPORT_protobuf_proto_5fod_5ftrip_5ffootpath_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_ProtoOdTripFootpath;
 }  // namespace protobuf_proto_5fod_5ftrip_5ffootpath_2eproto
-namespace protobuf_proto_5fpoint_2eproto {
-extern PROTOBUF_INTERNAL_EXPORT_protobuf_proto_5fpoint_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_ProtoPoint;
-}  // namespace protobuf_proto_5fpoint_2eproto
 class ProtoOdTripDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<ProtoOdTrip>
@@ -42,10 +39,9 @@ static void InitDefaultsProtoOdTrip() {
   ::ProtoOdTrip::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<2> scc_info_ProtoOdTrip =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 2, InitDefaultsProtoOdTrip}, {
-      &protobuf_proto_5fod_5ftrip_5ffootpath_2eproto::scc_info_ProtoOdTripFootpath.base,
-      &protobuf_proto_5fpoint_2eproto::scc_info_ProtoPoint.base,}};
+::google::protobuf::internal::SCCInfo<1> scc_info_ProtoOdTrip =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsProtoOdTrip}, {
+      &protobuf_proto_5fod_5ftrip_5ffootpath_2eproto::scc_info_ProtoOdTripFootpath.base,}};
 
 void InitDefaults() {
   ::google::protobuf::internal::InitSCC(&scc_info_ProtoOdTrip.base);
@@ -77,9 +73,12 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::ProtoOdTrip, activity_destination_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::ProtoOdTrip, access_footpaths_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::ProtoOdTrip, egress_footpaths_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::ProtoOdTrip, origin_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::ProtoOdTrip, destination_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::ProtoOdTrip, home_location_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::ProtoOdTrip, origin_latitude_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::ProtoOdTrip, origin_longitude_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::ProtoOdTrip, destination_latitude_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::ProtoOdTrip, destination_longitude_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::ProtoOdTrip, home_latitude_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::ProtoOdTrip, home_longitude_),
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::ProtoOdTrip)},
@@ -110,29 +109,29 @@ void protobuf_RegisterTypes(const ::std::string&) {
 void AddDescriptorsImpl() {
   InitDefaults();
   static const char descriptor[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
-      "\n\023proto_od_trip.proto\032\021proto_point.proto"
-      "\032\034proto_od_trip_footpath.proto\"\325\004\n\013Proto"
-      "OdTrip\022\n\n\002id\030\001 \001(\003\022\021\n\tperson_id\030\002 \001(\003\022\024\n"
-      "\014household_id\030\003 \001(\003\022\013\n\003age\030\004 \001(\003\022\036\n\026depa"
-      "rture_time_seconds\030\005 \001(\003\022\034\n\024arrival_time"
-      "_seconds\030\006 \001(\003\022#\n\033walking_travel_time_se"
-      "conds\030\007 \001(\003\022#\n\033cycling_travel_time_secon"
-      "ds\030\010 \001(\003\022#\n\033driving_travel_time_seconds\030"
-      "\t \001(\003\022\030\n\020expansion_factor\030\n \001(\001\022\021\n\tage_g"
-      "roup\030\013 \001(\t\022\016\n\006gender\030\014 \001(\t\022\014\n\004mode\030\r \001(\t"
-      "\022\022\n\noccupation\030\016 \001(\t\022\027\n\017activity_origin\030"
-      "\017 \001(\t\022\034\n\024activity_destination\030\020 \001(\t\022.\n\020a"
-      "ccess_footpaths\030\021 \003(\0132\024.ProtoOdTripFootp"
-      "ath\022.\n\020egress_footpaths\030\022 \003(\0132\024.ProtoOdT"
-      "ripFootpath\022\033\n\006origin\030\023 \001(\0132\013.ProtoPoint"
-      "\022 \n\013destination\030\024 \001(\0132\013.ProtoPoint\022\"\n\rho"
-      "me_location\030\025 \001(\0132\013.ProtoPointb\006proto3"
+      "\n\023proto_od_trip.proto\032\034proto_od_trip_foo"
+      "tpath.proto\"\221\005\n\013ProtoOdTrip\022\n\n\002id\030\001 \001(\003\022"
+      "\021\n\tperson_id\030\002 \001(\003\022\024\n\014household_id\030\003 \001(\003"
+      "\022\013\n\003age\030\004 \001(\003\022\036\n\026departure_time_seconds\030"
+      "\005 \001(\003\022\034\n\024arrival_time_seconds\030\006 \001(\003\022#\n\033w"
+      "alking_travel_time_seconds\030\007 \001(\003\022#\n\033cycl"
+      "ing_travel_time_seconds\030\010 \001(\003\022#\n\033driving"
+      "_travel_time_seconds\030\t \001(\003\022\030\n\020expansion_"
+      "factor\030\n \001(\001\022\021\n\tage_group\030\013 \001(\t\022\016\n\006gende"
+      "r\030\014 \001(\t\022\014\n\004mode\030\r \001(\t\022\022\n\noccupation\030\016 \001("
+      "\t\022\027\n\017activity_origin\030\017 \001(\t\022\034\n\024activity_d"
+      "estination\030\020 \001(\t\022.\n\020access_footpaths\030\021 \003"
+      "(\0132\024.ProtoOdTripFootpath\022.\n\020egress_footp"
+      "aths\030\022 \003(\0132\024.ProtoOdTripFootpath\022\027\n\017orig"
+      "in_latitude\030\023 \001(\001\022\030\n\020origin_longitude\030\024 "
+      "\001(\001\022\034\n\024destination_latitude\030\025 \001(\001\022\035\n\025des"
+      "tination_longitude\030\026 \001(\001\022\025\n\rhome_latitud"
+      "e\030\027 \001(\001\022\026\n\016home_longitude\030\030 \001(\001b\006proto3"
   };
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 678);
+      descriptor, 719);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "proto_od_trip.proto", &protobuf_RegisterTypes);
-  ::protobuf_proto_5fpoint_2eproto::AddDescriptors();
   ::protobuf_proto_5fod_5ftrip_5ffootpath_2eproto::AddDescriptors();
 }
 
@@ -151,36 +150,12 @@ struct StaticDescriptorInitializer {
 // ===================================================================
 
 void ProtoOdTrip::InitAsDefaultInstance() {
-  ::_ProtoOdTrip_default_instance_._instance.get_mutable()->origin_ = const_cast< ::ProtoPoint*>(
-      ::ProtoPoint::internal_default_instance());
-  ::_ProtoOdTrip_default_instance_._instance.get_mutable()->destination_ = const_cast< ::ProtoPoint*>(
-      ::ProtoPoint::internal_default_instance());
-  ::_ProtoOdTrip_default_instance_._instance.get_mutable()->home_location_ = const_cast< ::ProtoPoint*>(
-      ::ProtoPoint::internal_default_instance());
 }
 void ProtoOdTrip::clear_access_footpaths() {
   access_footpaths_.Clear();
 }
 void ProtoOdTrip::clear_egress_footpaths() {
   egress_footpaths_.Clear();
-}
-void ProtoOdTrip::clear_origin() {
-  if (GetArenaNoVirtual() == NULL && origin_ != NULL) {
-    delete origin_;
-  }
-  origin_ = NULL;
-}
-void ProtoOdTrip::clear_destination() {
-  if (GetArenaNoVirtual() == NULL && destination_ != NULL) {
-    delete destination_;
-  }
-  destination_ = NULL;
-}
-void ProtoOdTrip::clear_home_location() {
-  if (GetArenaNoVirtual() == NULL && home_location_ != NULL) {
-    delete home_location_;
-  }
-  home_location_ = NULL;
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int ProtoOdTrip::kIdFieldNumber;
@@ -201,9 +176,12 @@ const int ProtoOdTrip::kActivityOriginFieldNumber;
 const int ProtoOdTrip::kActivityDestinationFieldNumber;
 const int ProtoOdTrip::kAccessFootpathsFieldNumber;
 const int ProtoOdTrip::kEgressFootpathsFieldNumber;
-const int ProtoOdTrip::kOriginFieldNumber;
-const int ProtoOdTrip::kDestinationFieldNumber;
-const int ProtoOdTrip::kHomeLocationFieldNumber;
+const int ProtoOdTrip::kOriginLatitudeFieldNumber;
+const int ProtoOdTrip::kOriginLongitudeFieldNumber;
+const int ProtoOdTrip::kDestinationLatitudeFieldNumber;
+const int ProtoOdTrip::kDestinationLongitudeFieldNumber;
+const int ProtoOdTrip::kHomeLatitudeFieldNumber;
+const int ProtoOdTrip::kHomeLongitudeFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 ProtoOdTrip::ProtoOdTrip()
@@ -243,24 +221,9 @@ ProtoOdTrip::ProtoOdTrip(const ProtoOdTrip& from)
   if (from.activity_destination().size() > 0) {
     activity_destination_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.activity_destination_);
   }
-  if (from.has_origin()) {
-    origin_ = new ::ProtoPoint(*from.origin_);
-  } else {
-    origin_ = NULL;
-  }
-  if (from.has_destination()) {
-    destination_ = new ::ProtoPoint(*from.destination_);
-  } else {
-    destination_ = NULL;
-  }
-  if (from.has_home_location()) {
-    home_location_ = new ::ProtoPoint(*from.home_location_);
-  } else {
-    home_location_ = NULL;
-  }
   ::memcpy(&id_, &from.id_,
-    static_cast<size_t>(reinterpret_cast<char*>(&expansion_factor_) -
-    reinterpret_cast<char*>(&id_)) + sizeof(expansion_factor_));
+    static_cast<size_t>(reinterpret_cast<char*>(&home_longitude_) -
+    reinterpret_cast<char*>(&id_)) + sizeof(home_longitude_));
   // @@protoc_insertion_point(copy_constructor:ProtoOdTrip)
 }
 
@@ -271,9 +234,9 @@ void ProtoOdTrip::SharedCtor() {
   occupation_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   activity_origin_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   activity_destination_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  ::memset(&origin_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&expansion_factor_) -
-      reinterpret_cast<char*>(&origin_)) + sizeof(expansion_factor_));
+  ::memset(&id_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&home_longitude_) -
+      reinterpret_cast<char*>(&id_)) + sizeof(home_longitude_));
 }
 
 ProtoOdTrip::~ProtoOdTrip() {
@@ -288,9 +251,6 @@ void ProtoOdTrip::SharedDtor() {
   occupation_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   activity_origin_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   activity_destination_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (this != internal_default_instance()) delete origin_;
-  if (this != internal_default_instance()) delete destination_;
-  if (this != internal_default_instance()) delete home_location_;
 }
 
 void ProtoOdTrip::SetCachedSize(int size) const {
@@ -321,21 +281,9 @@ void ProtoOdTrip::Clear() {
   occupation_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   activity_origin_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   activity_destination_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (GetArenaNoVirtual() == NULL && origin_ != NULL) {
-    delete origin_;
-  }
-  origin_ = NULL;
-  if (GetArenaNoVirtual() == NULL && destination_ != NULL) {
-    delete destination_;
-  }
-  destination_ = NULL;
-  if (GetArenaNoVirtual() == NULL && home_location_ != NULL) {
-    delete home_location_;
-  }
-  home_location_ = NULL;
   ::memset(&id_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&expansion_factor_) -
-      reinterpret_cast<char*>(&id_)) + sizeof(expansion_factor_));
+      reinterpret_cast<char*>(&home_longitude_) -
+      reinterpret_cast<char*>(&id_)) + sizeof(home_longitude_));
   _internal_metadata_.Clear();
 }
 
@@ -609,36 +557,84 @@ bool ProtoOdTrip::MergePartialFromCodedStream(
         break;
       }
 
-      // .ProtoPoint origin = 19;
+      // double origin_latitude = 19;
       case 19: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(154u /* 154 & 0xFF */)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-               input, mutable_origin()));
+            static_cast< ::google::protobuf::uint8>(153u /* 153 & 0xFF */)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
+                 input, &origin_latitude_)));
         } else {
           goto handle_unusual;
         }
         break;
       }
 
-      // .ProtoPoint destination = 20;
+      // double origin_longitude = 20;
       case 20: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(162u /* 162 & 0xFF */)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-               input, mutable_destination()));
+            static_cast< ::google::protobuf::uint8>(161u /* 161 & 0xFF */)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
+                 input, &origin_longitude_)));
         } else {
           goto handle_unusual;
         }
         break;
       }
 
-      // .ProtoPoint home_location = 21;
+      // double destination_latitude = 21;
       case 21: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(170u /* 170 & 0xFF */)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-               input, mutable_home_location()));
+            static_cast< ::google::protobuf::uint8>(169u /* 169 & 0xFF */)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
+                 input, &destination_latitude_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // double destination_longitude = 22;
+      case 22: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(177u /* 177 & 0xFF */)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
+                 input, &destination_longitude_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // double home_latitude = 23;
+      case 23: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(185u /* 185 & 0xFF */)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
+                 input, &home_latitude_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // double home_longitude = 24;
+      case 24: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(193u /* 193 & 0xFF */)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
+                 input, &home_longitude_)));
         } else {
           goto handle_unusual;
         }
@@ -799,22 +795,34 @@ void ProtoOdTrip::SerializeWithCachedSizes(
       output);
   }
 
-  // .ProtoPoint origin = 19;
-  if (this->has_origin()) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      19, this->_internal_origin(), output);
+  // double origin_latitude = 19;
+  if (this->origin_latitude() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteDouble(19, this->origin_latitude(), output);
   }
 
-  // .ProtoPoint destination = 20;
-  if (this->has_destination()) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      20, this->_internal_destination(), output);
+  // double origin_longitude = 20;
+  if (this->origin_longitude() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteDouble(20, this->origin_longitude(), output);
   }
 
-  // .ProtoPoint home_location = 21;
-  if (this->has_home_location()) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      21, this->_internal_home_location(), output);
+  // double destination_latitude = 21;
+  if (this->destination_latitude() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteDouble(21, this->destination_latitude(), output);
+  }
+
+  // double destination_longitude = 22;
+  if (this->destination_longitude() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteDouble(22, this->destination_longitude(), output);
+  }
+
+  // double home_latitude = 23;
+  if (this->home_latitude() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteDouble(23, this->home_latitude(), output);
+  }
+
+  // double home_longitude = 24;
+  if (this->home_longitude() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteDouble(24, this->home_longitude(), output);
   }
 
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
@@ -963,25 +971,34 @@ void ProtoOdTrip::SerializeWithCachedSizes(
         18, this->egress_footpaths(static_cast<int>(i)), deterministic, target);
   }
 
-  // .ProtoPoint origin = 19;
-  if (this->has_origin()) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      InternalWriteMessageToArray(
-        19, this->_internal_origin(), deterministic, target);
+  // double origin_latitude = 19;
+  if (this->origin_latitude() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteDoubleToArray(19, this->origin_latitude(), target);
   }
 
-  // .ProtoPoint destination = 20;
-  if (this->has_destination()) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      InternalWriteMessageToArray(
-        20, this->_internal_destination(), deterministic, target);
+  // double origin_longitude = 20;
+  if (this->origin_longitude() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteDoubleToArray(20, this->origin_longitude(), target);
   }
 
-  // .ProtoPoint home_location = 21;
-  if (this->has_home_location()) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      InternalWriteMessageToArray(
-        21, this->_internal_home_location(), deterministic, target);
+  // double destination_latitude = 21;
+  if (this->destination_latitude() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteDoubleToArray(21, this->destination_latitude(), target);
+  }
+
+  // double destination_longitude = 22;
+  if (this->destination_longitude() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteDoubleToArray(22, this->destination_longitude(), target);
+  }
+
+  // double home_latitude = 23;
+  if (this->home_latitude() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteDoubleToArray(23, this->home_latitude(), target);
+  }
+
+  // double home_longitude = 24;
+  if (this->home_longitude() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteDoubleToArray(24, this->home_longitude(), target);
   }
 
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
@@ -1065,27 +1082,6 @@ size_t ProtoOdTrip::ByteSizeLong() const {
         this->activity_destination());
   }
 
-  // .ProtoPoint origin = 19;
-  if (this->has_origin()) {
-    total_size += 2 +
-      ::google::protobuf::internal::WireFormatLite::MessageSize(
-        *origin_);
-  }
-
-  // .ProtoPoint destination = 20;
-  if (this->has_destination()) {
-    total_size += 2 +
-      ::google::protobuf::internal::WireFormatLite::MessageSize(
-        *destination_);
-  }
-
-  // .ProtoPoint home_location = 21;
-  if (this->has_home_location()) {
-    total_size += 2 +
-      ::google::protobuf::internal::WireFormatLite::MessageSize(
-        *home_location_);
-  }
-
   // int64 id = 1;
   if (this->id() != 0) {
     total_size += 1 +
@@ -1154,6 +1150,36 @@ size_t ProtoOdTrip::ByteSizeLong() const {
     total_size += 1 + 8;
   }
 
+  // double origin_latitude = 19;
+  if (this->origin_latitude() != 0) {
+    total_size += 2 + 8;
+  }
+
+  // double origin_longitude = 20;
+  if (this->origin_longitude() != 0) {
+    total_size += 2 + 8;
+  }
+
+  // double destination_latitude = 21;
+  if (this->destination_latitude() != 0) {
+    total_size += 2 + 8;
+  }
+
+  // double destination_longitude = 22;
+  if (this->destination_longitude() != 0) {
+    total_size += 2 + 8;
+  }
+
+  // double home_latitude = 23;
+  if (this->home_latitude() != 0) {
+    total_size += 2 + 8;
+  }
+
+  // double home_longitude = 24;
+  if (this->home_longitude() != 0) {
+    total_size += 2 + 8;
+  }
+
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
@@ -1207,15 +1233,6 @@ void ProtoOdTrip::MergeFrom(const ProtoOdTrip& from) {
 
     activity_destination_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.activity_destination_);
   }
-  if (from.has_origin()) {
-    mutable_origin()->::ProtoPoint::MergeFrom(from.origin());
-  }
-  if (from.has_destination()) {
-    mutable_destination()->::ProtoPoint::MergeFrom(from.destination());
-  }
-  if (from.has_home_location()) {
-    mutable_home_location()->::ProtoPoint::MergeFrom(from.home_location());
-  }
   if (from.id() != 0) {
     set_id(from.id());
   }
@@ -1245,6 +1262,24 @@ void ProtoOdTrip::MergeFrom(const ProtoOdTrip& from) {
   }
   if (from.expansion_factor() != 0) {
     set_expansion_factor(from.expansion_factor());
+  }
+  if (from.origin_latitude() != 0) {
+    set_origin_latitude(from.origin_latitude());
+  }
+  if (from.origin_longitude() != 0) {
+    set_origin_longitude(from.origin_longitude());
+  }
+  if (from.destination_latitude() != 0) {
+    set_destination_latitude(from.destination_latitude());
+  }
+  if (from.destination_longitude() != 0) {
+    set_destination_longitude(from.destination_longitude());
+  }
+  if (from.home_latitude() != 0) {
+    set_home_latitude(from.home_latitude());
+  }
+  if (from.home_longitude() != 0) {
+    set_home_longitude(from.home_longitude());
   }
 }
 
@@ -1286,9 +1321,6 @@ void ProtoOdTrip::InternalSwap(ProtoOdTrip* other) {
     GetArenaNoVirtual());
   activity_destination_.Swap(&other->activity_destination_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
-  swap(origin_, other->origin_);
-  swap(destination_, other->destination_);
-  swap(home_location_, other->home_location_);
   swap(id_, other->id_);
   swap(person_id_, other->person_id_);
   swap(household_id_, other->household_id_);
@@ -1299,6 +1331,12 @@ void ProtoOdTrip::InternalSwap(ProtoOdTrip* other) {
   swap(cycling_travel_time_seconds_, other->cycling_travel_time_seconds_);
   swap(driving_travel_time_seconds_, other->driving_travel_time_seconds_);
   swap(expansion_factor_, other->expansion_factor_);
+  swap(origin_latitude_, other->origin_latitude_);
+  swap(origin_longitude_, other->origin_longitude_);
+  swap(destination_latitude_, other->destination_latitude_);
+  swap(destination_longitude_, other->destination_longitude_);
+  swap(home_latitude_, other->home_latitude_);
+  swap(home_longitude_, other->home_longitude_);
   _internal_metadata_.Swap(&other->_internal_metadata_);
 }
 

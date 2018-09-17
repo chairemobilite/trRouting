@@ -22,6 +22,10 @@
 #include <curses.h>
 #include <locale>
 
+#include <osrm/osrm.hpp>
+#include <osrm/engine_config.hpp>
+#include <osrm/table_parameters.hpp>
+
 #include "toolbox.hpp"
 #include "database_fetcher.hpp"
 #include "gtfs_fetcher.hpp"
@@ -163,7 +167,7 @@ int main(int argc, char** argv) {
   }
   if(variablesMap.count("updateOdTrips") == 1)
   {
-    algorithmParams.updateOdTrips = variablesMap["updateOdTrips"].as<int>();
+    algorithmParams.updateOdTrips = (variablesMap["updateOdTrips"].as<std::string>() == "1") ? true : false;
   }
   
   
@@ -199,7 +203,6 @@ int main(int argc, char** argv) {
   std::cout << "Starting transit routing for the application: ";
   std::cout << consoleGreen + dataShortname + consoleResetColor << std::endl << std::endl;
   
-  Calculator  calculator;
   algorithmParams.applicationShortname = dataShortname;
   algorithmParams.dataFetcherShortname = dataFetcherStr;
   
@@ -211,6 +214,13 @@ int main(int argc, char** argv) {
   }
   else
   {
+    try { 
+      databaseFetcher = DatabaseFetcher("dbname=" + algorithmParams.databaseName + " user=" + algorithmParams.databaseUser + " hostaddr=" + algorithmParams.databaseHost + " port=" + algorithmParams.databasePort + "");
+    } 
+    catch (const std::exception& e)
+    {
+      // is updateOdTrips is true, this will fail since connection to the database is not possible...
+    }
     algorithmParams.databaseFetcher = &databaseFetcher;
   }
   GtfsFetcher gtfsFetcher         = GtfsFetcher();
@@ -220,7 +230,7 @@ int main(int argc, char** argv) {
   CacheFetcher cacheFetcher       = CacheFetcher();
   algorithmParams.cacheFetcher    = &cacheFetcher;
   
-  calculator = Calculator(algorithmParams);
+  Calculator calculator(algorithmParams);
   int i = 0;
   
   /////////

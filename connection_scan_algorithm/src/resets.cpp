@@ -92,7 +92,7 @@ namespace TrRouting
         }
         else
         {
-          accessFootpaths = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(params.origin, stops, params.accessMode, params.maxAccessWalkingTravelTimeSeconds, params.walkingSpeedMetersPerSecond, params.osrmUseLib, params.osrmFilePath, params.osrmRoutingWalkingHost, params.osrmRoutingWalkingPort);
+          accessFootpaths = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(params.origin, stops, params.accessMode, params);
         }
       }
     
@@ -138,7 +138,7 @@ namespace TrRouting
         }
         else
         {
-          egressFootpaths = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(params.destination, stops, params.accessMode, params.maxEgressWalkingTravelTimeSeconds, params.walkingSpeedMetersPerSecond, params.osrmUseLib, params.osrmFilePath, params.osrmRoutingWalkingHost, params.osrmRoutingWalkingPort);
+          egressFootpaths = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(params.destination, stops, params.accessMode, params);
         }
       }
       

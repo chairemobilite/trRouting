@@ -19,9 +19,6 @@
 #endif
 // @@protoc_insertion_point(includes)
 
-namespace protobuf_proto_5fpoint_2eproto {
-extern PROTOBUF_INTERNAL_EXPORT_protobuf_proto_5fpoint_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_ProtoPoint;
-}  // namespace protobuf_proto_5fpoint_2eproto
 class ProtoStopDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<ProtoStop>
@@ -39,9 +36,8 @@ static void InitDefaultsProtoStop() {
   ::ProtoStop::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<1> scc_info_ProtoStop =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsProtoStop}, {
-      &protobuf_proto_5fpoint_2eproto::scc_info_ProtoPoint.base,}};
+::google::protobuf::internal::SCCInfo<0> scc_info_ProtoStop =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsProtoStop}, {}};
 
 void InitDefaults() {
   ::google::protobuf::internal::InitSCC(&scc_info_ProtoStop.base);
@@ -58,7 +54,8 @@ const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUT
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::ProtoStop, id_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::ProtoStop, code_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::ProtoStop, name_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::ProtoStop, point_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::ProtoStop, latitude_),
+  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::ProtoStop, longitude_),
   GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::ProtoStop, station_id_),
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
@@ -90,16 +87,15 @@ void protobuf_RegisterTypes(const ::std::string&) {
 void AddDescriptorsImpl() {
   InitDefaults();
   static const char descriptor[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
-      "\n\020proto_stop.proto\032\021proto_point.proto\"c\n"
-      "\tProtoStop\022\n\n\002id\030\001 \001(\003\022\014\n\004code\030\002 \001(\t\022\014\n\004"
-      "name\030\003 \001(\t\022\032\n\005point\030\004 \001(\0132\013.ProtoPoint\022\022"
-      "\n\nstation_id\030\005 \001(\003b\006proto3"
+      "\n\020proto_stop.proto\"l\n\tProtoStop\022\n\n\002id\030\001 "
+      "\001(\003\022\014\n\004code\030\002 \001(\t\022\014\n\004name\030\003 \001(\t\022\020\n\010latit"
+      "ude\030\004 \001(\001\022\021\n\tlongitude\030\005 \001(\001\022\022\n\nstation_"
+      "id\030\006 \001(\003b\006proto3"
   };
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 146);
+      descriptor, 136);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "proto_stop.proto", &protobuf_RegisterTypes);
-  ::protobuf_proto_5fpoint_2eproto::AddDescriptors();
 }
 
 void AddDescriptors() {
@@ -117,20 +113,13 @@ struct StaticDescriptorInitializer {
 // ===================================================================
 
 void ProtoStop::InitAsDefaultInstance() {
-  ::_ProtoStop_default_instance_._instance.get_mutable()->point_ = const_cast< ::ProtoPoint*>(
-      ::ProtoPoint::internal_default_instance());
-}
-void ProtoStop::clear_point() {
-  if (GetArenaNoVirtual() == NULL && point_ != NULL) {
-    delete point_;
-  }
-  point_ = NULL;
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int ProtoStop::kIdFieldNumber;
 const int ProtoStop::kCodeFieldNumber;
 const int ProtoStop::kNameFieldNumber;
-const int ProtoStop::kPointFieldNumber;
+const int ProtoStop::kLatitudeFieldNumber;
+const int ProtoStop::kLongitudeFieldNumber;
 const int ProtoStop::kStationIdFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
@@ -153,11 +142,6 @@ ProtoStop::ProtoStop(const ProtoStop& from)
   if (from.name().size() > 0) {
     name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.name_);
   }
-  if (from.has_point()) {
-    point_ = new ::ProtoPoint(*from.point_);
-  } else {
-    point_ = NULL;
-  }
   ::memcpy(&id_, &from.id_,
     static_cast<size_t>(reinterpret_cast<char*>(&station_id_) -
     reinterpret_cast<char*>(&id_)) + sizeof(station_id_));
@@ -167,9 +151,9 @@ ProtoStop::ProtoStop(const ProtoStop& from)
 void ProtoStop::SharedCtor() {
   code_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  ::memset(&point_, 0, static_cast<size_t>(
+  ::memset(&id_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&station_id_) -
-      reinterpret_cast<char*>(&point_)) + sizeof(station_id_));
+      reinterpret_cast<char*>(&id_)) + sizeof(station_id_));
 }
 
 ProtoStop::~ProtoStop() {
@@ -180,7 +164,6 @@ ProtoStop::~ProtoStop() {
 void ProtoStop::SharedDtor() {
   code_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   name_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (this != internal_default_instance()) delete point_;
 }
 
 void ProtoStop::SetCachedSize(int size) const {
@@ -205,10 +188,6 @@ void ProtoStop::Clear() {
 
   code_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (GetArenaNoVirtual() == NULL && point_ != NULL) {
-    delete point_;
-  }
-  point_ = NULL;
   ::memset(&id_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&station_id_) -
       reinterpret_cast<char*>(&id_)) + sizeof(station_id_));
@@ -271,22 +250,38 @@ bool ProtoStop::MergePartialFromCodedStream(
         break;
       }
 
-      // .ProtoPoint point = 4;
+      // double latitude = 4;
       case 4: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(34u /* 34 & 0xFF */)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-               input, mutable_point()));
+            static_cast< ::google::protobuf::uint8>(33u /* 33 & 0xFF */)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
+                 input, &latitude_)));
         } else {
           goto handle_unusual;
         }
         break;
       }
 
-      // int64 station_id = 5;
+      // double longitude = 5;
       case 5: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(40u /* 40 & 0xFF */)) {
+            static_cast< ::google::protobuf::uint8>(41u /* 41 & 0xFF */)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   double, ::google::protobuf::internal::WireFormatLite::TYPE_DOUBLE>(
+                 input, &longitude_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // int64 station_id = 6;
+      case 6: {
+        if (static_cast< ::google::protobuf::uint8>(tag) ==
+            static_cast< ::google::protobuf::uint8>(48u /* 48 & 0xFF */)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::int64, ::google::protobuf::internal::WireFormatLite::TYPE_INT64>(
@@ -348,15 +343,19 @@ void ProtoStop::SerializeWithCachedSizes(
       3, this->name(), output);
   }
 
-  // .ProtoPoint point = 4;
-  if (this->has_point()) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      4, this->_internal_point(), output);
+  // double latitude = 4;
+  if (this->latitude() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteDouble(4, this->latitude(), output);
   }
 
-  // int64 station_id = 5;
+  // double longitude = 5;
+  if (this->longitude() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteDouble(5, this->longitude(), output);
+  }
+
+  // int64 station_id = 6;
   if (this->station_id() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt64(5, this->station_id(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteInt64(6, this->station_id(), output);
   }
 
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
@@ -400,16 +399,19 @@ void ProtoStop::SerializeWithCachedSizes(
         3, this->name(), target);
   }
 
-  // .ProtoPoint point = 4;
-  if (this->has_point()) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      InternalWriteMessageToArray(
-        4, this->_internal_point(), deterministic, target);
+  // double latitude = 4;
+  if (this->latitude() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteDoubleToArray(4, this->latitude(), target);
   }
 
-  // int64 station_id = 5;
+  // double longitude = 5;
+  if (this->longitude() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteDoubleToArray(5, this->longitude(), target);
+  }
+
+  // int64 station_id = 6;
   if (this->station_id() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(5, this->station_id(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt64ToArray(6, this->station_id(), target);
   }
 
   if ((_internal_metadata_.have_unknown_fields() &&  ::google::protobuf::internal::GetProto3PreserveUnknownsDefault())) {
@@ -443,13 +445,6 @@ size_t ProtoStop::ByteSizeLong() const {
         this->name());
   }
 
-  // .ProtoPoint point = 4;
-  if (this->has_point()) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::MessageSize(
-        *point_);
-  }
-
   // int64 id = 1;
   if (this->id() != 0) {
     total_size += 1 +
@@ -457,7 +452,17 @@ size_t ProtoStop::ByteSizeLong() const {
         this->id());
   }
 
-  // int64 station_id = 5;
+  // double latitude = 4;
+  if (this->latitude() != 0) {
+    total_size += 1 + 8;
+  }
+
+  // double longitude = 5;
+  if (this->longitude() != 0) {
+    total_size += 1 + 8;
+  }
+
+  // int64 station_id = 6;
   if (this->station_id() != 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::Int64Size(
@@ -499,11 +504,14 @@ void ProtoStop::MergeFrom(const ProtoStop& from) {
 
     name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.name_);
   }
-  if (from.has_point()) {
-    mutable_point()->::ProtoPoint::MergeFrom(from.point());
-  }
   if (from.id() != 0) {
     set_id(from.id());
+  }
+  if (from.latitude() != 0) {
+    set_latitude(from.latitude());
+  }
+  if (from.longitude() != 0) {
+    set_longitude(from.longitude());
   }
   if (from.station_id() != 0) {
     set_station_id(from.station_id());
@@ -538,8 +546,9 @@ void ProtoStop::InternalSwap(ProtoStop* other) {
     GetArenaNoVirtual());
   name_.Swap(&other->name_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
-  swap(point_, other->point_);
   swap(id_, other->id_);
+  swap(latitude_, other->latitude_);
+  swap(longitude_, other->longitude_);
   swap(station_id_, other->station_id_);
   _internal_metadata_.Swap(&other->_internal_metadata_);
 }

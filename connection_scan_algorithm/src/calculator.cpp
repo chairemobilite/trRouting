@@ -6,7 +6,7 @@ namespace TrRouting
   RoutingResult Calculator::calculate(bool resetAccessPaths) {
     
     reset(resetAccessPaths);
-
+    
     RoutingResult result;
         
     result.json = "";

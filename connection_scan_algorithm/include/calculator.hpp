@@ -31,6 +31,7 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <limits>
 #include <stdlib.h>
+#include <osrm/osrm.hpp>
 
 #include "json.hpp"
 #include "toolbox.hpp"
@@ -64,7 +65,7 @@ namespace TrRouting
   public:
     
     std::string applicationShortname;
-    Calculator();
+    //Calculator();
     Calculator(Parameters& theParams);
     void                    prepare();
     void                    reset(bool resetAccessPaths = true);
@@ -79,7 +80,7 @@ namespace TrRouting
     std::map<unsigned long long, int>    routeIndexesById;
     
     
-    Parameters params;
+    Parameters& params;
     CalculationTime algorithmCalculationTime;
     std::vector<OdTrip>                  odTrips;
     std::map<unsigned long long, int>    odTripIndexesById;

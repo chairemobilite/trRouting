@@ -24,6 +24,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <stdlib.h>
+#include <osrm/osrm.hpp>
 
 #include "calculation_time.hpp"
 #include "stop.hpp"
@@ -32,7 +33,6 @@
 #include "trip.hpp"
 #include "proto/proto_stop.pb.h"
 #include "proto/proto_stops.pb.h"
-#include "proto/proto_point.pb.h"
 #include "proto/proto_route.pb.h"
 #include "proto/proto_routes.pb.h"
 #include "proto/proto_trip.pb.h"

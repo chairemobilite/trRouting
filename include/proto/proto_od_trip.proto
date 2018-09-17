@@ -1,5 +1,4 @@
 syntax = "proto3";
-import 'proto_point.proto';
 import 'proto_od_trip_footpath.proto';
 
 message ProtoOdTrip {
@@ -24,8 +23,12 @@ message ProtoOdTrip {
   repeated ProtoOdTripFootpath access_footpaths = 17;
   repeated ProtoOdTripFootpath egress_footpaths = 18;
 
-  ProtoPoint origin        = 19;
-  ProtoPoint destination   = 20;
-  ProtoPoint home_location = 21;
+  double origin_latitude = 19;
+  double origin_longitude = 20;
+  double destination_latitude = 21;
+  double destination_longitude = 22;
+  double home_latitude = 23;
+  double home_longitude = 24;
+  
 
 }

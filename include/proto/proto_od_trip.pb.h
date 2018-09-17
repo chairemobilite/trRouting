@@ -30,7 +30,6 @@
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
 #include <google/protobuf/unknown_field_set.h>
-#include "proto_point.pb.h"
 #include "proto_od_trip_footpath.pb.h"
 // @@protoc_insertion_point(includes)
 #define PROTOBUF_INTERNAL_EXPORT_protobuf_proto_5fod_5ftrip_2eproto 
@@ -253,42 +252,6 @@ class ProtoOdTrip : public ::google::protobuf::Message /* @@protoc_insertion_poi
   ::std::string* release_activity_destination();
   void set_allocated_activity_destination(::std::string* activity_destination);
 
-  // .ProtoPoint origin = 19;
-  bool has_origin() const;
-  void clear_origin();
-  static const int kOriginFieldNumber = 19;
-  private:
-  const ::ProtoPoint& _internal_origin() const;
-  public:
-  const ::ProtoPoint& origin() const;
-  ::ProtoPoint* release_origin();
-  ::ProtoPoint* mutable_origin();
-  void set_allocated_origin(::ProtoPoint* origin);
-
-  // .ProtoPoint destination = 20;
-  bool has_destination() const;
-  void clear_destination();
-  static const int kDestinationFieldNumber = 20;
-  private:
-  const ::ProtoPoint& _internal_destination() const;
-  public:
-  const ::ProtoPoint& destination() const;
-  ::ProtoPoint* release_destination();
-  ::ProtoPoint* mutable_destination();
-  void set_allocated_destination(::ProtoPoint* destination);
-
-  // .ProtoPoint home_location = 21;
-  bool has_home_location() const;
-  void clear_home_location();
-  static const int kHomeLocationFieldNumber = 21;
-  private:
-  const ::ProtoPoint& _internal_home_location() const;
-  public:
-  const ::ProtoPoint& home_location() const;
-  ::ProtoPoint* release_home_location();
-  ::ProtoPoint* mutable_home_location();
-  void set_allocated_home_location(::ProtoPoint* home_location);
-
   // int64 id = 1;
   void clear_id();
   static const int kIdFieldNumber = 1;
@@ -349,6 +312,42 @@ class ProtoOdTrip : public ::google::protobuf::Message /* @@protoc_insertion_poi
   double expansion_factor() const;
   void set_expansion_factor(double value);
 
+  // double origin_latitude = 19;
+  void clear_origin_latitude();
+  static const int kOriginLatitudeFieldNumber = 19;
+  double origin_latitude() const;
+  void set_origin_latitude(double value);
+
+  // double origin_longitude = 20;
+  void clear_origin_longitude();
+  static const int kOriginLongitudeFieldNumber = 20;
+  double origin_longitude() const;
+  void set_origin_longitude(double value);
+
+  // double destination_latitude = 21;
+  void clear_destination_latitude();
+  static const int kDestinationLatitudeFieldNumber = 21;
+  double destination_latitude() const;
+  void set_destination_latitude(double value);
+
+  // double destination_longitude = 22;
+  void clear_destination_longitude();
+  static const int kDestinationLongitudeFieldNumber = 22;
+  double destination_longitude() const;
+  void set_destination_longitude(double value);
+
+  // double home_latitude = 23;
+  void clear_home_latitude();
+  static const int kHomeLatitudeFieldNumber = 23;
+  double home_latitude() const;
+  void set_home_latitude(double value);
+
+  // double home_longitude = 24;
+  void clear_home_longitude();
+  static const int kHomeLongitudeFieldNumber = 24;
+  double home_longitude() const;
+  void set_home_longitude(double value);
+
   // @@protoc_insertion_point(class_scope:ProtoOdTrip)
  private:
 
@@ -361,9 +360,6 @@ class ProtoOdTrip : public ::google::protobuf::Message /* @@protoc_insertion_poi
   ::google::protobuf::internal::ArenaStringPtr occupation_;
   ::google::protobuf::internal::ArenaStringPtr activity_origin_;
   ::google::protobuf::internal::ArenaStringPtr activity_destination_;
-  ::ProtoPoint* origin_;
-  ::ProtoPoint* destination_;
-  ::ProtoPoint* home_location_;
   ::google::protobuf::int64 id_;
   ::google::protobuf::int64 person_id_;
   ::google::protobuf::int64 household_id_;
@@ -374,6 +370,12 @@ class ProtoOdTrip : public ::google::protobuf::Message /* @@protoc_insertion_poi
   ::google::protobuf::int64 cycling_travel_time_seconds_;
   ::google::protobuf::int64 driving_travel_time_seconds_;
   double expansion_factor_;
+  double origin_latitude_;
+  double origin_longitude_;
+  double destination_latitude_;
+  double destination_longitude_;
+  double home_latitude_;
+  double home_longitude_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::protobuf_proto_5fod_5ftrip_2eproto::TableStruct;
 };
@@ -900,148 +902,88 @@ ProtoOdTrip::egress_footpaths() const {
   return egress_footpaths_;
 }
 
-// .ProtoPoint origin = 19;
-inline bool ProtoOdTrip::has_origin() const {
-  return this != internal_default_instance() && origin_ != NULL;
+// double origin_latitude = 19;
+inline void ProtoOdTrip::clear_origin_latitude() {
+  origin_latitude_ = 0;
 }
-inline const ::ProtoPoint& ProtoOdTrip::_internal_origin() const {
-  return *origin_;
+inline double ProtoOdTrip::origin_latitude() const {
+  // @@protoc_insertion_point(field_get:ProtoOdTrip.origin_latitude)
+  return origin_latitude_;
 }
-inline const ::ProtoPoint& ProtoOdTrip::origin() const {
-  const ::ProtoPoint* p = origin_;
-  // @@protoc_insertion_point(field_get:ProtoOdTrip.origin)
-  return p != NULL ? *p : *reinterpret_cast<const ::ProtoPoint*>(
-      &::_ProtoPoint_default_instance_);
-}
-inline ::ProtoPoint* ProtoOdTrip::release_origin() {
-  // @@protoc_insertion_point(field_release:ProtoOdTrip.origin)
+inline void ProtoOdTrip::set_origin_latitude(double value) {
   
-  ::ProtoPoint* temp = origin_;
-  origin_ = NULL;
-  return temp;
-}
-inline ::ProtoPoint* ProtoOdTrip::mutable_origin() {
-  
-  if (origin_ == NULL) {
-    auto* p = CreateMaybeMessage<::ProtoPoint>(GetArenaNoVirtual());
-    origin_ = p;
-  }
-  // @@protoc_insertion_point(field_mutable:ProtoOdTrip.origin)
-  return origin_;
-}
-inline void ProtoOdTrip::set_allocated_origin(::ProtoPoint* origin) {
-  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
-  if (message_arena == NULL) {
-    delete reinterpret_cast< ::google::protobuf::MessageLite*>(origin_);
-  }
-  if (origin) {
-    ::google::protobuf::Arena* submessage_arena = NULL;
-    if (message_arena != submessage_arena) {
-      origin = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, origin, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  origin_ = origin;
-  // @@protoc_insertion_point(field_set_allocated:ProtoOdTrip.origin)
+  origin_latitude_ = value;
+  // @@protoc_insertion_point(field_set:ProtoOdTrip.origin_latitude)
 }
 
-// .ProtoPoint destination = 20;
-inline bool ProtoOdTrip::has_destination() const {
-  return this != internal_default_instance() && destination_ != NULL;
+// double origin_longitude = 20;
+inline void ProtoOdTrip::clear_origin_longitude() {
+  origin_longitude_ = 0;
 }
-inline const ::ProtoPoint& ProtoOdTrip::_internal_destination() const {
-  return *destination_;
+inline double ProtoOdTrip::origin_longitude() const {
+  // @@protoc_insertion_point(field_get:ProtoOdTrip.origin_longitude)
+  return origin_longitude_;
 }
-inline const ::ProtoPoint& ProtoOdTrip::destination() const {
-  const ::ProtoPoint* p = destination_;
-  // @@protoc_insertion_point(field_get:ProtoOdTrip.destination)
-  return p != NULL ? *p : *reinterpret_cast<const ::ProtoPoint*>(
-      &::_ProtoPoint_default_instance_);
-}
-inline ::ProtoPoint* ProtoOdTrip::release_destination() {
-  // @@protoc_insertion_point(field_release:ProtoOdTrip.destination)
+inline void ProtoOdTrip::set_origin_longitude(double value) {
   
-  ::ProtoPoint* temp = destination_;
-  destination_ = NULL;
-  return temp;
-}
-inline ::ProtoPoint* ProtoOdTrip::mutable_destination() {
-  
-  if (destination_ == NULL) {
-    auto* p = CreateMaybeMessage<::ProtoPoint>(GetArenaNoVirtual());
-    destination_ = p;
-  }
-  // @@protoc_insertion_point(field_mutable:ProtoOdTrip.destination)
-  return destination_;
-}
-inline void ProtoOdTrip::set_allocated_destination(::ProtoPoint* destination) {
-  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
-  if (message_arena == NULL) {
-    delete reinterpret_cast< ::google::protobuf::MessageLite*>(destination_);
-  }
-  if (destination) {
-    ::google::protobuf::Arena* submessage_arena = NULL;
-    if (message_arena != submessage_arena) {
-      destination = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, destination, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  destination_ = destination;
-  // @@protoc_insertion_point(field_set_allocated:ProtoOdTrip.destination)
+  origin_longitude_ = value;
+  // @@protoc_insertion_point(field_set:ProtoOdTrip.origin_longitude)
 }
 
-// .ProtoPoint home_location = 21;
-inline bool ProtoOdTrip::has_home_location() const {
-  return this != internal_default_instance() && home_location_ != NULL;
+// double destination_latitude = 21;
+inline void ProtoOdTrip::clear_destination_latitude() {
+  destination_latitude_ = 0;
 }
-inline const ::ProtoPoint& ProtoOdTrip::_internal_home_location() const {
-  return *home_location_;
+inline double ProtoOdTrip::destination_latitude() const {
+  // @@protoc_insertion_point(field_get:ProtoOdTrip.destination_latitude)
+  return destination_latitude_;
 }
-inline const ::ProtoPoint& ProtoOdTrip::home_location() const {
-  const ::ProtoPoint* p = home_location_;
-  // @@protoc_insertion_point(field_get:ProtoOdTrip.home_location)
-  return p != NULL ? *p : *reinterpret_cast<const ::ProtoPoint*>(
-      &::_ProtoPoint_default_instance_);
-}
-inline ::ProtoPoint* ProtoOdTrip::release_home_location() {
-  // @@protoc_insertion_point(field_release:ProtoOdTrip.home_location)
+inline void ProtoOdTrip::set_destination_latitude(double value) {
   
-  ::ProtoPoint* temp = home_location_;
-  home_location_ = NULL;
-  return temp;
+  destination_latitude_ = value;
+  // @@protoc_insertion_point(field_set:ProtoOdTrip.destination_latitude)
 }
-inline ::ProtoPoint* ProtoOdTrip::mutable_home_location() {
+
+// double destination_longitude = 22;
+inline void ProtoOdTrip::clear_destination_longitude() {
+  destination_longitude_ = 0;
+}
+inline double ProtoOdTrip::destination_longitude() const {
+  // @@protoc_insertion_point(field_get:ProtoOdTrip.destination_longitude)
+  return destination_longitude_;
+}
+inline void ProtoOdTrip::set_destination_longitude(double value) {
   
-  if (home_location_ == NULL) {
-    auto* p = CreateMaybeMessage<::ProtoPoint>(GetArenaNoVirtual());
-    home_location_ = p;
-  }
-  // @@protoc_insertion_point(field_mutable:ProtoOdTrip.home_location)
-  return home_location_;
+  destination_longitude_ = value;
+  // @@protoc_insertion_point(field_set:ProtoOdTrip.destination_longitude)
 }
-inline void ProtoOdTrip::set_allocated_home_location(::ProtoPoint* home_location) {
-  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
-  if (message_arena == NULL) {
-    delete reinterpret_cast< ::google::protobuf::MessageLite*>(home_location_);
-  }
-  if (home_location) {
-    ::google::protobuf::Arena* submessage_arena = NULL;
-    if (message_arena != submessage_arena) {
-      home_location = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, home_location, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  home_location_ = home_location;
-  // @@protoc_insertion_point(field_set_allocated:ProtoOdTrip.home_location)
+
+// double home_latitude = 23;
+inline void ProtoOdTrip::clear_home_latitude() {
+  home_latitude_ = 0;
+}
+inline double ProtoOdTrip::home_latitude() const {
+  // @@protoc_insertion_point(field_get:ProtoOdTrip.home_latitude)
+  return home_latitude_;
+}
+inline void ProtoOdTrip::set_home_latitude(double value) {
+  
+  home_latitude_ = value;
+  // @@protoc_insertion_point(field_set:ProtoOdTrip.home_latitude)
+}
+
+// double home_longitude = 24;
+inline void ProtoOdTrip::clear_home_longitude() {
+  home_longitude_ = 0;
+}
+inline double ProtoOdTrip::home_longitude() const {
+  // @@protoc_insertion_point(field_get:ProtoOdTrip.home_longitude)
+  return home_longitude_;
+}
+inline void ProtoOdTrip::set_home_longitude(double value) {
+  
+  home_longitude_ = value;
+  // @@protoc_insertion_point(field_set:ProtoOdTrip.home_longitude)
 }
 
 #ifdef __GNUC__

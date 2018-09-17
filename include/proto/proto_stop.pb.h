@@ -30,7 +30,6 @@
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
 #include <google/protobuf/unknown_field_set.h>
-#include "proto_point.pb.h"
 // @@protoc_insertion_point(includes)
 #define PROTOBUF_INTERNAL_EXPORT_protobuf_proto_5fstop_2eproto 
 
@@ -172,27 +171,27 @@ class ProtoStop : public ::google::protobuf::Message /* @@protoc_insertion_point
   ::std::string* release_name();
   void set_allocated_name(::std::string* name);
 
-  // .ProtoPoint point = 4;
-  bool has_point() const;
-  void clear_point();
-  static const int kPointFieldNumber = 4;
-  private:
-  const ::ProtoPoint& _internal_point() const;
-  public:
-  const ::ProtoPoint& point() const;
-  ::ProtoPoint* release_point();
-  ::ProtoPoint* mutable_point();
-  void set_allocated_point(::ProtoPoint* point);
-
   // int64 id = 1;
   void clear_id();
   static const int kIdFieldNumber = 1;
   ::google::protobuf::int64 id() const;
   void set_id(::google::protobuf::int64 value);
 
-  // int64 station_id = 5;
+  // double latitude = 4;
+  void clear_latitude();
+  static const int kLatitudeFieldNumber = 4;
+  double latitude() const;
+  void set_latitude(double value);
+
+  // double longitude = 5;
+  void clear_longitude();
+  static const int kLongitudeFieldNumber = 5;
+  double longitude() const;
+  void set_longitude(double value);
+
+  // int64 station_id = 6;
   void clear_station_id();
-  static const int kStationIdFieldNumber = 5;
+  static const int kStationIdFieldNumber = 6;
   ::google::protobuf::int64 station_id() const;
   void set_station_id(::google::protobuf::int64 value);
 
@@ -202,8 +201,9 @@ class ProtoStop : public ::google::protobuf::Message /* @@protoc_insertion_point
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr code_;
   ::google::protobuf::internal::ArenaStringPtr name_;
-  ::ProtoPoint* point_;
   ::google::protobuf::int64 id_;
+  double latitude_;
+  double longitude_;
   ::google::protobuf::int64 station_id_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::protobuf_proto_5fstop_2eproto::TableStruct;
@@ -339,55 +339,35 @@ inline void ProtoStop::set_allocated_name(::std::string* name) {
   // @@protoc_insertion_point(field_set_allocated:ProtoStop.name)
 }
 
-// .ProtoPoint point = 4;
-inline bool ProtoStop::has_point() const {
-  return this != internal_default_instance() && point_ != NULL;
+// double latitude = 4;
+inline void ProtoStop::clear_latitude() {
+  latitude_ = 0;
 }
-inline const ::ProtoPoint& ProtoStop::_internal_point() const {
-  return *point_;
+inline double ProtoStop::latitude() const {
+  // @@protoc_insertion_point(field_get:ProtoStop.latitude)
+  return latitude_;
 }
-inline const ::ProtoPoint& ProtoStop::point() const {
-  const ::ProtoPoint* p = point_;
-  // @@protoc_insertion_point(field_get:ProtoStop.point)
-  return p != NULL ? *p : *reinterpret_cast<const ::ProtoPoint*>(
-      &::_ProtoPoint_default_instance_);
-}
-inline ::ProtoPoint* ProtoStop::release_point() {
-  // @@protoc_insertion_point(field_release:ProtoStop.point)
+inline void ProtoStop::set_latitude(double value) {
   
-  ::ProtoPoint* temp = point_;
-  point_ = NULL;
-  return temp;
-}
-inline ::ProtoPoint* ProtoStop::mutable_point() {
-  
-  if (point_ == NULL) {
-    auto* p = CreateMaybeMessage<::ProtoPoint>(GetArenaNoVirtual());
-    point_ = p;
-  }
-  // @@protoc_insertion_point(field_mutable:ProtoStop.point)
-  return point_;
-}
-inline void ProtoStop::set_allocated_point(::ProtoPoint* point) {
-  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
-  if (message_arena == NULL) {
-    delete reinterpret_cast< ::google::protobuf::MessageLite*>(point_);
-  }
-  if (point) {
-    ::google::protobuf::Arena* submessage_arena = NULL;
-    if (message_arena != submessage_arena) {
-      point = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, point, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  point_ = point;
-  // @@protoc_insertion_point(field_set_allocated:ProtoStop.point)
+  latitude_ = value;
+  // @@protoc_insertion_point(field_set:ProtoStop.latitude)
 }
 
-// int64 station_id = 5;
+// double longitude = 5;
+inline void ProtoStop::clear_longitude() {
+  longitude_ = 0;
+}
+inline double ProtoStop::longitude() const {
+  // @@protoc_insertion_point(field_get:ProtoStop.longitude)
+  return longitude_;
+}
+inline void ProtoStop::set_longitude(double value) {
+  
+  longitude_ = value;
+  // @@protoc_insertion_point(field_set:ProtoStop.longitude)
+}
+
+// int64 station_id = 6;
 inline void ProtoStop::clear_station_id() {
   station_id_ = GOOGLE_LONGLONG(0);
 }

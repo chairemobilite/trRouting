@@ -20,7 +20,7 @@
 // @@protoc_insertion_point(includes)
 
 namespace protobuf_proto_5fstop_2eproto {
-extern PROTOBUF_INTERNAL_EXPORT_protobuf_proto_5fstop_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_ProtoStop;
+extern PROTOBUF_INTERNAL_EXPORT_protobuf_proto_5fstop_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_ProtoStop;
 }  // namespace protobuf_proto_5fstop_2eproto
 namespace protobuf_proto_5fstops_2eproto {
 extern PROTOBUF_INTERNAL_EXPORT_protobuf_proto_5fstops_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_ProtoStops_IndexesByIdEntry_DoNotUse;

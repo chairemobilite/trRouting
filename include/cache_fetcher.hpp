@@ -36,7 +36,6 @@
 #include "parameters.hpp"
 #include "proto/proto_stop.pb.h"
 #include "proto/proto_stops.pb.h"
-#include "proto/proto_point.pb.h"
 #include "proto/proto_route.pb.h"
 #include "proto/proto_routes.pb.h"
 #include "proto/proto_trip.pb.h"

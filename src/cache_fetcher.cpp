@@ -16,7 +16,6 @@ namespace TrRouting
       for (int i = 0; i < protoStops.stops_size(); i++)
       {
         const ProtoStop&  protoStop  = protoStops.stops(i);
-        const ProtoPoint& protoPoint = protoStop.point();
 
         Stop  * stop          = new Stop();
         Point * point         = new Point();
@@ -25,8 +24,8 @@ namespace TrRouting
         stop->name            = protoStop.name();
         stop->stationId       = protoStop.station_id();
         stop->point           = *point;
-        stop->point.latitude  = protoPoint.latitude();
-        stop->point.longitude = protoPoint.longitude();
+        stop->point.latitude  = protoStop.latitude();
+        stop->point.longitude = protoStop.longitude();
 
         stops.push_back(*stop);
         stopIndexesById[stop->id] = stops.size() - 1;
@@ -210,9 +209,6 @@ namespace TrRouting
       for (int i = 0; i < protoOdTrips.od_trips_size(); i++)
       {
         const ProtoOdTrip& protoOdTrip      = protoOdTrips.od_trips(i);
-        const ProtoPoint& protoOrigin       = protoOdTrip.origin();
-        const ProtoPoint& protoDestination  = protoOdTrip.destination();
-        const ProtoPoint& protoHomeLocation = protoOdTrip.home_location();
 
         OdTrip * odTrip       = new OdTrip();
         Point  * origin       = new Point();
@@ -228,12 +224,12 @@ namespace TrRouting
         odTrip->personId                 = protoOdTrip.person_id();
         odTrip->householdId              = protoOdTrip.household_id();
         odTrip->age                      = protoOdTrip.age();
-        odTrip->origin.latitude          = protoOrigin.latitude();
-        odTrip->origin.longitude         = protoOrigin.longitude();
-        odTrip->destination.latitude     = protoDestination.latitude();
-        odTrip->destination.longitude    = protoDestination.longitude();
-        odTrip->homeLocation.latitude    = protoHomeLocation.latitude();
-        odTrip->homeLocation.longitude   = protoHomeLocation.longitude();
+        odTrip->origin.latitude          = protoOdTrip.origin_latitude();
+        odTrip->origin.longitude         = protoOdTrip.origin_longitude();
+        odTrip->destination.latitude     = protoOdTrip.destination_latitude();
+        odTrip->destination.longitude    = protoOdTrip.destination_longitude();
+        odTrip->homeLocation.latitude    = protoOdTrip.home_latitude();
+        odTrip->homeLocation.longitude   = protoOdTrip.home_longitude();
         odTrip->ageGroup                 = protoOdTrip.age_group();
         odTrip->occupation               = protoOdTrip.occupation();
         odTrip->originActivity           = protoOdTrip.activity_origin();

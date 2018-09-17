@@ -3,29 +3,26 @@
 namespace TrRouting
 {
   
-  std::vector<std::pair<int,int>> OsrmFetcher::getAccessibleStopsFootpathsFromPoint(const Point point, const std::vector<Stop> stops, std::string mode, int maxTravelTimeSeconds, float defaultSpeedMetersPerSecond, bool osrmUseLib, std::string osrmFilePath, std::string osrmHost, std::string osrmPort)
+  std::vector<std::pair<int,int>> OsrmFetcher::getAccessibleStopsFootpathsFromPoint(const Point point, const std::vector<Stop> stops, std::string mode, Parameters& params)
   {
-    
-    using namespace osrm;
+
     std::vector<int>                birdDistanceAccessibleStopIndexes;
     std::vector<std::pair<int,int>> accessibleStopsFootpaths;
 
     float lengthOfOneDegreeOfLongitude = 111412.84 * cos(point.latitude * M_PI / 180) -93.5 * cos (3 * point.latitude * M_PI / 180);
     float lengthOfOneDegreeOflatitude  = 111132.92 - 559.82 * cos(2 * point.latitude * M_PI / 180) + 1.175 * cos(4 * point.latitude * M_PI / 180);
-    float maxDistanceMetersSquared     = (maxTravelTimeSeconds * defaultSpeedMetersPerSecond) * (maxTravelTimeSeconds * defaultSpeedMetersPerSecond);
+    float maxDistanceMetersSquared     = (params.maxAccessWalkingTravelTimeSeconds * params.walkingSpeedMetersPerSecond) * (params.maxAccessWalkingTravelTimeSeconds * params.walkingSpeedMetersPerSecond);
     float distanceMetersSquared;
     float distanceXMeters;
     float distanceYMeters;
 
-    if (osrmUseLib)
+    if (params.osrmUseLib)
     {
-      osrm::EngineConfig osrmConfig;
-      osrmConfig.storage_config    = {osrmFilePath};
-      osrmConfig.use_shared_memory = false;
-      osrmConfig.algorithm         = osrm::EngineConfig::Algorithm::CH;
-      
-      const osrm::OSRM osrmRouter{osrmConfig};
-      
+      //osrm::EngineConfig osrmConfig;
+      //osrmConfig.storage_config    = {params.osrmFilePath};
+      //osrmConfig.use_shared_memory = false;
+      //osrmConfig.algorithm         = osrm::EngineConfig::Algorithm::CH;
+      //osrm::OSRM osrmRouter2{osrmConfig};
       osrm::TableParameters osrmParams{};
 
       osrmParams.coordinates.push_back({osrm::util::FloatLongitude{point.longitude}, osrm::util::FloatLatitude{point.latitude}});
@@ -44,22 +41,22 @@ namespace TrRouting
       }
       osrmParams.sources.push_back(0);
       osrm::json::Object result;
-      const auto status = osrmRouter.Table(osrmParams, result);
+      
+      const auto status = params.osrmRouter.Table(osrmParams, result);
+      //std::cerr << "numberOfStops: " << osrmParams.coordinates.size() << std::endl;
       if (status == osrm::Status::Ok)
       {
         auto &durations = result.values["durations"].get<osrm::json::Array>().values.at(0).get<osrm::json::Array>().values;
-        
         //auto &distances = result.values["distances"].get<osrm::json::Array>().values.at(0).get<osrm::json::Array>().values;
         for (int i = 0; i < birdDistanceAccessibleStopIndexes.size(); i++)
         {
           const int duration = durations.at(i+1).get<osrm::json::Number>().value; // ignore i = 0 (source with itself)
           //const int distance = distances.at(i+1).get<osrm::json::Number>().value;
-          if (duration <= maxTravelTimeSeconds)
+          if (duration <= params.maxAccessWalkingTravelTimeSeconds)
           {
             accessibleStopsFootpaths.push_back(std::make_pair(birdDistanceAccessibleStopIndexes[i], duration));
           }
         }
-
       }
       else if (status == osrm::Status::Error)
       {
@@ -94,7 +91,7 @@ namespace TrRouting
 
       // call osrm on bird distance accessible stops for further filtering by network travel time:
       boost::asio::ip::tcp::iostream s;
-      s.connect(osrmHost, osrmPort);
+      s.connect(params.osrmRoutingWalkingHost, params.osrmRoutingWalkingPort);
       queryString += "?sources=0";
       queryString += " HTTP/1.1\r\n\r\n";
 
@@ -130,7 +127,7 @@ namespace TrRouting
             if(i >= 0) // first value is duration with self, we must ignore it (i was initialized with -1)
             {
               travelTimeSeconds = (int)ceil(std::stod(v2.second.data()));
-              if (travelTimeSeconds <= maxTravelTimeSeconds)
+              if (travelTimeSeconds <= params.maxAccessWalkingTravelTimeSeconds)
               {
                 accessibleStopsFootpaths.push_back(std::make_pair(birdDistanceAccessibleStopIndexes[i], travelTimeSeconds));
               }

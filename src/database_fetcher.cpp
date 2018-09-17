@@ -65,7 +65,6 @@ namespace TrRouting
         Stop * stop           = new Stop();
         ProtoStop * protoStop = protoStops.add_stops();
         Point * point         = new Point();
-        ProtoPoint protoPoint = protoStop->point();
         // set stop attributes from row:
         stop->id                                  = c[0].as<unsigned long long>();
         stop->code                                = c[1].as<std::string>();
@@ -79,8 +78,8 @@ namespace TrRouting
         protoStop->set_code(stop->code);
         protoStop->set_name(stop->name);
         protoStop->set_station_id(stop->stationId);
-        protoPoint.set_latitude(stop->point.latitude);
-        protoPoint.set_longitude(stop->point.longitude);
+        protoStop->set_latitude(stop->point.latitude);
+        protoStop->set_longitude(stop->point.longitude);
 
         // append stop:
         stops.push_back(*stop);
@@ -474,9 +473,13 @@ namespace TrRouting
     std::vector<OdTrip> odTrips;
     ProtoOdTrips protoOdTrips;
     std::map<unsigned long long, int> odTripIndexesById;
+    std::map<std::string,std::vector<std::pair<int,int>>> footpathsByPoint;
     
     // fetch existing so we can append:
-    std::tie(odTrips, odTripIndexesById) = params.cacheFetcher->getOdTrips(params.applicationShortname, stops, params);
+    if (!params.updateOdTrips)
+    {
+      std::tie(odTrips, odTripIndexesById) = params.cacheFetcher->getOdTrips(params.applicationShortname, stops, params);
+    }
     
     openConnection();
     
@@ -514,11 +517,8 @@ namespace TrRouting
         OdTrip * odTrip       = new OdTrip();
         ProtoOdTrip * protoOdTrip = protoOdTrips.add_od_trips();
         Point  * origin       = new Point();
-        ProtoPoint protoOrigin = protoOdTrip->origin();
         Point  * destination  = new Point();
-        ProtoPoint protoDestination = protoOdTrip->destination();
         Point  * homeLocation = new Point();
-        ProtoPoint protoHomeLocation = protoOdTrip->home_location();
 
         odTrip->id                       = odTripId;
         odTrip->origin                   = *origin;
@@ -547,12 +547,12 @@ namespace TrRouting
         odTrip->drivingTravelTimeSeconds = c[17].as<int>();
         
         protoOdTrip->set_id(odTripId);
-        protoOrigin.set_latitude(odTrip->origin.latitude);
-        protoOrigin.set_longitude(odTrip->origin.longitude);
-        protoDestination.set_latitude(odTrip->destination.latitude);
-        protoDestination.set_longitude(odTrip->destination.longitude);
-        protoHomeLocation.set_latitude(odTrip->homeLocation.latitude);
-        protoHomeLocation.set_longitude(odTrip->homeLocation.longitude);
+        protoOdTrip->set_origin_latitude(odTrip->origin.latitude);
+        protoOdTrip->set_origin_longitude(odTrip->origin.longitude);
+        protoOdTrip->set_destination_latitude(odTrip->destination.latitude);
+        protoOdTrip->set_destination_longitude(odTrip->destination.longitude);
+        protoOdTrip->set_home_latitude(odTrip->homeLocation.latitude);
+        protoOdTrip->set_home_longitude(odTrip->homeLocation.longitude);
         protoOdTrip->set_person_id(odTrip->personId);
         protoOdTrip->set_household_id(odTrip->householdId);
         protoOdTrip->set_age(odTrip->age);
@@ -569,9 +569,20 @@ namespace TrRouting
         protoOdTrip->set_cycling_travel_time_seconds(odTrip->cyclingTravelTimeSeconds);
         protoOdTrip->set_driving_travel_time_seconds(odTrip->drivingTravelTimeSeconds);
 
-        odTrip->accessFootpaths = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(odTrip->origin,      stops, "walking", 1200, params.walkingSpeedMetersPerSecond, params.osrmUseLib, params.osrmFilePath, params.osrmRoutingWalkingHost, params.osrmRoutingWalkingPort);
-        odTrip->egressFootpaths = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(odTrip->destination, stops, "walking", 1200, params.walkingSpeedMetersPerSecond, params.osrmUseLib, params.osrmFilePath, params.osrmRoutingWalkingHost, params.osrmRoutingWalkingPort);
-        
+        std::string originPointStr     {std::to_string(round(odTrip->origin.latitude * 10000000.0)/10000000.0)      + ',' + std::to_string(round(odTrip->origin.longitude * 10000000.0)/10000000.0)     };
+        std::string destinationPointStr{std::to_string(round(odTrip->destination.latitude * 10000000.0)/10000000.0) + ',' + std::to_string(round(odTrip->destination.longitude * 10000000.0)/10000000.0)};
+
+        if (footpathsByPoint.find(originPointStr) == footpathsByPoint.end())
+        {
+          footpathsByPoint[originPointStr] = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(odTrip->origin, stops, "walking", params);
+        }
+        if (footpathsByPoint.find(destinationPointStr) == footpathsByPoint.end())
+        {
+          footpathsByPoint[destinationPointStr] = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(odTrip->destination, stops, "walking", params);
+        }
+        odTrip->accessFootpaths = footpathsByPoint[originPointStr];
+        odTrip->egressFootpaths = footpathsByPoint[destinationPointStr];
+
         for (auto & accessFootpath : odTrip->accessFootpaths)
         {
           ProtoOdTripFootpath * protoOdTripFootpath = protoOdTrip->add_access_footpaths();
@@ -589,6 +600,7 @@ namespace TrRouting
         // append od trip:
         odTrips.push_back(*odTrip);
         odTripIndexesById[odTrip->id] = odTrips.size() - 1;
+
         (*protoOdTrips.mutable_indexes_by_id())[odTrip->id] = odTripIndexesById[odTrip->id];
 
         i++;
@@ -596,7 +608,7 @@ namespace TrRouting
         {
           std::cerr << ((((double) i) / resultCount) * 100) << "% (" << i << "/" << resultCount << ")             \r"; // \r is used to stay on the same line
         }
-        if (i % 5000 == 0)
+        if (i % 500 == 0)
         {
           CacheFetcher::saveToProtobufCacheFile(applicationShortname, protoOdTrips, "od_trips");
         }
