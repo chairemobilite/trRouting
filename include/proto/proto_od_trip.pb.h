@@ -270,41 +270,41 @@ class ProtoOdTrip : public ::google::protobuf::Message /* @@protoc_insertion_poi
   ::google::protobuf::int64 household_id() const;
   void set_household_id(::google::protobuf::int64 value);
 
-  // int64 age = 4;
+  // int32 age = 4;
   void clear_age();
   static const int kAgeFieldNumber = 4;
-  ::google::protobuf::int64 age() const;
-  void set_age(::google::protobuf::int64 value);
+  ::google::protobuf::int32 age() const;
+  void set_age(::google::protobuf::int32 value);
 
-  // int64 departure_time_seconds = 5;
+  // int32 departure_time_seconds = 5;
   void clear_departure_time_seconds();
   static const int kDepartureTimeSecondsFieldNumber = 5;
-  ::google::protobuf::int64 departure_time_seconds() const;
-  void set_departure_time_seconds(::google::protobuf::int64 value);
+  ::google::protobuf::int32 departure_time_seconds() const;
+  void set_departure_time_seconds(::google::protobuf::int32 value);
 
-  // int64 arrival_time_seconds = 6;
+  // int32 arrival_time_seconds = 6;
   void clear_arrival_time_seconds();
   static const int kArrivalTimeSecondsFieldNumber = 6;
-  ::google::protobuf::int64 arrival_time_seconds() const;
-  void set_arrival_time_seconds(::google::protobuf::int64 value);
+  ::google::protobuf::int32 arrival_time_seconds() const;
+  void set_arrival_time_seconds(::google::protobuf::int32 value);
 
-  // int64 walking_travel_time_seconds = 7;
+  // int32 walking_travel_time_seconds = 7;
   void clear_walking_travel_time_seconds();
   static const int kWalkingTravelTimeSecondsFieldNumber = 7;
-  ::google::protobuf::int64 walking_travel_time_seconds() const;
-  void set_walking_travel_time_seconds(::google::protobuf::int64 value);
+  ::google::protobuf::int32 walking_travel_time_seconds() const;
+  void set_walking_travel_time_seconds(::google::protobuf::int32 value);
 
-  // int64 cycling_travel_time_seconds = 8;
+  // int32 cycling_travel_time_seconds = 8;
   void clear_cycling_travel_time_seconds();
   static const int kCyclingTravelTimeSecondsFieldNumber = 8;
-  ::google::protobuf::int64 cycling_travel_time_seconds() const;
-  void set_cycling_travel_time_seconds(::google::protobuf::int64 value);
+  ::google::protobuf::int32 cycling_travel_time_seconds() const;
+  void set_cycling_travel_time_seconds(::google::protobuf::int32 value);
 
-  // int64 driving_travel_time_seconds = 9;
+  // int32 driving_travel_time_seconds = 9;
   void clear_driving_travel_time_seconds();
   static const int kDrivingTravelTimeSecondsFieldNumber = 9;
-  ::google::protobuf::int64 driving_travel_time_seconds() const;
-  void set_driving_travel_time_seconds(::google::protobuf::int64 value);
+  ::google::protobuf::int32 driving_travel_time_seconds() const;
+  void set_driving_travel_time_seconds(::google::protobuf::int32 value);
 
   // double expansion_factor = 10;
   void clear_expansion_factor();
@@ -363,12 +363,12 @@ class ProtoOdTrip : public ::google::protobuf::Message /* @@protoc_insertion_poi
   ::google::protobuf::int64 id_;
   ::google::protobuf::int64 person_id_;
   ::google::protobuf::int64 household_id_;
-  ::google::protobuf::int64 age_;
-  ::google::protobuf::int64 departure_time_seconds_;
-  ::google::protobuf::int64 arrival_time_seconds_;
-  ::google::protobuf::int64 walking_travel_time_seconds_;
-  ::google::protobuf::int64 cycling_travel_time_seconds_;
-  ::google::protobuf::int64 driving_travel_time_seconds_;
+  ::google::protobuf::int32 age_;
+  ::google::protobuf::int32 departure_time_seconds_;
+  ::google::protobuf::int32 arrival_time_seconds_;
+  ::google::protobuf::int32 walking_travel_time_seconds_;
+  ::google::protobuf::int32 cycling_travel_time_seconds_;
+  ::google::protobuf::int32 driving_travel_time_seconds_;
   double expansion_factor_;
   double origin_latitude_;
   double origin_longitude_;
@@ -432,85 +432,85 @@ inline void ProtoOdTrip::set_household_id(::google::protobuf::int64 value) {
   // @@protoc_insertion_point(field_set:ProtoOdTrip.household_id)
 }
 
-// int64 age = 4;
+// int32 age = 4;
 inline void ProtoOdTrip::clear_age() {
-  age_ = GOOGLE_LONGLONG(0);
+  age_ = 0;
 }
-inline ::google::protobuf::int64 ProtoOdTrip::age() const {
+inline ::google::protobuf::int32 ProtoOdTrip::age() const {
   // @@protoc_insertion_point(field_get:ProtoOdTrip.age)
   return age_;
 }
-inline void ProtoOdTrip::set_age(::google::protobuf::int64 value) {
+inline void ProtoOdTrip::set_age(::google::protobuf::int32 value) {
   
   age_ = value;
   // @@protoc_insertion_point(field_set:ProtoOdTrip.age)
 }
 
-// int64 departure_time_seconds = 5;
+// int32 departure_time_seconds = 5;
 inline void ProtoOdTrip::clear_departure_time_seconds() {
-  departure_time_seconds_ = GOOGLE_LONGLONG(0);
+  departure_time_seconds_ = 0;
 }
-inline ::google::protobuf::int64 ProtoOdTrip::departure_time_seconds() const {
+inline ::google::protobuf::int32 ProtoOdTrip::departure_time_seconds() const {
   // @@protoc_insertion_point(field_get:ProtoOdTrip.departure_time_seconds)
   return departure_time_seconds_;
 }
-inline void ProtoOdTrip::set_departure_time_seconds(::google::protobuf::int64 value) {
+inline void ProtoOdTrip::set_departure_time_seconds(::google::protobuf::int32 value) {
   
   departure_time_seconds_ = value;
   // @@protoc_insertion_point(field_set:ProtoOdTrip.departure_time_seconds)
 }
 
-// int64 arrival_time_seconds = 6;
+// int32 arrival_time_seconds = 6;
 inline void ProtoOdTrip::clear_arrival_time_seconds() {
-  arrival_time_seconds_ = GOOGLE_LONGLONG(0);
+  arrival_time_seconds_ = 0;
 }
-inline ::google::protobuf::int64 ProtoOdTrip::arrival_time_seconds() const {
+inline ::google::protobuf::int32 ProtoOdTrip::arrival_time_seconds() const {
   // @@protoc_insertion_point(field_get:ProtoOdTrip.arrival_time_seconds)
   return arrival_time_seconds_;
 }
-inline void ProtoOdTrip::set_arrival_time_seconds(::google::protobuf::int64 value) {
+inline void ProtoOdTrip::set_arrival_time_seconds(::google::protobuf::int32 value) {
   
   arrival_time_seconds_ = value;
   // @@protoc_insertion_point(field_set:ProtoOdTrip.arrival_time_seconds)
 }
 
-// int64 walking_travel_time_seconds = 7;
+// int32 walking_travel_time_seconds = 7;
 inline void ProtoOdTrip::clear_walking_travel_time_seconds() {
-  walking_travel_time_seconds_ = GOOGLE_LONGLONG(0);
+  walking_travel_time_seconds_ = 0;
 }
-inline ::google::protobuf::int64 ProtoOdTrip::walking_travel_time_seconds() const {
+inline ::google::protobuf::int32 ProtoOdTrip::walking_travel_time_seconds() const {
   // @@protoc_insertion_point(field_get:ProtoOdTrip.walking_travel_time_seconds)
   return walking_travel_time_seconds_;
 }
-inline void ProtoOdTrip::set_walking_travel_time_seconds(::google::protobuf::int64 value) {
+inline void ProtoOdTrip::set_walking_travel_time_seconds(::google::protobuf::int32 value) {
   
   walking_travel_time_seconds_ = value;
   // @@protoc_insertion_point(field_set:ProtoOdTrip.walking_travel_time_seconds)
 }
 
-// int64 cycling_travel_time_seconds = 8;
+// int32 cycling_travel_time_seconds = 8;
 inline void ProtoOdTrip::clear_cycling_travel_time_seconds() {
-  cycling_travel_time_seconds_ = GOOGLE_LONGLONG(0);
+  cycling_travel_time_seconds_ = 0;
 }
-inline ::google::protobuf::int64 ProtoOdTrip::cycling_travel_time_seconds() const {
+inline ::google::protobuf::int32 ProtoOdTrip::cycling_travel_time_seconds() const {
   // @@protoc_insertion_point(field_get:ProtoOdTrip.cycling_travel_time_seconds)
   return cycling_travel_time_seconds_;
 }
-inline void ProtoOdTrip::set_cycling_travel_time_seconds(::google::protobuf::int64 value) {
+inline void ProtoOdTrip::set_cycling_travel_time_seconds(::google::protobuf::int32 value) {
   
   cycling_travel_time_seconds_ = value;
   // @@protoc_insertion_point(field_set:ProtoOdTrip.cycling_travel_time_seconds)
 }
 
-// int64 driving_travel_time_seconds = 9;
+// int32 driving_travel_time_seconds = 9;
 inline void ProtoOdTrip::clear_driving_travel_time_seconds() {
-  driving_travel_time_seconds_ = GOOGLE_LONGLONG(0);
+  driving_travel_time_seconds_ = 0;
 }
-inline ::google::protobuf::int64 ProtoOdTrip::driving_travel_time_seconds() const {
+inline ::google::protobuf::int32 ProtoOdTrip::driving_travel_time_seconds() const {
   // @@protoc_insertion_point(field_get:ProtoOdTrip.driving_travel_time_seconds)
   return driving_travel_time_seconds_;
 }
-inline void ProtoOdTrip::set_driving_travel_time_seconds(::google::protobuf::int64 value) {
+inline void ProtoOdTrip::set_driving_travel_time_seconds(::google::protobuf::int32 value) {
   
   driving_travel_time_seconds_ = value;
   // @@protoc_insertion_point(field_set:ProtoOdTrip.driving_travel_time_seconds)

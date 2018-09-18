@@ -143,24 +143,24 @@ class ProtoOdTripFootpath : public ::google::protobuf::Message /* @@protoc_inser
 
   // accessors -------------------------------------------------------
 
-  // int64 stop_idx = 1;
+  // int32 stop_idx = 1;
   void clear_stop_idx();
   static const int kStopIdxFieldNumber = 1;
-  ::google::protobuf::int64 stop_idx() const;
-  void set_stop_idx(::google::protobuf::int64 value);
+  ::google::protobuf::int32 stop_idx() const;
+  void set_stop_idx(::google::protobuf::int32 value);
 
-  // int64 travel_time = 2;
+  // int32 travel_time = 2;
   void clear_travel_time();
   static const int kTravelTimeFieldNumber = 2;
-  ::google::protobuf::int64 travel_time() const;
-  void set_travel_time(::google::protobuf::int64 value);
+  ::google::protobuf::int32 travel_time() const;
+  void set_travel_time(::google::protobuf::int32 value);
 
   // @@protoc_insertion_point(class_scope:ProtoOdTripFootpath)
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::int64 stop_idx_;
-  ::google::protobuf::int64 travel_time_;
+  ::google::protobuf::int32 stop_idx_;
+  ::google::protobuf::int32 travel_time_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::protobuf_proto_5fod_5ftrip_5ffootpath_2eproto::TableStruct;
 };
@@ -175,29 +175,29 @@ class ProtoOdTripFootpath : public ::google::protobuf::Message /* @@protoc_inser
 #endif  // __GNUC__
 // ProtoOdTripFootpath
 
-// int64 stop_idx = 1;
+// int32 stop_idx = 1;
 inline void ProtoOdTripFootpath::clear_stop_idx() {
-  stop_idx_ = GOOGLE_LONGLONG(0);
+  stop_idx_ = 0;
 }
-inline ::google::protobuf::int64 ProtoOdTripFootpath::stop_idx() const {
+inline ::google::protobuf::int32 ProtoOdTripFootpath::stop_idx() const {
   // @@protoc_insertion_point(field_get:ProtoOdTripFootpath.stop_idx)
   return stop_idx_;
 }
-inline void ProtoOdTripFootpath::set_stop_idx(::google::protobuf::int64 value) {
+inline void ProtoOdTripFootpath::set_stop_idx(::google::protobuf::int32 value) {
   
   stop_idx_ = value;
   // @@protoc_insertion_point(field_set:ProtoOdTripFootpath.stop_idx)
 }
 
-// int64 travel_time = 2;
+// int32 travel_time = 2;
 inline void ProtoOdTripFootpath::clear_travel_time() {
-  travel_time_ = GOOGLE_LONGLONG(0);
+  travel_time_ = 0;
 }
-inline ::google::protobuf::int64 ProtoOdTripFootpath::travel_time() const {
+inline ::google::protobuf::int32 ProtoOdTripFootpath::travel_time() const {
   // @@protoc_insertion_point(field_get:ProtoOdTripFootpath.travel_time)
   return travel_time_;
 }
-inline void ProtoOdTripFootpath::set_travel_time(::google::protobuf::int64 value) {
+inline void ProtoOdTripFootpath::set_travel_time(::google::protobuf::int32 value) {
   
   travel_time_ = value;
   // @@protoc_insertion_point(field_set:ProtoOdTripFootpath.travel_time)

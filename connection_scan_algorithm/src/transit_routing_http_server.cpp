@@ -95,6 +95,8 @@ int main(int argc, char** argv) {
   optionsDesc.add_options() 
       ("osrmUseLib",       boost::program_options::value<std::string>(), "osrm use libosrm instead of server (1 or 0)");
   optionsDesc.add_options() 
+      ("odTripsFootpathsMaxTravelTimeMinutes", boost::program_options::value<int>(), "max travel time to use when fetching od_trips footpaths to access and egress stops");
+  optionsDesc.add_options() 
       ("databaseUser",     boost::program_options::value<std::string>(), "database user");
   optionsDesc.add_options() 
       ("databaseName",     boost::program_options::value<std::string>(), "database name");
@@ -144,6 +146,12 @@ int main(int argc, char** argv) {
   if(variablesMap.count("osrmUseLib") == 1)
   {
     algorithmParams.osrmUseLib = (variablesMap["osrmUseLib"].as<std::string>() == "1") ? true : false;
+  }
+  if(variablesMap.count("odTripsFootpathsMaxTravelTimeMinutes") == 1)
+  {
+    algorithmParams.maxAccessWalkingTravelTimeSeconds = variablesMap["odTripsFootpathsMaxTravelTimeMinutes"].as<int>() * 60;
+    algorithmParams.maxEgressWalkingTravelTimeSeconds = algorithmParams.maxAccessWalkingTravelTimeSeconds;
+    std::cerr << "Max access/egress travel time seconds: " << algorithmParams.maxAccessWalkingTravelTimeSeconds << std::endl;
   }
   if(variablesMap.count("databasePort") == 1)
   {

@@ -1,5 +1,4 @@
 #include "calculator.hpp"
-#include <osrm/table_parameters.hpp>
 
 namespace TrRouting
 {
@@ -13,8 +12,8 @@ namespace TrRouting
       osrmConfig.storage_config    = {params.osrmFilePath};
       osrmConfig.use_shared_memory = false;
       osrmConfig.algorithm         = osrm::EngineConfig::Algorithm::CH;
-      //osrm::OSRM osrmRouter{osrmConfig};
-      params.osrmRouter            = osrm::OSRM{osrmConfig};
+      osrm::OSRM osrmRouter{osrmConfig};
+      params.osrmRouter            = std::move(osrmRouter);
       
     }
 

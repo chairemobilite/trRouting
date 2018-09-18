@@ -12,6 +12,7 @@
 #include <map>
 #include <math.h>
 #include <osrm/osrm.hpp>
+#include <boost/optional.hpp>
 
 #include "point.hpp"
 #include "toolbox.hpp"
@@ -96,7 +97,7 @@ namespace TrRouting
     std::string osrmRoutingCyclingHost;
     std::string osrmFilePath; // path to .osrm file
     bool osrmUseLib;
-    osrm::OSRM osrmRouter;
+    boost::optional<osrm::OSRM> osrmRouter;
     int updateOdTrips; // if 1: update od trips access and egress stops from database. Set to 1 only if stops and/or od trips were modified.
     
     std::string accessMode;

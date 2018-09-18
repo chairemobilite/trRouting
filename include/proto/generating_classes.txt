@@ -1,16 +1,3 @@
-cd include/proto && protoc  --cpp_out=. proto_NAME.proto
-cd ../.. && mv include/proto/proto_NAME.pb.cc src/proto_NAME.pb.cpp
+# call from trRouting root directory:
 
-# Then add ../include/proto to include statment in cpp file
-
-cd include/proto && protoc  --cpp_out=. proto_stop.proto
-cd ../.. && mv include/proto/proto_stop.pb.cc src/proto_stop.pb.cpp
-
-cd include/proto && protoc  --cpp_out=. proto_stops.proto
-cd ../.. && mv include/proto/proto_stops.pb.cc src/proto_stops.pb.cpp
-
-cd include/proto && protoc  --cpp_out=. proto_od_trip.proto
-cd ../.. && mv include/proto/proto_od_trip.pb.cc src/proto_od_trip.pb.cpp
-
-cd include/proto && protoc  --cpp_out=. proto_od_trips.proto
-cd ../.. && mv include/proto/proto_od_trips.pb.cc src/proto_od_trips.pb.cpp
+cd include/proto && for f in *.proto; do protoc --cpp_out=. $f; done && cd ../..

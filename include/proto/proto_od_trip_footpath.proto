@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 message ProtoOdTripFootpath {
-  int64 stop_idx = 1;
-  int64 travel_time = 2;
+  int32 stop_idx = 1;
+  int32 travel_time = 2;
 }
 

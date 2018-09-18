@@ -3,5 +3,4 @@ import 'proto_route.proto';
 
 message ProtoRoutes {
   repeated ProtoRoute routes = 1;
-  map<int64, int64> indexes_by_id = 2;
 }

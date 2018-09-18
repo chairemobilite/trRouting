@@ -42,7 +42,7 @@ namespace TrRouting
       osrmParams.sources.push_back(0);
       osrm::json::Object result;
       
-      const auto status = params.osrmRouter.Table(osrmParams, result);
+      const auto status = params.osrmRouter.get().Table(osrmParams, result);
       //std::cerr << "numberOfStops: " << osrmParams.coordinates.size() << std::endl;
       if (status == osrm::Status::Ok)
       {

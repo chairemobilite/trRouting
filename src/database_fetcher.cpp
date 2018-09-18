@@ -83,8 +83,7 @@ namespace TrRouting
 
         // append stop:
         stops.push_back(*stop);
-        stopIndexesById[stop->id]             = stops.size() - 1;
-        (*protoStops.mutable_indexes_by_id())[stop->id] = stopIndexesById[stop->id];
+        stopIndexesById[stop->id] = stops.size() - 1;
         
         // show loading progress in percentage:
         i++;
@@ -164,7 +163,6 @@ namespace TrRouting
         // append route:
         routes.push_back(*route);
         routeIndexesById[route->id] = routes.size() - 1;
-        (*protoRoutes.mutable_indexes_by_id())[route->id] = routeIndexesById[route->id];
         
         // show loading progress in percentage:
         i++;
@@ -240,7 +238,6 @@ namespace TrRouting
         // append trip:
         trips.push_back(*trip);
         tripIndexesById[trip->id] = trips.size() - 1;
-        (*protoTrips.mutable_indexes_by_id())[trip->id] = tripIndexesById[trip->id];
         
         // show loading progress in percentage:
         i++;
@@ -569,8 +566,8 @@ namespace TrRouting
         protoOdTrip->set_cycling_travel_time_seconds(odTrip->cyclingTravelTimeSeconds);
         protoOdTrip->set_driving_travel_time_seconds(odTrip->drivingTravelTimeSeconds);
 
-        std::string originPointStr     {std::to_string(round(odTrip->origin.latitude * 10000000.0)/10000000.0)      + ',' + std::to_string(round(odTrip->origin.longitude * 10000000.0)/10000000.0)     };
-        std::string destinationPointStr{std::to_string(round(odTrip->destination.latitude * 10000000.0)/10000000.0) + ',' + std::to_string(round(odTrip->destination.longitude * 10000000.0)/10000000.0)};
+        std::string originPointStr     {std::to_string(round(odTrip->origin.latitude * 100000.0)/100000.0)      + ',' + std::to_string(round(odTrip->origin.longitude * 100000.0)/100000.0)     };
+        std::string destinationPointStr{std::to_string(round(odTrip->destination.latitude * 100000.0)/100000.0) + ',' + std::to_string(round(odTrip->destination.longitude * 100000.0)/100000.0)};
 
         if (footpathsByPoint.find(originPointStr) == footpathsByPoint.end())
         {
@@ -600,8 +597,6 @@ namespace TrRouting
         // append od trip:
         odTrips.push_back(*odTrip);
         odTripIndexesById[odTrip->id] = odTrips.size() - 1;
-
-        (*protoOdTrips.mutable_indexes_by_id())[odTrip->id] = odTripIndexesById[odTrip->id];
 
         i++;
         if (i % 10 == 0)

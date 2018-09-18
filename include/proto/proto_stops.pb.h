@@ -29,9 +29,6 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
-#include <google/protobuf/map.h>  // IWYU pragma: export
-#include <google/protobuf/map_entry.h>
-#include <google/protobuf/map_field_inl.h>
 #include <google/protobuf/unknown_field_set.h>
 #include "proto_stop.pb.h"
 // @@protoc_insertion_point(includes)
@@ -42,7 +39,7 @@ namespace protobuf_proto_5fstops_2eproto {
 struct TableStruct {
   static const ::google::protobuf::internal::ParseTableField entries[];
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[];
-  static const ::google::protobuf::internal::ParseTable schema[2];
+  static const ::google::protobuf::internal::ParseTable schema[1];
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
   static const ::google::protobuf::uint32 offsets[];
@@ -52,38 +49,13 @@ void AddDescriptors();
 class ProtoStops;
 class ProtoStopsDefaultTypeInternal;
 extern ProtoStopsDefaultTypeInternal _ProtoStops_default_instance_;
-class ProtoStops_IndexesByIdEntry_DoNotUse;
-class ProtoStops_IndexesByIdEntry_DoNotUseDefaultTypeInternal;
-extern ProtoStops_IndexesByIdEntry_DoNotUseDefaultTypeInternal _ProtoStops_IndexesByIdEntry_DoNotUse_default_instance_;
 namespace google {
 namespace protobuf {
 template<> ::ProtoStops* Arena::CreateMaybeMessage<::ProtoStops>(Arena*);
-template<> ::ProtoStops_IndexesByIdEntry_DoNotUse* Arena::CreateMaybeMessage<::ProtoStops_IndexesByIdEntry_DoNotUse>(Arena*);
 }  // namespace protobuf
 }  // namespace google
 
 // ===================================================================
-
-class ProtoStops_IndexesByIdEntry_DoNotUse : public ::google::protobuf::internal::MapEntry<ProtoStops_IndexesByIdEntry_DoNotUse, 
-    ::google::protobuf::int64, ::google::protobuf::int64,
-    ::google::protobuf::internal::WireFormatLite::TYPE_INT64,
-    ::google::protobuf::internal::WireFormatLite::TYPE_INT64,
-    0 > {
-public:
-  typedef ::google::protobuf::internal::MapEntry<ProtoStops_IndexesByIdEntry_DoNotUse, 
-    ::google::protobuf::int64, ::google::protobuf::int64,
-    ::google::protobuf::internal::WireFormatLite::TYPE_INT64,
-    ::google::protobuf::internal::WireFormatLite::TYPE_INT64,
-    0 > SuperType;
-  ProtoStops_IndexesByIdEntry_DoNotUse();
-  ProtoStops_IndexesByIdEntry_DoNotUse(::google::protobuf::Arena* arena);
-  void MergeFrom(const ProtoStops_IndexesByIdEntry_DoNotUse& other);
-  static const ProtoStops_IndexesByIdEntry_DoNotUse* internal_default_instance() { return reinterpret_cast<const ProtoStops_IndexesByIdEntry_DoNotUse*>(&_ProtoStops_IndexesByIdEntry_DoNotUse_default_instance_); }
-  void MergeFrom(const ::google::protobuf::Message& other) final;
-  ::google::protobuf::Metadata GetMetadata() const;
-};
-
-// -------------------------------------------------------------------
 
 class ProtoStops : public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:ProtoStops) */ {
  public:
@@ -120,7 +92,7 @@ class ProtoStops : public ::google::protobuf::Message /* @@protoc_insertion_poin
                &_ProtoStops_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    1;
+    0;
 
   void Swap(ProtoStops* other);
   friend void swap(ProtoStops& a, ProtoStops& b) {
@@ -170,7 +142,6 @@ class ProtoStops : public ::google::protobuf::Message /* @@protoc_insertion_poin
 
   // nested types ----------------------------------------------------
 
-
   // accessors -------------------------------------------------------
 
   // repeated .ProtoStop stops = 1;
@@ -185,26 +156,11 @@ class ProtoStops : public ::google::protobuf::Message /* @@protoc_insertion_poin
   const ::google::protobuf::RepeatedPtrField< ::ProtoStop >&
       stops() const;
 
-  // map<int64, int64> indexes_by_id = 2;
-  int indexes_by_id_size() const;
-  void clear_indexes_by_id();
-  static const int kIndexesByIdFieldNumber = 2;
-  const ::google::protobuf::Map< ::google::protobuf::int64, ::google::protobuf::int64 >&
-      indexes_by_id() const;
-  ::google::protobuf::Map< ::google::protobuf::int64, ::google::protobuf::int64 >*
-      mutable_indexes_by_id();
-
   // @@protoc_insertion_point(class_scope:ProtoStops)
  private:
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::RepeatedPtrField< ::ProtoStop > stops_;
-  ::google::protobuf::internal::MapField<
-      ProtoStops_IndexesByIdEntry_DoNotUse,
-      ::google::protobuf::int64, ::google::protobuf::int64,
-      ::google::protobuf::internal::WireFormatLite::TYPE_INT64,
-      ::google::protobuf::internal::WireFormatLite::TYPE_INT64,
-      0 > indexes_by_id_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::protobuf_proto_5fstops_2eproto::TableStruct;
 };
@@ -217,8 +173,6 @@ class ProtoStops : public ::google::protobuf::Message /* @@protoc_insertion_poin
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
-// -------------------------------------------------------------------
-
 // ProtoStops
 
 // repeated .ProtoStop stops = 1;
@@ -248,29 +202,9 @@ ProtoStops::stops() const {
   return stops_;
 }
 
-// map<int64, int64> indexes_by_id = 2;
-inline int ProtoStops::indexes_by_id_size() const {
-  return indexes_by_id_.size();
-}
-inline void ProtoStops::clear_indexes_by_id() {
-  indexes_by_id_.Clear();
-}
-inline const ::google::protobuf::Map< ::google::protobuf::int64, ::google::protobuf::int64 >&
-ProtoStops::indexes_by_id() const {
-  // @@protoc_insertion_point(field_map:ProtoStops.indexes_by_id)
-  return indexes_by_id_.GetMap();
-}
-inline ::google::protobuf::Map< ::google::protobuf::int64, ::google::protobuf::int64 >*
-ProtoStops::mutable_indexes_by_id() {
-  // @@protoc_insertion_point(field_mutable_map:ProtoStops.indexes_by_id)
-  return indexes_by_id_.MutableMap();
-}
-
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
-// -------------------------------------------------------------------
-
 
 // @@protoc_insertion_point(namespace_scope)
 

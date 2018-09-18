@@ -3,5 +3,4 @@ import 'proto_od_trip.proto';
 
 message ProtoOdTrips {
   repeated ProtoOdTrip od_trips = 1;
-  map<int64, int64> indexes_by_id = 2;
 }
