@@ -10,7 +10,7 @@ namespace TrRouting
       std::cerr << "preparing stops, routes, trips, connections and footpaths..." << std::endl;
     if (params.dataFetcherShortname == "database")
     {
-      std::tie(stops, stopIndexesById)                 = params.cacheFetcher->getStops(params.applicationShortname);
+      std::tie(stops, stopIndexesById)                 = params.databaseFetcher->getStops(params.applicationShortname);
       if (params.updateOdTrips == 1) // only update od trips if set as parameter (1) when launching app, because this takes a long time. Call only if stops and/or od trips were modified.
       {
         std::tie(odTrips, odTripIndexesById)           = params.databaseFetcher->getOdTrips(params.applicationShortname, stops, params);
@@ -19,9 +19,9 @@ namespace TrRouting
       {
         std::tie(odTrips, odTripIndexesById)           = params.cacheFetcher->getOdTrips(params.applicationShortname, stops, params);
       }
-      std::tie(routes, routeIndexesById)               = params.cacheFetcher->getRoutes(params.applicationShortname);
-      std::tie(trips, tripIndexesById)                 = params.cacheFetcher->getTrips(params.applicationShortname);
-      std::tie(forwardConnections, reverseConnections) = params.cacheFetcher->getConnections(params.applicationShortname, stopIndexesById, tripIndexesById);
+      std::tie(routes, routeIndexesById)               = params.databaseFetcher->getRoutes(params.applicationShortname);
+      std::tie(trips, tripIndexesById)                 = params.databaseFetcher->getTrips(params.applicationShortname);
+      std::tie(forwardConnections, reverseConnections) = params.databaseFetcher->getConnections(params.applicationShortname, stopIndexesById, tripIndexesById);
       std::tie(footpaths, footpathsRanges)             = params.databaseFetcher->getFootpaths(params.applicationShortname, stopIndexesById);
     }
     else if (params.dataFetcherShortname == "cache")
