@@ -429,7 +429,7 @@ namespace TrRouting
         ProtoFootpath * protoFootpath = protoFootpaths.add_footpaths();
 
         protoFootpath->set_stop_1_idx(stop1Index);
-        protoFootpath->set_stop_2_idx(stop1Index);
+        protoFootpath->set_stop_2_idx(stop2Index);
         protoFootpath->set_travel_time(travelTimeSeconds);
 
         footpaths.push_back(std::make_tuple(stop1Index, stop2Index, travelTimeSeconds));
