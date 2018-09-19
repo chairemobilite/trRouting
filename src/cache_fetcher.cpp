@@ -6,30 +6,38 @@ namespace TrRouting
   const std::pair<std::vector<Stop>, std::map<unsigned long long, int>> CacheFetcher::getStops(std::string applicationShortname)
   {
     std::vector<Stop> stops;
-    ProtoStops protoStops;
+    std::string cacheFileName{"stops"};
+    //ProtoStops protoStops;
+    //::capnp::PackedFdMessageReader capnpStopsCollectionMessage;
     std::map<unsigned long long, int> stopIndexesById;
     
     std::cout << "Fetching stops from cache..." << std::endl;
-    if (CacheFetcher::protobufCacheFileExists(applicationShortname, "stops"))
+    if (CacheFetcher::capnpCacheFileExists(applicationShortname, "stops"))
     {
-      protoStops = loadFromProtobufCacheFile(protoStops, applicationShortname, "stops");
-      for (int i = 0; i < protoStops.stops_size(); i++)
+      int fd = open((applicationShortname + "_" + cacheFileName + ".capnpbin").c_str(), O_RDWR);
+      ::capnp::PackedFdMessageReader capnpStopsCollectionMessage(fd);
+      //return ::capnp::PackedFdMessageReader(fd);
+      //::capnp::PackedFdMessageReader capnpStopsCollectionMessage = loadFromCapnpCacheFile(applicationShortname, "stops");
+      stopsCollection::StopsCollection::Reader capnpStopsCollection = capnpStopsCollectionMessage.getRoot<stopsCollection::StopsCollection>();
+      for (stopsCollection::Stop::Reader capnpStop : capnpStopsCollection.getStops())
+      //for (int i = 0; i < protoStops.stops_size(); i++)
       {
-        const ProtoStop&  protoStop  = protoStops.stops(i);
+        //const ProtoStop&  protoStop  = protoStops.stops(i);
 
         Stop  * stop          = new Stop();
         Point * point         = new Point();
-        stop->id              = protoStop.id();
-        stop->code            = protoStop.code();
-        stop->name            = protoStop.name();
-        stop->stationId       = protoStop.station_id();
+        stop->id              = capnpStop.getId();
+        stop->code            = capnpStop.getCode();
+        stop->name            = capnpStop.getName();
+        stop->stationId       = capnpStop.getStationId();
         stop->point           = *point;
-        stop->point.latitude  = protoStop.latitude();
-        stop->point.longitude = protoStop.longitude();
+        stop->point.latitude  = capnpStop.getLatitude();
+        stop->point.longitude = capnpStop.getLongitude();
 
         stops.push_back(*stop);
         stopIndexesById[stop->id] = stops.size() - 1;
       }
+      close(fd);
     }
     else
     {

@@ -11,6 +11,7 @@
 #include <iterator>
 #include <vector>
 #include <math.h>
+#include <fcntl.h>
 #include <boost/algorithm/string.hpp>
 //#include <cereal/archives/binary.hpp>
 #include <boost/serialization/map.hpp>
@@ -24,6 +25,8 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <stdlib.h>
+#include <capnp/message.h>
+#include <capnp/serialize-packed.h>
 
 #include "calculation_time.hpp"
 #include "route.hpp"
@@ -48,6 +51,8 @@
 #include "proto/proto_od_trip_footpath.pb.h"
 #include "proto/proto_od_trip.pb.h"
 #include "proto/proto_od_trips.pb.h"
+
+#include "capnp/stopsCollection.capnp.h"
 
 namespace TrRouting
 {
@@ -108,11 +113,42 @@ namespace TrRouting
       oCacheFile.close();
       google::protobuf::ShutdownProtobufLibrary();
     }
+
+    //static const ::capnp::PackedFdMessageReader loadFromCapnpCacheFile(std::string applicationShortname, std::string cacheFileName) {
+    //  int fd = open((applicationShortname + "_" + cacheFileName + ".capnpbin").c_str(), O_WRONLY);
+    //  //::capnp::PackedFdMessageReader message(fd);
+    //  close(fd);
+    //  return ::capnp::PackedFdMessageReader(fd);
+    //}
+
+    template<class T>
+    static void saveToCapnpCacheFile(std::string applicationShortname, T& data, std::string cacheFileName) {
+      //std::ostream oCacheFile;
+      std::ofstream oCacheFile;
+      oCacheFile.open(applicationShortname + "_" + cacheFileName + ".capnpbin", std::ios::out | std::ios::trunc | std::ios::binary);
+      oCacheFile.close();
+
+      int fd = open((applicationShortname + "_" + cacheFileName + ".capnpbin").c_str(), O_WRONLY);
+      //int fd = open(applicationShortname + "_" + cacheFileName + ".capnpbin", std::ios::out | std::ios::trunc | std::ios::binary);
+      //data.SerializeToOstream(&oCacheFile);
+      ::capnp::writePackedMessageToFd(fd, data);
+      close(fd);
+      //google::protobuf::ShutdownProtobufLibrary();
+    }
     
     static bool protobufCacheFileExists(std::string applicationShortname, std::string cacheFileName) {
       std::ifstream iCacheFile;
       bool notEmpty = false;
       iCacheFile.open(applicationShortname + "_" + cacheFileName + ".pb", std::ios::in | std::ios::binary | std::ios::ate);
+      notEmpty = iCacheFile.tellg() > 0;
+      iCacheFile.close();
+      return notEmpty;
+    }
+
+    static bool capnpCacheFileExists(std::string applicationShortname, std::string cacheFileName) {
+      std::ifstream iCacheFile;
+      bool notEmpty = false;
+      iCacheFile.open(applicationShortname + "_" + cacheFileName + ".capnpbin", std::ios::in | std::ios::binary | std::ios::ate);
       notEmpty = iCacheFile.tellg() > 0;
       iCacheFile.close();
       return notEmpty;

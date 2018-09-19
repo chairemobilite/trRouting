@@ -35,7 +35,10 @@ namespace TrRouting
   const std::pair<std::vector<Stop>, std::map<unsigned long long, int>> DatabaseFetcher::getStops(std::string applicationShortname)
   {
     std::vector<Stop> stops;
-    ProtoStops protoStops;
+    //ProtoStops protoStops;
+
+    ::capnp::MallocMessageBuilder capnpStopsCollectionMessage;
+    stopsCollection::StopsCollection::Builder capnpStopsCollection = capnpStopsCollectionMessage.initRoot<stopsCollection::StopsCollection>();
     std::map<unsigned long long, int> stopIndexesById;
     
     openConnection();
@@ -55,6 +58,8 @@ namespace TrRouting
       unsigned long long resultCount = pgResult.size();
       unsigned long long i = 0;
       
+      ::capnp::List<stopsCollection::Stop>::Builder capnpStops = capnpStopsCollection.initStops(resultCount);
+
       // set cout number of decimals to 2 for displaying progress percentage:
       std::cout << std::fixed;
       std::cout << std::setprecision(2);
@@ -63,7 +68,8 @@ namespace TrRouting
         
         // create a new stop for each row:
         Stop * stop           = new Stop();
-        ProtoStop * protoStop = protoStops.add_stops();
+        //ProtoStop * protoStop = protoStops.add_stops();
+        stopsCollection::Stop::Builder capnpStop = capnpStops[i];
         Point * point         = new Point();
         // set stop attributes from row:
         stop->id                                  = c[0].as<unsigned long long>();
@@ -74,12 +80,19 @@ namespace TrRouting
         stop->point.latitude                      = c[4].as<double>();
         stop->point.longitude                     = c[5].as<double>();
         
-        protoStop->set_id(stop->id);
-        protoStop->set_code(stop->code);
-        protoStop->set_name(stop->name);
-        protoStop->set_station_id(stop->stationId);
-        protoStop->set_latitude(stop->point.latitude);
-        protoStop->set_longitude(stop->point.longitude);
+        capnpStop.setId(stop->id);
+        capnpStop.setCode(stop->code);
+        capnpStop.setName(stop->name);
+        capnpStop.setStationId(stop->stationId);
+        capnpStop.setLatitude(stop->point.latitude);
+        capnpStop.setLongitude(stop->point.longitude);
+
+        //protoStop->set_id(stop->id);
+        //protoStop->set_code(stop->code);
+        //protoStop->set_name(stop->name);
+        //protoStop->set_station_id(stop->stationId);
+        //protoStop->set_latitude(stop->point.latitude);
+        //protoStop->set_longitude(stop->point.longitude);
 
         // append stop:
         stops.push_back(*stop);
@@ -96,7 +109,8 @@ namespace TrRouting
       
       // save stops and stop indexes to binary cache file:
       std::cout << "Saving stops to cache..." << std::endl;
-      CacheFetcher::saveToProtobufCacheFile(applicationShortname, protoStops, "stops");
+      //CacheFetcher::saveToProtobufCacheFile(applicationShortname, protoStops, "stops");
+      CacheFetcher::saveToCapnpCacheFile(applicationShortname, capnpStopsCollectionMessage, "stops");
       
     } else {
       std::cerr << "Can't open database" << std::endl;

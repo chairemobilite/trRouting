@@ -25,6 +25,8 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <stdlib.h>
 #include <osrm/osrm.hpp>
+#include <capnp/message.h>
+#include <capnp/serialize-packed.h>
 
 #include "calculation_time.hpp"
 #include "stop.hpp"
@@ -45,6 +47,9 @@
 #include "proto/proto_od_trip_footpath.pb.h"
 #include "proto/proto_od_trip.pb.h"
 #include "proto/proto_od_trips.pb.h"
+
+#include "capnp/stopsCollection.capnp.h"
+
 #include "od_trip.hpp"
 #include "tuple_boost_serialize.hpp"
 #include "toolbox.hpp"
