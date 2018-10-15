@@ -3,7 +3,7 @@
 namespace TrRouting
 {
   
-  std::vector<std::pair<int,int>> OsrmFetcher::getAccessibleStopsFootpathsFromPoint(const Point point, const std::vector<Stop> stops, std::string mode, Parameters& params)
+  std::vector<std::pair<int,int>> OsrmFetcher::getAccessibleStopsFootpathsFromPoint(const Point point, const std::vector<Stop> stops, std::string mode, Parameters& params, bool reversed)
   {
 
     std::vector<int>                birdDistanceAccessibleStopIndexes;
@@ -39,22 +39,47 @@ namespace TrRouting
         }
         i++;
       }
-      osrmParams.sources.push_back(0);
+      if (reversed)
+      {
+        osrmParams.destinations.push_back(0);
+      }
+      else
+      {
+        osrmParams.sources.push_back(0);
+      }
+
       osrm::json::Object result;
       
       const auto status = params.osrmRouter.get().Table(osrmParams, result);
       //std::cerr << "numberOfStops: " << osrmParams.coordinates.size() << std::endl;
       if (status == osrm::Status::Ok)
       {
-        auto &durations = result.values["durations"].get<osrm::json::Array>().values.at(0).get<osrm::json::Array>().values;
-        //auto &distances = result.values["distances"].get<osrm::json::Array>().values.at(0).get<osrm::json::Array>().values;
-        for (int i = 0; i < birdDistanceAccessibleStopIndexes.size(); i++)
+        if (reversed)
         {
-          const int duration = durations.at(i+1).get<osrm::json::Number>().value; // ignore i = 0 (source with itself)
-          //const int distance = distances.at(i+1).get<osrm::json::Number>().value;
-          if (duration <= params.maxAccessWalkingTravelTimeSeconds)
+          auto &durations = result.values["durations"].get<osrm::json::Array>().values;
+          //auto &distances = result.values["distances"].get<osrm::json::Array>().values.at(0).get<osrm::json::Array>().values;
+          for (int i = 0; i < birdDistanceAccessibleStopIndexes.size(); i++)
           {
-            accessibleStopsFootpaths.push_back(std::make_pair(birdDistanceAccessibleStopIndexes[i], duration));
+            const int duration = durations.at(i+1).get<osrm::json::Array>().values.at(0).get<osrm::json::Number>().value; // ignore i = 0 (source with itself)
+            //const int distance = distances.at(i+1).get<osrm::json::Number>().value;
+            if (duration <= params.maxAccessWalkingTravelTimeSeconds)
+            {
+              accessibleStopsFootpaths.push_back(std::make_pair(birdDistanceAccessibleStopIndexes[i], duration));
+            }
+          }
+        }
+        else
+        {
+          auto &durations = result.values["durations"].get<osrm::json::Array>().values.at(0).get<osrm::json::Array>().values;
+          //auto &distances = result.values["distances"].get<osrm::json::Array>().values.at(0).get<osrm::json::Array>().values;
+          for (int i = 0; i < birdDistanceAccessibleStopIndexes.size(); i++)
+          {
+            const int duration = durations.at(i+1).get<osrm::json::Number>().value; // ignore i = 0 (source with itself)
+            //const int distance = distances.at(i+1).get<osrm::json::Number>().value;
+            if (duration <= params.maxAccessWalkingTravelTimeSeconds)
+            {
+              accessibleStopsFootpaths.push_back(std::make_pair(birdDistanceAccessibleStopIndexes[i], duration));
+            }
           }
         }
       }
@@ -92,7 +117,15 @@ namespace TrRouting
       // call osrm on bird distance accessible stops for further filtering by network travel time:
       boost::asio::ip::tcp::iostream s;
       s.connect(params.osrmRoutingWalkingHost, params.osrmRoutingWalkingPort);
-      queryString += "?sources=0";
+      
+      if (reversed)
+      {
+        queryString += "?destinations=0";
+      }
+      else
+      {
+        queryString += "?sources=0";
+      }
       queryString += " HTTP/1.1\r\n\r\n";
 
       // std::cerr << queryString << std::endl;

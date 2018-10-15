@@ -33,22 +33,14 @@
 #include "route.hpp"
 #include "point.hpp"
 #include "trip.hpp"
-#include "proto/proto_stop.pb.h"
-#include "proto/proto_stops.pb.h"
-#include "proto/proto_route.pb.h"
-#include "proto/proto_routes.pb.h"
-#include "proto/proto_trip.pb.h"
-#include "proto/proto_trips.pb.h"
-#include "proto/proto_connection.pb.h"
-#include "proto/proto_connections.pb.h"
-#include "proto/proto_footpath.pb.h"
-#include "proto/proto_footpath_range.pb.h"
-#include "proto/proto_footpaths.pb.h"
-#include "proto/proto_od_trip_footpath.pb.h"
-#include "proto/proto_od_trip.pb.h"
-#include "proto/proto_od_trips.pb.h"
 
 #include "capnp/stopsCollection.capnp.h"
+#include "capnp/routesCollection.capnp.h"
+#include "capnp/tripsCollection.capnp.h"
+#include "capnp/connectionsCollection.capnp.h"
+#include "capnp/footpathsCollection.capnp.h"
+#include "capnp/odTripsCollection.capnp.h"
+#include "capnp/odTripFootpathsCollection.capnp.h"
 
 #include "od_trip.hpp"
 #include "tuple_boost_serialize.hpp"
@@ -76,13 +68,13 @@ namespace TrRouting
     void openConnection();
     bool isConnectionOpen();
     
-    const std::pair<std::vector<Stop> , std::map<unsigned long long, int>> getStops( std::string applicationShortname);
-    const std::pair<std::vector<Route>, std::map<unsigned long long, int>> getRoutes(std::string applicationShortname);
-    const std::pair<std::vector<Trip> , std::map<unsigned long long, int>> getTrips( std::string applicationShortname);
-    const std::pair<std::vector<std::tuple<int,int,int,int,int,short,short,int>>, std::vector<std::tuple<int,int,int,int,int,short,short,int>>> getConnections(std::string applicationShortname, std::map<unsigned long long, int> stopIndexesById, std::map<unsigned long long, int> tripIndexesById);
-    const std::pair<std::vector<std::tuple<int,int,int>>, std::vector<std::pair<int,int>>> getFootpaths(std::string applicationShortname, std::map<unsigned long long, int> stopIndexesById);
-    const std::pair<std::vector<OdTrip>, std::map<unsigned long long, int>> getOdTrips(std::string applicationShortname, std::vector<Stop> stops, Parameters& params);
-    //static const std::pair<int, int> getTripTravelTimeAndDistance(Point startingPoint, Point endingPoint, std::string mode, Parameters& params);
+    const std::pair<std::vector<Stop> , std::map<unsigned long long,int>> getStops( std::string applicationShortname);
+    const std::pair<std::vector<Route>, std::map<unsigned long long,int>> getRoutes(std::string applicationShortname);
+    const std::pair<std::vector<Trip> , std::map<unsigned long long,int>> getTrips( std::string applicationShortname);
+    const std::pair<std::vector<std::tuple<int,int,int,int,int,short,short,int>>, std::vector<std::tuple<int,int,int,int,int,short,short,int>>> getConnections(std::string applicationShortname, std::map<unsigned long long,int> stopIndexesById, std::map<unsigned long long,int> tripIndexesById);
+    const std::pair<std::vector<std::tuple<int,int,int>>, std::vector<std::pair<long long,long long>>> getFootpaths(std::string applicationShortname, std::map<unsigned long long,int> stopIndexesById);
+    const std::tuple<std::vector<OdTrip>, std::map<unsigned long long,int>, std::vector<std::pair<int,int>>> getOdTrips(std::string applicationShortname, std::vector<Stop> stops, Parameters& params);
+    //const std::vector<std::pair<int,int>> getOdTripFootpaths(std::vector<OdTrip> odTrips, std::vector<Stop> stops, Parameters& params);
     
   private:
     

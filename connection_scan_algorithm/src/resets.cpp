@@ -77,9 +77,9 @@ namespace TrRouting
     {
       if (resetAccessPaths)
       {
-        if(params.odTrip != NULL)
+        if(params.odTrip != NULL && params.odTrip->accessFootpathsStartIndex >= 0 && params.odTrip->accessFootpathsEndIndex >= 0 && params.odTrip->accessFootpathsEndIndex >= params.odTrip->accessFootpathsStartIndex)
         {
-          accessFootpaths = params.odTrip->accessFootpaths;
+          accessFootpaths.assign(odTripFootpaths.begin() + params.odTrip->accessFootpathsStartIndex, odTripFootpaths.begin() + params.odTrip->accessFootpathsEndIndex);
         }
         else if (params.accessStopIds.size() > 0 && params.accessStopTravelTimesSeconds.size() == params.accessStopIds.size())
         {
@@ -122,9 +122,9 @@ namespace TrRouting
       if (resetAccessPaths)
       {
         // fetch stops footpaths accessible to destination using params or osrm fetcher if not provided:
-        if(params.odTrip != NULL)
+        if(params.odTrip != NULL && params.odTrip->egressFootpathsStartIndex >= 0 && params.odTrip->egressFootpathsEndIndex >= 0 && params.odTrip->egressFootpathsEndIndex >= params.odTrip->egressFootpathsStartIndex)
         {
-          egressFootpaths = params.odTrip->egressFootpaths;
+          egressFootpaths.assign(odTripFootpaths.begin() + params.odTrip->egressFootpathsStartIndex, odTripFootpaths.begin() + params.odTrip->egressFootpathsEndIndex);
         }
         else if (params.egressStopIds.size() > 0 && params.egressStopTravelTimesSeconds.size() == params.egressStopIds.size())
         {

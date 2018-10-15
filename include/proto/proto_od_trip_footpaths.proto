@@ -1,8 +1,0 @@
-syntax = "proto3";
-import 'proto_od_trip_footpath.proto';
-import 'proto_footpath_range.proto';
-
-message ProtoOdTripFootpaths {
-  repeated ProtoOdTripFootpath footpaths = 1;
-  repeated ProtoFootpathRange footpath_ranges = 2;
-}

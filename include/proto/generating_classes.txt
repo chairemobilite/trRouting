@@ -1,3 +1,0 @@
-# call from trRouting root directory:
-
-cd include/proto && for f in *.proto; do protoc --cpp_out=. $f; done && cd ../..

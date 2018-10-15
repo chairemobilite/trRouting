@@ -1,7 +1,0 @@
-syntax = "proto3";
-import 'proto_connection.proto';
-
-message ProtoConnections {
-  repeated ProtoConnection forward_connections = 1;
-  repeated ProtoConnection reverse_connections = 2;
-}

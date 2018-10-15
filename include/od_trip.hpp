@@ -28,38 +28,15 @@ namespace TrRouting
     std::string mode;
     std::string occupation;
     std::string originActivity;
-    //std::string activity;
     std::string destinationActivity;
-    std::vector<std::pair<int,int>> accessFootpaths;
-    std::vector<std::pair<int,int>> egressFootpaths;
+    long long accessFootpathsStartIndex;
+    long long accessFootpathsEndIndex;
+    long long egressFootpathsStartIndex;
+    long long egressFootpathsEndIndex;
     Point origin;
     Point destination;
     Point homeLocation;
-  
-  //private:
-  //  friend class boost::serialization::access;
-  //  template<class Archive>
-  //  void serialize(Archive&ar, const unsigned int version)
-  //  {
-  //    ar & id;
-  //    ar & personId;
-  //    ar & householdId;
-  //    ar & age;
-  //    ar & departureTimeSeconds;
-  //    ar & walkingTravelTimeSeconds;
-  //    ar & cyclingTravelTimeSeconds;
-  //    ar & drivingTravelTimeSeconds;
-  //    ar & ageGroup;
-  //    ar & gender;
-  //    ar & mode;
-  //    ar & occupation;
-  //    ar & activity;
-  //    ar & accessFootpaths;
-  //    ar & egressFootpaths;
-  //    ar & origin;
-  //    ar & destination;
-  //    ar & expansionFactor;
-  //  }
+
   };
 
 }

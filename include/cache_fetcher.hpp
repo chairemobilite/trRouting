@@ -37,22 +37,14 @@
 #include "tuple_boost_serialize.hpp"
 #include "toolbox.hpp"
 #include "parameters.hpp"
-#include "proto/proto_stop.pb.h"
-#include "proto/proto_stops.pb.h"
-#include "proto/proto_route.pb.h"
-#include "proto/proto_routes.pb.h"
-#include "proto/proto_trip.pb.h"
-#include "proto/proto_trips.pb.h"
-#include "proto/proto_connection.pb.h"
-#include "proto/proto_connections.pb.h"
-#include "proto/proto_footpath.pb.h"
-#include "proto/proto_footpath_range.pb.h"
-#include "proto/proto_footpaths.pb.h"
-#include "proto/proto_od_trip_footpath.pb.h"
-#include "proto/proto_od_trip.pb.h"
-#include "proto/proto_od_trips.pb.h"
 
 #include "capnp/stopsCollection.capnp.h"
+#include "capnp/routesCollection.capnp.h"
+#include "capnp/tripsCollection.capnp.h"
+#include "capnp/connectionsCollection.capnp.h"
+#include "capnp/footpathsCollection.capnp.h"
+#include "capnp/odTripsCollection.capnp.h"
+#include "capnp/odTripFootpathsCollection.capnp.h"
 
 namespace TrRouting
 {
@@ -96,53 +88,13 @@ namespace TrRouting
     }
     
     template<class T>
-    static const T loadFromProtobufCacheFile(T& data, std::string applicationShortname, std::string cacheFileName) {
-      std::ifstream iCacheFile;
-      iCacheFile.open(applicationShortname + "_" + cacheFileName + ".pb", std::ios::in | std::ios::binary);
-      data.ParseFromIstream(&iCacheFile);
-      iCacheFile.close();
-      google::protobuf::ShutdownProtobufLibrary();
-      return data;
-    }
-
-    template<class T>
-    static void saveToProtobufCacheFile(std::string applicationShortname, T& data, std::string cacheFileName) {
-      std::ofstream oCacheFile;
-      oCacheFile.open(applicationShortname + "_" + cacheFileName + ".pb", std::ios::out | std::ios::trunc | std::ios::binary);
-      data.SerializeToOstream(&oCacheFile);
-      oCacheFile.close();
-      google::protobuf::ShutdownProtobufLibrary();
-    }
-
-    //static const ::capnp::PackedFdMessageReader loadFromCapnpCacheFile(std::string applicationShortname, std::string cacheFileName) {
-    //  int fd = open((applicationShortname + "_" + cacheFileName + ".capnpbin").c_str(), O_WRONLY);
-    //  //::capnp::PackedFdMessageReader message(fd);
-    //  close(fd);
-    //  return ::capnp::PackedFdMessageReader(fd);
-    //}
-
-    template<class T>
     static void saveToCapnpCacheFile(std::string applicationShortname, T& data, std::string cacheFileName) {
-      //std::ostream oCacheFile;
       std::ofstream oCacheFile;
       oCacheFile.open(applicationShortname + "_" + cacheFileName + ".capnpbin", std::ios::out | std::ios::trunc | std::ios::binary);
       oCacheFile.close();
-
       int fd = open((applicationShortname + "_" + cacheFileName + ".capnpbin").c_str(), O_WRONLY);
-      //int fd = open(applicationShortname + "_" + cacheFileName + ".capnpbin", std::ios::out | std::ios::trunc | std::ios::binary);
-      //data.SerializeToOstream(&oCacheFile);
       ::capnp::writePackedMessageToFd(fd, data);
       close(fd);
-      //google::protobuf::ShutdownProtobufLibrary();
-    }
-    
-    static bool protobufCacheFileExists(std::string applicationShortname, std::string cacheFileName) {
-      std::ifstream iCacheFile;
-      bool notEmpty = false;
-      iCacheFile.open(applicationShortname + "_" + cacheFileName + ".pb", std::ios::in | std::ios::binary | std::ios::ate);
-      notEmpty = iCacheFile.tellg() > 0;
-      iCacheFile.close();
-      return notEmpty;
     }
 
     static bool capnpCacheFileExists(std::string applicationShortname, std::string cacheFileName) {
@@ -158,7 +110,8 @@ namespace TrRouting
     const std::pair<std::vector<Route>, std::map<unsigned long long, int>> getRoutes(std::string applicationShortname);
     const std::pair<std::vector<Trip> , std::map<unsigned long long, int>> getTrips( std::string applicationShortname);
     const std::pair<std::vector<std::tuple<int,int,int,int,int,short,short,int>>, std::vector<std::tuple<int,int,int,int,int,short,short,int>>> getConnections(std::string applicationShortname, std::map<unsigned long long, int> stopIndexesById, std::map<unsigned long long, int> tripIndexesById);
-    const std::pair<std::vector<std::tuple<int,int,int>>, std::vector<std::pair<int,int>>> getFootpaths(std::string applicationShortname, std::map<unsigned long long, int> stopIndexesById);
+    const std::pair<std::vector<std::tuple<int,int,int>>, std::vector<std::pair<long long,long long>>> getFootpaths(std::string applicationShortname, std::map<unsigned long long, int> stopIndexesById);
+    const std::vector<std::pair<int,int>> getOdTripFootpaths(std::string applicationShortname, Parameters& params);
     const std::pair<std::vector<OdTrip>, std::map<unsigned long long, int>> getOdTrips(std::string applicationShortname, std::vector<Stop> stops, Parameters& params);
     
   private:

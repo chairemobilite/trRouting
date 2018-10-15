@@ -1,6 +1,0 @@
-syntax = "proto3";
-import 'proto_stop.proto';
-
-message ProtoStops {
-  repeated ProtoStop stops = 1;
-}

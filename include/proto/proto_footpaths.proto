@@ -1,8 +1,0 @@
-syntax = "proto3";
-import 'proto_footpath.proto';
-import 'proto_footpath_range.proto';
-
-message ProtoFootpaths {
-  repeated ProtoFootpath footpaths = 1;
-  repeated ProtoFootpathRange footpath_ranges = 2;
-}

@@ -1,7 +1,0 @@
-syntax = "proto3";
-
-message ProtoOdTripFootpath {
-  int32 stop_idx = 1;
-  int32 travel_time = 2;
-}
-

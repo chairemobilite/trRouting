@@ -17,6 +17,7 @@ swift/trRouting/Package.resolved
 # Cache files
 *.cache
 *.pb
+*.capnpbin
 *.msgpack
 
 # osrm files

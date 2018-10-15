@@ -1,6 +1,0 @@
-syntax = "proto3";
-import 'proto_route.proto';
-
-message ProtoRoutes {
-  repeated ProtoRoute routes = 1;
-}

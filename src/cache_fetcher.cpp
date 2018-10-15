@@ -7,22 +7,16 @@ namespace TrRouting
   {
     std::vector<Stop> stops;
     std::string cacheFileName{"stops"};
-    //ProtoStops protoStops;
-    //::capnp::PackedFdMessageReader capnpStopsCollectionMessage;
     std::map<unsigned long long, int> stopIndexesById;
     
     std::cout << "Fetching stops from cache..." << std::endl;
-    if (CacheFetcher::capnpCacheFileExists(applicationShortname, "stops"))
+    if (CacheFetcher::capnpCacheFileExists(applicationShortname, cacheFileName))
     {
       int fd = open((applicationShortname + "_" + cacheFileName + ".capnpbin").c_str(), O_RDWR);
-      ::capnp::PackedFdMessageReader capnpStopsCollectionMessage(fd);
-      //return ::capnp::PackedFdMessageReader(fd);
-      //::capnp::PackedFdMessageReader capnpStopsCollectionMessage = loadFromCapnpCacheFile(applicationShortname, "stops");
+      ::capnp::PackedFdMessageReader capnpStopsCollectionMessage(fd, {64 * 1024 * 1024});
       stopsCollection::StopsCollection::Reader capnpStopsCollection = capnpStopsCollectionMessage.getRoot<stopsCollection::StopsCollection>();
       for (stopsCollection::Stop::Reader capnpStop : capnpStopsCollection.getStops())
-      //for (int i = 0; i < protoStops.stops_size(); i++)
       {
-        //const ProtoStop&  protoStop  = protoStops.stops(i);
 
         Stop  * stop          = new Stop();
         Point * point         = new Point();
@@ -49,30 +43,31 @@ namespace TrRouting
   const std::pair<std::vector<Route>, std::map<unsigned long long, int>> CacheFetcher::getRoutes(std::string applicationShortname)
   {
     std::vector<Route> routes;
-    ProtoRoutes protoRoutes;
+    std::string cacheFileName{"routes"};
     std::map<unsigned long long, int> routeIndexesById;
     
     std::cout << "Fetching routes from cache..." << std::endl;
-    if (CacheFetcher::protobufCacheFileExists(applicationShortname, "routes"))
+    if (CacheFetcher::capnpCacheFileExists(applicationShortname, cacheFileName))
     {
-      protoRoutes = loadFromProtobufCacheFile(protoRoutes, applicationShortname, "routes");
-      for (int i = 0; i < protoRoutes.routes_size(); i++)
+      int fd = open((applicationShortname + "_" + cacheFileName + ".capnpbin").c_str(), O_RDWR);
+      ::capnp::PackedFdMessageReader capnpRoutesCollectionMessage(fd, {64 * 1024 * 1024});
+      routesCollection::RoutesCollection::Reader capnpRoutesCollection = capnpRoutesCollectionMessage.getRoot<routesCollection::RoutesCollection>();
+      for (routesCollection::Route::Reader capnpRoute : capnpRoutesCollection.getRoutes())
       {
-        const ProtoRoute& protoRoute = protoRoutes.routes(i);
-
-        Route  * route          = new Route();
-        route->id               = protoRoute.id();
-        route->agencyId         = protoRoute.agency_id();
-        route->routeTypeId      = protoRoute.route_type_id();
-        route->agencyAcronym    = protoRoute.agency_acronym();
-        route->agencyName       = protoRoute.agency_name();
-        route->shortname        = protoRoute.shortname();
-        route->longname         = protoRoute.longname();
-        route->routeTypeName    = protoRoute.route_type_name();
+        Route * route           = new Route();
+        route->id               = capnpRoute.getId();
+        route->agencyId         = capnpRoute.getAgencyId();
+        route->routeTypeId      = capnpRoute.getRouteTypeId();
+        route->agencyAcronym    = capnpRoute.getAgencyAcronym();
+        route->agencyName       = capnpRoute.getAgencyName();
+        route->shortname        = capnpRoute.getShortname();
+        route->longname         = capnpRoute.getLongname();
+        route->routeTypeName    = capnpRoute.getRouteTypeName();
        
         routes.push_back(*route);
         routeIndexesById[route->id] = routes.size() - 1;
       }
+      close(fd);
     }
     else
     {
@@ -84,27 +79,28 @@ namespace TrRouting
   const std::pair<std::vector<Trip>, std::map<unsigned long long, int>> CacheFetcher::getTrips(std::string applicationShortname)
   {
     std::vector<Trip> trips;
-    ProtoTrips protoTrips;
+    std::string cacheFileName{"trips"};
     std::map<unsigned long long, int> tripIndexesById;
     
-    if (CacheFetcher::protobufCacheFileExists(applicationShortname, "trips"))
+    if (CacheFetcher::capnpCacheFileExists(applicationShortname, cacheFileName))
     {
-      protoTrips = loadFromProtobufCacheFile(protoTrips, applicationShortname, "trips");
-      for (int i = 0; i < protoTrips.trips_size(); i++)
+      int fd = open((applicationShortname + "_" + cacheFileName + ".capnpbin").c_str(), O_RDWR);
+      ::capnp::PackedFdMessageReader capnpTripsCollectionMessage(fd, {64 * 1024 * 1024});
+      tripsCollection::TripsCollection::Reader capnpTripsCollection = capnpTripsCollectionMessage.getRoot<tripsCollection::TripsCollection>();
+      for (tripsCollection::Trip::Reader capnpTrip : capnpTripsCollection.getTrips())
       {
-        const ProtoTrip& protoTrip = protoTrips.trips(i);
-
         Trip * trip       = new Trip();
-        trip->id          = protoTrip.id();
-        trip->routeId     = protoTrip.route_id();
-        trip->routePathId = protoTrip.route_path_id();
-        trip->routeTypeId = protoTrip.route_type_id();
-        trip->agencyId    = protoTrip.agency_id();
-        trip->serviceId   = protoTrip.service_id();
+        trip->id          = capnpTrip.getId();
+        trip->routeId     = capnpTrip.getRouteId();
+        trip->routePathId = capnpTrip.getRoutePathId();
+        trip->routeTypeId = capnpTrip.getRouteTypeId();
+        trip->agencyId    = capnpTrip.getAgencyId();
+        trip->serviceId   = capnpTrip.getServiceId();
 
         trips.push_back(*trip);
         tripIndexesById[trip->id] = trips.size() - 1;
       }
+      close(fd);
     }
     else
     {
@@ -117,42 +113,43 @@ namespace TrRouting
   {
     std::vector<std::tuple<int,int,int,int,int,short,short,int>> forwardConnections;
     std::vector<std::tuple<int,int,int,int,int,short,short,int>> reverseConnections; 
-    ProtoConnections protoConnections;
+    std::string cacheFileName{"connections"};
     
     std::cout << "Fetching connections from cache..." << std::endl;
-    if (CacheFetcher::protobufCacheFileExists(applicationShortname, "connections"))
+    if (CacheFetcher::capnpCacheFileExists(applicationShortname, cacheFileName))
     {
-      protoConnections = loadFromProtobufCacheFile(protoConnections, applicationShortname, "connections");
-
-      for (int i = 0; i < protoConnections.forward_connections_size(); i++)
+      int fd = open((applicationShortname + "_" + cacheFileName + ".capnpbin").c_str(), O_RDWR);
+      ::capnp::PackedFdMessageReader capnpConnectionsCollectionMessage(fd, {64 * 1024 * 1024});
+      connectionsCollection::ConnectionsCollection::Reader capnpConnectionsCollection = capnpConnectionsCollectionMessage.getRoot<connectionsCollection::ConnectionsCollection>();
+      for (connectionsCollection::Connection::Reader capnpConnection : capnpConnectionsCollection.getForwardConnections())
       {
-        const ProtoConnection& protoConnection = protoConnections.forward_connections(i);
         forwardConnections.push_back(std::make_tuple(
-          protoConnection.stop_dep_idx(),
-          protoConnection.stop_arr_idx(),
-          protoConnection.time_dep(),
-          protoConnection.time_arr(),
-          protoConnection.trip_idx(),
-          protoConnection.can_board(),
-          protoConnection.can_unboard(),
-          protoConnection.sequence()
+          capnpConnection.getStopDepIdx(),
+          capnpConnection.getStopArrIdx(),
+          capnpConnection.getTimeDep(),
+          capnpConnection.getTimeArr(),
+          capnpConnection.getTripIdx(),
+          capnpConnection.getCanBoard(),
+          capnpConnection.getCanUnboard(),
+          capnpConnection.getSequence()
         ));
       }
 
-      for (int i = 0; i < protoConnections.reverse_connections_size(); i++)
+      for (connectionsCollection::Connection::Reader capnpConnection : capnpConnectionsCollection.getReverseConnections())
       {
-        const ProtoConnection& protoConnection = protoConnections.reverse_connections(i);
         reverseConnections.push_back(std::make_tuple(
-          protoConnection.stop_dep_idx(),
-          protoConnection.stop_arr_idx(),
-          protoConnection.time_dep(),
-          protoConnection.time_arr(),
-          protoConnection.trip_idx(),
-          protoConnection.can_board(),
-          protoConnection.can_unboard(),
-          protoConnection.sequence()
+          capnpConnection.getStopDepIdx(),
+          capnpConnection.getStopArrIdx(),
+          capnpConnection.getTimeDep(),
+          capnpConnection.getTimeArr(),
+          capnpConnection.getTripIdx(),
+          capnpConnection.getCanBoard(),
+          capnpConnection.getCanUnboard(),
+          capnpConnection.getSequence()
         ));
       }
+
+      close(fd);
 
     }
     else
@@ -163,123 +160,134 @@ namespace TrRouting
     
   }
   
-  const std::pair<std::vector<std::tuple<int,int,int>>, std::vector<std::pair<int,int>>> CacheFetcher::getFootpaths(std::string applicationShortname, std::map<unsigned long long, int> stopIndexesById)
+  const std::pair<std::vector<std::tuple<int,int,int>>, std::vector<std::pair<long long,long long>>> CacheFetcher::getFootpaths(std::string applicationShortname, std::map<unsigned long long, int> stopIndexesById)
   {
     std::vector<std::tuple<int,int,int>> footpaths;
-    ProtoFootpaths protoFootpaths;
-    std::vector<std::pair<int,int>>      footpathsRanges;
+    std::string cacheFileName{"footpaths"};
+    std::vector<std::pair<long long,long long>>      footpathsRanges;
     
     std::cout << "Fetching footpaths from cache..." << std::endl;
-    if (CacheFetcher::protobufCacheFileExists(applicationShortname, "footpaths"))
+    if (CacheFetcher::capnpCacheFileExists(applicationShortname, cacheFileName))
     {
-      protoFootpaths = loadFromProtobufCacheFile(protoFootpaths, applicationShortname, "footpaths");
-      for (int i = 0; i < protoFootpaths.footpaths_size(); i++)
+      int fd = open((applicationShortname + "_" + cacheFileName + ".capnpbin").c_str(), O_RDWR);
+      ::capnp::PackedFdMessageReader capnpFootpathsCollectionMessage(fd, {64 * 1024 * 1024});
+      footpathsCollection::FootpathsCollection::Reader capnpFootpathsCollection = capnpFootpathsCollectionMessage.getRoot<footpathsCollection::FootpathsCollection>();
+      for (footpathsCollection::Footpath::Reader capnpFootpath : capnpFootpathsCollection.getFootpaths())
       {
-        const ProtoFootpath& protoFootpath = protoFootpaths.footpaths(i);
-
         footpaths.push_back(std::make_tuple(
-          protoFootpath.stop_1_idx(),
-          protoFootpath.stop_2_idx(),
-          protoFootpath.travel_time()
+          capnpFootpath.getStop1Idx(),
+          capnpFootpath.getStop2Idx(),
+          capnpFootpath.getTravelTime()
         ));
-      
       }
-
-      for (int i = 0; i < protoFootpaths.footpath_ranges_size(); i++)
+      for (footpathsCollection::FootpathRange::Reader capnpFootpathRange : capnpFootpathsCollection.getFootpathRanges())
       {
-        const ProtoFootpathRange& protoFootpathRange = protoFootpaths.footpath_ranges(i);
-
         footpathsRanges.push_back(std::make_pair(
-          protoFootpathRange.footpaths_start_idx(),
-          protoFootpathRange.footpaths_end_idx()
+          capnpFootpathRange.getFootpathsStartIdx(),
+          capnpFootpathRange.getFootpathsEndIdx()
         ));
-
       }
+      close(fd);
     }
     else
     {
-      std::cerr << "missing trips cache file!" << std::endl;
+      std::cerr << "missing footpaths cache file!" << std::endl;
     }
     return std::make_pair(footpaths, footpathsRanges);
+    
+  }
+
+  const std::vector<std::pair<int,int>> CacheFetcher::getOdTripFootpaths(std::string applicationShortname, Parameters& params)
+  {
+    std::vector<std::pair<int,int>> odTripFootpaths;
+    std::string cacheFileName{"od_trip_footpaths"};
+    
+    std::cout << "Fetching od trip footpaths from cache..." << std::endl;
+    if (CacheFetcher::capnpCacheFileExists(applicationShortname, cacheFileName))
+    {
+      int fd = open((applicationShortname + "_" + cacheFileName + ".capnpbin").c_str(), O_RDWR);
+      ::capnp::PackedFdMessageReader capnpOdTripFootpathsCollectionMessage(fd, {64 * 1024 * 1024});
+      odTripFootpathsCollection::OdTripFootpathsCollection::Reader capnpOdTripFootpathsCollection = capnpOdTripFootpathsCollectionMessage.getRoot<odTripFootpathsCollection::OdTripFootpathsCollection>();
+
+      for (odTripFootpathsCollection::OdTripFootpath::Reader capnpOdTripFoopath : capnpOdTripFootpathsCollection.getOdTripFootpaths())
+      {
+        odTripFootpaths.push_back(std::make_pair(
+          capnpOdTripFoopath.getStopIdx(),
+          capnpOdTripFoopath.getTravelTime()
+        ));
+      }
+      close(fd);
+    }
+
+    else
+    {
+      std::cerr << "missing od trip cache file!" << std::endl;
+    }
+    return odTripFootpaths;
     
   }
 
   const std::pair<std::vector<OdTrip>, std::map<unsigned long long, int>> CacheFetcher::getOdTrips(std::string applicationShortname, std::vector<Stop> stops, Parameters& params)
   {
     std::vector<OdTrip> odTrips;
-    ProtoOdTrips protoOdTrips;
+    std::string cacheFileName{"od_trips"};
     std::map<unsigned long long, int> odTripIndexesById;
     
     std::cout << "Fetching od trips from cache..." << std::endl;
-    if (CacheFetcher::protobufCacheFileExists(applicationShortname, "footpaths"))
+    if (CacheFetcher::capnpCacheFileExists(applicationShortname, cacheFileName))
     {
-      protoOdTrips = loadFromProtobufCacheFile(protoOdTrips, applicationShortname, "od_trips");
-      for (int i = 0; i < protoOdTrips.od_trips_size(); i++)
-      {
-        const ProtoOdTrip& protoOdTrip      = protoOdTrips.od_trips(i);
+      int fd = open((applicationShortname + "_" + cacheFileName + ".capnpbin").c_str(), O_RDWR);
+      ::capnp::PackedFdMessageReader capnpOdTripsCollectionMessage(fd, {64 * 1024 * 1024});
+      odTripsCollection::OdTripsCollection::Reader capnpOdTripsCollection = capnpOdTripsCollectionMessage.getRoot<odTripsCollection::OdTripsCollection>();
 
+      for (odTripsCollection::OdTrip::Reader capnpOdTrip : capnpOdTripsCollection.getOdTrips())
+      {
         OdTrip * odTrip       = new OdTrip();
         Point  * origin       = new Point();
         Point  * destination  = new Point();
         Point  * homeLocation = new Point();
-        std::vector<std::pair<int,int>> accessFootpaths;
-        std::vector<std::pair<int,int>> egressFootpaths;
+        //std::vector<std::pair<int,int>> accessFootpaths;
+        //std::vector<std::pair<int,int>> egressFootpaths;
 
-        odTrip->id                       = protoOdTrip.id();
-        odTrip->origin                   = *origin;
-        odTrip->destination              = *destination;
-        odTrip->homeLocation             = *homeLocation;
-        odTrip->personId                 = protoOdTrip.person_id();
-        odTrip->householdId              = protoOdTrip.household_id();
-        odTrip->age                      = protoOdTrip.age();
-        odTrip->origin.latitude          = protoOdTrip.origin_latitude();
-        odTrip->origin.longitude         = protoOdTrip.origin_longitude();
-        odTrip->destination.latitude     = protoOdTrip.destination_latitude();
-        odTrip->destination.longitude    = protoOdTrip.destination_longitude();
-        odTrip->homeLocation.latitude    = protoOdTrip.home_latitude();
-        odTrip->homeLocation.longitude   = protoOdTrip.home_longitude();
-        odTrip->ageGroup                 = protoOdTrip.age_group();
-        odTrip->occupation               = protoOdTrip.occupation();
-        odTrip->originActivity           = protoOdTrip.activity_origin();
-        odTrip->destinationActivity      = protoOdTrip.activity_destination();
-        odTrip->gender                   = protoOdTrip.gender();
-        odTrip->mode                     = protoOdTrip.mode();
-        odTrip->departureTimeSeconds     = protoOdTrip.departure_time_seconds();
-        odTrip->arrivalTimeSeconds       = protoOdTrip.arrival_time_seconds();
-        odTrip->expansionFactor          = protoOdTrip.expansion_factor();
-        odTrip->walkingTravelTimeSeconds = protoOdTrip.walking_travel_time_seconds();
-        odTrip->cyclingTravelTimeSeconds = protoOdTrip.cycling_travel_time_seconds();
-        odTrip->drivingTravelTimeSeconds = protoOdTrip.driving_travel_time_seconds();
-
-        for (int j = 0; j < protoOdTrip.access_footpaths_size(); j++)
-        {
-          const ProtoOdTripFootpath& protoOdTripFootpath = protoOdTrip.access_footpaths(j);
-          accessFootpaths.push_back(std::make_pair(
-            protoOdTripFootpath.stop_idx(),
-            protoOdTripFootpath.travel_time()
-          ));
-        }
-        odTrip->accessFootpaths = accessFootpaths;
-
-        for (int j = 0; j < protoOdTrip.egress_footpaths_size(); j++)
-        {
-          const ProtoOdTripFootpath& protoOdTripFootpath = protoOdTrip.egress_footpaths(j);
-          egressFootpaths.push_back(std::make_pair(
-            protoOdTripFootpath.stop_idx(),
-            protoOdTripFootpath.travel_time()
-          ));
-        }
-        odTrip->egressFootpaths = accessFootpaths;
+        odTrip->id                        = capnpOdTrip.getId();
+        odTrip->origin                    = *origin;
+        odTrip->destination               = *destination;
+        odTrip->homeLocation              = *homeLocation;
+        odTrip->personId                  = capnpOdTrip.getPersonId();
+        odTrip->householdId               = capnpOdTrip.getHouseholdId();
+        odTrip->age                       = capnpOdTrip.getAge();
+        odTrip->origin.latitude           = capnpOdTrip.getOriginLatitude();
+        odTrip->origin.longitude          = capnpOdTrip.getOriginLongitude();
+        odTrip->destination.latitude      = capnpOdTrip.getDestinationLatitude();
+        odTrip->destination.longitude     = capnpOdTrip.getDestinationLongitude();
+        odTrip->homeLocation.latitude     = capnpOdTrip.getHomeLatitude();
+        odTrip->homeLocation.longitude    = capnpOdTrip.getHomeLongitude();
+        odTrip->ageGroup                  = capnpOdTrip.getAgeGroup();
+        odTrip->occupation                = capnpOdTrip.getOccupation();
+        odTrip->originActivity            = capnpOdTrip.getOriginActivity();
+        odTrip->destinationActivity       = capnpOdTrip.getDestinationActivity();
+        odTrip->gender                    = capnpOdTrip.getGender();
+        odTrip->mode                      = capnpOdTrip.getMode();
+        odTrip->departureTimeSeconds      = capnpOdTrip.getDepartureTimeSeconds();
+        odTrip->arrivalTimeSeconds        = capnpOdTrip.getArrivalTimeSeconds();
+        odTrip->expansionFactor           = capnpOdTrip.getExpansionFactor();
+        odTrip->walkingTravelTimeSeconds  = capnpOdTrip.getWalkingTravelTimeSeconds();
+        odTrip->cyclingTravelTimeSeconds  = capnpOdTrip.getCyclingTravelTimeSeconds();
+        odTrip->drivingTravelTimeSeconds  = capnpOdTrip.getDrivingTravelTimeSeconds();
+        odTrip->accessFootpathsStartIndex = capnpOdTrip.getAccessFootpathsStartIdx();
+        odTrip->accessFootpathsEndIndex   = capnpOdTrip.getAccessFootpathsEndIdx();
+        odTrip->egressFootpathsStartIndex = capnpOdTrip.getEgressFootpathsStartIdx();
+        odTrip->egressFootpathsEndIndex   = capnpOdTrip.getEgressFootpathsEndIdx();
 
         odTrips.push_back(*odTrip);
         odTripIndexesById[odTrip->id] = odTrips.size() - 1;
       }
-
+      close(fd);
     }
 
     else
     {
-      std::cerr << "missing od trip indexes cache file!" << std::endl;
+      std::cerr << "missing od trip cache file!" << std::endl;
     }
     return std::make_pair(odTrips, odTripIndexesById);
     

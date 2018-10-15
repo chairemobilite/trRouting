@@ -1,6 +1,0 @@
-syntax = "proto3";
-import 'proto_od_trip.proto';
-
-message ProtoOdTrips {
-  repeated ProtoOdTrip od_trips = 1;
-}
