@@ -1,4 +1,6 @@
 # trRouting
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fkaligrafy%2FtrRouting.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fkaligrafy%2FtrRouting?ref=badge_shield)
+
 Transit routing server app written in C++ using the Connection Scan Algorithm including flexible parameters.
 
 ## Performance
@@ -41,3 +43,7 @@ sudo apt-get install clang libboost-all-dev libexpat1-dev libjsoncpp-dev libpqxx
 make -f MakeFileCSA
 ```
 
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fkaligrafy%2FtrRouting.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fkaligrafy%2FtrRouting?ref=badge_large)
