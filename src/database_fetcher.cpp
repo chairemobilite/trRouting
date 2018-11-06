@@ -398,16 +398,6 @@ namespace TrRouting
   
   const std::pair<std::vector<std::tuple<int,int,int>>, std::vector<std::pair<long long, long long>>> DatabaseFetcher::getFootpaths(std::string applicationShortname, std::map<unsigned long long, int> stopIndexesById)
   {
-    std::vector<std::tuple<int,int,int>> footpaths;
-    ::capnp::MallocMessageBuilder capnpFootpathsCollectionMessage;
-    footpathsCollection::FootpathsCollection::Builder capnpFootpathsCollection = capnpFootpathsCollectionMessage.initRoot<footpathsCollection::FootpathsCollection>();
-    std::vector<std::pair<long long, long long>> footpathsRanges(stopIndexesById.size());
-    
-    for (auto & stop : stopIndexesById)
-    {
-      footpathsRanges[stop.second] = std::make_pair(-1, -1);
-    }
-
     
     openConnection();
     
@@ -423,7 +413,7 @@ namespace TrRouting
       "ORDER BY stop_1_id, MAX(CEIL(COALESCE(network_walking_duration_seconds::float, network_distance::float/1.38, distance::float/1.38))) ";
     
     std::cout << sqlQuery << std::endl;
-    
+
     if (isConnectionOpen())
     {
       
@@ -431,9 +421,21 @@ namespace TrRouting
       pqxx::result pgResult( pgNonTransaction.exec( sqlQuery ));
       unsigned long long resultCount = pgResult.size();
       unsigned long long i = 1;
-      
-      ::capnp::List<footpathsCollection::Footpath>::Builder capnpFootpaths           = capnpFootpathsCollection.initFootpaths(resultCount);
+
+      std::vector<std::tuple<int,int,int>> footpaths(resultCount);
+      std::vector<std::pair<long long, long long>> footpathsRanges(stopIndexesById.size());
+      ::capnp::MallocMessageBuilder capnpFootpathsCollectionMessage;
+      footpathsCollection::FootpathsCollection::Builder capnpFootpathsCollection     = capnpFootpathsCollectionMessage.initRoot<footpathsCollection::FootpathsCollection>();
       ::capnp::List<footpathsCollection::FootpathRange>::Builder capnpFootpathRanges = capnpFootpathsCollection.initFootpathRanges(stopIndexesById.size());
+      ::capnp::List<footpathsCollection::Footpath>::Builder capnpFootpaths           = capnpFootpathsCollection.initFootpaths(resultCount);
+
+      for (auto & stop : stopIndexesById)
+      {
+        footpathsRanges[stop.second] = std::make_pair(-1, -1);
+        footpathsCollection::FootpathRange::Builder capnpFootpathRange = capnpFootpathRanges[stop.second];
+        capnpFootpathRange.setFootpathsStartIdx(-1);
+        capnpFootpathRange.setFootpathsEndIdx(-1);
+      }
 
       std::cout << std::fixed;
       std::cout << std::setprecision(2);
@@ -453,15 +455,18 @@ namespace TrRouting
         capnpFootpath.setStop2Idx(stop2Index);
         capnpFootpath.setTravelTime(travelTimeSeconds);
 
-        footpaths.push_back(std::make_tuple(stop1Index, stop2Index, travelTimeSeconds));
-        footpathIndex = footpaths.size() - 1;
-                
+        footpaths[i] = std::make_tuple(stop1Index, stop2Index, travelTimeSeconds);
+        
         if (footpathsRanges[stop1Index].first == -1)
         {
-          footpathsRanges[stop1Index].first = footpathIndex;
+          footpathsRanges[stop1Index].first = i;
         }
-        footpathsRanges[stop1Index].second = footpathIndex;
+        footpathsRanges[stop1Index].second = i;
         
+        //footpathsCollection::FootpathRange::Builder capnpFootpathRange = capnpFootpathRanges[stop1Index];
+        capnpFootpathRanges[stop1Index].setFootpathsStartIdx(footpathsRanges[stop1Index].first);
+        capnpFootpathRanges[stop1Index].setFootpathsEndIdx(footpathsRanges[stop1Index].second);
+
         if (i % 1000 == 0)
         {
           std::cout << ((((double) i) / resultCount) * 100) << "%\r";
@@ -471,23 +476,18 @@ namespace TrRouting
       }
       std::cout << std::endl;
       
-      i = 0;
-      for(auto & footpathRange : footpathsRanges)
-      {
-        footpathsCollection::FootpathRange::Builder capnpFootpathRange = capnpFootpathRanges[i];
-        capnpFootpathRange.setFootpathsStartIdx(std::get<0>(footpathRange));
-        capnpFootpathRange.setFootpathsEndIdx(std::get<1>(footpathRange));
-        i++;
-      }
-      
       std::cout << "Saving footpaths to cache..." << std::endl;
       CacheFetcher::saveToCapnpCacheFile(applicationShortname, capnpFootpathsCollectionMessage, "footpaths");
-      
+
+      return std::make_pair(footpaths, footpathsRanges);
+
     } else {
       std::cout << "Can't open database" << std::endl;
+      std::vector<std::tuple<int,int,int>> footpaths;
+      std::vector<std::pair<long long, long long>> footpathsRanges(stopIndexesById.size());
+      return std::make_pair(footpaths, footpathsRanges);
     }
     
-    return std::make_pair(footpaths, footpathsRanges);
   }
   
   const std::tuple<std::vector<OdTrip>, std::map<unsigned long long,int>, std::vector<std::pair<int,int>>> DatabaseFetcher::getOdTrips(std::string applicationShortname, std::vector<Stop> stops, Parameters& params)
