@@ -12,6 +12,7 @@
 #include <boost/tokenizer.hpp>
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/replace.hpp>
 
 #include <vector>
 #include <algorithm>
@@ -494,6 +495,10 @@ int main(int argc, char** argv) {
           for(std::string odTripsAgeGroup : odTripsAgeGroupsVector)
           {
             odTripsAgeGroups.push_back(odTripsAgeGroup);
+            if (odTripsAgeGroup.find("plus") != std::string::npos) // replace plus by + (+ cannot be used in query string)
+            {
+              odTripsAgeGroups.push_back(boost::replace_all_copy(odTripsAgeGroup, "plus","+"));
+            }
           }
           //calculator.params.odTripsAgeGroups = odTripsAgeGroups;
         }
@@ -1064,11 +1069,11 @@ int main(int argc, char** argv) {
           atLeastOneCompatiblePeriod = false;
           
           // verify that od trip matches selected attributes:
-          if ( (odTripsAgeGroups.size()   > 0 && std::find(odTripsAgeGroups.begin(), odTripsAgeGroups.end(), odTrip.ageGroup)       == odTripsAgeGroups.end()) 
-            || (odTripsGenders.size()     > 0 && std::find(odTripsGenders.begin(), odTripsGenders.end(), odTrip.gender)             == odTripsGenders.end())
-            || (odTripsOccupations.size() > 0 && std::find(odTripsOccupations.begin(), odTripsOccupations.end(), odTrip.occupation) == odTripsOccupations.end())
-            || (odTripsActivities.size()  > 0 && std::find(odTripsActivities.begin(), odTripsActivities.end(), odTrip.destinationActivity)     == odTripsActivities.end())
-            || (odTripsModes.size()       > 0 && std::find(odTripsModes.begin(), odTripsModes.end(), odTrip.mode)                   == odTripsModes.end())
+          if ( (odTripsAgeGroups.size()   > 0 && std::find(odTripsAgeGroups.begin(), odTripsAgeGroups.end(), odTrip.ageGroup)              == odTripsAgeGroups.end()) 
+            || (odTripsGenders.size()     > 0 && std::find(odTripsGenders.begin(), odTripsGenders.end(), odTrip.gender)                    == odTripsGenders.end())
+            || (odTripsOccupations.size() > 0 && std::find(odTripsOccupations.begin(), odTripsOccupations.end(), odTrip.occupation)        == odTripsOccupations.end())
+            || (odTripsActivities.size()  > 0 && std::find(odTripsActivities.begin(), odTripsActivities.end(), odTrip.destinationActivity) == odTripsActivities.end())
+            || (odTripsModes.size()       > 0 && std::find(odTripsModes.begin(), odTripsModes.end(), odTrip.mode)                          == odTripsModes.end())
           )
           {
             attributesMatches = false;
