@@ -17,17 +17,6 @@ namespace TrRouting
     long long stationId;
     Point point;
   
-  private:
-    friend class boost::serialization::access;
-    template<class Archive>
-    void serialize(Archive&ar, const unsigned int version)
-    {
-      ar & id;
-      ar & code;
-      ar & name;
-      ar & stationId;
-      ar & point;
-    }
   };
 
 }

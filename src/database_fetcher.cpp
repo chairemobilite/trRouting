@@ -35,6 +35,9 @@ namespace TrRouting
   const std::pair<std::vector<Stop>, std::map<unsigned long long, int>> DatabaseFetcher::getStops(std::string applicationShortname)
   {
     std::vector<Stop> stops;
+
+    ::capnp::MallocMessageBuilder capnpStopsCollectionMessage;
+    stopsCollection::StopsCollection::Builder capnpStopsCollection = capnpStopsCollectionMessage.initRoot<stopsCollection::StopsCollection>();
     std::map<unsigned long long, int> stopIndexesById;
     
     openConnection();
@@ -54,6 +57,8 @@ namespace TrRouting
       unsigned long long resultCount = pgResult.size();
       unsigned long long i = 0;
       
+      ::capnp::List<stopsCollection::Stop>::Builder capnpStops = capnpStopsCollection.initStops(resultCount);
+
       // set cout number of decimals to 2 for displaying progress percentage:
       std::cout << std::fixed;
       std::cout << std::setprecision(2);
@@ -61,8 +66,10 @@ namespace TrRouting
       for (pqxx::result::const_iterator c = pgResult.begin(); c != pgResult.end(); ++c) {
         
         // create a new stop for each row:
-        Stop * stop   = new Stop();
-        Point * point = new Point();
+        Stop * stop                              = new Stop();
+        Point * point                            = new Point();
+        stopsCollection::Stop::Builder capnpStop = capnpStops[i];
+
         // set stop attributes from row:
         stop->id                                  = c[0].as<unsigned long long>();
         stop->code                                = c[1].as<std::string>();
@@ -72,6 +79,13 @@ namespace TrRouting
         stop->point.latitude                      = c[4].as<double>();
         stop->point.longitude                     = c[5].as<double>();
         
+        capnpStop.setId(stop->id);
+        capnpStop.setCode(stop->code);
+        capnpStop.setName(stop->name);
+        capnpStop.setStationId(stop->stationId);
+        capnpStop.setLatitude(stop->point.latitude);
+        capnpStop.setLongitude(stop->point.longitude);
+
         // append stop:
         stops.push_back(*stop);
         stopIndexesById[stop->id] = stops.size() - 1;
@@ -86,8 +100,8 @@ namespace TrRouting
       std::cout << std::endl;
       
       // save stops and stop indexes to binary cache file:
-      CacheFetcher::saveToCacheFile(applicationShortname, stops, "stops");
-      CacheFetcher::saveToCacheFile(applicationShortname, stopIndexesById, "stop_indexes");
+      std::cout << "Saving stops to cache..." << std::endl;
+      CacheFetcher::saveToCapnpCacheFile(applicationShortname, capnpStopsCollectionMessage, "stops");
       
     } else {
       std::cerr << "Can't open database" << std::endl;
@@ -100,6 +114,8 @@ namespace TrRouting
   const std::pair<std::vector<Route>, std::map<unsigned long long, int>> DatabaseFetcher::getRoutes(std::string applicationShortname)
   {
     std::vector<Route> routes;
+    ::capnp::MallocMessageBuilder capnpRoutesCollectionMessage;
+    routesCollection::RoutesCollection::Builder capnpRoutesCollection = capnpRoutesCollectionMessage.initRoot<routesCollection::RoutesCollection>();
     std::map<unsigned long long, int> routeIndexesById;
     
     openConnection();
@@ -121,6 +137,9 @@ namespace TrRouting
       unsigned long long resultCount = pgResult.size();
       unsigned long long i = 0;
       
+      ::capnp::List<routesCollection::Route>::Builder capnpRoutes = capnpRoutesCollection.initRoutes(resultCount);
+
+
       // set cout number of decimals to 2 for displaying progress percentage:
       std::cout << std::fixed;
       std::cout << std::setprecision(2);
@@ -128,7 +147,9 @@ namespace TrRouting
       for (pqxx::result::const_iterator c = pgResult.begin(); c != pgResult.end(); ++c) {
         
         // create a new route for each row:
-        Route * route = new Route();
+        Route * route                               = new Route();
+        routesCollection::Route::Builder capnpRoute = capnpRoutes[i];
+
         // set route attributes from row:
         route->id                                  = c[0].as<unsigned long long>();
         route->agencyId                            = c[1].as<unsigned long long>();
@@ -138,7 +159,16 @@ namespace TrRouting
         route->shortname                           = c[5].as<std::string>();
         route->longname                            = c[6].as<std::string>();
         route->routeTypeName                       = c[7].as<std::string>();
-        
+
+        capnpRoute.setId(route->id);
+        capnpRoute.setAgencyId(route->agencyId);
+        capnpRoute.setRouteTypeId(route->routeTypeId);
+        capnpRoute.setAgencyAcronym(route->agencyAcronym);
+        capnpRoute.setAgencyName(route->agencyName);
+        capnpRoute.setShortname(route->shortname);
+        capnpRoute.setLongname(route->longname);
+        capnpRoute.setRouteTypeName(route->routeTypeName);
+
         // append route:
         routes.push_back(*route);
         routeIndexesById[route->id] = routes.size() - 1;
@@ -152,9 +182,9 @@ namespace TrRouting
       }
       std::cout << std::endl;
       
-      // save routes and stop indexes to binary cache file:
-      CacheFetcher::saveToCacheFile(applicationShortname, routes, "routes");
-      CacheFetcher::saveToCacheFile(applicationShortname, routeIndexesById, "route_indexes");
+      // save routes and route indexes to binary cache file:
+      std::cout << "Saving routes to cache..." << std::endl;
+      CacheFetcher::saveToCapnpCacheFile(applicationShortname, capnpRoutesCollectionMessage, "routes");
     
     } else {
       std::cout << "Can't open database" << std::endl;
@@ -167,8 +197,10 @@ namespace TrRouting
   const std::pair<std::vector<Trip>, std::map<unsigned long long, int>> DatabaseFetcher::getTrips(std::string applicationShortname)
   {
     std::vector<Trip> trips;
+    ::capnp::MallocMessageBuilder capnpTripsCollectionMessage;
+    tripsCollection::TripsCollection::Builder capnpTripsCollection = capnpTripsCollectionMessage.initRoot<tripsCollection::TripsCollection>();
     std::map<unsigned long long, int> tripIndexesById;
-    
+
     openConnection();
     
     std::cout << "Fetching trips from database..." << std::endl;
@@ -188,6 +220,8 @@ namespace TrRouting
       unsigned long long resultCount = pgResult.size();
       unsigned long long i = 0;
       
+      ::capnp::List<tripsCollection::Trip>::Builder capnpTrips = capnpTripsCollection.initTrips(resultCount);
+
       // set cout number of decimals to 2 for displaying progress percentage:
       std::cout << std::fixed;
       std::cout << std::setprecision(2);
@@ -196,6 +230,8 @@ namespace TrRouting
         
         // create a new trip for each row:
         Trip * trip = new Trip();
+        tripsCollection::Trip::Builder capnpTrip = capnpTrips[i];
+
         // set trip attributes from row:
         trip->id              = c[0].as<unsigned long long>();
         trip->routeId         = c[1].as<unsigned long long>();
@@ -203,7 +239,14 @@ namespace TrRouting
         trip->routeTypeId     = c[3].as<unsigned long long>();
         trip->agencyId        = c[4].as<unsigned long long>();
         trip->serviceId       = c[5].as<unsigned long long>();
-        
+
+        capnpTrip.setId(trip->id);
+        capnpTrip.setRouteId(trip->routeId);
+        capnpTrip.setRoutePathId(trip->routePathId);
+        capnpTrip.setRouteTypeId(trip->routeTypeId);
+        capnpTrip.setAgencyId(trip->agencyId);
+        capnpTrip.setServiceId(trip->serviceId);
+
         // append trip:
         trips.push_back(*trip);
         tripIndexesById[trip->id] = trips.size() - 1;
@@ -217,9 +260,9 @@ namespace TrRouting
       }
       std::cout << std::endl;
       
-      // save trips and stop indexes to binary cache file:
-      CacheFetcher::saveToCacheFile(applicationShortname, trips, "trips");
-      CacheFetcher::saveToCacheFile(applicationShortname, tripIndexesById, "trip_indexes");
+      // save trips and trip indexes to binary cache file:
+      std::cout << "Saving trips to cache..." << std::endl;
+      CacheFetcher::saveToCapnpCacheFile(applicationShortname, capnpTripsCollectionMessage, "trips");
     
     } else {
       std::cout << "Can't open database" << std::endl;
@@ -234,7 +277,10 @@ namespace TrRouting
   {
     std::vector<std::tuple<int,int,int,int,int,short,short,int>> forwardConnections;
     std::vector<std::tuple<int,int,int,int,int,short,short,int>> reverseConnections;
-    
+    ::capnp::MallocMessageBuilder capnpConnectionsCollectionMessage;
+    connectionsCollection::ConnectionsCollection::Builder capnpConnectionsCollection = capnpConnectionsCollectionMessage.initRoot<connectionsCollection::ConnectionsCollection>();
+    enum connectionIndexes : short { STOP_DEP = 0, STOP_ARR = 1, TIME_DEP = 2, TIME_ARR = 3, TRIP = 4, CAN_BOARD = 5, CAN_UNBOARD = 6, SEQUENCE = 7 };
+
     openConnection();
     
     std::cout << "Fetching connections from database..." << std::endl;
@@ -254,6 +300,9 @@ namespace TrRouting
       unsigned long long resultCount = pgResult.size();
       unsigned long long i = 0;
       
+      ::capnp::List<connectionsCollection::Connection>::Builder capnpForwardConnections = capnpConnectionsCollection.initForwardConnections(resultCount);
+      ::capnp::List<connectionsCollection::Connection>::Builder capnpReverseConnections = capnpConnectionsCollection.initReverseConnections(resultCount);
+
       // set cout number of decimals to 2 for displaying progress percentage:
       std::cout << std::fixed;
       std::cout << std::setprecision(2);
@@ -305,12 +354,40 @@ namespace TrRouting
         return false;
       });
 
-      // save connections to binary cache files:
-      std::cout << "Saving forward connections to cache..." << std::endl;
-      CacheFetcher::saveToCacheFile(applicationShortname, forwardConnections, "connections_forward");
-      std::cout << "Saving reverse connections to cache..." << std::endl;
-      CacheFetcher::saveToCacheFile(applicationShortname, reverseConnections, "connections_reverse");
-  
+      i = 0;
+      for(auto & connection : forwardConnections)
+      {
+        connectionsCollection::Connection::Builder capnpConnection = capnpForwardConnections[i];
+        capnpConnection.setStopDepIdx(std::get<connectionIndexes::STOP_DEP>   (connection));
+        capnpConnection.setStopArrIdx(std::get<connectionIndexes::STOP_ARR>   (connection));
+        capnpConnection.setTimeDep   (std::get<connectionIndexes::TIME_DEP>   (connection));
+        capnpConnection.setTimeArr   (std::get<connectionIndexes::TIME_ARR>   (connection));
+        capnpConnection.setTripIdx   (std::get<connectionIndexes::TRIP>       (connection));
+        capnpConnection.setCanBoard  (std::get<connectionIndexes::CAN_BOARD>  (connection));
+        capnpConnection.setCanUnboard(std::get<connectionIndexes::CAN_UNBOARD>(connection));
+        capnpConnection.setSequence  (std::get<connectionIndexes::SEQUENCE>   (connection));
+        i++;
+      }
+
+      i = 0;
+      for(auto & connection : reverseConnections)
+      {
+        connectionsCollection::Connection::Builder capnpConnection = capnpReverseConnections[i];
+        capnpConnection.setStopDepIdx(std::get<connectionIndexes::STOP_DEP>   (connection));
+        capnpConnection.setStopArrIdx(std::get<connectionIndexes::STOP_ARR>   (connection));
+        capnpConnection.setTimeDep   (std::get<connectionIndexes::TIME_DEP>   (connection));
+        capnpConnection.setTimeArr   (std::get<connectionIndexes::TIME_ARR>   (connection));
+        capnpConnection.setTripIdx   (std::get<connectionIndexes::TRIP>       (connection));
+        capnpConnection.setCanBoard  (std::get<connectionIndexes::CAN_BOARD>  (connection));
+        capnpConnection.setCanUnboard(std::get<connectionIndexes::CAN_UNBOARD>(connection));
+        capnpConnection.setSequence  (std::get<connectionIndexes::SEQUENCE>   (connection));
+        i++;
+      }
+
+      // save connections to binary cache file:
+      std::cout << "Saving connections to cache..." << std::endl;
+      CacheFetcher::saveToCapnpCacheFile(applicationShortname, capnpConnectionsCollectionMessage, "connections");
+      
     } else {
       std::cout << "Can't open database" << std::endl;
     }
@@ -319,15 +396,8 @@ namespace TrRouting
     
   }
   
-  const std::pair<std::vector<std::tuple<int,int,int>>, std::vector<std::pair<int,int>>> DatabaseFetcher::getFootpaths(std::string applicationShortname, std::map<unsigned long long, int> stopIndexesById)
+  const std::pair<std::vector<std::tuple<int,int,int>>, std::vector<std::pair<long long, long long>>> DatabaseFetcher::getFootpaths(std::string applicationShortname, std::map<unsigned long long, int> stopIndexesById)
   {
-    std::vector<std::tuple<int,int,int>> footpaths;
-    std::vector<std::pair<int,int>>      footpathsRanges(stopIndexesById.size());
-    
-    for (auto & stop : stopIndexesById)
-    {
-      footpathsRanges[stop.second] = std::make_pair(-1, -1);
-    }
     
     openConnection();
     
@@ -343,7 +413,7 @@ namespace TrRouting
       "ORDER BY stop_1_id, MAX(CEIL(COALESCE(network_walking_duration_seconds::float, network_distance::float/1.38, distance::float/1.38))) ";
     
     std::cout << sqlQuery << std::endl;
-    
+
     if (isConnectionOpen())
     {
       
@@ -351,24 +421,52 @@ namespace TrRouting
       pqxx::result pgResult( pgNonTransaction.exec( sqlQuery ));
       unsigned long long resultCount = pgResult.size();
       unsigned long long i = 1;
-      
+
+      std::vector<std::tuple<int,int,int>> footpaths(resultCount);
+      std::vector<std::pair<long long, long long>> footpathsRanges(stopIndexesById.size());
+      ::capnp::MallocMessageBuilder capnpFootpathsCollectionMessage;
+      footpathsCollection::FootpathsCollection::Builder capnpFootpathsCollection     = capnpFootpathsCollectionMessage.initRoot<footpathsCollection::FootpathsCollection>();
+      ::capnp::List<footpathsCollection::FootpathRange>::Builder capnpFootpathRanges = capnpFootpathsCollection.initFootpathRanges(stopIndexesById.size());
+      ::capnp::List<footpathsCollection::Footpath>::Builder capnpFootpaths           = capnpFootpathsCollection.initFootpaths(resultCount);
+
+      for (auto & stop : stopIndexesById)
+      {
+        footpathsRanges[stop.second] = std::make_pair(-1, -1);
+        footpathsCollection::FootpathRange::Builder capnpFootpathRange = capnpFootpathRanges[stop.second];
+        capnpFootpathRange.setFootpathsStartIdx(-1);
+        capnpFootpathRange.setFootpathsEndIdx(-1);
+      }
+
       std::cout << std::fixed;
       std::cout << std::setprecision(2);
       int stop1Index              = -1;
+      int stop2Index              = -1;
+      int travelTimeSeconds       = -1;
       int footpathIndex           = -1;
       
       for (pqxx::result::const_iterator c = pgResult.begin(); c != pgResult.end(); ++c) {
         
-        stop1Index = stopIndexesById[c[0].as<unsigned long long>()];
-        footpaths.push_back(std::make_tuple(stop1Index, stopIndexesById[c[1].as<unsigned long long>()], c[2].as<int>()));
-        footpathIndex = footpaths.size() - 1;
-                
+        footpathsCollection::Footpath::Builder capnpFootpath = capnpFootpaths[i];
+        stop1Index                                           = stopIndexesById[c[0].as<unsigned long long>()];
+        stop2Index                                           = stopIndexesById[c[1].as<unsigned long long>()];
+        travelTimeSeconds                                    = c[2].as<int>();
+
+        capnpFootpath.setStop1Idx(stop1Index);
+        capnpFootpath.setStop2Idx(stop2Index);
+        capnpFootpath.setTravelTime(travelTimeSeconds);
+
+        footpaths[i] = std::make_tuple(stop1Index, stop2Index, travelTimeSeconds);
+        
         if (footpathsRanges[stop1Index].first == -1)
         {
-          footpathsRanges[stop1Index].first = footpathIndex;
+          footpathsRanges[stop1Index].first = i;
         }
-        footpathsRanges[stop1Index].second = footpathIndex;
+        footpathsRanges[stop1Index].second = i;
         
+        //footpathsCollection::FootpathRange::Builder capnpFootpathRange = capnpFootpathRanges[stop1Index];
+        capnpFootpathRanges[stop1Index].setFootpathsStartIdx(footpathsRanges[stop1Index].first);
+        capnpFootpathRanges[stop1Index].setFootpathsEndIdx(footpathsRanges[stop1Index].second);
+
         if (i % 1000 == 0)
         {
           std::cout << ((((double) i) / resultCount) * 100) << "%\r";
@@ -379,68 +477,77 @@ namespace TrRouting
       std::cout << std::endl;
       
       std::cout << "Saving footpaths to cache..." << std::endl;
-      CacheFetcher::saveToCacheFile(applicationShortname, footpaths, "footpaths");
-      std::cout << "Saving footpaths_ranges to cache..." << std::endl;
-      CacheFetcher::saveToCacheFile(applicationShortname, footpathsRanges, "footpaths_ranges");
-      
+      CacheFetcher::saveToCapnpCacheFile(applicationShortname, capnpFootpathsCollectionMessage, "footpaths");
+
+      return std::make_pair(footpaths, footpathsRanges);
+
     } else {
       std::cout << "Can't open database" << std::endl;
+      std::vector<std::tuple<int,int,int>> footpaths;
+      std::vector<std::pair<long long, long long>> footpathsRanges(stopIndexesById.size());
+      return std::make_pair(footpaths, footpathsRanges);
     }
     
-    return std::make_pair(footpaths, footpathsRanges);
   }
   
-  const std::pair<std::vector<OdTrip>, std::map<unsigned long long, int>> DatabaseFetcher::getOdTrips(std::string applicationShortname, std::vector<Stop> stops, Parameters& params)
+  const std::tuple<std::vector<OdTrip>, std::map<unsigned long long,int>, std::vector<std::pair<int,int>>> DatabaseFetcher::getOdTrips(std::string applicationShortname, std::vector<Stop> stops, Parameters& params)
   {
     
     std::vector<OdTrip> odTrips;
+    ::capnp::MallocMessageBuilder capnpOdTripsCollectionMessage;
+    odTripsCollection::OdTripsCollection::Builder capnpOdTripsCollection = capnpOdTripsCollectionMessage.initRoot<odTripsCollection::OdTripsCollection>();
     std::map<unsigned long long, int> odTripIndexesById;
     
+    std::vector<std::pair<int,int>> footpaths;
+    ::capnp::MallocMessageBuilder capnpOdTripFootpathsCollectionMessage;
+    odTripFootpathsCollection::OdTripFootpathsCollection::Builder capnpOdTripFootpathsCollection = capnpOdTripFootpathsCollectionMessage.initRoot<odTripFootpathsCollection::OdTripFootpathsCollection>();
+    //std::vector<std::pair<long long, long long>> originFootpathsRanges(odTrips.size());
+    //std::vector<std::pair<long long, long long>> destinationFootpathsRanges(odTrips.size());
+    std::map<std::string,std::pair<long long,long long>> originFootpathsRangesByPoint;
+    std::map<std::string,std::pair<long long,long long>> destinationFootpathsRangesByPoint;
+
     // fetch existing so we can append:
-    std::tie(odTrips, odTripIndexesById) = params.cacheFetcher->getOdTrips(params.applicationShortname, stops, params);
+    //if (!params.updateOdTrips)
+    //{
+    //std::tie(odTrips, odTripIndexesById) = params.cacheFetcher->getOdTrips(params.applicationShortname, stops, params);
+    //}
     
     openConnection();
     
     std::cout << "Fetching od trips from database..." << std::endl;
     
     // query for connections:
-    std::string sqlQuery = "SELECT id, user_interview_id, household_interview_id, COALESCE(age,-1), origin_lat, origin_lon, destination_lat, destination_lon, COALESCE(age_group_sn, 'unknown'), COALESCE(occupation_sn, 'unknown'), COALESCE(activity_sn, 'unknown'),  COALESCE(gender_sn, 'unknown'), COALESCE(mode_sn, 'unknown'), start_at_seconds, COALESCE(expansion_factor,1), COALESCE(walking_travel_time_seconds,-1), COALESCE(cycling_travel_time_seconds,-1), COALESCE(driving_travel_time_seconds,-1) FROM " + applicationShortname + ".tr_od_trips WHERE origin_geography IS NOT NULL AND destination_geography IS NOT NULL AND start_at_seconds >= 0 AND user_interview_id iS NOT NULL AND household_interview_id IS NOT NULL ORDER BY id";
-    
+    std::string sqlQuery = "SELECT id, user_interview_id, household_interview_id, COALESCE(age,-1), origin_lat, origin_lon, destination_lat, destination_lon, COALESCE(age_group_sn, 'unknown'), COALESCE(occupation_sn, 'unknown'), COALESCE(activity_sn, 'unknown'),  COALESCE(gender_sn, 'unknown'), COALESCE(mode_sn, 'unknown'), start_at_seconds, COALESCE(expansion_factor,1), COALESCE(walking_travel_time_seconds,-1), COALESCE(cycling_travel_time_seconds,-1), COALESCE(driving_travel_time_seconds,-1), ST_Y(home_geography::geometry), ST_X(home_geography::geometry), '-', COALESCE(end_at_seconds, -1) FROM " + applicationShortname + ".tr_od_trips WHERE origin_geography IS NOT NULL AND destination_geography IS NOT NULL AND start_at_seconds >= 0 AND user_interview_id iS NOT NULL AND household_interview_id IS NOT NULL ORDER BY id";
     std::cout << sqlQuery << std::endl;
-    
     if (isConnectionOpen())
     {
-      
       pqxx::nontransaction pgNonTransaction(*(getConnectionPtr()));
       pqxx::result pgResult( pgNonTransaction.exec( sqlQuery ));
       unsigned long long resultCount = pgResult.size();
       unsigned long long i = 0;
-      
+
+      ::capnp::List<odTripsCollection::OdTrip>::Builder capnpOdTrips = capnpOdTripsCollection.initOdTrips(resultCount);
+
       // set cout number of decimals to 2 for displaying progress percentage:
       std::cout << std::fixed;
       std::cout << std::setprecision(2);
-      
       unsigned long long odTripId;
-      
       for (pqxx::result::const_iterator c = pgResult.begin(); c != pgResult.end(); ++c) {
         
         // set trip attributes from row:
         odTripId = c[0].as<unsigned long long>();
         
-        if (odTripIndexesById.find(odTripId) != odTripIndexesById.end()) // ignore if already saved
-        {
-          i++;
-          continue;
-        }
-        
         // create a new trip for each row:
-        OdTrip * odTrip      = new OdTrip();
-        Point  * origin      = new Point();
-        Point  * destination = new Point();
-        
+        OdTrip * odTrip       = new OdTrip();
+        Point  * origin       = new Point();
+        Point  * destination  = new Point();
+        Point  * homeLocation = new Point();
+        odTripsCollection::OdTrip::Builder capnpOdTrip = capnpOdTrips[i];
+
         odTrip->id                       = odTripId;
         odTrip->origin                   = *origin;
         odTrip->destination              = *destination;
+        odTrip->homeLocation             = *homeLocation;
         odTrip->personId                 = c[1 ].as<unsigned long long>();
         odTrip->householdId              = c[2 ].as<unsigned long long>();
         odTrip->age                      = c[3 ].as<int>();
@@ -448,47 +555,137 @@ namespace TrRouting
         odTrip->origin.longitude         = c[5 ].as<double>();
         odTrip->destination.latitude     = c[6 ].as<double>();
         odTrip->destination.longitude    = c[7 ].as<double>();
+        odTrip->homeLocation.latitude    = c[18].as<double>();
+        odTrip->homeLocation.longitude   = c[19].as<double>();
         odTrip->ageGroup                 = c[8 ].as<std::string>();
         odTrip->occupation               = c[9 ].as<std::string>();
-        odTrip->activity                 = c[10].as<std::string>();
+        odTrip->originActivity           = c[20].as<std::string>();
+        odTrip->destinationActivity      = c[10].as<std::string>();
         odTrip->gender                   = c[11].as<std::string>();
         odTrip->mode                     = c[12].as<std::string>();
         odTrip->departureTimeSeconds     = c[13].as<int>();
+        odTrip->arrivalTimeSeconds       = c[21].as<int>();
         odTrip->expansionFactor          = c[14].as<float>();
         odTrip->walkingTravelTimeSeconds = c[15].as<int>();
         odTrip->cyclingTravelTimeSeconds = c[16].as<int>();
         odTrip->drivingTravelTimeSeconds = c[17].as<int>();
         
-        odTrip->accessFootpaths = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(odTrip->origin,      stops, "walking", 1200, params.walkingSpeedMetersPerSecond, params.osrmRoutingWalkingHost, params.osrmRoutingWalkingPort);
-        odTrip->egressFootpaths = OsrmFetcher::getAccessibleStopsFootpathsFromPoint(odTrip->destination, stops, "walking", 1200, params.walkingSpeedMetersPerSecond, params.osrmRoutingWalkingHost, params.osrmRoutingWalkingPort);
+        capnpOdTrip.setId(odTripId);
+        capnpOdTrip.setOriginLatitude(odTrip->origin.latitude);
+        capnpOdTrip.setOriginLongitude(odTrip->origin.longitude);
+        capnpOdTrip.setDestinationLatitude(odTrip->destination.latitude);
+        capnpOdTrip.setDestinationLongitude(odTrip->destination.longitude);
+        capnpOdTrip.setHomeLatitude(odTrip->homeLocation.latitude);
+        capnpOdTrip.setHomeLongitude(odTrip->homeLocation.longitude);
+        capnpOdTrip.setPersonId(odTrip->personId);
+        capnpOdTrip.setHouseholdId(odTrip->householdId);
+        capnpOdTrip.setAge(odTrip->age);
+        capnpOdTrip.setAgeGroup(odTrip->ageGroup);
+        capnpOdTrip.setOccupation(odTrip->occupation);
+        capnpOdTrip.setOriginActivity(odTrip->originActivity);
+        capnpOdTrip.setDestinationActivity(odTrip->destinationActivity);
+        capnpOdTrip.setGender(odTrip->gender);
+        capnpOdTrip.setMode(odTrip->mode);
+        capnpOdTrip.setDepartureTimeSeconds(odTrip->departureTimeSeconds);
+        capnpOdTrip.setArrivalTimeSeconds(odTrip->arrivalTimeSeconds);
+        capnpOdTrip.setExpansionFactor(odTrip->expansionFactor);
+        capnpOdTrip.setWalkingTravelTimeSeconds(odTrip->walkingTravelTimeSeconds);
+        capnpOdTrip.setCyclingTravelTimeSeconds(odTrip->cyclingTravelTimeSeconds);
+        capnpOdTrip.setDrivingTravelTimeSeconds(odTrip->drivingTravelTimeSeconds);
+
+        std::string originPointStr     {std::to_string(round(odTrip->origin.latitude      * 10000.0)/10000.0) + ',' + std::to_string(round(odTrip->origin.longitude      * 10000.0)/10000.0)};
+        std::string destinationPointStr{std::to_string(round(odTrip->destination.latitude * 10000.0)/10000.0) + ',' + std::to_string(round(odTrip->destination.longitude * 10000.0)/10000.0)};
+                
+        if (originFootpathsRangesByPoint.find(originPointStr) == originFootpathsRangesByPoint.end())
+        {
+          std::vector<std::pair<int,int>> originFootpaths{OsrmFetcher::getAccessibleStopsFootpathsFromPoint(odTrip->origin, stops, "walking", params)};
+          long long originStartIndex{(long long)footpaths.size()};
+          long long originEndIndex{originStartIndex - 1};
+          for (auto & footpath : originFootpaths)
+          {
+            footpaths.push_back(footpath);
+            originEndIndex++;
+          }
+          if (originEndIndex >= originStartIndex)
+          {
+            originFootpathsRangesByPoint[originPointStr] = std::make_pair(originStartIndex, originEndIndex);
+          }
+          else
+          {
+            originFootpathsRangesByPoint[originPointStr] = std::make_pair(-1, -1);
+          }
+        }
         
-        // append trip:
+        if (destinationFootpathsRangesByPoint.find(destinationPointStr) == destinationFootpathsRangesByPoint.end())
+        {
+          std::vector<std::pair<int,int>> destinationFootpaths{OsrmFetcher::getAccessibleStopsFootpathsFromPoint(odTrip->destination, stops, "walking", params, true)};
+          long long destinationStartIndex{(long long)footpaths.size()};
+          long long destinationEndIndex{destinationStartIndex - 1};
+          for (auto & footpath : destinationFootpaths)
+          {
+            footpaths.push_back(footpath);
+            destinationEndIndex++;
+          }
+          if (destinationEndIndex >= destinationStartIndex)
+          {
+            destinationFootpathsRangesByPoint[destinationPointStr] = std::make_pair(destinationStartIndex, destinationEndIndex);
+          }
+          else
+          {
+            destinationFootpathsRangesByPoint[destinationPointStr] = std::make_pair(-1, -1);
+          }
+        }
+                
+        long long originFootpathsStartIndex      {originFootpathsRangesByPoint[originPointStr].first};
+        long long originFootpathsEndIndex        {originFootpathsRangesByPoint[originPointStr].second};
+        long long destinationFootpathsStartIndex {destinationFootpathsRangesByPoint[destinationPointStr].first};
+        long long destinationFootpathsEndIndex   {destinationFootpathsRangesByPoint[destinationPointStr].second};
+
+        odTrip->accessFootpathsStartIndex = originFootpathsStartIndex;
+        odTrip->accessFootpathsEndIndex   = originFootpathsEndIndex;
+        odTrip->egressFootpathsStartIndex = destinationFootpathsStartIndex;
+        odTrip->egressFootpathsEndIndex   = destinationFootpathsEndIndex;
+
+        capnpOdTrip.setAccessFootpathsStartIdx(odTrip->accessFootpathsStartIndex);
+        capnpOdTrip.setAccessFootpathsEndIdx(odTrip->accessFootpathsEndIndex);
+        capnpOdTrip.setEgressFootpathsStartIdx(odTrip->egressFootpathsStartIndex);
+        capnpOdTrip.setEgressFootpathsEndIdx(odTrip->egressFootpathsEndIndex);
+
+        // append od trip:
         odTrips.push_back(*odTrip);
         odTripIndexesById[odTrip->id] = odTrips.size() - 1;
-        
-        // show loading progress in percentage:
+
         i++;
         if (i % 10 == 0)
         {
           std::cerr << ((((double) i) / resultCount) * 100) << "% (" << i << "/" << resultCount << ")             \r"; // \r is used to stay on the same line
         }
-        if (i % 5000 == 0)
-        {
-          CacheFetcher::saveToCacheFile(applicationShortname, odTrips, "od_trips");
-          CacheFetcher::saveToCacheFile(applicationShortname, odTripIndexesById, "od_trip_indexes");
-        }
       }
+
       std::cerr << std::endl;
-      
-      // save trips and stop indexes to binary cache file:
-      CacheFetcher::saveToCacheFile(applicationShortname, odTrips, "od_trips");
-      CacheFetcher::saveToCacheFile(applicationShortname, odTripIndexesById, "od_trip_indexes");
-    
+
+      ::capnp::List<odTripFootpathsCollection::OdTripFootpath>::Builder capnpOdTripFootpaths = capnpOdTripFootpathsCollection.initOdTripFootpaths(footpaths.size());
+
+      i = 0;
+      for (auto footpath : footpaths)
+      {
+        odTripFootpathsCollection::OdTripFootpath::Builder capnpOdTripFootpath = capnpOdTripFootpaths[i];
+        capnpOdTripFootpath.setStopIdx(footpath.first);
+        capnpOdTripFootpath.setTravelTime(footpath.second);
+        i++;
+      }
+
+      // save od trips and od trip indexes to binary cache file:
+      std::cout << "Saving od trips to cache..." << std::endl;
+      CacheFetcher::saveToCapnpCacheFile(applicationShortname, capnpOdTripsCollectionMessage, "od_trips");
+      std::cout << "Saving od trips footpaths to cache..." << std::endl;
+      CacheFetcher::saveToCapnpCacheFile(applicationShortname, capnpOdTripFootpathsCollectionMessage, "od_trip_footpaths");
+
     } else {
       std::cerr << "Can't open database" << std::endl;
     }
     
-    return std::make_pair(odTrips, odTripIndexesById);
+    return std::make_tuple(odTrips, odTripIndexesById, footpaths);
     
   }
   

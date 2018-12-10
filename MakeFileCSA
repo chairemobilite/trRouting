@@ -1,34 +1,42 @@
-# required libraries: yaml-cpp, boost
+# required libraries: boost, capnproto, libosrm
 
 OS := $(shell uname)
 CC = clang++
 LOCAL_CPP_FILES := $(wildcard src/*.cpp)
 SPECIFIC_CPP_FILES := $(wildcard connection_scan_algorithm/src/*.cpp)
+SPECIFIC_CAPNP_C++_FILES := $(wildcard include/capnp/*.c++)
 LOCAL_OBJS = $(addprefix obj/,$(notdir $(LOCAL_CPP_FILES:.cpp=.o)))
 SPECIFIC_OBJS = $(addprefix connection_scan_algorithm/obj/,$(notdir $(SPECIFIC_CPP_FILES:.cpp=.o)))
-LDFLAGS  := -I/usr/local/include -Iinclude -Iconnection_scan_algorithm/include -L/usr/local/lib -lpqxx -lpq -lyaml-cpp -lcurses
+CAPNP_OBJS = $(addprefix include/capnp/obj/,$(notdir $(SPECIFIC_CAPNP_C++_FILES:.c++=.o)))
+
+#LDFLAGS  := -DBOOST_TEST_DYN_LINK -DBOOST_SPIRIT_USE_PHOENIX_V3 -DBOOST_RESULT_OF_USE_DECLTYPE -DBOOST_FILESYSTEM_NO_DEPRECATED -I/usr/local/include -Iinclude -Iconnection_scan_algorithm/include -I/usr/local/Cellar/osrm-backend/5.18.0/include -I/usr/local/Cellar/osrm-backend/5.18.0/include/osrm -L/usr/local/lib -losrm /usr/local/lib/libboost_regex-mt.dylib /usr/local/lib/libboost_date_time-mt.dylib /usr/local/lib/libboost_chrono-mt.dylib /usr/local/lib/libboost_filesystem-mt.dylib /usr/local/lib/libboost_iostreams-mt.dylib /usr/local/lib/libboost_thread-mt.dylib /usr/local/lib/libboost_system-mt.dylib /usr/local/lib/libtbb.dylib /usr/local/lib/libtbbmalloc.dylib /usr/lib/libz.dylib -lpqxx -lpq -lcurses -lcapnp -lkj
+LDFLAGS  := -I/usr/local/include -Iinclude -Iconnection_scan_algorithm/include -I/usr/local/Cellar/osrm-backend/5.18.0/include -I/usr/local/Cellar/osrm-backend/5.18.0/include/osrm
 
 ifeq ($(OS),Darwin) 
 	# macox
-	CXXFLAGS += -std=c++11 -stdlib=libc++
-	LINKFLAGS = -lboost_thread-mt -lboost_serialization -lboost_system -lboost_filesystem -lboost_regex -lboost_program_options
+	CXXFLAGS += -std=c++14 -stdlib=libc++
+	#LINKFLAGS = -lboost_thread-mt -lboost_serialization -lboost_system -lboost_filesystem -lboost_regex -lboost_program_options
+	LINKFLAGS = -L/usr/local/lib -lboost_iostreams -losrm -lpqxx -lpq -lcurses -lcapnp -lkj -lboost_thread-mt -lboost_serialization -lboost_system -lboost_filesystem -lboost_regex -lboost_program_options
 else
 	# linux or other (only linux ubuntu and debian are supported right now)
 	CXXFLAGS += -std=c++14 -stdlib=libstdc++
-	LINKFLAGS = -pthread -lboost_thread -lboost_serialization -lboost_system -lboost_filesystem -lboost_regex -lboost_program_options
+	LINKFLAGS = -L/usr/local/lib -losrm -lpqxx -lpq -lcurses -lcapnp -lkj -pthread -lboost_thread -lboost_serialization -lboost_system -lboost_filesystem -lboost_regex -lboost_program_options
 endif
 
 all: trRoutingCSA
 
-trRoutingCSA: $(LOCAL_OBJS) $(SPECIFIC_OBJS)
+trRoutingCSA: $(LOCAL_OBJS) $(SPECIFIC_OBJS) $(PROTO_OBJS)
 	$(CC) $(CXXFLAGS) $(LDFLAGS) $(LINKFLAGS) $^ -O3 -o $@
-	
+
+include/capnp/obj/%.o: include/capnp/%.c++
+	$(CC) $(CXXFLAGS) $(LDFLAGS) -O3 -c -o $@ $<
+
 obj/%.o: src/%.cpp
-	$(CC) $(CXXFLAGS) $(LDFLAGS) $(LINKFLAGS) -O3 -c -o $@ $<
+	$(CC) $(CXXFLAGS) $(LDFLAGS) -O3 -c -o $@ $<
 
 connection_scan_algorithm/obj/%.o: connection_scan_algorithm/src/%.cpp
-	$(CC) $(CXXFLAGS) $(LDFLAGS) $(LINKFLAGS) -O3 -c -o $@ $<
+	$(CC) $(CXXFLAGS) $(LDFLAGS) -O3 -c -o $@ $<
 
 clean:
-	-rm connection_scan_algorithm/obj/*.o obj/*.o trRoutingCSA
+	-rm connection_scan_algorithm/obj/*.o obj/*.o include/capnp/obj/*.o trRoutingCSA
 

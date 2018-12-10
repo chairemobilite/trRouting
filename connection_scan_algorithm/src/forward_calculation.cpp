@@ -16,9 +16,9 @@ namespace TrRouting
     int  stopArrivalTentativeTime {MAX_INT};
     int  connectionDepartureTime {-1};
     int  connectionArrivalTime {-1};
-    int  footpathsRangeStart {-1};
-    int  footpathsRangeEnd {-1};
-    int  footpathIndex {-1};
+    long long  footpathsRangeStart {-1};
+    long long  footpathsRangeEnd {-1};
+    long long  footpathIndex {-1};
     int  footpathStopArrivalIndex {-1};
     int  footpathTravelTime {-1};
     int  tentativeEgressStopArrivalTime {MAX_INT};

@@ -1,0 +1,3 @@
+# call from trRouting root directory:
+
+cd include/capnp && for f in *.capnp; do capnp compile -oc++ $f; done && cd ../..

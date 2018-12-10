@@ -12,6 +12,7 @@
 #include <boost/tokenizer.hpp>
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/replace.hpp>
 
 #include <vector>
 #include <algorithm>
@@ -21,6 +22,10 @@
 #include <iterator>
 #include <curses.h>
 #include <locale>
+
+#include <osrm/osrm.hpp>
+#include <osrm/engine_config.hpp>
+#include <osrm/table_parameters.hpp>
 
 #include "toolbox.hpp"
 #include "database_fetcher.hpp"
@@ -87,6 +92,12 @@ int main(int argc, char** argv) {
   optionsDesc.add_options() 
       ("osrmWalkPort",     boost::program_options::value<std::string>(), "osrm walking port");
   optionsDesc.add_options() 
+      ("osrmFilePath",     boost::program_options::value<std::string>(), "osrm file path (PATH_TO_ROUTING_FILE.osrm)");
+  optionsDesc.add_options() 
+      ("osrmUseLib",       boost::program_options::value<std::string>(), "osrm use libosrm instead of server (1 or 0)");
+  optionsDesc.add_options() 
+      ("odTripsFootpathsMaxTravelTimeMinutes", boost::program_options::value<int>(), "max travel time to use when fetching od_trips footpaths to access and egress stops");
+  optionsDesc.add_options() 
       ("databaseUser",     boost::program_options::value<std::string>(), "database user");
   optionsDesc.add_options() 
       ("databaseName",     boost::program_options::value<std::string>(), "database name");
@@ -129,6 +140,20 @@ int main(int argc, char** argv) {
   {
     algorithmParams.osrmRoutingWalkingPort = variablesMap["osrmWalkPort"].as<std::string>();
   }
+  if(variablesMap.count("osrmFilePath") == 1)
+  {
+    algorithmParams.osrmFilePath = variablesMap["osrmFilePath"].as<std::string>();
+  }
+  if(variablesMap.count("osrmUseLib") == 1)
+  {
+    algorithmParams.osrmUseLib = (variablesMap["osrmUseLib"].as<std::string>() == "1") ? true : false;
+  }
+  if(variablesMap.count("odTripsFootpathsMaxTravelTimeMinutes") == 1)
+  {
+    algorithmParams.maxAccessWalkingTravelTimeSeconds = variablesMap["odTripsFootpathsMaxTravelTimeMinutes"].as<int>() * 60;
+    algorithmParams.maxEgressWalkingTravelTimeSeconds = algorithmParams.maxAccessWalkingTravelTimeSeconds;
+    std::cerr << "Max access/egress travel time seconds: " << algorithmParams.maxAccessWalkingTravelTimeSeconds << std::endl;
+  }
   if(variablesMap.count("databasePort") == 1)
   {
     algorithmParams.databasePort = variablesMap["databasePort"].as<std::string>();
@@ -151,7 +176,7 @@ int main(int argc, char** argv) {
   }
   if(variablesMap.count("updateOdTrips") == 1)
   {
-    algorithmParams.updateOdTrips = variablesMap["updateOdTrips"].as<int>();
+    algorithmParams.updateOdTrips = (variablesMap["updateOdTrips"].as<std::string>() == "1") ? true : false;
   }
   
   
@@ -187,7 +212,6 @@ int main(int argc, char** argv) {
   std::cout << "Starting transit routing for the application: ";
   std::cout << consoleGreen + dataShortname + consoleResetColor << std::endl << std::endl;
   
-  Calculator  calculator;
   algorithmParams.applicationShortname = dataShortname;
   algorithmParams.dataFetcherShortname = dataFetcherStr;
   
@@ -199,6 +223,13 @@ int main(int argc, char** argv) {
   }
   else
   {
+    try { 
+      databaseFetcher = DatabaseFetcher("dbname=" + algorithmParams.databaseName + " user=" + algorithmParams.databaseUser + " hostaddr=" + algorithmParams.databaseHost + " port=" + algorithmParams.databasePort + "");
+    } 
+    catch (const std::exception& e)
+    {
+      // is updateOdTrips is true, this will fail since connection to the database is not possible...
+    }
     algorithmParams.databaseFetcher = &databaseFetcher;
   }
   GtfsFetcher gtfsFetcher         = GtfsFetcher();
@@ -208,7 +239,7 @@ int main(int argc, char** argv) {
   CacheFetcher cacheFetcher       = CacheFetcher();
   algorithmParams.cacheFetcher    = &cacheFetcher;
   
-  calculator = Calculator(algorithmParams);
+  Calculator calculator(algorithmParams);
   int i = 0;
   
   /////////
@@ -464,6 +495,10 @@ int main(int argc, char** argv) {
           for(std::string odTripsAgeGroup : odTripsAgeGroupsVector)
           {
             odTripsAgeGroups.push_back(odTripsAgeGroup);
+            if (odTripsAgeGroup.find("plus") != std::string::npos) // replace plus by + (+ cannot be used in query string)
+            {
+              odTripsAgeGroups.push_back(boost::replace_all_copy(odTripsAgeGroup, "plus","+"));
+            }
           }
           //calculator.params.odTripsAgeGroups = odTripsAgeGroups;
         }
@@ -1034,11 +1069,11 @@ int main(int argc, char** argv) {
           atLeastOneCompatiblePeriod = false;
           
           // verify that od trip matches selected attributes:
-          if ( (odTripsAgeGroups.size()   > 0 && std::find(odTripsAgeGroups.begin(), odTripsAgeGroups.end(), odTrip.ageGroup)       == odTripsAgeGroups.end()) 
-            || (odTripsGenders.size()     > 0 && std::find(odTripsGenders.begin(), odTripsGenders.end(), odTrip.gender)             == odTripsGenders.end())
-            || (odTripsOccupations.size() > 0 && std::find(odTripsOccupations.begin(), odTripsOccupations.end(), odTrip.occupation) == odTripsOccupations.end())
-            || (odTripsActivities.size()  > 0 && std::find(odTripsActivities.begin(), odTripsActivities.end(), odTrip.activity)     == odTripsActivities.end())
-            || (odTripsModes.size()       > 0 && std::find(odTripsModes.begin(), odTripsModes.end(), odTrip.mode)                   == odTripsModes.end())
+          if ( (odTripsAgeGroups.size()   > 0 && std::find(odTripsAgeGroups.begin(), odTripsAgeGroups.end(), odTrip.ageGroup)              == odTripsAgeGroups.end()) 
+            || (odTripsGenders.size()     > 0 && std::find(odTripsGenders.begin(), odTripsGenders.end(), odTrip.gender)                    == odTripsGenders.end())
+            || (odTripsOccupations.size() > 0 && std::find(odTripsOccupations.begin(), odTripsOccupations.end(), odTrip.occupation)        == odTripsOccupations.end())
+            || (odTripsActivities.size()  > 0 && std::find(odTripsActivities.begin(), odTripsActivities.end(), odTrip.destinationActivity) == odTripsActivities.end())
+            || (odTripsModes.size()       > 0 && std::find(odTripsModes.begin(), odTripsModes.end(), odTrip.mode)                          == odTripsModes.end())
           )
           {
             attributesMatches = false;
@@ -1124,7 +1159,7 @@ int main(int argc, char** argv) {
                 ageGroup = odTrip.ageGroup;
                 std::replace( ageGroup.begin(), ageGroup.end(), '-', '_' ); // remove dash so Excel does not convert to age groups to numbers...
                 csv += std::to_string(odTrip.id) + ",\"" + routingResult.status + "\",\"" + ageGroup + "\",\"" + odTrip.gender + "\",\"" + odTrip.occupation + "\",\"";
-                csv += odTrip.activity + "\",\"" + odTrip.mode + "\"," + std::to_string(odTrip.expansionFactor) + "," + std::to_string(routingResult.travelTimeSeconds) + ",";
+                csv += odTrip.destinationActivity + "\",\"" + odTrip.mode + "\"," + std::to_string(odTrip.expansionFactor) + "," + std::to_string(routingResult.travelTimeSeconds) + ",";
                 csv += std::to_string(odTrip.walkingTravelTimeSeconds) + "," + std::to_string(odTrip.departureTimeSeconds) + "," + std::to_string(routingResult.departureTimeSeconds) + ",";
                 csv += std::to_string(routingResult.arrivalTimeSeconds) + "," + std::to_string(routingResult.numberOfTransfers) + "," + std::to_string(routingResult.inVehicleTravelTimeSeconds) + ",";
                 csv += std::to_string(routingResult.transferTravelTimeSeconds) + "," + std::to_string(routingResult.waitingTimeSeconds) + "," + std::to_string(routingResult.accessTravelTimeSeconds) + ",";
@@ -1207,7 +1242,7 @@ int main(int argc, char** argv) {
                 odTripJson["ageGroup"]                     = odTrip.ageGroup;
                 odTripJson["gender"]                       = odTrip.gender;
                 odTripJson["occupation"]                   = odTrip.occupation;
-                odTripJson["activity"]                     = odTrip.activity;
+                odTripJson["activity"]                     = odTrip.destinationActivity;
                 odTripJson["mode"]                         = odTrip.mode;
                 odTripJson["expansionFactor"]              = odTrip.expansionFactor;
                 odTripJson["travelTimeSeconds"]            = routingResult.travelTimeSeconds;

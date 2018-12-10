@@ -4,6 +4,7 @@
 /trRoutingConfig.yml
 /trRoutingTripBased
 /trRoutingTripBasedConfig.yml
+/osrm
 
 *.csv
 *.json
@@ -16,7 +17,12 @@ swift/trRouting/Package.resolved
 # Cache files
 *.cache
 *.pb
+*.capnpbin
 *.msgpack
+
+# osrm files
+*.osrm
+*.osrm.*
 
 # Compiled Object files
 *.slo

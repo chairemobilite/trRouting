@@ -32,10 +32,10 @@ namespace TrRouting
     
   }
   
-  const std::pair<std::vector<std::tuple<int,int,int>>, std::vector<std::pair<int,int>>> GtfsFetcher::getFootpaths(std::string applicationShortname, std::map<unsigned long long, int> stopIndexesById)
+  const std::pair<std::vector<std::tuple<int,int,int>>, std::vector<std::pair<long long,long long>>> GtfsFetcher::getFootpaths(std::string applicationShortname, std::map<unsigned long long, int> stopIndexesById)
   {
     std::vector<std::tuple<int,int,int>> footpaths;
-    std::vector<std::pair<int,int>>      footpathsRanges;
+    std::vector<std::pair<long long,long long>>      footpathsRanges;
     return std::make_pair(footpaths, footpathsRanges);
     
   }
