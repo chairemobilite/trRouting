@@ -812,7 +812,6 @@ int main(int argc, char** argv) {
         std::cout << "initialMaxTotalTravelTimeSeconds: " << calculator.params.maxTotalTravelTimeSeconds << std::endl;
         
         routingResult = calculator.calculate();
-        numAlternatives += 1;
         
         if (routingResult.status == "success")
         {
@@ -845,7 +844,7 @@ int main(int argc, char** argv) {
           alternativeJson["boardingStopIds"]              = routingResult.boardingStopIds;
           alternativeJson["unboardingStopIds"]            = routingResult.unboardingStopIds;
           alternativeJson["tripIds"]                      = routingResult.tripIds;
-          alternativeJson["alternativeSequence"]          = 1;
+          alternativeJson["alternativeSequence"]          = numAlternatives;
           json["alternatives"].push_back(alternativeJson);
           json["status"] = "success";
           departureTimeSeconds = routingResult.departureTimeSeconds + routingResult.firstWaitingTimeSeconds - calculator.params.minWaitingTimeSeconds;
