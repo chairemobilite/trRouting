@@ -5,6 +5,7 @@
 /trRoutingTripBased
 /trRoutingTripBasedConfig.yml
 /osrm
+/cache
 
 *.csv
 *.json
