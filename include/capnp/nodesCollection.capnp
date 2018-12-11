@@ -1,14 +1,14 @@
-@0xe4f4eb0e4c776b38;
+0xd68f205b1747bdab;
 
 using Cxx = import "/capnp/c++.capnp";
-$Cxx.namespace("stopsCollection");
+$Cxx.namespace("nodesCollection");
 
-struct StopsCollection {
-  stops @0 :List(Stop);
+struct NodesCollection {
+  nodes @0 :List(Node);
 }
 
-struct Stop {
-  id @0 :Int64;
+struct Node {
+  id @0 :Int32;
   uuid @1 :Text;
   code @2 :Text;
   name @3 :Text;
@@ -16,4 +16,3 @@ struct Stop {
   longitude @5 :Float32;
   stationId @6 :Int32;
 }
-
