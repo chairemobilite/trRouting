@@ -1,7 +1,11 @@
-@0xd68f205b1747bdab;
+@0xa099e4ab58cfbe39;
 
 using Cxx = import "/capnp/c++.capnp";
-$Cxx.namespace("node");
+$Cxx.namespace("nodesCollection");
+
+struct NodesCollection {
+  nodes @0 :List(Node);
+}
 
 struct Node {
   uuid @0 :Text;
@@ -11,6 +15,6 @@ struct Node {
   latitude @4 :Float32;
   longitude @5 :Float32;
   stationUuid @6 :Text;
-  transferableNodesIds @7 :List(Int64); # unique in the whole network, changed to indexes in collection
+  transferableNodesIdx @7 :List(Int32);  # unique in the whole network, from NodesCollection index
   transferableNodesTravelTimes @8 :List(Int32); # seconds
 }

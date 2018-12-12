@@ -45,7 +45,7 @@ struct Connection {
   class Pipeline;
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(e18cc97a6b614e9c, 4, 0)
+    CAPNP_DECLARE_STRUCT_HEADER(e18cc97a6b614e9c, 3, 0)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
     #endif  // !CAPNP_LITE
@@ -178,8 +178,6 @@ public:
 
   inline  ::int16_t getSequence() const;
 
-  inline  ::int16_t getLoad() const;
-
 private:
   ::capnp::_::StructReader _reader;
   template <typename, ::capnp::Kind>
@@ -231,9 +229,6 @@ public:
 
   inline  ::int16_t getSequence();
   inline void setSequence( ::int16_t value);
-
-  inline  ::int16_t getLoad();
-  inline void setLoad( ::int16_t value);
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -441,20 +436,6 @@ inline  ::int16_t Connection::Builder::getSequence() {
 inline void Connection::Builder::setSequence( ::int16_t value) {
   _builder.setDataField< ::int16_t>(
       ::capnp::bounded<11>() * ::capnp::ELEMENTS, value);
-}
-
-inline  ::int16_t Connection::Reader::getLoad() const {
-  return _reader.getDataField< ::int16_t>(
-      ::capnp::bounded<12>() * ::capnp::ELEMENTS);
-}
-
-inline  ::int16_t Connection::Builder::getLoad() {
-  return _builder.getDataField< ::int16_t>(
-      ::capnp::bounded<12>() * ::capnp::ELEMENTS);
-}
-inline void Connection::Builder::setLoad( ::int16_t value) {
-  _builder.setDataField< ::int16_t>(
-      ::capnp::bounded<12>() * ::capnp::ELEMENTS, value);
 }
 
 }  // namespace

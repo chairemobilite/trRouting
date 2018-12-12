@@ -9,13 +9,12 @@ struct ConnectionsCollection {
 }
 
 struct Connection {
-  nodeDepIdx @0 :Int32; # unique in the whole network
-  nodeArrIdx @1 :Int32; # unique in the whole network
-  timeDep @2 :Int32;
-  timeArr @3 :Int32;
-  tripIdx @4 :Int32; # unique in the whole network
+  nodeDepIdx @0 :Int32; # unique in the whole network, NodesCollection index
+  nodeArrIdx @1 :Int32; # unique in the whole network, NodesCollection index
+  timeDep @2 :Int32; # seconds after midnight
+  timeArr @3 :Int32; # seconds after midnight
+  tripIdx @4 :Int32; # unique in the whole network, TripsCollection index
   canBoard @5 :Int8;
   canUnboard @6 :Int8;
   sequence @7 :Int16;
-  load @8 :Int16; # how many passengers used this connection already (used for simulations)
 }
