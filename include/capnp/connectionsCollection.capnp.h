@@ -162,9 +162,9 @@ public:
   }
 #endif  // !CAPNP_LITE
 
-  inline  ::int32_t getStopDepIdx() const;
+  inline  ::int32_t getNodeDepIdx() const;
 
-  inline  ::int32_t getStopArrIdx() const;
+  inline  ::int32_t getNodeArrIdx() const;
 
   inline  ::int32_t getTimeDep() const;
 
@@ -176,7 +176,9 @@ public:
 
   inline  ::int8_t getCanUnboard() const;
 
-  inline  ::int32_t getSequence() const;
+  inline  ::int16_t getSequence() const;
+
+  inline  ::int16_t getLoad() const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -206,11 +208,11 @@ public:
   inline ::kj::StringTree toString() const { return asReader().toString(); }
 #endif  // !CAPNP_LITE
 
-  inline  ::int32_t getStopDepIdx();
-  inline void setStopDepIdx( ::int32_t value);
+  inline  ::int32_t getNodeDepIdx();
+  inline void setNodeDepIdx( ::int32_t value);
 
-  inline  ::int32_t getStopArrIdx();
-  inline void setStopArrIdx( ::int32_t value);
+  inline  ::int32_t getNodeArrIdx();
+  inline void setNodeArrIdx( ::int32_t value);
 
   inline  ::int32_t getTimeDep();
   inline void setTimeDep( ::int32_t value);
@@ -227,8 +229,11 @@ public:
   inline  ::int8_t getCanUnboard();
   inline void setCanUnboard( ::int8_t value);
 
-  inline  ::int32_t getSequence();
-  inline void setSequence( ::int32_t value);
+  inline  ::int16_t getSequence();
+  inline void setSequence( ::int16_t value);
+
+  inline  ::int16_t getLoad();
+  inline void setLoad( ::int16_t value);
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -326,30 +331,30 @@ inline ::capnp::Orphan< ::capnp::List< ::connectionsCollection::Connection,  ::c
       ::capnp::bounded<1>() * ::capnp::POINTERS));
 }
 
-inline  ::int32_t Connection::Reader::getStopDepIdx() const {
+inline  ::int32_t Connection::Reader::getNodeDepIdx() const {
   return _reader.getDataField< ::int32_t>(
       ::capnp::bounded<0>() * ::capnp::ELEMENTS);
 }
 
-inline  ::int32_t Connection::Builder::getStopDepIdx() {
+inline  ::int32_t Connection::Builder::getNodeDepIdx() {
   return _builder.getDataField< ::int32_t>(
       ::capnp::bounded<0>() * ::capnp::ELEMENTS);
 }
-inline void Connection::Builder::setStopDepIdx( ::int32_t value) {
+inline void Connection::Builder::setNodeDepIdx( ::int32_t value) {
   _builder.setDataField< ::int32_t>(
       ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
 }
 
-inline  ::int32_t Connection::Reader::getStopArrIdx() const {
+inline  ::int32_t Connection::Reader::getNodeArrIdx() const {
   return _reader.getDataField< ::int32_t>(
       ::capnp::bounded<1>() * ::capnp::ELEMENTS);
 }
 
-inline  ::int32_t Connection::Builder::getStopArrIdx() {
+inline  ::int32_t Connection::Builder::getNodeArrIdx() {
   return _builder.getDataField< ::int32_t>(
       ::capnp::bounded<1>() * ::capnp::ELEMENTS);
 }
-inline void Connection::Builder::setStopArrIdx( ::int32_t value) {
+inline void Connection::Builder::setNodeArrIdx( ::int32_t value) {
   _builder.setDataField< ::int32_t>(
       ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
 }
@@ -424,18 +429,32 @@ inline void Connection::Builder::setCanUnboard( ::int8_t value) {
       ::capnp::bounded<21>() * ::capnp::ELEMENTS, value);
 }
 
-inline  ::int32_t Connection::Reader::getSequence() const {
-  return _reader.getDataField< ::int32_t>(
-      ::capnp::bounded<6>() * ::capnp::ELEMENTS);
+inline  ::int16_t Connection::Reader::getSequence() const {
+  return _reader.getDataField< ::int16_t>(
+      ::capnp::bounded<11>() * ::capnp::ELEMENTS);
 }
 
-inline  ::int32_t Connection::Builder::getSequence() {
-  return _builder.getDataField< ::int32_t>(
-      ::capnp::bounded<6>() * ::capnp::ELEMENTS);
+inline  ::int16_t Connection::Builder::getSequence() {
+  return _builder.getDataField< ::int16_t>(
+      ::capnp::bounded<11>() * ::capnp::ELEMENTS);
 }
-inline void Connection::Builder::setSequence( ::int32_t value) {
-  _builder.setDataField< ::int32_t>(
-      ::capnp::bounded<6>() * ::capnp::ELEMENTS, value);
+inline void Connection::Builder::setSequence( ::int16_t value) {
+  _builder.setDataField< ::int16_t>(
+      ::capnp::bounded<11>() * ::capnp::ELEMENTS, value);
+}
+
+inline  ::int16_t Connection::Reader::getLoad() const {
+  return _reader.getDataField< ::int16_t>(
+      ::capnp::bounded<12>() * ::capnp::ELEMENTS);
+}
+
+inline  ::int16_t Connection::Builder::getLoad() {
+  return _builder.getDataField< ::int16_t>(
+      ::capnp::bounded<12>() * ::capnp::ELEMENTS);
+}
+inline void Connection::Builder::setLoad( ::int16_t value) {
+  _builder.setDataField< ::int16_t>(
+      ::capnp::bounded<12>() * ::capnp::ELEMENTS, value);
 }
 
 }  // namespace

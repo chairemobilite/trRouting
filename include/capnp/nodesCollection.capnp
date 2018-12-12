@@ -1,4 +1,4 @@
-0xd68f205b1747bdab;
+@0xd68f205b1747bdab;
 
 using Cxx = import "/capnp/c++.capnp";
 $Cxx.namespace("nodesCollection");
@@ -8,11 +8,10 @@ struct NodesCollection {
 }
 
 struct Node {
-  id @0 :Int32;
-  uuid @1 :Text;
-  code @2 :Text;
-  name @3 :Text;
-  latitude @4 :Float32;
-  longitude @5 :Float32;
-  stationId @6 :Int32;
+  uuid @0 :Text;
+  code @1 :Text;
+  name @2 :Text;
+  latitude @3 :Float32;
+  longitude @4 :Float32;
+  stationIdx @5 :Int32;
 }

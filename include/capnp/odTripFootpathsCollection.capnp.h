@@ -178,7 +178,7 @@ public:
   }
 #endif  // !CAPNP_LITE
 
-  inline  ::int32_t getStopIdx() const;
+  inline  ::int32_t getNodeIdx() const;
 
   inline  ::int32_t getTravelTime() const;
 
@@ -210,8 +210,8 @@ public:
   inline ::kj::StringTree toString() const { return asReader().toString(); }
 #endif  // !CAPNP_LITE
 
-  inline  ::int32_t getStopIdx();
-  inline void setStopIdx( ::int32_t value);
+  inline  ::int32_t getNodeIdx();
+  inline void setNodeIdx( ::int32_t value);
 
   inline  ::int32_t getTravelTime();
   inline void setTravelTime( ::int32_t value);
@@ -393,16 +393,16 @@ inline ::capnp::Orphan< ::capnp::List< ::odTripFootpathsCollection::OdTripFootpa
       ::capnp::bounded<1>() * ::capnp::POINTERS));
 }
 
-inline  ::int32_t OdTripFootpath::Reader::getStopIdx() const {
+inline  ::int32_t OdTripFootpath::Reader::getNodeIdx() const {
   return _reader.getDataField< ::int32_t>(
       ::capnp::bounded<0>() * ::capnp::ELEMENTS);
 }
 
-inline  ::int32_t OdTripFootpath::Builder::getStopIdx() {
+inline  ::int32_t OdTripFootpath::Builder::getNodeIdx() {
   return _builder.getDataField< ::int32_t>(
       ::capnp::bounded<0>() * ::capnp::ELEMENTS);
 }
-inline void OdTripFootpath::Builder::setStopIdx( ::int32_t value) {
+inline void OdTripFootpath::Builder::setNodeIdx( ::int32_t value) {
   _builder.setDataField< ::int32_t>(
       ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
 }

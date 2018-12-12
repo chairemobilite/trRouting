@@ -9,8 +9,8 @@ struct FootpathsCollection {
 }
 
 struct Footpath {
-  stop1Idx @0 :Int32;
-  stop2Idx @1 :Int32;
+  node1Idx @0 :Int32;
+  node2Idx @1 :Int32;
   travelTime @2 :Int32;
 }
 

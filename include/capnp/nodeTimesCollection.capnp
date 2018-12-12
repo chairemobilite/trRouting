@@ -3,7 +3,7 @@
 using Cxx = import "/capnp/c++.capnp";
 $Cxx.namespace("nodeTimesCollection");
 
-struct nodeTimesCollection {
+struct NodeTimesCollection {
   nodeTimes @0 :List(NodeTime);
 }
 

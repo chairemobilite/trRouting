@@ -178,9 +178,9 @@ public:
   }
 #endif  // !CAPNP_LITE
 
-  inline  ::int32_t getStop1Idx() const;
+  inline  ::int32_t getNode1Idx() const;
 
-  inline  ::int32_t getStop2Idx() const;
+  inline  ::int32_t getNode2Idx() const;
 
   inline  ::int32_t getTravelTime() const;
 
@@ -212,11 +212,11 @@ public:
   inline ::kj::StringTree toString() const { return asReader().toString(); }
 #endif  // !CAPNP_LITE
 
-  inline  ::int32_t getStop1Idx();
-  inline void setStop1Idx( ::int32_t value);
+  inline  ::int32_t getNode1Idx();
+  inline void setNode1Idx( ::int32_t value);
 
-  inline  ::int32_t getStop2Idx();
-  inline void setStop2Idx( ::int32_t value);
+  inline  ::int32_t getNode2Idx();
+  inline void setNode2Idx( ::int32_t value);
 
   inline  ::int32_t getTravelTime();
   inline void setTravelTime( ::int32_t value);
@@ -398,30 +398,30 @@ inline ::capnp::Orphan< ::capnp::List< ::footpathsCollection::FootpathRange,  ::
       ::capnp::bounded<1>() * ::capnp::POINTERS));
 }
 
-inline  ::int32_t Footpath::Reader::getStop1Idx() const {
+inline  ::int32_t Footpath::Reader::getNode1Idx() const {
   return _reader.getDataField< ::int32_t>(
       ::capnp::bounded<0>() * ::capnp::ELEMENTS);
 }
 
-inline  ::int32_t Footpath::Builder::getStop1Idx() {
+inline  ::int32_t Footpath::Builder::getNode1Idx() {
   return _builder.getDataField< ::int32_t>(
       ::capnp::bounded<0>() * ::capnp::ELEMENTS);
 }
-inline void Footpath::Builder::setStop1Idx( ::int32_t value) {
+inline void Footpath::Builder::setNode1Idx( ::int32_t value) {
   _builder.setDataField< ::int32_t>(
       ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
 }
 
-inline  ::int32_t Footpath::Reader::getStop2Idx() const {
+inline  ::int32_t Footpath::Reader::getNode2Idx() const {
   return _reader.getDataField< ::int32_t>(
       ::capnp::bounded<1>() * ::capnp::ELEMENTS);
 }
 
-inline  ::int32_t Footpath::Builder::getStop2Idx() {
+inline  ::int32_t Footpath::Builder::getNode2Idx() {
   return _builder.getDataField< ::int32_t>(
       ::capnp::bounded<1>() * ::capnp::ELEMENTS);
 }
-inline void Footpath::Builder::setStop2Idx( ::int32_t value) {
+inline void Footpath::Builder::setNode2Idx( ::int32_t value) {
   _builder.setDataField< ::int32_t>(
       ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
 }

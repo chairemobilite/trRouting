@@ -121,7 +121,7 @@ namespace TrRouting
     std::vector<int>                      tripsExitConnectionTransferTravelTime; // index of the exiting connection for each trip index 
     //std::vector<int>                     tripsReverseTime;
     std::vector<int>                      tripsEnabled; // allow/disallow use of this trip during calculation
-    std::vector<int>                      tripsUsable; // after forwarrd calculation, keep a list of usable trips in time range for reverse calculation
+    std::vector<int>                      tripsUsable; // after forward calculation, keep a list of usable trips in time range for reverse calculation
     std::vector<std::tuple<int,int,int,int,int,short,short,int>> forwardConnections; // tuple: initialDepartureTimeSecondsStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequence in trip
     std::vector<std::tuple<int,int,int,int,int,short,short,int>> reverseConnections; // tuple: departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequence in trip
     std::vector<std::pair<int,int>>       accessFootpaths; // pair: accessStopIndex, walkingTravelTimeSeconds

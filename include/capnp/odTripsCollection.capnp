@@ -8,15 +8,15 @@ struct OdTripsCollection {
 }
 
 struct OdTrip {
-  id @0 :Int64;
-  personId @1 :Int64;
-  householdId @2 :Int64;
-  age @3 :Int64;
-  departureTimeSeconds @4 :Int64;
-  arrivalTimeSeconds @5 :Int64;
-  walkingTravelTimeSeconds @6 :Int64;
-  cyclingTravelTimeSeconds @7 :Int64;
-  drivingTravelTimeSeconds @8 :Int64;
+  uuid @0 :Text;
+  personUuid @1 :Text;
+  householdUuid @2 :Text;
+  age @3 :Int16;
+  departureTimeSeconds @4 :Int32;
+  arrivalTimeSeconds @5 :Int32;
+  walkingTravelTimeSeconds @6 :Int32;
+  cyclingTravelTimeSeconds @7 :Int32;
+  drivingTravelTimeSeconds @8 :Int32;
   expansionFactor @9 :Float32;
   
   ageGroup @10 :Text;

@@ -9,7 +9,7 @@ struct OdTripFootpathsCollection {
 }
 
 struct OdTripFootpath {
-  stopIdx @0 :Int32;
+  nodeIdx @0 :Int32;
   travelTime @1 :Int32;
 }
 

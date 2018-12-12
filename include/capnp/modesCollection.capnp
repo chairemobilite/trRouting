@@ -3,13 +3,12 @@
 using Cxx = import "/capnp/c++.capnp";
 $Cxx.namespace("modesCollection");
 
-struct modesCollection {
-  modes @0 :List(Service);
+struct ModesCollection {
+  modes @0 :List(Mode);
 }
 
 struct Mode {
-  id @0 :Int32;
-  shortname @1 :Text;
-  name @2 :Text;
+  shortname @0 :Text;
+  name @1 :Text;
 }
 

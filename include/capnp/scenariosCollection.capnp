@@ -3,13 +3,12 @@
 using Cxx = import "/capnp/c++.capnp";
 $Cxx.namespace("scenariosCollection");
 
-struct scenariosCollection {
+struct ScenariosCollection {
   scenarios @0 :List(Scenario);
 }
 
 struct Scenario {
-  id @0 :Int32;
-  uuid @1 :Text;
-  name @2 :Text;
+  uuid @0 :Text;
+  name @1 :Text;
 }
 

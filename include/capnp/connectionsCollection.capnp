@@ -9,12 +9,13 @@ struct ConnectionsCollection {
 }
 
 struct Connection {
-  stopDepIdx @0 :Int32;
-  stopArrIdx @1 :Int32;
+  nodeDepIdx @0 :Int32;
+  nodeArrIdx @1 :Int32;
   timeDep @2 :Int32;
   timeArr @3 :Int32;
   tripIdx @4 :Int32;
   canBoard @5 :Int8;
   canUnboard @6 :Int8;
-  sequence @7 :Int32;
+  sequence @7 :Int16;
+  load @8 :Int16; # how many passengers used this connection already (used for simulations)
 }
