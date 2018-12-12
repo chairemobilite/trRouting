@@ -9,6 +9,7 @@ struct ScenariosCollection {
 
 struct Scenario {
   uuid @0 :Text;
-  name @1 :Text;
+  id @1 :Int64;  # unique for the whole network 
+  name @2 :Text;
 }
 

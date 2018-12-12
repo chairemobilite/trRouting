@@ -9,12 +9,12 @@ struct OdTripFootpathsCollection {
 }
 
 struct OdTripFootpath {
-  nodeIdx @0 :Int32;
-  travelTime @1 :Int32;
+  nodeIdx @0 :Int32; # unique in the whole network
+  travelTime @1 :Int32; # seconds
 }
 
 struct OdTripFootpathRange {
-  footpathsStartIdx @0 :Int32;
-  footpathsEndIdx @1 :Int32;
+  footpathsStartIdx @0 :Int32; # unique in the whole network
+  footpathsEndIdx @1 :Int32; # unique in the whole network
 }
 

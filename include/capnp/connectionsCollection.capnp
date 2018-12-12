@@ -9,11 +9,11 @@ struct ConnectionsCollection {
 }
 
 struct Connection {
-  nodeDepIdx @0 :Int32;
-  nodeArrIdx @1 :Int32;
+  nodeDepIdx @0 :Int32; # unique in the whole network
+  nodeArrIdx @1 :Int32; # unique in the whole network
   timeDep @2 :Int32;
   timeArr @3 :Int32;
-  tripIdx @4 :Int32;
+  tripIdx @4 :Int32; # unique in the whole network
   canBoard @5 :Int8;
   canUnboard @6 :Int8;
   sequence @7 :Int16;

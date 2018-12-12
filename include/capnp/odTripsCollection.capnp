@@ -26,10 +26,10 @@ struct OdTrip {
   originActivity @14 :Text;
   destinationActivity @15 :Text;
 
-  accessFootpathsStartIdx @16 :Int64;
-  accessFootpathsEndIdx @17 :Int64;
-  egressFootpathsStartIdx @18 :Int64;
-  egressFootpathsEndIdx @19 :Int64;
+  accessFootpathsStartIdx @16 :Int64; # unique in the whole network
+  accessFootpathsEndIdx @17 :Int64; # unique in the whole network
+  egressFootpathsStartIdx @18 :Int64; # unique in the whole network
+  egressFootpathsEndIdx @19 :Int64; # unique in the whole network
 
   originLatitude @20 :Float32;
   originLongitude @21 :Float32;
