@@ -9,7 +9,16 @@ struct PathsCollection {
 
 struct Path {
   uuid @0 :Text;
-  direction @1 :Text;
-  name @2 :Text;
-  lineIdx @3 :Int32; # unique for the whole network, from LinesCollection index
+  id @1 :Int32;
+  internalId @2 :Text;
+  direction @3 :Text;
+  lineUuid @4 :Text;
+  name @5 :Text;
+  isEnabled @6 :Int8;
+  description @7 :Text;
+  data @8 :Text;
+  nodes @9 :List(Text);
+  stops @10 :List(Text);
+  segments @11 :List(Int32); # index of the first coordinate of segment in geography coordinates
+  geography @12 :Text; # encoded polyline (mapbox format)
 }

@@ -3,40 +3,38 @@
 using Cxx = import "/capnp/c++.capnp";
 $Cxx.namespace("line");
 
+struct Trip {
+  pathUuid @0 :Text;
+  departureTimeSeconds @1 :Int32;
+  arrivalTimeSeconds @2 :Int32;
+  nodeArrivalTimesSeconds @3 :List(Int32);
+  nodeDepartureTimesSeconds @4 :List(Int32);
+  nodesCanBoard @5 :List(Int8);
+  nodesCanUnboard @6 :List(Int8);
+  blockUuid @7 :Text;
+  totalCapacity @8 :Int16; # total vehicle capacity for the trip
+  seatedCapacity @9 :Int16; # total seated capacity for this trip
+}
+
+struct Schedule {
+  uuid @0 :Text;
+  serviceUuid @1 :Text;
+  trips @2 :List(Trip);
+}
+
 struct Line {
   uuid @0 :Text;
-  agencyUuid @1 :Text;
+  internalId @1 :Text;
   mode @2 :Text;
-  shortname @3 :Text;
-  longname @4 :Text;
-  paths @5 :List(Path);
-  allowSameLineTransfers @6 :Int8;
-}
-
-struct NodeTime {
-  nodeId @0 :Int64; # unique for the whole network
-  timeArr @1 :Int32; # seconds after midnight
-  timeDep @2 :Int32; # seconds after midnight
-  tripIdx @3 :Int32; # index in line trips list
-  canUnboard @4 :Int8;
-  canBoard @5 :Int8;
-  sequence @6 :Int32;
-}
-
-struct Path {
-  uuid @0 :Text;
-  direction @1 :Text;
-  name @2 :Text;
-  trips @3 :List(Trip);
-}
-
-struct Trip {
-  timeDep @0 :Int32; # seconds after midnight
-  timeArr @1 :Int32; # seconds after midnight
-  serviceUuid @2 :Text;
-  scenarioUuid @3 :Text;
-  blockUuid @4 :Text;
-  totalCapacity @5 :Int16; # total vehicle capacity for the trip
-  seatedCapacity @6 :Int16; # total seated capacity for this trip
-  nodeTimes @7 :List(NodeTime);
+  category @3 :Text;
+  agencyUuid @4 :Text;
+  shortname @5 :Text;
+  longname @6 :Text;
+  color @7 :Text;
+  isEnabled @8 :Int8;
+  description @9 :Text;
+  data @10 :Text;
+  isAutonomous @11 :Int8;
+  allowSameLineTransfers @12 :Int8;
+  schedules @13 :List(Schedule);
 }
