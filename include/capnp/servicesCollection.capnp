@@ -9,8 +9,8 @@ struct ServicesCollection {
 
 struct Service {
   uuid @0 :Text;
-  id @1 :Int64;  # unique for the whole network 
-  name @2 :Text;
+  name @1 :Text;
+  internalId @2 :Text;
   monday @3 :Int8;
   tuesday @4 :Int8;
   wednesday @5 :Int8;
@@ -22,5 +22,9 @@ struct Service {
   endDate @11 :Text; # YYYY-MM-DD
   onlyDates @12 :List(Text); # YYYY-MM-DD
   exceptDates @13 :List(Text); # YYYY-MM-DD
+  color @14 :Text;
+  isEnabled @15 :Int8;
+  description @16 :Text;
+  data @17 :Text;
 }
 

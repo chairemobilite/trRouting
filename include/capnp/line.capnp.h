@@ -15,6 +15,7 @@ namespace capnp {
 namespace schemas {
 
 CAPNP_DECLARE_SCHEMA(aeeb93dd97609064);
+CAPNP_DECLARE_SCHEMA(ddeccfbefad43561);
 CAPNP_DECLARE_SCHEMA(fa89c34b8ef97103);
 CAPNP_DECLARE_SCHEMA(c474ebe8d98c347e);
 
@@ -38,6 +39,21 @@ struct Trip {
   };
 };
 
+struct Period {
+  Period() = delete;
+
+  class Reader;
+  class Builder;
+  class Pipeline;
+
+  struct _capnpPrivate {
+    CAPNP_DECLARE_STRUCT_HEADER(ddeccfbefad43561, 2, 4)
+    #if !CAPNP_LITE
+    static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
+    #endif  // !CAPNP_LITE
+  };
+};
+
 struct Schedule {
   Schedule() = delete;
 
@@ -46,7 +62,7 @@ struct Schedule {
   class Pipeline;
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(fa89c34b8ef97103, 0, 3)
+    CAPNP_DECLARE_STRUCT_HEADER(fa89c34b8ef97103, 1, 4)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
     #endif  // !CAPNP_LITE
@@ -225,6 +241,142 @@ private:
 };
 #endif  // !CAPNP_LITE
 
+class Period::Reader {
+public:
+  typedef Period Reads;
+
+  Reader() = default;
+  inline explicit Reader(::capnp::_::StructReader base): _reader(base) {}
+
+  inline ::capnp::MessageSize totalSize() const {
+    return _reader.totalSize().asPublic();
+  }
+
+#if !CAPNP_LITE
+  inline ::kj::StringTree toString() const {
+    return ::capnp::_::structString(_reader, *_capnpPrivate::brand());
+  }
+#endif  // !CAPNP_LITE
+
+  inline bool hasPeriodShortname() const;
+  inline  ::capnp::Text::Reader getPeriodShortname() const;
+
+  inline bool hasOutboundPathUuid() const;
+  inline  ::capnp::Text::Reader getOutboundPathUuid() const;
+
+  inline bool hasInboundPathUuid() const;
+  inline  ::capnp::Text::Reader getInboundPathUuid() const;
+
+  inline  ::int32_t getCustomStartAtSeconds() const;
+
+  inline  ::int32_t getStartAtSeconds() const;
+
+  inline  ::int32_t getEndAtSeconds() const;
+
+  inline  ::int16_t getIntervalSeconds() const;
+
+  inline  ::int16_t getNumberOfUnits() const;
+
+  inline bool hasTrips() const;
+  inline  ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>::Reader getTrips() const;
+
+private:
+  ::capnp::_::StructReader _reader;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::_::PointerHelpers;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::List;
+  friend class ::capnp::MessageBuilder;
+  friend class ::capnp::Orphanage;
+};
+
+class Period::Builder {
+public:
+  typedef Period Builds;
+
+  Builder() = delete;  // Deleted to discourage incorrect usage.
+                       // You can explicitly initialize to nullptr instead.
+  inline Builder(decltype(nullptr)) {}
+  inline explicit Builder(::capnp::_::StructBuilder base): _builder(base) {}
+  inline operator Reader() const { return Reader(_builder.asReader()); }
+  inline Reader asReader() const { return *this; }
+
+  inline ::capnp::MessageSize totalSize() const { return asReader().totalSize(); }
+#if !CAPNP_LITE
+  inline ::kj::StringTree toString() const { return asReader().toString(); }
+#endif  // !CAPNP_LITE
+
+  inline bool hasPeriodShortname();
+  inline  ::capnp::Text::Builder getPeriodShortname();
+  inline void setPeriodShortname( ::capnp::Text::Reader value);
+  inline  ::capnp::Text::Builder initPeriodShortname(unsigned int size);
+  inline void adoptPeriodShortname(::capnp::Orphan< ::capnp::Text>&& value);
+  inline ::capnp::Orphan< ::capnp::Text> disownPeriodShortname();
+
+  inline bool hasOutboundPathUuid();
+  inline  ::capnp::Text::Builder getOutboundPathUuid();
+  inline void setOutboundPathUuid( ::capnp::Text::Reader value);
+  inline  ::capnp::Text::Builder initOutboundPathUuid(unsigned int size);
+  inline void adoptOutboundPathUuid(::capnp::Orphan< ::capnp::Text>&& value);
+  inline ::capnp::Orphan< ::capnp::Text> disownOutboundPathUuid();
+
+  inline bool hasInboundPathUuid();
+  inline  ::capnp::Text::Builder getInboundPathUuid();
+  inline void setInboundPathUuid( ::capnp::Text::Reader value);
+  inline  ::capnp::Text::Builder initInboundPathUuid(unsigned int size);
+  inline void adoptInboundPathUuid(::capnp::Orphan< ::capnp::Text>&& value);
+  inline ::capnp::Orphan< ::capnp::Text> disownInboundPathUuid();
+
+  inline  ::int32_t getCustomStartAtSeconds();
+  inline void setCustomStartAtSeconds( ::int32_t value);
+
+  inline  ::int32_t getStartAtSeconds();
+  inline void setStartAtSeconds( ::int32_t value);
+
+  inline  ::int32_t getEndAtSeconds();
+  inline void setEndAtSeconds( ::int32_t value);
+
+  inline  ::int16_t getIntervalSeconds();
+  inline void setIntervalSeconds( ::int16_t value);
+
+  inline  ::int16_t getNumberOfUnits();
+  inline void setNumberOfUnits( ::int16_t value);
+
+  inline bool hasTrips();
+  inline  ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>::Builder getTrips();
+  inline void setTrips( ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>::Reader value);
+  inline  ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>::Builder initTrips(unsigned int size);
+  inline void adoptTrips(::capnp::Orphan< ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>>&& value);
+  inline ::capnp::Orphan< ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>> disownTrips();
+
+private:
+  ::capnp::_::StructBuilder _builder;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+  friend class ::capnp::Orphanage;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::_::PointerHelpers;
+};
+
+#if !CAPNP_LITE
+class Period::Pipeline {
+public:
+  typedef Period Pipelines;
+
+  inline Pipeline(decltype(nullptr)): _typeless(nullptr) {}
+  inline explicit Pipeline(::capnp::AnyPointer::Pipeline&& typeless)
+      : _typeless(kj::mv(typeless)) {}
+
+private:
+  ::capnp::AnyPointer::Pipeline _typeless;
+  friend class ::capnp::PipelineHook;
+  template <typename, ::capnp::Kind>
+  friend struct ::capnp::ToDynamic_;
+};
+#endif  // !CAPNP_LITE
+
 class Schedule::Reader {
 public:
   typedef Schedule Reads;
@@ -248,8 +400,13 @@ public:
   inline bool hasServiceUuid() const;
   inline  ::capnp::Text::Reader getServiceUuid() const;
 
-  inline bool hasTrips() const;
-  inline  ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>::Reader getTrips() const;
+  inline bool hasPeriodsGroupShortname() const;
+  inline  ::capnp::Text::Reader getPeriodsGroupShortname() const;
+
+  inline bool hasPeriods() const;
+  inline  ::capnp::List< ::line::Period,  ::capnp::Kind::STRUCT>::Reader getPeriods() const;
+
+  inline  ::int8_t getAllowSecondsBasedSchedules() const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -293,12 +450,22 @@ public:
   inline void adoptServiceUuid(::capnp::Orphan< ::capnp::Text>&& value);
   inline ::capnp::Orphan< ::capnp::Text> disownServiceUuid();
 
-  inline bool hasTrips();
-  inline  ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>::Builder getTrips();
-  inline void setTrips( ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>::Reader value);
-  inline  ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>::Builder initTrips(unsigned int size);
-  inline void adoptTrips(::capnp::Orphan< ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>>&& value);
-  inline ::capnp::Orphan< ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>> disownTrips();
+  inline bool hasPeriodsGroupShortname();
+  inline  ::capnp::Text::Builder getPeriodsGroupShortname();
+  inline void setPeriodsGroupShortname( ::capnp::Text::Reader value);
+  inline  ::capnp::Text::Builder initPeriodsGroupShortname(unsigned int size);
+  inline void adoptPeriodsGroupShortname(::capnp::Orphan< ::capnp::Text>&& value);
+  inline ::capnp::Orphan< ::capnp::Text> disownPeriodsGroupShortname();
+
+  inline bool hasPeriods();
+  inline  ::capnp::List< ::line::Period,  ::capnp::Kind::STRUCT>::Builder getPeriods();
+  inline void setPeriods( ::capnp::List< ::line::Period,  ::capnp::Kind::STRUCT>::Reader value);
+  inline  ::capnp::List< ::line::Period,  ::capnp::Kind::STRUCT>::Builder initPeriods(unsigned int size);
+  inline void adoptPeriods(::capnp::Orphan< ::capnp::List< ::line::Period,  ::capnp::Kind::STRUCT>>&& value);
+  inline ::capnp::Orphan< ::capnp::List< ::line::Period,  ::capnp::Kind::STRUCT>> disownPeriods();
+
+  inline  ::int8_t getAllowSecondsBasedSchedules();
+  inline void setAllowSecondsBasedSchedules( ::int8_t value);
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -800,6 +967,212 @@ inline void Trip::Builder::setSeatedCapacity( ::int16_t value) {
       ::capnp::bounded<5>() * ::capnp::ELEMENTS, value);
 }
 
+inline bool Period::Reader::hasPeriodShortname() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
+}
+inline bool Period::Builder::hasPeriodShortname() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::Text::Reader Period::Reader::getPeriodShortname() const {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_reader.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+inline  ::capnp::Text::Builder Period::Builder::getPeriodShortname() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+inline void Period::Builder::setPeriodShortname( ::capnp::Text::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::set(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), value);
+}
+inline  ::capnp::Text::Builder Period::Builder::initPeriodShortname(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::init(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), size);
+}
+inline void Period::Builder::adoptPeriodShortname(
+    ::capnp::Orphan< ::capnp::Text>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::adopt(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::Text> Period::Builder::disownPeriodShortname() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
+      ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+
+inline bool Period::Reader::hasOutboundPathUuid() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS).isNull();
+}
+inline bool Period::Builder::hasOutboundPathUuid() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::Text::Reader Period::Reader::getOutboundPathUuid() const {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_reader.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS));
+}
+inline  ::capnp::Text::Builder Period::Builder::getOutboundPathUuid() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS));
+}
+inline void Period::Builder::setOutboundPathUuid( ::capnp::Text::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::set(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS), value);
+}
+inline  ::capnp::Text::Builder Period::Builder::initOutboundPathUuid(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::init(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS), size);
+}
+inline void Period::Builder::adoptOutboundPathUuid(
+    ::capnp::Orphan< ::capnp::Text>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::adopt(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::Text> Period::Builder::disownOutboundPathUuid() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS));
+}
+
+inline bool Period::Reader::hasInboundPathUuid() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<2>() * ::capnp::POINTERS).isNull();
+}
+inline bool Period::Builder::hasInboundPathUuid() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<2>() * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::Text::Reader Period::Reader::getInboundPathUuid() const {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_reader.getPointerField(
+      ::capnp::bounded<2>() * ::capnp::POINTERS));
+}
+inline  ::capnp::Text::Builder Period::Builder::getInboundPathUuid() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_builder.getPointerField(
+      ::capnp::bounded<2>() * ::capnp::POINTERS));
+}
+inline void Period::Builder::setInboundPathUuid( ::capnp::Text::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::set(_builder.getPointerField(
+      ::capnp::bounded<2>() * ::capnp::POINTERS), value);
+}
+inline  ::capnp::Text::Builder Period::Builder::initInboundPathUuid(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::init(_builder.getPointerField(
+      ::capnp::bounded<2>() * ::capnp::POINTERS), size);
+}
+inline void Period::Builder::adoptInboundPathUuid(
+    ::capnp::Orphan< ::capnp::Text>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::adopt(_builder.getPointerField(
+      ::capnp::bounded<2>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::Text> Period::Builder::disownInboundPathUuid() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
+      ::capnp::bounded<2>() * ::capnp::POINTERS));
+}
+
+inline  ::int32_t Period::Reader::getCustomStartAtSeconds() const {
+  return _reader.getDataField< ::int32_t>(
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
+}
+
+inline  ::int32_t Period::Builder::getCustomStartAtSeconds() {
+  return _builder.getDataField< ::int32_t>(
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
+}
+inline void Period::Builder::setCustomStartAtSeconds( ::int32_t value) {
+  _builder.setDataField< ::int32_t>(
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
+}
+
+inline  ::int32_t Period::Reader::getStartAtSeconds() const {
+  return _reader.getDataField< ::int32_t>(
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
+}
+
+inline  ::int32_t Period::Builder::getStartAtSeconds() {
+  return _builder.getDataField< ::int32_t>(
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
+}
+inline void Period::Builder::setStartAtSeconds( ::int32_t value) {
+  _builder.setDataField< ::int32_t>(
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
+}
+
+inline  ::int32_t Period::Reader::getEndAtSeconds() const {
+  return _reader.getDataField< ::int32_t>(
+      ::capnp::bounded<2>() * ::capnp::ELEMENTS);
+}
+
+inline  ::int32_t Period::Builder::getEndAtSeconds() {
+  return _builder.getDataField< ::int32_t>(
+      ::capnp::bounded<2>() * ::capnp::ELEMENTS);
+}
+inline void Period::Builder::setEndAtSeconds( ::int32_t value) {
+  _builder.setDataField< ::int32_t>(
+      ::capnp::bounded<2>() * ::capnp::ELEMENTS, value);
+}
+
+inline  ::int16_t Period::Reader::getIntervalSeconds() const {
+  return _reader.getDataField< ::int16_t>(
+      ::capnp::bounded<6>() * ::capnp::ELEMENTS);
+}
+
+inline  ::int16_t Period::Builder::getIntervalSeconds() {
+  return _builder.getDataField< ::int16_t>(
+      ::capnp::bounded<6>() * ::capnp::ELEMENTS);
+}
+inline void Period::Builder::setIntervalSeconds( ::int16_t value) {
+  _builder.setDataField< ::int16_t>(
+      ::capnp::bounded<6>() * ::capnp::ELEMENTS, value);
+}
+
+inline  ::int16_t Period::Reader::getNumberOfUnits() const {
+  return _reader.getDataField< ::int16_t>(
+      ::capnp::bounded<7>() * ::capnp::ELEMENTS);
+}
+
+inline  ::int16_t Period::Builder::getNumberOfUnits() {
+  return _builder.getDataField< ::int16_t>(
+      ::capnp::bounded<7>() * ::capnp::ELEMENTS);
+}
+inline void Period::Builder::setNumberOfUnits( ::int16_t value) {
+  _builder.setDataField< ::int16_t>(
+      ::capnp::bounded<7>() * ::capnp::ELEMENTS, value);
+}
+
+inline bool Period::Reader::hasTrips() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS).isNull();
+}
+inline bool Period::Builder::hasTrips() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>::Reader Period::Reader::getTrips() const {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>>::get(_reader.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS));
+}
+inline  ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>::Builder Period::Builder::getTrips() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>>::get(_builder.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS));
+}
+inline void Period::Builder::setTrips( ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>>::set(_builder.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS), value);
+}
+inline  ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>::Builder Period::Builder::initTrips(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>>::init(_builder.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS), size);
+}
+inline void Period::Builder::adoptTrips(
+    ::capnp::Orphan< ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>>::adopt(_builder.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>> Period::Builder::disownTrips() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>>::disown(_builder.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS));
+}
+
 inline bool Schedule::Reader::hasUuid() const {
   return !_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
@@ -868,38 +1241,86 @@ inline ::capnp::Orphan< ::capnp::Text> Schedule::Builder::disownServiceUuid() {
       ::capnp::bounded<1>() * ::capnp::POINTERS));
 }
 
-inline bool Schedule::Reader::hasTrips() const {
+inline bool Schedule::Reader::hasPeriodsGroupShortname() const {
   return !_reader.getPointerField(
       ::capnp::bounded<2>() * ::capnp::POINTERS).isNull();
 }
-inline bool Schedule::Builder::hasTrips() {
+inline bool Schedule::Builder::hasPeriodsGroupShortname() {
   return !_builder.getPointerField(
       ::capnp::bounded<2>() * ::capnp::POINTERS).isNull();
 }
-inline  ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>::Reader Schedule::Reader::getTrips() const {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>>::get(_reader.getPointerField(
+inline  ::capnp::Text::Reader Schedule::Reader::getPeriodsGroupShortname() const {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_reader.getPointerField(
       ::capnp::bounded<2>() * ::capnp::POINTERS));
 }
-inline  ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>::Builder Schedule::Builder::getTrips() {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>>::get(_builder.getPointerField(
+inline  ::capnp::Text::Builder Schedule::Builder::getPeriodsGroupShortname() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_builder.getPointerField(
       ::capnp::bounded<2>() * ::capnp::POINTERS));
 }
-inline void Schedule::Builder::setTrips( ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>::Reader value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>>::set(_builder.getPointerField(
+inline void Schedule::Builder::setPeriodsGroupShortname( ::capnp::Text::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::set(_builder.getPointerField(
       ::capnp::bounded<2>() * ::capnp::POINTERS), value);
 }
-inline  ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>::Builder Schedule::Builder::initTrips(unsigned int size) {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>>::init(_builder.getPointerField(
+inline  ::capnp::Text::Builder Schedule::Builder::initPeriodsGroupShortname(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::init(_builder.getPointerField(
       ::capnp::bounded<2>() * ::capnp::POINTERS), size);
 }
-inline void Schedule::Builder::adoptTrips(
-    ::capnp::Orphan< ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>>&& value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>>::adopt(_builder.getPointerField(
+inline void Schedule::Builder::adoptPeriodsGroupShortname(
+    ::capnp::Orphan< ::capnp::Text>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::adopt(_builder.getPointerField(
       ::capnp::bounded<2>() * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>> Schedule::Builder::disownTrips() {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>>::disown(_builder.getPointerField(
+inline ::capnp::Orphan< ::capnp::Text> Schedule::Builder::disownPeriodsGroupShortname() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
       ::capnp::bounded<2>() * ::capnp::POINTERS));
+}
+
+inline bool Schedule::Reader::hasPeriods() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS).isNull();
+}
+inline bool Schedule::Builder::hasPeriods() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::List< ::line::Period,  ::capnp::Kind::STRUCT>::Reader Schedule::Reader::getPeriods() const {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::line::Period,  ::capnp::Kind::STRUCT>>::get(_reader.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS));
+}
+inline  ::capnp::List< ::line::Period,  ::capnp::Kind::STRUCT>::Builder Schedule::Builder::getPeriods() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::line::Period,  ::capnp::Kind::STRUCT>>::get(_builder.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS));
+}
+inline void Schedule::Builder::setPeriods( ::capnp::List< ::line::Period,  ::capnp::Kind::STRUCT>::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::line::Period,  ::capnp::Kind::STRUCT>>::set(_builder.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS), value);
+}
+inline  ::capnp::List< ::line::Period,  ::capnp::Kind::STRUCT>::Builder Schedule::Builder::initPeriods(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::line::Period,  ::capnp::Kind::STRUCT>>::init(_builder.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS), size);
+}
+inline void Schedule::Builder::adoptPeriods(
+    ::capnp::Orphan< ::capnp::List< ::line::Period,  ::capnp::Kind::STRUCT>>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::line::Period,  ::capnp::Kind::STRUCT>>::adopt(_builder.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::List< ::line::Period,  ::capnp::Kind::STRUCT>> Schedule::Builder::disownPeriods() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::line::Period,  ::capnp::Kind::STRUCT>>::disown(_builder.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS));
+}
+
+inline  ::int8_t Schedule::Reader::getAllowSecondsBasedSchedules() const {
+  return _reader.getDataField< ::int8_t>(
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
+}
+
+inline  ::int8_t Schedule::Builder::getAllowSecondsBasedSchedules() {
+  return _builder.getDataField< ::int8_t>(
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
+}
+inline void Schedule::Builder::setAllowSecondsBasedSchedules( ::int8_t value) {
+  _builder.setDataField< ::int8_t>(
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
 }
 
 inline bool Line::Reader::hasUuid() const {

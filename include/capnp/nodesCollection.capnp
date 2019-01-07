@@ -22,6 +22,4 @@ struct Node {
   isEnabled @11 :Int8;
   routingRadiusMeters @12 :Int16;
   defaultDwellTimeSeconds @13 :Int16;
-  transferableNodesIdx @14 :List(Int32);  # unique in the whole network, from NodesCollection indexes
-  transferableNodesTravelTimes @15 :List(Int16); # seconds
 }

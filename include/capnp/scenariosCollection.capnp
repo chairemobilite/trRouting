@@ -9,7 +9,11 @@ struct ScenariosCollection {
 
 struct Scenario {
   uuid @0 :Text;
-  id @1 :Int64;  # unique for the whole network 
-  name @2 :Text;
+  name @1 :Text;
+  color @2 :Text;
+  isEnabled @3 :Int8;
+  description @4 :Text;
+  data @5 :Text;
+  servicesUuids @6 :List(Text);
 }
 

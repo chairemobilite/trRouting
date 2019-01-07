@@ -45,7 +45,7 @@ struct Service {
   class Pipeline;
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(b43b93e1c1ad0616, 2, 6)
+    CAPNP_DECLARE_STRUCT_HEADER(b43b93e1c1ad0616, 1, 10)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
     #endif  // !CAPNP_LITE
@@ -155,10 +155,11 @@ public:
   inline bool hasUuid() const;
   inline  ::capnp::Text::Reader getUuid() const;
 
-  inline  ::int64_t getId() const;
-
   inline bool hasName() const;
   inline  ::capnp::Text::Reader getName() const;
+
+  inline bool hasInternalId() const;
+  inline  ::capnp::Text::Reader getInternalId() const;
 
   inline  ::int8_t getMonday() const;
 
@@ -185,6 +186,17 @@ public:
 
   inline bool hasExceptDates() const;
   inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader getExceptDates() const;
+
+  inline bool hasColor() const;
+  inline  ::capnp::Text::Reader getColor() const;
+
+  inline  ::int8_t getIsEnabled() const;
+
+  inline bool hasDescription() const;
+  inline  ::capnp::Text::Reader getDescription() const;
+
+  inline bool hasData() const;
+  inline  ::capnp::Text::Reader getData() const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -221,15 +233,19 @@ public:
   inline void adoptUuid(::capnp::Orphan< ::capnp::Text>&& value);
   inline ::capnp::Orphan< ::capnp::Text> disownUuid();
 
-  inline  ::int64_t getId();
-  inline void setId( ::int64_t value);
-
   inline bool hasName();
   inline  ::capnp::Text::Builder getName();
   inline void setName( ::capnp::Text::Reader value);
   inline  ::capnp::Text::Builder initName(unsigned int size);
   inline void adoptName(::capnp::Orphan< ::capnp::Text>&& value);
   inline ::capnp::Orphan< ::capnp::Text> disownName();
+
+  inline bool hasInternalId();
+  inline  ::capnp::Text::Builder getInternalId();
+  inline void setInternalId( ::capnp::Text::Reader value);
+  inline  ::capnp::Text::Builder initInternalId(unsigned int size);
+  inline void adoptInternalId(::capnp::Orphan< ::capnp::Text>&& value);
+  inline ::capnp::Orphan< ::capnp::Text> disownInternalId();
 
   inline  ::int8_t getMonday();
   inline void setMonday( ::int8_t value);
@@ -281,6 +297,30 @@ public:
   inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder initExceptDates(unsigned int size);
   inline void adoptExceptDates(::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value);
   inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> disownExceptDates();
+
+  inline bool hasColor();
+  inline  ::capnp::Text::Builder getColor();
+  inline void setColor( ::capnp::Text::Reader value);
+  inline  ::capnp::Text::Builder initColor(unsigned int size);
+  inline void adoptColor(::capnp::Orphan< ::capnp::Text>&& value);
+  inline ::capnp::Orphan< ::capnp::Text> disownColor();
+
+  inline  ::int8_t getIsEnabled();
+  inline void setIsEnabled( ::int8_t value);
+
+  inline bool hasDescription();
+  inline  ::capnp::Text::Builder getDescription();
+  inline void setDescription( ::capnp::Text::Reader value);
+  inline  ::capnp::Text::Builder initDescription(unsigned int size);
+  inline void adoptDescription(::capnp::Orphan< ::capnp::Text>&& value);
+  inline ::capnp::Orphan< ::capnp::Text> disownDescription();
+
+  inline bool hasData();
+  inline  ::capnp::Text::Builder getData();
+  inline void setData( ::capnp::Text::Reader value);
+  inline  ::capnp::Text::Builder initData(unsigned int size);
+  inline void adoptData(::capnp::Orphan< ::capnp::Text>&& value);
+  inline ::capnp::Orphan< ::capnp::Text> disownData();
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -378,20 +418,6 @@ inline ::capnp::Orphan< ::capnp::Text> Service::Builder::disownUuid() {
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 
-inline  ::int64_t Service::Reader::getId() const {
-  return _reader.getDataField< ::int64_t>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
-}
-
-inline  ::int64_t Service::Builder::getId() {
-  return _builder.getDataField< ::int64_t>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
-}
-inline void Service::Builder::setId( ::int64_t value) {
-  _builder.setDataField< ::int64_t>(
-      ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
-}
-
 inline bool Service::Reader::hasName() const {
   return !_reader.getPointerField(
       ::capnp::bounded<1>() * ::capnp::POINTERS).isNull();
@@ -426,246 +452,396 @@ inline ::capnp::Orphan< ::capnp::Text> Service::Builder::disownName() {
       ::capnp::bounded<1>() * ::capnp::POINTERS));
 }
 
-inline  ::int8_t Service::Reader::getMonday() const {
-  return _reader.getDataField< ::int8_t>(
-      ::capnp::bounded<8>() * ::capnp::ELEMENTS);
-}
-
-inline  ::int8_t Service::Builder::getMonday() {
-  return _builder.getDataField< ::int8_t>(
-      ::capnp::bounded<8>() * ::capnp::ELEMENTS);
-}
-inline void Service::Builder::setMonday( ::int8_t value) {
-  _builder.setDataField< ::int8_t>(
-      ::capnp::bounded<8>() * ::capnp::ELEMENTS, value);
-}
-
-inline  ::int8_t Service::Reader::getTuesday() const {
-  return _reader.getDataField< ::int8_t>(
-      ::capnp::bounded<9>() * ::capnp::ELEMENTS);
-}
-
-inline  ::int8_t Service::Builder::getTuesday() {
-  return _builder.getDataField< ::int8_t>(
-      ::capnp::bounded<9>() * ::capnp::ELEMENTS);
-}
-inline void Service::Builder::setTuesday( ::int8_t value) {
-  _builder.setDataField< ::int8_t>(
-      ::capnp::bounded<9>() * ::capnp::ELEMENTS, value);
-}
-
-inline  ::int8_t Service::Reader::getWednesday() const {
-  return _reader.getDataField< ::int8_t>(
-      ::capnp::bounded<10>() * ::capnp::ELEMENTS);
-}
-
-inline  ::int8_t Service::Builder::getWednesday() {
-  return _builder.getDataField< ::int8_t>(
-      ::capnp::bounded<10>() * ::capnp::ELEMENTS);
-}
-inline void Service::Builder::setWednesday( ::int8_t value) {
-  _builder.setDataField< ::int8_t>(
-      ::capnp::bounded<10>() * ::capnp::ELEMENTS, value);
-}
-
-inline  ::int8_t Service::Reader::getThursday() const {
-  return _reader.getDataField< ::int8_t>(
-      ::capnp::bounded<11>() * ::capnp::ELEMENTS);
-}
-
-inline  ::int8_t Service::Builder::getThursday() {
-  return _builder.getDataField< ::int8_t>(
-      ::capnp::bounded<11>() * ::capnp::ELEMENTS);
-}
-inline void Service::Builder::setThursday( ::int8_t value) {
-  _builder.setDataField< ::int8_t>(
-      ::capnp::bounded<11>() * ::capnp::ELEMENTS, value);
-}
-
-inline  ::int8_t Service::Reader::getFriday() const {
-  return _reader.getDataField< ::int8_t>(
-      ::capnp::bounded<12>() * ::capnp::ELEMENTS);
-}
-
-inline  ::int8_t Service::Builder::getFriday() {
-  return _builder.getDataField< ::int8_t>(
-      ::capnp::bounded<12>() * ::capnp::ELEMENTS);
-}
-inline void Service::Builder::setFriday( ::int8_t value) {
-  _builder.setDataField< ::int8_t>(
-      ::capnp::bounded<12>() * ::capnp::ELEMENTS, value);
-}
-
-inline  ::int8_t Service::Reader::getSaturday() const {
-  return _reader.getDataField< ::int8_t>(
-      ::capnp::bounded<13>() * ::capnp::ELEMENTS);
-}
-
-inline  ::int8_t Service::Builder::getSaturday() {
-  return _builder.getDataField< ::int8_t>(
-      ::capnp::bounded<13>() * ::capnp::ELEMENTS);
-}
-inline void Service::Builder::setSaturday( ::int8_t value) {
-  _builder.setDataField< ::int8_t>(
-      ::capnp::bounded<13>() * ::capnp::ELEMENTS, value);
-}
-
-inline  ::int8_t Service::Reader::getSunday() const {
-  return _reader.getDataField< ::int8_t>(
-      ::capnp::bounded<14>() * ::capnp::ELEMENTS);
-}
-
-inline  ::int8_t Service::Builder::getSunday() {
-  return _builder.getDataField< ::int8_t>(
-      ::capnp::bounded<14>() * ::capnp::ELEMENTS);
-}
-inline void Service::Builder::setSunday( ::int8_t value) {
-  _builder.setDataField< ::int8_t>(
-      ::capnp::bounded<14>() * ::capnp::ELEMENTS, value);
-}
-
-inline bool Service::Reader::hasStartDate() const {
+inline bool Service::Reader::hasInternalId() const {
   return !_reader.getPointerField(
       ::capnp::bounded<2>() * ::capnp::POINTERS).isNull();
 }
-inline bool Service::Builder::hasStartDate() {
+inline bool Service::Builder::hasInternalId() {
   return !_builder.getPointerField(
       ::capnp::bounded<2>() * ::capnp::POINTERS).isNull();
 }
-inline  ::capnp::Text::Reader Service::Reader::getStartDate() const {
+inline  ::capnp::Text::Reader Service::Reader::getInternalId() const {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_reader.getPointerField(
       ::capnp::bounded<2>() * ::capnp::POINTERS));
 }
-inline  ::capnp::Text::Builder Service::Builder::getStartDate() {
+inline  ::capnp::Text::Builder Service::Builder::getInternalId() {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_builder.getPointerField(
       ::capnp::bounded<2>() * ::capnp::POINTERS));
 }
-inline void Service::Builder::setStartDate( ::capnp::Text::Reader value) {
+inline void Service::Builder::setInternalId( ::capnp::Text::Reader value) {
   ::capnp::_::PointerHelpers< ::capnp::Text>::set(_builder.getPointerField(
       ::capnp::bounded<2>() * ::capnp::POINTERS), value);
 }
-inline  ::capnp::Text::Builder Service::Builder::initStartDate(unsigned int size) {
+inline  ::capnp::Text::Builder Service::Builder::initInternalId(unsigned int size) {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::init(_builder.getPointerField(
       ::capnp::bounded<2>() * ::capnp::POINTERS), size);
 }
-inline void Service::Builder::adoptStartDate(
+inline void Service::Builder::adoptInternalId(
     ::capnp::Orphan< ::capnp::Text>&& value) {
   ::capnp::_::PointerHelpers< ::capnp::Text>::adopt(_builder.getPointerField(
       ::capnp::bounded<2>() * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::capnp::Text> Service::Builder::disownStartDate() {
+inline ::capnp::Orphan< ::capnp::Text> Service::Builder::disownInternalId() {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
       ::capnp::bounded<2>() * ::capnp::POINTERS));
 }
 
-inline bool Service::Reader::hasEndDate() const {
+inline  ::int8_t Service::Reader::getMonday() const {
+  return _reader.getDataField< ::int8_t>(
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
+}
+
+inline  ::int8_t Service::Builder::getMonday() {
+  return _builder.getDataField< ::int8_t>(
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS);
+}
+inline void Service::Builder::setMonday( ::int8_t value) {
+  _builder.setDataField< ::int8_t>(
+      ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
+}
+
+inline  ::int8_t Service::Reader::getTuesday() const {
+  return _reader.getDataField< ::int8_t>(
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
+}
+
+inline  ::int8_t Service::Builder::getTuesday() {
+  return _builder.getDataField< ::int8_t>(
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
+}
+inline void Service::Builder::setTuesday( ::int8_t value) {
+  _builder.setDataField< ::int8_t>(
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
+}
+
+inline  ::int8_t Service::Reader::getWednesday() const {
+  return _reader.getDataField< ::int8_t>(
+      ::capnp::bounded<2>() * ::capnp::ELEMENTS);
+}
+
+inline  ::int8_t Service::Builder::getWednesday() {
+  return _builder.getDataField< ::int8_t>(
+      ::capnp::bounded<2>() * ::capnp::ELEMENTS);
+}
+inline void Service::Builder::setWednesday( ::int8_t value) {
+  _builder.setDataField< ::int8_t>(
+      ::capnp::bounded<2>() * ::capnp::ELEMENTS, value);
+}
+
+inline  ::int8_t Service::Reader::getThursday() const {
+  return _reader.getDataField< ::int8_t>(
+      ::capnp::bounded<3>() * ::capnp::ELEMENTS);
+}
+
+inline  ::int8_t Service::Builder::getThursday() {
+  return _builder.getDataField< ::int8_t>(
+      ::capnp::bounded<3>() * ::capnp::ELEMENTS);
+}
+inline void Service::Builder::setThursday( ::int8_t value) {
+  _builder.setDataField< ::int8_t>(
+      ::capnp::bounded<3>() * ::capnp::ELEMENTS, value);
+}
+
+inline  ::int8_t Service::Reader::getFriday() const {
+  return _reader.getDataField< ::int8_t>(
+      ::capnp::bounded<4>() * ::capnp::ELEMENTS);
+}
+
+inline  ::int8_t Service::Builder::getFriday() {
+  return _builder.getDataField< ::int8_t>(
+      ::capnp::bounded<4>() * ::capnp::ELEMENTS);
+}
+inline void Service::Builder::setFriday( ::int8_t value) {
+  _builder.setDataField< ::int8_t>(
+      ::capnp::bounded<4>() * ::capnp::ELEMENTS, value);
+}
+
+inline  ::int8_t Service::Reader::getSaturday() const {
+  return _reader.getDataField< ::int8_t>(
+      ::capnp::bounded<5>() * ::capnp::ELEMENTS);
+}
+
+inline  ::int8_t Service::Builder::getSaturday() {
+  return _builder.getDataField< ::int8_t>(
+      ::capnp::bounded<5>() * ::capnp::ELEMENTS);
+}
+inline void Service::Builder::setSaturday( ::int8_t value) {
+  _builder.setDataField< ::int8_t>(
+      ::capnp::bounded<5>() * ::capnp::ELEMENTS, value);
+}
+
+inline  ::int8_t Service::Reader::getSunday() const {
+  return _reader.getDataField< ::int8_t>(
+      ::capnp::bounded<6>() * ::capnp::ELEMENTS);
+}
+
+inline  ::int8_t Service::Builder::getSunday() {
+  return _builder.getDataField< ::int8_t>(
+      ::capnp::bounded<6>() * ::capnp::ELEMENTS);
+}
+inline void Service::Builder::setSunday( ::int8_t value) {
+  _builder.setDataField< ::int8_t>(
+      ::capnp::bounded<6>() * ::capnp::ELEMENTS, value);
+}
+
+inline bool Service::Reader::hasStartDate() const {
   return !_reader.getPointerField(
       ::capnp::bounded<3>() * ::capnp::POINTERS).isNull();
 }
-inline bool Service::Builder::hasEndDate() {
+inline bool Service::Builder::hasStartDate() {
   return !_builder.getPointerField(
       ::capnp::bounded<3>() * ::capnp::POINTERS).isNull();
 }
-inline  ::capnp::Text::Reader Service::Reader::getEndDate() const {
+inline  ::capnp::Text::Reader Service::Reader::getStartDate() const {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_reader.getPointerField(
       ::capnp::bounded<3>() * ::capnp::POINTERS));
 }
-inline  ::capnp::Text::Builder Service::Builder::getEndDate() {
+inline  ::capnp::Text::Builder Service::Builder::getStartDate() {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_builder.getPointerField(
       ::capnp::bounded<3>() * ::capnp::POINTERS));
 }
-inline void Service::Builder::setEndDate( ::capnp::Text::Reader value) {
+inline void Service::Builder::setStartDate( ::capnp::Text::Reader value) {
   ::capnp::_::PointerHelpers< ::capnp::Text>::set(_builder.getPointerField(
       ::capnp::bounded<3>() * ::capnp::POINTERS), value);
 }
-inline  ::capnp::Text::Builder Service::Builder::initEndDate(unsigned int size) {
+inline  ::capnp::Text::Builder Service::Builder::initStartDate(unsigned int size) {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::init(_builder.getPointerField(
       ::capnp::bounded<3>() * ::capnp::POINTERS), size);
 }
-inline void Service::Builder::adoptEndDate(
+inline void Service::Builder::adoptStartDate(
     ::capnp::Orphan< ::capnp::Text>&& value) {
   ::capnp::_::PointerHelpers< ::capnp::Text>::adopt(_builder.getPointerField(
       ::capnp::bounded<3>() * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::capnp::Text> Service::Builder::disownEndDate() {
+inline ::capnp::Orphan< ::capnp::Text> Service::Builder::disownStartDate() {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
       ::capnp::bounded<3>() * ::capnp::POINTERS));
 }
 
-inline bool Service::Reader::hasOnlyDates() const {
+inline bool Service::Reader::hasEndDate() const {
   return !_reader.getPointerField(
       ::capnp::bounded<4>() * ::capnp::POINTERS).isNull();
 }
-inline bool Service::Builder::hasOnlyDates() {
+inline bool Service::Builder::hasEndDate() {
   return !_builder.getPointerField(
       ::capnp::bounded<4>() * ::capnp::POINTERS).isNull();
 }
+inline  ::capnp::Text::Reader Service::Reader::getEndDate() const {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_reader.getPointerField(
+      ::capnp::bounded<4>() * ::capnp::POINTERS));
+}
+inline  ::capnp::Text::Builder Service::Builder::getEndDate() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_builder.getPointerField(
+      ::capnp::bounded<4>() * ::capnp::POINTERS));
+}
+inline void Service::Builder::setEndDate( ::capnp::Text::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::set(_builder.getPointerField(
+      ::capnp::bounded<4>() * ::capnp::POINTERS), value);
+}
+inline  ::capnp::Text::Builder Service::Builder::initEndDate(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::init(_builder.getPointerField(
+      ::capnp::bounded<4>() * ::capnp::POINTERS), size);
+}
+inline void Service::Builder::adoptEndDate(
+    ::capnp::Orphan< ::capnp::Text>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::adopt(_builder.getPointerField(
+      ::capnp::bounded<4>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::Text> Service::Builder::disownEndDate() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
+      ::capnp::bounded<4>() * ::capnp::POINTERS));
+}
+
+inline bool Service::Reader::hasOnlyDates() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<5>() * ::capnp::POINTERS).isNull();
+}
+inline bool Service::Builder::hasOnlyDates() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<5>() * ::capnp::POINTERS).isNull();
+}
 inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader Service::Reader::getOnlyDates() const {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_reader.getPointerField(
-      ::capnp::bounded<4>() * ::capnp::POINTERS));
+      ::capnp::bounded<5>() * ::capnp::POINTERS));
 }
 inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Service::Builder::getOnlyDates() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_builder.getPointerField(
-      ::capnp::bounded<4>() * ::capnp::POINTERS));
+      ::capnp::bounded<5>() * ::capnp::POINTERS));
 }
 inline void Service::Builder::setOnlyDates( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
-      ::capnp::bounded<4>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<5>() * ::capnp::POINTERS), value);
 }
 inline void Service::Builder::setOnlyDates(::kj::ArrayPtr<const  ::capnp::Text::Reader> value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
-      ::capnp::bounded<4>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<5>() * ::capnp::POINTERS), value);
 }
 inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Service::Builder::initOnlyDates(unsigned int size) {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::init(_builder.getPointerField(
-      ::capnp::bounded<4>() * ::capnp::POINTERS), size);
+      ::capnp::bounded<5>() * ::capnp::POINTERS), size);
 }
 inline void Service::Builder::adoptOnlyDates(
     ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::adopt(_builder.getPointerField(
-      ::capnp::bounded<4>() * ::capnp::POINTERS), kj::mv(value));
+      ::capnp::bounded<5>() * ::capnp::POINTERS), kj::mv(value));
 }
 inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> Service::Builder::disownOnlyDates() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::disown(_builder.getPointerField(
-      ::capnp::bounded<4>() * ::capnp::POINTERS));
+      ::capnp::bounded<5>() * ::capnp::POINTERS));
 }
 
 inline bool Service::Reader::hasExceptDates() const {
   return !_reader.getPointerField(
-      ::capnp::bounded<5>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<6>() * ::capnp::POINTERS).isNull();
 }
 inline bool Service::Builder::hasExceptDates() {
   return !_builder.getPointerField(
-      ::capnp::bounded<5>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<6>() * ::capnp::POINTERS).isNull();
 }
 inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader Service::Reader::getExceptDates() const {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_reader.getPointerField(
-      ::capnp::bounded<5>() * ::capnp::POINTERS));
+      ::capnp::bounded<6>() * ::capnp::POINTERS));
 }
 inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Service::Builder::getExceptDates() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_builder.getPointerField(
-      ::capnp::bounded<5>() * ::capnp::POINTERS));
+      ::capnp::bounded<6>() * ::capnp::POINTERS));
 }
 inline void Service::Builder::setExceptDates( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
-      ::capnp::bounded<5>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<6>() * ::capnp::POINTERS), value);
 }
 inline void Service::Builder::setExceptDates(::kj::ArrayPtr<const  ::capnp::Text::Reader> value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
-      ::capnp::bounded<5>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<6>() * ::capnp::POINTERS), value);
 }
 inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Service::Builder::initExceptDates(unsigned int size) {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::init(_builder.getPointerField(
-      ::capnp::bounded<5>() * ::capnp::POINTERS), size);
+      ::capnp::bounded<6>() * ::capnp::POINTERS), size);
 }
 inline void Service::Builder::adoptExceptDates(
     ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::adopt(_builder.getPointerField(
-      ::capnp::bounded<5>() * ::capnp::POINTERS), kj::mv(value));
+      ::capnp::bounded<6>() * ::capnp::POINTERS), kj::mv(value));
 }
 inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> Service::Builder::disownExceptDates() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::disown(_builder.getPointerField(
-      ::capnp::bounded<5>() * ::capnp::POINTERS));
+      ::capnp::bounded<6>() * ::capnp::POINTERS));
+}
+
+inline bool Service::Reader::hasColor() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS).isNull();
+}
+inline bool Service::Builder::hasColor() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::Text::Reader Service::Reader::getColor() const {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_reader.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS));
+}
+inline  ::capnp::Text::Builder Service::Builder::getColor() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_builder.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS));
+}
+inline void Service::Builder::setColor( ::capnp::Text::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::set(_builder.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS), value);
+}
+inline  ::capnp::Text::Builder Service::Builder::initColor(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::init(_builder.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS), size);
+}
+inline void Service::Builder::adoptColor(
+    ::capnp::Orphan< ::capnp::Text>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::adopt(_builder.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::Text> Service::Builder::disownColor() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS));
+}
+
+inline  ::int8_t Service::Reader::getIsEnabled() const {
+  return _reader.getDataField< ::int8_t>(
+      ::capnp::bounded<7>() * ::capnp::ELEMENTS);
+}
+
+inline  ::int8_t Service::Builder::getIsEnabled() {
+  return _builder.getDataField< ::int8_t>(
+      ::capnp::bounded<7>() * ::capnp::ELEMENTS);
+}
+inline void Service::Builder::setIsEnabled( ::int8_t value) {
+  _builder.setDataField< ::int8_t>(
+      ::capnp::bounded<7>() * ::capnp::ELEMENTS, value);
+}
+
+inline bool Service::Reader::hasDescription() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<8>() * ::capnp::POINTERS).isNull();
+}
+inline bool Service::Builder::hasDescription() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<8>() * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::Text::Reader Service::Reader::getDescription() const {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_reader.getPointerField(
+      ::capnp::bounded<8>() * ::capnp::POINTERS));
+}
+inline  ::capnp::Text::Builder Service::Builder::getDescription() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_builder.getPointerField(
+      ::capnp::bounded<8>() * ::capnp::POINTERS));
+}
+inline void Service::Builder::setDescription( ::capnp::Text::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::set(_builder.getPointerField(
+      ::capnp::bounded<8>() * ::capnp::POINTERS), value);
+}
+inline  ::capnp::Text::Builder Service::Builder::initDescription(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::init(_builder.getPointerField(
+      ::capnp::bounded<8>() * ::capnp::POINTERS), size);
+}
+inline void Service::Builder::adoptDescription(
+    ::capnp::Orphan< ::capnp::Text>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::adopt(_builder.getPointerField(
+      ::capnp::bounded<8>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::Text> Service::Builder::disownDescription() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
+      ::capnp::bounded<8>() * ::capnp::POINTERS));
+}
+
+inline bool Service::Reader::hasData() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<9>() * ::capnp::POINTERS).isNull();
+}
+inline bool Service::Builder::hasData() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<9>() * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::Text::Reader Service::Reader::getData() const {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_reader.getPointerField(
+      ::capnp::bounded<9>() * ::capnp::POINTERS));
+}
+inline  ::capnp::Text::Builder Service::Builder::getData() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_builder.getPointerField(
+      ::capnp::bounded<9>() * ::capnp::POINTERS));
+}
+inline void Service::Builder::setData( ::capnp::Text::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::set(_builder.getPointerField(
+      ::capnp::bounded<9>() * ::capnp::POINTERS), value);
+}
+inline  ::capnp::Text::Builder Service::Builder::initData(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::init(_builder.getPointerField(
+      ::capnp::bounded<9>() * ::capnp::POINTERS), size);
+}
+inline void Service::Builder::adoptData(
+    ::capnp::Orphan< ::capnp::Text>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::adopt(_builder.getPointerField(
+      ::capnp::bounded<9>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::Text> Service::Builder::disownData() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
+      ::capnp::bounded<9>() * ::capnp::POINTERS));
 }
 
 }  // namespace
