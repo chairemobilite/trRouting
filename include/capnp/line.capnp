@@ -16,10 +16,24 @@ struct Trip {
   seatedCapacity @9 :Int16; # total seated capacity for this trip
 }
 
+struct Period {
+  periodShortname @0 :Text;
+  outboundPathUuid @1 :Text;
+  inboundPathUuid @2 :Text;
+  customStartAtSeconds @3 :Int32;
+  startAtSeconds @4 :Int32;
+  endAtSeconds @5 :Int32;
+  intervalSeconds @6 :Int16;
+  numberOfUnits @7 :Int16;
+  trips @8 :List(Trip);
+}
+
 struct Schedule {
   uuid @0 :Text;
   serviceUuid @1 :Text;
-  trips @2 :List(Trip);
+  periodsGroupShortname @2 :Text;
+  periods @3 :List(Period);
+  allowSecondsBasedSchedules @4 :Int8;
 }
 
 struct Line {
