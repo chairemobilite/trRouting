@@ -16,7 +16,7 @@ namespace TrRouting
       params.osrmRouter            = std::move(osrmRouter);
       
     }
-
+    
     algorithmCalculationTime = CalculationTime();
     std::cout << "preparing calculator..." << std::endl; 
     prepare();

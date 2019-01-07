@@ -1,8 +1,8 @@
 #ifndef TR_TRIP
 #define TR_TRIP
 
+#include <boost/uuid/uuid.hpp>
 #include <vector>
-#include <boost/serialization/access.hpp>
 
 namespace TrRouting
 {
@@ -11,13 +11,17 @@ namespace TrRouting
   
   public:
    
-    unsigned long long id;
-    unsigned long long routeId;
-    unsigned long long routePathId;
-    unsigned long long routeTypeId;
-    unsigned long long agencyId;
-    unsigned long long serviceId;
-  
+    boost::uuids::uuid uuid;
+    int agencyIdx;
+    int lineIdx;
+    int pathIdx;
+    int modeIdx;
+    int serviceIdx;
+    int blockIdx;
+    int totalCapacity;
+    int seatedCapacity;
+    std::vector<int> loadBySegment; // must be reset before each batch routing
+
   };
 
 }

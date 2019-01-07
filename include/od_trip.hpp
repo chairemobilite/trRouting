@@ -2,7 +2,6 @@
 #define TR_OD_TRIP
 
 #include <vector>
-#include <boost/serialization/access.hpp>
 
 #include "point.hpp"
 

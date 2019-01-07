@@ -3,6 +3,7 @@
 namespace TrRouting
 {
   
+  /*
   const std::pair<std::vector<Stop>, std::map<unsigned long long, int>> CacheFetcher::getStops(std::string applicationShortname)
   {
     std::vector<Stop> stops;
@@ -39,7 +40,9 @@ namespace TrRouting
     }
     return std::make_pair(stops, stopIndexesById);
   }
+  */
   
+  /*
   const std::pair<std::vector<Route>, std::map<unsigned long long, int>> CacheFetcher::getRoutes(std::string applicationShortname)
   {
     std::vector<Route> routes;
@@ -75,7 +78,9 @@ namespace TrRouting
     }
     return std::make_pair(routes, routeIndexesById);
   }
-  
+  */
+
+  /*
   const std::pair<std::vector<Trip>, std::map<unsigned long long, int>> CacheFetcher::getTrips(std::string applicationShortname)
   {
     std::vector<Trip> trips;
@@ -108,7 +113,9 @@ namespace TrRouting
     }
     return std::make_pair(trips, tripIndexesById);
   }
-  
+  */
+
+  /*
   const std::pair<std::vector<std::tuple<int,int,int,int,int,short,short,int>>, std::vector<std::tuple<int,int,int,int,int,short,short,int>>> CacheFetcher::getConnections(std::string applicationShortname, std::map<unsigned long long, int> stopIndexesById, std::map<unsigned long long, int> tripIndexesById)
   {
     std::vector<std::tuple<int,int,int,int,int,short,short,int>> forwardConnections;
@@ -159,7 +166,9 @@ namespace TrRouting
     return std::make_pair(forwardConnections, reverseConnections);
     
   }
+  */
   
+  /*
   const std::pair<std::vector<std::tuple<int,int,int>>, std::vector<std::pair<long long,long long>>> CacheFetcher::getFootpaths(std::string applicationShortname, std::map<unsigned long long, int> stopIndexesById)
   {
     std::vector<std::tuple<int,int,int>> footpaths;
@@ -196,7 +205,9 @@ namespace TrRouting
     return std::make_pair(footpaths, footpathsRanges);
     
   }
+  */
 
+  /*
   const std::vector<std::pair<int,int>> CacheFetcher::getOdTripFootpaths(std::string applicationShortname, Parameters& params)
   {
     std::vector<std::pair<int,int>> odTripFootpaths;
@@ -226,7 +237,9 @@ namespace TrRouting
     return odTripFootpaths;
     
   }
+  */
 
+  /*
   const std::pair<std::vector<OdTrip>, std::map<unsigned long long, int>> CacheFetcher::getOdTrips(std::string applicationShortname, std::vector<Stop> stops, Parameters& params)
   {
     std::vector<OdTrip> odTrips;
@@ -292,6 +305,6 @@ namespace TrRouting
     return std::make_pair(odTrips, odTripIndexesById);
     
   }
-  
+  */
   
 }

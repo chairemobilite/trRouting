@@ -13,6 +13,7 @@
 #include <math.h>
 #include <osrm/osrm.hpp>
 #include <boost/optional.hpp>
+#include <boost/uuid/uuid.hpp>
 
 #include "point.hpp"
 #include "toolbox.hpp"
@@ -35,21 +36,21 @@ namespace TrRouting
     GtfsFetcher*     gtfsFetcher;
     CsvFetcher*      csvFetcher;
     
-    int routingDateYear;   // not implemented, use onlyServiceIds or exceptServiceIds for now
-    int routingDateMonth;  // not implemented, use onlyServiceIds or exceptServiceIds for now
-    int routingDateDay;    // not implemented, use onlyServiceIds or exceptServiceIds for now
-    std::vector<int> onlyServiceIds;
-    std::vector<unsigned long long> exceptServiceIds;
-    std::vector<unsigned long long> onlyRouteIds;
-    std::vector<unsigned long long> exceptRouteIds;
-    std::vector<unsigned long long> onlyRouteTypeIds;
-    std::vector<unsigned long long> exceptRouteTypeIds;
-    std::vector<unsigned long long> onlyAgencyIds;
-    std::vector<unsigned long long> exceptAgencyIds;
-    std::vector<unsigned long long> accessStopIds;
-    std::vector<int>                accessStopTravelTimesSeconds;
-    std::vector<unsigned long long> egressStopIds;
-    std::vector<int>                egressStopTravelTimesSeconds;
+    int routingDateYear;   // not implemented, use onlyServiceUuids or exceptServiceUuids for now
+    int routingDateMonth;  // not implemented, use onlyServiceUuids or exceptServiceUuids for now
+    int routingDateDay;    // not implemented, use onlyServiceUuids or exceptServiceUuids for now
+    std::vector<boost::uuids::uuid> onlyServiceUuids;
+    std::vector<boost::uuids::uuid> exceptServiceUuids;
+    std::vector<boost::uuids::uuid> onlyLineUuids;
+    std::vector<boost::uuids::uuid> exceptLineUuids;
+    std::vector<boost::uuids::uuid> onlyModes;
+    std::vector<boost::uuids::uuid> exceptModes;
+    std::vector<boost::uuids::uuid> onlyAgencyUuids;
+    std::vector<boost::uuids::uuid> exceptAgencyUuids;
+    std::vector<boost::uuids::uuid> accessNodeUuids;
+    std::vector<int>                accessNodeTravelTimesSeconds;
+    std::vector<boost::uuids::uuid> egressNodeUuids;
+    std::vector<int>                egressNodeTravelTimesSeconds;
     
     std::vector<std::pair<int,int>> odTripsPeriods; // pair: start_at_seconds, end_at_seconds
     std::vector<std::string>        odTripsGenders;
@@ -80,15 +81,10 @@ namespace TrRouting
     
     Point origin;
     Point destination;
-    long long originStopId;
-    long long destinationStopId;
+    boost::uuids::uuid originNodeUuid;
+    boost::uuids::uuid destinationNodeUuid;
     OdTrip* odTrip;
     
-    std::string databaseName;
-    std::string databaseHost;
-    std::string databaseUser;
-    std::string databasePort;
-    std::string databasePassword;
     std::string osrmRoutingWalkingPort;
     std::string osrmRoutingWalkingHost;
     std::string osrmRoutingDrivingPort;
@@ -98,7 +94,7 @@ namespace TrRouting
     std::string osrmFilePath; // path to .osrm file
     bool osrmUseLib;
     boost::optional<osrm::OSRM> osrmRouter;
-    int updateOdTrips; // if 1: update od trips access and egress stops from database. Set to 1 only if stops and/or od trips were modified.
+    int updateOdTrips; // if 1: update od trips access and egress nodes from database. Set to 1 only if nodes and/or od trips were modified.
     
     std::string accessMode;
     std::string egressMode;
@@ -112,10 +108,10 @@ namespace TrRouting
     float minAlternativeMaxTravelTimeSeconds; // if multiplying max travel time ratio with max travel time is too small, keep max travel time to this minimum.
     int   alternativesMaxAddedTravelTimeSeconds; // how many seconds to add to fastest travel time to limit alternatives travel time.
     
-    bool returnAllStopsResult;         // keep results for all stops (used in creating accessibility map)
+    bool returnAllNodesResult;         // keep results for all nodes (used in creating accessibility map)
     bool forwardCalculation;           // forward calculation: default. if false: reverse calculation, will ride connections backward (useful when setting the arrival time)
-    bool detailedResults;              // return detailed results when using results for all stops
-    bool transferOnlyAtSameStation;    // will transfer only between stops having the same station_id (better performance, but make sure your stations are well designed and specified)
+    bool detailedResults;              // return detailed results when using results for all nodes
+    bool transferOnlyAtSameStation;    // will transfer only between nodes/stops having the same station_id (better performance, but make sure your stations are well designed and specified)
     bool transferBetweenSameRoute;     // allow transfers between the same route_id
     bool calculateByNumberOfTransfers; // calculate first the fastest route, then calculate with decreasing number of transfers until no route is found, return results for each number of transfers.
     bool alternatives;                 // calculate alternatives or not
@@ -137,11 +133,6 @@ namespace TrRouting
       maxTotalWalkingTravelTimeSeconds       = 60*60; // not used right now
       maxOnlyWalkingAccessTravelTimeRatio    = 1.5; // prefer walking only if it is faster than transit and total only walking travel time <= maxAccessWalkingTravelTimeSeconds * this ratio
       transferPenaltySeconds                 = 0; // not used right now
-      databaseName                           = "tr_all_dev";
-      databasePort                           = "5432";
-      databaseHost                           = "127.0.0.1";
-      databaseUser                           = "postgres";
-      databasePassword                       = "";
       updateOdTrips                          = 0;
       osrmRoutingWalkingHost                 = "localhost";
       osrmRoutingWalkingPort                 = "5000";
@@ -150,14 +141,14 @@ namespace TrRouting
       osrmRoutingCyclingHost                 = "localhost";
       osrmRoutingCyclingPort                 = "8000";
       osrmUseLib                             = false;
-      osrmFilePath                           = "data.osrm";
+      osrmFilePath                           = "walk.osrm";
       accessMode                             = "walking";
       egressMode                             = "walking";
       noResultSecondMode                     = "driving";
       tryNextModeIfRoutingFails              = false;
       noResultNextAccessTimeSecondsIncrement = 5*60;
       maxNoResultNextAccessTimeSeconds       = 40*60;
-      returnAllStopsResult                   = false;
+      returnAllNodesResult                   = false;
       forwardCalculation                     = true;
       detailedResults                        = false;
       transferOnlyAtSameStation              = false;

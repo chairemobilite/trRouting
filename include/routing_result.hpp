@@ -1,9 +1,11 @@
 #ifndef TR_ROUTING_RESULT
 #define TR_ROUTING_RESULT
 
+#include <vector>
+#include <string>
+
 namespace TrRouting
 {
-  
   
   struct RoutingResult {
     
@@ -22,14 +24,14 @@ namespace TrRouting
     int calculationTimeMilliseconds;
     std::string status;
     std::string json;
-    std::vector<unsigned long long> routeIds;
-    std::vector<unsigned long long> tripIds;
-    std::vector<unsigned long long> boardingStopIds;
-    std::vector<unsigned long long> unboardingStopIds;
-    std::vector<unsigned long long> routeTypeIds;
-    std::vector<unsigned long long> agencyIds;
+    std::vector<boost::uuids::uuid> lineUuids;
+    std::vector<boost::uuids::uuid> tripUuids;
+    std::vector<boost::uuids::uuid> boardingNodeUuids;
+    std::vector<boost::uuids::uuid> unboardingNodeUuids;
+    std::vector<boost::uuids::uuid> agencyUuids;
+    std::vector<std::string>        modes;
     std::vector<int>                inVehicleTravelTimesSeconds;
-    std::vector<std::tuple<unsigned long long, unsigned long long, unsigned long long, int, int>> legs; // tuple: tripId, routeId, routePathId, boarding sequence, unboarding sequence
+    std::vector<std::tuple<boost::uuids::uuid, boost::uuids::uuid, boost::uuids::uuid, int, int>> legs; // tuple: tripUuid, lineUuid, pathUuid, boarding sequence, unboarding sequence
     
   };
   

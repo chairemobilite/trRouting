@@ -4,50 +4,50 @@
 namespace TrRouting
 {
     
-  RoutingResult Calculator::reverseJourney(int bestDepartureTime, int bestAccessStopIndex, int bestAccessTravelTime)
+  RoutingResult Calculator::reverseJourney(int bestDepartureTime, int bestAccessNodeIndex, int bestAccessTravelTime)
   {
     RoutingResult    result;
     nlohmann::json   json;
-    int              stopsCount           {1};
+    int              nodesCount           {1};
     int              i                    {0};
-    int              reachableStopsCount  {0};
+    int              reachableNodesCount  {0};
     bool             foundRoute           {false};
 
-    std::vector<int> resultingStops;
-    if (params.returnAllStopsResult)
+    std::vector<int> resultingNodes;
+    if (params.returnAllNodesResult)
     {
-      stopsCount     = stops.size();
-      json["stops"]  = nlohmann::json::array();
-      resultingStops = std::vector<int>(stopsCount);
-      std::iota (std::begin(resultingStops), std::end(resultingStops), 0); // generate sequencial indexes of each stops
+      nodesCount     = nodes.size();
+      json["nodes"]  = nlohmann::json::array();
+      resultingNodes = std::vector<int>(nodesCount);
+      std::iota (std::begin(resultingNodes), std::end(resultingNodes), 0); // generate sequencial indexes of each nodes
     }
     else if (bestDepartureTime > -1) // route found
     {
       foundRoute = true;
-      resultingStops.push_back(bestAccessStopIndex);
+      resultingNodes.push_back(bestAccessNodeIndex);
     }
 
-    if (foundRoute || params.returnAllStopsResult)
+    if (foundRoute || params.returnAllNodesResult)
     {
 
       std::deque<std::tuple<int,int,int,int,int,short>> journey;
-      std::tuple<int,int,int,int,int,short>             resultingStopJourneyStep;
+      std::tuple<int,int,int,int,int,short>             resultingNodeJourneyStep;
       std::tuple<int,int,int,int,int,short>             emptyJourneyStep {-1,-1,-1,-1,-1,-1};
-      std::tuple<int,int,int,int,int,short,short,int>   journeyStepEnterConnection; // connection tuple: departureStopIndex, arrivalStopIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequenceinTrip
+      std::tuple<int,int,int,int,int,short,short,int>   journeyStepEnterConnection; // connection tuple: departureNodeIndex, arrivalNodeIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequenceinTrip
       std::tuple<int,int,int,int,int,short,short,int>   journeyStepExitConnection;
       std::vector<unsigned long long>                   routeIds;
       std::vector<unsigned long long>                   routeTypeIds;
       std::vector<unsigned long long>                   agencyIds;
-      std::vector<unsigned long long>                   unboardingStopIds;
-      std::vector<unsigned long long>                   boardingStopIds;
+      std::vector<unsigned long long>                   unboardingNodeIds;
+      std::vector<unsigned long long>                   boardingNodeIds;
       std::vector<unsigned long long>                   tripIds;
       std::vector<int>                                  inVehicleTravelTimesSeconds; // the in vehicle travel time for each segment
       std::vector<std::tuple<unsigned long long, unsigned long long, unsigned long long, int, int>> legs; // tuple: tripId, routeId, routePathId, boarding sequence, unboarding sequence
       nlohmann::json stepJson = {};
-      nlohmann::json stopJson = {};
+      nlohmann::json nodeJson = {};
 
-      Stop  journeyStepStopDeparture;
-      Stop  journeyStepStopArrival;
+      Node  journeyStepNodeDeparture;
+      Node  journeyStepNodeArrival;
       Trip  journeyStepTrip;
       Route journeyStepRoute;
       
@@ -55,19 +55,19 @@ namespace TrRouting
       int totalWalkingTime         { 0}; int transferReadyTime   {-1}; int numberOfTransfers      {-1};
       int totalWaitingTime         { 0}; int departureTime       {-1}; int boardingSequence       {-1};
       int totalTransferWalkingTime { 0}; int arrivalTime         {-1}; int unboardingSequence     {-1};
-      int totalTransferWaitingTime { 0}; int inVehicleTime       {-1}; int bestEgressStopIndex    {-1};
+      int totalTransferWaitingTime { 0}; int inVehicleTime       {-1}; int bestEgressNodeIndex    {-1};
       int journeyStepTravelTime    {-1}; int accessWalkingTime   {-1}; 
       int transferTime             {-1}; int egressWalkingTime   {-1}; 
       int waitingTime              {-1}; int accessWaitingTime   {-1}; 
   
-      for (auto & resultingStopIndex : resultingStops)
+      for (auto & resultingNodeIndex : resultingNodes)
       {
         
         legs.clear();
         journey.clear();
         routeIds.clear();
-        boardingStopIds.clear();
-        unboardingStopIds.clear();
+        boardingNodeIds.clear();
+        unboardingNodeIds.clear();
         tripIds.clear();
         routeTypeIds.clear();
         inVehicleTravelTimesSeconds.clear();
@@ -76,41 +76,41 @@ namespace TrRouting
         totalWalkingTime         =  0; transferReadyTime   = -1; numberOfTransfers   = -1;
         totalWaitingTime         =  0; departureTime       = -1; boardingSequence    = -1;
         totalTransferWalkingTime =  0; arrivalTime         = -1; unboardingSequence  = -1;
-        totalTransferWaitingTime =  0; inVehicleTime       = -1; bestEgressStopIndex = -1;
+        totalTransferWaitingTime =  0; inVehicleTime       = -1; bestEgressNodeIndex = -1;
         journeyStepTravelTime    = -1; accessWalkingTime   = -1; 
         transferTime             = -1; egressWalkingTime   = -1; 
         waitingTime              = -1; accessWaitingTime   = -1; 
         
-        //std::cerr << stops[resultingStopIndex].name << " : " << std::get<0>(reverseAccessJourneys[resultingStopIndex]) << " tt: " << std::get<4>(reverseAccessJourneys[resultingStopIndex]) << std::endl; 
+        //std::cerr << nodes[resultingNodeIndex].name << " : " << std::get<0>(reverseAccessJourneys[resultingNodeIndex]) << " tt: " << std::get<4>(reverseAccessJourneys[resultingNodeIndex]) << std::endl; 
         // recreate journey:
-        resultingStopJourneyStep = reverseAccessJourneys[resultingStopIndex];
+        resultingNodeJourneyStep = reverseAccessJourneys[resultingNodeIndex];
         
-        if (resultingStopJourneyStep == emptyJourneyStep) // ignore stops with no route
+        if (resultingNodeJourneyStep == emptyJourneyStep) // ignore nodes with no route
         {
           continue;
         }
-        //std::cerr << stops[bestEgressStopIndex].name << std::endl;
+        //std::cerr << nodes[bestEgressNodeIndex].name << std::endl;
         i = 0;
-        while ((std::get<0>(resultingStopJourneyStep) != -1 && std::get<1>(resultingStopJourneyStep) != -1))
+        while ((std::get<0>(resultingNodeJourneyStep) != -1 && std::get<1>(resultingNodeJourneyStep) != -1))
         {
           if (journey.size() > 0)
           {
-            std::get<4>(journey[journey.size()-1]) = std::get<4>(resultingStopJourneyStep);
+            std::get<4>(journey[journey.size()-1]) = std::get<4>(resultingNodeJourneyStep);
           }
-          journey.push_back(resultingStopJourneyStep);
-          bestEgressStopIndex      = std::get<connectionIndexes::STOP_ARR>(reverseConnections[std::get<1>(resultingStopJourneyStep)]);
-          //std::cerr << stops[std::get<connectionIndexes::STOP_DEP>(reverseConnections[std::get<0>(resultingStopJourneyStep)])].name << " tt: " << std::get<4>(resultingStopJourneyStep) << " > "  << stops[std::get<connectionIndexes::STOP_ARR>(reverseConnections[std::get<1>(resultingStopJourneyStep)])].name << std::endl;
-          resultingStopJourneyStep = reverseJourneys[bestEgressStopIndex];
+          journey.push_back(resultingNodeJourneyStep);
+          bestEgressNodeIndex      = std::get<connectionIndexes::NODE_ARR>(reverseConnections[std::get<1>(resultingNodeJourneyStep)]);
+          //std::cerr << nodes[std::get<connectionIndexes::NODE_DEP>(reverseConnections[std::get<0>(resultingNodeJourneyStep)])].name << " tt: " << std::get<4>(resultingNodeJourneyStep) << " > "  << nodes[std::get<connectionIndexes::NODE_ARR>(reverseConnections[std::get<1>(resultingNodeJourneyStep)])].name << std::endl;
+          resultingNodeJourneyStep = reverseJourneys[bestEgressNodeIndex];
           
           i++;
         }
         
-        if (!params.returnAllStopsResult)
+        if (!params.returnAllNodesResult)
         {
           json["steps"] = nlohmann::json::array();
-          journey.push_front(std::make_tuple(-1,-1,-1,-1,stopsAccessTravelTime[resultingStopIndex],-1));
+          journey.push_front(std::make_tuple(-1,-1,-1,-1,nodesAccessTravelTime[resultingNodeIndex],-1));
         }
-        journey.push_back(std::make_tuple(-1,-1,-1,-1,stopsEgressTravelTime[bestEgressStopIndex],-1));
+        journey.push_back(std::make_tuple(-1,-1,-1,-1,nodesEgressTravelTime[bestEgressNodeIndex],-1));
         
         //std::string stepsJson = "  \"steps\":\n  [\n";
        
@@ -124,8 +124,8 @@ namespace TrRouting
             // journey tuple: final enter connection, final exit connection, final footpath
             journeyStepEnterConnection  = reverseConnections[std::get<0>(journeyStep)];
             journeyStepExitConnection   = reverseConnections[std::get<1>(journeyStep)];
-            journeyStepStopDeparture    = stops[std::get<connectionIndexes::STOP_DEP>(journeyStepEnterConnection)];
-            journeyStepStopArrival      = stops[std::get<connectionIndexes::STOP_ARR>(journeyStepExitConnection)];
+            journeyStepNodeDeparture    = nodes[std::get<connectionIndexes::NODE_DEP>(journeyStepEnterConnection)];
+            journeyStepNodeArrival      = nodes[std::get<connectionIndexes::NODE_ARR>(journeyStepExitConnection)];
             journeyStepTrip             = trips[std::get<3>(journeyStep)];
             journeyStepRoute            = routes[routeIndexesById[journeyStepTrip.routeId]];
             transferTime                = std::get<4>(journeyStep);
@@ -144,8 +144,8 @@ namespace TrRouting
             routeTypeIds.push_back(journeyStepRoute.routeTypeId);
             inVehicleTravelTimesSeconds.push_back(inVehicleTime);
             agencyIds.push_back(journeyStepRoute.agencyId);
-            boardingStopIds.push_back(journeyStepStopDeparture.id);
-            unboardingStopIds.push_back(journeyStepStopArrival.id);
+            boardingNodeIds.push_back(journeyStepNodeDeparture.id);
+            unboardingNodeIds.push_back(journeyStepNodeArrival.id);
             tripIds.push_back(journeyStepTrip.id);
             legs.push_back(std::make_tuple(journeyStepTrip.id, journeyStepTrip.routeId, journeyStepTrip.routePathId, boardingSequence, unboardingSequence));
             
@@ -159,7 +159,7 @@ namespace TrRouting
               totalTransferWaitingTime += waitingTime;
             }
             
-            if (!params.returnAllStopsResult)
+            if (!params.returnAllNodesResult)
             {
               stepJson                         = {};
               stepJson["action"]               = "board";
@@ -173,10 +173,10 @@ namespace TrRouting
               stepJson["routeTypeId"]          = journeyStepRoute.routeTypeId;
               stepJson["tripId"]               = journeyStepTrip.id;
               stepJson["sequenceInTrip"]       = boardingSequence;
-              stepJson["stopName"]             = journeyStepStopDeparture.name;
-              stepJson["stopCode"]             = journeyStepStopDeparture.code;
-              stepJson["stopId"]               = journeyStepStopDeparture.id;
-              stepJson["stopCoordinates"]      = {journeyStepStopDeparture.point.longitude, journeyStepStopDeparture.point.latitude};
+              stepJson["nodeName"]             = journeyStepNodeDeparture.name;
+              stepJson["nodeCode"]             = journeyStepNodeDeparture.code;
+              stepJson["nodeId"]               = journeyStepNodeDeparture.id;
+              stepJson["nodeCoordinates"]      = {journeyStepNodeDeparture.point.longitude, journeyStepNodeDeparture.point.latitude};
               stepJson["departureTime"]        = Toolbox::convertSecondsToFormattedTime(departureTime);
               stepJson["departureTimeSeconds"] = departureTime;
               stepJson["waitingTimeSeconds"]   = waitingTime;
@@ -194,10 +194,10 @@ namespace TrRouting
               stepJson["routeTypeId"]          = journeyStepRoute.routeTypeId;
               stepJson["tripId"]               = journeyStepTrip.id;
               stepJson["sequenceInTrip"]       = unboardingSequence;
-              stepJson["stopName"]             = journeyStepStopArrival.name;
-              stepJson["stopCode"]             = journeyStepStopArrival.code;
-              stepJson["stopId"]               = journeyStepStopArrival.id;
-              stepJson["stopCoordinates"]      = {journeyStepStopArrival.point.longitude, journeyStepStopArrival.point.latitude};
+              stepJson["nodeName"]             = journeyStepNodeArrival.name;
+              stepJson["nodeCode"]             = journeyStepNodeArrival.code;
+              stepJson["nodeId"]               = journeyStepNodeArrival.id;
+              stepJson["nodeCoordinates"]      = {journeyStepNodeArrival.point.longitude, journeyStepNodeArrival.point.latitude};
               stepJson["arrivalTime"]          = Toolbox::convertSecondsToFormattedTime(arrivalTime);
               stepJson["arrivalTimeSeconds"]   = arrivalTime;
               stepJson["inVehicleTimeSeconds"] = inVehicleTime;
@@ -208,7 +208,7 @@ namespace TrRouting
             {
               totalTransferWalkingTime += transferTime;
               totalWalkingTime         += transferTime;
-              if (!params.returnAllStopsResult)
+              if (!params.returnAllNodesResult)
               {
                 stepJson                         = {};
                 stepJson["action"]               = "walking";
@@ -234,7 +234,7 @@ namespace TrRouting
               transferReadyTime    = transferArrivalTime;
               totalWalkingTime    += transferTime;
               accessWalkingTime    = transferTime;
-              if (!params.returnAllStopsResult)
+              if (!params.returnAllNodesResult)
               {
                 stepJson                         = {};
                 stepJson["action"]               = "walking";
@@ -255,7 +255,7 @@ namespace TrRouting
               totalWalkingTime   += transferTime;
               egressWalkingTime   = transferTime;
               transferArrivalTime = arrivalTime + transferTime;
-              if (!params.returnAllStopsResult)
+              if (!params.returnAllNodesResult)
               {
                 stepJson                         = {};
                 stepJson["action"]               = "walking";
@@ -274,24 +274,24 @@ namespace TrRouting
           i++;
         }
                 
-        if (params.returnAllStopsResult)
+        if (params.returnAllNodesResult)
         {
-          if (std::get<0>(reverseAccessJourneys[resultingStopIndex]) != -1)
+          if (std::get<0>(reverseAccessJourneys[resultingNodeIndex]) != -1)
           {
-            departureTime = std::get<connectionIndexes::TIME_DEP>(reverseConnections[std::get<0>(reverseAccessJourneys[resultingStopIndex])]) - params.minWaitingTimeSeconds;
+            departureTime = std::get<connectionIndexes::TIME_DEP>(reverseConnections[std::get<0>(reverseAccessJourneys[resultingNodeIndex])]) - params.minWaitingTimeSeconds;
             if (arrivalTimeSeconds - departureTime <= params.maxTotalTravelTimeSeconds)
             {
-              reachableStopsCount++;
-              stopJson                           = {};
-              stopJson["id"]                     = stops[resultingStopIndex].id;
-              stopJson["departureTime"]          = Toolbox::convertSecondsToFormattedTime(departureTime);
-              stopJson["totalTravelTimeSeconds"] = arrivalTimeSeconds - departureTime;
-              stopJson["numberOfTransfers"]      = numberOfTransfers;
-              json["stops"].push_back(stopJson);
+              reachableNodesCount++;
+              nodeJson                           = {};
+              nodeJson["id"]                     = nodes[resultingNodeIndex].id;
+              nodeJson["departureTime"]          = Toolbox::convertSecondsToFormattedTime(departureTime);
+              nodeJson["totalTravelTimeSeconds"] = arrivalTimeSeconds - departureTime;
+              nodeJson["numberOfTransfers"]      = numberOfTransfers;
+              json["nodes"].push_back(nodeJson);
             }
           }
         }
-        else if (!params.returnAllStopsResult)
+        else if (!params.returnAllNodesResult)
         {
           if (numberOfTransfers >= 0)
           {
@@ -346,8 +346,8 @@ namespace TrRouting
             result.routeIds                    = routeIds;
             result.routeTypeIds                = routeTypeIds;
             result.agencyIds                   = agencyIds;
-            result.boardingStopIds             = boardingStopIds;
-            result.unboardingStopIds           = unboardingStopIds;
+            result.boardingNodeIds             = boardingNodeIds;
+            result.unboardingNodeIds           = unboardingNodeIds;
             result.tripIds                     = tripIds;
             result.inVehicleTravelTimesSeconds = inVehicleTravelTimesSeconds;
             result.status                      = "success";
@@ -377,10 +377,10 @@ namespace TrRouting
       result.nonTransitTravelTimeSeconds = -1;
     }
 
-    if (params.returnAllStopsResult)
+    if (params.returnAllNodesResult)
     {
-      json["numberOfReachableStops"]  = reachableStopsCount;
-      json["percentOfReachableStops"] = round(10000 * (float)reachableStopsCount / (float)(stopsCount))/100.0;
+      json["numberOfReachableNodes"]  = reachableNodesCount;
+      json["percentOfReachableNodes"] = round(10000 * (float)reachableNodesCount / (float)(nodesCount))/100.0;
     }
 
     result.json = json.dump(2); // number of spaces in indent for human readable json, use dump() to put all json content on the same line

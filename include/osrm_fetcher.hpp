@@ -2,10 +2,6 @@
 #define TR_OSRM_FETCHER
 
 #include <boost/algorithm/string.hpp>
-#include <boost/serialization/map.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/archive/binary_iarchive.hpp>
-#include <boost/archive/binary_oarchive.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/tokenizer.hpp>
@@ -26,7 +22,7 @@
 #include <osrm/table_parameters.hpp>
 
 #include "point.hpp"
-#include "stop.hpp"
+#include "node.hpp"
 #include "parameters.hpp"
 
 using namespace osrm;
@@ -43,7 +39,7 @@ namespace TrRouting
       
     }
     
-    static std::vector<std::pair<int,int>> getAccessibleStopsFootpathsFromPoint(const Point point, const std::vector<Stop> stops, std::string mode, Parameters& params, bool reversed = false);
+    static std::vector<std::pair<int,int>> getAccessibleNodesFootpathsFromPoint(const Point point, const std::vector<Node> nodes, std::string mode, Parameters& params, bool reversed = false);
     
   };
   

@@ -2,7 +2,6 @@
 #define TR_POINT
 
 #include <string>
-#include <boost/serialization/access.hpp>
 
 namespace TrRouting
 {

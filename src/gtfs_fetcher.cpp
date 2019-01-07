@@ -3,7 +3,7 @@
 namespace TrRouting
 {
   
-  const std::pair<std::vector<Stop>, std::map<unsigned long long, int>> GtfsFetcher::getStops(std::string applicationShortname)
+  /*const std::pair<std::vector<Stop>, std::map<unsigned long long, int>> GtfsFetcher::getStops(std::string applicationShortname)
   {
     std::vector<Stop> stops;
     std::map<unsigned long long, int> stopIndexesById;
@@ -38,7 +38,7 @@ namespace TrRouting
     std::vector<std::pair<long long,long long>>      footpathsRanges;
     return std::make_pair(footpaths, footpathsRanges);
     
-  }
+  }*/
   
   
 }

@@ -1,16 +1,17 @@
-#ifndef TR_STOP
-#define TR_STOP
+#ifndef TR_NODE
+#define TR_NODE
 
 #include <vector>
 #include <string>
 #include <boost/uuid/uuid.hpp>
+#include <boost/optional.hpp>
 
 #include "point.hpp"
 
 namespace TrRouting
 {
   
-  struct Stop {
+  struct Node {
   
   public:
    
@@ -18,9 +19,9 @@ namespace TrRouting
     unsigned long long id;
     std::string code;
     std::string name;
-    boost::uuids::uuid nodeUuid;
+    boost::optional<boost::uuids::uuid> stationUuid;
     Point point;
-    std::vector<int> transferableStopsIdx;
+    std::vector<int> transferableNodesIdx;
     std::vector<int> transferableTravelTimesSeconds;
     std::vector<int> transferableDistancesMeters;
   
@@ -28,4 +29,4 @@ namespace TrRouting
 
 }
 
-#endif // TR_STOP
+#endif // TR_NODE

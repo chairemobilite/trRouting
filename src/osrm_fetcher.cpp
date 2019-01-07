@@ -3,11 +3,11 @@
 namespace TrRouting
 {
   
-  std::vector<std::pair<int,int>> OsrmFetcher::getAccessibleStopsFootpathsFromPoint(const Point point, const std::vector<Stop> stops, std::string mode, Parameters& params, bool reversed)
+  std::vector<std::pair<int,int>> OsrmFetcher::getAccessibleNodesFootpathsFromPoint(const Point point, const std::vector<Node> nodes, std::string mode, Parameters& params, bool reversed)
   {
 
-    std::vector<int>                birdDistanceAccessibleStopIndexes;
-    std::vector<std::pair<int,int>> accessibleStopsFootpaths;
+    std::vector<int>                birdDistanceAccessibleNodeIndexes;
+    std::vector<std::pair<int,int>> accessibleNodesFootpaths;
 
     float lengthOfOneDegreeOfLongitude = 111412.84 * cos(point.latitude * M_PI / 180) -93.5 * cos (3 * point.latitude * M_PI / 180);
     float lengthOfOneDegreeOflatitude  = 111132.92 - 559.82 * cos(2 * point.latitude * M_PI / 180) + 1.175 * cos(4 * point.latitude * M_PI / 180);
@@ -27,15 +27,15 @@ namespace TrRouting
 
       osrmParams.coordinates.push_back({osrm::util::FloatLongitude{point.longitude}, osrm::util::FloatLatitude{point.latitude}});
       int i {0};
-      for (auto & stop : stops)
+      for (auto & node : nodes)
       {
-        distanceXMeters       = (stop.point.longitude - point.longitude) * lengthOfOneDegreeOfLongitude;
-        distanceYMeters       = (stop.point.latitude  - point.latitude)  * lengthOfOneDegreeOflatitude ;
+        distanceXMeters       = (node.point.longitude - point.longitude) * lengthOfOneDegreeOfLongitude;
+        distanceYMeters       = (node.point.latitude  - point.latitude)  * lengthOfOneDegreeOflatitude ;
         distanceMetersSquared = distanceXMeters * distanceXMeters + distanceYMeters * distanceYMeters;
         if (distanceMetersSquared <= maxDistanceMetersSquared)
         {
-          birdDistanceAccessibleStopIndexes.push_back(i);
-          osrmParams.coordinates.push_back({osrm::util::FloatLongitude{stop.point.longitude}, osrm::util::FloatLatitude{stop.point.latitude}});
+          birdDistanceAccessibleNodeIndexes.push_back(i);
+          osrmParams.coordinates.push_back({osrm::util::FloatLongitude{node.point.longitude}, osrm::util::FloatLatitude{node.point.latitude}});
         }
         i++;
       }
@@ -51,20 +51,20 @@ namespace TrRouting
       osrm::json::Object result;
       
       const auto status = params.osrmRouter.get().Table(osrmParams, result);
-      //std::cerr << "numberOfStops: " << osrmParams.coordinates.size() << std::endl;
+      //std::cerr << "numberOfNodes: " << osrmParams.coordinates.size() << std::endl;
       if (status == osrm::Status::Ok)
       {
         if (reversed)
         {
           auto &durations = result.values["durations"].get<osrm::json::Array>().values;
           //auto &distances = result.values["distances"].get<osrm::json::Array>().values.at(0).get<osrm::json::Array>().values;
-          for (int i = 0; i < birdDistanceAccessibleStopIndexes.size(); i++)
+          for (int i = 0; i < birdDistanceAccessibleNodeIndexes.size(); i++)
           {
             const int duration = durations.at(i+1).get<osrm::json::Array>().values.at(0).get<osrm::json::Number>().value; // ignore i = 0 (source with itself)
             //const int distance = distances.at(i+1).get<osrm::json::Number>().value;
             if (duration <= params.maxAccessWalkingTravelTimeSeconds)
             {
-              accessibleStopsFootpaths.push_back(std::make_pair(birdDistanceAccessibleStopIndexes[i], duration));
+              accessibleNodesFootpaths.push_back(std::make_pair(birdDistanceAccessibleNodeIndexes[i], duration));
             }
           }
         }
@@ -72,13 +72,13 @@ namespace TrRouting
         {
           auto &durations = result.values["durations"].get<osrm::json::Array>().values.at(0).get<osrm::json::Array>().values;
           //auto &distances = result.values["distances"].get<osrm::json::Array>().values.at(0).get<osrm::json::Array>().values;
-          for (int i = 0; i < birdDistanceAccessibleStopIndexes.size(); i++)
+          for (int i = 0; i < birdDistanceAccessibleNodeIndexes.size(); i++)
           {
             const int duration = durations.at(i+1).get<osrm::json::Number>().value; // ignore i = 0 (source with itself)
             //const int distance = distances.at(i+1).get<osrm::json::Number>().value;
             if (duration <= params.maxAccessWalkingTravelTimeSeconds)
             {
-              accessibleStopsFootpaths.push_back(std::make_pair(birdDistanceAccessibleStopIndexes[i], duration));
+              accessibleNodesFootpaths.push_back(std::make_pair(birdDistanceAccessibleNodeIndexes[i], duration));
             }
           }
         }
@@ -100,21 +100,21 @@ namespace TrRouting
       std::string queryString = "GET /table/v1/" + mode + "/" + std::to_string(point.longitude) +  "," + std::to_string(point.latitude);
 
       int i {0};
-      for (auto & stop : stops)
+      for (auto & node : nodes)
       {
-        //std::cerr << stop.point.latitude << std::endl;
-        distanceXMeters       = (stop.point.longitude - point.longitude) * lengthOfOneDegreeOfLongitude;
-        distanceYMeters       = (stop.point.latitude  - point.latitude)  * lengthOfOneDegreeOflatitude ;
+        //std::cerr << node.point.latitude << std::endl;
+        distanceXMeters       = (node.point.longitude - point.longitude) * lengthOfOneDegreeOfLongitude;
+        distanceYMeters       = (node.point.latitude  - point.latitude)  * lengthOfOneDegreeOflatitude ;
         distanceMetersSquared = distanceXMeters * distanceXMeters + distanceYMeters * distanceYMeters;
         if (distanceMetersSquared <= maxDistanceMetersSquared)
         {
-          birdDistanceAccessibleStopIndexes.push_back(i);
-          queryString += ";" + std::to_string(stop.point.longitude) +  "," + std::to_string(stop.point.latitude);
+          birdDistanceAccessibleNodeIndexes.push_back(i);
+          queryString += ";" + std::to_string(node.point.longitude) +  "," + std::to_string(node.point.latitude);
         }
         i++;
       }
 
-      // call osrm on bird distance accessible stops for further filtering by network travel time:
+      // call osrm on bird distance accessible nodes for further filtering by network travel time:
       boost::asio::ip::tcp::iostream s;
       s.connect(params.osrmRoutingWalkingHost, params.osrmRoutingWalkingPort);
       
@@ -162,7 +162,7 @@ namespace TrRouting
               travelTimeSeconds = (int)ceil(std::stod(v2.second.data()));
               if (travelTimeSeconds <= params.maxAccessWalkingTravelTimeSeconds)
               {
-                accessibleStopsFootpaths.push_back(std::make_pair(birdDistanceAccessibleStopIndexes[i], travelTimeSeconds));
+                accessibleNodesFootpaths.push_back(std::make_pair(birdDistanceAccessibleNodeIndexes[i], travelTimeSeconds));
               }
             }
             i++;
@@ -171,7 +171,7 @@ namespace TrRouting
       }
     }
     
-    return accessibleStopsFootpaths;
+    return accessibleNodesFootpaths;
   }
    
 }
