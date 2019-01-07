@@ -21,4 +21,5 @@ struct Node {
   transferableNodesUuids @14 :List(Text); # unique in the whole network, changed to indexes in collection
   transferableNodesTravelTimes @15 :List(Int32); # seconds
   transferableNodesDistances @16 :List(Int32); # meters
+
 }
