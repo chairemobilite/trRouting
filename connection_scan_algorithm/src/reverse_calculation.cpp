@@ -75,35 +75,32 @@ namespace TrRouting
               // get footpaths for the arrival node to get transferable nodes:
               nodeDepartureIndex      = std::get<connectionIndexes::NODE_DEP>(connection);
               connectionDepartureTime = std::get<connectionIndexes::TIME_DEP>(connection);
-              footpathsRangeStart     = footpathsRanges[nodeDepartureIndex].first;
-              footpathsRangeEnd       = footpathsRanges[nodeDepartureIndex].second;
+              //footpathsRangeStart     = footpathsRanges[nodeDepartureIndex].first;
+              //footpathsRangeEnd       = footpathsRanges[nodeDepartureIndex].second;
               if (!params.returnAllNodesResult && !reachedAtLeastOneAccessNode && nodesAccessTravelTime[nodeDepartureIndex] != -1) // check if the departure node is accessable
               {
                 reachedAtLeastOneAccessNode      = true;
                 tentativeAccessNodeDepartureTime = connectionDepartureTime;
               }
-              if (footpathsRangeStart >= 0 && footpathsRangeEnd >= 0)
+              footpathIndex = 0;
+              for (int & transferableNodeIndex : nodes[nodeDepartureIndex].transferableNodesIdx)
               {
-                footpathIndex = footpathsRangeStart;
-                while (footpathIndex <= footpathsRangeEnd)
+                footpathTravelTime         = nodes[nodeDepartureIndex].transferableTravelTimesSeconds[footpathIndex];
+                footpathNodeDepartureIndex = transferableNodeIndex;
+
+                if (footpathTravelTime <= params.maxTransferWalkingTravelTimeSeconds)
                 {
-                  footpathNodeDepartureIndex = std::get<1>(footpaths[footpathIndex]);
-                  footpathTravelTime         = std::get<2>(footpaths[footpathIndex]);
-                  
-                  if (footpathTravelTime <= params.maxTransferWalkingTravelTimeSeconds)
+                  if (connectionDepartureTime - footpathTravelTime - params.minWaitingTimeSeconds >= nodesReverseTentativeTime[footpathNodeDepartureIndex])
                   {
-                    if (connectionDepartureTime - footpathTravelTime - params.minWaitingTimeSeconds >= nodesReverseTentativeTime[footpathNodeDepartureIndex])
-                    {
-                      nodesReverseTentativeTime[footpathNodeDepartureIndex] = connectionDepartureTime - footpathTravelTime - params.minWaitingTimeSeconds;
-                      reverseJourneys[footpathNodeDepartureIndex]           = std::make_tuple(i, tripsExitConnection[tripIndex], footpathIndex, tripIndex, footpathTravelTime, (nodeDepartureIndex == footpathNodeDepartureIndex ? 1 : -1));
-                    }
-                    if (nodeDepartureIndex == footpathNodeDepartureIndex && (std::get<4>(reverseAccessJourneys[footpathNodeDepartureIndex]) == -1 || std::get<connectionIndexes::TIME_DEP>(reverseConnections[std::get<1>(reverseAccessJourneys[footpathNodeDepartureIndex])]) <= connectionDepartureTime))
-                    {
-                      reverseAccessJourneys[footpathNodeDepartureIndex] = std::make_tuple(i, tripsExitConnection[tripIndex], footpathIndex, tripIndex, footpathTravelTime, 1);
-                    }
+                    nodesReverseTentativeTime[footpathNodeDepartureIndex] = connectionDepartureTime - footpathTravelTime - params.minWaitingTimeSeconds;
+                    reverseJourneys[footpathNodeDepartureIndex]           = std::make_tuple(i, tripsExitConnection[tripIndex], nodeDepartureIndex, tripIndex, footpathTravelTime, (nodeDepartureIndex == footpathNodeDepartureIndex ? 1 : -1));
                   }
-                  footpathIndex++;
+                  if (nodeDepartureIndex == footpathNodeDepartureIndex && (std::get<4>(reverseAccessJourneys[footpathNodeDepartureIndex]) == -1 || std::get<connectionIndexes::TIME_DEP>(reverseConnections[std::get<1>(reverseAccessJourneys[footpathNodeDepartureIndex])]) <= connectionDepartureTime))
+                  {
+                    reverseAccessJourneys[footpathNodeDepartureIndex] = std::make_tuple(i, tripsExitConnection[tripIndex], nodeDepartureIndex, tripIndex, footpathTravelTime, 1);
+                  }
                 }
+                footpathIndex++;
               }
             }
             reachableConnectionsCount++;

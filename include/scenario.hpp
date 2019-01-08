@@ -16,6 +16,10 @@ namespace TrRouting
     std::string name;
     std::vector<int> servicesIdx;
 
+    const std::string toString() {
+      return "Scenario " + boost::uuids::to_string(uuid) + "\n  name " + name;
+    }
+
   };
 
 }

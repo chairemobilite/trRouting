@@ -3,6 +3,7 @@
 
 #include <string>
 #include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_io.hpp>
 
 namespace TrRouting
 {
@@ -17,6 +18,10 @@ namespace TrRouting
     std::string shortname;
     std::string longname;
     short allowSameLineTransfers;
+
+    const std::string toString() {
+      return "Line " + boost::uuids::to_string(uuid) + "\n  shortname " + shortname + "\n  longname " + longname;
+    }
 
   };
 

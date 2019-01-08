@@ -2,6 +2,7 @@
 #define TR_OD_TRIP
 
 #include <vector>
+#include <boost/uuid/uuid.hpp>
 
 #include "point.hpp"
 
@@ -11,10 +12,11 @@ namespace TrRouting
   struct OdTrip {
   
   public:
-   
+
+    boost::uuids::uuid uuid;
     unsigned long long id;
-    unsigned long long personId;
-    unsigned long long householdId;
+    boost::uuids::uuid personUuid;
+    boost::uuids::uuid householdUuid;
     int age; // -1: unknown or nil
     int departureTimeSeconds;
     int arrivalTimeSeconds;

@@ -27,6 +27,10 @@ namespace TrRouting
     boost::gregorian::date startDate;
     boost::gregorian::date endDate;
 
+    const std::string toString() {
+      return "Service " + boost::uuids::to_string(uuid) + "\n  name " + name;
+    }
+
   };
 
 }

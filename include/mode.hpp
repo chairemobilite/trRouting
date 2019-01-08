@@ -12,9 +12,13 @@ namespace TrRouting
    
     std::string shortname;
     std::string name;
-    int extendedGtfsId;
     int gtfsId;
- 
+    int extendedGtfsId;
+
+    const std::string toString() {
+      return "Mode\n  shortname " + shortname + "\n  name " + name + "\n  gtfsId " + std::to_string(gtfsId) + "\n  extendedGtfsId " + std::to_string(extendedGtfsId);
+    }
+
   };
 
 }

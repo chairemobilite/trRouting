@@ -154,7 +154,7 @@ namespace TrRouting
       forwardCalculation                     = true;
       detailedResults                        = false;
       transferOnlyAtSameStation              = false;
-      transferBetweenSameRoute               = true;
+      transferBetweenSameLine                = true;
       calculateByNumberOfTransfers           = false;
       alternatives                           = false;
       maxAlternatives                        = 100;

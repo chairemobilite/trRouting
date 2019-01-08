@@ -16,11 +16,11 @@ ifeq ($(OS),Darwin)
 	# macox
 	CXXFLAGS += -std=c++14 -stdlib=libc++
 	#LINKFLAGS = -lboost_thread-mt -lboost_serialization -lboost_system -lboost_filesystem -lboost_regex -lboost_program_options
-	LINKFLAGS = -L/usr/local/lib -lboost_iostreams -losrm -lpqxx -lpq -lcurses -lcapnp -lkj -lboost_thread-mt -lboost_serialization -lboost_system -lboost_filesystem -lboost_regex -lboost_program_options
+	LINKFLAGS = -L/usr/local/lib -lboost_iostreams -losrm -lpqxx -lpq -lcurses -lcapnp -lkj -lboost_thread-mt -lboost_serialization -lboost_system -lboost_filesystem -lboost_regex -lboost_program_options -lboost_date_time
 else
 	# linux or other (only linux ubuntu and debian are supported right now)
 	CXXFLAGS += -std=c++14 -stdlib=libstdc++
-	LINKFLAGS = -L/usr/local/lib -losrm -lpqxx -lpq -lcurses -lcapnp -lkj -pthread -lboost_thread -lboost_serialization -lboost_system -lboost_filesystem -lboost_regex -lboost_program_options
+	LINKFLAGS = -L/usr/local/lib -losrm -lpqxx -lpq -lcurses -lcapnp -lkj -pthread -lboost_thread -lboost_serialization -lboost_system -lboost_filesystem -lboost_regex -lboost_program_options -lboost_date_time
 endif
 
 all: trRoutingCSA

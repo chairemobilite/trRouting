@@ -17,6 +17,10 @@ namespace TrRouting
     std::string direction;
     std::vector<int> nodesIdx;
 
+    const std::string toString() {
+      return "Path " + boost::uuids::to_string(uuid) + "\n  direction " + direction;
+    }
+
   };
 
 }

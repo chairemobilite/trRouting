@@ -177,11 +177,11 @@ public:
   inline bool hasData() const;
   inline  ::capnp::Text::Reader getData() const;
 
-  inline bool hasNodes() const;
-  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader getNodes() const;
+  inline bool hasNodesUuids() const;
+  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader getNodesUuids() const;
 
-  inline bool hasStops() const;
-  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader getStops() const;
+  inline bool hasStopsUuids() const;
+  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader getStopsUuids() const;
 
   inline bool hasSegments() const;
   inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader getSegments() const;
@@ -272,21 +272,21 @@ public:
   inline void adoptData(::capnp::Orphan< ::capnp::Text>&& value);
   inline ::capnp::Orphan< ::capnp::Text> disownData();
 
-  inline bool hasNodes();
-  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder getNodes();
-  inline void setNodes( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value);
-  inline void setNodes(::kj::ArrayPtr<const  ::capnp::Text::Reader> value);
-  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder initNodes(unsigned int size);
-  inline void adoptNodes(::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value);
-  inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> disownNodes();
+  inline bool hasNodesUuids();
+  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder getNodesUuids();
+  inline void setNodesUuids( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value);
+  inline void setNodesUuids(::kj::ArrayPtr<const  ::capnp::Text::Reader> value);
+  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder initNodesUuids(unsigned int size);
+  inline void adoptNodesUuids(::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value);
+  inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> disownNodesUuids();
 
-  inline bool hasStops();
-  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder getStops();
-  inline void setStops( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value);
-  inline void setStops(::kj::ArrayPtr<const  ::capnp::Text::Reader> value);
-  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder initStops(unsigned int size);
-  inline void adoptStops(::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value);
-  inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> disownStops();
+  inline bool hasStopsUuids();
+  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder getStopsUuids();
+  inline void setStopsUuids( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value);
+  inline void setStopsUuids(::kj::ArrayPtr<const  ::capnp::Text::Reader> value);
+  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder initStopsUuids(unsigned int size);
+  inline void adoptStopsUuids(::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value);
+  inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> disownStopsUuids();
 
   inline bool hasSegments();
   inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder getSegments();
@@ -631,78 +631,78 @@ inline ::capnp::Orphan< ::capnp::Text> Path::Builder::disownData() {
       ::capnp::bounded<6>() * ::capnp::POINTERS));
 }
 
-inline bool Path::Reader::hasNodes() const {
+inline bool Path::Reader::hasNodesUuids() const {
   return !_reader.getPointerField(
       ::capnp::bounded<7>() * ::capnp::POINTERS).isNull();
 }
-inline bool Path::Builder::hasNodes() {
+inline bool Path::Builder::hasNodesUuids() {
   return !_builder.getPointerField(
       ::capnp::bounded<7>() * ::capnp::POINTERS).isNull();
 }
-inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader Path::Reader::getNodes() const {
+inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader Path::Reader::getNodesUuids() const {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_reader.getPointerField(
       ::capnp::bounded<7>() * ::capnp::POINTERS));
 }
-inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Path::Builder::getNodes() {
+inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Path::Builder::getNodesUuids() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_builder.getPointerField(
       ::capnp::bounded<7>() * ::capnp::POINTERS));
 }
-inline void Path::Builder::setNodes( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value) {
+inline void Path::Builder::setNodesUuids( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
       ::capnp::bounded<7>() * ::capnp::POINTERS), value);
 }
-inline void Path::Builder::setNodes(::kj::ArrayPtr<const  ::capnp::Text::Reader> value) {
+inline void Path::Builder::setNodesUuids(::kj::ArrayPtr<const  ::capnp::Text::Reader> value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
       ::capnp::bounded<7>() * ::capnp::POINTERS), value);
 }
-inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Path::Builder::initNodes(unsigned int size) {
+inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Path::Builder::initNodesUuids(unsigned int size) {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::init(_builder.getPointerField(
       ::capnp::bounded<7>() * ::capnp::POINTERS), size);
 }
-inline void Path::Builder::adoptNodes(
+inline void Path::Builder::adoptNodesUuids(
     ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::adopt(_builder.getPointerField(
       ::capnp::bounded<7>() * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> Path::Builder::disownNodes() {
+inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> Path::Builder::disownNodesUuids() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::disown(_builder.getPointerField(
       ::capnp::bounded<7>() * ::capnp::POINTERS));
 }
 
-inline bool Path::Reader::hasStops() const {
+inline bool Path::Reader::hasStopsUuids() const {
   return !_reader.getPointerField(
       ::capnp::bounded<8>() * ::capnp::POINTERS).isNull();
 }
-inline bool Path::Builder::hasStops() {
+inline bool Path::Builder::hasStopsUuids() {
   return !_builder.getPointerField(
       ::capnp::bounded<8>() * ::capnp::POINTERS).isNull();
 }
-inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader Path::Reader::getStops() const {
+inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader Path::Reader::getStopsUuids() const {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_reader.getPointerField(
       ::capnp::bounded<8>() * ::capnp::POINTERS));
 }
-inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Path::Builder::getStops() {
+inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Path::Builder::getStopsUuids() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_builder.getPointerField(
       ::capnp::bounded<8>() * ::capnp::POINTERS));
 }
-inline void Path::Builder::setStops( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value) {
+inline void Path::Builder::setStopsUuids( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
       ::capnp::bounded<8>() * ::capnp::POINTERS), value);
 }
-inline void Path::Builder::setStops(::kj::ArrayPtr<const  ::capnp::Text::Reader> value) {
+inline void Path::Builder::setStopsUuids(::kj::ArrayPtr<const  ::capnp::Text::Reader> value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
       ::capnp::bounded<8>() * ::capnp::POINTERS), value);
 }
-inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Path::Builder::initStops(unsigned int size) {
+inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Path::Builder::initStopsUuids(unsigned int size) {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::init(_builder.getPointerField(
       ::capnp::bounded<8>() * ::capnp::POINTERS), size);
 }
-inline void Path::Builder::adoptStops(
+inline void Path::Builder::adoptStopsUuids(
     ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::adopt(_builder.getPointerField(
       ::capnp::bounded<8>() * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> Path::Builder::disownStops() {
+inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> Path::Builder::disownStopsUuids() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::disown(_builder.getPointerField(
       ::capnp::bounded<8>() * ::capnp::POINTERS));
 }

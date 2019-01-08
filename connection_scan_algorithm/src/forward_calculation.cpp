@@ -16,9 +16,10 @@ namespace TrRouting
     int  nodeArrivalTentativeTime {MAX_INT};
     int  connectionDepartureTime {-1};
     int  connectionArrivalTime {-1};
-    long long  footpathsRangeStart {-1};
-    long long  footpathsRangeEnd {-1};
-    long long  footpathIndex {-1};
+    /*long long  footpathsRangeStart {-1};
+    long long  footpathsRangeEnd {-1};*/
+    int  footpathIndex {-1};
+    int  transferableNodeIndex {0};
     int  footpathNodeArrivalIndex {-1};
     int  footpathTravelTime {-1};
     int  tentativeEgressNodeArrivalTime {MAX_INT};
@@ -76,34 +77,32 @@ namespace TrRouting
               // get footpaths for the arrival node to get transferable nodes:
               nodeArrivalIndex      = std::get<connectionIndexes::NODE_ARR>(connection);
               connectionArrivalTime = std::get<connectionIndexes::TIME_ARR>(connection);
-              footpathsRangeStart   = footpathsRanges[nodeArrivalIndex].first;
-              footpathsRangeEnd     = footpathsRanges[nodeArrivalIndex].second;
+              //footpathsRangeStart   = footpathsRanges[nodeArrivalIndex].first;
+              //footpathsRangeEnd     = footpathsRanges[nodeArrivalIndex].second;
               if (!params.returnAllNodesResult && !reachedAtLeastOneEgressNode && nodesEgressTravelTime[nodeArrivalIndex] != -1) // check if the arrival node is egressable
               {
                 reachedAtLeastOneEgressNode    = true;
                 tentativeEgressNodeArrivalTime = connectionArrivalTime;
               }
-              if (footpathsRangeStart >= 0 && footpathsRangeEnd >= 0)
+              footpathIndex = 0;
+              for (int & transferableNodeIndex : nodes[nodeArrivalIndex].transferableNodesIdx)
               {
-                footpathIndex = footpathsRangeStart;
-                while (footpathIndex <= footpathsRangeEnd)
+                footpathTravelTime       = nodes[nodeArrivalIndex].transferableTravelTimesSeconds[footpathIndex];
+                footpathNodeArrivalIndex = transferableNodeIndex;
+
+                if (footpathTravelTime <= params.maxTransferWalkingTravelTimeSeconds)
                 {
-                  footpathNodeArrivalIndex = std::get<1>(footpaths[footpathIndex]);
-                  footpathTravelTime       = std::get<2>(footpaths[footpathIndex]);
-                  if (footpathTravelTime <= params.maxTransferWalkingTravelTimeSeconds)
+                  if (footpathTravelTime + params.minWaitingTimeSeconds + connectionArrivalTime < nodesTentativeTime[footpathNodeArrivalIndex])
                   {
-                    if (footpathTravelTime + params.minWaitingTimeSeconds + connectionArrivalTime < nodesTentativeTime[footpathNodeArrivalIndex])
-                    {
-                      nodesTentativeTime[footpathNodeArrivalIndex] = footpathTravelTime + connectionArrivalTime + params.minWaitingTimeSeconds;
-                      forwardJourneys[footpathNodeArrivalIndex]    = std::make_tuple(tripsEnterConnection[tripIndex], i, footpathIndex, tripIndex, footpathTravelTime, (nodeArrivalIndex == footpathNodeArrivalIndex ? 1 : -1));
-                    }
-                    if (nodeArrivalIndex == footpathNodeArrivalIndex && (std::get<4>(forwardEgressJourneys[footpathNodeArrivalIndex]) == -1 || std::get<connectionIndexes::TIME_ARR>(forwardConnections[std::get<1>(forwardEgressJourneys[footpathNodeArrivalIndex])]) > connectionArrivalTime))
-                    {
-                      forwardEgressJourneys[footpathNodeArrivalIndex] = std::make_tuple(tripsEnterConnection[tripIndex], i, footpathIndex, tripIndex, footpathTravelTime, 1);
-                    }
+                    nodesTentativeTime[footpathNodeArrivalIndex] = footpathTravelTime + connectionArrivalTime + params.minWaitingTimeSeconds;
+                    forwardJourneys[footpathNodeArrivalIndex]    = std::make_tuple(tripsEnterConnection[tripIndex], i, nodeArrivalIndex, tripIndex, footpathTravelTime, (nodeArrivalIndex == footpathNodeArrivalIndex ? 1 : -1));
                   }
-                  footpathIndex++;
+                  if (nodeArrivalIndex == footpathNodeArrivalIndex && (std::get<4>(forwardEgressJourneys[footpathNodeArrivalIndex]) == -1 || std::get<connectionIndexes::TIME_ARR>(forwardConnections[std::get<1>(forwardEgressJourneys[footpathNodeArrivalIndex])]) > connectionArrivalTime))
+                  {
+                    forwardEgressJourneys[footpathNodeArrivalIndex] = std::make_tuple(tripsEnterConnection[tripIndex], i, nodeArrivalIndex, tripIndex, footpathTravelTime, 1);
+                  }
                 }
+                footpathIndex++;
               }
             }
             reachableConnectionsCount++;

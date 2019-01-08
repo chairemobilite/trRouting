@@ -3,6 +3,7 @@
 
 #include <string>
 #include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_io.hpp>
 
 namespace TrRouting
 {
@@ -14,7 +15,11 @@ namespace TrRouting
     boost::uuids::uuid uuid;
     std::string acronym;
     std::string name;
- 
+
+    const std::string toString() {
+      return "Agency " + boost::uuids::to_string(uuid) + "\n  acronym " + acronym + "\n  name " + name;
+    }
+
   };
 
 }

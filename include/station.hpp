@@ -20,7 +20,11 @@ namespace TrRouting
     std::string code;
     std::string name;
     Point point;
-  
+
+    const std::string toString() {
+      return "Station " + boost::uuids::to_string(uuid) + " (id " + std::to_string(id) + ")\n  code " + code + "\n  name " + name;
+    }
+
   };
 
 }

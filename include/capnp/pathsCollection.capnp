@@ -17,8 +17,8 @@ struct Path {
   isEnabled @6 :Int8;
   description @7 :Text;
   data @8 :Text;
-  nodes @9 :List(Text);
-  stops @10 :List(Text);
+  nodesUuids @9 :List(Text);
+  stopsUuids @10 :List(Text);
   segments @11 :List(Int32); # index of the first coordinate of segment in geography coordinates
   geography @12 :Text; # encoded polyline (mapbox format)
 }

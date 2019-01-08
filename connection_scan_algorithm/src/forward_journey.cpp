@@ -36,11 +36,13 @@ namespace TrRouting
       std::tuple<int,int,int,int,int,short,short,int>   journeyStepEnterConnection; // connection tuple: departureNodeIndex, arrivalNodeIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequenceinTrip
       std::tuple<int,int,int,int,int,short,short,int>   journeyStepExitConnection;
       std::vector<boost::uuids::uuid>                   lineUuids;
+      std::vector<int>                                  linesIdx;
       std::vector<std::string>                          modeShortnames;
       std::vector<boost::uuids::uuid>                   agencyUuids;
       std::vector<boost::uuids::uuid>                   unboardingNodeUuids;
       std::vector<boost::uuids::uuid>                   boardingNodeUuids;
       std::vector<boost::uuids::uuid>                   tripUuids;
+      std::vector<int>                                  tripsIdx;
       std::vector<int>                                  inVehicleTravelTimesSeconds; // the in vehicle travel time for each segment
       std::vector<std::tuple<boost::uuids::uuid, boost::uuids::uuid, boost::uuids::uuid, int, int>> legs; // tuple: tripUuid, lineUuid, pathUuid, boarding sequence, unboarding sequence
       nlohmann::json stepJson = {};
@@ -69,9 +71,11 @@ namespace TrRouting
         legs.clear();
         journey.clear();
         lineUuids.clear();
+        linesIdx.clear();
         boardingNodeUuids.clear();
         unboardingNodeUuids.clear();
         tripUuids.clear();
+        tripsIdx.clear();
         modeShortnames.clear();
         inVehicleTravelTimesSeconds.clear();
         
@@ -143,12 +147,14 @@ namespace TrRouting
             totalWaitingTime           += waitingTime;
             numberOfTransfers          += 1;
             lineUuids.push_back(journeyStepLine.uuid);
+            linesIdx.push_back(journeyStepTrip.lineIdx);
             modeShortnames.push_back(journeyStepMode.shortname);
             inVehicleTravelTimesSeconds.push_back(inVehicleTime);
             agencyUuids.push_back(journeyStepAgency.uuid);
             boardingNodeUuids.push_back(journeyStepNodeDeparture.uuid);
             unboardingNodeUuids.push_back(journeyStepNodeArrival.uuid);
             tripUuids.push_back(journeyStepTrip.uuid);
+            tripsIdx.push_back(std::get<3>(journeyStep));
             legs.push_back(std::make_tuple(journeyStepTrip.uuid, journeyStepLine.uuid, journeyStepPath.uuid, boardingSequence, unboardingSequence));
             
             if (i == 1) // first leg
@@ -167,17 +173,17 @@ namespace TrRouting
               stepJson["action"]               = "board";
               stepJson["agencyAcronym"]        = journeyStepAgency.acronym;
               stepJson["agencyName"]           = journeyStepAgency.name;
-              stepJson["agencyUuid"]           = journeyStepAgency.uuid;
+              stepJson["agencyUuid"]           = boost::uuids::to_string(journeyStepAgency.uuid);
               stepJson["lineShortname"]        = journeyStepLine.shortname;
               stepJson["lineLongname"]         = journeyStepLine.longname;
-              stepJson["lineUuid"]             = journeyStepLine.uuid;
+              stepJson["lineUuid"]             = boost::uuids::to_string(journeyStepLine.uuid);
               stepJson["modeName"]             = journeyStepMode.name;
               stepJson["mode"]                 = journeyStepMode.shortname;
-              stepJson["tripUuid"]             = journeyStepTrip.uuid;
+              stepJson["tripUuid"]             = boost::uuids::to_string(journeyStepTrip.uuid);
               stepJson["sequenceInTrip"]       = boardingSequence;
               stepJson["nodeName"]             = journeyStepNodeDeparture.name;
               stepJson["nodeCode"]             = journeyStepNodeDeparture.code;
-              stepJson["nodeUuid"]             = journeyStepNodeDeparture.uuid;
+              stepJson["nodeUuid"]             = boost::uuids::to_string(journeyStepNodeDeparture.uuid);
               stepJson["nodeCoordinates"]      = {journeyStepNodeDeparture.point.longitude, journeyStepNodeDeparture.point.latitude};
               stepJson["departureTime"]        = Toolbox::convertSecondsToFormattedTime(departureTime);
               stepJson["departureTimeSeconds"] = departureTime;
@@ -189,17 +195,17 @@ namespace TrRouting
               stepJson["action"]               = "unboard";
               stepJson["agencyAcronym"]        = journeyStepAgency.acronym;
               stepJson["agencyName"]           = journeyStepAgency.name;
-              stepJson["agencyUuid"]           = journeyStepAgency.uuid;
+              stepJson["agencyUuid"]           = boost::uuids::to_string(journeyStepAgency.uuid);
               stepJson["lineShortname"]        = journeyStepLine.shortname;
               stepJson["lineLongname"]         = journeyStepLine.longname;
-              stepJson["lineUuid"]             = journeyStepLine.uuid;
+              stepJson["lineUuid"]             = boost::uuids::to_string(journeyStepLine.uuid);
               stepJson["modeName"]             = journeyStepMode.name;
               stepJson["mode"]                 = journeyStepMode.shortname;
-              stepJson["tripUuid"]             = journeyStepTrip.uuid;
+              stepJson["tripUuid"]             = boost::uuids::to_string(journeyStepTrip.uuid);
               stepJson["sequenceInTrip"]       = unboardingSequence;
               stepJson["nodeName"]             = journeyStepNodeArrival.name;
               stepJson["nodeCode"]             = journeyStepNodeArrival.code;
-              stepJson["nodeUuid"]             = journeyStepNodeArrival.uuid;
+              stepJson["nodeUuid"]             = boost::uuids::to_string(journeyStepNodeArrival.uuid);
               stepJson["nodeCoordinates"]      = {journeyStepNodeArrival.point.longitude, journeyStepNodeArrival.point.latitude};
               stepJson["arrivalTime"]          = Toolbox::convertSecondsToFormattedTime(arrivalTime);
               stepJson["arrivalTimeSeconds"]   = arrivalTime;
@@ -349,11 +355,13 @@ namespace TrRouting
             result.nonTransitTravelTimeSeconds = totalWalkingTime;
             result.legs                        = legs;
             result.lineUuids                   = lineUuids;
-            result.modes                       = modeShortnames;
+            result.linesIdx                    = linesIdx;
+            result.modeShortnames              = modeShortnames;
             result.agencyUuids                 = agencyUuids;
             result.boardingNodeUuids           = boardingNodeUuids;
             result.unboardingNodeUuids         = unboardingNodeUuids;
             result.tripUuids                   = tripUuids;
+            result.tripsIdx                    = tripsIdx;
             result.inVehicleTravelTimesSeconds = inVehicleTravelTimesSeconds;
             result.status                      = "success";
             

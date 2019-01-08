@@ -81,12 +81,12 @@ namespace TrRouting
         {
           accessFootpaths.assign(odTripFootpaths.begin() + params.odTrip->accessFootpathsStartIndex, odTripFootpaths.begin() + params.odTrip->accessFootpathsEndIndex);
         }
-        else if (params.accessNodeUuids.size() > 0 && params.accessNodeTravelTimesSeconds.size() == params.accessNodeUuids.size())
+        else if (params.accessNodesIdx.size() > 0 && params.accessNodeTravelTimesSeconds.size() == params.accessNodesIdx.size())
         {
           i = 0;
-          for (auto & accessNodeUuid : params.accessNodeUuids)
+          for (auto & accessNodeIdx : params.accessNodesIdx)
           {
-            accessFootpaths.push_back(std::make_pair(nodeIndexesByUuid[accessNodeUuid], params.accessNodeTravelTimesSeconds[i]));
+            accessFootpaths.push_back(std::make_pair(accessNodeIdx, params.accessNodeTravelTimesSeconds[i]));
             i++;
           }
         }
@@ -126,13 +126,13 @@ namespace TrRouting
         {
           egressFootpaths.assign(odTripFootpaths.begin() + params.odTrip->egressFootpathsStartIndex, odTripFootpaths.begin() + params.odTrip->egressFootpathsEndIndex);
         }
-        else if (params.egressNodeUuids.size() > 0 && params.egressNodeTravelTimesSeconds.size() == params.egressNodeUuids.size())
+        else if (params.egressNodesIdx.size() > 0 && params.egressNodeTravelTimesSeconds.size() == params.egressNodesIdx.size())
         {
-          egressFootpaths.reserve(params.egressNodeUuids.size());
+          egressFootpaths.reserve(params.egressNodesIdx.size());
           i = 0;
-          for (auto & egressNodeUuid : params.egressNodeUuids)
+          for (auto & egressNodeIdx : params.egressNodesIdx)
           {
-            egressFootpaths.push_back(std::make_pair(nodeIndexesByUuid[egressNodeUuid], params.egressNodeTravelTimesSeconds[i]));
+            egressFootpaths.push_back(std::make_pair(egressNodeIdx, params.egressNodeTravelTimesSeconds[i]));
             i++;
           }
         }
@@ -180,33 +180,33 @@ namespace TrRouting
     i = 0;
     for (auto & trip : trips)
     {
-      if (params.onlyServiceUuids.size() > 0)
+      if (params.onlyServicesIdx.size() > 0)
       {
-        if (std::find(params.onlyServiceUuids.begin(), params.onlyServiceUuids.end(), trip.serviceIdx) == params.onlyServiceUuids.end())
+        if (std::find(params.onlyServicesIdx.begin(), params.onlyServicesIdx.end(), trip.serviceIdx) == params.onlyServicesIdx.end())
         {
           tripsEnabled[i] = -1;
         }
       }
       
-      if (params.onlyLineUuids.size() > 0)
+      if (params.onlyLinesIdx.size() > 0)
       {
-        if (std::find(params.onlyLineUuids.begin(), params.onlyLineUuids.end(), trip.lineUuid) == params.onlyLineUuids.end())
+        if (std::find(params.onlyLinesIdx.begin(), params.onlyLinesIdx.end(), trip.lineIdx) == params.onlyLinesIdx.end())
         {
           tripsEnabled[i] = -1;
         }
       }
       
-      if (params.onlyRouteTypeUuids.size() > 0)
+      if (params.onlyModesIdx.size() > 0)
       {
-        if (std::find(params.onlyRouteTypeUuids.begin(), params.onlyRouteTypeUuids.end(), trip.routeTypeUuid) == params.onlyRouteTypeUuids.end())
+        if (std::find(params.onlyModesIdx.begin(), params.onlyModesIdx.end(), trip.modeIdx) == params.onlyModesIdx.end())
         {
           tripsEnabled[i] = -1;
         }
       }
       
-      if (params.onlyAgencyUuids.size() > 0)
+      if (params.onlyAgenciesIdx.size() > 0)
       {
-        if (std::find(params.onlyAgencyUuids.begin(), params.onlyAgencyUuids.end(), trip.agencyUuid) == params.onlyAgencyUuids.end())
+        if (std::find(params.onlyAgenciesIdx.begin(), params.onlyAgenciesIdx.end(), trip.agencyIdx) == params.onlyAgenciesIdx.end())
         {
           tripsEnabled[i] = -1;
         }
@@ -214,33 +214,33 @@ namespace TrRouting
       
       
       
-      if (params.exceptServiceUuids.size() > 0)
+      if (params.exceptServicesIdx.size() > 0)
       {
-        if (std::find(params.exceptServiceUuids.begin(), params.exceptServiceUuids.end(), trip.serviceUuid) != params.exceptServiceUuids.end())
+        if (std::find(params.exceptServicesIdx.begin(), params.exceptServicesIdx.end(), trip.serviceIdx) != params.exceptServicesIdx.end())
         {
           tripsEnabled[i] = -1;
         }
       }
       
-      if (params.exceptRouteUuids.size() > 0)
+      if (params.exceptLinesIdx.size() > 0)
       {
-        if (std::find(params.exceptRouteUuids.begin(), params.exceptRouteUuids.end(), trip.lineUuid) != params.exceptRouteUuids.end())
+        if (std::find(params.exceptLinesIdx.begin(), params.exceptLinesIdx.end(), trip.lineIdx) != params.exceptLinesIdx.end())
         {
           tripsEnabled[i] = -1;
         }
       }
       
-      if (params.exceptRouteTypeUuids.size() > 0)
+      if (params.exceptModesIdx.size() > 0)
       {
-        if (std::find(params.exceptRouteTypeUuids.begin(), params.exceptRouteTypeUuids.end(), trip.routeTypeUuid) != params.exceptRouteTypeUuids.end())
+        if (std::find(params.exceptModesIdx.begin(), params.exceptModesIdx.end(), trip.modeIdx) != params.exceptModesIdx.end())
         {
           tripsEnabled[i] = -1;
         }
       }
       
-      if (params.exceptAgencyUuids.size() > 0)
+      if (params.exceptAgenciesIdx.size() > 0)
       {
-        if (std::find(params.exceptAgencyUuids.begin(), params.exceptAgencyUuids.end(), trip.agencyUuid) != params.exceptAgencyUuids.end())
+        if (std::find(params.exceptAgenciesIdx.begin(), params.exceptAgenciesIdx.end(), trip.agencyIdx) != params.exceptAgenciesIdx.end())
         {
           tripsEnabled[i] = -1;
         }

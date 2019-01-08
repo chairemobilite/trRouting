@@ -29,7 +29,9 @@ namespace TrRouting
     std::vector<boost::uuids::uuid> boardingNodeUuids;
     std::vector<boost::uuids::uuid> unboardingNodeUuids;
     std::vector<boost::uuids::uuid> agencyUuids;
-    std::vector<std::string>        modes;
+    std::vector<std::string>        modeShortnames;
+    std::vector<int>                tripsIdx;
+    std::vector<int>                linesIdx;
     std::vector<int>                inVehicleTravelTimesSeconds;
     std::vector<std::tuple<boost::uuids::uuid, boost::uuids::uuid, boost::uuids::uuid, int, int>> legs; // tuple: tripUuid, lineUuid, pathUuid, boarding sequence, unboarding sequence
     
