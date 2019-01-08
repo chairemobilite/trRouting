@@ -35,7 +35,7 @@ namespace TrRouting
   public:
     
     OsrmFetcher() {}
-    OsrmFetcher(std::string applicationShortname) {
+    OsrmFetcher(std::string projectShortname) {
       
     }
     

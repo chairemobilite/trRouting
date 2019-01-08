@@ -29,28 +29,29 @@ namespace TrRouting
 
   struct Parameters {
 
-    std::string applicationShortname;
-    std::string dataFetcherShortname; // csv, database, cache, gtfs
-    DatabaseFetcher* databaseFetcher;
+    std::string projectShortname;
+    std::string dataFetcherShortname; // cache, csv or gtfs, only cache is implemented for now
+    std::string cacheDirectoryPath;
+    
     CacheFetcher*    cacheFetcher;
     GtfsFetcher*     gtfsFetcher;
     CsvFetcher*      csvFetcher;
     
-    int routingDateYear;   // not implemented, use onlyServiceUuids or exceptServiceUuids for now
-    int routingDateMonth;  // not implemented, use onlyServiceUuids or exceptServiceUuids for now
-    int routingDateDay;    // not implemented, use onlyServiceUuids or exceptServiceUuids for now
-    std::vector<boost::uuids::uuid> onlyServiceUuids;
-    std::vector<boost::uuids::uuid> exceptServiceUuids;
-    std::vector<boost::uuids::uuid> onlyLineUuids;
-    std::vector<boost::uuids::uuid> exceptLineUuids;
-    std::vector<boost::uuids::uuid> onlyModes;
-    std::vector<boost::uuids::uuid> exceptModes;
-    std::vector<boost::uuids::uuid> onlyAgencyUuids;
-    std::vector<boost::uuids::uuid> exceptAgencyUuids;
-    std::vector<boost::uuids::uuid> accessNodeUuids;
-    std::vector<int>                accessNodeTravelTimesSeconds;
-    std::vector<boost::uuids::uuid> egressNodeUuids;
-    std::vector<int>                egressNodeTravelTimesSeconds;
+    int routingDateYear;   // not implemented, use onlyServicesIdx or exceptServicesIdx for now
+    int routingDateMonth;  // not implemented, use onlyServicesIdx or exceptServicesIdx for now
+    int routingDateDay;    // not implemented, use onlyServicesIdx or exceptServicesIdx for now
+    std::vector<int> onlyServicesIdx;
+    std::vector<int> exceptServicesIdx;
+    std::vector<int> onlyLinesIdx;
+    std::vector<int> exceptLinesIdx;
+    std::vector<int> onlyModesIdx;
+    std::vector<int> exceptModesIdx;
+    std::vector<int> onlyAgenciesIdx;
+    std::vector<int> exceptAgenciesIdx;
+    std::vector<int> accessNodesIdx;
+    std::vector<int> accessNodeTravelTimesSeconds;
+    std::vector<int> egressNodesIdx;
+    std::vector<int> egressNodeTravelTimesSeconds;
     
     std::vector<std::pair<int,int>> odTripsPeriods; // pair: start_at_seconds, end_at_seconds
     std::vector<std::string>        odTripsGenders;
@@ -81,8 +82,8 @@ namespace TrRouting
     
     Point origin;
     Point destination;
-    boost::uuids::uuid originNodeUuid;
-    boost::uuids::uuid destinationNodeUuid;
+    int originNodeIdx;
+    int destinationNodeIdx;
     OdTrip* odTrip;
     
     std::string osrmRoutingWalkingPort;
@@ -112,12 +113,13 @@ namespace TrRouting
     bool forwardCalculation;           // forward calculation: default. if false: reverse calculation, will ride connections backward (useful when setting the arrival time)
     bool detailedResults;              // return detailed results when using results for all nodes
     bool transferOnlyAtSameStation;    // will transfer only between nodes/stops having the same station_id (better performance, but make sure your stations are well designed and specified)
-    bool transferBetweenSameRoute;     // allow transfers between the same route_id
+    bool transferBetweenSameLine;      // allow transfers between the same line
     bool calculateByNumberOfTransfers; // calculate first the fastest route, then calculate with decreasing number of transfers until no route is found, return results for each number of transfers.
     bool alternatives;                 // calculate alternatives or not
     
     void setDefaultValues()
     {
+      cacheDirectoryPath                     = "cache/transit/";
       odTrip                                 = NULL;
       walkingSpeedMetersPerSecond            = 5/3.6; // 5 km/h
       drivingSpeedMetersPerSecond            = 90/3.6; // 90 km/h
@@ -141,7 +143,7 @@ namespace TrRouting
       osrmRoutingCyclingHost                 = "localhost";
       osrmRoutingCyclingPort                 = "8000";
       osrmUseLib                             = false;
-      osrmFilePath                           = "walk.osrm";
+      osrmFilePath                           = "osrm/walk/walk.osrm";
       accessMode                             = "walking";
       egressMode                             = "walking";
       noResultSecondMode                     = "driving";

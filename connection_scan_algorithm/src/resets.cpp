@@ -182,15 +182,15 @@ namespace TrRouting
     {
       if (params.onlyServiceUuids.size() > 0)
       {
-        if (std::find(params.onlyServiceUuids.begin(), params.onlyServiceUuids.end(), trip.serviceUuid) == params.onlyServiceUuids.end())
+        if (std::find(params.onlyServiceUuids.begin(), params.onlyServiceUuids.end(), trip.serviceIdx) == params.onlyServiceUuids.end())
         {
           tripsEnabled[i] = -1;
         }
       }
       
-      if (params.onlyRouteUuids.size() > 0)
+      if (params.onlyLineUuids.size() > 0)
       {
-        if (std::find(params.onlyRouteUuids.begin(), params.onlyRouteUuids.end(), trip.routeUuid) == params.onlyRouteUuids.end())
+        if (std::find(params.onlyLineUuids.begin(), params.onlyLineUuids.end(), trip.lineUuid) == params.onlyLineUuids.end())
         {
           tripsEnabled[i] = -1;
         }
@@ -224,7 +224,7 @@ namespace TrRouting
       
       if (params.exceptRouteUuids.size() > 0)
       {
-        if (std::find(params.exceptRouteUuids.begin(), params.exceptRouteUuids.end(), trip.routeUuid) != params.exceptRouteUuids.end())
+        if (std::find(params.exceptRouteUuids.begin(), params.exceptRouteUuids.end(), trip.lineUuid) != params.exceptRouteUuids.end())
         {
           tripsEnabled[i] = -1;
         }

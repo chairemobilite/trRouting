@@ -13,7 +13,7 @@
 namespace TrRouting
 {
 
-  const std::pair<std::vector<Agency>, std::map<boost::uuids::uuid, int>> CacheFetcher::getAgencies(std::string applicationShortname)
+  const std::pair<std::vector<Agency>, std::map<boost::uuids::uuid, int>> CacheFetcher::getAgencies(std::string projectShortname, Parameters& params)
   {
     std::vector<Agency> agencies;
     std::string cacheFileName{"agencies"};
@@ -21,9 +21,9 @@ namespace TrRouting
     boost::uuids::string_generator uuidGenerator;
 
     std::cout << "Fetching routes from cache..." << std::endl;
-    if (CacheFetcher::capnpCacheFileExists(applicationShortname, cacheFileName))
+    if (CacheFetcher::capnpCacheFileExists(projectShortname, cacheFileName, params))
     {
-      int fd = open((applicationShortname + "/" + cacheFileName + ".capnpbin").c_str(), O_RDWR);
+      int fd = open((projectShortname + "/" + cacheFileName + ".capnpbin").c_str(), O_RDWR);
       ::capnp::PackedFdMessageReader capnpAgenciesCollectionMessage(fd, {16 * 1024 * 1024});
       agenciesCollection::AgenciesCollection::Reader capnpAgenciesCollection = capnpAgenciesCollectionMessage.getRoot<agenciesCollection::AgenciesCollection>();
       for (agenciesCollection::Agency::Reader capnpAgency : capnpAgenciesCollection.getAgencies())

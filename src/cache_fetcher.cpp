@@ -4,16 +4,16 @@ namespace TrRouting
 {
   
   /*
-  const std::pair<std::vector<Stop>, std::map<unsigned long long, int>> CacheFetcher::getStops(std::string applicationShortname)
+  const std::pair<std::vector<Stop>, std::map<unsigned long long, int>> CacheFetcher::getStops(std::string projectShortname)
   {
     std::vector<Stop> stops;
     std::string cacheFileName{"stops"};
     std::map<unsigned long long, int> stopIndexesById;
     
     std::cout << "Fetching stops from cache..." << std::endl;
-    if (CacheFetcher::capnpCacheFileExists(applicationShortname, cacheFileName))
+    if (CacheFetcher::capnpCacheFileExists(projectShortname, cacheFileName))
     {
-      int fd = open((applicationShortname + "_" + cacheFileName + ".capnpbin").c_str(), O_RDWR);
+      int fd = open((projectShortname + "_" + cacheFileName + ".capnpbin").c_str(), O_RDWR);
       ::capnp::PackedFdMessageReader capnpStopsCollectionMessage(fd, {64 * 1024 * 1024});
       stopsCollection::StopsCollection::Reader capnpStopsCollection = capnpStopsCollectionMessage.getRoot<stopsCollection::StopsCollection>();
       for (stopsCollection::Stop::Reader capnpStop : capnpStopsCollection.getStops())
@@ -43,16 +43,16 @@ namespace TrRouting
   */
   
   /*
-  const std::pair<std::vector<Route>, std::map<unsigned long long, int>> CacheFetcher::getRoutes(std::string applicationShortname)
+  const std::pair<std::vector<Route>, std::map<unsigned long long, int>> CacheFetcher::getRoutes(std::string projectShortname)
   {
     std::vector<Route> routes;
     std::string cacheFileName{"routes"};
     std::map<unsigned long long, int> routeIndexesById;
     
     std::cout << "Fetching routes from cache..." << std::endl;
-    if (CacheFetcher::capnpCacheFileExists(applicationShortname, cacheFileName))
+    if (CacheFetcher::capnpCacheFileExists(projectShortname, cacheFileName))
     {
-      int fd = open((applicationShortname + "_" + cacheFileName + ".capnpbin").c_str(), O_RDWR);
+      int fd = open((projectShortname + "_" + cacheFileName + ".capnpbin").c_str(), O_RDWR);
       ::capnp::PackedFdMessageReader capnpRoutesCollectionMessage(fd, {64 * 1024 * 1024});
       routesCollection::RoutesCollection::Reader capnpRoutesCollection = capnpRoutesCollectionMessage.getRoot<routesCollection::RoutesCollection>();
       for (routesCollection::Route::Reader capnpRoute : capnpRoutesCollection.getRoutes())
@@ -81,15 +81,15 @@ namespace TrRouting
   */
 
   /*
-  const std::pair<std::vector<Trip>, std::map<unsigned long long, int>> CacheFetcher::getTrips(std::string applicationShortname)
+  const std::pair<std::vector<Trip>, std::map<unsigned long long, int>> CacheFetcher::getTrips(std::string projectShortname)
   {
     std::vector<Trip> trips;
     std::string cacheFileName{"trips"};
     std::map<unsigned long long, int> tripIndexesById;
     
-    if (CacheFetcher::capnpCacheFileExists(applicationShortname, cacheFileName))
+    if (CacheFetcher::capnpCacheFileExists(projectShortname, cacheFileName))
     {
-      int fd = open((applicationShortname + "_" + cacheFileName + ".capnpbin").c_str(), O_RDWR);
+      int fd = open((projectShortname + "_" + cacheFileName + ".capnpbin").c_str(), O_RDWR);
       ::capnp::PackedFdMessageReader capnpTripsCollectionMessage(fd, {64 * 1024 * 1024});
       tripsCollection::TripsCollection::Reader capnpTripsCollection = capnpTripsCollectionMessage.getRoot<tripsCollection::TripsCollection>();
       for (tripsCollection::Trip::Reader capnpTrip : capnpTripsCollection.getTrips())
@@ -116,16 +116,16 @@ namespace TrRouting
   */
 
   /*
-  const std::pair<std::vector<std::tuple<int,int,int,int,int,short,short,int>>, std::vector<std::tuple<int,int,int,int,int,short,short,int>>> CacheFetcher::getConnections(std::string applicationShortname, std::map<unsigned long long, int> stopIndexesById, std::map<unsigned long long, int> tripIndexesById)
+  const std::pair<std::vector<std::tuple<int,int,int,int,int,short,short,int>>, std::vector<std::tuple<int,int,int,int,int,short,short,int>>> CacheFetcher::getConnections(std::string projectShortname, std::map<unsigned long long, int> stopIndexesById, std::map<unsigned long long, int> tripIndexesById)
   {
     std::vector<std::tuple<int,int,int,int,int,short,short,int>> forwardConnections;
     std::vector<std::tuple<int,int,int,int,int,short,short,int>> reverseConnections; 
     std::string cacheFileName{"connections"};
     
     std::cout << "Fetching connections from cache..." << std::endl;
-    if (CacheFetcher::capnpCacheFileExists(applicationShortname, cacheFileName))
+    if (CacheFetcher::capnpCacheFileExists(projectShortname, cacheFileName))
     {
-      int fd = open((applicationShortname + "_" + cacheFileName + ".capnpbin").c_str(), O_RDWR);
+      int fd = open((projectShortname + "_" + cacheFileName + ".capnpbin").c_str(), O_RDWR);
       ::capnp::PackedFdMessageReader capnpConnectionsCollectionMessage(fd, {64 * 1024 * 1024});
       connectionsCollection::ConnectionsCollection::Reader capnpConnectionsCollection = capnpConnectionsCollectionMessage.getRoot<connectionsCollection::ConnectionsCollection>();
       for (connectionsCollection::Connection::Reader capnpConnection : capnpConnectionsCollection.getForwardConnections())
@@ -169,16 +169,16 @@ namespace TrRouting
   */
   
   /*
-  const std::pair<std::vector<std::tuple<int,int,int>>, std::vector<std::pair<long long,long long>>> CacheFetcher::getFootpaths(std::string applicationShortname, std::map<unsigned long long, int> stopIndexesById)
+  const std::pair<std::vector<std::tuple<int,int,int>>, std::vector<std::pair<long long,long long>>> CacheFetcher::getFootpaths(std::string projectShortname, std::map<unsigned long long, int> stopIndexesById)
   {
     std::vector<std::tuple<int,int,int>> footpaths;
     std::string cacheFileName{"footpaths"};
     std::vector<std::pair<long long,long long>>      footpathsRanges;
     
     std::cout << "Fetching footpaths from cache..." << std::endl;
-    if (CacheFetcher::capnpCacheFileExists(applicationShortname, cacheFileName))
+    if (CacheFetcher::capnpCacheFileExists(projectShortname, cacheFileName))
     {
-      int fd = open((applicationShortname + "_" + cacheFileName + ".capnpbin").c_str(), O_RDWR);
+      int fd = open((projectShortname + "_" + cacheFileName + ".capnpbin").c_str(), O_RDWR);
       ::capnp::PackedFdMessageReader capnpFootpathsCollectionMessage(fd, {64 * 1024 * 1024});
       footpathsCollection::FootpathsCollection::Reader capnpFootpathsCollection = capnpFootpathsCollectionMessage.getRoot<footpathsCollection::FootpathsCollection>();
       for (footpathsCollection::Footpath::Reader capnpFootpath : capnpFootpathsCollection.getFootpaths())
@@ -208,15 +208,15 @@ namespace TrRouting
   */
 
   /*
-  const std::vector<std::pair<int,int>> CacheFetcher::getOdTripFootpaths(std::string applicationShortname, Parameters& params)
+  const std::vector<std::pair<int,int>> CacheFetcher::getOdTripFootpaths(std::string projectShortname, Parameters& params)
   {
     std::vector<std::pair<int,int>> odTripFootpaths;
     std::string cacheFileName{"od_trip_footpaths"};
     
     std::cout << "Fetching od trip footpaths from cache..." << std::endl;
-    if (CacheFetcher::capnpCacheFileExists(applicationShortname, cacheFileName))
+    if (CacheFetcher::capnpCacheFileExists(projectShortname, cacheFileName))
     {
-      int fd = open((applicationShortname + "_" + cacheFileName + ".capnpbin").c_str(), O_RDWR);
+      int fd = open((projectShortname + "_" + cacheFileName + ".capnpbin").c_str(), O_RDWR);
       ::capnp::PackedFdMessageReader capnpOdTripFootpathsCollectionMessage(fd, {64 * 1024 * 1024});
       odTripFootpathsCollection::OdTripFootpathsCollection::Reader capnpOdTripFootpathsCollection = capnpOdTripFootpathsCollectionMessage.getRoot<odTripFootpathsCollection::OdTripFootpathsCollection>();
 
@@ -240,16 +240,16 @@ namespace TrRouting
   */
 
   /*
-  const std::pair<std::vector<OdTrip>, std::map<unsigned long long, int>> CacheFetcher::getOdTrips(std::string applicationShortname, std::vector<Stop> stops, Parameters& params)
+  const std::pair<std::vector<OdTrip>, std::map<unsigned long long, int>> CacheFetcher::getOdTrips(std::string projectShortname, std::vector<Stop> stops, Parameters& params)
   {
     std::vector<OdTrip> odTrips;
     std::string cacheFileName{"od_trips"};
     std::map<unsigned long long, int> odTripIndexesById;
     
     std::cout << "Fetching od trips from cache..." << std::endl;
-    if (CacheFetcher::capnpCacheFileExists(applicationShortname, cacheFileName))
+    if (CacheFetcher::capnpCacheFileExists(projectShortname, cacheFileName))
     {
-      int fd = open((applicationShortname + "_" + cacheFileName + ".capnpbin").c_str(), O_RDWR);
+      int fd = open((projectShortname + "_" + cacheFileName + ".capnpbin").c_str(), O_RDWR);
       ::capnp::PackedFdMessageReader capnpOdTripsCollectionMessage(fd, {64 * 1024 * 1024});
       odTripsCollection::OdTripsCollection::Reader capnpOdTripsCollection = capnpOdTripsCollectionMessage.getRoot<odTripsCollection::OdTripsCollection>();
 

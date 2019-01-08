@@ -27,8 +27,8 @@
 #include <osrm/table_parameters.hpp>
 
 #include "toolbox.hpp"
-//#include "gtfs_fetcher.hpp"
-//#include "csv_fetcher.hpp"
+#include "gtfs_fetcher.hpp"
+#include "csv_fetcher.hpp"
 #include "cache_fetcher.hpp"
 #include "calculation_time.hpp"
 #include "parameters.hpp"
@@ -36,7 +36,7 @@
 #include "combinations.hpp"
 
 //Added for the json-example:
-using namespace boost::property_tree;
+//using namespace boost::property_tree;
 using namespace TrRouting;
 
 typedef SimpleWeb::Server<SimpleWeb::HTTP> HttpServer;
@@ -51,11 +51,6 @@ std::string consoleCyan       = "";
 std::string consoleMagenta    = "";
 std::string consoleResetColor = "";
 
-//namespace 
-//{ 
-//  const size_t ERROR_IN_COMMAND_LINE = 1;
-//}
-
 //Added for the default_resource example
 void default_resource_send(const HttpServer &server, const std::shared_ptr<HttpServer::Response> &response,
                            const std::shared_ptr<std::ifstream> &ifs);
@@ -63,15 +58,15 @@ void default_resource_send(const HttpServer &server, const std::shared_ptr<HttpS
 int main(int argc, char** argv) {
   
   int serverPort {4000};
-  std::string dataFetcherStr {"database"}; // csv, database
+  std::string dataFetcherStr {"cache"}; // cache, csv or gtfs, only cache is implemented for now
   
-  // Get application shortname from config file:
-  std::string applicationShortname;
-  std::ifstream applicationShortnameFile;
-  applicationShortnameFile.open("application_shortname.txt");
-  std::getline(applicationShortnameFile, applicationShortname);
-  applicationShortnameFile.close();
-  std::string dataShortname {applicationShortname};
+  // Get project shortname from config file:
+  std::string projectShortnameFromFile;
+  std::ifstream projectShortnameFile;
+  projectShortnameFile.open("project_shortname.txt");
+  std::getline(projectShortnameFile, projectShortnameFromFile);
+  projectShortnameFile.close();
+  std::string projectShortname {projectShortnameFromFile};
   
   // Set params:
   Parameters algorithmParams;
@@ -81,19 +76,19 @@ int main(int argc, char** argv) {
   
   boost::program_options::options_description optionsDesc("Options"); 
   boost::program_options::variables_map variablesMap;
-  optionsDesc.add_options() 
+  optionsDesc.add_options()
       ("port,p", boost::program_options::value<int>(), "http server port");
-  optionsDesc.add_options() 
+  optionsDesc.add_options()
       ("dataFetcher,data", boost::program_options::value<std::string>(), "data fetcher (csv, gtfs or cache)"); // only cache implemented for now
-  optionsDesc.add_options() 
-      ("dataShortname,sn", boost::program_options::value<std::string>(), "data shortname (shortname of the application to use or data to use)");
-  optionsDesc.add_options() 
+  optionsDesc.add_options()
+      ("projectShortname,project", boost::program_options::value<std::string>(), "project shortname (shortname of the project to use or data to use)");
+  optionsDesc.add_options()
       ("osrmWalkPort",     boost::program_options::value<std::string>(), "osrm walking port");
-  optionsDesc.add_options() 
-      ("osrmFilePath",     boost::program_options::value<std::string>(), "osrm file path (PATH_TO_ROUTING_FILE.osrm)");
-  optionsDesc.add_options() 
+  optionsDesc.add_options()
+      ("osrmFilePath",     boost::program_options::value<std::string>(), "osrm file path (PATH/TO/ROUTING_FILE.osrm)");
+  optionsDesc.add_options()
       ("osrmUseLib",       boost::program_options::value<std::string>(), "osrm use libosrm instead of server (1 or 0)");
-  optionsDesc.add_options() 
+  optionsDesc.add_options()
       ("odTripsFootpathsMaxTravelTimeMinutes", boost::program_options::value<int>(), "max travel time to use when fetching od_trips footpaths to access and egress nodes");
   optionsDesc.add_options() 
       ("updateOdTrips", boost::program_options::value<std::string>(), "update od trips access and egress nodes or not (1 or 0)");
@@ -116,13 +111,13 @@ int main(int argc, char** argv) {
   {
     dataFetcherStr = variablesMap["data"].as<std::string>();
   }
-  if(variablesMap.count("dataShortname") == 1)
+  if(variablesMap.count("projectShortname") == 1)
   {
-    dataShortname = variablesMap["dataShortname"].as<std::string>();
+    projectShortname = variablesMap["projectShortname"].as<std::string>();
   }
-  if(variablesMap.count("sn") == 1)
+  else if(variablesMap.count("project") == 1)
   {
-    dataShortname = variablesMap["sn"].as<std::string>();
+    projectShortname = variablesMap["project"].as<std::string>();
   }
   if(variablesMap.count("osrmWalkPort") == 1)
   {
@@ -147,12 +142,12 @@ int main(int argc, char** argv) {
     algorithmParams.updateOdTrips = (variablesMap["updateOdTrips"].as<std::string>() == "1") ? true : false;
   }
   
-  std::cout << "Using http port "      << serverPort << std::endl;
-  std::cout << "Using osrm walk port "  << algorithmParams.osrmRoutingWalkingPort << std::endl;
-  std::cout << "Using data fetcher "   << dataFetcherStr << std::endl;
-  std::cout << "Using data shortname " << dataShortname << std::endl;
+  std::cout << "Using http port "         << serverPort << std::endl;
+  std::cout << "Using osrm walk port "    << algorithmParams.osrmRoutingWalkingPort << std::endl;
+  std::cout << "Using data fetcher "      << dataFetcherStr << std::endl;
+  std::cout << "Using project shortname " << projectShortname << std::endl;
   
-  // setup console colors 
+  // setup console colors:
   // (this will create a new terminal window, check if the terminal is color-capable and then it will close the terminal window with endwin()):
   initscr();
   start_color();
@@ -176,23 +171,21 @@ int main(int argc, char** argv) {
   }
   endwin();
   
-  std::cout << "Starting transit routing for the application: ";
-  std::cout << consoleGreen + dataShortname + consoleResetColor << std::endl << std::endl;
+  std::cout << "Starting transit routing for the project: ";
+  std::cout << consoleGreen + projectShortname + consoleResetColor << std::endl << std::endl;
   
-  algorithmParams.applicationShortname = dataShortname;
+  algorithmParams.projectShortname     = projectShortname;
   algorithmParams.dataFetcherShortname = dataFetcherStr;
   
-  /*GtfsFetcher gtfsFetcher         = GtfsFetcher();
-  algorithmParams.gtfsFetcher     = &gtfsFetcher;
-  CsvFetcher csvFetcher           = CsvFetcher();
-  algorithmParams.csvFetcher      = &csvFetcher;*/
-  CacheFetcher cacheFetcher       = CacheFetcher();
-  algorithmParams.cacheFetcher    = &cacheFetcher;
+  GtfsFetcher  gtfsFetcher     = GtfsFetcher();
+  algorithmParams.gtfsFetcher  = &gtfsFetcher;
+  CsvFetcher   csvFetcher      = CsvFetcher();
+  algorithmParams.csvFetcher   = &csvFetcher;
+  CacheFetcher cacheFetcher    = CacheFetcher();
+  algorithmParams.cacheFetcher = &cacheFetcher;
   
   Calculator calculator(algorithmParams);
   int i = 0;
-  
-  /////////
   
   std::cout << "preparing server..." << std::endl;
   
@@ -229,16 +222,6 @@ int main(int argc, char** argv) {
       
       float originLatitude, originLongitude, destinationLatitude, destinationLongitude;
       long long startingNodeUuid{-1}, endingNodeUuid{-1};
-      std::vector<int> onlyServiceUuids;
-      std::vector<unsigned long long> exceptServiceUuids;
-      std::vector<unsigned long long> onlyLineUuids;
-      std::vector<unsigned long long> exceptLineUuids;
-      std::vector<unsigned long long> onlyModes;
-      std::vector<unsigned long long> exceptModes;
-      std::vector<unsigned long long> onlyAgencyUuids;
-      std::vector<unsigned long long> exceptAgencyUuids;
-      std::vector<unsigned long long> accessNodeUuids;
-      std::vector<unsigned long long> egressNodeUUids;
       std::vector<int> accessNodeTravelTimesSeconds;
       std::vector<int> egressNodeTravelTimesSeconds;
       std::vector<std::pair<int,int>> odTripsPeriods; // pair: start_at_seconds, end_at_seconds
@@ -255,14 +238,14 @@ int main(int argc, char** argv) {
       int odTripUuid {""}; // when calculating for only one trip
       bool alternatives {false}; // calculate alternatives or not
       
-      calculator.params.onlyServiceUuids     = onlyServiceUuids;
-      calculator.params.exceptServiceUuids   = exceptServiceUuids;
-      calculator.params.onlyLineUuids       = onlyLineUuids;
-      calculator.params.exceptLineUuids     = exceptLineUuids;
-      calculator.params.onlyLineTypeUuids   = onlyModes;
-      calculator.params.exceptLineTypeUuids = exceptModes;
-      calculator.params.onlyAgencyUuids      = onlyAgencyUuids;
-      calculator.params.exceptAgencyUuids    = exceptAgencyUuids;
+      calculator.params.onlyServicesIdx.clear();
+      calculator.params.exceptServicesIdx.clear();
+      calculator.params.onlyLinesIdx.clear();
+      calculator.params.exceptLinesIdx.clear();
+      calculator.params.onlyModesIdx.clear();
+      calculator.params.exceptModesIdx.clear();
+      calculator.params.onlyAgenciesIdx.clear();
+      calculator.params.exceptAgenciesIdx.clear();
       //calculator.params.odTripsPeriods     = odTripsPeriods;
       //calculator.params.odTripsGenders     = odTripsGenders;
       //calculator.params.odTripsAgeGroups   = odTripsAgeGroups;
@@ -300,14 +283,14 @@ int main(int argc, char** argv) {
       calculator.params.detailedResults                        = false;
       calculator.params.returnAllNodesResult                   = false;
       calculator.params.transferOnlyAtSameStation              = false;
-      calculator.params.transferBetweenSameLine               = true;
+      calculator.params.transferBetweenSameLine                = true;
       calculator.params.origin                                 = Point();
       calculator.params.destination                            = Point();
       calculator.params.routingDateYear                        = 0;
       calculator.params.routingDateMonth                       = 0;
       calculator.params.routingDateDay                         = 0;
-      calculator.params.originNodeUuid                         = -1;
-      calculator.params.destinationNodeUuid                    = -1;
+      calculator.params.originNodeIdx                          = -1;
+      calculator.params.destinationNodeIdx                     = -1;
       calculator.params.odTrip                                 = NULL;
       calculator.params.maxNumberOfTransfers                   = -1;
       calculator.params.minWaitingTimeSeconds                  = 5 * 60;
@@ -332,8 +315,8 @@ int main(int argc, char** argv) {
       calculator.params.maxNoResultNextAccessTimeSeconds       = 40 * 60;
       calculator.params.calculateByNumberOfTransfers           = false;
       calculator.params.alternatives                           = false;
-      calculator.params.accessNodeUuids.clear();
-      calculator.params.egressNodeUuids.clear();
+      calculator.params.accessNodesIdx.clear();
+      calculator.params.egressNodesIdx.clear();
       calculator.params.accessNodeTravelTimesSeconds.clear();
       calculator.params.egressNodeTravelTimesSeconds.clear();
 
@@ -393,9 +376,11 @@ int main(int argc, char** argv) {
           boost::split(accessNodeUuidsVector, parameterWithValueVector[1], boost::is_any_of(","));
           for(std::string accessNodeUuid : accessNodeUuidsVector)
           {
-            accessNodeUuids.push_back(accessNodeUuid);
+            if (calculator.nodeIndexesByUuid.count(accessNodeUuid) == 1)
+            {
+              calculator.params.accessNodeIdx.push_back(calculator.nodeIndexesByUuid[accessNodeUuid]);
+            }
           }
-          calculator.params.accessNodeUuids = accessNodeUuids;
         }
         else if (parameterWithValueVector[0] == "egress_node_uuids")
         {
@@ -1325,43 +1310,46 @@ int main(int argc, char** argv) {
   };
   
   
-  
-  
   std::cout << "starting server..." << std::endl;
-  //server.start();
   std::thread server_thread([&server](){
-      //Start server
       server.start();
   });
     
-  //Wait for server to start so that the client can connect
+  // Wait for server to start so that the client can connect:
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
   
   std::cout << "ready." << std::endl;
   
   server_thread.join();
   
-  //calculator.destroy();
-
   std::cout << "done..." << std::endl;
   
   return 0;
 }
 
-void default_resource_send(const HttpServer &server, const std::shared_ptr<HttpServer::Response> &response,
-                           const std::shared_ptr<std::ifstream> &ifs) {
-    //read and send 128 KB at a time
-    static std::vector<char> buffer(131072); // Safe when server is running on one thread
-    std::streamsize read_length;
-    if((read_length=ifs->read(&buffer[0], buffer.size()).gcount())>0) {
-        response->write(&buffer[0], read_length);
-        if(read_length==static_cast<std::streamsize>(buffer.size())) {
-            server.send(response, [&server, response, ifs](const boost::system::error_code &ec) {
-                if(!ec)
-                    default_resource_send(server, response, ifs);
-                else
-                    std::cerr << "Connection interrupted" << std::endl;
-            });
+void default_resource_send(const HttpServer &server, const std::shared_ptr<HttpServer::Response> &response, const std::shared_ptr<std::ifstream> &ifs) {
+  
+  // Read and send 128 KB at a time:
+  static std::vector<char> buffer(131072);
+  
+  // Safe when server is running on one thread:
+  std::streamsize read_length;
+  if ((read_length = ifs->read(&buffer[0], buffer.size()).gcount())>0)
+  {
+    response->write(&buffer[0], read_length);
+    if (read_length==static_cast<std::streamsize>(buffer.size()))
+    {
+      server.send(response, [&server, response, ifs](const boost::system::error_code &ec)
+      {
+        if (!ec)
+        {
+          default_resource_send(server, response, ifs);
         }
+        else
+        {
+          std::cerr << "Connection interrupted" << std::endl;
+        }
+      });
     }
+  }
 }

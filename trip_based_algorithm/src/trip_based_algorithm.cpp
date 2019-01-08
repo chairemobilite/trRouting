@@ -78,7 +78,7 @@ namespace TrRouting
     
     // fetch footpaths_by_source:
     dataName = "footpaths_by_source";
-    stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
+    stream   = std::ifstream("cache/" + params.projectShortname + "__trip_based_routing__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
     footpathsBySource = std::vector<Footpath>();
@@ -98,7 +98,7 @@ namespace TrRouting
     
     // fetch footpaths_by_target:
     dataName = "footpaths_by_target";
-    stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
+    stream   = std::ifstream("cache/" + params.projectShortname + "__trip_based_routing__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
     footpathsByTarget = std::vector<Footpath>();
@@ -118,7 +118,7 @@ namespace TrRouting
     
     // fetch footpaths_index_by_source: Exact same copy as footpaths_index_by_target, so we don't need both!
     dataName = "footpaths_index_by_source";
-    stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
+    stream   = std::ifstream("cache/" + params.projectShortname + "__trip_based_routing__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
     footpathsIndex = jsonContent.get<std::vector<std::vector<int>> >();
@@ -128,7 +128,7 @@ namespace TrRouting
     
     // fetch route_paths:
     dataName = "route_paths";
-    stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
+    stream   = std::ifstream("cache/" + params.projectShortname + "__trip_based_routing__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
     routePaths = std::vector<RoutePath>();
@@ -151,7 +151,7 @@ namespace TrRouting
 
     // fetch route_paths_index_by_id
     dataName = "route_paths_index_by_id";
-    stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
+    stream   = std::ifstream("cache/" + params.projectShortname + "__trip_based_routing__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
     routePathsIndexById = jsonContent.get<std::vector<int>>();
@@ -161,7 +161,7 @@ namespace TrRouting
 
     // fetch route_paths_index_by_stop:
     dataName = "route_paths_index_by_stop";
-    stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
+    stream   = std::ifstream("cache/" + params.projectShortname + "__trip_based_routing__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
     routePathsIndexByStop = jsonContent.get<std::vector<std::vector<std::vector<int>>>>();
@@ -172,7 +172,7 @@ namespace TrRouting
 
     // fetch stops:
     dataName = "stops";
-    stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
+    stream   = std::ifstream("cache/" + params.projectShortname + "__trip_based_routing__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
     stops = std::vector<Stop>();
@@ -196,7 +196,7 @@ namespace TrRouting
 
     // fetch stops_index_by_id
     dataName = "stops_index_by_id";
-    stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
+    stream   = std::ifstream("cache/" + params.projectShortname + "__trip_based_routing__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
     stopsIndexById = jsonContent.get<std::vector<int>>();
@@ -206,7 +206,7 @@ namespace TrRouting
 
     // fetch stops_index_by_route_path:
     dataName = "stops_index_by_route_path";
-    stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
+    stream   = std::ifstream("cache/" + params.projectShortname + "__trip_based_routing__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
     stopsIndexByRoutePath = jsonContent.get<std::vector<std::vector<int>> >();
@@ -217,7 +217,7 @@ namespace TrRouting
 
     // fetch arrival_times
     dataName = "arrival_times";
-    stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + weekdayName + "__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
+    stream   = std::ifstream("cache/" + params.projectShortname + "__trip_based_routing__" + weekdayName + "__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
     //std::cerr << jsonContent.dump() << std::endl;
@@ -228,7 +228,7 @@ namespace TrRouting
 
     // fetch departure_times
     dataName = "departure_times";
-    stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + weekdayName + "__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
+    stream   = std::ifstream("cache/" + params.projectShortname + "__trip_based_routing__" + weekdayName + "__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
     departureTimes[params.weekdayIndex] = jsonContent.get<std::vector<int>>();
@@ -238,7 +238,7 @@ namespace TrRouting
 
     // fetch arrival_times_index
     dataName = "arrival_times_first_last_index_by_trip";
-    stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + weekdayName + "__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
+    stream   = std::ifstream("cache/" + params.projectShortname + "__trip_based_routing__" + weekdayName + "__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
     arrivalTimesIndex[params.weekdayIndex] = jsonContent.get<std::vector<std::vector<int>> >();
@@ -248,7 +248,7 @@ namespace TrRouting
 
     // fetch departure_times_index
     dataName = "departure_times_first_last_index_by_trip";
-    stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + weekdayName + "__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
+    stream   = std::ifstream("cache/" + params.projectShortname + "__trip_based_routing__" + weekdayName + "__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
     departureTimesIndex[params.weekdayIndex] = jsonContent.get<std::vector<std::vector<int>> >();
@@ -258,7 +258,7 @@ namespace TrRouting
 
     // fetch transfers:
     dataName = "transfers";
-    stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + weekdayName + "__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
+    stream   = std::ifstream("cache/" + params.projectShortname + "__trip_based_routing__" + weekdayName + "__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
     transfers[params.weekdayIndex] = std::vector<Transfer>();
@@ -278,7 +278,7 @@ namespace TrRouting
 
     // fetch transfers_index
     dataName = "transfers_first_last_by_arrival_time_index";
-    stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + weekdayName + "__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
+    stream   = std::ifstream("cache/" + params.projectShortname + "__trip_based_routing__" + weekdayName + "__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
     transfersIndex[params.weekdayIndex] = jsonContent.get<std::vector<std::vector<int>> >();
@@ -288,7 +288,7 @@ namespace TrRouting
 
     // fetch trips:
     dataName = "trips";
-    stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + weekdayName + "__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
+    stream   = std::ifstream("cache/" + params.projectShortname + "__trip_based_routing__" + weekdayName + "__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
     trips[params.weekdayIndex] = std::vector<Trip>();
@@ -308,7 +308,7 @@ namespace TrRouting
 
     // fetch trips_index
     dataName = "trips_first_last_index_by_route_path";
-    stream   = std::ifstream("cache/" + params.applicationShortname + "__trip_based_routing__" + weekdayName + "__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
+    stream   = std::ifstream("cache/" + params.projectShortname + "__trip_based_routing__" + weekdayName + "__" + dataName + ".msgpack", std::ios::in | std::ios::binary);
     contents = std::vector<uint8_t>((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
     jsonContent = json::from_msgpack(contents);
     tripsIndex[params.weekdayIndex] = jsonContent.get<std::vector<std::vector<int>> >();

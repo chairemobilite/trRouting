@@ -6,6 +6,8 @@ namespace TrRouting
   Calculator::Calculator(Parameters& theParams) : params(theParams)
   {
     
+    algorithmCalculationTime = CalculationTime();
+
     if (params.osrmUseLib == true)
     {
       osrm::EngineConfig osrmConfig;
@@ -17,14 +19,11 @@ namespace TrRouting
       
     }
     
-    algorithmCalculationTime = CalculationTime();
-    std::cout << "preparing calculator..." << std::endl; 
+    std::cout << "preparing calculator..." << std::endl;
+
     prepare();
+
   }
   
-  //Calculator::Calculator()
-  //{
-  //  
-  //}
 
 }

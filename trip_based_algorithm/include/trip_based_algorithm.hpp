@@ -44,7 +44,7 @@ namespace TrRouting
   
   public:
     
-    std::string applicationShortname;
+    std::string projectShortname;
     TripBasedAlgorithm();
     TripBasedAlgorithm(Parameters& theParams);
     void setup();

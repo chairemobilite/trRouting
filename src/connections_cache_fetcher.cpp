@@ -11,7 +11,7 @@
 namespace TrRouting
 {
 
-  const std::pair<std::vector<std::tuple<int,int,int,int,int,short,short,int>>, std::vector<std::tuple<int,int,int,int,int,short,short,int>>> CacheFetcher::getConnections(std::string applicationShortname, std::map<unsigned long long, int> nodeIndexesByUuid, std::map<unsigned long long, int> tripIndexesByUuid)
+  const std::pair<std::vector<std::tuple<int,int,int,int,int,short,short,int>>, std::vector<std::tuple<int,int,int,int,int,short,short,int>>> CacheFetcher::getConnections(std::string projectShortname, std::map<unsigned long long, int> nodeIndexesByUuid, std::map<unsigned long long, int> tripIndexesByUuid)
   {
     
   }

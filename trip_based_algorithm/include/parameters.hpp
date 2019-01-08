@@ -9,7 +9,7 @@ namespace TrRouting
 {
   struct Parameters {
     
-    std::string applicationShortname;
+    std::string projectShortname;
     std::string dataFetcher; // csv, database
     
     int routingDateYear;   // not implemented, use onlyServiceIds or exceptServiceIds for now

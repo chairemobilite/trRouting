@@ -42,38 +42,37 @@ namespace TrRouting
   public:
     
     CacheFetcher() {}
-    CacheFetcher(std::string applicationShortname) {
+    CacheFetcher(std::string projectShortname) {
       
     }
     
     template<class T>
-    static void saveToCapnpCacheFile(std::string applicationShortname, T& data, std::string cacheFileName) {
+    static void saveToCapnpCacheFile(std::string projectShortname, T& data, std::string cacheFileName, Parameters& params) {
       std::ofstream oCacheFile;
-      oCacheFile.open(applicationShortname + "/" + cacheFileName + ".capnpbin", std::ios::out | std::ios::trunc | std::ios::binary);
+      oCacheFile.open(params.cacheDirectoryPath + projectShortname + "/" + cacheFileName + ".capnpbin", std::ios::out | std::ios::trunc | std::ios::binary);
       oCacheFile.close();
-      int fd = open((applicationShortname + "/" + cacheFileName + ".capnpbin").c_str(), O_WRONLY);
+      int fd = open((projectShortname + "/" + cacheFileName + ".capnpbin").c_str(), O_WRONLY);
       ::capnp::writePackedMessageToFd(fd, data);
       close(fd);
     }
 
-    static bool capnpCacheFileExists(std::string applicationShortname, std::string cacheFileName) {
+    static bool capnpCacheFileExists(std::string projectShortname, std::string cacheFileName, Parameters& params) {
       std::ifstream iCacheFile;
       bool notEmpty = false;
-      iCacheFile.open(applicationShortname + "/" + cacheFileName + ".capnpbin", std::ios::in | std::ios::binary | std::ios::ate);
+      iCacheFile.open(params.cacheDirectoryPath + projectShortname + "/" + cacheFileName + ".capnpbin", std::ios::in | std::ios::binary | std::ios::ate);
       notEmpty = iCacheFile.tellg() > 0;
       iCacheFile.close();
       return notEmpty;
     }
     
-    const std::pair<std::vector<Agency>, std::map<boost::uuids::uuid, int>> getAgencies(std::string applicationShortname);
-
-    //const std::pair<std::vector<Stop> , std::map<unsigned long long, int>> getStops( std::string applicationShortname);
-    //const std::pair<std::vector<Route>, std::map<unsigned long long, int>> getRoutes(std::string applicationShortname);
-    //const std::pair<std::vector<Trip> , std::map<unsigned long long, int>> getTrips( std::string applicationShortname);
-    const std::pair<std::vector<std::tuple<int,int,int,int,int,short,short,int>>, std::vector<std::tuple<int,int,int,int,int,short,short,int>>> getConnections(std::string applicationShortname, std::map<unsigned long long, int> stopIndexesById, std::map<unsigned long long, int> tripIndexesById);
-    //const std::pair<std::vector<std::tuple<int,int,int>>, std::vector<std::pair<long long,long long>>> getFootpaths(std::string applicationShortname, std::map<unsigned long long, int> stopIndexesById);
-    //const std::vector<std::pair<int,int>> getOdTripFootpaths(std::string applicationShortname, Parameters& params);
-    //const std::pair<std::vector<OdTrip>, std::map<unsigned long long, int>> getOdTrips(std::string applicationShortname, std::vector<Stop> stops, Parameters& params);
+    const std::pair<std::vector<Agency>, std::map<boost::uuids::uuid, int>> getAgencies(std::string projectShortname, Parameters& params);
+    //const std::pair<std::vector<Stop> , std::map<unsigned long long, int>> getStops( std::string projectShortname);
+    //const std::pair<std::vector<Route>, std::map<unsigned long long, int>> getRoutes(std::string projectShortname);
+    //const std::pair<std::vector<Trip> , std::map<unsigned long long, int>> getTrips( std::string projectShortname);
+    const std::pair<std::vector<std::tuple<int,int,int,int,int,short,short,int>>, std::vector<std::tuple<int,int,int,int,int,short,short,int>>> getConnections(std::string projectShortname, std::map<unsigned long long, int> stopIndexesById, std::map<unsigned long long, int> tripIndexesById);
+    //const std::pair<std::vector<std::tuple<int,int,int>>, std::vector<std::pair<long long,long long>>> getFootpaths(std::string projectShortname, std::map<unsigned long long, int> stopIndexesById);
+    //const std::vector<std::pair<int,int>> getOdTripFootpaths(std::string projectShortname, Parameters& params);
+    //const std::pair<std::vector<OdTrip>, std::map<unsigned long long, int>> getOdTrips(std::string projectShortname, std::vector<Stop> stops, Parameters& params);
     
   private:
     

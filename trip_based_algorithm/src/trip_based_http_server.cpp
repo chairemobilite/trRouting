@@ -53,12 +53,12 @@ int main(int argc, char** argv) {
   std::string dataFetcher {"database"}; // csv, database
   
   // Get application shortname from config file:
-  std::string applicationShortname;
-  //std::ifstream applicationShortnameFile;
-  //applicationShortnameFile.open("application_shortname.txt");
-  //std::getline(applicationShortnameFile, applicationShortname);
-  //applicationShortnameFile.close();
-  //std::string dataShortname {applicationShortname};
+  std::string projectShortname;
+  //std::ifstream projectShortnameFile;
+  //projectShortnameFile.open("application_shortname.txt");
+  //std::getline(projectShortnameFile, projectShortname);
+  //projectShortnameFile.close();
+  //std::string dataShortname {projectShortname};
   
   std::string dataShortname {""};
 
@@ -134,7 +134,7 @@ int main(int argc, char** argv) {
   // Set params:
   Parameters algorithmParams;
   TripBasedAlgorithm calculator;
-  algorithmParams.applicationShortname = dataShortname;
+  algorithmParams.projectShortname = dataShortname;
   algorithmParams.dataFetcher          = dataFetcher;
   
   calculator = TripBasedAlgorithm(algorithmParams);
