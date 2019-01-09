@@ -15,26 +15,27 @@
 namespace TrRouting
 {
 
-  const std::tuple<std::vector<Trip>, std::map<boost::uuids::uuid, int>, std::vector<Block>, std::map<boost::uuids::uuid, int>, std::vector<std::tuple<int,int,int,int,int,short,short,int>>, std::vector<std::tuple<int,int,int,int,int,short,short,int>>> CacheFetcher::getTripsAndConnections(std::map<boost::uuids::uuid, int> agencyIndexesByUuid, std::vector<Line> lines, std::map<boost::uuids::uuid, int> lineIndexesByUuid, std::map<boost::uuids::uuid, int> pathIndexesByUuid, std::map<boost::uuids::uuid, int> nodeIndexesByUuid, std::map<boost::uuids::uuid, int> serviceIndexesByUuid, Parameters& params)
+  const std::tuple<std::vector<Trip>, std::map<boost::uuids::uuid, int>, std::vector<Block>, std::map<boost::uuids::uuid, int>, std::vector<std::tuple<int,int,int,int,int,short,short,int>>, std::vector<std::tuple<int,int,int,int,int,short,short,int>>> CacheFetcher::getTripsAndConnections(std::map<boost::uuids::uuid, int> agencyIndexesByUuid, std::vector<Line> lines, std::map<boost::uuids::uuid, int> lineIndexesByUuid, std::vector<Path> paths, std::map<boost::uuids::uuid, int> pathIndexesByUuid, std::map<boost::uuids::uuid, int> nodeIndexesByUuid, std::map<boost::uuids::uuid, int> serviceIndexesByUuid, Parameters& params)
   { 
 
     std::vector<Trip> trips;
-    std::map<boost::uuids::uuid, int> tripIndexesByUuid;
     std::vector<Block> blocks;
-    std::map<boost::uuids::uuid, int> blockIndexesByUuid;
-    std::vector<std::tuple<int,int,int,int,int,short,short,int>> forwardConnections;
-    std::vector<std::tuple<int,int,int,int,int,short,short,int>> reverseConnections; 
-
+    std::map<boost::uuids::uuid, int> tripIndexesByUuid, blockIndexesByUuid;
+    std::vector<std::tuple<int,int,int,int,int,short,short,int>> forwardConnections, reverseConnections;
     boost::uuids::string_generator uuidGenerator;
-    std::string serviceUuidStr;
-    boost::uuids::uuid serviceUuid;
-    std::string blockUuidStr;
-    boost::uuids::uuid blockUuid;
-    std::string cacheFileName;
-    int serviceIdx;
-    int lineIdx;
+    boost::uuids::uuid tripUuid, pathUuid, blockUuid, serviceUuid;
+    Path path;
+    std::vector<int> pathNodesIdx;
+    std::string tripUuidStr, pathUuidStr, blockUuidStr, serviceUuidStr, cacheFileName;
+    int serviceIdx, lineIdx, tripIdx;
+    unsigned long nodeTimesCount;
+    unsigned long linesCount {lines.size()};
+    int lineI {0};
 
     std::cout << "Fetching trips and connections from cache..." << std::endl;
+
+    std::cout << std::fixed;
+    std::cout << std::setprecision(2);
 
     for (auto & line : lines)
     {
@@ -58,13 +59,18 @@ namespace TrRouting
             const auto capnpTrips {period.getTrips()};
             for (const auto & capnpTrip : capnpTrips)
             {
-              std::string uuid     {capnpTrip.getUuid()};
-              std::string pathUuid {capnpTrip.getPathUuid()};
+              tripUuidStr  = capnpTrip.getUuid();
+              pathUuidStr  = capnpTrip.getPathUuid();
+              tripUuid     = uuidGenerator(tripUuidStr);
+              pathUuid     = uuidGenerator(pathUuidStr);
+              path         = paths[pathIndexesByUuid[pathUuid]];
+              pathNodesIdx = path.nodesIdx;
+              
               Trip * trip                  = new Trip();
-              trip->uuid                   = uuidGenerator(uuid);
+              trip->uuid                   = tripUuid;
               trip->agencyIdx              = line.agencyIdx;
               trip->lineIdx                = lineIndexesByUuid[line.uuid];
-              trip->pathIdx                = pathIndexesByUuid[uuidGenerator(pathUuid)];
+              trip->pathIdx                = pathIndexesByUuid[pathUuid];
               trip->modeIdx                = line.modeIdx;
               trip->serviceIdx             = serviceIdx;
               trip->totalCapacity          = capnpTrip.getTotalCapacity();
@@ -91,17 +97,123 @@ namespace TrRouting
               }
 
               trips.push_back(*trip);
-              tripIndexesByUuid[trip->uuid] = trips.size() - 1;
+              tripIdx = trips.size() - 1;
+              tripIndexesByUuid[trip->uuid] = tripIdx;
+              nodeTimesCount = capnpTrip.getNodeArrivalTimesSeconds().size();
+              auto arrivalTimesSeconds   = capnpTrip.getNodeArrivalTimesSeconds();
+              auto departureTimesSeconds = capnpTrip.getNodeDepartureTimesSeconds();
+              auto canBoards             = capnpTrip.getNodesCanBoard();
+              auto canUnboards           = capnpTrip.getNodesCanUnboard();
+
+              for (int nodeTimeI = 0; nodeTimeI < nodeTimesCount; nodeTimeI++)
+              {
+                if (nodeTimeI < nodeTimesCount - 1)
+                {
+
+                  forwardConnections.push_back(std::make_tuple(
+                    pathNodesIdx[nodeTimeI],
+                    pathNodesIdx[nodeTimeI + 1],
+                    departureTimesSeconds[nodeTimeI],
+                    arrivalTimesSeconds[nodeTimeI + 1],
+                    tripIdx,
+                    canBoards[nodeTimeI],
+                    canUnboards[nodeTimeI + 1],
+                    nodeTimeI + 1
+                  ));
+
+                }
+              }
             }
           }
         }
         close(fd);
+        lineI++;
+        if (lineI % 1000 == 0)
+        {
+          std::cout << ((((double) lineI) / linesCount) * 100) << "%      \r"; // \r is used to stay on the same line
+        }
       }
       else
       {
         std::cerr << "missing schedules cache file for line " << boost::uuids::to_string(line.uuid) << " !" << std::endl;
       }
+      std::cout << std::endl;
     }
+
+    std::cout << "Sorting connections..." << std::endl;
+    std::stable_sort(forwardConnections.begin(), forwardConnections.end(), [](std::tuple<int,int,int,int,int,short,short,int> connectionA, std::tuple<int,int,int,int,int,short,short,int> connectionB)
+    {
+      // { STOP_DEP = 0, STOP_ARR = 1, TIME_DEP = 2, TIME_ARR = 3, TRIP = 4, CAN_BOARD = 5, CAN_UNBOARD = 6, SEQUENCE = 7 };
+      if (std::get<2>(connectionA) < std::get<2>(connectionB))
+      {
+        return true;
+      }
+      else if (std::get<2>(connectionA) > std::get<2>(connectionB))
+      {
+        return false;
+      }
+      if (std::get<4>(connectionA) < std::get<4>(connectionB))
+      {
+        return true;
+      }
+      else if (std::get<4>(connectionA) > std::get<4>(connectionB))
+      {
+        return false;
+      }
+      if (std::get<7>(connectionA) < std::get<7>(connectionB))
+      {
+        return true;
+      }
+      else if (std::get<7>(connectionA) > std::get<7>(connectionB))
+      {
+        return false;
+      }
+      return false;
+    });
+    reverseConnections = forwardConnections;
+    std::stable_sort(reverseConnections.begin(), reverseConnections.end(), [](std::tuple<int,int,int,int,int,short,short,int> connectionA, std::tuple<int,int,int,int,int,short,short,int> connectionB)
+    {
+      // { STOP_DEP = 0, STOP_ARR = 1, TIME_DEP = 2, TIME_ARR = 3, TRIP = 4, CAN_BOARD = 5, CAN_UNBOARD = 6, SEQUENCE = 7 };
+      if (std::get<3>(connectionA) > std::get<3>(connectionB))
+      {
+        return true;
+      }
+      else if (std::get<3>(connectionA) < std::get<3>(connectionB))
+      {
+        return false;
+      }
+      if (std::get<4>(connectionA) > std::get<4>(connectionB)) // here we need to reverse sequence!
+      {
+        return true;
+      }
+      else if (std::get<4>(connectionA) < std::get<4>(connectionB))
+      {
+        return false;
+      }
+      if (std::get<7>(connectionA) > std::get<7>(connectionB)) // here we need to reverse sequence!
+      {
+        return true;
+      }
+      else if (std::get<7>(connectionA) < std::get<7>(connectionB))
+      {
+        return false;
+      }
+      return false;
+    });
+
+    //for (auto & connection : forwardConnections)
+    //{
+    //  std::cout 
+    //  << " nD" << std::get<0>(connection) 
+    //  << " nA" << std::get<1>(connection) 
+    //  << " D" << std::get<2>(connection) 
+    //  << " A" << std::get<3>(connection) 
+    //  << " T" << std::get<4>(connection) 
+    //  << " B" << std::get<5>(connection) 
+    //  << " U" << std::get<6>(connection) 
+    //  << " S" << std::get<7>(connection) 
+    //  << std::endl;
+    //}
 
     return std::make_tuple(trips, tripIndexesByUuid, blocks, blockIndexesByUuid, forwardConnections, reverseConnections);
   }

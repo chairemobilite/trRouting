@@ -143,7 +143,7 @@ namespace TrRouting
     std::vector<std::pair<int,int>> accessFootpaths; // pair: accessNodeIndex, walkingTravelTimeSeconds
     std::vector<std::pair<int,int>> egressFootpaths; // pair: egressNodeIndex, walkingTravelTimeSeconds
     std::vector<std::pair<int,int>> odTripFootpaths; // pair: nodeIndex, walkingTravelTimeSeconds
-    std::vector<std::tuple<int,int,int,int,int,short,short,int>> forwardConnections; // tuple: initialDepartureTimeSecondsNodeIndex, arrivalNodeIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequence in trip
+    std::vector<std::tuple<int,int,int,int,int,short,short,int>> forwardConnections; // tuple: departureNodeIndex, arrivalNodeIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequence in trip
     std::vector<std::tuple<int,int,int,int,int,short,short,int>> reverseConnections; // tuple: departureNodeIndex, arrivalNodeIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequence in trip
     std::vector<std::tuple<int,int,int,int,int,short>> forwardJourneys; // index = node index, tuple: final enter connection, final exit connection, final transferring node index, final exit trip index, transfer travel time, is same node transfer (first, second, third and fourth values = -1 for access and egress journeys)
     std::vector<std::tuple<int,int,int,int,int,short>> forwardEgressJourneys; // index = node index, tuple: final enter connection, final exit connection, final transferring node index, final exit trip index, transfer travel time, is same node transfer (first, second, third and fourth values = -1 for access and egress journeys)

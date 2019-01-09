@@ -53,8 +53,7 @@ namespace TrRouting
         ts.push_back(*t);
         tIndexesByUuid[t->uuid] = ts.size() - 1;
       }
-
-      std::cout << TStr << ":\n" << Toolbox::prettyPrintStructVector(ts) << std::endl;
+      //std::cout << TStr << ":\n" << Toolbox::prettyPrintStructVector(ts) << std::endl;
       close(fd);
     }
     else

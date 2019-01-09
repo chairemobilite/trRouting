@@ -20,7 +20,7 @@ namespace TrRouting
       std::tie(lines,    lineIndexesByUuid)       = params.cacheFetcher->getLines(agencyIndexesByUuid, modeIndexesByShortname, params);
       std::tie(paths,    pathIndexesByUuid)       = params.cacheFetcher->getPaths(lineIndexesByUuid, nodeIndexesByUuid, params);
       
-      std::tie(trips, tripIndexesByUuid, blocks, blockIndexesByUuid, forwardConnections, reverseConnections) = params.cacheFetcher->getTripsAndConnections(agencyIndexesByUuid, lines, lineIndexesByUuid, pathIndexesByUuid, nodeIndexesByUuid, serviceIndexesByUuid, params);
+      std::tie(trips, tripIndexesByUuid, blocks, blockIndexesByUuid, forwardConnections, reverseConnections) = params.cacheFetcher->getTripsAndConnections(agencyIndexesByUuid, lines, lineIndexesByUuid, paths, pathIndexesByUuid, nodeIndexesByUuid, serviceIndexesByUuid, params);
 
       /*for (auto & node : nodes)
       {
