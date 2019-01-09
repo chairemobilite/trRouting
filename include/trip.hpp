@@ -20,6 +20,7 @@ namespace TrRouting
     int blockIdx;
     int totalCapacity;
     int seatedCapacity;
+    short allowSameLineTransfers;
     std::vector<int> loadBySegment; // must be reset before each batch routing
 
   };

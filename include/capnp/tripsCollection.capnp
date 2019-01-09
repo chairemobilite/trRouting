@@ -5,16 +5,18 @@ $Cxx.namespace("tripsCollection");
 
 struct TripsCollection {
   trips @0 :List(Trip);
+  blocks @1 :List(Text);
 }
 
 struct Trip {
-  id @0 :Int64; # unique for the whole network
-  lineIdx @1 :Int32; # unique for the whole network, from LinesCollection index
-  pathIdx @2 :Int32; # unique for the whole network, from PathsCollection index
-  serviceIdx @3 :Int32; # unique for the whole network, from ServicesCollection index
-  scenarioIdx @4 :Int32; # unique for the whole network, from ScenariosCollection index
-  blockIdx @5 :Int64; # unique for whole network, from BlocksCollection index
-  totalCapacity @6 :Int16; # total vehicle capacity for the trip
-  seatedCapacity @7 :Int16; # total seated capacity for this trip
-  allowSameLineTransfers @8 :Int8;
+  uuid @0 :Text;
+  agencyIdx @1 :Int32;
+  lineIdx @2 :Int32;
+  pathIdx @3 :Int32;
+  modeIdx @4 :Int32;
+  serviceIdx @5 :Int32;
+  blockIdx @6 :Int32; 
+  totalCapacity @7 :Int16; # total vehicle capacity for the trip
+  seatedCapacity @8 :Int16; # total seated capacity for this trip
+  allowSameLineTransfers @9 :Int8;
 }

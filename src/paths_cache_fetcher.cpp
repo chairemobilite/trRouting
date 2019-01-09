@@ -27,7 +27,7 @@ namespace TrRouting
     std::string cacheFileName{tStr};
     std::map<boost::uuids::uuid, int> tIndexesByUuid;
     boost::uuids::string_generator uuidGenerator;
-
+    
     std::cout << "Fetching " << tStr << " from cache..." << std::endl;
     if (CacheFetcher::capnpCacheFileExists(cacheFileName, params))
     {

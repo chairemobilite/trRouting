@@ -32,7 +32,7 @@ struct Trip {
   class Pipeline;
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(aeeb93dd97609064, 2, 6)
+    CAPNP_DECLARE_STRUCT_HEADER(aeeb93dd97609064, 2, 7)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
     #endif  // !CAPNP_LITE
@@ -103,6 +103,9 @@ public:
   }
 #endif  // !CAPNP_LITE
 
+  inline bool hasUuid() const;
+  inline  ::capnp::Text::Reader getUuid() const;
+
   inline bool hasPathUuid() const;
   inline  ::capnp::Text::Reader getPathUuid() const;
 
@@ -156,6 +159,13 @@ public:
 #if !CAPNP_LITE
   inline ::kj::StringTree toString() const { return asReader().toString(); }
 #endif  // !CAPNP_LITE
+
+  inline bool hasUuid();
+  inline  ::capnp::Text::Builder getUuid();
+  inline void setUuid( ::capnp::Text::Reader value);
+  inline  ::capnp::Text::Builder initUuid(unsigned int size);
+  inline void adoptUuid(::capnp::Orphan< ::capnp::Text>&& value);
+  inline ::capnp::Orphan< ::capnp::Text> disownUuid();
 
   inline bool hasPathUuid();
   inline  ::capnp::Text::Builder getPathUuid();
@@ -691,38 +701,72 @@ private:
 
 // =======================================================================================
 
-inline bool Trip::Reader::hasPathUuid() const {
+inline bool Trip::Reader::hasUuid() const {
   return !_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline bool Trip::Builder::hasPathUuid() {
+inline bool Trip::Builder::hasUuid() {
   return !_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
 }
-inline  ::capnp::Text::Reader Trip::Reader::getPathUuid() const {
+inline  ::capnp::Text::Reader Trip::Reader::getUuid() const {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline  ::capnp::Text::Builder Trip::Builder::getPathUuid() {
+inline  ::capnp::Text::Builder Trip::Builder::getUuid() {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
-inline void Trip::Builder::setPathUuid( ::capnp::Text::Reader value) {
+inline void Trip::Builder::setUuid( ::capnp::Text::Reader value) {
   ::capnp::_::PointerHelpers< ::capnp::Text>::set(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), value);
 }
-inline  ::capnp::Text::Builder Trip::Builder::initPathUuid(unsigned int size) {
+inline  ::capnp::Text::Builder Trip::Builder::initUuid(unsigned int size) {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::init(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), size);
 }
-inline void Trip::Builder::adoptPathUuid(
+inline void Trip::Builder::adoptUuid(
     ::capnp::Orphan< ::capnp::Text>&& value) {
   ::capnp::_::PointerHelpers< ::capnp::Text>::adopt(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::capnp::Text> Trip::Builder::disownPathUuid() {
+inline ::capnp::Orphan< ::capnp::Text> Trip::Builder::disownUuid() {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS));
+}
+
+inline bool Trip::Reader::hasPathUuid() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS).isNull();
+}
+inline bool Trip::Builder::hasPathUuid() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::Text::Reader Trip::Reader::getPathUuid() const {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_reader.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS));
+}
+inline  ::capnp::Text::Builder Trip::Builder::getPathUuid() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS));
+}
+inline void Trip::Builder::setPathUuid( ::capnp::Text::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::set(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS), value);
+}
+inline  ::capnp::Text::Builder Trip::Builder::initPathUuid(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::init(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS), size);
+}
+inline void Trip::Builder::adoptPathUuid(
+    ::capnp::Orphan< ::capnp::Text>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::adopt(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::Text> Trip::Builder::disownPathUuid() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
+      ::capnp::bounded<1>() * ::capnp::POINTERS));
 }
 
 inline  ::int32_t Trip::Reader::getDepartureTimeSeconds() const {
@@ -755,188 +799,188 @@ inline void Trip::Builder::setArrivalTimeSeconds( ::int32_t value) {
 
 inline bool Trip::Reader::hasNodeArrivalTimesSeconds() const {
   return !_reader.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<2>() * ::capnp::POINTERS).isNull();
 }
 inline bool Trip::Builder::hasNodeArrivalTimesSeconds() {
   return !_builder.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<2>() * ::capnp::POINTERS).isNull();
 }
 inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader Trip::Reader::getNodeArrivalTimesSeconds() const {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::get(_reader.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS));
+      ::capnp::bounded<2>() * ::capnp::POINTERS));
 }
 inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder Trip::Builder::getNodeArrivalTimesSeconds() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::get(_builder.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS));
+      ::capnp::bounded<2>() * ::capnp::POINTERS));
 }
 inline void Trip::Builder::setNodeArrivalTimesSeconds( ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<2>() * ::capnp::POINTERS), value);
 }
 inline void Trip::Builder::setNodeArrivalTimesSeconds(::kj::ArrayPtr<const  ::int32_t> value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<2>() * ::capnp::POINTERS), value);
 }
 inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder Trip::Builder::initNodeArrivalTimesSeconds(unsigned int size) {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::init(_builder.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS), size);
+      ::capnp::bounded<2>() * ::capnp::POINTERS), size);
 }
 inline void Trip::Builder::adoptNodeArrivalTimesSeconds(
     ::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>&& value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::adopt(_builder.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS), kj::mv(value));
+      ::capnp::bounded<2>() * ::capnp::POINTERS), kj::mv(value));
 }
 inline ::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>> Trip::Builder::disownNodeArrivalTimesSeconds() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::disown(_builder.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS));
+      ::capnp::bounded<2>() * ::capnp::POINTERS));
 }
 
 inline bool Trip::Reader::hasNodeDepartureTimesSeconds() const {
   return !_reader.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<3>() * ::capnp::POINTERS).isNull();
 }
 inline bool Trip::Builder::hasNodeDepartureTimesSeconds() {
   return !_builder.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<3>() * ::capnp::POINTERS).isNull();
 }
 inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader Trip::Reader::getNodeDepartureTimesSeconds() const {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::get(_reader.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS));
+      ::capnp::bounded<3>() * ::capnp::POINTERS));
 }
 inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder Trip::Builder::getNodeDepartureTimesSeconds() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::get(_builder.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS));
+      ::capnp::bounded<3>() * ::capnp::POINTERS));
 }
 inline void Trip::Builder::setNodeDepartureTimesSeconds( ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<3>() * ::capnp::POINTERS), value);
 }
 inline void Trip::Builder::setNodeDepartureTimesSeconds(::kj::ArrayPtr<const  ::int32_t> value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<3>() * ::capnp::POINTERS), value);
 }
 inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder Trip::Builder::initNodeDepartureTimesSeconds(unsigned int size) {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::init(_builder.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS), size);
+      ::capnp::bounded<3>() * ::capnp::POINTERS), size);
 }
 inline void Trip::Builder::adoptNodeDepartureTimesSeconds(
     ::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>&& value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::adopt(_builder.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS), kj::mv(value));
+      ::capnp::bounded<3>() * ::capnp::POINTERS), kj::mv(value));
 }
 inline ::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>> Trip::Builder::disownNodeDepartureTimesSeconds() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::disown(_builder.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS));
+      ::capnp::bounded<3>() * ::capnp::POINTERS));
 }
 
 inline bool Trip::Reader::hasNodesCanBoard() const {
   return !_reader.getPointerField(
-      ::capnp::bounded<3>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<4>() * ::capnp::POINTERS).isNull();
 }
 inline bool Trip::Builder::hasNodesCanBoard() {
   return !_builder.getPointerField(
-      ::capnp::bounded<3>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<4>() * ::capnp::POINTERS).isNull();
 }
 inline  ::capnp::List< ::int8_t,  ::capnp::Kind::PRIMITIVE>::Reader Trip::Reader::getNodesCanBoard() const {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::int8_t,  ::capnp::Kind::PRIMITIVE>>::get(_reader.getPointerField(
-      ::capnp::bounded<3>() * ::capnp::POINTERS));
+      ::capnp::bounded<4>() * ::capnp::POINTERS));
 }
 inline  ::capnp::List< ::int8_t,  ::capnp::Kind::PRIMITIVE>::Builder Trip::Builder::getNodesCanBoard() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::int8_t,  ::capnp::Kind::PRIMITIVE>>::get(_builder.getPointerField(
-      ::capnp::bounded<3>() * ::capnp::POINTERS));
+      ::capnp::bounded<4>() * ::capnp::POINTERS));
 }
 inline void Trip::Builder::setNodesCanBoard( ::capnp::List< ::int8_t,  ::capnp::Kind::PRIMITIVE>::Reader value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::int8_t,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
-      ::capnp::bounded<3>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<4>() * ::capnp::POINTERS), value);
 }
 inline void Trip::Builder::setNodesCanBoard(::kj::ArrayPtr<const  ::int8_t> value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::int8_t,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
-      ::capnp::bounded<3>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<4>() * ::capnp::POINTERS), value);
 }
 inline  ::capnp::List< ::int8_t,  ::capnp::Kind::PRIMITIVE>::Builder Trip::Builder::initNodesCanBoard(unsigned int size) {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::int8_t,  ::capnp::Kind::PRIMITIVE>>::init(_builder.getPointerField(
-      ::capnp::bounded<3>() * ::capnp::POINTERS), size);
+      ::capnp::bounded<4>() * ::capnp::POINTERS), size);
 }
 inline void Trip::Builder::adoptNodesCanBoard(
     ::capnp::Orphan< ::capnp::List< ::int8_t,  ::capnp::Kind::PRIMITIVE>>&& value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::int8_t,  ::capnp::Kind::PRIMITIVE>>::adopt(_builder.getPointerField(
-      ::capnp::bounded<3>() * ::capnp::POINTERS), kj::mv(value));
+      ::capnp::bounded<4>() * ::capnp::POINTERS), kj::mv(value));
 }
 inline ::capnp::Orphan< ::capnp::List< ::int8_t,  ::capnp::Kind::PRIMITIVE>> Trip::Builder::disownNodesCanBoard() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::int8_t,  ::capnp::Kind::PRIMITIVE>>::disown(_builder.getPointerField(
-      ::capnp::bounded<3>() * ::capnp::POINTERS));
+      ::capnp::bounded<4>() * ::capnp::POINTERS));
 }
 
 inline bool Trip::Reader::hasNodesCanUnboard() const {
   return !_reader.getPointerField(
-      ::capnp::bounded<4>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<5>() * ::capnp::POINTERS).isNull();
 }
 inline bool Trip::Builder::hasNodesCanUnboard() {
   return !_builder.getPointerField(
-      ::capnp::bounded<4>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<5>() * ::capnp::POINTERS).isNull();
 }
 inline  ::capnp::List< ::int8_t,  ::capnp::Kind::PRIMITIVE>::Reader Trip::Reader::getNodesCanUnboard() const {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::int8_t,  ::capnp::Kind::PRIMITIVE>>::get(_reader.getPointerField(
-      ::capnp::bounded<4>() * ::capnp::POINTERS));
+      ::capnp::bounded<5>() * ::capnp::POINTERS));
 }
 inline  ::capnp::List< ::int8_t,  ::capnp::Kind::PRIMITIVE>::Builder Trip::Builder::getNodesCanUnboard() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::int8_t,  ::capnp::Kind::PRIMITIVE>>::get(_builder.getPointerField(
-      ::capnp::bounded<4>() * ::capnp::POINTERS));
+      ::capnp::bounded<5>() * ::capnp::POINTERS));
 }
 inline void Trip::Builder::setNodesCanUnboard( ::capnp::List< ::int8_t,  ::capnp::Kind::PRIMITIVE>::Reader value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::int8_t,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
-      ::capnp::bounded<4>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<5>() * ::capnp::POINTERS), value);
 }
 inline void Trip::Builder::setNodesCanUnboard(::kj::ArrayPtr<const  ::int8_t> value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::int8_t,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
-      ::capnp::bounded<4>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<5>() * ::capnp::POINTERS), value);
 }
 inline  ::capnp::List< ::int8_t,  ::capnp::Kind::PRIMITIVE>::Builder Trip::Builder::initNodesCanUnboard(unsigned int size) {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::int8_t,  ::capnp::Kind::PRIMITIVE>>::init(_builder.getPointerField(
-      ::capnp::bounded<4>() * ::capnp::POINTERS), size);
+      ::capnp::bounded<5>() * ::capnp::POINTERS), size);
 }
 inline void Trip::Builder::adoptNodesCanUnboard(
     ::capnp::Orphan< ::capnp::List< ::int8_t,  ::capnp::Kind::PRIMITIVE>>&& value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::int8_t,  ::capnp::Kind::PRIMITIVE>>::adopt(_builder.getPointerField(
-      ::capnp::bounded<4>() * ::capnp::POINTERS), kj::mv(value));
+      ::capnp::bounded<5>() * ::capnp::POINTERS), kj::mv(value));
 }
 inline ::capnp::Orphan< ::capnp::List< ::int8_t,  ::capnp::Kind::PRIMITIVE>> Trip::Builder::disownNodesCanUnboard() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::int8_t,  ::capnp::Kind::PRIMITIVE>>::disown(_builder.getPointerField(
-      ::capnp::bounded<4>() * ::capnp::POINTERS));
+      ::capnp::bounded<5>() * ::capnp::POINTERS));
 }
 
 inline bool Trip::Reader::hasBlockUuid() const {
   return !_reader.getPointerField(
-      ::capnp::bounded<5>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<6>() * ::capnp::POINTERS).isNull();
 }
 inline bool Trip::Builder::hasBlockUuid() {
   return !_builder.getPointerField(
-      ::capnp::bounded<5>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<6>() * ::capnp::POINTERS).isNull();
 }
 inline  ::capnp::Text::Reader Trip::Reader::getBlockUuid() const {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_reader.getPointerField(
-      ::capnp::bounded<5>() * ::capnp::POINTERS));
+      ::capnp::bounded<6>() * ::capnp::POINTERS));
 }
 inline  ::capnp::Text::Builder Trip::Builder::getBlockUuid() {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_builder.getPointerField(
-      ::capnp::bounded<5>() * ::capnp::POINTERS));
+      ::capnp::bounded<6>() * ::capnp::POINTERS));
 }
 inline void Trip::Builder::setBlockUuid( ::capnp::Text::Reader value) {
   ::capnp::_::PointerHelpers< ::capnp::Text>::set(_builder.getPointerField(
-      ::capnp::bounded<5>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<6>() * ::capnp::POINTERS), value);
 }
 inline  ::capnp::Text::Builder Trip::Builder::initBlockUuid(unsigned int size) {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::init(_builder.getPointerField(
-      ::capnp::bounded<5>() * ::capnp::POINTERS), size);
+      ::capnp::bounded<6>() * ::capnp::POINTERS), size);
 }
 inline void Trip::Builder::adoptBlockUuid(
     ::capnp::Orphan< ::capnp::Text>&& value) {
   ::capnp::_::PointerHelpers< ::capnp::Text>::adopt(_builder.getPointerField(
-      ::capnp::bounded<5>() * ::capnp::POINTERS), kj::mv(value));
+      ::capnp::bounded<6>() * ::capnp::POINTERS), kj::mv(value));
 }
 inline ::capnp::Orphan< ::capnp::Text> Trip::Builder::disownBlockUuid() {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
-      ::capnp::bounded<5>() * ::capnp::POINTERS));
+      ::capnp::bounded<6>() * ::capnp::POINTERS));
 }
 
 inline  ::int16_t Trip::Reader::getTotalCapacity() const {

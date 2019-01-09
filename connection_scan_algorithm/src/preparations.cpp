@@ -16,10 +16,12 @@ namespace TrRouting
       std::tie(stations,  stationIndexesByUuid)   = params.cacheFetcher->getStations(params);
       std::tie(nodes,     nodeIndexesByUuid)      = params.cacheFetcher->getNodes(stationIndexesByUuid, params);
                nodes                              = params.cacheFetcher->getNodeFootpaths(nodes, nodeIndexesByUuid, params);
-      std::tie(agencies, agencyIndexesByUuid) = params.cacheFetcher->getAgencies(params);
-      std::tie(lines,    lineIndexesByUuid)   = params.cacheFetcher->getLines(agencyIndexesByUuid, modeIndexesByShortname, params);
-      std::tie(paths,    pathIndexesByUuid)   = params.cacheFetcher->getPaths(lineIndexesByUuid, nodeIndexesByUuid, params);
+      std::tie(agencies, agencyIndexesByUuid)     = params.cacheFetcher->getAgencies(params);
+      std::tie(lines,    lineIndexesByUuid)       = params.cacheFetcher->getLines(agencyIndexesByUuid, modeIndexesByShortname, params);
+      std::tie(paths,    pathIndexesByUuid)       = params.cacheFetcher->getPaths(lineIndexesByUuid, nodeIndexesByUuid, params);
       
+      std::tie(trips, tripIndexesByUuid, blocks, blockIndexesByUuid, forwardConnections, reverseConnections) = params.cacheFetcher->getTripsAndConnections(agencyIndexesByUuid, lines, lineIndexesByUuid, pathIndexesByUuid, nodeIndexesByUuid, serviceIndexesByUuid, params);
+
       /*for (auto & node : nodes)
       {
         std::cout << node.toString() << std::endl;

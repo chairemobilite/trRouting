@@ -4,16 +4,17 @@ using Cxx = import "/capnp/c++.capnp";
 $Cxx.namespace("line");
 
 struct Trip {
-  pathUuid @0 :Text;
-  departureTimeSeconds @1 :Int32;
-  arrivalTimeSeconds @2 :Int32;
-  nodeArrivalTimesSeconds @3 :List(Int32);
-  nodeDepartureTimesSeconds @4 :List(Int32);
-  nodesCanBoard @5 :List(Int8);
-  nodesCanUnboard @6 :List(Int8);
-  blockUuid @7 :Text;
-  totalCapacity @8 :Int16; # total vehicle capacity for the trip
-  seatedCapacity @9 :Int16; # total seated capacity for this trip
+  uuid @0 :Text;
+  pathUuid @1 :Text;
+  departureTimeSeconds @2 :Int32;
+  arrivalTimeSeconds @3 :Int32;
+  nodeArrivalTimesSeconds @4 :List(Int32);
+  nodeDepartureTimesSeconds @5 :List(Int32);
+  nodesCanBoard @6 :List(Int8);
+  nodesCanUnboard @7 :List(Int8);
+  blockUuid @8 :Text;
+  totalCapacity @9 :Int16; # total vehicle capacity for the trip
+  seatedCapacity @10 :Int16; # total seated capacity for this trip
 }
 
 struct Period {
