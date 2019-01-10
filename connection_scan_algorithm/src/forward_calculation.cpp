@@ -16,8 +16,6 @@ namespace TrRouting
     int  nodeArrivalTentativeTime {MAX_INT};
     int  connectionDepartureTime {-1};
     int  connectionArrivalTime {-1};
-    /*long long  footpathsRangeStart {-1};
-    long long  footpathsRangeEnd {-1};*/
     int  footpathIndex {-1};
     int  transferableNodeIndex {0};
     int  footpathNodeArrivalIndex {-1};
@@ -27,7 +25,6 @@ namespace TrRouting
     int  bestEgressNodeIndex {-1};
     int  bestEgressTravelTime {-1};
     int  bestArrivalTime {MAX_INT};
-    
     
     // main loop:
     i = 0;
@@ -57,11 +54,8 @@ namespace TrRouting
           if (tripEnterConnectionIndex != -1 || nodeDepartureTentativeTime <= connectionDepartureTime)
           {
             
-            //std::get<5>(forwardJourneys[nodeDepartureIndex]) != 1 
-            
+            // TODO: add constrain for sameLineTransfer (check trip allowSameLineTransfers)
             if (std::get<connectionIndexes::CAN_BOARD>(connection) == 1 && (tripEnterConnectionIndex == -1 || (std::get<0>(forwardJourneys[nodeDepartureIndex]) == -1 && std::get<4>(forwardJourneys[nodeDepartureIndex]) >= 0 && std::get<4>(forwardJourneys[nodeDepartureIndex]) < tripsEnterConnectionTransferTravelTime[tripIndex])))
-            //( tripEnterConnectionIndex == -1) || (std::get<5>(forwardJourneys[nodeDepartureIndex]) != 1 && (std::get<0>(forwardJourneys[nodeDepartureIndex]) == -1 || std::get<connectionIndexes::TRIP>(forwardConnections[std::get<0>(forwardJourneys[nodeDepartureIndex])]) == tripIndex) && std::get<4>(forwardJourneys[nodeDepartureIndex]) >= 0 && std::get<4>(forwardJourneys[nodeDepartureIndex]) < tripsEnterConnectionTransferTravelTime[tripIndex]))
-            //)
             {
               //if (tripEnterConnectionIndex != -1)
               //{
@@ -77,8 +71,6 @@ namespace TrRouting
               // get footpaths for the arrival node to get transferable nodes:
               nodeArrivalIndex      = std::get<connectionIndexes::NODE_ARR>(connection);
               connectionArrivalTime = std::get<connectionIndexes::TIME_ARR>(connection);
-              //footpathsRangeStart   = footpathsRanges[nodeArrivalIndex].first;
-              //footpathsRangeEnd     = footpathsRanges[nodeArrivalIndex].second;
               if (!params.returnAllNodesResult && !reachedAtLeastOneEgressNode && nodesEgressTravelTime[nodeArrivalIndex] != -1) // check if the arrival node is egressable
               {
                 reachedAtLeastOneEgressNode    = true;
@@ -87,7 +79,7 @@ namespace TrRouting
               footpathIndex = 0;
               for (int & transferableNodeIndex : nodes[nodeArrivalIndex].transferableNodesIdx)
               {
-                footpathTravelTime       = nodes[nodeArrivalIndex].transferableTravelTimesSeconds[footpathIndex];
+                footpathTravelTime       = (int)ceil((float)nodes[nodeArrivalIndex].transferableTravelTimesSeconds[footpathIndex] / params.walkingSpeedFactor);
                 footpathNodeArrivalIndex = transferableNodeIndex;
 
                 if (footpathTravelTime <= params.maxTransferWalkingTravelTimeSeconds)

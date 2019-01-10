@@ -85,7 +85,7 @@ namespace TrRouting
               footpathIndex = 0;
               for (int & transferableNodeIndex : nodes[nodeDepartureIndex].transferableNodesIdx)
               {
-                footpathTravelTime         = nodes[nodeDepartureIndex].transferableTravelTimesSeconds[footpathIndex];
+                footpathTravelTime         = (int)ceil((float)nodes[nodeDepartureIndex].transferableTravelTimesSeconds[footpathIndex] / params.walkingSpeedFactor);
                 footpathNodeDepartureIndex = transferableNodeIndex;
 
                 if (footpathTravelTime <= params.maxTransferWalkingTravelTimeSeconds)

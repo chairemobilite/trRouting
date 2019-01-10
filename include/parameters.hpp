@@ -76,6 +76,7 @@ namespace TrRouting
     int maxTransferWalkingTravelTimeSeconds;
     int maxTotalWalkingTravelTimeSeconds;
     float maxOnlyWalkingAccessTravelTimeRatio;
+    float walkingSpeedFactor;
     float walkingSpeedMetersPerSecond;
     float drivingSpeedMetersPerSecond;
     float cyclingSpeedMetersPerSecond;
@@ -162,6 +163,7 @@ namespace TrRouting
       alternativesMaxTravelTimeRatio         = 1.5;
       minAlternativeMaxTravelTimeSeconds     = 30*60;
       alternativesMaxAddedTravelTimeSeconds  = 30*60;
+      walkingSpeedFactor                     = 1.0; // all walking segments are weighted with this value. > 1.0 means faster walking, < 1.0 means slower walking
     }
     
   };

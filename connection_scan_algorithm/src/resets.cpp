@@ -95,19 +95,22 @@ namespace TrRouting
           accessFootpaths = OsrmFetcher::getAccessibleNodesFootpathsFromPoint(params.origin, nodes, params.accessMode, params);
         }
       }
-    
+
+
+      int footpathTravelTimeSeconds;
       for (auto & accessFootpath : accessFootpaths)
       {
-        nodesAccessTravelTime[accessFootpath.first] = accessFootpath.second;
-        forwardJourneys[accessFootpath.first]       = std::make_tuple(-1, -1, -1, -1, accessFootpath.second, -1);
-        nodesTentativeTime[accessFootpath.first]    = departureTimeSeconds + accessFootpath.second + params.minWaitingTimeSeconds;
-        if (accessFootpath.second < minAccessTravelTime)
+        footpathTravelTimeSeconds = (int)ceil((float)accessFootpath.second / params.walkingSpeedFactor);
+        nodesAccessTravelTime[accessFootpath.first] = footpathTravelTimeSeconds;
+        forwardJourneys[accessFootpath.first]       = std::make_tuple(-1, -1, -1, -1, footpathTravelTimeSeconds, -1);
+        nodesTentativeTime[accessFootpath.first]    = departureTimeSeconds + footpathTravelTimeSeconds + params.minWaitingTimeSeconds;
+        if (footpathTravelTimeSeconds < minAccessTravelTime)
         {
-          minAccessTravelTime = accessFootpath.second;
+          minAccessTravelTime = footpathTravelTimeSeconds;
         }
-        if (accessFootpath.second > maxAccessTravelTime)
+        if (footpathTravelTimeSeconds > maxAccessTravelTime)
         {
-          maxAccessTravelTime = accessFootpath.second;
+          maxAccessTravelTime = footpathTravelTimeSeconds;
         }
         //std::cerr << "origin_node: " << nodes[accessFootpath.first].name << " - " << Toolbox::convertSecondsToFormattedTime(nodesTentativeTime[accessFootpath.first]) << std::endl;
         //std::cerr << std::to_string(nodes[accessFootpath.first].id) + ",";
@@ -142,18 +145,20 @@ namespace TrRouting
         }
       }
       
+      int footpathTravelTimeSeconds;
       for (auto & egressFootpath : egressFootpaths)
       {
-        nodesEgressTravelTime[egressFootpath.first]     = egressFootpath.second;
-        reverseJourneys[egressFootpath.first]           = std::make_tuple(-1, -1, -1, -1, egressFootpath.second, -1);
-        nodesReverseTentativeTime[egressFootpath.first] = arrivalTimeSeconds - egressFootpath.second;
-        if (egressFootpath.second > maxEgressTravelTime)
+        footpathTravelTimeSeconds                       = (int)ceil((float)egressFootpath.second / params.walkingSpeedFactor);
+        nodesEgressTravelTime[egressFootpath.first]     = footpathTravelTimeSeconds;
+        reverseJourneys[egressFootpath.first]           = std::make_tuple(-1, -1, -1, -1, footpathTravelTimeSeconds, -1);
+        nodesReverseTentativeTime[egressFootpath.first] = arrivalTimeSeconds - footpathTravelTimeSeconds;
+        if (footpathTravelTimeSeconds > maxEgressTravelTime)
         {
-          maxEgressTravelTime = egressFootpath.second;
+          maxEgressTravelTime = footpathTravelTimeSeconds;
         }
-        if (egressFootpath.second < minEgressTravelTime)
+        if (footpathTravelTimeSeconds < minEgressTravelTime)
         {
-          minEgressTravelTime = egressFootpath.second;
+          minEgressTravelTime = footpathTravelTimeSeconds;
         }
         //nodesD[egressFootpath.first]                = egressFootpath.second;
         //result.json += "origin_node: " + nodes[accessFootpath.first].name + " - " + Toolbox::convertSecondsToFormattedTime(nodesTentativeTime[accessFootpath.first]) + "\n";

@@ -694,6 +694,10 @@ int main(int argc, char** argv) {
         {
           calculator.params.transferPenaltySeconds = std::stoi(parameterWithValueVector[1]) * 60;
         }
+        else if (parameterWithValueVector[0] == "walking_speed_factor" || parameterWithValueVector[0] == "walk_factor") // > 1.0 means faster walking
+        {
+          calculator.params.walkingSpeedFactor = std::stof(parameterWithValueVector[1]);
+        }
         else if (parameterWithValueVector[0] == "max_alternatives" || parameterWithValueVector[0] == "max_alt")
         {
           calculator.params.maxAlternatives = std::stoi(parameterWithValueVector[1]);
