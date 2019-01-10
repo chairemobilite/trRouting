@@ -692,13 +692,29 @@ int main(int argc, char** argv) {
             calculator.params.maxTotalTravelTimeSeconds = MAX_INT;
           }
         }
+        else if (parameterWithValueVector[0] == "max_travel_time_seconds")
+        {
+          calculator.params.maxTotalTravelTimeSeconds = std::stoi(parameterWithValueVector[1]);
+          if (calculator.params.maxTotalTravelTimeSeconds == 0)
+          {
+            calculator.params.maxTotalTravelTimeSeconds = MAX_INT;
+          }
+        }
         else if (parameterWithValueVector[0] == "max_access_travel_time" || parameterWithValueVector[0] == "max_access_travel_time_minutes")
         {
           calculator.params.maxAccessWalkingTravelTimeSeconds = std::stoi(parameterWithValueVector[1]) * 60;
         }
+        else if (parameterWithValueVector[0] == "max_access_travel_time_seconds")
+        {
+          calculator.params.maxAccessWalkingTravelTimeSeconds = std::stoi(parameterWithValueVector[1]);
+        }
         else if (parameterWithValueVector[0] == "alternatives_max_added_travel_time_minutes" || parameterWithValueVector[0] == "alt_max_added_travel_time")
         {
           calculator.params.alternativesMaxAddedTravelTimeSeconds = std::stoi(parameterWithValueVector[1]) * 60;
+        }
+        else if (parameterWithValueVector[0] == "alternatives_max_added_travel_time_seconds" || parameterWithValueVector[0] == "alt_max_added_travel_time_seconds")
+        {
+          calculator.params.alternativesMaxAddedTravelTimeSeconds = std::stoi(parameterWithValueVector[1]);
         }
         else if (parameterWithValueVector[0] == "max_only_walking_access_travel_time_ratio")
         {
@@ -712,13 +728,25 @@ int main(int argc, char** argv) {
         {
           calculator.params.minAlternativeMaxTravelTimeSeconds = std::stoi(parameterWithValueVector[1]) * 60;
         }
+        else if (parameterWithValueVector[0] == "alternatives_min_max_travel_time_seconds" || parameterWithValueVector[0] == "alt_min_max_travel_time_seconds")
+        {
+          calculator.params.minAlternativeMaxTravelTimeSeconds = std::stoi(parameterWithValueVector[1]);
+        }
         else if (parameterWithValueVector[0] == "max_egress_travel_time" || parameterWithValueVector[0] == "max_egress_travel_time_minutes")
         {
           calculator.params.maxEgressWalkingTravelTimeSeconds = std::stoi(parameterWithValueVector[1]) * 60;
         }
+         else if (parameterWithValueVector[0] == "max_egress_travel_time_seconds")
+        {
+          calculator.params.maxEgressWalkingTravelTimeSeconds = std::stoi(parameterWithValueVector[1]);
+        }
         else if (parameterWithValueVector[0] == "max_transfer_travel_time" || parameterWithValueVector[0] == "max_transfer_travel_time_minutes")
         {
           calculator.params.maxTransferWalkingTravelTimeSeconds = std::stoi(parameterWithValueVector[1]) * 60;
+        }
+        else if (parameterWithValueVector[0] == "max_transfer_travel_time_seconds")
+        {
+          calculator.params.maxTransferWalkingTravelTimeSeconds = std::stoi(parameterWithValueVector[1]);
         }
         else if (parameterWithValueVector[0] == "transfer_penalty" || parameterWithValueVector[0] == "transfer_penalty_minutes")
         {
