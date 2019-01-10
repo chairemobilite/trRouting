@@ -38,19 +38,19 @@ namespace TrRouting
     {
       departureTimeSeconds = params.odTrip->departureTimeSeconds;
     }
-    else if (params.departureTimeSeconds != -1)
+    else if (params.departureTimeSeconds >= 0)
     {
       departureTimeSeconds = params.departureTimeSeconds;
     }
-    else if (params.departureTimeHour != -1 && params.departureTimeMinutes != -1)
+    else if (params.departureTimeHour >= 0 && params.departureTimeMinutes >= 0)
     {
       departureTimeSeconds = params.departureTimeHour * 3600 + params.departureTimeMinutes * 60;
     }
-    if (params.arrivalTimeSeconds != -1)
+    if (params.arrivalTimeSeconds >= 0)
     {
       arrivalTimeSeconds = params.arrivalTimeSeconds;
     }
-    else if(params.arrivalTimeHour != -1 && params.arrivalTimeMinutes != -1)
+    else if(params.arrivalTimeHour >= 0 && params.arrivalTimeMinutes >= 0)
     {
       arrivalTimeSeconds = params.arrivalTimeHour * 3600 + params.arrivalTimeMinutes * 60;
     }

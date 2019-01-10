@@ -282,8 +282,7 @@ int main(int argc, char** argv) {
       std::vector<std::string> odTripsActivitiesVector;
       std::vector<std::string> odTripsModesVector;
 
-      int timeHour;
-      int timeMinute;
+      int departureTimeHour, departureTimeMinutes, arrivalTimeHour, arrivalTimeMinutes;
       
       calculator.params.forwardCalculation                     = true;
       calculator.params.detailedResults                        = false;
@@ -368,14 +367,45 @@ int main(int argc, char** argv) {
           calculator.params.routingDateDay       = std::stoi(dateVector[2]);
         }
         else if (parameterWithValueVector[0] == "time"
-                 || parameterWithValueVector[0] == "departure"      || parameterWithValueVector[0] == "arrival"
-                 || parameterWithValueVector[0] == "departure_time" || parameterWithValueVector[0] == "arrival_time"
-                 || parameterWithValueVector[0] == "start_time"     || parameterWithValueVector[0] == "end_time"
+                 || parameterWithValueVector[0] == "departure"
+                 || parameterWithValueVector[0] == "departure_time"
+                 || parameterWithValueVector[0] == "start_time"
                 )
         {
           boost::split(timeVector, parameterWithValueVector[1], boost::is_any_of(":"));
-          timeHour      = std::stoi(timeVector[0]);
-          timeMinute    = std::stoi(timeVector[1]);
+          departureTimeHour    = std::stoi(timeVector[0]);
+          departureTimeMinutes = std::stoi(timeVector[1]);
+        }
+        else if (parameterWithValueVector[0] == "arrival_time"
+                 || parameterWithValueVector[0] == "arrival"
+                 || parameterWithValueVector[0] == "end_time"
+                )
+        {
+          boost::split(timeVector, parameterWithValueVector[1], boost::is_any_of(":"));
+          arrivalTimeHour    = std::stoi(timeVector[0]);
+          arrivalTimeMinutes = std::stoi(timeVector[1]);
+        }
+        else if (parameterWithValueVector[0] == "departure_seconds"
+                 || parameterWithValueVector[0] == "departure_time_seconds"
+                 || parameterWithValueVector[0] == "start_time_seconds"
+                )
+        {
+          calculator.params.departureTimeSeconds = std::stoi(parameterWithValueVector[1]);
+          if (calculator.params.departureTimeSeconds < 0)
+          {
+            calculator.params.departureTimeSeconds = -1;
+          }
+        }
+        else if (parameterWithValueVector[0] == "arrival_seconds"
+                 || parameterWithValueVector[0] == "arrival_time_seconds"
+                 || parameterWithValueVector[0] == "end_time_seconds"
+                )
+        {
+          calculator.params.arrivalTimeSeconds = std::stoi(parameterWithValueVector[1]);
+          if (calculator.params.arrivalTimeSeconds < 0)
+          {
+            calculator.params.arrivalTimeSeconds = -1;
+          }
         }
         else if (parameterWithValueVector[0] == "access_node_uuids")
         {
@@ -740,16 +770,26 @@ int main(int argc, char** argv) {
         }
         
       }
-            
-      if (calculator.params.forwardCalculation)
+
+      if (calculator.params.departureTimeSeconds >= 0)
       {
-        calculator.params.departureTimeHour    = timeHour;
-        calculator.params.departureTimeMinutes = timeMinute;
+        calculator.params.forwardCalculation = true;
       }
-      else
+      else if (calculator.params.arrivalTimeSeconds >= 0)
       {
-        calculator.params.arrivalTimeHour    = timeHour;
-        calculator.params.arrivalTimeMinutes = timeMinute;
+        calculator.params.forwardCalculation = false;
+      }
+      else if (departureTimeHour >= 0 && departureTimeMinutes >= 0)
+      {
+        calculator.params.departureTimeHour    = departureTimeHour;
+        calculator.params.departureTimeMinutes = departureTimeMinutes;
+        calculator.params.forwardCalculation   = true;
+      }
+      else if(arrivalTimeHour >= 0 && arrivalTimeMinutes >= 0)
+      {
+        calculator.params.arrivalTimeHour    = arrivalTimeHour;
+        calculator.params.arrivalTimeMinutes = arrivalTimeMinutes;
+        calculator.params.forwardCalculation = false;
       }
       
       //for (auto & ageGroup : odTripsAgeGroups)
