@@ -73,7 +73,7 @@ namespace TrRouting
     minEgressTravelTime = MAX_INT;
     maxAccessTravelTime = -1;
     
-    if (!params.returnAllStopsResult || departureTimeSeconds >= -1)
+    if (!params.returnAllStopsResult || departureTimeSeconds > -1)
     {
       if (resetAccessPaths)
       {
@@ -98,17 +98,21 @@ namespace TrRouting
     
       for (auto & accessFootpath : accessFootpaths)
       {
-        stopsAccessTravelTime[accessFootpath.first] = accessFootpath.second;
-        forwardJourneys[accessFootpath.first]       = std::make_tuple(-1, -1, -1, -1, accessFootpath.second, -1);
-        stopsTentativeTime[accessFootpath.first]    = departureTimeSeconds + accessFootpath.second + params.minWaitingTimeSeconds;
-        if (accessFootpath.second < minAccessTravelTime)
+        if (accessFootpath.second <= params.maxAccessWalkingTravelTimeSeconds)
         {
-          minAccessTravelTime = accessFootpath.second;
+          stopsAccessTravelTime[accessFootpath.first] = accessFootpath.second;
+          forwardJourneys[accessFootpath.first]       = std::make_tuple(-1, -1, -1, -1, accessFootpath.second, -1);
+          stopsTentativeTime[accessFootpath.first]    = departureTimeSeconds + accessFootpath.second + params.minWaitingTimeSeconds;
+          if (accessFootpath.second < minAccessTravelTime)
+          {
+            minAccessTravelTime = accessFootpath.second;
+          }
+          if (accessFootpath.second > maxAccessTravelTime)
+          {
+            maxAccessTravelTime = accessFootpath.second;
+          }
         }
-        if (accessFootpath.second > maxAccessTravelTime)
-        {
-          maxAccessTravelTime = accessFootpath.second;
-        }
+        
         //std::cerr << "origin_stop: " << stops[accessFootpath.first].name << " - " << Toolbox::convertSecondsToFormattedTime(stopsTentativeTime[accessFootpath.first]) << std::endl;
         //std::cerr << std::to_string(stops[accessFootpath.first].id) + ",";
       }
@@ -117,7 +121,7 @@ namespace TrRouting
   
   
   
-    if (!params.returnAllStopsResult || arrivalTimeSeconds >= -1)
+    if (!params.returnAllStopsResult || arrivalTimeSeconds > -1)
     {
       if (resetAccessPaths)
       {
@@ -144,16 +148,17 @@ namespace TrRouting
       
       for (auto & egressFootpath : egressFootpaths)
       {
-        stopsEgressTravelTime[egressFootpath.first]     = egressFootpath.second;
-        reverseJourneys[egressFootpath.first]           = std::make_tuple(-1, -1, -1, -1, egressFootpath.second, -1);
-        stopsReverseTentativeTime[egressFootpath.first] = arrivalTimeSeconds - egressFootpath.second;
-        if (egressFootpath.second > maxEgressTravelTime)
+        if (egressFootpath.second <= params.maxEgressWalkingTravelTimeSeconds)
         {
-          maxEgressTravelTime = egressFootpath.second;
-        }
-        if (egressFootpath.second < minEgressTravelTime)
-        {
-          minEgressTravelTime = egressFootpath.second;
+          stopsReverseTentativeTime[egressFootpath.first] = arrivalTimeSeconds - egressFootpath.second;
+          if (egressFootpath.second > maxEgressTravelTime)
+          {
+            maxEgressTravelTime = egressFootpath.second;
+          }
+          if (egressFootpath.second < minEgressTravelTime)
+          {
+            minEgressTravelTime = egressFootpath.second;
+          }
         }
         //stopsD[egressFootpath.first]                = egressFootpath.second;
         //result.json += "origin_stop: " + stops[accessFootpath.first].name + " - " + Toolbox::convertSecondsToFormattedTime(stopsTentativeTime[accessFootpath.first]) + "\n";

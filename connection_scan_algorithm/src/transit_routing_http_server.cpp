@@ -1038,6 +1038,9 @@ int main(int argc, char** argv) {
         nlohmann::json routesOdTripsCountJson;
         nlohmann::json routePathsOdTripsProfilesJson;
         nlohmann::json routePathsOdTripsProfilesSequenceJson;
+        nlohmann::json tripsLoadProfilesJson;
+        nlohmann::json tripsLoadProfilesSequenceJson;
+
         //std::vector<unsigned long long> routePathsOdTripsProfilesOdTripIds;
         
         if (fileFormat == "csv" && batchNumber == 1) // write header only on first batch, so we can easily append subsequent batches to the same csv file
@@ -1300,6 +1303,19 @@ int main(int argc, char** argv) {
             routePathsOdTripsProfilesJson[std::to_string(routePathProfile.first)] = routePathsOdTripsProfilesSequenceJson;
           }
           json["routePathsOdTripsProfiles"] = routePathsOdTripsProfilesJson;
+
+          tripsLoadProfilesJson = {};
+          for (auto & tripLegProfile : tripsLegsProfile)
+          {
+            tripsLoadProfilesSequenceJson = {};
+            for (auto & sequenceProfile : tripLegProfile.second)
+            {
+              tripsLoadProfilesSequenceJson[std::to_string(sequenceProfile.first)] = sequenceProfile.second;
+            }
+            tripsLoadProfilesJson[std::to_string(tripLegProfile.first)] = tripsLoadProfilesSequenceJson;
+          }
+          json["tripsLoadProfiles"] = tripsLoadProfilesJson;
+
           resultStr = json.dump(2);
         }
         if (calculateAllOdTrips && fileFormat == "csv")
