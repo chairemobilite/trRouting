@@ -150,6 +150,8 @@ namespace TrRouting
       {
         if (egressFootpath.second <= params.maxEgressWalkingTravelTimeSeconds)
         {
+          stopsEgressTravelTime[egressFootpath.first]     = egressFootpath.second;
+          reverseJourneys[egressFootpath.first]           = std::make_tuple(-1, -1, -1, -1, egressFootpath.second, -1);
           stopsReverseTentativeTime[egressFootpath.first] = arrivalTimeSeconds - egressFootpath.second;
           if (egressFootpath.second > maxEgressTravelTime)
           {
