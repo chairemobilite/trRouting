@@ -1476,6 +1476,8 @@ int main(int argc, char** argv) {
   return 0;
 }
 
+
+
 void default_resource_send(const HttpServer &server, const std::shared_ptr<HttpServer::Response> &response, const std::shared_ptr<std::ifstream> &ifs) {
   
   // Read and send 128 KB at a time:
