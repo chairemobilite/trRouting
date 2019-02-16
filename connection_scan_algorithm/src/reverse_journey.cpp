@@ -298,8 +298,9 @@ namespace TrRouting
             {
               reachableNodesCount++;
               nodeJson                           = {};
-              nodeJson["id"]                     = nodes[resultingNodeIndex].id;
+              nodeJson["id"]                     = boost::uuids::to_string(nodes[resultingNodeIndex].uuid);
               nodeJson["departureTime"]          = Toolbox::convertSecondsToFormattedTime(departureTime);
+              nodeJson["departureTimeSeconds"]   = departureTime;
               nodeJson["totalTravelTimeSeconds"] = arrivalTimeSeconds - departureTime;
               nodeJson["numberOfTransfers"]      = numberOfTransfers;
               json["nodes"].push_back(nodeJson);
