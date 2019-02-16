@@ -128,17 +128,14 @@ namespace TrRouting
         }
         close(fd);
         lineI++;
-        if (lineI % 1000 == 0)
-        {
-          std::cout << ((((double) lineI) / linesCount) * 100) << "%      \r"; // \r is used to stay on the same line
-        }
+        std::cout << ((((double) lineI) / linesCount) * 100) << "%      \r" << std::flush; // \r is used to stay on the same line
       }
       else
       {
         std::cerr << "missing schedules cache file for line " << boost::uuids::to_string(line.uuid) << " !" << std::endl;
       }
-      std::cout << std::endl;
     }
+    std::cout << "100%         " << std::endl;
 
     std::cout << "Sorting connections..." << std::endl;
     std::stable_sort(forwardConnections.begin(), forwardConnections.end(), [](std::tuple<int,int,int,int,int,short,short,int> connectionA, std::tuple<int,int,int,int,int,short,short,int> connectionB)
