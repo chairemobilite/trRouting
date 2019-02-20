@@ -12,7 +12,7 @@ With random origin and destination (multiple accessible stops at origin and dest
 [Open Source Routing Machine (OSRM)][3] (must be installed separately, see [install and usage instructions in OSRM Wiki][4])
 use -DBOOST_ROOT option to choose boost path if not default (ex: /usr/lib or /usr/local/lib)
 
-[1]: http://i11www.iti.uni-karlsruhe.de/extra/publications/dpsw-isftr-13.pdf "Intriguingly Simple and Fast Transit Routing"
+[1]: https://arxiv.org/pdf/1703.05997.pdf "Intriguingly Simple and Fast Transit Routing"
 [2]: https://arxiv.org/pdf/1504.07149v2.pdf "Trip-Based Public Transit Routing"
 [3]: https://github.com/Project-OSRM/osrm-backend/ "Open Source Routing Machine Github Repository"
 [4]: https://github.com/Project-OSRM/osrm-backend/wiki "OSRM Wiki"
