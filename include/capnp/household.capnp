@@ -18,6 +18,7 @@ struct Household {
   homeNodesUuids       @10 :List(Text); # unique in the whole network, changed to indexes in collection
   homeNodesTravelTimes @11 :List(Int32); # seconds
   homeNodesDistances   @12 :List(Int32); # meters
+  internalId           @13 :Text;
 
   enum IncomeLevelGroup {
     veryLow  @0;

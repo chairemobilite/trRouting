@@ -24,6 +24,7 @@ struct OdTrip {
   destinationNodesUuids       @16 :List(Text); # unique in the whole network, changed to indexes in collection
   destinationNodesTravelTimes @17 :List(Int32); # seconds
   destinationNodesDistances   @18 :List(Int32); # meters
+  internalId                  @19 :Text;
 
   enum Mode {
     walking         @0;

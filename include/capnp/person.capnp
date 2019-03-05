@@ -25,6 +25,7 @@ struct Person {
   usualSchoolPlaceNodesUuids       @17 :List(Text); # unique in the whole network, changed to indexes in collection
   usualSchoolPlaceNodesTravelTimes @18 :List(Int32); # seconds
   usualSchoolPlaceNodesDistances   @19 :List(Int32); # meters
+  internalId                       @20 :Text;
 
   enum AgeGroup {
     ag0004   @0;
