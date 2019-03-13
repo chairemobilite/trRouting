@@ -7,7 +7,7 @@
 
 #include "cache_fetcher.hpp"
 #include "scenario.hpp"
-#include "capnp/scenariosCollection.capnp.h"
+#include "capnp/scenarioCollection.capnp.h"
 //#include "toolbox.hpp"
 
 namespace TrRouting
@@ -17,8 +17,8 @@ namespace TrRouting
   { 
 
     using T           = Scenario;
-    using TCollection = scenariosCollection::ScenariosCollection;
-    using cT          = scenariosCollection::Scenario;
+    using TCollection = scenarioCollection::ScenarioCollection;
+    using cT          = scenarioCollection::Scenario;
 
     std::string tStr  = "scenarios";
     std::string TStr  = "Scenarios";

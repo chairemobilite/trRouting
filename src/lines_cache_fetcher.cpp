@@ -7,7 +7,7 @@
 
 #include "cache_fetcher.hpp"
 #include "line.hpp"
-#include "capnp/linesCollection.capnp.h"
+#include "capnp/lineCollection.capnp.h"
 //#include "toolbox.hpp"
 
 namespace TrRouting
@@ -17,8 +17,8 @@ namespace TrRouting
   { 
 
     using T           = Line;
-    using TCollection = linesCollection::LinesCollection;
-    using cT          = linesCollection::Line;
+    using TCollection = lineCollection::LineCollection;
+    using cT          = lineCollection::Line;
 
     std::string tStr  = "lines";
     std::string TStr  = "Lines";

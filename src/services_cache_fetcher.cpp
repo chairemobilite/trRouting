@@ -7,7 +7,7 @@
 
 #include "cache_fetcher.hpp"
 #include "service.hpp"
-#include "capnp/servicesCollection.capnp.h"
+#include "capnp/serviceCollection.capnp.h"
 //#include "toolbox.hpp"
 
 namespace TrRouting
@@ -17,8 +17,8 @@ namespace TrRouting
   { 
 
     using T           = Service;
-    using TCollection = servicesCollection::ServicesCollection;
-    using cT          = servicesCollection::Service;
+    using TCollection = serviceCollection::ServiceCollection;
+    using cT          = serviceCollection::Service;
 
     std::string tStr  = "services";
     std::string TStr  = "Services";

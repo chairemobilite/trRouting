@@ -179,9 +179,9 @@ namespace TrRouting
     if (CacheFetcher::capnpCacheFileExists(projectShortname, cacheFileName))
     {
       int fd = open((projectShortname + "_" + cacheFileName + ".capnpbin").c_str(), O_RDWR);
-      ::capnp::PackedFdMessageReader capnpFootpathsCollectionMessage(fd, {64 * 1024 * 1024});
-      footpathsCollection::FootpathsCollection::Reader capnpFootpathsCollection = capnpFootpathsCollectionMessage.getRoot<footpathsCollection::FootpathsCollection>();
-      for (footpathsCollection::Footpath::Reader capnpFootpath : capnpFootpathsCollection.getFootpaths())
+      ::capnp::PackedFdMessageReader capnpFootpathCollectionMessage(fd, {64 * 1024 * 1024});
+      footpathCollection::FootpathCollection::Reader capnpFootpathCollection = capnpFootpathCollectionMessage.getRoot<footpathCollection::FootpathCollection>();
+      for (footpathCollection::Footpath::Reader capnpFootpath : capnpFootpathCollection.getFootpaths())
       {
         footpaths.push_back(std::make_tuple(
           capnpFootpath.getStop1Idx(),
@@ -189,7 +189,7 @@ namespace TrRouting
           capnpFootpath.getTravelTime()
         ));
       }
-      for (footpathsCollection::FootpathRange::Reader capnpFootpathRange : capnpFootpathsCollection.getFootpathRanges())
+      for (footpathCollection::FootpathRange::Reader capnpFootpathRange : capnpFootpathCollection.getFootpathRanges())
       {
         footpathsRanges.push_back(std::make_pair(
           capnpFootpathRange.getFootpathsStartIdx(),
@@ -217,10 +217,10 @@ namespace TrRouting
     if (CacheFetcher::capnpCacheFileExists(projectShortname, cacheFileName))
     {
       int fd = open((projectShortname + "_" + cacheFileName + ".capnpbin").c_str(), O_RDWR);
-      ::capnp::PackedFdMessageReader capnpOdTripFootpathsCollectionMessage(fd, {64 * 1024 * 1024});
-      odTripFootpathsCollection::OdTripFootpathsCollection::Reader capnpOdTripFootpathsCollection = capnpOdTripFootpathsCollectionMessage.getRoot<odTripFootpathsCollection::OdTripFootpathsCollection>();
+      ::capnp::PackedFdMessageReader capnpOdTripFootpathCollectionMessage(fd, {64 * 1024 * 1024});
+      odTripFootpathCollection::OdTripFootpathCollection::Reader capnpOdTripFootpathCollection = capnpOdTripFootpathCollectionMessage.getRoot<odTripFootpathCollection::OdTripFootpathCollection>();
 
-      for (odTripFootpathsCollection::OdTripFootpath::Reader capnpOdTripFoopath : capnpOdTripFootpathsCollection.getOdTripFootpaths())
+      for (odTripFootpathCollection::OdTripFootpath::Reader capnpOdTripFoopath : capnpOdTripFootpathCollection.getOdTripFootpaths())
       {
         odTripFootpaths.push_back(std::make_pair(
           capnpOdTripFoopath.getStopIdx(),

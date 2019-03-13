@@ -7,7 +7,7 @@
 
 #include "cache_fetcher.hpp"
 #include "agency.hpp"
-#include "capnp/agenciesCollection.capnp.h"
+#include "capnp/agencyCollection.capnp.h"
 
 namespace TrRouting
 {
@@ -16,8 +16,8 @@ namespace TrRouting
   {
 
     using T           = Agency;
-    using TCollection = agenciesCollection::AgenciesCollection;
-    using cT          = agenciesCollection::Agency;
+    using TCollection = agencyCollection::AgencyCollection;
+    using cT          = agencyCollection::Agency;
 
     std::string tStr  = "agencies";
     std::string TStr  = "Agencies";

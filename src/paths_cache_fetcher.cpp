@@ -7,7 +7,7 @@
 
 #include "cache_fetcher.hpp"
 #include "path.hpp"
-#include "capnp/pathsCollection.capnp.h"
+#include "capnp/pathCollection.capnp.h"
 //#include "toolbox.hpp"
 
 namespace TrRouting
@@ -17,8 +17,8 @@ namespace TrRouting
   { 
 
     using T           = Path;
-    using TCollection = pathsCollection::PathsCollection;
-    using cT          = pathsCollection::Path;
+    using TCollection = pathCollection::PathCollection;
+    using cT          = pathCollection::Path;
 
     std::string tStr  = "paths";
     std::string TStr  = "Paths";

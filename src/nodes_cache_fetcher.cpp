@@ -8,7 +8,7 @@
 #include "cache_fetcher.hpp"
 #include "node.hpp"
 #include "point.hpp"
-#include "capnp/nodesCollection.capnp.h"
+#include "capnp/nodeCollection.capnp.h"
 #include "capnp/node.capnp.h"
 //#include "toolbox.hpp"
 
@@ -19,8 +19,8 @@ namespace TrRouting
   { 
 
     using T           = Node;
-    using TCollection = nodesCollection::NodesCollection;
-    using cT          = nodesCollection::Node;
+    using TCollection = nodeCollection::NodeCollection;
+    using cT          = nodeCollection::Node;
 
     std::string tStr  = "nodes";
     std::string TStr  = "Nodes";

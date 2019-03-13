@@ -28,7 +28,7 @@ struct OdTrip {
   destinationNodesDistances   @20 :List(Int32); # meters
   internalId                  @21 :Text;
   data                        @22 :Text; # json
-
+  
   enum Mode {
     none            @0 ;
     walking         @1 ;

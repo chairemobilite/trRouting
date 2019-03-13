@@ -1,7 +1,11 @@
-@0xd68f205b1747bdab;
+@0xa099e4ab58cfbe39;
 
 using Cxx = import "/capnp/c++.capnp";
-$Cxx.namespace("node");
+$Cxx.namespace("nodeCollection");
+
+struct NodeCollection {
+  nodes @0 :List(Node);
+}
 
 struct Node {
   uuid @0 :Text;
@@ -18,7 +22,4 @@ struct Node {
   isEnabled @11 :Int8;
   routingRadiusMeters @12 :Int16;
   defaultDwellTimeSeconds @13 :Int16;
-  transferableNodesUuids @14 :List(Text); # unique in the whole network, changed to indexes in collection
-  transferableNodesTravelTimes @15 :List(Int32); # seconds
-  transferableNodesDistances @16 :List(Int32); # meters
 }

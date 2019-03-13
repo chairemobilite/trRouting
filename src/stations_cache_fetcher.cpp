@@ -8,7 +8,7 @@
 #include "cache_fetcher.hpp"
 #include "station.hpp"
 #include "point.hpp"
-#include "capnp/stationsCollection.capnp.h"
+#include "capnp/stationCollection.capnp.h"
 //#include "toolbox.hpp"
 
 namespace TrRouting
@@ -18,8 +18,8 @@ namespace TrRouting
   { 
 
     using T           = Station;
-    using TCollection = stationsCollection::StationsCollection;
-    using cT          = stationsCollection::Station;
+    using TCollection = stationCollection::StationCollection;
+    using cT          = stationCollection::Station;
 
     std::string tStr  = "stations";
     std::string TStr  = "Stations";
