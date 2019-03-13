@@ -6,36 +6,40 @@ $Cxx.namespace("household");
 struct Household {
   
   uuid                 @0  :Text;
-  id                   @1  :UInt32;
-  expansionFactor      @2  :Float32;
-  size                 @3  :Int8;
-  carNumber            @4  :Int8;
-  incomeLevel          @5  :Int32;
-  incomeLevelGroup     @6  :IncomeLevelGroup;
-  category             @7  :Category;
-  homeLatitude         @8  :Float32;
-  homeLongitude        @9  :Float32;
-  homeNodesUuids       @10 :List(Text); # unique in the whole network, changed to indexes in collection
-  homeNodesTravelTimes @11 :List(Int32); # seconds
-  homeNodesDistances   @12 :List(Int32); # meters
-  internalId           @13 :Text;
+  dataSourceUuid       @1  :Text;
+  id                   @2  :UInt32;
+  expansionFactor      @3  :Float32;
+  size                 @4  :Int8;
+  carNumber            @5  :Int8;
+  incomeLevel          @6  :Int32;
+  incomeLevelGroup     @7  :IncomeLevelGroup;
+  category             @8  :Category;
+  homeLatitude         @9  :Int32; # divide by 1000000 to get float
+  homeLongitude        @10 :Int32; # divide by 1000000 to get float
+  homeNodesUuids       @11 :List(Text); # unique in the whole network, changed to indexes in collection
+  homeNodesTravelTimes @12 :List(Int32); # seconds
+  homeNodesDistances   @13 :List(Int32); # meters
+  internalId           @14 :Text;
+  data                 @15 :Text; # json
 
   enum IncomeLevelGroup {
-    veryLow  @0;
-    low      @1;
-    medium   @2;
-    high     @3;
-    veryHigh @4;
-    unknown  @5;
+    none     @0;
+    veryLow  @1;
+    low      @2;
+    medium   @3;
+    high     @4;
+    veryHigh @5;
+    unknown  @6;
   }
 
   enum Category {
-    singlePerson       @0;
-    couple             @1;
-    monoparentalFamily @2;
-    biparentalFamily   @3;
-    other              @4;
-    unknown            @5;
+    none               @0;
+    singlePerson       @1;
+    couple             @2;
+    monoparentalFamily @3;
+    biparentalFamily   @4;
+    other              @5;
+    unknown            @6;
   }
 
 }

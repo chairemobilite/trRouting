@@ -17,6 +17,7 @@ namespace schemas {
 CAPNP_DECLARE_SCHEMA(f97d02eb36e1c023);
 CAPNP_DECLARE_SCHEMA(cd7b3672405db997);
 enum class Mode_cd7b3672405db997: uint16_t {
+  NONE,
   WALKING,
   CYCLING,
   CAR_DRIVER,
@@ -41,6 +42,7 @@ enum class Mode_cd7b3672405db997: uint16_t {
 CAPNP_DECLARE_ENUM(Mode, cd7b3672405db997);
 CAPNP_DECLARE_SCHEMA(c08b3cc8370e2b85);
 enum class Activity_c08b3cc8370e2b85: uint16_t {
+  NONE,
   HOME,
   WORK_USUAL,
   WORK_NON_USUAL,
@@ -79,7 +81,7 @@ struct OdTrip {
 
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(f97d02eb36e1c023, 5, 8)
+    CAPNP_DECLARE_STRUCT_HEADER(f97d02eb36e1c023, 5, 12)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
     #endif  // !CAPNP_LITE
@@ -111,6 +113,12 @@ public:
   inline bool hasPersonUuid() const;
   inline  ::capnp::Text::Reader getPersonUuid() const;
 
+  inline bool hasHouseholdUuid() const;
+  inline  ::capnp::Text::Reader getHouseholdUuid() const;
+
+  inline bool hasDataSourceUuid() const;
+  inline  ::capnp::Text::Reader getDataSourceUuid() const;
+
   inline  ::uint32_t getId() const;
 
   inline float getExpansionFactor() const;
@@ -125,13 +133,13 @@ public:
 
   inline  ::odTrip::OdTrip::Activity getDestinationActivity() const;
 
-  inline float getOriginLatitude() const;
+  inline  ::int32_t getOriginLatitude() const;
 
-  inline float getOriginLongitude() const;
+  inline  ::int32_t getOriginLongitude() const;
 
-  inline float getDestinationLatitude() const;
+  inline  ::int32_t getDestinationLatitude() const;
 
-  inline float getDestinationLongitude() const;
+  inline  ::int32_t getDestinationLongitude() const;
 
   inline bool hasOriginNodesUuids() const;
   inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader getOriginNodesUuids() const;
@@ -150,6 +158,12 @@ public:
 
   inline bool hasDestinationNodesDistances() const;
   inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader getDestinationNodesDistances() const;
+
+  inline bool hasInternalId() const;
+  inline  ::capnp::Text::Reader getInternalId() const;
+
+  inline bool hasData() const;
+  inline  ::capnp::Text::Reader getData() const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -193,6 +207,20 @@ public:
   inline void adoptPersonUuid(::capnp::Orphan< ::capnp::Text>&& value);
   inline ::capnp::Orphan< ::capnp::Text> disownPersonUuid();
 
+  inline bool hasHouseholdUuid();
+  inline  ::capnp::Text::Builder getHouseholdUuid();
+  inline void setHouseholdUuid( ::capnp::Text::Reader value);
+  inline  ::capnp::Text::Builder initHouseholdUuid(unsigned int size);
+  inline void adoptHouseholdUuid(::capnp::Orphan< ::capnp::Text>&& value);
+  inline ::capnp::Orphan< ::capnp::Text> disownHouseholdUuid();
+
+  inline bool hasDataSourceUuid();
+  inline  ::capnp::Text::Builder getDataSourceUuid();
+  inline void setDataSourceUuid( ::capnp::Text::Reader value);
+  inline  ::capnp::Text::Builder initDataSourceUuid(unsigned int size);
+  inline void adoptDataSourceUuid(::capnp::Orphan< ::capnp::Text>&& value);
+  inline ::capnp::Orphan< ::capnp::Text> disownDataSourceUuid();
+
   inline  ::uint32_t getId();
   inline void setId( ::uint32_t value);
 
@@ -214,17 +242,17 @@ public:
   inline  ::odTrip::OdTrip::Activity getDestinationActivity();
   inline void setDestinationActivity( ::odTrip::OdTrip::Activity value);
 
-  inline float getOriginLatitude();
-  inline void setOriginLatitude(float value);
+  inline  ::int32_t getOriginLatitude();
+  inline void setOriginLatitude( ::int32_t value);
 
-  inline float getOriginLongitude();
-  inline void setOriginLongitude(float value);
+  inline  ::int32_t getOriginLongitude();
+  inline void setOriginLongitude( ::int32_t value);
 
-  inline float getDestinationLatitude();
-  inline void setDestinationLatitude(float value);
+  inline  ::int32_t getDestinationLatitude();
+  inline void setDestinationLatitude( ::int32_t value);
 
-  inline float getDestinationLongitude();
-  inline void setDestinationLongitude(float value);
+  inline  ::int32_t getDestinationLongitude();
+  inline void setDestinationLongitude( ::int32_t value);
 
   inline bool hasOriginNodesUuids();
   inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder getOriginNodesUuids();
@@ -273,6 +301,20 @@ public:
   inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder initDestinationNodesDistances(unsigned int size);
   inline void adoptDestinationNodesDistances(::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>&& value);
   inline ::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>> disownDestinationNodesDistances();
+
+  inline bool hasInternalId();
+  inline  ::capnp::Text::Builder getInternalId();
+  inline void setInternalId( ::capnp::Text::Reader value);
+  inline  ::capnp::Text::Builder initInternalId(unsigned int size);
+  inline void adoptInternalId(::capnp::Orphan< ::capnp::Text>&& value);
+  inline ::capnp::Orphan< ::capnp::Text> disownInternalId();
+
+  inline bool hasData();
+  inline  ::capnp::Text::Builder getData();
+  inline void setData( ::capnp::Text::Reader value);
+  inline  ::capnp::Text::Builder initData(unsigned int size);
+  inline void adoptData(::capnp::Orphan< ::capnp::Text>&& value);
+  inline ::capnp::Orphan< ::capnp::Text> disownData();
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -368,6 +410,74 @@ inline void OdTrip::Builder::adoptPersonUuid(
 inline ::capnp::Orphan< ::capnp::Text> OdTrip::Builder::disownPersonUuid() {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
       ::capnp::bounded<1>() * ::capnp::POINTERS));
+}
+
+inline bool OdTrip::Reader::hasHouseholdUuid() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<2>() * ::capnp::POINTERS).isNull();
+}
+inline bool OdTrip::Builder::hasHouseholdUuid() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<2>() * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::Text::Reader OdTrip::Reader::getHouseholdUuid() const {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_reader.getPointerField(
+      ::capnp::bounded<2>() * ::capnp::POINTERS));
+}
+inline  ::capnp::Text::Builder OdTrip::Builder::getHouseholdUuid() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_builder.getPointerField(
+      ::capnp::bounded<2>() * ::capnp::POINTERS));
+}
+inline void OdTrip::Builder::setHouseholdUuid( ::capnp::Text::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::set(_builder.getPointerField(
+      ::capnp::bounded<2>() * ::capnp::POINTERS), value);
+}
+inline  ::capnp::Text::Builder OdTrip::Builder::initHouseholdUuid(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::init(_builder.getPointerField(
+      ::capnp::bounded<2>() * ::capnp::POINTERS), size);
+}
+inline void OdTrip::Builder::adoptHouseholdUuid(
+    ::capnp::Orphan< ::capnp::Text>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::adopt(_builder.getPointerField(
+      ::capnp::bounded<2>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::Text> OdTrip::Builder::disownHouseholdUuid() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
+      ::capnp::bounded<2>() * ::capnp::POINTERS));
+}
+
+inline bool OdTrip::Reader::hasDataSourceUuid() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS).isNull();
+}
+inline bool OdTrip::Builder::hasDataSourceUuid() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::Text::Reader OdTrip::Reader::getDataSourceUuid() const {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_reader.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS));
+}
+inline  ::capnp::Text::Builder OdTrip::Builder::getDataSourceUuid() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_builder.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS));
+}
+inline void OdTrip::Builder::setDataSourceUuid( ::capnp::Text::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::set(_builder.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS), value);
+}
+inline  ::capnp::Text::Builder OdTrip::Builder::initDataSourceUuid(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::init(_builder.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS), size);
+}
+inline void OdTrip::Builder::adoptDataSourceUuid(
+    ::capnp::Orphan< ::capnp::Text>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::adopt(_builder.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::Text> OdTrip::Builder::disownDataSourceUuid() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
+      ::capnp::bounded<3>() * ::capnp::POINTERS));
 }
 
 inline  ::uint32_t OdTrip::Reader::getId() const {
@@ -468,288 +578,356 @@ inline void OdTrip::Builder::setDestinationActivity( ::odTrip::OdTrip::Activity 
       ::capnp::bounded<10>() * ::capnp::ELEMENTS, value);
 }
 
-inline float OdTrip::Reader::getOriginLatitude() const {
-  return _reader.getDataField<float>(
+inline  ::int32_t OdTrip::Reader::getOriginLatitude() const {
+  return _reader.getDataField< ::int32_t>(
       ::capnp::bounded<6>() * ::capnp::ELEMENTS);
 }
 
-inline float OdTrip::Builder::getOriginLatitude() {
-  return _builder.getDataField<float>(
+inline  ::int32_t OdTrip::Builder::getOriginLatitude() {
+  return _builder.getDataField< ::int32_t>(
       ::capnp::bounded<6>() * ::capnp::ELEMENTS);
 }
-inline void OdTrip::Builder::setOriginLatitude(float value) {
-  _builder.setDataField<float>(
+inline void OdTrip::Builder::setOriginLatitude( ::int32_t value) {
+  _builder.setDataField< ::int32_t>(
       ::capnp::bounded<6>() * ::capnp::ELEMENTS, value);
 }
 
-inline float OdTrip::Reader::getOriginLongitude() const {
-  return _reader.getDataField<float>(
+inline  ::int32_t OdTrip::Reader::getOriginLongitude() const {
+  return _reader.getDataField< ::int32_t>(
       ::capnp::bounded<7>() * ::capnp::ELEMENTS);
 }
 
-inline float OdTrip::Builder::getOriginLongitude() {
-  return _builder.getDataField<float>(
+inline  ::int32_t OdTrip::Builder::getOriginLongitude() {
+  return _builder.getDataField< ::int32_t>(
       ::capnp::bounded<7>() * ::capnp::ELEMENTS);
 }
-inline void OdTrip::Builder::setOriginLongitude(float value) {
-  _builder.setDataField<float>(
+inline void OdTrip::Builder::setOriginLongitude( ::int32_t value) {
+  _builder.setDataField< ::int32_t>(
       ::capnp::bounded<7>() * ::capnp::ELEMENTS, value);
 }
 
-inline float OdTrip::Reader::getDestinationLatitude() const {
-  return _reader.getDataField<float>(
+inline  ::int32_t OdTrip::Reader::getDestinationLatitude() const {
+  return _reader.getDataField< ::int32_t>(
       ::capnp::bounded<8>() * ::capnp::ELEMENTS);
 }
 
-inline float OdTrip::Builder::getDestinationLatitude() {
-  return _builder.getDataField<float>(
+inline  ::int32_t OdTrip::Builder::getDestinationLatitude() {
+  return _builder.getDataField< ::int32_t>(
       ::capnp::bounded<8>() * ::capnp::ELEMENTS);
 }
-inline void OdTrip::Builder::setDestinationLatitude(float value) {
-  _builder.setDataField<float>(
+inline void OdTrip::Builder::setDestinationLatitude( ::int32_t value) {
+  _builder.setDataField< ::int32_t>(
       ::capnp::bounded<8>() * ::capnp::ELEMENTS, value);
 }
 
-inline float OdTrip::Reader::getDestinationLongitude() const {
-  return _reader.getDataField<float>(
+inline  ::int32_t OdTrip::Reader::getDestinationLongitude() const {
+  return _reader.getDataField< ::int32_t>(
       ::capnp::bounded<9>() * ::capnp::ELEMENTS);
 }
 
-inline float OdTrip::Builder::getDestinationLongitude() {
-  return _builder.getDataField<float>(
+inline  ::int32_t OdTrip::Builder::getDestinationLongitude() {
+  return _builder.getDataField< ::int32_t>(
       ::capnp::bounded<9>() * ::capnp::ELEMENTS);
 }
-inline void OdTrip::Builder::setDestinationLongitude(float value) {
-  _builder.setDataField<float>(
+inline void OdTrip::Builder::setDestinationLongitude( ::int32_t value) {
+  _builder.setDataField< ::int32_t>(
       ::capnp::bounded<9>() * ::capnp::ELEMENTS, value);
 }
 
 inline bool OdTrip::Reader::hasOriginNodesUuids() const {
   return !_reader.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<4>() * ::capnp::POINTERS).isNull();
 }
 inline bool OdTrip::Builder::hasOriginNodesUuids() {
   return !_builder.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<4>() * ::capnp::POINTERS).isNull();
 }
 inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader OdTrip::Reader::getOriginNodesUuids() const {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_reader.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS));
+      ::capnp::bounded<4>() * ::capnp::POINTERS));
 }
 inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder OdTrip::Builder::getOriginNodesUuids() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_builder.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS));
+      ::capnp::bounded<4>() * ::capnp::POINTERS));
 }
 inline void OdTrip::Builder::setOriginNodesUuids( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<4>() * ::capnp::POINTERS), value);
 }
 inline void OdTrip::Builder::setOriginNodesUuids(::kj::ArrayPtr<const  ::capnp::Text::Reader> value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<4>() * ::capnp::POINTERS), value);
 }
 inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder OdTrip::Builder::initOriginNodesUuids(unsigned int size) {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::init(_builder.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS), size);
+      ::capnp::bounded<4>() * ::capnp::POINTERS), size);
 }
 inline void OdTrip::Builder::adoptOriginNodesUuids(
     ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::adopt(_builder.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS), kj::mv(value));
+      ::capnp::bounded<4>() * ::capnp::POINTERS), kj::mv(value));
 }
 inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> OdTrip::Builder::disownOriginNodesUuids() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::disown(_builder.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS));
+      ::capnp::bounded<4>() * ::capnp::POINTERS));
 }
 
 inline bool OdTrip::Reader::hasOriginNodesTravelTimes() const {
   return !_reader.getPointerField(
-      ::capnp::bounded<3>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<5>() * ::capnp::POINTERS).isNull();
 }
 inline bool OdTrip::Builder::hasOriginNodesTravelTimes() {
   return !_builder.getPointerField(
-      ::capnp::bounded<3>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<5>() * ::capnp::POINTERS).isNull();
 }
 inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader OdTrip::Reader::getOriginNodesTravelTimes() const {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::get(_reader.getPointerField(
-      ::capnp::bounded<3>() * ::capnp::POINTERS));
+      ::capnp::bounded<5>() * ::capnp::POINTERS));
 }
 inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder OdTrip::Builder::getOriginNodesTravelTimes() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::get(_builder.getPointerField(
-      ::capnp::bounded<3>() * ::capnp::POINTERS));
+      ::capnp::bounded<5>() * ::capnp::POINTERS));
 }
 inline void OdTrip::Builder::setOriginNodesTravelTimes( ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
-      ::capnp::bounded<3>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<5>() * ::capnp::POINTERS), value);
 }
 inline void OdTrip::Builder::setOriginNodesTravelTimes(::kj::ArrayPtr<const  ::int32_t> value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
-      ::capnp::bounded<3>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<5>() * ::capnp::POINTERS), value);
 }
 inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder OdTrip::Builder::initOriginNodesTravelTimes(unsigned int size) {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::init(_builder.getPointerField(
-      ::capnp::bounded<3>() * ::capnp::POINTERS), size);
+      ::capnp::bounded<5>() * ::capnp::POINTERS), size);
 }
 inline void OdTrip::Builder::adoptOriginNodesTravelTimes(
     ::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>&& value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::adopt(_builder.getPointerField(
-      ::capnp::bounded<3>() * ::capnp::POINTERS), kj::mv(value));
+      ::capnp::bounded<5>() * ::capnp::POINTERS), kj::mv(value));
 }
 inline ::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>> OdTrip::Builder::disownOriginNodesTravelTimes() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::disown(_builder.getPointerField(
-      ::capnp::bounded<3>() * ::capnp::POINTERS));
+      ::capnp::bounded<5>() * ::capnp::POINTERS));
 }
 
 inline bool OdTrip::Reader::hasOriginNodesDistances() const {
   return !_reader.getPointerField(
-      ::capnp::bounded<4>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<6>() * ::capnp::POINTERS).isNull();
 }
 inline bool OdTrip::Builder::hasOriginNodesDistances() {
   return !_builder.getPointerField(
-      ::capnp::bounded<4>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<6>() * ::capnp::POINTERS).isNull();
 }
 inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader OdTrip::Reader::getOriginNodesDistances() const {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::get(_reader.getPointerField(
-      ::capnp::bounded<4>() * ::capnp::POINTERS));
+      ::capnp::bounded<6>() * ::capnp::POINTERS));
 }
 inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder OdTrip::Builder::getOriginNodesDistances() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::get(_builder.getPointerField(
-      ::capnp::bounded<4>() * ::capnp::POINTERS));
+      ::capnp::bounded<6>() * ::capnp::POINTERS));
 }
 inline void OdTrip::Builder::setOriginNodesDistances( ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
-      ::capnp::bounded<4>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<6>() * ::capnp::POINTERS), value);
 }
 inline void OdTrip::Builder::setOriginNodesDistances(::kj::ArrayPtr<const  ::int32_t> value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
-      ::capnp::bounded<4>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<6>() * ::capnp::POINTERS), value);
 }
 inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder OdTrip::Builder::initOriginNodesDistances(unsigned int size) {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::init(_builder.getPointerField(
-      ::capnp::bounded<4>() * ::capnp::POINTERS), size);
+      ::capnp::bounded<6>() * ::capnp::POINTERS), size);
 }
 inline void OdTrip::Builder::adoptOriginNodesDistances(
     ::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>&& value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::adopt(_builder.getPointerField(
-      ::capnp::bounded<4>() * ::capnp::POINTERS), kj::mv(value));
+      ::capnp::bounded<6>() * ::capnp::POINTERS), kj::mv(value));
 }
 inline ::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>> OdTrip::Builder::disownOriginNodesDistances() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::disown(_builder.getPointerField(
-      ::capnp::bounded<4>() * ::capnp::POINTERS));
+      ::capnp::bounded<6>() * ::capnp::POINTERS));
 }
 
 inline bool OdTrip::Reader::hasDestinationNodesUuids() const {
   return !_reader.getPointerField(
-      ::capnp::bounded<5>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<7>() * ::capnp::POINTERS).isNull();
 }
 inline bool OdTrip::Builder::hasDestinationNodesUuids() {
   return !_builder.getPointerField(
-      ::capnp::bounded<5>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<7>() * ::capnp::POINTERS).isNull();
 }
 inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader OdTrip::Reader::getDestinationNodesUuids() const {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_reader.getPointerField(
-      ::capnp::bounded<5>() * ::capnp::POINTERS));
+      ::capnp::bounded<7>() * ::capnp::POINTERS));
 }
 inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder OdTrip::Builder::getDestinationNodesUuids() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_builder.getPointerField(
-      ::capnp::bounded<5>() * ::capnp::POINTERS));
+      ::capnp::bounded<7>() * ::capnp::POINTERS));
 }
 inline void OdTrip::Builder::setDestinationNodesUuids( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
-      ::capnp::bounded<5>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<7>() * ::capnp::POINTERS), value);
 }
 inline void OdTrip::Builder::setDestinationNodesUuids(::kj::ArrayPtr<const  ::capnp::Text::Reader> value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
-      ::capnp::bounded<5>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<7>() * ::capnp::POINTERS), value);
 }
 inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder OdTrip::Builder::initDestinationNodesUuids(unsigned int size) {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::init(_builder.getPointerField(
-      ::capnp::bounded<5>() * ::capnp::POINTERS), size);
+      ::capnp::bounded<7>() * ::capnp::POINTERS), size);
 }
 inline void OdTrip::Builder::adoptDestinationNodesUuids(
     ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::adopt(_builder.getPointerField(
-      ::capnp::bounded<5>() * ::capnp::POINTERS), kj::mv(value));
+      ::capnp::bounded<7>() * ::capnp::POINTERS), kj::mv(value));
 }
 inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> OdTrip::Builder::disownDestinationNodesUuids() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::disown(_builder.getPointerField(
-      ::capnp::bounded<5>() * ::capnp::POINTERS));
+      ::capnp::bounded<7>() * ::capnp::POINTERS));
 }
 
 inline bool OdTrip::Reader::hasDestinationNodesTravelTimes() const {
   return !_reader.getPointerField(
-      ::capnp::bounded<6>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<8>() * ::capnp::POINTERS).isNull();
 }
 inline bool OdTrip::Builder::hasDestinationNodesTravelTimes() {
   return !_builder.getPointerField(
-      ::capnp::bounded<6>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<8>() * ::capnp::POINTERS).isNull();
 }
 inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader OdTrip::Reader::getDestinationNodesTravelTimes() const {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::get(_reader.getPointerField(
-      ::capnp::bounded<6>() * ::capnp::POINTERS));
+      ::capnp::bounded<8>() * ::capnp::POINTERS));
 }
 inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder OdTrip::Builder::getDestinationNodesTravelTimes() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::get(_builder.getPointerField(
-      ::capnp::bounded<6>() * ::capnp::POINTERS));
+      ::capnp::bounded<8>() * ::capnp::POINTERS));
 }
 inline void OdTrip::Builder::setDestinationNodesTravelTimes( ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
-      ::capnp::bounded<6>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<8>() * ::capnp::POINTERS), value);
 }
 inline void OdTrip::Builder::setDestinationNodesTravelTimes(::kj::ArrayPtr<const  ::int32_t> value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
-      ::capnp::bounded<6>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<8>() * ::capnp::POINTERS), value);
 }
 inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder OdTrip::Builder::initDestinationNodesTravelTimes(unsigned int size) {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::init(_builder.getPointerField(
-      ::capnp::bounded<6>() * ::capnp::POINTERS), size);
+      ::capnp::bounded<8>() * ::capnp::POINTERS), size);
 }
 inline void OdTrip::Builder::adoptDestinationNodesTravelTimes(
     ::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>&& value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::adopt(_builder.getPointerField(
-      ::capnp::bounded<6>() * ::capnp::POINTERS), kj::mv(value));
+      ::capnp::bounded<8>() * ::capnp::POINTERS), kj::mv(value));
 }
 inline ::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>> OdTrip::Builder::disownDestinationNodesTravelTimes() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::disown(_builder.getPointerField(
-      ::capnp::bounded<6>() * ::capnp::POINTERS));
+      ::capnp::bounded<8>() * ::capnp::POINTERS));
 }
 
 inline bool OdTrip::Reader::hasDestinationNodesDistances() const {
   return !_reader.getPointerField(
-      ::capnp::bounded<7>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<9>() * ::capnp::POINTERS).isNull();
 }
 inline bool OdTrip::Builder::hasDestinationNodesDistances() {
   return !_builder.getPointerField(
-      ::capnp::bounded<7>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<9>() * ::capnp::POINTERS).isNull();
 }
 inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader OdTrip::Reader::getDestinationNodesDistances() const {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::get(_reader.getPointerField(
-      ::capnp::bounded<7>() * ::capnp::POINTERS));
+      ::capnp::bounded<9>() * ::capnp::POINTERS));
 }
 inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder OdTrip::Builder::getDestinationNodesDistances() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::get(_builder.getPointerField(
-      ::capnp::bounded<7>() * ::capnp::POINTERS));
+      ::capnp::bounded<9>() * ::capnp::POINTERS));
 }
 inline void OdTrip::Builder::setDestinationNodesDistances( ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
-      ::capnp::bounded<7>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<9>() * ::capnp::POINTERS), value);
 }
 inline void OdTrip::Builder::setDestinationNodesDistances(::kj::ArrayPtr<const  ::int32_t> value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
-      ::capnp::bounded<7>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<9>() * ::capnp::POINTERS), value);
 }
 inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder OdTrip::Builder::initDestinationNodesDistances(unsigned int size) {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::init(_builder.getPointerField(
-      ::capnp::bounded<7>() * ::capnp::POINTERS), size);
+      ::capnp::bounded<9>() * ::capnp::POINTERS), size);
 }
 inline void OdTrip::Builder::adoptDestinationNodesDistances(
     ::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>&& value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::adopt(_builder.getPointerField(
-      ::capnp::bounded<7>() * ::capnp::POINTERS), kj::mv(value));
+      ::capnp::bounded<9>() * ::capnp::POINTERS), kj::mv(value));
 }
 inline ::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>> OdTrip::Builder::disownDestinationNodesDistances() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::disown(_builder.getPointerField(
-      ::capnp::bounded<7>() * ::capnp::POINTERS));
+      ::capnp::bounded<9>() * ::capnp::POINTERS));
+}
+
+inline bool OdTrip::Reader::hasInternalId() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<10>() * ::capnp::POINTERS).isNull();
+}
+inline bool OdTrip::Builder::hasInternalId() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<10>() * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::Text::Reader OdTrip::Reader::getInternalId() const {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_reader.getPointerField(
+      ::capnp::bounded<10>() * ::capnp::POINTERS));
+}
+inline  ::capnp::Text::Builder OdTrip::Builder::getInternalId() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_builder.getPointerField(
+      ::capnp::bounded<10>() * ::capnp::POINTERS));
+}
+inline void OdTrip::Builder::setInternalId( ::capnp::Text::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::set(_builder.getPointerField(
+      ::capnp::bounded<10>() * ::capnp::POINTERS), value);
+}
+inline  ::capnp::Text::Builder OdTrip::Builder::initInternalId(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::init(_builder.getPointerField(
+      ::capnp::bounded<10>() * ::capnp::POINTERS), size);
+}
+inline void OdTrip::Builder::adoptInternalId(
+    ::capnp::Orphan< ::capnp::Text>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::adopt(_builder.getPointerField(
+      ::capnp::bounded<10>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::Text> OdTrip::Builder::disownInternalId() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
+      ::capnp::bounded<10>() * ::capnp::POINTERS));
+}
+
+inline bool OdTrip::Reader::hasData() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<11>() * ::capnp::POINTERS).isNull();
+}
+inline bool OdTrip::Builder::hasData() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<11>() * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::Text::Reader OdTrip::Reader::getData() const {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_reader.getPointerField(
+      ::capnp::bounded<11>() * ::capnp::POINTERS));
+}
+inline  ::capnp::Text::Builder OdTrip::Builder::getData() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_builder.getPointerField(
+      ::capnp::bounded<11>() * ::capnp::POINTERS));
+}
+inline void OdTrip::Builder::setData( ::capnp::Text::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::set(_builder.getPointerField(
+      ::capnp::bounded<11>() * ::capnp::POINTERS), value);
+}
+inline  ::capnp::Text::Builder OdTrip::Builder::initData(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::init(_builder.getPointerField(
+      ::capnp::bounded<11>() * ::capnp::POINTERS), size);
+}
+inline void OdTrip::Builder::adoptData(
+    ::capnp::Orphan< ::capnp::Text>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::adopt(_builder.getPointerField(
+      ::capnp::bounded<11>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::Text> OdTrip::Builder::disownData() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
+      ::capnp::bounded<11>() * ::capnp::POINTERS));
 }
 
 }  // namespace

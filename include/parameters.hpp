@@ -120,7 +120,7 @@ namespace TrRouting
     
     void setDefaultValues()
     {
-      cacheDirectoryPath                     = "cache/transit/";
+      cacheDirectoryPath                     = "cache/";
       odTrip                                 = NULL;
       walkingSpeedMetersPerSecond            = 5/3.6; // 5 km/h
       drivingSpeedMetersPerSecond            = 90/3.6; // 90 km/h

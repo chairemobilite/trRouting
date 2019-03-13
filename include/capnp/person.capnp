@@ -6,69 +6,74 @@ $Cxx.namespace("person");
 struct Person {
   
   uuid                             @0  :Text;
-  householdUuid                    @1  :Text;
-  id                               @2  :UInt32;
-  expansionFactor                  @3  :Float32;
-  age                              @4  :Int16;
-  drivingLicenseOwner              @5  :Int8;
-  transitPassOwner                 @6  :Int8;
-  ageGroup                         @7  :AgeGroup;
-  gender                           @8  :Gender;
-  occupation                       @9  :Occupation;
-  usualWorkPlaceLatitude           @10 :Float32;
-  usualWorkPlaceLongitude          @11 :Float32;
-  usualschoolPlaceLatitude         @12 :Float32;
-  usualschoolPlaceLongitude        @13 :Float32;
-  usualWorkPlaceNodesUuids         @14 :List(Text); # unique in the whole network, changed to indexes in collection
-  usualWorkPlaceNodesTravelTimes   @15 :List(Int32); # seconds
-  usualWorkPlaceNodesDistances     @16 :List(Int32); # meters
-  usualSchoolPlaceNodesUuids       @17 :List(Text); # unique in the whole network, changed to indexes in collection
-  usualSchoolPlaceNodesTravelTimes @18 :List(Int32); # seconds
-  usualSchoolPlaceNodesDistances   @19 :List(Int32); # meters
-  internalId                       @20 :Text;
+  dataSourceUuid                   @1  :Text;
+  householdUuid                    @2  :Text;
+  id                               @3  :UInt32;
+  expansionFactor                  @4  :Float32;
+  age                              @5  :Int16;
+  drivingLicenseOwner              @6  :Int8;
+  transitPassOwner                 @7  :Int8;
+  ageGroup                         @8  :AgeGroup;
+  gender                           @9  :Gender;
+  occupation                       @10 :Occupation;
+  usualWorkPlaceLatitude           @11 :Int32; # divide by 1000000 to get float
+  usualWorkPlaceLongitude          @12 :Int32; # divide by 1000000 to get float
+  usualSchoolPlaceLatitude         @13 :Int32; # divide by 1000000 to get float
+  usualSchoolPlaceLongitude        @14 :Int32; # divide by 1000000 to get float
+  usualWorkPlaceNodesUuids         @15 :List(Text); # unique in the whole network, changed to indexes in collection
+  usualWorkPlaceNodesTravelTimes   @16 :List(Int32); # seconds
+  usualWorkPlaceNodesDistances     @17 :List(Int32); # meters
+  usualSchoolPlaceNodesUuids       @18 :List(Text); # unique in the whole network, changed to indexes in collection
+  usualSchoolPlaceNodesTravelTimes @19 :List(Int32); # seconds
+  usualSchoolPlaceNodesDistances   @20 :List(Int32); # meters
+  internalId                       @21 :Text;
+  data                             @22 :Text; # json
 
   enum AgeGroup {
-    ag0004   @0;
-    ag0509   @1;
-    ag1014   @2;
-    ag1519   @3;
-    ag2024   @4;
-    ag2529   @5;
-    ag3034   @6;
-    ag3539   @7;
-    ag4044   @8;
-    ag4549   @9;
-    ag5054   @10;
-    ag5559   @11;
-    ag6064   @12;
-    ag6569   @13;
-    ag7074   @14;
-    ag7579   @15;
-    ag8084   @16;
-    ag8589   @17;
-    ag9094   @18;
-    ag95plus @19;
-    unknown  @20;
+    none     @0 ;
+    ag0004   @1 ;
+    ag0509   @2 ;
+    ag1014   @3 ;
+    ag1519   @4 ;
+    ag2024   @5 ;
+    ag2529   @6 ;
+    ag3034   @7 ;
+    ag3539   @8 ;
+    ag4044   @9 ;
+    ag4549   @10;
+    ag5054   @11;
+    ag5559   @12;
+    ag6064   @13;
+    ag6569   @14;
+    ag7074   @15;
+    ag7579   @16;
+    ag8084   @17;
+    ag8589   @18;
+    ag9094   @19;
+    ag95plus @20;
+    unknown  @21;
   }
 
   enum Gender {
-    female  @0;
-    male    @1;
-    custom  @2;
-    unknown @3;
+    none    @0;
+    female  @1;
+    male    @2;
+    custom  @3;
+    unknown @4;
   }
 
   enum Occupation {
-    fullTimeWorker   @0;
-    partTimeWorker   @1;
-    fullTimeStudent  @2;
-    partTimeStudent  @3;
-    workerAndStudent @4;
-    retired          @5;
-    atHome           @6;
-    other            @7;
-    nonApplicable    @8;
-    unknown          @9;
+    none             @0;
+    fullTimeWorker   @1;
+    partTimeWorker   @2;
+    fullTimeStudent  @3;
+    partTimeStudent  @4;
+    workerAndStudent @5;
+    retired          @6;
+    atHome           @7;
+    other            @8;
+    nonApplicable    @9;
+    unknown          @10;
   }
 
 }

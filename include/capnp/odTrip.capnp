@@ -7,67 +7,72 @@ struct OdTrip {
 
   uuid                        @0  :Text;
   personUuid                  @1  :Text;
-  id                          @2  :UInt32;
-  expansionFactor             @3  :Float32;
-  departureTimeSeconds        @4  :Int32;
-  arrivalTimeSeconds          @5  :Int32;
-  mode                        @6  :Mode;
-  originActivity              @7  :Activity;
-  destinationActivity         @8  :Activity;
-  originLatitude              @9  :Float32;
-  originLongitude             @10 :Float32;
-  destinationLatitude         @11 :Float32;
-  destinationLongitude        @12 :Float32;
-  originNodesUuids            @13 :List(Text); # unique in the whole network, changed to indexes in collection
-  originNodesTravelTimes      @14 :List(Int32); # seconds
-  originNodesDistances        @15 :List(Int32); # meters
-  destinationNodesUuids       @16 :List(Text); # unique in the whole network, changed to indexes in collection
-  destinationNodesTravelTimes @17 :List(Int32); # seconds
-  destinationNodesDistances   @18 :List(Int32); # meters
-  internalId                  @19 :Text;
+  householdUuid               @2  :Text;
+  dataSourceUuid              @3  :Text;
+  id                          @4  :UInt32; # unique per data source
+  expansionFactor             @5  :Float32;
+  departureTimeSeconds        @6  :Int32;
+  arrivalTimeSeconds          @7  :Int32;
+  mode                        @8  :Mode;
+  originActivity              @9  :Activity;
+  destinationActivity         @10 :Activity;
+  originLatitude              @11 :Int32; # divide by 1000000 to get float
+  originLongitude             @12 :Int32; # divide by 1000000 to get float
+  destinationLatitude         @13 :Int32; # divide by 1000000 to get float
+  destinationLongitude        @14 :Int32; # divide by 1000000 to get float
+  originNodesUuids            @15 :List(Text); # unique in the whole network, changed to indexes in collection
+  originNodesTravelTimes      @16 :List(Int32); # seconds
+  originNodesDistances        @17 :List(Int32); # meters
+  destinationNodesUuids       @18 :List(Text); # unique in the whole network, changed to indexes in collection
+  destinationNodesTravelTimes @19 :List(Int32); # seconds
+  destinationNodesDistances   @20 :List(Int32); # meters
+  internalId                  @21 :Text;
+  data                        @22 :Text; # json
 
   enum Mode {
-    walking         @0;
-    cycling         @1;
-    carDriver       @2;
-    carPassenger    @3;
-    motorcycle      @4;
-    transit         @5;
-    paratransit     @6;
-    taxi            @7;
-    schoolBus       @8;
-    otherBus        @9;
-    intercityBus    @10;
-    intercityTrain  @11;
-    plane           @12;
-    ferry           @13;
-    parkAndRide     @14;
-    kissAndRide     @15;
-    bikeAndRide     @16;
-    multimodalOther @17;
-    other           @18;
-    unknown         @19;
+    none            @0 ;
+    walking         @1 ;
+    cycling         @2 ;
+    carDriver       @3 ;
+    carPassenger    @4 ;
+    motorcycle      @5 ;
+    transit         @6 ;
+    paratransit     @7 ;
+    taxi            @8 ;
+    schoolBus       @9 ;
+    otherBus        @10;
+    intercityBus    @11;
+    intercityTrain  @12;
+    plane           @13;
+    ferry           @14;
+    parkAndRide     @15;
+    kissAndRide     @16;
+    bikeAndRide     @17;
+    multimodalOther @18;
+    other           @19;
+    unknown         @20;
   }
 
   enum Activity {
-    home            @0;
-    workUsual       @1;
-    workNonUsual    @2;
-    schoolUsual     @3;
-    schoolNonUsual  @4;
-    shopping        @5;
-    leisure         @6;
-    service         @7;
-    secondaryHome   @8;
-    visitingFriends @9;
-    dropSomeone     @10;
-    fetchSomeone    @11;
-    restaurant      @12;
-    medical         @13;
-    worship         @14;
-    onTheRoad       @15;
-    other           @16;
-    unknown         @17;
+    none            @0;
+    home            @1;
+    workUsual       @2;
+    workNonUsual    @3;
+    schoolUsual     @4;
+    schoolNonUsual  @5;
+    shopping        @6;
+    leisure         @7;
+    service         @8;
+    secondaryHome   @9;
+    visitingFriends @10;
+    dropSomeone     @11;
+    fetchSomeone    @12;
+    restaurant      @13;
+    medical         @14;
+    worship         @15;
+    onTheRoad       @16;
+    other           @17;
+    unknown         @18;
   }
 
 }
