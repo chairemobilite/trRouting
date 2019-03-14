@@ -20,10 +20,10 @@ struct OdTrip {
   originLongitude             @12 :Int32; # divide by 1000000 to get float
   destinationLatitude         @13 :Int32; # divide by 1000000 to get float
   destinationLongitude        @14 :Int32; # divide by 1000000 to get float
-  originNodesUuids            @15 :List(Text); # unique in the whole network, changed to indexes in collection
+  originNodesIdx              @15 :List(Int32);
   originNodesTravelTimes      @16 :List(Int32); # seconds
   originNodesDistances        @17 :List(Int32); # meters
-  destinationNodesUuids       @18 :List(Text); # unique in the whole network, changed to indexes in collection
+  destinationNodesIdx         @18 :List(Int32);
   destinationNodesTravelTimes @19 :List(Int32); # seconds
   destinationNodesDistances   @20 :List(Int32); # meters
   internalId                  @21 :Text;

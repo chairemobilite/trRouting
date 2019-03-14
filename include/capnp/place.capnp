@@ -15,7 +15,7 @@ struct Place {
   description      @7  :Text;
   latitude         @8  :Int32; # divide by 1000000 to get float
   longitude        @9  :Int32; # divide by 1000000 to get float
-  nodesUuids       @10 :List(Text); # unique in the whole network, changed to indexes in collection
+  nodesIdx         @10 :List(Int32);
   nodesTravelTimes @11 :List(Int32); # seconds
   nodesDistances   @12 :List(Int32); # meters
   internalId       @13 :Text;

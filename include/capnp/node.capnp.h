@@ -91,8 +91,8 @@ public:
 
   inline  ::int16_t getDefaultDwellTimeSeconds() const;
 
-  inline bool hasTransferableNodesUuids() const;
-  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader getTransferableNodesUuids() const;
+  inline bool hasTransferableNodesIdx() const;
+  inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader getTransferableNodesIdx() const;
 
   inline bool hasTransferableNodesTravelTimes() const;
   inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader getTransferableNodesTravelTimes() const;
@@ -202,13 +202,13 @@ public:
   inline  ::int16_t getDefaultDwellTimeSeconds();
   inline void setDefaultDwellTimeSeconds( ::int16_t value);
 
-  inline bool hasTransferableNodesUuids();
-  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder getTransferableNodesUuids();
-  inline void setTransferableNodesUuids( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value);
-  inline void setTransferableNodesUuids(::kj::ArrayPtr<const  ::capnp::Text::Reader> value);
-  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder initTransferableNodesUuids(unsigned int size);
-  inline void adoptTransferableNodesUuids(::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value);
-  inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> disownTransferableNodesUuids();
+  inline bool hasTransferableNodesIdx();
+  inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder getTransferableNodesIdx();
+  inline void setTransferableNodesIdx( ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader value);
+  inline void setTransferableNodesIdx(::kj::ArrayPtr<const  ::int32_t> value);
+  inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder initTransferableNodesIdx(unsigned int size);
+  inline void adoptTransferableNodesIdx(::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>&& value);
+  inline ::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>> disownTransferableNodesIdx();
 
   inline bool hasTransferableNodesTravelTimes();
   inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder getTransferableNodesTravelTimes();
@@ -610,41 +610,41 @@ inline void Node::Builder::setDefaultDwellTimeSeconds( ::int16_t value) {
       ::capnp::bounded<8>() * ::capnp::ELEMENTS, value);
 }
 
-inline bool Node::Reader::hasTransferableNodesUuids() const {
+inline bool Node::Reader::hasTransferableNodesIdx() const {
   return !_reader.getPointerField(
       ::capnp::bounded<8>() * ::capnp::POINTERS).isNull();
 }
-inline bool Node::Builder::hasTransferableNodesUuids() {
+inline bool Node::Builder::hasTransferableNodesIdx() {
   return !_builder.getPointerField(
       ::capnp::bounded<8>() * ::capnp::POINTERS).isNull();
 }
-inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader Node::Reader::getTransferableNodesUuids() const {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_reader.getPointerField(
+inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader Node::Reader::getTransferableNodesIdx() const {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::get(_reader.getPointerField(
       ::capnp::bounded<8>() * ::capnp::POINTERS));
 }
-inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Node::Builder::getTransferableNodesUuids() {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_builder.getPointerField(
+inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder Node::Builder::getTransferableNodesIdx() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::get(_builder.getPointerField(
       ::capnp::bounded<8>() * ::capnp::POINTERS));
 }
-inline void Node::Builder::setTransferableNodesUuids( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
+inline void Node::Builder::setTransferableNodesIdx( ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
       ::capnp::bounded<8>() * ::capnp::POINTERS), value);
 }
-inline void Node::Builder::setTransferableNodesUuids(::kj::ArrayPtr<const  ::capnp::Text::Reader> value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
+inline void Node::Builder::setTransferableNodesIdx(::kj::ArrayPtr<const  ::int32_t> value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
       ::capnp::bounded<8>() * ::capnp::POINTERS), value);
 }
-inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Node::Builder::initTransferableNodesUuids(unsigned int size) {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::init(_builder.getPointerField(
+inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder Node::Builder::initTransferableNodesIdx(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::init(_builder.getPointerField(
       ::capnp::bounded<8>() * ::capnp::POINTERS), size);
 }
-inline void Node::Builder::adoptTransferableNodesUuids(
-    ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::adopt(_builder.getPointerField(
+inline void Node::Builder::adoptTransferableNodesIdx(
+    ::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::adopt(_builder.getPointerField(
       ::capnp::bounded<8>() * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> Node::Builder::disownTransferableNodesUuids() {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::disown(_builder.getPointerField(
+inline ::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>> Node::Builder::disownTransferableNodesIdx() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::disown(_builder.getPointerField(
       ::capnp::bounded<8>() * ::capnp::POINTERS));
 }
 

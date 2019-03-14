@@ -144,8 +144,8 @@ public:
 
   inline  ::int32_t getUsualSchoolPlaceLongitude() const;
 
-  inline bool hasUsualWorkPlaceNodesUuids() const;
-  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader getUsualWorkPlaceNodesUuids() const;
+  inline bool hasUsualWorkPlaceNodesIdx() const;
+  inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader getUsualWorkPlaceNodesIdx() const;
 
   inline bool hasUsualWorkPlaceNodesTravelTimes() const;
   inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader getUsualWorkPlaceNodesTravelTimes() const;
@@ -153,8 +153,8 @@ public:
   inline bool hasUsualWorkPlaceNodesDistances() const;
   inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader getUsualWorkPlaceNodesDistances() const;
 
-  inline bool hasUsualSchoolPlaceNodesUuids() const;
-  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader getUsualSchoolPlaceNodesUuids() const;
+  inline bool hasUsualSchoolPlaceNodesIdx() const;
+  inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader getUsualSchoolPlaceNodesIdx() const;
 
   inline bool hasUsualSchoolPlaceNodesTravelTimes() const;
   inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader getUsualSchoolPlaceNodesTravelTimes() const;
@@ -253,13 +253,13 @@ public:
   inline  ::int32_t getUsualSchoolPlaceLongitude();
   inline void setUsualSchoolPlaceLongitude( ::int32_t value);
 
-  inline bool hasUsualWorkPlaceNodesUuids();
-  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder getUsualWorkPlaceNodesUuids();
-  inline void setUsualWorkPlaceNodesUuids( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value);
-  inline void setUsualWorkPlaceNodesUuids(::kj::ArrayPtr<const  ::capnp::Text::Reader> value);
-  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder initUsualWorkPlaceNodesUuids(unsigned int size);
-  inline void adoptUsualWorkPlaceNodesUuids(::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value);
-  inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> disownUsualWorkPlaceNodesUuids();
+  inline bool hasUsualWorkPlaceNodesIdx();
+  inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder getUsualWorkPlaceNodesIdx();
+  inline void setUsualWorkPlaceNodesIdx( ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader value);
+  inline void setUsualWorkPlaceNodesIdx(::kj::ArrayPtr<const  ::int32_t> value);
+  inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder initUsualWorkPlaceNodesIdx(unsigned int size);
+  inline void adoptUsualWorkPlaceNodesIdx(::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>&& value);
+  inline ::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>> disownUsualWorkPlaceNodesIdx();
 
   inline bool hasUsualWorkPlaceNodesTravelTimes();
   inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder getUsualWorkPlaceNodesTravelTimes();
@@ -277,13 +277,13 @@ public:
   inline void adoptUsualWorkPlaceNodesDistances(::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>&& value);
   inline ::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>> disownUsualWorkPlaceNodesDistances();
 
-  inline bool hasUsualSchoolPlaceNodesUuids();
-  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder getUsualSchoolPlaceNodesUuids();
-  inline void setUsualSchoolPlaceNodesUuids( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value);
-  inline void setUsualSchoolPlaceNodesUuids(::kj::ArrayPtr<const  ::capnp::Text::Reader> value);
-  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder initUsualSchoolPlaceNodesUuids(unsigned int size);
-  inline void adoptUsualSchoolPlaceNodesUuids(::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value);
-  inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> disownUsualSchoolPlaceNodesUuids();
+  inline bool hasUsualSchoolPlaceNodesIdx();
+  inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder getUsualSchoolPlaceNodesIdx();
+  inline void setUsualSchoolPlaceNodesIdx( ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader value);
+  inline void setUsualSchoolPlaceNodesIdx(::kj::ArrayPtr<const  ::int32_t> value);
+  inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder initUsualSchoolPlaceNodesIdx(unsigned int size);
+  inline void adoptUsualSchoolPlaceNodesIdx(::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>&& value);
+  inline ::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>> disownUsualSchoolPlaceNodesIdx();
 
   inline bool hasUsualSchoolPlaceNodesTravelTimes();
   inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder getUsualSchoolPlaceNodesTravelTimes();
@@ -613,41 +613,41 @@ inline void Person::Builder::setUsualSchoolPlaceLongitude( ::int32_t value) {
       ::capnp::bounded<8>() * ::capnp::ELEMENTS, value);
 }
 
-inline bool Person::Reader::hasUsualWorkPlaceNodesUuids() const {
+inline bool Person::Reader::hasUsualWorkPlaceNodesIdx() const {
   return !_reader.getPointerField(
       ::capnp::bounded<3>() * ::capnp::POINTERS).isNull();
 }
-inline bool Person::Builder::hasUsualWorkPlaceNodesUuids() {
+inline bool Person::Builder::hasUsualWorkPlaceNodesIdx() {
   return !_builder.getPointerField(
       ::capnp::bounded<3>() * ::capnp::POINTERS).isNull();
 }
-inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader Person::Reader::getUsualWorkPlaceNodesUuids() const {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_reader.getPointerField(
+inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader Person::Reader::getUsualWorkPlaceNodesIdx() const {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::get(_reader.getPointerField(
       ::capnp::bounded<3>() * ::capnp::POINTERS));
 }
-inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Person::Builder::getUsualWorkPlaceNodesUuids() {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_builder.getPointerField(
+inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder Person::Builder::getUsualWorkPlaceNodesIdx() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::get(_builder.getPointerField(
       ::capnp::bounded<3>() * ::capnp::POINTERS));
 }
-inline void Person::Builder::setUsualWorkPlaceNodesUuids( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
+inline void Person::Builder::setUsualWorkPlaceNodesIdx( ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
       ::capnp::bounded<3>() * ::capnp::POINTERS), value);
 }
-inline void Person::Builder::setUsualWorkPlaceNodesUuids(::kj::ArrayPtr<const  ::capnp::Text::Reader> value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
+inline void Person::Builder::setUsualWorkPlaceNodesIdx(::kj::ArrayPtr<const  ::int32_t> value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
       ::capnp::bounded<3>() * ::capnp::POINTERS), value);
 }
-inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Person::Builder::initUsualWorkPlaceNodesUuids(unsigned int size) {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::init(_builder.getPointerField(
+inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder Person::Builder::initUsualWorkPlaceNodesIdx(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::init(_builder.getPointerField(
       ::capnp::bounded<3>() * ::capnp::POINTERS), size);
 }
-inline void Person::Builder::adoptUsualWorkPlaceNodesUuids(
-    ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::adopt(_builder.getPointerField(
+inline void Person::Builder::adoptUsualWorkPlaceNodesIdx(
+    ::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::adopt(_builder.getPointerField(
       ::capnp::bounded<3>() * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> Person::Builder::disownUsualWorkPlaceNodesUuids() {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::disown(_builder.getPointerField(
+inline ::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>> Person::Builder::disownUsualWorkPlaceNodesIdx() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::disown(_builder.getPointerField(
       ::capnp::bounded<3>() * ::capnp::POINTERS));
 }
 
@@ -727,41 +727,41 @@ inline ::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>> Pe
       ::capnp::bounded<5>() * ::capnp::POINTERS));
 }
 
-inline bool Person::Reader::hasUsualSchoolPlaceNodesUuids() const {
+inline bool Person::Reader::hasUsualSchoolPlaceNodesIdx() const {
   return !_reader.getPointerField(
       ::capnp::bounded<6>() * ::capnp::POINTERS).isNull();
 }
-inline bool Person::Builder::hasUsualSchoolPlaceNodesUuids() {
+inline bool Person::Builder::hasUsualSchoolPlaceNodesIdx() {
   return !_builder.getPointerField(
       ::capnp::bounded<6>() * ::capnp::POINTERS).isNull();
 }
-inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader Person::Reader::getUsualSchoolPlaceNodesUuids() const {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_reader.getPointerField(
+inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader Person::Reader::getUsualSchoolPlaceNodesIdx() const {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::get(_reader.getPointerField(
       ::capnp::bounded<6>() * ::capnp::POINTERS));
 }
-inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Person::Builder::getUsualSchoolPlaceNodesUuids() {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_builder.getPointerField(
+inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder Person::Builder::getUsualSchoolPlaceNodesIdx() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::get(_builder.getPointerField(
       ::capnp::bounded<6>() * ::capnp::POINTERS));
 }
-inline void Person::Builder::setUsualSchoolPlaceNodesUuids( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
+inline void Person::Builder::setUsualSchoolPlaceNodesIdx( ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
       ::capnp::bounded<6>() * ::capnp::POINTERS), value);
 }
-inline void Person::Builder::setUsualSchoolPlaceNodesUuids(::kj::ArrayPtr<const  ::capnp::Text::Reader> value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
+inline void Person::Builder::setUsualSchoolPlaceNodesIdx(::kj::ArrayPtr<const  ::int32_t> value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
       ::capnp::bounded<6>() * ::capnp::POINTERS), value);
 }
-inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Person::Builder::initUsualSchoolPlaceNodesUuids(unsigned int size) {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::init(_builder.getPointerField(
+inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder Person::Builder::initUsualSchoolPlaceNodesIdx(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::init(_builder.getPointerField(
       ::capnp::bounded<6>() * ::capnp::POINTERS), size);
 }
-inline void Person::Builder::adoptUsualSchoolPlaceNodesUuids(
-    ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::adopt(_builder.getPointerField(
+inline void Person::Builder::adoptUsualSchoolPlaceNodesIdx(
+    ::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::adopt(_builder.getPointerField(
       ::capnp::bounded<6>() * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> Person::Builder::disownUsualSchoolPlaceNodesUuids() {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::disown(_builder.getPointerField(
+inline ::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>> Person::Builder::disownUsualSchoolPlaceNodesIdx() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::disown(_builder.getPointerField(
       ::capnp::bounded<6>() * ::capnp::POINTERS));
 }
 

@@ -82,8 +82,8 @@ public:
 
   inline  ::int32_t getLongitude() const;
 
-  inline bool hasNodesUuids() const;
-  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader getNodesUuids() const;
+  inline bool hasNodesIdx() const;
+  inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader getNodesIdx() const;
 
   inline bool hasNodesTravelTimes() const;
   inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader getNodesTravelTimes() const;
@@ -183,13 +183,13 @@ public:
   inline  ::int32_t getLongitude();
   inline void setLongitude( ::int32_t value);
 
-  inline bool hasNodesUuids();
-  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder getNodesUuids();
-  inline void setNodesUuids( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value);
-  inline void setNodesUuids(::kj::ArrayPtr<const  ::capnp::Text::Reader> value);
-  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder initNodesUuids(unsigned int size);
-  inline void adoptNodesUuids(::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value);
-  inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> disownNodesUuids();
+  inline bool hasNodesIdx();
+  inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder getNodesIdx();
+  inline void setNodesIdx( ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader value);
+  inline void setNodesIdx(::kj::ArrayPtr<const  ::int32_t> value);
+  inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder initNodesIdx(unsigned int size);
+  inline void adoptNodesIdx(::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>&& value);
+  inline ::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>> disownNodesIdx();
 
   inline bool hasNodesTravelTimes();
   inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder getNodesTravelTimes();
@@ -529,41 +529,41 @@ inline void Place::Builder::setLongitude( ::int32_t value) {
       ::capnp::bounded<2>() * ::capnp::ELEMENTS, value);
 }
 
-inline bool Place::Reader::hasNodesUuids() const {
+inline bool Place::Reader::hasNodesIdx() const {
   return !_reader.getPointerField(
       ::capnp::bounded<7>() * ::capnp::POINTERS).isNull();
 }
-inline bool Place::Builder::hasNodesUuids() {
+inline bool Place::Builder::hasNodesIdx() {
   return !_builder.getPointerField(
       ::capnp::bounded<7>() * ::capnp::POINTERS).isNull();
 }
-inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader Place::Reader::getNodesUuids() const {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_reader.getPointerField(
+inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader Place::Reader::getNodesIdx() const {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::get(_reader.getPointerField(
       ::capnp::bounded<7>() * ::capnp::POINTERS));
 }
-inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Place::Builder::getNodesUuids() {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_builder.getPointerField(
+inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder Place::Builder::getNodesIdx() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::get(_builder.getPointerField(
       ::capnp::bounded<7>() * ::capnp::POINTERS));
 }
-inline void Place::Builder::setNodesUuids( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
+inline void Place::Builder::setNodesIdx( ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
       ::capnp::bounded<7>() * ::capnp::POINTERS), value);
 }
-inline void Place::Builder::setNodesUuids(::kj::ArrayPtr<const  ::capnp::Text::Reader> value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
+inline void Place::Builder::setNodesIdx(::kj::ArrayPtr<const  ::int32_t> value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
       ::capnp::bounded<7>() * ::capnp::POINTERS), value);
 }
-inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Place::Builder::initNodesUuids(unsigned int size) {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::init(_builder.getPointerField(
+inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder Place::Builder::initNodesIdx(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::init(_builder.getPointerField(
       ::capnp::bounded<7>() * ::capnp::POINTERS), size);
 }
-inline void Place::Builder::adoptNodesUuids(
-    ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::adopt(_builder.getPointerField(
+inline void Place::Builder::adoptNodesIdx(
+    ::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::adopt(_builder.getPointerField(
       ::capnp::bounded<7>() * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> Place::Builder::disownNodesUuids() {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::disown(_builder.getPointerField(
+inline ::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>> Place::Builder::disownNodesIdx() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::disown(_builder.getPointerField(
       ::capnp::bounded<7>() * ::capnp::POINTERS));
 }
 

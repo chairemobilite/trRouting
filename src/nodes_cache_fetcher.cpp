@@ -87,15 +87,13 @@ namespace TrRouting
         int fd = open((params.cacheDirectoryPath + params.projectShortname + "/" + cacheFileName + ".capnpbin").c_str(), O_RDWR);
         ::capnp::PackedFdMessageReader capnpTMessage(fd, {32 * 1024 * 1024});
         cT::Reader capnpT = capnpTMessage.getRoot<cT>();
-        const unsigned int transferableNodesCount {capnpT.getTransferableNodesUuids().size()};
+        const unsigned int transferableNodesCount {capnpT.getTransferableNodesIdx().size()};
         std::vector<int> transferableNodesIdx(transferableNodesCount);
         std::vector<int> transferableTravelTimesSeconds(transferableNodesCount);
         std::vector<int> transferableDistancesMeters(transferableNodesCount);
-        std::string      transferableNodeUuid;
         for (int i = 0; i < transferableNodesCount; i++)
         {
-          transferableNodeUuid              = capnpT.getTransferableNodesUuids()[i];
-          transferableNodesIdx          [i] = nodeIndexesByUuid[uuidGenerator(transferableNodeUuid)];
+          transferableNodesIdx          [i] = capnpT.getTransferableNodesIdx()[i];
           transferableTravelTimesSeconds[i] = capnpT.getTransferableNodesTravelTimes()[i];
           transferableDistancesMeters   [i] = capnpT.getTransferableNodesDistances()[i];
         }

@@ -20,10 +20,10 @@ struct Person {
   usualWorkPlaceLongitude          @12 :Int32; # divide by 1000000 to get float
   usualSchoolPlaceLatitude         @13 :Int32; # divide by 1000000 to get float
   usualSchoolPlaceLongitude        @14 :Int32; # divide by 1000000 to get float
-  usualWorkPlaceNodesUuids         @15 :List(Text); # unique in the whole network, changed to indexes in collection
+  usualWorkPlaceNodesIdx           @15 :List(Int32);
   usualWorkPlaceNodesTravelTimes   @16 :List(Int32); # seconds
   usualWorkPlaceNodesDistances     @17 :List(Int32); # meters
-  usualSchoolPlaceNodesUuids       @18 :List(Text); # unique in the whole network, changed to indexes in collection
+  usualSchoolPlaceNodesIdx         @18 :List(Int32);
   usualSchoolPlaceNodesTravelTimes @19 :List(Int32); # seconds
   usualSchoolPlaceNodesDistances   @20 :List(Int32); # meters
   internalId                       @21 :Text;
