@@ -37,6 +37,7 @@
 #include "mode.hpp"
 #include "path.hpp"
 #include "stop.hpp"
+#include "data_source.hpp"
 #include "scenario.hpp"
 #include "service.hpp"
 #include "station.hpp"
@@ -77,6 +78,9 @@ namespace TrRouting
     
     std::vector<Agency>                 agencies;
     std::map<boost::uuids::uuid, int>   agencyIndexesByUuid;
+
+    std::vector<DataSource>             dataSources;
+    std::map<boost::uuids::uuid, int>   dataSourceIndexesByUuid;
 
     std::vector<Scenario>               scenarios;
     std::map<boost::uuids::uuid, int>   scenarioIndexesByUuid;
