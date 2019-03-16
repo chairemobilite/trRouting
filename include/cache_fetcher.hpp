@@ -36,13 +36,15 @@
 #include "line.hpp"
 #include "node.hpp"
 #include "data_source.hpp"
+#include "household.hpp"
+#include "person.hpp"
+#include "od_trip.hpp"
 #include "service.hpp"
 #include "scenario.hpp"
 #include "path.hpp"
 #include "block.hpp"
 #include "stop.hpp"
 #include "mode.hpp"
-#include "od_trip.hpp"
 #include "station.hpp"
 #include "trip.hpp"
 
@@ -60,27 +62,45 @@ namespace TrRouting
     }
     
     template<class T>
-    static void saveToCapnpCacheFile(T& data, std::string cacheFileName, Parameters& params) {
+    static void saveToCapnpCacheFile(T& data, std::string cacheFilePath, Parameters& params) {
       std::ofstream oCacheFile;
-      oCacheFile.open(params.cacheDirectoryPath + params.projectShortname + "/" + cacheFileName + ".capnpbin", std::ios::out | std::ios::trunc | std::ios::binary);
+      oCacheFile.open(params.cacheDirectoryPath + params.projectShortname + "/" + cacheFilePath + ".capnpbin", std::ios::out | std::ios::trunc | std::ios::binary);
       oCacheFile.close();
-      int fd = open((params.projectShortname + "/" + cacheFileName + ".capnpbin").c_str(), O_WRONLY);
+      int fd = open((params.projectShortname + "/" + cacheFilePath + ".capnpbin").c_str(), O_WRONLY);
       ::capnp::writePackedMessageToFd(fd, data);
       close(fd);
     }
   
-    static bool capnpCacheFileExists(std::string cacheFileName, Parameters& params) {
+    static bool capnpCacheFileExists(std::string cacheFilePath, Parameters& params) {
       std::ifstream iCacheFile;
       bool notEmpty = false;
-      iCacheFile.open(params.cacheDirectoryPath + params.projectShortname + "/" + cacheFileName + ".capnpbin", std::ios::in | std::ios::binary | std::ios::ate);
+      iCacheFile.open(params.cacheDirectoryPath + params.projectShortname + "/" + cacheFilePath + ".capnpbin", std::ios::in | std::ios::binary | std::ios::ate);
       notEmpty = iCacheFile.tellg() > 0;
       iCacheFile.close();
       return notEmpty;
     }
+
+    static int getCacheFilesCount(std::string cacheFilePath, Parameters& params) {
+      std::ifstream iCacheFile;
+      bool notEmpty = false;
+      iCacheFile.open(params.cacheDirectoryPath + params.projectShortname + "/" + cacheFilePath + ".count", std::ios::in | std::ios::binary | std::ios::ate);
+      int count {1};
+      notEmpty = iCacheFile.tellg() > 0;
+      if (notEmpty)
+      {
+        iCacheFile >> count;
+        std::cout << cacheFilePath << " has " << count << " cache files" << std::endl;
+      }
+      iCacheFile.close();
+      return count;
+    }
     
     const std::pair<std::vector<Mode>      , std::map<std::string       , int>> getModes();
     const std::pair<std::vector<Service>   , std::map<boost::uuids::uuid, int>> getServices(Parameters& params);
-    const std::pair<std::vector<DataSource>, std::map<boost::uuids::uuid, int>> getDataSources(std::map<boost::uuids::uuid, int> dataSourceIndexesByUuid, Parameters& params);
+    const std::pair<std::vector<DataSource>, std::map<boost::uuids::uuid, int>> getDataSources(Parameters& params);
+    const std::pair<std::vector<Household> , std::map<boost::uuids::uuid, int>> getHouseholds(std::map<boost::uuids::uuid, int> dataSourceIndexesByUuid, Parameters& params);
+    const std::pair<std::vector<Person>    , std::map<boost::uuids::uuid, int>> getPersons(std::map<boost::uuids::uuid, int> dataSourceIndexesByUuid, std::map<boost::uuids::uuid, int> householdIndexesByUuid, Parameters& params);
+    const std::pair<std::vector<OdTrip>    , std::map<boost::uuids::uuid, int>> getOdTrips(std::map<boost::uuids::uuid, int> dataSourceIndexesByUuid, std::map<boost::uuids::uuid, int> householdIndexesByUuid, std::map<boost::uuids::uuid, int> personIndexesByUuid, Parameters& params);
     const std::pair<std::vector<Scenario>  , std::map<boost::uuids::uuid, int>> getScenarios(std::map<boost::uuids::uuid, int> serviceIndexesByUuid, Parameters& params);
     const std::pair<std::vector<Station>   , std::map<boost::uuids::uuid, int>> getStations(Parameters& params);
     const std::pair<std::vector<Node>      , std::map<boost::uuids::uuid, int>> getNodes(std::map<boost::uuids::uuid, int> stationIndexesByUuid, Parameters& params);

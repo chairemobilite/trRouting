@@ -81,7 +81,7 @@ struct OdTrip {
 
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(f97d02eb36e1c023, 5, 12)
+    CAPNP_DECLARE_STRUCT_HEADER(f97d02eb36e1c023, 7, 12)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
     #endif  // !CAPNP_LITE
@@ -126,6 +126,12 @@ public:
   inline  ::int32_t getDepartureTimeSeconds() const;
 
   inline  ::int32_t getArrivalTimeSeconds() const;
+
+  inline  ::int32_t getWalkingTravelTimeSeconds() const;
+
+  inline  ::int32_t getCyclingTravelTimeSeconds() const;
+
+  inline  ::int32_t getDrivingTravelTimeSeconds() const;
 
   inline  ::odTrip::OdTrip::Mode getMode() const;
 
@@ -232,6 +238,15 @@ public:
 
   inline  ::int32_t getArrivalTimeSeconds();
   inline void setArrivalTimeSeconds( ::int32_t value);
+
+  inline  ::int32_t getWalkingTravelTimeSeconds();
+  inline void setWalkingTravelTimeSeconds( ::int32_t value);
+
+  inline  ::int32_t getCyclingTravelTimeSeconds();
+  inline void setCyclingTravelTimeSeconds( ::int32_t value);
+
+  inline  ::int32_t getDrivingTravelTimeSeconds();
+  inline void setDrivingTravelTimeSeconds( ::int32_t value);
 
   inline  ::odTrip::OdTrip::Mode getMode();
   inline void setMode( ::odTrip::OdTrip::Mode value);
@@ -536,102 +551,144 @@ inline void OdTrip::Builder::setArrivalTimeSeconds( ::int32_t value) {
       ::capnp::bounded<3>() * ::capnp::ELEMENTS, value);
 }
 
-inline  ::odTrip::OdTrip::Mode OdTrip::Reader::getMode() const {
-  return _reader.getDataField< ::odTrip::OdTrip::Mode>(
-      ::capnp::bounded<8>() * ::capnp::ELEMENTS);
+inline  ::int32_t OdTrip::Reader::getWalkingTravelTimeSeconds() const {
+  return _reader.getDataField< ::int32_t>(
+      ::capnp::bounded<4>() * ::capnp::ELEMENTS);
 }
 
-inline  ::odTrip::OdTrip::Mode OdTrip::Builder::getMode() {
-  return _builder.getDataField< ::odTrip::OdTrip::Mode>(
-      ::capnp::bounded<8>() * ::capnp::ELEMENTS);
+inline  ::int32_t OdTrip::Builder::getWalkingTravelTimeSeconds() {
+  return _builder.getDataField< ::int32_t>(
+      ::capnp::bounded<4>() * ::capnp::ELEMENTS);
 }
-inline void OdTrip::Builder::setMode( ::odTrip::OdTrip::Mode value) {
-  _builder.setDataField< ::odTrip::OdTrip::Mode>(
-      ::capnp::bounded<8>() * ::capnp::ELEMENTS, value);
-}
-
-inline  ::odTrip::OdTrip::Activity OdTrip::Reader::getOriginActivity() const {
-  return _reader.getDataField< ::odTrip::OdTrip::Activity>(
-      ::capnp::bounded<9>() * ::capnp::ELEMENTS);
+inline void OdTrip::Builder::setWalkingTravelTimeSeconds( ::int32_t value) {
+  _builder.setDataField< ::int32_t>(
+      ::capnp::bounded<4>() * ::capnp::ELEMENTS, value);
 }
 
-inline  ::odTrip::OdTrip::Activity OdTrip::Builder::getOriginActivity() {
-  return _builder.getDataField< ::odTrip::OdTrip::Activity>(
-      ::capnp::bounded<9>() * ::capnp::ELEMENTS);
-}
-inline void OdTrip::Builder::setOriginActivity( ::odTrip::OdTrip::Activity value) {
-  _builder.setDataField< ::odTrip::OdTrip::Activity>(
-      ::capnp::bounded<9>() * ::capnp::ELEMENTS, value);
+inline  ::int32_t OdTrip::Reader::getCyclingTravelTimeSeconds() const {
+  return _reader.getDataField< ::int32_t>(
+      ::capnp::bounded<5>() * ::capnp::ELEMENTS);
 }
 
-inline  ::odTrip::OdTrip::Activity OdTrip::Reader::getDestinationActivity() const {
-  return _reader.getDataField< ::odTrip::OdTrip::Activity>(
-      ::capnp::bounded<10>() * ::capnp::ELEMENTS);
+inline  ::int32_t OdTrip::Builder::getCyclingTravelTimeSeconds() {
+  return _builder.getDataField< ::int32_t>(
+      ::capnp::bounded<5>() * ::capnp::ELEMENTS);
+}
+inline void OdTrip::Builder::setCyclingTravelTimeSeconds( ::int32_t value) {
+  _builder.setDataField< ::int32_t>(
+      ::capnp::bounded<5>() * ::capnp::ELEMENTS, value);
 }
 
-inline  ::odTrip::OdTrip::Activity OdTrip::Builder::getDestinationActivity() {
-  return _builder.getDataField< ::odTrip::OdTrip::Activity>(
-      ::capnp::bounded<10>() * ::capnp::ELEMENTS);
-}
-inline void OdTrip::Builder::setDestinationActivity( ::odTrip::OdTrip::Activity value) {
-  _builder.setDataField< ::odTrip::OdTrip::Activity>(
-      ::capnp::bounded<10>() * ::capnp::ELEMENTS, value);
-}
-
-inline  ::int32_t OdTrip::Reader::getOriginLatitude() const {
+inline  ::int32_t OdTrip::Reader::getDrivingTravelTimeSeconds() const {
   return _reader.getDataField< ::int32_t>(
       ::capnp::bounded<6>() * ::capnp::ELEMENTS);
 }
 
-inline  ::int32_t OdTrip::Builder::getOriginLatitude() {
+inline  ::int32_t OdTrip::Builder::getDrivingTravelTimeSeconds() {
   return _builder.getDataField< ::int32_t>(
       ::capnp::bounded<6>() * ::capnp::ELEMENTS);
 }
-inline void OdTrip::Builder::setOriginLatitude( ::int32_t value) {
+inline void OdTrip::Builder::setDrivingTravelTimeSeconds( ::int32_t value) {
   _builder.setDataField< ::int32_t>(
       ::capnp::bounded<6>() * ::capnp::ELEMENTS, value);
 }
 
+inline  ::odTrip::OdTrip::Mode OdTrip::Reader::getMode() const {
+  return _reader.getDataField< ::odTrip::OdTrip::Mode>(
+      ::capnp::bounded<14>() * ::capnp::ELEMENTS);
+}
+
+inline  ::odTrip::OdTrip::Mode OdTrip::Builder::getMode() {
+  return _builder.getDataField< ::odTrip::OdTrip::Mode>(
+      ::capnp::bounded<14>() * ::capnp::ELEMENTS);
+}
+inline void OdTrip::Builder::setMode( ::odTrip::OdTrip::Mode value) {
+  _builder.setDataField< ::odTrip::OdTrip::Mode>(
+      ::capnp::bounded<14>() * ::capnp::ELEMENTS, value);
+}
+
+inline  ::odTrip::OdTrip::Activity OdTrip::Reader::getOriginActivity() const {
+  return _reader.getDataField< ::odTrip::OdTrip::Activity>(
+      ::capnp::bounded<15>() * ::capnp::ELEMENTS);
+}
+
+inline  ::odTrip::OdTrip::Activity OdTrip::Builder::getOriginActivity() {
+  return _builder.getDataField< ::odTrip::OdTrip::Activity>(
+      ::capnp::bounded<15>() * ::capnp::ELEMENTS);
+}
+inline void OdTrip::Builder::setOriginActivity( ::odTrip::OdTrip::Activity value) {
+  _builder.setDataField< ::odTrip::OdTrip::Activity>(
+      ::capnp::bounded<15>() * ::capnp::ELEMENTS, value);
+}
+
+inline  ::odTrip::OdTrip::Activity OdTrip::Reader::getDestinationActivity() const {
+  return _reader.getDataField< ::odTrip::OdTrip::Activity>(
+      ::capnp::bounded<16>() * ::capnp::ELEMENTS);
+}
+
+inline  ::odTrip::OdTrip::Activity OdTrip::Builder::getDestinationActivity() {
+  return _builder.getDataField< ::odTrip::OdTrip::Activity>(
+      ::capnp::bounded<16>() * ::capnp::ELEMENTS);
+}
+inline void OdTrip::Builder::setDestinationActivity( ::odTrip::OdTrip::Activity value) {
+  _builder.setDataField< ::odTrip::OdTrip::Activity>(
+      ::capnp::bounded<16>() * ::capnp::ELEMENTS, value);
+}
+
+inline  ::int32_t OdTrip::Reader::getOriginLatitude() const {
+  return _reader.getDataField< ::int32_t>(
+      ::capnp::bounded<9>() * ::capnp::ELEMENTS);
+}
+
+inline  ::int32_t OdTrip::Builder::getOriginLatitude() {
+  return _builder.getDataField< ::int32_t>(
+      ::capnp::bounded<9>() * ::capnp::ELEMENTS);
+}
+inline void OdTrip::Builder::setOriginLatitude( ::int32_t value) {
+  _builder.setDataField< ::int32_t>(
+      ::capnp::bounded<9>() * ::capnp::ELEMENTS, value);
+}
+
 inline  ::int32_t OdTrip::Reader::getOriginLongitude() const {
   return _reader.getDataField< ::int32_t>(
-      ::capnp::bounded<7>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<10>() * ::capnp::ELEMENTS);
 }
 
 inline  ::int32_t OdTrip::Builder::getOriginLongitude() {
   return _builder.getDataField< ::int32_t>(
-      ::capnp::bounded<7>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<10>() * ::capnp::ELEMENTS);
 }
 inline void OdTrip::Builder::setOriginLongitude( ::int32_t value) {
   _builder.setDataField< ::int32_t>(
-      ::capnp::bounded<7>() * ::capnp::ELEMENTS, value);
+      ::capnp::bounded<10>() * ::capnp::ELEMENTS, value);
 }
 
 inline  ::int32_t OdTrip::Reader::getDestinationLatitude() const {
   return _reader.getDataField< ::int32_t>(
-      ::capnp::bounded<8>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<11>() * ::capnp::ELEMENTS);
 }
 
 inline  ::int32_t OdTrip::Builder::getDestinationLatitude() {
   return _builder.getDataField< ::int32_t>(
-      ::capnp::bounded<8>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<11>() * ::capnp::ELEMENTS);
 }
 inline void OdTrip::Builder::setDestinationLatitude( ::int32_t value) {
   _builder.setDataField< ::int32_t>(
-      ::capnp::bounded<8>() * ::capnp::ELEMENTS, value);
+      ::capnp::bounded<11>() * ::capnp::ELEMENTS, value);
 }
 
 inline  ::int32_t OdTrip::Reader::getDestinationLongitude() const {
   return _reader.getDataField< ::int32_t>(
-      ::capnp::bounded<9>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<12>() * ::capnp::ELEMENTS);
 }
 
 inline  ::int32_t OdTrip::Builder::getDestinationLongitude() {
   return _builder.getDataField< ::int32_t>(
-      ::capnp::bounded<9>() * ::capnp::ELEMENTS);
+      ::capnp::bounded<12>() * ::capnp::ELEMENTS);
 }
 inline void OdTrip::Builder::setDestinationLongitude( ::int32_t value) {
   _builder.setDataField< ::int32_t>(
-      ::capnp::bounded<9>() * ::capnp::ELEMENTS, value);
+      ::capnp::bounded<12>() * ::capnp::ELEMENTS, value);
 }
 
 inline bool OdTrip::Reader::hasOriginNodesIdx() const {

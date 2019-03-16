@@ -18,7 +18,7 @@ namespace TrRouting
     std::string type;
 
     const std::string toString() {
-      return "DataSource " + boost::uuids::to_string(uuid) + "\n  name " + name + " (" + type + ")";
+      return "DataSource " + boost::uuids::to_string(uuid) + " name " + name + " type " + type;
     }
 
   };

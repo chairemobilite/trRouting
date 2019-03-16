@@ -13,7 +13,7 @@
 namespace TrRouting
 {
 
-  const std::pair<std::vector<DataSource>, std::map<boost::uuids::uuid, int>> CacheFetcher::getDataSources(std::map<boost::uuids::uuid, int> dataSourceIndexesByUuid, Parameters& params)
+  const std::pair<std::vector<DataSource>, std::map<boost::uuids::uuid, int>> CacheFetcher::getDataSources(Parameters& params)
   { 
 
     using T           = DataSource;

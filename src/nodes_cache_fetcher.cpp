@@ -34,7 +34,7 @@ namespace TrRouting
     if (CacheFetcher::capnpCacheFileExists(cacheFileName, params))
     {
       int fd = open((params.cacheDirectoryPath + params.projectShortname + "/" + cacheFileName + ".capnpbin").c_str(), O_RDWR);
-      ::capnp::PackedFdMessageReader capnpTCollectionMessage(fd, {16 * 1024 * 1024});
+      ::capnp::PackedFdMessageReader capnpTCollectionMessage(fd, {64 * 1024 * 1024});
       TCollection::Reader capnpTCollection = capnpTCollectionMessage.getRoot<TCollection>();
       for (cT::Reader capnpT : capnpTCollection.getNodes())
       {
@@ -48,8 +48,8 @@ namespace TrRouting
         t->name            = capnpT.getName();
         t->stationIdx      = stationUuid.length() > 0 ? stationIndexesByUuid[uuidGenerator(stationUuid)] : -1;
         t->point           = *point;
-        t->point.latitude  = capnpT.getLatitude();
-        t->point.longitude = capnpT.getLongitude();
+        t->point.latitude  = ((double)capnpT.getLatitude())  / 1000000.0;
+        t->point.longitude = ((double)capnpT.getLongitude()) / 1000000.0;
         ts.push_back(*t);
         tIndexesByUuid[t->uuid] = ts.size() - 1;
       }

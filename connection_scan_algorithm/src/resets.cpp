@@ -77,7 +77,7 @@ namespace TrRouting
     {
       if (resetAccessPaths)
       {
-        if(params.odTrip != NULL && params.odTrip->accessFootpathsStartIndex >= 0 && params.odTrip->accessFootpathsEndIndex >= 0 && params.odTrip->accessFootpathsEndIndex >= params.odTrip->accessFootpathsStartIndex)
+        /*if(params.odTrip != NULL && params.odTrip->accessFootpathsStartIndex >= 0 && params.odTrip->accessFootpathsEndIndex >= 0 && params.odTrip->accessFootpathsEndIndex >= params.odTrip->accessFootpathsStartIndex)
         {
           accessFootpaths.assign(odTripFootpaths.begin() + params.odTrip->accessFootpathsStartIndex, odTripFootpaths.begin() + params.odTrip->accessFootpathsEndIndex);
         }
@@ -93,7 +93,7 @@ namespace TrRouting
         else
         {
           accessFootpaths = OsrmFetcher::getAccessibleNodesFootpathsFromPoint(params.origin, nodes, params.accessMode, params);
-        }
+        }*/
       }
 
 
@@ -125,7 +125,7 @@ namespace TrRouting
       if (resetAccessPaths)
       {
         // fetch nodes footpaths accessible to destination using params or osrm fetcher if not provided:
-        if(params.odTrip != NULL && params.odTrip->egressFootpathsStartIndex >= 0 && params.odTrip->egressFootpathsEndIndex >= 0 && params.odTrip->egressFootpathsEndIndex >= params.odTrip->egressFootpathsStartIndex)
+        /*if(params.odTrip != NULL && params.odTrip->egressFootpathsStartIndex >= 0 && params.odTrip->egressFootpathsEndIndex >= 0 && params.odTrip->egressFootpathsEndIndex >= params.odTrip->egressFootpathsStartIndex)
         {
           egressFootpaths.assign(odTripFootpaths.begin() + params.odTrip->egressFootpathsStartIndex, odTripFootpaths.begin() + params.odTrip->egressFootpathsEndIndex);
         }
@@ -142,7 +142,7 @@ namespace TrRouting
         else
         {
           egressFootpaths = OsrmFetcher::getAccessibleNodesFootpathsFromPoint(params.destination, nodes, params.accessMode, params);
-        }
+        }*/
       }
       
       int footpathTravelTimeSeconds;

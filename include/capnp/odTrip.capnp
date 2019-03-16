@@ -13,21 +13,24 @@ struct OdTrip {
   expansionFactor             @5  :Float32;
   departureTimeSeconds        @6  :Int32;
   arrivalTimeSeconds          @7  :Int32;
-  mode                        @8  :Mode;
-  originActivity              @9  :Activity;
-  destinationActivity         @10 :Activity;
-  originLatitude              @11 :Int32; # divide by 1000000 to get float
-  originLongitude             @12 :Int32; # divide by 1000000 to get float
-  destinationLatitude         @13 :Int32; # divide by 1000000 to get float
-  destinationLongitude        @14 :Int32; # divide by 1000000 to get float
-  originNodesIdx              @15 :List(Int32);
-  originNodesTravelTimes      @16 :List(Int32); # seconds
-  originNodesDistances        @17 :List(Int32); # meters
-  destinationNodesIdx         @18 :List(Int32);
-  destinationNodesTravelTimes @19 :List(Int32); # seconds
-  destinationNodesDistances   @20 :List(Int32); # meters
-  internalId                  @21 :Text;
-  data                        @22 :Text; # json
+  walkingTravelTimeSeconds    @8  :Int32;
+  cyclingTravelTimeSeconds    @9  :Int32;
+  drivingTravelTimeSeconds    @10 :Int32;
+  mode                        @11 :Mode;
+  originActivity              @12 :Activity;
+  destinationActivity         @13 :Activity;
+  originLatitude              @14 :Int32; # divide by 1000000 to get float
+  originLongitude             @15 :Int32; # divide by 1000000 to get float
+  destinationLatitude         @16 :Int32; # divide by 1000000 to get float
+  destinationLongitude        @17 :Int32; # divide by 1000000 to get float
+  originNodesIdx              @18 :List(Int32);
+  originNodesTravelTimes      @19 :List(Int32); # seconds
+  originNodesDistances        @20 :List(Int32); # meters
+  destinationNodesIdx         @21 :List(Int32);
+  destinationNodesTravelTimes @22 :List(Int32); # seconds
+  destinationNodesDistances   @23 :List(Int32); # meters
+  internalId                  @24 :Text;
+  data                        @25 :Text; # json
   
   enum Mode {
     none            @0 ;

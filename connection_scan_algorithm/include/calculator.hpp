@@ -38,6 +38,9 @@
 #include "path.hpp"
 #include "stop.hpp"
 #include "data_source.hpp"
+#include "household.hpp"
+#include "person.hpp"
+#include "od_trip.hpp"
 #include "scenario.hpp"
 #include "service.hpp"
 #include "station.hpp"
@@ -82,6 +85,15 @@ namespace TrRouting
     std::vector<DataSource>             dataSources;
     std::map<boost::uuids::uuid, int>   dataSourceIndexesByUuid;
 
+    std::vector<Household>              households;
+    std::map<boost::uuids::uuid, int>   householdIndexesByUuid;
+
+    std::vector<Person>                 persons;
+    std::map<boost::uuids::uuid, int>   personIndexesByUuid;
+
+    std::vector<OdTrip>                 odTrips;
+    std::map<boost::uuids::uuid, int>   odTripIndexesByUuid;
+
     std::vector<Scenario>               scenarios;
     std::map<boost::uuids::uuid, int>   scenarioIndexesByUuid;
 
@@ -114,8 +126,6 @@ namespace TrRouting
 
     Parameters& params;
     CalculationTime algorithmCalculationTime;
-    std::vector<OdTrip>                  odTrips;
-    std::map<unsigned long long, int>    odTripIndexesById;
 
   private:
     

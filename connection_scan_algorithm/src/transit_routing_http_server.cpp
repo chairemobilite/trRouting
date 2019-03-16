@@ -1160,10 +1160,11 @@ int main(int argc, char** argv) {
           atLeastOneCompatiblePeriod = false;
           
           // verify that od trip matches selected attributes:
-          if ( (odTripsAgeGroups.size()   > 0 && std::find(odTripsAgeGroups.begin(), odTripsAgeGroups.end(), odTrip.ageGroup)              == odTripsAgeGroups.end()) 
+          if ( /*(odTripsAgeGroups.size()   > 0 && std::find(odTripsAgeGroups.begin(), odTripsAgeGroups.end(), odTrip.ageGroup)              == odTripsAgeGroups.end()) 
             || (odTripsGenders.size()     > 0 && std::find(odTripsGenders.begin(), odTripsGenders.end(), odTrip.gender)                    == odTripsGenders.end())
-            || (odTripsOccupations.size() > 0 && std::find(odTripsOccupations.begin(), odTripsOccupations.end(), odTrip.occupation)        == odTripsOccupations.end())
-            || (odTripsActivities.size()  > 0 && std::find(odTripsActivities.begin(), odTripsActivities.end(), odTrip.destinationActivity) == odTripsActivities.end())
+            || (odTripsOccupations.size() > 0 && std::find(odTripsOccupations.begin(), odTripsOccupations.end(), odTrip.occupation)        == odTripsOccupations.end())*/
+            /*||*/ 
+               (odTripsActivities.size()  > 0 && std::find(odTripsActivities.begin(), odTripsActivities.end(), odTrip.destinationActivity) == odTripsActivities.end())
             || (odTripsModes.size()       > 0 && std::find(odTripsModes.begin(), odTripsModes.end(), odTrip.mode)                          == odTripsModes.end())
           )
           {
@@ -1247,9 +1248,9 @@ int main(int argc, char** argv) {
               
               if (fileFormat == "csv")
               {
-                ageGroup = odTrip.ageGroup;
-                std::replace( ageGroup.begin(), ageGroup.end(), '-', '_' ); // remove dash so Excel does not convert to age groups to numbers...
-                csv += boost::uuids::to_string(odTrip.uuid) + ",\"" + routingResult.status + "\",\"" + ageGroup + "\",\"" + odTrip.gender + "\",\"" + odTrip.occupation + "\",\"";
+                //ageGroup = odTrip.ageGroup;
+                //std::replace( ageGroup.begin(), ageGroup.end(), '-', '_' ); // remove dash so Excel does not convert to age groups to numbers...
+                csv += boost::uuids::to_string(odTrip.uuid) + ",\"" + routingResult.status + "\",\"" /*+ ageGroup*/ + "\",\"" /*+ odTrip.gender*/ + "\",\"" /*+ odTrip.occupation*/ + "\",\"";
                 csv += odTrip.destinationActivity + "\",\"" + odTrip.mode + "\"," + std::to_string(odTrip.expansionFactor) + "," + std::to_string(routingResult.travelTimeSeconds) + ",";
                 csv += std::to_string(odTrip.walkingTravelTimeSeconds) + "," + std::to_string(odTrip.departureTimeSeconds) + "," + std::to_string(routingResult.departureTimeSeconds) + ",";
                 csv += std::to_string(routingResult.arrivalTimeSeconds) + "," + std::to_string(routingResult.numberOfTransfers) + "," + std::to_string(routingResult.inVehicleTravelTimeSeconds) + ",";
@@ -1330,9 +1331,9 @@ int main(int argc, char** argv) {
                 odTripJson = {};
                 odTripJson["uuid"]                         = odTrip.uuid;
                 odTripJson["status"]                       = routingResult.status;
-                odTripJson["ageGroup"]                     = odTrip.ageGroup;
-                odTripJson["gender"]                       = odTrip.gender;
-                odTripJson["occupation"]                   = odTrip.occupation;
+                //odTripJson["ageGroup"]                     = odTrip.ageGroup;
+                //odTripJson["gender"]                       = odTrip.gender;
+                //odTripJson["occupation"]                   = odTrip.occupation;
                 odTripJson["activity"]                     = odTrip.destinationActivity;
                 odTripJson["mode"]                         = odTrip.mode;
                 odTripJson["expansionFactor"]              = odTrip.expansionFactor;
