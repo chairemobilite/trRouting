@@ -15,8 +15,8 @@ namespace TrRouting
     boost::uuids::uuid uuid;
     unsigned long long id;
     int dataSourceIdx;
-    int personIdx;
     int householdIdx;
+    int personIdx;
     int departureTimeSeconds;
     int arrivalTimeSeconds;
     int walkingTravelTimeSeconds;
@@ -26,6 +26,7 @@ namespace TrRouting
     std::string mode;
     std::string originActivity;
     std::string destinationActivity;
+    std::string internalId;
     std::vector<int> originNodesIdx;
     std::vector<int> originNodesTravelTimesSeconds;
     std::vector<int> originNodesDistancesMeters;

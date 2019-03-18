@@ -53,7 +53,33 @@ namespace TrRouting
           T     * t          = new T();
           t->uuid            = uuidGenerator(uuid);
           t->id              = capnpT.getId();
+          t->expansionFactor = capnpT.getExpansionFactor();
+          t->size            = capnpT.getSize();
+          t->carNumber       = capnpT.getCarNumber();
+          t->incomeLevel     = capnpT.getIncomeLevel();
+          t->internalId      = capnpT.getInternalId();
           t->dataSourceIdx   = dataSourceUuid.length() > 0 ? dataSourceIndexesByUuid[uuidGenerator(dataSourceUuid)] : -1;
+
+          switch (capnpT.getIncomeLevelGroup()) {
+            case household::Household::IncomeLevelGroup::NONE      : t->incomeLevelGroup = "none";     break;
+            case household::Household::IncomeLevelGroup::VERY_LOW  : t->incomeLevelGroup = "veryLow";  break;
+            case household::Household::IncomeLevelGroup::LOW       : t->incomeLevelGroup = "low";      break;
+            case household::Household::IncomeLevelGroup::MEDIUM    : t->incomeLevelGroup = "medium";   break;
+            case household::Household::IncomeLevelGroup::HIGH      : t->incomeLevelGroup = "high";     break;
+            case household::Household::IncomeLevelGroup::VERY_HIGH : t->incomeLevelGroup = "veryHigh"; break;
+            case household::Household::IncomeLevelGroup::UNKNOWN   : t->incomeLevelGroup = "unknown";  break;
+          }
+
+          switch (capnpT.getCategory()) {
+            case household::Household::Category::NONE                : t->category = "none";               break;
+            case household::Household::Category::SINGLE_PERSON       : t->category = "singlePerson";       break;
+            case household::Household::Category::COUPLE              : t->category = "couple";             break;
+            case household::Household::Category::MONOPARENTAL_FAMILY : t->category = "monoparentalFamily"; break;
+            case household::Household::Category::BIPARENTAL_FAMILY   : t->category = "biparentalFamily";   break;
+            case household::Household::Category::OTHER               : t->category = "other";              break;
+            case household::Household::Category::UNKNOWN             : t->category = "unknown";            break;
+          }
+          
           t->point           = *point;
           t->point.latitude  = ((double)capnpT.getHomeLatitude())  / 1000000.0;
           t->point.longitude = ((double)capnpT.getHomeLongitude()) / 1000000.0;
