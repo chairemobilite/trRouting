@@ -1401,7 +1401,7 @@ int main(int argc, char** argv) {
               //{
               //  pathsOdTripsProfilesOdTripUuids.push_back()
               //}
-              pathsOdTripsProfilesSequenceJson[std::to_string(sequenceProfile.first)] = {{"demand", std::get<0>(sequenceProfile.second)}, {"odTripUuids", std::get<1>(sequenceProfile.second)}};
+              pathsOdTripsProfilesSequenceJson[std::to_string(sequenceProfile.first)] = {{"demand", std::get<0>(sequenceProfile.second)}, {"odTripUuids", Toolbox::uuidsToStrings(std::get<1>(sequenceProfile.second))}};
             }
             pathsOdTripsProfilesJson[boost::uuids::to_string(pathProfile.first)] = pathsOdTripsProfilesSequenceJson;
           }
