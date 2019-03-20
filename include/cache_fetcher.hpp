@@ -65,9 +65,9 @@ namespace TrRouting
     template<class T>
     static void saveToCapnpCacheFile(T& data, std::string cacheFilePath, Parameters& params) {
       std::ofstream oCacheFile;
-      oCacheFile.open(params.cacheDirectoryPath + params.projectShortname + "/" + cacheFilePath + ".capnpbin", std::ios::out | std::ios::trunc | std::ios::binary);
+      oCacheFile.open(params.cacheDirectoryPath + params.projectShortname + "/" + cacheFilePath, std::ios::out | std::ios::trunc | std::ios::binary);
       oCacheFile.close();
-      int fd = open((params.projectShortname + "/" + cacheFilePath + ".capnpbin").c_str(), O_WRONLY);
+      int fd = open((params.cacheDirectoryPath + params.projectShortname + "/" + cacheFilePath).c_str(), O_WRONLY);
       ::capnp::writePackedMessageToFd(fd, data);
       close(fd);
     }
@@ -75,7 +75,7 @@ namespace TrRouting
     static bool capnpCacheFileExists(std::string cacheFilePath, Parameters& params) {
       std::ifstream iCacheFile;
       bool notEmpty = false;
-      iCacheFile.open(params.cacheDirectoryPath + params.projectShortname + "/" + cacheFilePath + ".capnpbin", std::ios::in | std::ios::binary | std::ios::ate);
+      iCacheFile.open(params.cacheDirectoryPath + params.projectShortname + "/" + cacheFilePath, std::ios::in | std::ios::binary | std::ios::ate);
       notEmpty = iCacheFile.tellg() > 0;
       iCacheFile.close();
       return notEmpty;
@@ -84,7 +84,7 @@ namespace TrRouting
     static int getCacheFilesCount(std::string cacheFilePath, Parameters& params) {
       std::ifstream iCacheFile;
       bool notEmpty = false;
-      iCacheFile.open(params.cacheDirectoryPath + params.projectShortname + "/" + cacheFilePath + ".count", std::ios::in | std::ios::binary | std::ios::ate);
+      iCacheFile.open(params.cacheDirectoryPath + params.projectShortname + "/" + cacheFilePath, std::ios::in | std::ios::binary | std::ios::ate);
       int count {1};
       notEmpty = iCacheFile.tellg() > 0;
       if (notEmpty)

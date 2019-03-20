@@ -40,7 +40,7 @@ namespace TrRouting
     for (auto & line : lines)
     {
       cacheFileName = "lines/line_" + boost::uuids::to_string(line.uuid);
-      if (CacheFetcher::capnpCacheFileExists(cacheFileName, params))
+      if (CacheFetcher::capnpCacheFileExists(cacheFileName + ".capnpbin", params))
       {
         int fd = open((params.cacheDirectoryPath + params.projectShortname + "/" + cacheFileName + ".capnpbin").c_str(), O_RDWR);
         ::capnp::PackedFdMessageReader capnpLineMessage(fd, {32 * 1024 * 1024});

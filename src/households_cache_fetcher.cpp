@@ -38,13 +38,13 @@ namespace TrRouting
 
       std::string cacheFilePath {params.cacheDirectoryPath + params.projectShortname + "/dataSources/" + boost::uuids::to_string(dataSourceUuid) + "/households/" + cacheFileName};
 
-      int filesCount {CacheFetcher::getCacheFilesCount(cacheFilePath, params)};
+      int filesCount {CacheFetcher::getCacheFilesCount(cacheFilePath + ".capnpbin.count", params)};
 
       for (int i = 0; i < filesCount; i++)
       {
         std::string filePath {cacheFilePath + ".capnpbin" + (filesCount > 1 ? std::to_string(i) : "")};
 
-        if (CacheFetcher::capnpCacheFileExists(cacheFileName, params))
+        if (CacheFetcher::capnpCacheFileExists(filePath, params))
         {
           int fd = open((filePath).c_str(), O_RDWR);
           ::capnp::PackedFdMessageReader capnpTCollectionMessage(fd, {64 * 1024 * 1024});

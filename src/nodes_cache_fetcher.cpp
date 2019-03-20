@@ -31,7 +31,7 @@ namespace TrRouting
     boost::uuids::string_generator uuidGenerator;
 
     std::cout << "Fetching " << tStr << " from cache..." << std::endl;
-    if (CacheFetcher::capnpCacheFileExists(cacheFileName, params))
+    if (CacheFetcher::capnpCacheFileExists(cacheFileName + ".capnpbin", params))
     {
       int fd = open((params.cacheDirectoryPath + params.projectShortname + "/" + cacheFileName + ".capnpbin").c_str(), O_RDWR);
       ::capnp::PackedFdMessageReader capnpTCollectionMessage(fd, {64 * 1024 * 1024});
@@ -82,7 +82,7 @@ namespace TrRouting
     for (auto & node : nodes)
     {
       cacheFileName = "nodes/node_" + boost::uuids::to_string(node.uuid);
-      if (CacheFetcher::capnpCacheFileExists(cacheFileName, params))
+      if (CacheFetcher::capnpCacheFileExists(cacheFileName + ".capnpbin", params))
       {
         int fd = open((params.cacheDirectoryPath + params.projectShortname + "/" + cacheFileName + ".capnpbin").c_str(), O_RDWR);
         ::capnp::PackedFdMessageReader capnpTMessage(fd, {32 * 1024 * 1024});
