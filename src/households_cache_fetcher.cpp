@@ -36,17 +36,19 @@ namespace TrRouting
     {
       boost::uuids::uuid dataSourceUuid = iter->first;
 
-      std::string cacheFilePath {params.cacheDirectoryPath + params.projectShortname + "/dataSources/" + boost::uuids::to_string(dataSourceUuid) + "/households/" + cacheFileName};
+      std::string cacheFilePath {"dataSources/" + boost::uuids::to_string(dataSourceUuid) + "/households/" + cacheFileName};
 
       int filesCount {CacheFetcher::getCacheFilesCount(cacheFilePath + ".capnpbin.count", params)};
 
+      std::cout << "files count households: " << filesCount << " path: " << cacheFilePath << std::endl;
+
       for (int i = 0; i < filesCount; i++)
       {
-        std::string filePath {cacheFilePath + ".capnpbin" + (filesCount > 1 ? std::to_string(i) : "")};
+        std::string filePath {cacheFilePath + ".capnpbin" + (filesCount > 1 ? "." + std::to_string(i) : "")};
 
         if (CacheFetcher::capnpCacheFileExists(filePath, params))
         {
-          int fd = open((filePath).c_str(), O_RDWR);
+          int fd = open((CacheFetcher::getFilePath(filePath, params)).c_str(), O_RDWR);
           ::capnp::PackedFdMessageReader capnpTCollectionMessage(fd, {64 * 1024 * 1024});
           TCollection::Reader capnpTCollection = capnpTCollectionMessage.getRoot<TCollection>();
           for (cT::Reader capnpT : capnpTCollection.getHouseholds())

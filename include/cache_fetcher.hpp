@@ -63,38 +63,11 @@ namespace TrRouting
     }
     
     template<class T>
-    static void saveToCapnpCacheFile(T& data, std::string cacheFilePath, Parameters& params) {
-      std::ofstream oCacheFile;
-      oCacheFile.open(params.cacheDirectoryPath + params.projectShortname + "/" + cacheFilePath, std::ios::out | std::ios::trunc | std::ios::binary);
-      oCacheFile.close();
-      int fd = open((params.cacheDirectoryPath + params.projectShortname + "/" + cacheFilePath).c_str(), O_WRONLY);
-      ::capnp::writePackedMessageToFd(fd, data);
-      close(fd);
-    }
+    static void saveToCapnpCacheFile(T& data, std::string cacheFilePath, Parameters& params);
   
-    static bool capnpCacheFileExists(std::string cacheFilePath, Parameters& params) {
-      std::ifstream iCacheFile;
-      bool notEmpty = false;
-      iCacheFile.open(params.cacheDirectoryPath + params.projectShortname + "/" + cacheFilePath, std::ios::in | std::ios::binary | std::ios::ate);
-      notEmpty = iCacheFile.tellg() > 0;
-      iCacheFile.close();
-      return notEmpty;
-    }
-
-    static int getCacheFilesCount(std::string cacheFilePath, Parameters& params) {
-      std::ifstream iCacheFile;
-      bool notEmpty = false;
-      iCacheFile.open(params.cacheDirectoryPath + params.projectShortname + "/" + cacheFilePath, std::ios::in | std::ios::binary | std::ios::ate);
-      int count {1};
-      notEmpty = iCacheFile.tellg() > 0;
-      if (notEmpty)
-      {
-        iCacheFile >> count;
-        std::cout << cacheFilePath << " has " << count << " cache files" << std::endl;
-      }
-      iCacheFile.close();
-      return count;
-    }
+    static bool capnpCacheFileExists(std::string cacheFilePath, Parameters& params);
+    static int getCacheFilesCount(std::string cacheFilePath, Parameters& params);
+    static std::string getFilePath(std::string cacheFilePath, Parameters& params);
     
     const std::pair<std::vector<Mode>      , std::map<std::string       , int>> getModes();
     const std::pair<std::vector<Service>   , std::map<boost::uuids::uuid, int>> getServices(Parameters& params);

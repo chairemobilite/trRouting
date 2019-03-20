@@ -31,9 +31,10 @@ namespace TrRouting
     boost::uuids::string_generator uuidGenerator;
 
     std::cout << "Fetching " << tStr << " from cache..." << std::endl;
+    
     if (CacheFetcher::capnpCacheFileExists(cacheFileName + ".capnpbin", params))
     {
-      int fd = open((params.cacheDirectoryPath + params.projectShortname + "/" + cacheFileName + ".capnpbin").c_str(), O_RDWR);
+      int fd = open((CacheFetcher::getFilePath(cacheFileName, params) + ".capnpbin").c_str(), O_RDWR);
       ::capnp::PackedFdMessageReader capnpTCollectionMessage(fd, {64 * 1024 * 1024});
       TCollection::Reader capnpTCollection = capnpTCollectionMessage.getRoot<TCollection>();
       for (cT::Reader capnpT : capnpTCollection.getNodes())
@@ -84,7 +85,7 @@ namespace TrRouting
       cacheFileName = "nodes/node_" + boost::uuids::to_string(node.uuid);
       if (CacheFetcher::capnpCacheFileExists(cacheFileName + ".capnpbin", params))
       {
-        int fd = open((params.cacheDirectoryPath + params.projectShortname + "/" + cacheFileName + ".capnpbin").c_str(), O_RDWR);
+        int fd = open((CacheFetcher::getFilePath(cacheFileName, params) + ".capnpbin").c_str(), O_RDWR);
         ::capnp::PackedFdMessageReader capnpTMessage(fd, {32 * 1024 * 1024});
         cT::Reader capnpT = capnpTMessage.getRoot<cT>();
         const unsigned int transferableNodesCount {capnpT.getTransferableNodesIdx().size()};
