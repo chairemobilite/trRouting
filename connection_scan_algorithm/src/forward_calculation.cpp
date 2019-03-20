@@ -5,10 +5,15 @@ namespace TrRouting
     
   std::tuple<int,int,int> Calculator::forwardCalculation()
   {
+
+    int benchmarkingStart = algorithmCalculationTime.getEpoch();
+
     int  i {0};
     int  connectionsCount = forwardConnections.size();
     int  reachableConnectionsCount {0};
     int  tripIndex {-1};
+    int  lineIndex {-1};
+    int  blockIndex {-1};
     int  nodeDepartureIndex {-1};
     int  nodeArrivalIndex {-1};
     int  tripEnterConnectionIndex {-1};
@@ -22,6 +27,7 @@ namespace TrRouting
     int  footpathTravelTime {-1};
     int  tentativeEgressNodeArrivalTime {MAX_INT};
     bool reachedAtLeastOneEgressNode {false};
+    bool canTransferOnSameLine {false};
     int  bestEgressNodeIndex {-1};
     int  bestEgressTravelTime {-1};
     int  bestArrivalTime {MAX_INT};
@@ -34,13 +40,14 @@ namespace TrRouting
       // ignore connections before departure time + minimum access travel time:
       if (std::get<connectionIndexes::TIME_DEP>(connection) >= departureTimeSeconds + minAccessTravelTime)
       {
-        tripIndex = std::get<connectionIndexes::TRIP>(connection);
         
+        tripIndex = std::get<connectionIndexes::TRIP>(connection);
+
         // enabled trips only here:
         if (tripsEnabled[tripIndex] != -1)
         {
           connectionDepartureTime = std::get<connectionIndexes::TIME_DEP>(connection);
-          
+
           // no need to parse next connections if already reached destination from all egress nodes:
           if ( (!params.returnAllNodesResult && reachedAtLeastOneEgressNode && maxEgressTravelTime >= 0 && tentativeEgressNodeArrivalTime < MAX_INT && connectionDepartureTime > tentativeEgressNodeArrivalTime + maxEgressTravelTime) || (connectionDepartureTime - departureTimeSeconds > params.maxTotalTravelTimeSeconds))
           {
@@ -54,6 +61,11 @@ namespace TrRouting
           if (tripEnterConnectionIndex != -1 || nodeDepartureTentativeTime <= connectionDepartureTime)
           {
             
+            /* Difficult to deal with blocks and no transfer between same line in CSA algorithm! */
+            /*lineIndex             = std::get<connectionIndexes::LINE>(connection);
+            canTransferOnSameLine = std::get<connectionIndexes::CAN_TRANSFER_SAME_LINE>(connection);
+            blockIndex            = std::get<connectionIndexes::BLOCK>(connection);*/
+
             // TODO: add constrain for sameLineTransfer (check trip allowSameLineTransfers)
             if (std::get<connectionIndexes::CAN_BOARD>(connection) == 1 && (tripEnterConnectionIndex == -1 || (std::get<0>(forwardJourneys[nodeDepartureIndex]) == -1 && std::get<4>(forwardJourneys[nodeDepartureIndex]) >= 0 && std::get<4>(forwardJourneys[nodeDepartureIndex]) < tripsEnterConnectionTransferTravelTime[tripIndex])))
             {
@@ -132,10 +144,13 @@ namespace TrRouting
         }
         i++;
       }
+
+      benchmarking["forward_calculation"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
       return std::make_tuple(bestArrivalTime, bestEgressNodeIndex, bestEgressTravelTime);
     }
     else
     {
+      benchmarking["forward_calculation"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
       return std::make_tuple(MAX_INT, -1, -1);
     }
 

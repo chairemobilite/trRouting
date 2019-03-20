@@ -6,6 +6,9 @@ namespace TrRouting
 
   RoutingResult Calculator::reverseJourney(int bestDepartureTime, int bestAccessNodeIndex, int bestAccessTravelTime)
   {
+  
+    int benchmarkingStart = algorithmCalculationTime.getEpoch();
+
     RoutingResult    result;
     nlohmann::json   json;
     int              nodesCount           {1};
@@ -33,8 +36,8 @@ namespace TrRouting
       std::deque<std::tuple<int,int,int,int,int,short>> journey;
       std::tuple<int,int,int,int,int,short>             resultingNodeJourneyStep;
       std::tuple<int,int,int,int,int,short>             emptyJourneyStep {-1,-1,-1,-1,-1,-1};
-      std::tuple<int,int,int,int,int,short,short,int>   journeyStepEnterConnection; // connection tuple: departureNodeIndex, arrivalNodeIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequenceinTrip
-      std::tuple<int,int,int,int,int,short,short,int>   journeyStepExitConnection;
+      std::tuple<int,int,int,int,int,short,short,int,int,int,short>   journeyStepEnterConnection; // connection tuple: departureNodeIndex, arrivalNodeIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequenceinTrip
+      std::tuple<int,int,int,int,int,short,short,int,int,int,short>   journeyStepExitConnection;
       std::vector<boost::uuids::uuid>                   lineUuids;
       std::vector<int>                                  linesIdx;
       std::vector<std::string>                          modeShortnames;
@@ -402,6 +405,8 @@ namespace TrRouting
     }
 
     result.json = json.dump(2); // number of spaces in indent for human readable json, use dump() to put all json content on the same line
+    
+    benchmarking["reverse_journey"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
     return result;
   }
 

@@ -3,9 +3,11 @@
 namespace TrRouting
 {
   
-  void Calculator::reset(bool resetAccessPaths)
+  void Calculator::reset(bool resetAccessPaths, bool resetFilters)
   {
     
+    int benchmarkingStart = algorithmCalculationTime.getEpoch();
+
     calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
     
     std::fill(nodesTentativeTime.begin(),        nodesTentativeTime.end(),   MAX_INT);
@@ -31,6 +33,9 @@ namespace TrRouting
     std::fill(reverseJourneys.begin(),       reverseJourneys.end(),       std::make_tuple(-1,-1,-1,-1,-1,-1));
     std::fill(reverseAccessJourneys.begin(), reverseAccessJourneys.end(), std::make_tuple(-1,-1,-1,-1,-1,-1));
     
+    benchmarking["reset_1"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
+    benchmarkingStart = algorithmCalculationTime.getEpoch();
+
     departureTimeSeconds = -1;
     arrivalTimeSeconds   = -1;
     
@@ -56,7 +61,8 @@ namespace TrRouting
     }
 
 
-
+    benchmarking["reset_2"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
+    benchmarkingStart = algorithmCalculationTime.getEpoch();
 
 
     if (params.debugDisplay)
@@ -77,9 +83,14 @@ namespace TrRouting
     {
       if (resetAccessPaths)
       {
-        /*if(params.odTrip != NULL && params.odTrip->accessFootpathsStartIndex >= 0 && params.odTrip->accessFootpathsEndIndex >= 0 && params.odTrip->accessFootpathsEndIndex >= params.odTrip->accessFootpathsStartIndex)
+        if(params.odTrip != NULL && params.odTrip->originNodesIdx.size() > 0)
         {
-          accessFootpaths.assign(odTripFootpaths.begin() + params.odTrip->accessFootpathsStartIndex, odTripFootpaths.begin() + params.odTrip->accessFootpathsEndIndex);
+          i = 0;
+          for (auto & accessNodeIdx : params.odTrip->originNodesIdx)
+          {
+            accessFootpaths.push_back(std::make_pair(accessNodeIdx, params.odTrip->originNodesTravelTimesSeconds[i]));
+            i++;
+          }
         }
         else if (params.accessNodesIdx.size() > 0 && params.accessNodeTravelTimesSeconds.size() == params.accessNodesIdx.size())
         {
@@ -93,7 +104,7 @@ namespace TrRouting
         else
         {
           accessFootpaths = OsrmFetcher::getAccessibleNodesFootpathsFromPoint(params.origin, nodes, params.accessMode, params);
-        }*/
+        }
       }
 
 
@@ -117,7 +128,8 @@ namespace TrRouting
       }
     }
   
-  
+    benchmarking["reset_3"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
+    benchmarkingStart = algorithmCalculationTime.getEpoch();
   
   
     if (!params.returnAllNodesResult || arrivalTimeSeconds >= -1)
@@ -125,9 +137,14 @@ namespace TrRouting
       if (resetAccessPaths)
       {
         // fetch nodes footpaths accessible to destination using params or osrm fetcher if not provided:
-        /*if(params.odTrip != NULL && params.odTrip->egressFootpathsStartIndex >= 0 && params.odTrip->egressFootpathsEndIndex >= 0 && params.odTrip->egressFootpathsEndIndex >= params.odTrip->egressFootpathsStartIndex)
+        if(params.odTrip != NULL && params.odTrip->destinationNodesIdx.size() > 0)
         {
-          egressFootpaths.assign(odTripFootpaths.begin() + params.odTrip->egressFootpathsStartIndex, odTripFootpaths.begin() + params.odTrip->egressFootpathsEndIndex);
+          i = 0;
+          for (auto & egressNodeIdx : params.odTrip->destinationNodesIdx)
+          {
+            egressFootpaths.push_back(std::make_pair(egressNodeIdx, params.odTrip->destinationNodesTravelTimesSeconds[i]));
+            i++;
+          }
         }
         else if (params.egressNodesIdx.size() > 0 && params.egressNodeTravelTimesSeconds.size() == params.egressNodesIdx.size())
         {
@@ -142,7 +159,7 @@ namespace TrRouting
         else
         {
           egressFootpaths = OsrmFetcher::getAccessibleNodesFootpathsFromPoint(params.destination, nodes, params.accessMode, params);
-        }*/
+        }
       }
       
       int footpathTravelTimeSeconds;
@@ -168,8 +185,8 @@ namespace TrRouting
     
     //std::cerr << "-- maxEgressTravelTime = " << maxEgressTravelTime << std::endl;
 
-
-
+    benchmarking["reset_4"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
+    benchmarkingStart = algorithmCalculationTime.getEpoch();
 
 
     if (params.debugDisplay)
@@ -183,77 +200,83 @@ namespace TrRouting
 
     // disable trips according to parameters:
     i = 0;
-    for (auto & trip : trips)
+
+    if (resetFilters)
     {
-      if (params.onlyServicesIdx.size() > 0)
+      for (auto & trip : trips)
       {
-        if (std::find(params.onlyServicesIdx.begin(), params.onlyServicesIdx.end(), trip.serviceIdx) == params.onlyServicesIdx.end())
+        if (tripsEnabled[i] == 1 && params.onlyServicesIdx.size() > 0)
         {
-          tripsEnabled[i] = -1;
+          if (std::find(params.onlyServicesIdx.begin(), params.onlyServicesIdx.end(), trip.serviceIdx) == params.onlyServicesIdx.end())
+          {
+            tripsEnabled[i] = -1;
+          }
         }
-      }
-      
-      if (params.onlyLinesIdx.size() > 0)
-      {
-        if (std::find(params.onlyLinesIdx.begin(), params.onlyLinesIdx.end(), trip.lineIdx) == params.onlyLinesIdx.end())
+
+        if (tripsEnabled[i] == 1 && params.onlyLinesIdx.size() > 0)
         {
-          tripsEnabled[i] = -1;
+          if (std::find(params.onlyLinesIdx.begin(), params.onlyLinesIdx.end(), trip.lineIdx) == params.onlyLinesIdx.end())
+          {
+            tripsEnabled[i] = -1;
+          }
         }
-      }
-      
-      if (params.onlyModesIdx.size() > 0)
-      {
-        if (std::find(params.onlyModesIdx.begin(), params.onlyModesIdx.end(), trip.modeIdx) == params.onlyModesIdx.end())
+
+        if (tripsEnabled[i] == 1 && params.onlyModesIdx.size() > 0)
         {
-          tripsEnabled[i] = -1;
+          if (std::find(params.onlyModesIdx.begin(), params.onlyModesIdx.end(), trip.modeIdx) == params.onlyModesIdx.end())
+          {
+            tripsEnabled[i] = -1;
+          }
         }
-      }
-      
-      if (params.onlyAgenciesIdx.size() > 0)
-      {
-        if (std::find(params.onlyAgenciesIdx.begin(), params.onlyAgenciesIdx.end(), trip.agencyIdx) == params.onlyAgenciesIdx.end())
+
+        if (tripsEnabled[i] == 1 && params.onlyAgenciesIdx.size() > 0)
         {
-          tripsEnabled[i] = -1;
+          if (std::find(params.onlyAgenciesIdx.begin(), params.onlyAgenciesIdx.end(), trip.agencyIdx) == params.onlyAgenciesIdx.end())
+          {
+            tripsEnabled[i] = -1;
+          }
         }
-      }
-      
-      
-      
-      if (params.exceptServicesIdx.size() > 0)
-      {
-        if (std::find(params.exceptServicesIdx.begin(), params.exceptServicesIdx.end(), trip.serviceIdx) != params.exceptServicesIdx.end())
+
+        if (tripsEnabled[i] == 1 && params.exceptServicesIdx.size() > 0)
         {
-          tripsEnabled[i] = -1;
+          if (std::find(params.exceptServicesIdx.begin(), params.exceptServicesIdx.end(), trip.serviceIdx) != params.exceptServicesIdx.end())
+          {
+            tripsEnabled[i] = -1;
+          }
         }
-      }
-      
-      if (params.exceptLinesIdx.size() > 0)
-      {
-        if (std::find(params.exceptLinesIdx.begin(), params.exceptLinesIdx.end(), trip.lineIdx) != params.exceptLinesIdx.end())
+
+        if (tripsEnabled[i] == 1 && params.exceptLinesIdx.size() > 0)
         {
-          tripsEnabled[i] = -1;
+          if (std::find(params.exceptLinesIdx.begin(), params.exceptLinesIdx.end(), trip.lineIdx) != params.exceptLinesIdx.end())
+          {
+            tripsEnabled[i] = -1;
+          }
         }
-      }
-      
-      if (params.exceptModesIdx.size() > 0)
-      {
-        if (std::find(params.exceptModesIdx.begin(), params.exceptModesIdx.end(), trip.modeIdx) != params.exceptModesIdx.end())
+
+        if (tripsEnabled[i] == 1 && params.exceptModesIdx.size() > 0)
         {
-          tripsEnabled[i] = -1;
+          if (std::find(params.exceptModesIdx.begin(), params.exceptModesIdx.end(), trip.modeIdx) != params.exceptModesIdx.end())
+          {
+            tripsEnabled[i] = -1;
+          }
         }
-      }
-      
-      if (params.exceptAgenciesIdx.size() > 0)
-      {
-        if (std::find(params.exceptAgenciesIdx.begin(), params.exceptAgenciesIdx.end(), trip.agencyIdx) != params.exceptAgenciesIdx.end())
+
+        if (tripsEnabled[i] == 1 && params.exceptAgenciesIdx.size() > 0)
         {
-          tripsEnabled[i] = -1;
+          if (std::find(params.exceptAgenciesIdx.begin(), params.exceptAgenciesIdx.end(), trip.agencyIdx) != params.exceptAgenciesIdx.end())
+          {
+            tripsEnabled[i] = -1;
+          }
         }
+
+        i++;
       }
-      
-      i++;
     }
+
     
+    
+    benchmarking["reset_5"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
+    benchmarkingStart = algorithmCalculationTime.getEpoch();
 
 
 
@@ -262,7 +285,7 @@ namespace TrRouting
       std::cerr << "-- filter trips -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
     calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
 
-
+    //benchmarking["reset"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
 
 
 

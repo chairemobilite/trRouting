@@ -21,11 +21,11 @@ struct Person {
   usualSchoolPlaceLatitude         @13 :Int32; # divide by 1000000 to get float
   usualSchoolPlaceLongitude        @14 :Int32; # divide by 1000000 to get float
   usualWorkPlaceNodesIdx           @15 :List(Int32);
-  usualWorkPlaceNodesTravelTimes   @16 :List(Int32); # seconds
-  usualWorkPlaceNodesDistances     @17 :List(Int32); # meters
+  usualWorkPlaceNodesTravelTimes   @16 :List(Int16); # seconds
+  usualWorkPlaceNodesDistances     @17 :List(Int16); # meters
   usualSchoolPlaceNodesIdx         @18 :List(Int32);
-  usualSchoolPlaceNodesTravelTimes @19 :List(Int32); # seconds
-  usualSchoolPlaceNodesDistances   @20 :List(Int32); # meters
+  usualSchoolPlaceNodesTravelTimes @19 :List(Int16); # seconds
+  usualSchoolPlaceNodesDistances   @20 :List(Int16); # meters
   internalId                       @21 :Text;
   data                             @22 :Text; # json
 

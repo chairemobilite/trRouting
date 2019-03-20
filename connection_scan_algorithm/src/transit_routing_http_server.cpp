@@ -203,7 +203,20 @@ int main(int argc, char** argv) {
   server.resource["^/route/v1/transit[/]?\\?([0-9a-zA-Z&=_,:/.-]+)$"]["GET"]=[&server, &calculator](std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request) {
     
     calculator.algorithmCalculationTime.start();
-    
+    calculator.benchmarking.clear();
+
+    calculator.benchmarking["reset_1"]             = 0;
+    calculator.benchmarking["reset_2"]             = 0;
+    calculator.benchmarking["reset_3"]             = 0;
+    calculator.benchmarking["reset_4"]             = 0;
+    calculator.benchmarking["reset_5"]             = 0;
+    calculator.benchmarking["forward_calculation"] = 0;
+    calculator.benchmarking["forward_journey"]     = 0;
+    calculator.benchmarking["reverse_calculation"] = 0;
+    calculator.benchmarking["reverse_journey"]     = 0;
+    calculator.benchmarking["generating_results"]  = 0;
+    int countOdTripsCalculated {0};
+
     //calculator.algorithmCalculationTime.startStep();
     
     std::cout << "calculating request..." << std::endl;
@@ -472,10 +485,6 @@ int main(int argc, char** argv) {
           for(std::string odTripsAgeGroup : odTripsAgeGroupsVector)
           {
             odTripsAgeGroups.push_back(odTripsAgeGroup);
-            if (odTripsAgeGroup.find("plus") != std::string::npos) // replace plus by + (+ cannot be used in query string)
-            {
-              odTripsAgeGroups.push_back(boost::replace_all_copy(odTripsAgeGroup, "plus","+"));
-            }
           }
           //calculator.params.odTripsAgeGroups = odTripsAgeGroups;
         }
@@ -882,7 +891,7 @@ int main(int argc, char** argv) {
           calculator.params.origin      = odTrip.origin;
           calculator.params.destination = odTrip.destination;
           calculator.params.odTrip      = &odTrip;
-          json["odTripUuid"] = odTrip.uuid;
+          json["odTripUuid"] = boost::uuids::to_string(odTrip.uuid);
         }
         
         json["alternatives"] = nlohmann::json::array();
@@ -1002,7 +1011,7 @@ int main(int argc, char** argv) {
               //  std::cout << calculator.lines[calculator.lineIndexesByUuid[lineUuid]].shortname << " ";
               //}
               //std::cout << std::endl;
-              routingResult = calculator.calculate(false);
+              routingResult = calculator.calculate(false, false);
               
               if (routingResult.status == "success")
               {
@@ -1135,7 +1144,7 @@ int main(int argc, char** argv) {
         if (fileFormat == "csv" && batchNumber == 1) // write header only on first batch, so we can easily append subsequent batches to the same csv file
         {
           // write csv header:
-          csv += "uuid,status,ageGroup,gender,occupation,activity,mode,expansionFactor,travelTimeSeconds,onlyWalkingTravelTimeSeconds,"
+          csv += "uuid,status,ageGroup,gender,occupation,destinationActivity,mode,expansionFactor,travelTimeSeconds,onlyWalkingTravelTimeSeconds,"
                  "declaredDepartureTimeSeconds,departureTimeSeconds,arrivalTimeSeconds,numberOfTransfers,inVehicleTravelTimeSeconds,"
                  "transferTravelTimeSeconds,waitingTimeSeconds,accessTravelTimeSeconds,egressTravelTimeSeconds,transferWaitingTimeSeconds,"
                  "firstWaitingTimeSeconds,nonTransitTravelTimeSeconds,lineUuids,modeShortnames,agencyUuids,boardingNodeUuids,unboardingNodeUuids,tripUuids\n";
@@ -1145,8 +1154,9 @@ int main(int argc, char** argv) {
           json["odTrips"] = nlohmann::json::array();
         }
                 
-        int i = 0;
-        int j = 0;
+        int i {0};
+        int j {0};
+        bool resetFilters {true};
         for (auto & odTrip : calculator.odTrips)
         {
           
@@ -1160,12 +1170,11 @@ int main(int argc, char** argv) {
           atLeastOneCompatiblePeriod = false;
           
           // verify that od trip matches selected attributes:
-          if ( /*(odTripsAgeGroups.size()   > 0 && std::find(odTripsAgeGroups.begin(), odTripsAgeGroups.end(), odTrip.ageGroup)              == odTripsAgeGroups.end()) 
-            || (odTripsGenders.size()     > 0 && std::find(odTripsGenders.begin(), odTripsGenders.end(), odTrip.gender)                    == odTripsGenders.end())
-            || (odTripsOccupations.size() > 0 && std::find(odTripsOccupations.begin(), odTripsOccupations.end(), odTrip.occupation)        == odTripsOccupations.end())*/
-            /*||*/ 
-               (odTripsActivities.size()  > 0 && std::find(odTripsActivities.begin(), odTripsActivities.end(), odTrip.destinationActivity) == odTripsActivities.end())
-            || (odTripsModes.size()       > 0 && std::find(odTripsModes.begin(), odTripsModes.end(), odTrip.mode)                          == odTripsModes.end())
+          if ( (odTripsAgeGroups.size()   > 0 && std::find(odTripsAgeGroups.begin(), odTripsAgeGroups.end(), calculator.persons[odTrip.personIdx].ageGroup)       == odTripsAgeGroups.end()) 
+            || (odTripsGenders.size()     > 0 && std::find(odTripsGenders.begin(), odTripsGenders.end(), calculator.persons[odTrip.personIdx].gender)             == odTripsGenders.end())
+            || (odTripsOccupations.size() > 0 && std::find(odTripsOccupations.begin(), odTripsOccupations.end(), calculator.persons[odTrip.personIdx].occupation) == odTripsOccupations.end())
+            || (odTripsActivities.size()  > 0 && std::find(odTripsActivities.begin(), odTripsActivities.end(), odTrip.destinationActivity)                        == odTripsActivities.end())
+            || (odTripsModes.size()       > 0 && std::find(odTripsModes.begin(), odTripsModes.end(), odTrip.mode)                                                 == odTripsModes.end())
           )
           {
             attributesMatches = false;
@@ -1180,14 +1189,17 @@ int main(int argc, char** argv) {
             }
           }
           
-          if (attributesMatches && (atLeastOneCompatiblePeriod || odTripsPeriods.size() == 0) && (odTripUuid.is_initialized() || odTripUuid == odTrip.uuid) )
+          if (attributesMatches && (atLeastOneCompatiblePeriod || odTripsPeriods.size() == 0) && (!odTripUuid.is_initialized() || odTripUuid == odTrip.uuid) )
           {
             std::cout << "od trip uuid " << odTrip.uuid << " (" << (i+1) << "/" << odTripsCount << ")" << std::endl;// << " dts: " << odTrip.departureTimeSeconds << " atLeastOneCompatiblePeriod: " << (atLeastOneCompatiblePeriod ? "true " : "false ") << "attributesMatches: " << (attributesMatches ? "true " : "false ") << std::endl;
             
-            calculator.params.origin = odTrip.origin;
+            calculator.params.origin      = odTrip.origin;
             calculator.params.destination = odTrip.destination;
-            calculator.params.odTrip = &odTrip;
-            routingResult = calculator.calculate();
+            calculator.params.odTrip      = &odTrip;
+            routingResult = calculator.calculate(true, resetFilters); // reset filters only on first calculation
+            resetFilters  = false;
+            countOdTripsCalculated++;
+            int benchmarkingStart = calculator.algorithmCalculationTime.getEpoch();
             if (true/*routingResult.status == "success"*/)
             {
               atLeastOneOdTrip = true;
@@ -1329,7 +1341,7 @@ int main(int argc, char** argv) {
               else
               {
                 odTripJson = {};
-                odTripJson["uuid"]                         = odTrip.uuid;
+                odTripJson["uuid"]                         = boost::uuids::to_string(odTrip.uuid);
                 odTripJson["status"]                       = routingResult.status;
                 //odTripJson["ageGroup"]                     = odTrip.ageGroup;
                 //odTripJson["gender"]                       = odTrip.gender;
@@ -1361,6 +1373,7 @@ int main(int argc, char** argv) {
                 json["odTrips"].push_back(odTripJson);
               }
             }
+            calculator.benchmarking["generating_results"] += calculator.algorithmCalculationTime.getEpoch() - benchmarkingStart;
           }
           i++;
           if (odTripsSampleSize >= 0 && i >= odTripsSampleSize)
@@ -1451,6 +1464,19 @@ int main(int argc, char** argv) {
     }
     
     std::cerr << "-- total -- " << calculator.algorithmCalculationTime.getDurationMicrosecondsNoStop() << " microseconds\n";
+    for (auto & benchmark : calculator.benchmarking)
+    {
+      std::cerr << "  -- " << benchmark.first << " -- " << benchmark.second / 1000 << " ms ";
+      if (countOdTripsCalculated > 0)
+      {
+        std::cerr << " (" << (benchmark.second / countOdTripsCalculated / 1000) << " per odTrip)";
+      }
+      std::cerr << "\n";
+    }
+    if (countOdTripsCalculated > 0)
+    {
+      std::cerr << "  -- number of od trips calculated -- " << countOdTripsCalculated << "\n";
+    }
     
     //calculator.algorithmCalculationTime.stop();
       

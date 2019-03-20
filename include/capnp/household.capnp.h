@@ -109,10 +109,10 @@ public:
   inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader getHomeNodesIdx() const;
 
   inline bool hasHomeNodesTravelTimes() const;
-  inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader getHomeNodesTravelTimes() const;
+  inline  ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>::Reader getHomeNodesTravelTimes() const;
 
   inline bool hasHomeNodesDistances() const;
-  inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader getHomeNodesDistances() const;
+  inline  ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>::Reader getHomeNodesDistances() const;
 
   inline bool hasInternalId() const;
   inline  ::capnp::Text::Reader getInternalId() const;
@@ -198,20 +198,20 @@ public:
   inline ::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>> disownHomeNodesIdx();
 
   inline bool hasHomeNodesTravelTimes();
-  inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder getHomeNodesTravelTimes();
-  inline void setHomeNodesTravelTimes( ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader value);
-  inline void setHomeNodesTravelTimes(::kj::ArrayPtr<const  ::int32_t> value);
-  inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder initHomeNodesTravelTimes(unsigned int size);
-  inline void adoptHomeNodesTravelTimes(::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>&& value);
-  inline ::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>> disownHomeNodesTravelTimes();
+  inline  ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>::Builder getHomeNodesTravelTimes();
+  inline void setHomeNodesTravelTimes( ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>::Reader value);
+  inline void setHomeNodesTravelTimes(::kj::ArrayPtr<const  ::int16_t> value);
+  inline  ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>::Builder initHomeNodesTravelTimes(unsigned int size);
+  inline void adoptHomeNodesTravelTimes(::capnp::Orphan< ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>>&& value);
+  inline ::capnp::Orphan< ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>> disownHomeNodesTravelTimes();
 
   inline bool hasHomeNodesDistances();
-  inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder getHomeNodesDistances();
-  inline void setHomeNodesDistances( ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader value);
-  inline void setHomeNodesDistances(::kj::ArrayPtr<const  ::int32_t> value);
-  inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder initHomeNodesDistances(unsigned int size);
-  inline void adoptHomeNodesDistances(::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>&& value);
-  inline ::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>> disownHomeNodesDistances();
+  inline  ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>::Builder getHomeNodesDistances();
+  inline void setHomeNodesDistances( ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>::Reader value);
+  inline void setHomeNodesDistances(::kj::ArrayPtr<const  ::int16_t> value);
+  inline  ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>::Builder initHomeNodesDistances(unsigned int size);
+  inline void adoptHomeNodesDistances(::capnp::Orphan< ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>>&& value);
+  inline ::capnp::Orphan< ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>> disownHomeNodesDistances();
 
   inline bool hasInternalId();
   inline  ::capnp::Text::Builder getInternalId();
@@ -495,33 +495,33 @@ inline bool Household::Builder::hasHomeNodesTravelTimes() {
   return !_builder.getPointerField(
       ::capnp::bounded<3>() * ::capnp::POINTERS).isNull();
 }
-inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader Household::Reader::getHomeNodesTravelTimes() const {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::get(_reader.getPointerField(
+inline  ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>::Reader Household::Reader::getHomeNodesTravelTimes() const {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>>::get(_reader.getPointerField(
       ::capnp::bounded<3>() * ::capnp::POINTERS));
 }
-inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder Household::Builder::getHomeNodesTravelTimes() {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::get(_builder.getPointerField(
+inline  ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>::Builder Household::Builder::getHomeNodesTravelTimes() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>>::get(_builder.getPointerField(
       ::capnp::bounded<3>() * ::capnp::POINTERS));
 }
-inline void Household::Builder::setHomeNodesTravelTimes( ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
+inline void Household::Builder::setHomeNodesTravelTimes( ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
       ::capnp::bounded<3>() * ::capnp::POINTERS), value);
 }
-inline void Household::Builder::setHomeNodesTravelTimes(::kj::ArrayPtr<const  ::int32_t> value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
+inline void Household::Builder::setHomeNodesTravelTimes(::kj::ArrayPtr<const  ::int16_t> value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
       ::capnp::bounded<3>() * ::capnp::POINTERS), value);
 }
-inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder Household::Builder::initHomeNodesTravelTimes(unsigned int size) {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::init(_builder.getPointerField(
+inline  ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>::Builder Household::Builder::initHomeNodesTravelTimes(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>>::init(_builder.getPointerField(
       ::capnp::bounded<3>() * ::capnp::POINTERS), size);
 }
 inline void Household::Builder::adoptHomeNodesTravelTimes(
-    ::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>&& value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::adopt(_builder.getPointerField(
+    ::capnp::Orphan< ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>>::adopt(_builder.getPointerField(
       ::capnp::bounded<3>() * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>> Household::Builder::disownHomeNodesTravelTimes() {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::disown(_builder.getPointerField(
+inline ::capnp::Orphan< ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>> Household::Builder::disownHomeNodesTravelTimes() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>>::disown(_builder.getPointerField(
       ::capnp::bounded<3>() * ::capnp::POINTERS));
 }
 
@@ -533,33 +533,33 @@ inline bool Household::Builder::hasHomeNodesDistances() {
   return !_builder.getPointerField(
       ::capnp::bounded<4>() * ::capnp::POINTERS).isNull();
 }
-inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader Household::Reader::getHomeNodesDistances() const {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::get(_reader.getPointerField(
+inline  ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>::Reader Household::Reader::getHomeNodesDistances() const {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>>::get(_reader.getPointerField(
       ::capnp::bounded<4>() * ::capnp::POINTERS));
 }
-inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder Household::Builder::getHomeNodesDistances() {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::get(_builder.getPointerField(
+inline  ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>::Builder Household::Builder::getHomeNodesDistances() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>>::get(_builder.getPointerField(
       ::capnp::bounded<4>() * ::capnp::POINTERS));
 }
-inline void Household::Builder::setHomeNodesDistances( ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Reader value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
+inline void Household::Builder::setHomeNodesDistances( ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
       ::capnp::bounded<4>() * ::capnp::POINTERS), value);
 }
-inline void Household::Builder::setHomeNodesDistances(::kj::ArrayPtr<const  ::int32_t> value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
+inline void Household::Builder::setHomeNodesDistances(::kj::ArrayPtr<const  ::int16_t> value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>>::set(_builder.getPointerField(
       ::capnp::bounded<4>() * ::capnp::POINTERS), value);
 }
-inline  ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>::Builder Household::Builder::initHomeNodesDistances(unsigned int size) {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::init(_builder.getPointerField(
+inline  ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>::Builder Household::Builder::initHomeNodesDistances(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>>::init(_builder.getPointerField(
       ::capnp::bounded<4>() * ::capnp::POINTERS), size);
 }
 inline void Household::Builder::adoptHomeNodesDistances(
-    ::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>&& value) {
-  ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::adopt(_builder.getPointerField(
+    ::capnp::Orphan< ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>>::adopt(_builder.getPointerField(
       ::capnp::bounded<4>() * ::capnp::POINTERS), kj::mv(value));
 }
-inline ::capnp::Orphan< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>> Household::Builder::disownHomeNodesDistances() {
-  return ::capnp::_::PointerHelpers< ::capnp::List< ::int32_t,  ::capnp::Kind::PRIMITIVE>>::disown(_builder.getPointerField(
+inline ::capnp::Orphan< ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>> Household::Builder::disownHomeNodesDistances() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>>::disown(_builder.getPointerField(
       ::capnp::bounded<4>() * ::capnp::POINTERS));
 }
 

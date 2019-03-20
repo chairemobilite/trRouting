@@ -16,8 +16,8 @@ struct Place {
   latitude         @8  :Int32; # divide by 1000000 to get float
   longitude        @9  :Int32; # divide by 1000000 to get float
   nodesIdx         @10 :List(Int32);
-  nodesTravelTimes @11 :List(Int32); # seconds
-  nodesDistances   @12 :List(Int32); # meters
+  nodesTravelTimes @11 :List(Int16); # seconds
+  nodesDistances   @12 :List(Int16); # meters
   internalId       @13 :Text;
   data             @14 :Text; # json
 

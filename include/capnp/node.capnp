@@ -19,6 +19,6 @@ struct Node {
   routingRadiusMeters          @12 :Int16;
   defaultDwellTimeSeconds      @13 :Int16;
   transferableNodesIdx         @14 :List(Int32);
-  transferableNodesTravelTimes @15 :List(Int32); # seconds
-  transferableNodesDistances   @16 :List(Int32); # meters
+  transferableNodesTravelTimes @15 :List(Int16); # seconds
+  transferableNodesDistances   @16 :List(Int16); # meters
 }

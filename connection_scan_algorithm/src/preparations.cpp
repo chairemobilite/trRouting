@@ -37,17 +37,6 @@ namespace TrRouting
         std::cout << std::endl;
       }*/
       
-      //if (params.updateOdTrips == 1) // only update od trips if set as parameter (1) when launching app, because this takes a long time. Call only if nodes and/or od trips were modified.
-      //{
-      //  std::tie(odTrips, odTripIndexesById, odTripFootpaths) = params.databaseFetcher->getOdTrips(params.projectShortname, nodes, params);
-      //}
-      //else
-      //{
-      //  std::tie(odTrips, odTripIndexesById)             = params.cacheFetcher->getOdTrips(params.projectShortname, nodes, params);
-      //  odTripFootpaths                                  = params.cacheFetcher->getOdTripFootpaths(params.projectShortname, params);
-      //}
-      
-      //std::tie(forwardConnections, reverseConnections)   = params.cacheFetcher->getConnections(params.projectShortname, nodeIndexesById, tripIndexesById);
     }
     else if (params.dataFetcherShortname == "gtfs")
     {

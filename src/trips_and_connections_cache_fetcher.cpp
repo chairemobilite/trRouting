@@ -15,13 +15,13 @@
 namespace TrRouting
 {
 
-  const std::tuple<std::vector<Trip>, std::map<boost::uuids::uuid, int>, std::vector<Block>, std::map<boost::uuids::uuid, int>, std::vector<std::tuple<int,int,int,int,int,short,short,int>>, std::vector<std::tuple<int,int,int,int,int,short,short,int>>> CacheFetcher::getTripsAndConnections(std::map<boost::uuids::uuid, int> agencyIndexesByUuid, std::vector<Line> lines, std::map<boost::uuids::uuid, int> lineIndexesByUuid, std::vector<Path> paths, std::map<boost::uuids::uuid, int> pathIndexesByUuid, std::map<boost::uuids::uuid, int> nodeIndexesByUuid, std::map<boost::uuids::uuid, int> serviceIndexesByUuid, Parameters& params)
+  const std::tuple<std::vector<Trip>, std::map<boost::uuids::uuid, int>, std::vector<Block>, std::map<boost::uuids::uuid, int>, std::vector<std::tuple<int,int,int,int,int,short,short,int,int,int,short>>, std::vector<std::tuple<int,int,int,int,int,short,short,int,int,int,short>>> CacheFetcher::getTripsAndConnections(std::map<boost::uuids::uuid, int> agencyIndexesByUuid, std::vector<Line> lines, std::map<boost::uuids::uuid, int> lineIndexesByUuid, std::vector<Path> paths, std::map<boost::uuids::uuid, int> pathIndexesByUuid, std::map<boost::uuids::uuid, int> nodeIndexesByUuid, std::map<boost::uuids::uuid, int> serviceIndexesByUuid, Parameters& params)
   { 
 
     std::vector<Trip> trips;
     std::vector<Block> blocks;
     std::map<boost::uuids::uuid, int> tripIndexesByUuid, blockIndexesByUuid;
-    std::vector<std::tuple<int,int,int,int,int,short,short,int>> forwardConnections, reverseConnections;
+    std::vector<std::tuple<int,int,int,int,int,short,short,int,int,int,short>> forwardConnections, reverseConnections;
     boost::uuids::string_generator uuidGenerator;
     boost::uuids::uuid tripUuid, pathUuid, blockUuid, serviceUuid;
     Path path;
@@ -119,7 +119,10 @@ namespace TrRouting
                     tripIdx,
                     canBoards[nodeTimeI],
                     canUnboards[nodeTimeI + 1],
-                    nodeTimeI + 1
+                    nodeTimeI + 1,
+                    trip->lineIdx,
+                    trip->blockIdx,
+                    trip->allowSameLineTransfers
                   ));
 
                 }
@@ -139,9 +142,9 @@ namespace TrRouting
     std::cout << "100%         " << std::endl;
 
     std::cout << "Sorting connections..." << std::endl;
-    std::stable_sort(forwardConnections.begin(), forwardConnections.end(), [](std::tuple<int,int,int,int,int,short,short,int> connectionA, std::tuple<int,int,int,int,int,short,short,int> connectionB)
+    std::stable_sort(forwardConnections.begin(), forwardConnections.end(), [](std::tuple<int,int,int,int,int,short,short,int,int,int,short> connectionA, std::tuple<int,int,int,int,int,short,short,int,int,int,short> connectionB)
     {
-      // { STOP_DEP = 0, STOP_ARR = 1, TIME_DEP = 2, TIME_ARR = 3, TRIP = 4, CAN_BOARD = 5, CAN_UNBOARD = 6, SEQUENCE = 7 };
+      // { NODE_DEP = 0, NODE_ARR = 1, TIME_DEP = 2, TIME_ARR = 3, TRIP = 4, CAN_BOARD = 5, CAN_UNBOARD = 6, SEQUENCE = 7, LINE = 8, BLOCK = 9, CAN_TRANSFER_SAME_LINE = 10 };
       if (std::get<2>(connectionA) < std::get<2>(connectionB))
       {
         return true;
@@ -169,9 +172,9 @@ namespace TrRouting
       return false;
     });
     reverseConnections = forwardConnections;
-    std::stable_sort(reverseConnections.begin(), reverseConnections.end(), [](std::tuple<int,int,int,int,int,short,short,int> connectionA, std::tuple<int,int,int,int,int,short,short,int> connectionB)
+    std::stable_sort(reverseConnections.begin(), reverseConnections.end(), [](std::tuple<int,int,int,int,int,short,short,int,int,int,short> connectionA, std::tuple<int,int,int,int,int,short,short,int,int,int,short> connectionB)
     {
-      // { STOP_DEP = 0, STOP_ARR = 1, TIME_DEP = 2, TIME_ARR = 3, TRIP = 4, CAN_BOARD = 5, CAN_UNBOARD = 6, SEQUENCE = 7 };
+      // { NODE_DEP = 0, NODE_ARR = 1, TIME_DEP = 2, TIME_ARR = 3, TRIP = 4, CAN_BOARD = 5, CAN_UNBOARD = 6, SEQUENCE = 7, LINE = 8, BLOCK = 9, CAN_TRANSFER_SAME_LINE = 10 };
       if (std::get<3>(connectionA) > std::get<3>(connectionB))
       {
         return true;

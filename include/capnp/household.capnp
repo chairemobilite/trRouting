@@ -17,8 +17,8 @@ struct Household {
   homeLatitude         @9  :Int32; # divide by 1000000 to get float
   homeLongitude        @10 :Int32; # divide by 1000000 to get float
   homeNodesIdx         @11 :List(Int32);
-  homeNodesTravelTimes @12 :List(Int32); # seconds
-  homeNodesDistances   @13 :List(Int32); # meters
+  homeNodesTravelTimes @12 :List(Int16); # seconds
+  homeNodesDistances   @13 :List(Int16); # meters
   internalId           @14 :Text;
   data                 @15 :Text; # json
 
