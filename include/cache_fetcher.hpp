@@ -39,6 +39,7 @@
 #include "household.hpp"
 #include "person.hpp"
 #include "od_trip.hpp"
+#include "place.hpp"
 #include "service.hpp"
 #include "scenario.hpp"
 #include "path.hpp"
@@ -101,6 +102,7 @@ namespace TrRouting
     const std::pair<std::vector<Household> , std::map<boost::uuids::uuid, int>> getHouseholds(std::map<boost::uuids::uuid, int> dataSourceIndexesByUuid, Parameters& params);
     const std::pair<std::vector<Person>    , std::map<boost::uuids::uuid, int>> getPersons(std::map<boost::uuids::uuid, int> dataSourceIndexesByUuid, std::map<boost::uuids::uuid, int> householdIndexesByUuid, Parameters& params);
     const std::pair<std::vector<OdTrip>    , std::map<boost::uuids::uuid, int>> getOdTrips(std::map<boost::uuids::uuid, int> dataSourceIndexesByUuid, std::map<boost::uuids::uuid, int> householdIndexesByUuid, std::map<boost::uuids::uuid, int> personIndexesByUuid, Parameters& params);
+    const std::pair<std::vector<Place>     , std::map<boost::uuids::uuid, int>> getPlaces(std::map<boost::uuids::uuid, int> dataSourceIndexesByUuid, Parameters& params);
     const std::pair<std::vector<Scenario>  , std::map<boost::uuids::uuid, int>> getScenarios(std::map<boost::uuids::uuid, int> serviceIndexesByUuid, Parameters& params);
     const std::pair<std::vector<Station>   , std::map<boost::uuids::uuid, int>> getStations(Parameters& params);
     const std::pair<std::vector<Node>      , std::map<boost::uuids::uuid, int>> getNodes(std::map<boost::uuids::uuid, int> stationIndexesByUuid, Parameters& params);

@@ -41,6 +41,7 @@
 #include "household.hpp"
 #include "person.hpp"
 #include "od_trip.hpp"
+#include "place.hpp"
 #include "scenario.hpp"
 #include "service.hpp"
 #include "station.hpp"
@@ -93,6 +94,9 @@ namespace TrRouting
 
     std::vector<OdTrip>                 odTrips;
     std::map<boost::uuids::uuid, int>   odTripIndexesByUuid;
+
+    std::vector<Place>                  places;
+    std::map<boost::uuids::uuid, int>   placeIndexesByUuid;
 
     std::vector<Scenario>               scenarios;
     std::map<boost::uuids::uuid, int>   scenarioIndexesByUuid;

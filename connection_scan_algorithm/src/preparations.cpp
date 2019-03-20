@@ -13,7 +13,9 @@ namespace TrRouting
       std::tie(modes,       modeIndexesByShortname)  = params.cacheFetcher->getModes();
       std::tie(dataSources, dataSourceIndexesByUuid) = params.cacheFetcher->getDataSources(params);
       std::tie(households,  householdIndexesByUuid)  = params.cacheFetcher->getHouseholds(dataSourceIndexesByUuid, params);
-
+      std::tie(persons,     personIndexesByUuid)     = params.cacheFetcher->getPersons(dataSourceIndexesByUuid, householdIndexesByUuid, params);
+      std::tie(odTrips,     odTripIndexesByUuid)     = params.cacheFetcher->getOdTrips(dataSourceIndexesByUuid, householdIndexesByUuid, personIndexesByUuid, params);
+      std::tie(places,      placeIndexesByUuid)      = params.cacheFetcher->getPlaces(dataSourceIndexesByUuid, params);
       std::tie(services,    serviceIndexesByUuid)    = params.cacheFetcher->getServices(params);
       std::tie(scenarios,   scenarioIndexesByUuid)   = params.cacheFetcher->getScenarios(serviceIndexesByUuid, params);
       std::tie(stations,    stationIndexesByUuid)    = params.cacheFetcher->getStations(params);
