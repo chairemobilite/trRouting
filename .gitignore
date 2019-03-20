@@ -30,6 +30,8 @@ swift/trRouting/Package.resolved
 *.lo
 *.o
 *.o-*
+*.d
+*.d-*
 *.obj
 
 # Precompiled Headers
