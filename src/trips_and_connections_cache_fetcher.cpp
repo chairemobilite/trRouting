@@ -100,12 +100,13 @@ namespace TrRouting
               trips.push_back(*trip);
               tripIdx = trips.size() - 1;
               tripIndexesByUuid[trip->uuid] = tripIdx;
+
               nodeTimesCount = capnpTrip.getNodeArrivalTimesSeconds().size();
               auto arrivalTimesSeconds   = capnpTrip.getNodeArrivalTimesSeconds();
               auto departureTimesSeconds = capnpTrip.getNodeDepartureTimesSeconds();
               auto canBoards             = capnpTrip.getNodesCanBoard();
               auto canUnboards           = capnpTrip.getNodesCanUnboard();
-
+              
               for (int nodeTimeI = 0; nodeTimeI < nodeTimesCount; nodeTimeI++)
               {
                 if (nodeTimeI < nodeTimesCount - 1)

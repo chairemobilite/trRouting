@@ -27,6 +27,22 @@ namespace TrRouting
       
       std::tie(trips, tripIndexesByUuid, blocks, blockIndexesByUuid, forwardConnections, reverseConnections) = params.cacheFetcher->getTripsAndConnections(agencyIndexesByUuid, lines, lineIndexesByUuid, paths, pathIndexesByUuid, nodeIndexesByUuid, serviceIndexesByUuid, params);
 
+      //for (auto & connection : forwardConnections)
+      //{
+      //  forwardConnectionsDepartureNodeIndexes.push_back(std::get<connectionIndexes::NODE_DEP>(connection));
+      //  forwardConnectionsArrivalNodeIndexes.push_back(std::get<connectionIndexes::NODE_ARR>(connection));
+      //  forwardConnectionsDepartureTimesSeconds.push_back(std::get<connectionIndexes::TIME_DEP>(connection));
+      //  forwardConnectionsArrivalTimesSeconds.push_back(std::get<connectionIndexes::TIME_ARR>(connection));
+      //  forwardConnectionsTripIndexes.push_back(std::get<connectionIndexes::TRIP>(connection));
+      //  forwardConnectionsCanBoards.push_back(std::get<connectionIndexes::CAN_BOARD>(connection));
+      //  forwardConnectionsCanUnboards.push_back(std::get<connectionIndexes::CAN_UNBOARD>(connection));
+      //  forwardConnectionsSequences.push_back(std::get<connectionIndexes::SEQUENCE>(connection));
+      //  forwardConnectionsLineIndexes.push_back(std::get<connectionIndexes::LINE>(connection));
+      //  forwardConnectionsBlockIndexes.push_back(std::get<connectionIndexes::BLOCK>(connection));
+      //  forwardConnectionsCanTransferSameLines.push_back(std::get<connectionIndexes::CAN_TRANSFER_SAME_LINE>(connection));
+      //}
+     
+
       /*for (auto & node : nodes)
       {
         std::cout << node.toString() << std::endl;

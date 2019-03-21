@@ -72,6 +72,7 @@ int main(int argc, char** argv) {
   std::getline(projectShortnameFile, projectShortnameFromFile);
   projectShortnameFile.close();
   std::string projectShortname {projectShortnameFromFile};
+  boost::uuids::string_generator uuidGeneratorMain;
 
   // Set params:
   Parameters algorithmParams;
@@ -146,6 +147,10 @@ int main(int argc, char** argv) {
   {
     algorithmParams.updateOdTrips = (variablesMap["updateOdTrips"].as<std::string>() == "1") ? true : false;
   }
+  if(variablesMap.count("scenarioUuid") == 1)
+  {
+    algorithmParams.scenarioUuid = uuidGeneratorMain(variablesMap["scenarioUuid"].as<std::string>());
+  }
   
   std::cout << "Using http port "         << serverPort << std::endl;
   std::cout << "Using osrm walk port "    << algorithmParams.osrmRoutingWalkingPort << std::endl;
@@ -215,6 +220,12 @@ int main(int argc, char** argv) {
     calculator.benchmarking["reverse_calculation"] = 0;
     calculator.benchmarking["reverse_journey"]     = 0;
     calculator.benchmarking["generating_results"]  = 0;
+    calculator.benchmarking["transferable_nodes"]  = 0;
+    calculator.benchmarking["count_1"]              = 0;
+    calculator.benchmarking["count_2"]              = 0;
+    calculator.benchmarking["count_3"]              = 0;
+    calculator.benchmarking["count_4"]              = 0;
+    calculator.benchmarking["count_5"]              = 0;
     int countOdTripsCalculated {0};
 
     //calculator.algorithmCalculationTime.startStep();
@@ -252,11 +263,11 @@ int main(int argc, char** argv) {
       std::vector<std::string> odTripsModes;
       
       int odTripsSampleSize {-1}; // for testing only
-      bool calculateAllOdTrips {false}; // fetch all od trips from cache or database and calculate for all these trips
       int batchNumber  {1}; // when using multiple batches (parallele calculations)
       int batchesCount {1};
       bool alternatives {false}; // calculate alternatives or not
       
+      calculator.params.calculateAllOdTrips = false;
       calculator.params.onlyServicesIdx.clear();
       calculator.params.exceptServicesIdx.clear();
       calculator.params.onlyLinesIdx.clear();
@@ -452,7 +463,7 @@ int main(int argc, char** argv) {
         }
         else if (parameterWithValueVector[0] == "od_trips")
         {
-          if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1") { calculateAllOdTrips = true; }
+          if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1") { calculator.params.calculateAllOdTrips = true; }
         }
         else if (parameterWithValueVector[0] == "od_trips_sample_size")
         {
@@ -1116,7 +1127,7 @@ int main(int argc, char** argv) {
       }
       
       
-      if (!calculator.params.alternatives && (calculateAllOdTrips || odTripUuid.is_initialized() ))
+      if (!calculator.params.alternatives && (calculator.params.calculateAllOdTrips || odTripUuid.is_initialized() ))
       {
         RoutingResult routingResult;
         std::map<boost::uuids::uuid, std::map<int, float>> tripsLegsProfile; // parent map key: trip uuid, nested map key: connection sequence, value: number of trips using this connection
@@ -1408,7 +1419,7 @@ int main(int argc, char** argv) {
           json["pathsOdTripsProfiles"] = pathsOdTripsProfilesJson;
           resultStr = json.dump(2);
         }
-        if (calculateAllOdTrips && fileFormat == "csv")
+        if (calculator.params.calculateAllOdTrips && fileFormat == "csv")
         {
           
           

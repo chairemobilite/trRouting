@@ -86,7 +86,9 @@ namespace TrRouting
     int originNodeIdx;
     int destinationNodeIdx;
     OdTrip* odTrip;
-    
+    bool calculateAllOdTrips;
+    boost::optional<boost::uuids::uuid> scenarioUuid;
+
     std::string osrmRoutingWalkingPort;
     std::string osrmRoutingWalkingHost;
     std::string osrmRoutingDrivingPort;
@@ -122,6 +124,7 @@ namespace TrRouting
     {
       cacheDirectoryPath                     = "cache/";
       odTrip                                 = NULL;
+      calculateAllOdTrips                    = false;
       walkingSpeedMetersPerSecond            = 5/3.6; // 5 km/h
       drivingSpeedMetersPerSecond            = 90/3.6; // 90 km/h
       cyclingSpeedMetersPerSecond            = 25/3.6; // 25 km/h

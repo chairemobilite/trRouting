@@ -203,6 +203,12 @@ namespace TrRouting
 
     if (resetFilters)
     {
+
+      /*if (params.calculateAllOdTrips)
+      {
+        std::tie(trips, tripIndexesByUuid, blocks, blockIndexesByUuid, forwardConnections, reverseConnections) = params.cacheFetcher->getTripsAndConnections(agencyIndexesByUuid, lines, lineIndexesByUuid, paths, pathIndexesByUuid, nodeIndexesByUuid, serviceIndexesByUuid, params);
+      }*/
+
       for (auto & trip : trips)
       {
         if (tripsEnabled[i] == 1 && params.onlyServicesIdx.size() > 0)
@@ -269,6 +275,8 @@ namespace TrRouting
           }
         }
 
+
+
         i++;
       }
     }
@@ -290,6 +298,11 @@ namespace TrRouting
 
 
   }
+
+  /*void Calculator::refreshConnectionsForOnlyServices()
+  {
+    std::tie(trips, tripIndexesByUuid, blocks, blockIndexesByUuid, forwardConnections, reverseConnections) = params.cacheFetcher->getTripsAndConnections(agencyIndexesByUuid, lines, lineIndexesByUuid, paths, pathIndexesByUuid, nodeIndexesByUuid, serviceIndexesByUuid, params);
+  }*/
 
 
 

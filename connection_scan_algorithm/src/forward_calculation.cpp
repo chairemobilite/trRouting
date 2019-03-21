@@ -6,7 +6,10 @@ namespace TrRouting
   std::tuple<int,int,int> Calculator::forwardCalculation()
   {
 
-    int benchmarkingStart = algorithmCalculationTime.getEpoch();
+    int benchmarkingStart  = algorithmCalculationTime.getEpoch();
+
+    //int benchmarking1 {0}, benchmarking2 {0}, benchmarking3 {0}, benchmarking4 {0}, benchmarking5 {0};
+    //int benchmarkingStart1 {0}, benchmarkingStart2 {0}, benchmarkingStart3 {0}, benchmarkingStart4 {0}, benchmarkingStart5 {0};
 
     int  i {0};
     int  connectionsCount = forwardConnections.size();
@@ -23,7 +26,6 @@ namespace TrRouting
     int  connectionArrivalTime {-1};
     int  footpathIndex {-1};
     int  transferableNodeIndex {0};
-    int  footpathNodeArrivalIndex {-1};
     int  footpathTravelTime {-1};
     int  tentativeEgressNodeArrivalTime {MAX_INT};
     bool reachedAtLeastOneEgressNode {false};
@@ -31,12 +33,11 @@ namespace TrRouting
     int  bestEgressNodeIndex {-1};
     int  bestEgressTravelTime {-1};
     int  bestArrivalTime {MAX_INT};
-    
+
     // main loop:
     i = 0;
     for(auto & connection : forwardConnections)
     {
-
       // ignore connections before departure time + minimum access travel time:
       if (std::get<connectionIndexes::TIME_DEP>(connection) >= departureTimeSeconds + minAccessTravelTime)
       {
@@ -91,21 +92,41 @@ namespace TrRouting
               footpathIndex = 0;
               for (int & transferableNodeIndex : nodes[nodeArrivalIndex].transferableNodesIdx)
               {
-                footpathTravelTime       = /*(int)ceil((float)*/nodes[nodeArrivalIndex].transferableTravelTimesSeconds[footpathIndex]/* / params.walkingSpeedFactor)*/;
-                footpathNodeArrivalIndex = transferableNodeIndex;
+                //benchmarking1++;
+                //benchmarkingStart1 = algorithmCalculationTime.getEpoch();
+                if (nodeArrivalIndex != transferableNodeIndex && nodesTentativeTime[transferableNodeIndex] < params.minWaitingTimeSeconds + connectionArrivalTime)
+                {
+                  footpathIndex++;
+                  //benchmarking1 += algorithmCalculationTime.getEpoch() - benchmarkingStart1;
+                  continue;
+                }
+                //benchmarking1 += algorithmCalculationTime.getEpoch() - benchmarkingStart1;
+  
+                //benchmarkingStart2 = algorithmCalculationTime.getEpoch();
+                if (params.walkingSpeedFactor != 1.0)
+                {
+                  footpathTravelTime = (int)ceil((float)nodes[nodeArrivalIndex].transferableTravelTimesSeconds[footpathIndex] / params.walkingSpeedFactor);
+                }
+                else
+                {
+                  footpathTravelTime = nodes[nodeArrivalIndex].transferableTravelTimesSeconds[footpathIndex];
+                }
+                //benchmarking2 += algorithmCalculationTime.getEpoch() - benchmarkingStart2;
 
+                //benchmarkingStart3 = algorithmCalculationTime.getEpoch();
                 if (footpathTravelTime <= params.maxTransferWalkingTravelTimeSeconds)
                 {
-                  if (footpathTravelTime + params.minWaitingTimeSeconds + connectionArrivalTime < nodesTentativeTime[footpathNodeArrivalIndex])
+                  if (footpathTravelTime + params.minWaitingTimeSeconds + connectionArrivalTime < nodesTentativeTime[transferableNodeIndex])
                   {
-                    nodesTentativeTime[footpathNodeArrivalIndex] = footpathTravelTime + connectionArrivalTime + params.minWaitingTimeSeconds;
-                    forwardJourneys[footpathNodeArrivalIndex]    = std::make_tuple(tripsEnterConnection[tripIndex], i, nodeArrivalIndex, tripIndex, footpathTravelTime, (nodeArrivalIndex == footpathNodeArrivalIndex ? 1 : -1));
+                    nodesTentativeTime[transferableNodeIndex] = footpathTravelTime + connectionArrivalTime + params.minWaitingTimeSeconds;
+                    forwardJourneys[transferableNodeIndex]    = std::make_tuple(tripsEnterConnection[tripIndex], i, nodeArrivalIndex, tripIndex, footpathTravelTime, (nodeArrivalIndex == transferableNodeIndex ? 1 : -1));
                   }
-                  if (nodeArrivalIndex == footpathNodeArrivalIndex && (std::get<4>(forwardEgressJourneys[footpathNodeArrivalIndex]) == -1 || std::get<connectionIndexes::TIME_ARR>(forwardConnections[std::get<1>(forwardEgressJourneys[footpathNodeArrivalIndex])]) > connectionArrivalTime))
+                  if (nodeArrivalIndex == transferableNodeIndex && (std::get<4>(forwardEgressJourneys[transferableNodeIndex]) == -1 || std::get<connectionIndexes::TIME_ARR>(forwardConnections[std::get<1>(forwardEgressJourneys[transferableNodeIndex])]) > connectionArrivalTime))
                   {
-                    forwardEgressJourneys[footpathNodeArrivalIndex] = std::make_tuple(tripsEnterConnection[tripIndex], i, nodeArrivalIndex, tripIndex, footpathTravelTime, 1);
+                    forwardEgressJourneys[transferableNodeIndex] = std::make_tuple(tripsEnterConnection[tripIndex], i, nodeArrivalIndex, tripIndex, footpathTravelTime, 1);
                   }
                 }
+                //benchmarking3 += algorithmCalculationTime.getEpoch() - benchmarkingStart3;
                 footpathIndex++;
               }
             }
@@ -115,7 +136,7 @@ namespace TrRouting
       }
       i++;
     }
-    
+
     if (params.debugDisplay)
       std::cerr << "-- " << reachableConnectionsCount << " forward connections parsed on " << connectionsCount << std::endl;
     
@@ -144,6 +165,12 @@ namespace TrRouting
         }
         i++;
       }
+
+      /*benchmarking["count_1"] += benchmarking1;
+      benchmarking["count_2"] += benchmarking2;
+      benchmarking["count_3"] += benchmarking3;
+      benchmarking["count_4"] += benchmarking4;
+      benchmarking["count_5"] += benchmarking5;*/
 
       benchmarking["forward_calculation"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
       return std::make_tuple(bestArrivalTime, bestEgressNodeIndex, bestEgressTravelTime);
