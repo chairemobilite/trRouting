@@ -12,13 +12,13 @@ namespace TrRouting
     {
       std::tie(modes,       modeIndexesByShortname)  = params.cacheFetcher->getModes();
       std::tie(dataSources, dataSourceIndexesByUuid) = params.cacheFetcher->getDataSources(params);
-      std::tie(households,  householdIndexesByUuid)  = params.cacheFetcher->getHouseholds(dataSourceIndexesByUuid, params);
-      std::tie(persons,     personIndexesByUuid)     = params.cacheFetcher->getPersons(dataSourceIndexesByUuid, householdIndexesByUuid, params);
+      //std::tie(households,  householdIndexesByUuid)  = params.cacheFetcher->getHouseholds(dataSourceIndexesByUuid, params);
+      //std::tie(persons,     personIndexesByUuid)     = params.cacheFetcher->getPersons(dataSourceIndexesByUuid, householdIndexesByUuid, params);
       std::tie(odTrips,     odTripIndexesByUuid)     = params.cacheFetcher->getOdTrips(dataSourceIndexesByUuid, householdIndexesByUuid, personIndexesByUuid, params);
-      std::tie(places,      placeIndexesByUuid)      = params.cacheFetcher->getPlaces(dataSourceIndexesByUuid, params);
+      //std::tie(places,      placeIndexesByUuid)      = params.cacheFetcher->getPlaces(dataSourceIndexesByUuid, params);
       std::tie(services,    serviceIndexesByUuid)    = params.cacheFetcher->getServices(params);
       std::tie(scenarios,   scenarioIndexesByUuid)   = params.cacheFetcher->getScenarios(serviceIndexesByUuid, params);
-      std::tie(stations,    stationIndexesByUuid)    = params.cacheFetcher->getStations(params);
+      //std::tie(stations,    stationIndexesByUuid)    = params.cacheFetcher->getStations(params);
       std::tie(nodes,       nodeIndexesByUuid)       = params.cacheFetcher->getNodes(stationIndexesByUuid, params);
                nodes                                 = params.cacheFetcher->getNodeFootpaths(nodes, nodeIndexesByUuid, params);
       std::tie(agencies,    agencyIndexesByUuid)     = params.cacheFetcher->getAgencies(params);
@@ -26,6 +26,54 @@ namespace TrRouting
       std::tie(paths,       pathIndexesByUuid)       = params.cacheFetcher->getPaths(lineIndexesByUuid, nodeIndexesByUuid, params);
       
       std::tie(trips, tripIndexesByUuid, tripConnectionDepartureTimes, tripConnectionDemands, blocks, blockIndexesByUuid, forwardConnections, reverseConnections) = params.cacheFetcher->getTripsAndConnections(agencyIndexesByUuid, lines, lineIndexesByUuid, paths, pathIndexesByUuid, nodeIndexesByUuid, serviceIndexesByUuid, params);
+
+      std::cout << forwardConnections.size() << " connections" << std::endl; 
+
+      int benchmarkingStart = algorithmCalculationTime.getEpoch();
+
+      int lastConnectionIndex = forwardConnections.size() - 1;
+
+      forwardConnectionsIndexPerDepartureTimeHour = std::vector<int>(32, -1);
+      reverseConnectionsIndexPerArrivalTimeHour   = std::vector<int>(32, lastConnectionIndex);
+
+      int hour {0};
+      int i = 0;
+      for (auto & connection : forwardConnections)
+      {
+        while (std::get<connectionIndexes::TIME_DEP>(connection) >= hour * 3600 && forwardConnectionsIndexPerDepartureTimeHour[hour] == -1 && hour < 32)
+        {
+          forwardConnectionsIndexPerDepartureTimeHour[hour] = i;
+          //std::cout << hour << ":" << i << ":" << std::get<connectionIndexes::TIME_DEP>(connection) << std::endl;
+          hour++;
+        }
+        i++;
+      }
+
+      hour = 31;
+      i = 0;
+      for (auto & connection : reverseConnections)
+      {
+        while (std::get<connectionIndexes::TIME_ARR>(connection) <= hour * 3600 && reverseConnectionsIndexPerArrivalTimeHour[hour] == lastConnectionIndex && hour >= 0)
+        {
+          reverseConnectionsIndexPerArrivalTimeHour[hour] = i;
+          //std::cout << hour << ":" << i << ":" << std::get<connectionIndexes::TIME_ARR>(connection) << std::endl;
+          hour--;
+        }
+        i++;
+      }
+
+      for (int h = 0; h < 32; h++)
+      {
+        if (forwardConnectionsIndexPerDepartureTimeHour[h] == -1)
+        {
+          forwardConnectionsIndexPerDepartureTimeHour[h] = lastConnectionIndex;
+        }
+        //std::cout << h << ": " << forwardConnectionsIndexPerDepartureTimeHour[h] << std::endl;
+      }
+      for (int h = 0; h < 32; h++)
+      {
+        std::cout << h << ": " << reverseConnectionsIndexPerArrivalTimeHour[h] << std::endl;
+      }
 
       //for (auto & connection : forwardConnections)
       //{
@@ -41,7 +89,10 @@ namespace TrRouting
       //  forwardConnectionsBlockIndexes.push_back(std::get<connectionIndexes::BLOCK>(connection));
       //  forwardConnectionsCanTransferSameLines.push_back(std::get<connectionIndexes::CAN_TRANSFER_SAME_LINE>(connection));
       //}
-     
+
+
+      int total = algorithmCalculationTime.getEpoch() - benchmarkingStart;
+      std::cout << "test took " << total << std::endl;
 
       /*for (auto & node : nodes)
       {

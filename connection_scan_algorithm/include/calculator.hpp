@@ -142,6 +142,8 @@ namespace TrRouting
     int                             departureTimeSeconds;
     int                             initialDepartureTimeSeconds;
     int                             arrivalTimeSeconds;
+    std::vector<int>                forwardConnectionsIndexPerDepartureTimeHour;
+    std::vector<int>                reverseConnectionsIndexPerArrivalTimeHour;
     int                             maxTimeValue;
     int                             minAccessTravelTime;
     int                             maxEgressTravelTime;

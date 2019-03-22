@@ -33,21 +33,25 @@ namespace TrRouting
     int  bestEgressNodeIndex {-1};
     int  bestEgressTravelTime {-1};
     int  bestArrivalTime {MAX_INT};
+    int  departureTimeHour = departureTimeSeconds / 3600;
+
+    //std::cout << forwardConnectionsIndexPerDepartureTimeHour[departureTimeHour] << ":" << departureTimeHour << std::endl;
 
     // main loop:
-    i = 0;
-    for(auto & connection : forwardConnections)
+    i = forwardConnectionsIndexPerDepartureTimeHour[departureTimeHour];
+    auto lastConnection = forwardConnections.end();
+    for(auto connection = forwardConnections.begin() + forwardConnectionsIndexPerDepartureTimeHour[departureTimeHour]; connection != lastConnection; ++connection)
+    //for(auto & connection : forwardConnections)
     {
       // ignore connections before departure time + minimum access travel time:
-      if (std::get<connectionIndexes::TIME_DEP>(connection) >= departureTimeSeconds + minAccessTravelTime)
+      if (std::get<connectionIndexes::TIME_DEP>(*connection) >= departureTimeSeconds + minAccessTravelTime)
       {
-        
-        tripIndex = std::get<connectionIndexes::TRIP>(connection);
+        tripIndex = std::get<connectionIndexes::TRIP>(*connection);
 
         // enabled trips only here:
         if (tripsEnabled[tripIndex] != -1)
         {
-          connectionDepartureTime = std::get<connectionIndexes::TIME_DEP>(connection);
+          connectionDepartureTime = std::get<connectionIndexes::TIME_DEP>(*connection);
 
           // no need to parse next connections if already reached destination from all egress nodes:
           if ( (!params.returnAllNodesResult && reachedAtLeastOneEgressNode && maxEgressTravelTime >= 0 && tentativeEgressNodeArrivalTime < MAX_INT && connectionDepartureTime > tentativeEgressNodeArrivalTime + maxEgressTravelTime) || (connectionDepartureTime - departureTimeSeconds > params.maxTotalTravelTimeSeconds))
@@ -55,7 +59,7 @@ namespace TrRouting
             break;
           }
           tripEnterConnectionIndex   = tripsEnterConnection[tripIndex];
-          nodeDepartureIndex         = std::get<connectionIndexes::NODE_DEP>(connection);
+          nodeDepartureIndex         = std::get<connectionIndexes::NODE_DEP>(*connection);
           nodeDepartureTentativeTime = nodesTentativeTime[nodeDepartureIndex];
           
           // reachable connections only here:
@@ -63,12 +67,12 @@ namespace TrRouting
           {
             
             /* Difficult to deal with blocks and no transfer between same line in CSA algorithm! */
-            /*lineIndex             = std::get<connectionIndexes::LINE>(connection);
-            canTransferOnSameLine = std::get<connectionIndexes::CAN_TRANSFER_SAME_LINE>(connection);
-            blockIndex            = std::get<connectionIndexes::BLOCK>(connection);*/
+            /*lineIndex             = std::get<connectionIndexes::LINE>(*connection);
+            canTransferOnSameLine = std::get<connectionIndexes::CAN_TRANSFER_SAME_LINE>(*connection);
+            blockIndex            = std::get<connectionIndexes::BLOCK>(*connection);*/
 
             // TODO: add constrain for sameLineTransfer (check trip allowSameLineTransfers)
-            if (std::get<connectionIndexes::CAN_BOARD>(connection) == 1 && (tripEnterConnectionIndex == -1 || (std::get<0>(forwardJourneys[nodeDepartureIndex]) == -1 && std::get<4>(forwardJourneys[nodeDepartureIndex]) >= 0 && std::get<4>(forwardJourneys[nodeDepartureIndex]) < tripsEnterConnectionTransferTravelTime[tripIndex])))
+            if (std::get<connectionIndexes::CAN_BOARD>(*connection) == 1 && (tripEnterConnectionIndex == -1 || (std::get<0>(forwardJourneys[nodeDepartureIndex]) == -1 && std::get<4>(forwardJourneys[nodeDepartureIndex]) >= 0 && std::get<4>(forwardJourneys[nodeDepartureIndex]) < tripsEnterConnectionTransferTravelTime[tripIndex])))
             {
               //if (tripEnterConnectionIndex != -1)
               //{
@@ -79,11 +83,11 @@ namespace TrRouting
               tripsEnterConnectionTransferTravelTime[tripIndex] = std::get<4>(forwardJourneys[nodeDepartureIndex]);
             }
             
-            if (std::get<connectionIndexes::CAN_UNBOARD>(connection) == 1 && tripsEnterConnection[tripIndex] != -1)
+            if (std::get<connectionIndexes::CAN_UNBOARD>(*connection) == 1 && tripsEnterConnection[tripIndex] != -1)
             {
               // get footpaths for the arrival node to get transferable nodes:
-              nodeArrivalIndex      = std::get<connectionIndexes::NODE_ARR>(connection);
-              connectionArrivalTime = std::get<connectionIndexes::TIME_ARR>(connection);
+              nodeArrivalIndex      = std::get<connectionIndexes::NODE_ARR>(*connection);
+              connectionArrivalTime = std::get<connectionIndexes::TIME_ARR>(*connection);
               if (!params.returnAllNodesResult && !reachedAtLeastOneEgressNode && nodesEgressTravelTime[nodeArrivalIndex] != -1) // check if the arrival node is egressable
               {
                 reachedAtLeastOneEgressNode    = true;

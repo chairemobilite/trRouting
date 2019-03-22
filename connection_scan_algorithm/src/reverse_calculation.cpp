@@ -31,6 +31,7 @@ namespace TrRouting
     int  bestAccessNodeIndex {-1};
     int  bestAccessTravelTime {-1};
     int  bestDepartureTime {-1};
+    int  arrivalTimeHour = arrivalTimeSeconds / 3600;
 
     // reverse calculation:
     //int time1 {-1};
@@ -38,21 +39,27 @@ namespace TrRouting
     //int time3 {-1};
     //int timeC {-1};
 
+    //std::cout << reverseConnectionsIndexPerArrivalTimeHour[arrivalTimeHour] << ":" << arrivalTimeHour << std::endl;
+
     // main loop for reverse connections:
-    i = 0;
-    for(auto & connection : reverseConnections)
+    i = (arrivalTimeHour + 1 >= reverseConnectionsIndexPerArrivalTimeHour.size()) ? 0 : reverseConnectionsIndexPerArrivalTimeHour[arrivalTimeHour + 1];
+    
+    auto lastConnection = reverseConnections.end();
+    for(auto connection = reverseConnections.begin() + reverseConnectionsIndexPerArrivalTimeHour[arrivalTimeHour + 1]; connection != lastConnection; ++connection)
     {
+    //for(auto & connection : reverseConnections)
+    //{
       // ignore connections before departure time + minimum access travel time:
-      if (std::get<connectionIndexes::TIME_ARR>(connection) <= arrivalTimeSeconds - minEgressTravelTime)
+      if (std::get<connectionIndexes::TIME_ARR>(*connection) <= arrivalTimeSeconds - minEgressTravelTime)
       {
         
-        tripIndex = std::get<connectionIndexes::TRIP>(connection);
+        tripIndex = std::get<connectionIndexes::TRIP>(*connection);
         
         // enabled trips only here:
         if (tripsUsable[tripIndex] == 1 && tripsEnabled[tripIndex] != -1)
         {
           
-          connectionArrivalTime = std::get<connectionIndexes::TIME_ARR>(connection);
+          connectionArrivalTime = std::get<connectionIndexes::TIME_ARR>(*connection);
           
           // no need to parse next connections if already reached destination from all egress nodes, except if max travel time is set, so we can get a reverse profile in the next loop calculation:
           if ( (!params.returnAllNodesResult && reachedAtLeastOneAccessNode && maxAccessTravelTime >= 0 && connectionArrivalTime < tentativeAccessNodeDepartureTime - maxAccessTravelTime) || (arrivalTimeSeconds - connectionArrivalTime > params.maxTotalTravelTimeSeconds))
@@ -60,7 +67,7 @@ namespace TrRouting
             break;
           }
           tripExitConnectionIndex  = tripsExitConnection[tripIndex];
-          nodeArrivalIndex         = std::get<connectionIndexes::NODE_ARR>(connection);
+          nodeArrivalIndex         = std::get<connectionIndexes::NODE_ARR>(*connection);
           nodeArrivalTentativeTime = nodesReverseTentativeTime[nodeArrivalIndex];
           
           //std::cerr << "nodeArrivalTentativeTime: " << nodeArrivalTentativeTime << " connectionArrivalTime: " << connectionArrivalTime << " tripExitConnectionIndex: " << tripExitConnectionIndex << std::endl;
@@ -69,17 +76,17 @@ namespace TrRouting
           if (tripExitConnectionIndex != -1 || nodeArrivalTentativeTime >= connectionArrivalTime)
           {
             
-            if (std::get<connectionIndexes::CAN_UNBOARD>(connection) == 1 && (tripExitConnectionIndex == -1 || (std::get<0>(reverseJourneys[nodeArrivalIndex]) == -1 && std::get<4>(reverseJourneys[nodeArrivalIndex]) >= 0 && std::get<4>(reverseJourneys[nodeArrivalIndex]) <= tripsExitConnectionTransferTravelTime[tripIndex]))) // <= to make sure we get the same result as forward calculation, which uses >
+            if (std::get<connectionIndexes::CAN_UNBOARD>(*connection) == 1 && (tripExitConnectionIndex == -1 || (std::get<0>(reverseJourneys[nodeArrivalIndex]) == -1 && std::get<4>(reverseJourneys[nodeArrivalIndex]) >= 0 && std::get<4>(reverseJourneys[nodeArrivalIndex]) <= tripsExitConnectionTransferTravelTime[tripIndex]))) // <= to make sure we get the same result as forward calculation, which uses >
             {
               tripsExitConnection[tripIndex]                   = i;
               tripsExitConnectionTransferTravelTime[tripIndex] = std::get<4>(reverseJourneys[nodeArrivalIndex]);
             }
             
-            if (std::get<connectionIndexes::CAN_BOARD>(connection) == 1 && tripsExitConnection[tripIndex] != -1)
+            if (std::get<connectionIndexes::CAN_BOARD>(*connection) == 1 && tripsExitConnection[tripIndex] != -1)
             {
               // get footpaths for the arrival node to get transferable nodes:
-              nodeDepartureIndex      = std::get<connectionIndexes::NODE_DEP>(connection);
-              connectionDepartureTime = std::get<connectionIndexes::TIME_DEP>(connection);
+              nodeDepartureIndex      = std::get<connectionIndexes::NODE_DEP>(*connection);
+              connectionDepartureTime = std::get<connectionIndexes::TIME_DEP>(*connection);
               //footpathsRangeStart     = footpathsRanges[nodeDepartureIndex].first;
               //footpathsRangeEnd       = footpathsRanges[nodeDepartureIndex].second;
               if (!params.returnAllNodesResult && !reachedAtLeastOneAccessNode && nodesAccessTravelTime[nodeDepartureIndex] != -1) // check if the departure node is accessable

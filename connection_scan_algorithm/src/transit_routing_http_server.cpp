@@ -215,6 +215,7 @@ int main(int argc, char** argv) {
     calculator.benchmarking["reset_3"]             = 0;
     calculator.benchmarking["reset_4"]             = 0;
     calculator.benchmarking["reset_5"]             = 0;*/
+    calculator.benchmarking["test"]                = 0;
     calculator.benchmarking["forward_calculation"] = 0;
     calculator.benchmarking["reset"]               = 0;
     //calculator.benchmarking["forward_journey"]     = 0;
@@ -1227,7 +1228,7 @@ int main(int argc, char** argv) {
           
           if (attributesMatches && (atLeastOneCompatiblePeriod || odTripsPeriods.size() == 0) && (!odTripUuid.is_initialized() || odTripUuid == odTrip.uuid) )
           {
-            std::cout << "od trip uuid " << odTrip.uuid << " (" << (i+1) << "/" << odTripsCount << ")" << std::endl;// << " dts: " << odTrip.departureTimeSeconds << " atLeastOneCompatiblePeriod: " << (atLeastOneCompatiblePeriod ? "true " : "false ") << "attributesMatches: " << (attributesMatches ? "true " : "false ") << std::endl;
+            std::cout /*<< /"od trip uuid " << odTrip.uuid << " ("*/ << (i+1) << "/" << odTripsCount /*<< ")"*/ << std::endl;// << " dts: " << odTrip.departureTimeSeconds << " atLeastOneCompatiblePeriod: " << (atLeastOneCompatiblePeriod ? "true " : "false ") << "attributesMatches: " << (attributesMatches ? "true " : "false ") << std::endl;
             
             calculator.params.origin      = odTrip.origin;
             calculator.params.destination = odTrip.destination;
