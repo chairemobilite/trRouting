@@ -16,6 +16,7 @@ namespace TrRouting
     int lineIdx;
     std::string direction;
     std::vector<int> nodesIdx;
+    std::vector<int> tripsIdx;
 
     const std::string toString() {
       return "Path " + boost::uuids::to_string(uuid) + "\n  direction " + direction;

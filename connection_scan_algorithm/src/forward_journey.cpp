@@ -7,7 +7,7 @@ namespace TrRouting
   RoutingResult Calculator::forwardJourney(int bestArrivalTime, int bestEgressNodeIndex, int bestEgressTravelTime)
   {
 
-    int benchmarkingStart = algorithmCalculationTime.getEpoch();
+    //int benchmarkingStart = algorithmCalculationTime.getEpoch();
 
     RoutingResult    result;
     nlohmann::json   json;
@@ -47,7 +47,7 @@ namespace TrRouting
       std::vector<boost::uuids::uuid>                   tripUuids;
       std::vector<int>                                  tripsIdx;
       std::vector<int>                                  inVehicleTravelTimesSeconds; // the in vehicle travel time for each segment
-      std::vector<std::tuple<boost::uuids::uuid, boost::uuids::uuid, boost::uuids::uuid, int, int>> legs; // tuple: tripUuid, lineUuid, pathUuid, boarding sequence, unboarding sequence
+      std::vector<std::tuple<int, int, int, int, int>>  legs; // tuple: tripIdx, lineIdx, pathIdx, start connection index, end connection index
       nlohmann::json stepJson = {};
       nlohmann::json nodeJson = {};
 
@@ -158,8 +158,8 @@ namespace TrRouting
             unboardingNodeUuids.push_back(journeyStepNodeArrival.uuid);
             tripUuids.push_back(journeyStepTrip.uuid);
             tripsIdx.push_back(std::get<3>(journeyStep));
-            legs.push_back(std::make_tuple(journeyStepTrip.uuid, journeyStepLine.uuid, journeyStepPath.uuid, boardingSequence, unboardingSequence));
-            
+            legs.push_back(std::make_tuple(std::get<3>(journeyStep), journeyStepTrip.lineIdx, journeyStepTrip.pathIdx, boardingSequence - 1, unboardingSequence - 1));
+
             if (i == 1) // first leg
             {
               accessWaitingTime  = waitingTime;
@@ -404,7 +404,7 @@ namespace TrRouting
     }
 
     result.json = json.dump(2); // number of spaces in indent for human readable json, use dump() to put all json content on the same line
-    benchmarking["forward_journey"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
+    //benchmarking["forward_journey"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
     return result;
 
   }

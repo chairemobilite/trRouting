@@ -15,11 +15,13 @@
 namespace TrRouting
 {
 
-  const std::tuple<std::vector<Trip>, std::map<boost::uuids::uuid, int>, std::vector<Block>, std::map<boost::uuids::uuid, int>, std::vector<std::tuple<int,int,int,int,int,short,short,int,int,int,short>>, std::vector<std::tuple<int,int,int,int,int,short,short,int,int,int,short>>> CacheFetcher::getTripsAndConnections(std::map<boost::uuids::uuid, int> agencyIndexesByUuid, std::vector<Line> lines, std::map<boost::uuids::uuid, int> lineIndexesByUuid, std::vector<Path> paths, std::map<boost::uuids::uuid, int> pathIndexesByUuid, std::map<boost::uuids::uuid, int> nodeIndexesByUuid, std::map<boost::uuids::uuid, int> serviceIndexesByUuid, Parameters& params)
+  const std::tuple<std::vector<Trip>, std::map<boost::uuids::uuid, int>, std::vector<std::vector<int>>, std::vector<std::vector<float>>, std::vector<Block>, std::map<boost::uuids::uuid, int>, std::vector<std::tuple<int,int,int,int,int,short,short,int,int,int,short>>, std::vector<std::tuple<int,int,int,int,int,short,short,int,int,int,short>>> CacheFetcher::getTripsAndConnections(std::map<boost::uuids::uuid, int> agencyIndexesByUuid, std::vector<Line> lines, std::map<boost::uuids::uuid, int> lineIndexesByUuid, std::vector<Path> paths, std::map<boost::uuids::uuid, int> pathIndexesByUuid, std::map<boost::uuids::uuid, int> nodeIndexesByUuid, std::map<boost::uuids::uuid, int> serviceIndexesByUuid, Parameters& params)
   { 
 
     std::vector<Trip> trips;
     std::vector<Block> blocks;
+    std::vector<std::vector<int>> tripConnectionDepartureTimes;
+    std::vector<std::vector<float>> tripConnectionDemands;
     std::map<boost::uuids::uuid, int> tripIndexesByUuid, blockIndexesByUuid;
     std::vector<std::tuple<int,int,int,int,int,short,short,int,int,int,short>> forwardConnections, reverseConnections;
     boost::uuids::string_generator uuidGenerator;
@@ -99,6 +101,7 @@ namespace TrRouting
 
               trips.push_back(*trip);
               tripIdx = trips.size() - 1;
+              paths[trip->pathIdx].tripsIdx.push_back(tripIdx);
               tripIndexesByUuid[trip->uuid] = tripIdx;
 
               nodeTimesCount = capnpTrip.getNodeArrivalTimesSeconds().size();
@@ -107,6 +110,9 @@ namespace TrRouting
               auto canBoards             = capnpTrip.getNodesCanBoard();
               auto canUnboards           = capnpTrip.getNodesCanUnboard();
               
+              std::vector<int>   connectionDepartureTimes(nodeTimesCount);
+              std::vector<float> connectionDemands(nodeTimesCount);
+
               for (int nodeTimeI = 0; nodeTimeI < nodeTimesCount; nodeTimeI++)
               {
                 if (nodeTimeI < nodeTimesCount - 1)
@@ -126,8 +132,15 @@ namespace TrRouting
                     trip->allowSameLineTransfers
                   ));
 
+                  connectionDepartureTimes[nodeTimeI] = departureTimesSeconds[nodeTimeI];
+                  connectionDemands[nodeTimeI]        = 0.0;
+
                 }
               }
+
+              tripConnectionDepartureTimes.push_back(connectionDepartureTimes);
+              tripConnectionDemands.push_back(connectionDemands);
+
             }
           }
         }
@@ -217,7 +230,7 @@ namespace TrRouting
     //  << std::endl;
     //}
 
-    return std::make_tuple(trips, tripIndexesByUuid, blocks, blockIndexesByUuid, forwardConnections, reverseConnections);
+    return std::make_tuple(trips, tripIndexesByUuid, tripConnectionDepartureTimes, tripConnectionDemands, blocks, blockIndexesByUuid, forwardConnections, reverseConnections);
   }
 
 }

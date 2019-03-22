@@ -122,6 +122,9 @@ namespace TrRouting
     
     std::vector<Trip>                   trips;
     std::map<boost::uuids::uuid, int>   tripIndexesByUuid;
+    std::vector<std::vector<int>>       tripConnectionDepartureTimes; // tripIndex: [connectionIndex (sequence in trip): departureTimeSeconds]
+    std::vector<std::vector<float>>     tripConnectionDemands; // tripIndex: [connectionIndex (sequence in trip): sum of od trips weights using this connection (demand)]
+    std::vector<std::vector<int>>       tripIndexesByPathIndex;
 
     std::vector<Mode>                   modes;
     std::map<std::string, int>          modeIndexesByShortname;

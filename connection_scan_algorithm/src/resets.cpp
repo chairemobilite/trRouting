@@ -32,9 +32,6 @@ namespace TrRouting
     std::fill(forwardEgressJourneys.begin(), forwardEgressJourneys.end(), std::make_tuple(-1,-1,-1,-1,-1,-1));
     std::fill(reverseJourneys.begin(),       reverseJourneys.end(),       std::make_tuple(-1,-1,-1,-1,-1,-1));
     std::fill(reverseAccessJourneys.begin(), reverseAccessJourneys.end(), std::make_tuple(-1,-1,-1,-1,-1,-1));
-    
-    benchmarking["reset_1"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
-    benchmarkingStart = algorithmCalculationTime.getEpoch();
 
     departureTimeSeconds = -1;
     arrivalTimeSeconds   = -1;
@@ -59,11 +56,6 @@ namespace TrRouting
     {
       arrivalTimeSeconds = params.arrivalTimeHour * 3600 + params.arrivalTimeMinutes * 60;
     }
-
-
-    benchmarking["reset_2"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
-    benchmarkingStart = algorithmCalculationTime.getEpoch();
-
 
     if (params.debugDisplay)
       std::cerr << "-- reset and preparations -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
@@ -128,10 +120,6 @@ namespace TrRouting
       }
     }
   
-    benchmarking["reset_3"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
-    benchmarkingStart = algorithmCalculationTime.getEpoch();
-  
-  
     if (!params.returnAllNodesResult || arrivalTimeSeconds >= -1)
     {
       if (resetAccessPaths)
@@ -185,9 +173,6 @@ namespace TrRouting
     
     //std::cerr << "-- maxEgressTravelTime = " << maxEgressTravelTime << std::endl;
 
-    benchmarking["reset_4"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
-    benchmarkingStart = algorithmCalculationTime.getEpoch();
-
 
     if (params.debugDisplay)
       std::cerr << "-- access and egress footpaths -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
@@ -204,10 +189,15 @@ namespace TrRouting
     if (resetFilters)
     {
 
-      /*if (params.calculateAllOdTrips)
+      if (params.calculateAllOdTrips)
       {
-        std::tie(trips, tripIndexesByUuid, blocks, blockIndexesByUuid, forwardConnections, reverseConnections) = params.cacheFetcher->getTripsAndConnections(agencyIndexesByUuid, lines, lineIndexesByUuid, paths, pathIndexesByUuid, nodeIndexesByUuid, serviceIndexesByUuid, params);
-      }*/
+        // reset connections demand:
+        for (auto & tripConnectionDemand : tripConnectionDemands)
+        {
+          std::fill(tripConnectionDemand.begin(), tripConnectionDemand.end(), 0.0);
+        }
+        //std::tie(trips, tripIndexesByUuid, blocks, blockIndexesByUuid, forwardConnections, reverseConnections) = params.cacheFetcher->getTripsAndConnections(agencyIndexesByUuid, lines, lineIndexesByUuid, paths, pathIndexesByUuid, nodeIndexesByUuid, serviceIndexesByUuid, params);
+      }
 
       for (auto & trip : trips)
       {
@@ -283,11 +273,7 @@ namespace TrRouting
 
     
     
-    benchmarking["reset_5"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
-    benchmarkingStart = algorithmCalculationTime.getEpoch();
-
-
-
+    benchmarking["reset"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
 
     if (params.debugDisplay)
       std::cerr << "-- filter trips -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";

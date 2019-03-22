@@ -210,22 +210,23 @@ int main(int argc, char** argv) {
     calculator.algorithmCalculationTime.start();
     calculator.benchmarking.clear();
 
-    calculator.benchmarking["reset_1"]             = 0;
+    /*calculator.benchmarking["reset_1"]             = 0;
     calculator.benchmarking["reset_2"]             = 0;
     calculator.benchmarking["reset_3"]             = 0;
     calculator.benchmarking["reset_4"]             = 0;
-    calculator.benchmarking["reset_5"]             = 0;
+    calculator.benchmarking["reset_5"]             = 0;*/
     calculator.benchmarking["forward_calculation"] = 0;
-    calculator.benchmarking["forward_journey"]     = 0;
+    calculator.benchmarking["reset"]               = 0;
+    //calculator.benchmarking["forward_journey"]     = 0;
     calculator.benchmarking["reverse_calculation"] = 0;
-    calculator.benchmarking["reverse_journey"]     = 0;
-    calculator.benchmarking["generating_results"]  = 0;
-    calculator.benchmarking["transferable_nodes"]  = 0;
-    calculator.benchmarking["count_1"]              = 0;
+    //calculator.benchmarking["reverse_journey"]     = 0;
+    //calculator.benchmarking["generating_results"]  = 0;
+    //calculator.benchmarking["transferable_nodes"]  = 0;
+    /*calculator.benchmarking["count_1"]              = 0;
     calculator.benchmarking["count_2"]              = 0;
     calculator.benchmarking["count_3"]              = 0;
     calculator.benchmarking["count_4"]              = 0;
-    calculator.benchmarking["count_5"]              = 0;
+    calculator.benchmarking["count_5"]              = 0;*/
     int countOdTripsCalculated {0};
 
     //calculator.algorithmCalculationTime.startStep();
@@ -1130,26 +1131,33 @@ int main(int argc, char** argv) {
       if (!calculator.params.alternatives && (calculator.params.calculateAllOdTrips || odTripUuid.is_initialized() ))
       {
         RoutingResult routingResult;
-        std::map<boost::uuids::uuid, std::map<int, float>> tripsLegsProfile; // parent map key: trip uuid, nested map key: connection sequence, value: number of trips using this connection
-        std::map<boost::uuids::uuid, std::map<int, std::pair<float, std::vector<boost::uuids::uuid>>>> pathsLegsProfile; // parent map key: trip uuid, nested map key: connection sequence, value: number of trips using this connection
-        std::map<boost::uuids::uuid, float> linesOdTripsCount; // key: line id, value: count od trips using this line
-        boost::uuids::uuid legTripUuid;
-        boost::uuids::uuid legLineUuid;
-        boost::uuids::uuid legPathUuid;
+        //std::map<boost::uuids::uuid, std::map<int, float>> tripsLegsProfile; // parent map key: trip uuid, nested map key: connection sequence, value: number of trips using this connection
+        //std::map<boost::uuids::uuid, std::map<int, std::pair<float, std::vector<boost::uuids::uuid>>>> pathsLegsProfile; // parent map key: trip uuid, nested map key: connection sequence, value: number of trips using this connection
+        std::map<boost::uuids::uuid, float> lineProfiles; // key: line uuid, value: count od trips using this line
+        std::map<boost::uuids::uuid, std::vector<std::vector<float>>> pathProfiles; // key: path uuid, value: [index: segment index, value: [index: hourOfDay, demand]]
+        std::map<boost::uuids::uuid, std::vector<float>> pathTotalProfiles; // key: path uuid, value: [index: segment index, value: totalDemand]
+        int  legTripIdx;
+        int  legLineIdx;
+        int  legPathIdx;
+        Path legPath;
+        int  connectionDepartureTimeSeconds;
+        int  connectionDepartureTimeHour;
         bool atLeastOneOdTrip {false};
         bool atLeastOneCompatiblePeriod {false};
         bool attributesMatches {true};
-        int odTripsCount = calculator.odTrips.size();
+        int  odTripsCount = calculator.odTrips.size();
+        float maximumSegmentHourlyDemand = 0.0;
+        float maximumSegmentTotalDemand  = 0.0;
         std::string ageGroup;
         
-        int legBoardingSequence;
-        int legUnboardingSequence;
+        int legConnectionStartIdx;
+        int legConnectionEndIdx;
         
         nlohmann::json json;
         nlohmann::json odTripJson;
-        nlohmann::json linesOdTripsCountJson;
-        nlohmann::json pathsOdTripsProfilesJson;
-        nlohmann::json pathsOdTripsProfilesSequenceJson;
+        nlohmann::json lineProfilesJson;
+        nlohmann::json pathProfilesJson;
+        //nlohmann::json pathsOdTripsProfilesSequenceJson;
         //std::vector<unsigned long long> pathsOdTripsProfilesOdTripUuids;
         
         if (fileFormat == "csv" && batchNumber == 1) // write header only on first batch, so we can easily append subsequent batches to the same csv file
@@ -1168,6 +1176,23 @@ int main(int argc, char** argv) {
         int i {0};
         int j {0};
         bool resetFilters {true};
+
+        for (auto & line : calculator.lines)
+        {
+          lineProfiles[line.uuid] = 0.0;
+        }
+
+        std::vector<float> demandByHourOfDay;
+        for (int i = 0; i <= 28; i++)
+        {
+          demandByHourOfDay.push_back(0.0);
+        }
+
+        /*for (auto & path : calculator.paths)
+        {
+          pathProfiles[path.uuid] = std::vector<std::vector<float>>(path.nodesIdx.size() - 1, demandByHourOfDay);
+        }*/
+
         for (auto & odTrip : calculator.odTrips)
         {
           
@@ -1210,7 +1235,7 @@ int main(int argc, char** argv) {
             routingResult = calculator.calculate(true, resetFilters); // reset filters only on first calculation
             resetFilters  = false;
             countOdTripsCalculated++;
-            int benchmarkingStart = calculator.algorithmCalculationTime.getEpoch();
+            //int benchmarkingStart = calculator.algorithmCalculationTime.getEpoch();
             if (true/*routingResult.status == "success"*/)
             {
               atLeastOneOdTrip = true;
@@ -1220,49 +1245,35 @@ int main(int argc, char** argv) {
                 {
                   for (auto & leg : routingResult.legs)
                   {
-                    legTripUuid           = std::get<0>(leg);
-                    legLineUuid           = std::get<1>(leg);
-                    legPathUuid           = std::get<2>(leg);
-                    legBoardingSequence   = std::get<3>(leg);
-                    legUnboardingSequence = std::get<4>(leg);
-                    if (linesOdTripsCount.find(legLineUuid) == linesOdTripsCount.end())
+                    legTripIdx            = std::get<0>(leg);
+                    legLineIdx            = std::get<1>(leg);
+                    legPathIdx            = std::get<2>(leg);
+                    legPath               = calculator.paths[legPathIdx];
+                    legConnectionStartIdx = std::get<3>(leg);
+                    legConnectionEndIdx   = std::get<4>(leg);
+                    lineProfiles[calculator.lines[legLineIdx].uuid] += odTrip.expansionFactor;
+
+                    if (pathProfiles.find(legPath.uuid) == pathProfiles.end())
                     {
-                      linesOdTripsCount[legLineUuid] = odTrip.expansionFactor;
+                      pathProfiles[legPath.uuid] = std::vector<std::vector<float>>(legPath.nodesIdx.size() - 1, demandByHourOfDay);
+                      pathTotalProfiles[legPath.uuid] = std::vector<float>(legPath.nodesIdx.size() - 1, 0.0);
                     }
-                    else
+
+                    for (int connectionIndex = legConnectionStartIdx; connectionIndex <= legConnectionEndIdx; connectionIndex++)
                     {
-                      linesOdTripsCount[legLineUuid] += odTrip.expansionFactor;
-                    }
-                    if (tripsLegsProfile.find(legTripUuid) == tripsLegsProfile.end()) // initialize legs for this trip if not already set
-                    {
-                      tripsLegsProfile[legTripUuid] = std::map<int, float>();
-                    }
-                    if (pathsLegsProfile.find(legPathUuid) == pathsLegsProfile.end()) // initialize legs for this trip if not already set
-                    {
-                      pathsLegsProfile[legPathUuid] = std::map<int, std::pair<float, std::vector<boost::uuids::uuid>>>();
-                    }
-                    for (int sequence = legBoardingSequence; sequence <= legUnboardingSequence; sequence++) // loop each connection sequence between boarding and unboarding sequences
-                    {
-                      // increment in trip profile:
-                      if (tripsLegsProfile[legTripUuid].find(sequence) == tripsLegsProfile[legTripUuid].end())
+                      connectionDepartureTimeSeconds = calculator.tripConnectionDepartureTimes[legTripIdx][connectionIndex];
+                      calculator.tripConnectionDemands[legTripIdx][connectionIndex] += odTrip.expansionFactor;
+                      connectionDepartureTimeHour    = connectionDepartureTimeSeconds / 3600;
+                      //std::cout << "pUuid:" << legPath.uuid << " dth:" << connectionDepartureTimeHour << " cI:" << connectionIndex << " oldD:" << pathProfiles[legPath.uuid][connectionIndex][connectionDepartureTimeHour] << std::endl;
+                      pathProfiles[legPath.uuid][connectionIndex][connectionDepartureTimeHour] += odTrip.expansionFactor;
+                      pathTotalProfiles[legPath.uuid][connectionIndex] += odTrip.expansionFactor;
+                      if (maximumSegmentHourlyDemand < pathProfiles[legPath.uuid][connectionIndex][connectionDepartureTimeHour])
                       {
-                        tripsLegsProfile[legTripUuid][sequence] = odTrip.expansionFactor; // create the first od_trip for this connection
+                        maximumSegmentHourlyDemand = pathProfiles[legPath.uuid][connectionIndex][connectionDepartureTimeHour];
                       }
-                      else
+                      if (maximumSegmentTotalDemand < pathTotalProfiles[legPath.uuid][connectionIndex])
                       {
-                        tripsLegsProfile[legTripUuid][sequence] += odTrip.expansionFactor; // increment od_trips for this connection
-                      }
-                      // increment in line path profile:
-                      if (pathsLegsProfile[legPathUuid].find(sequence) == pathsLegsProfile[legPathUuid].end())
-                      {
-                        std::vector<boost::uuids::uuid> odTripUuids;
-                        odTripUuids.push_back(odTrip.uuid);
-                        pathsLegsProfile[legPathUuid][sequence] = std::make_pair(odTrip.expansionFactor, odTripUuids); // create the first od_trip for this connection
-                      }
-                      else
-                      {
-                        std::get<0>(pathsLegsProfile[legPathUuid][sequence]) += odTrip.expansionFactor; // increment od_trips for this connection
-                        std::get<1>(pathsLegsProfile[legPathUuid][sequence]).push_back(odTrip.uuid);
+                        maximumSegmentTotalDemand = pathTotalProfiles[legPath.uuid][connectionIndex];
                       }
                     }
                   }
@@ -1384,7 +1395,7 @@ int main(int argc, char** argv) {
                 json["odTrips"].push_back(odTripJson);
               }
             }
-            calculator.benchmarking["generating_results"] += calculator.algorithmCalculationTime.getEpoch() - benchmarkingStart;
+            //calculator.benchmarking["generating_results"] += calculator.algorithmCalculationTime.getEpoch() - benchmarkingStart;
           }
           i++;
           if (odTripsSampleSize >= 0 && i >= odTripsSampleSize)
@@ -1394,34 +1405,37 @@ int main(int argc, char** argv) {
         }
         if (fileFormat != "csv")
         {
-          linesOdTripsCountJson = {};
-          for (auto & lineCount : linesOdTripsCount)
+          json["maxSegmentHourlyDemand"] = maximumSegmentHourlyDemand;
+          json["maxSegmentTotalDemand"]  = maximumSegmentTotalDemand;
+          lineProfilesJson = {};
+          for (auto & lineCount : lineProfiles)
           {
-            linesOdTripsCountJson[boost::uuids::to_string(lineCount.first)] = lineCount.second;
+            lineProfilesJson[boost::uuids::to_string(lineCount.first)] = lineCount.second;
           }
-          json["linesOdTripsCount"] = linesOdTripsCountJson;
+          json["lineProfiles"] = lineProfilesJson;
           
-          pathsOdTripsProfilesJson = {};
-          for (auto & pathProfile : pathsLegsProfile)
+          pathProfilesJson = {};
+          for (auto & pathProfile : pathProfiles)
           {
-            pathsOdTripsProfilesSequenceJson = {};
-            for (auto & sequenceProfile : pathProfile.second)
+            pathProfilesJson[boost::uuids::to_string(pathProfile.first)] = pathProfile.second;
+            //pathsOdTripsProfilesSequenceJson = {};
+            /*for (auto & segmentProfile : pathProfile)
             {
+              
               //pathsOdTripsProfilesOdTripUuids.clear();
               //for (auto & odTripUuid : std::get<1>(sequenceProfile.second))
               //{
               //  pathsOdTripsProfilesOdTripUuids.push_back()
               //}
-              pathsOdTripsProfilesSequenceJson[std::to_string(sequenceProfile.first)] = {{"demand", std::get<0>(sequenceProfile.second)}, {"odTripUuids", Toolbox::uuidsToStrings(std::get<1>(sequenceProfile.second))}};
-            }
-            pathsOdTripsProfilesJson[boost::uuids::to_string(pathProfile.first)] = pathsOdTripsProfilesSequenceJson;
+              //pathsOdTripsProfilesSequenceJson[std::to_string(sequenceProfile.first)] = {{"demand", std::get<0>(sequenceProfile.second)}, {"odTripUuids", Toolbox::uuidsToStrings(std::get<1>(sequenceProfile.second))}};
+            }*/
+            //pathsOdTripsProfilesJson[boost::uuids::to_string(pathProfile.first)] = pathsProfile;
           }
-          json["pathsOdTripsProfiles"] = pathsOdTripsProfilesJson;
+          json["pathProfiles"] = pathProfilesJson;
           resultStr = json.dump(2);
         }
         if (calculator.params.calculateAllOdTrips && fileFormat == "csv")
         {
-          
           
           if (saveToFile)
           {

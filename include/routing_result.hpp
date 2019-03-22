@@ -33,7 +33,7 @@ namespace TrRouting
     std::vector<int>                tripsIdx;
     std::vector<int>                linesIdx;
     std::vector<int>                inVehicleTravelTimesSeconds;
-    std::vector<std::tuple<boost::uuids::uuid, boost::uuids::uuid, boost::uuids::uuid, int, int>> legs; // tuple: tripUuid, lineUuid, pathUuid, boarding sequence, unboarding sequence
+    std::vector<std::tuple<int, int, int, int, int>> legs; // tuple: tripIdx, lineIdx, pathIdx, start connection index, end connection index
     
   };
   

@@ -40,11 +40,13 @@ namespace TrRouting
         std::string uuid     {capnpT.getUuid()};
         std::string lineUuid {capnpT.getLineUuid()};
         std::vector<int> nodesIdx;
+        std::vector<int> tripsIdx;
         boost::uuids::uuid nodeUuid;
         T * t                     = new T();
         t->uuid                   = uuidGenerator(uuid);
         t->direction              = capnpT.getDirection();
         t->lineIdx                = lineIndexesByUuid[uuidGenerator(lineUuid)];
+        t->tripsIdx               = tripsIdx;
         for (std::string nodeUuidStr : capnpT.getNodesUuids())
         {
           nodeUuid = uuidGenerator(nodeUuidStr);
