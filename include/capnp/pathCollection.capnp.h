@@ -189,6 +189,8 @@ public:
   inline bool hasGeography() const;
   inline  ::capnp::Text::Reader getGeography() const;
 
+  inline  ::int8_t getIsFrozen() const;
+
 private:
   ::capnp::_::StructReader _reader;
   template <typename, ::capnp::Kind>
@@ -302,6 +304,9 @@ public:
   inline  ::capnp::Text::Builder initGeography(unsigned int size);
   inline void adoptGeography(::capnp::Orphan< ::capnp::Text>&& value);
   inline ::capnp::Orphan< ::capnp::Text> disownGeography();
+
+  inline  ::int8_t getIsFrozen();
+  inline void setIsFrozen( ::int8_t value);
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -777,6 +782,20 @@ inline void Path::Builder::adoptGeography(
 inline ::capnp::Orphan< ::capnp::Text> Path::Builder::disownGeography() {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
       ::capnp::bounded<10>() * ::capnp::POINTERS));
+}
+
+inline  ::int8_t Path::Reader::getIsFrozen() const {
+  return _reader.getDataField< ::int8_t>(
+      ::capnp::bounded<5>() * ::capnp::ELEMENTS);
+}
+
+inline  ::int8_t Path::Builder::getIsFrozen() {
+  return _builder.getDataField< ::int8_t>(
+      ::capnp::bounded<5>() * ::capnp::ELEMENTS);
+}
+inline void Path::Builder::setIsFrozen( ::int8_t value) {
+  _builder.setDataField< ::int8_t>(
+      ::capnp::bounded<5>() * ::capnp::ELEMENTS, value);
 }
 
 }  // namespace

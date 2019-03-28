@@ -21,4 +21,5 @@ struct Path {
   stopsUuids  @10 :List(Text);
   segments    @11 :List(Int32); # index of the first coordinate of segment in geography coordinates
   geography   @12 :Text; # encoded polyline (mapbox format)
+  isFrozen    @13 :Int8;
 }

@@ -28,6 +28,7 @@ struct Person {
   usualSchoolPlaceNodesDistances   @20 :List(Int16); # meters
   internalId                       @21 :Text;
   data                             @22 :Text; # json
+  isFrozen                         @23 :Int8;
 
   enum AgeGroup {
     none     @0 ;

@@ -69,9 +69,9 @@ public:
   inline bool hasName() const;
   inline  ::capnp::Text::Reader getName() const;
 
-  inline  ::int32_t getLatitude() const;
+  inline float getLatitude() const;
 
-  inline  ::int32_t getLongitude() const;
+  inline float getLongitude() const;
 
   inline bool hasStationUuid() const;
   inline  ::capnp::Text::Reader getStationUuid() const;
@@ -99,6 +99,8 @@ public:
 
   inline bool hasTransferableNodesDistances() const;
   inline  ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>::Reader getTransferableNodesDistances() const;
+
+  inline  ::int8_t getIsFrozen() const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -159,11 +161,11 @@ public:
   inline void adoptName(::capnp::Orphan< ::capnp::Text>&& value);
   inline ::capnp::Orphan< ::capnp::Text> disownName();
 
-  inline  ::int32_t getLatitude();
-  inline void setLatitude( ::int32_t value);
+  inline float getLatitude();
+  inline void setLatitude(float value);
 
-  inline  ::int32_t getLongitude();
-  inline void setLongitude( ::int32_t value);
+  inline float getLongitude();
+  inline void setLongitude(float value);
 
   inline bool hasStationUuid();
   inline  ::capnp::Text::Builder getStationUuid();
@@ -225,6 +227,9 @@ public:
   inline  ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>::Builder initTransferableNodesDistances(unsigned int size);
   inline void adoptTransferableNodesDistances(::capnp::Orphan< ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>>&& value);
   inline ::capnp::Orphan< ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>> disownTransferableNodesDistances();
+
+  inline  ::int8_t getIsFrozen();
+  inline void setIsFrozen( ::int8_t value);
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -404,31 +409,31 @@ inline ::capnp::Orphan< ::capnp::Text> Node::Builder::disownName() {
       ::capnp::bounded<3>() * ::capnp::POINTERS));
 }
 
-inline  ::int32_t Node::Reader::getLatitude() const {
-  return _reader.getDataField< ::int32_t>(
+inline float Node::Reader::getLatitude() const {
+  return _reader.getDataField<float>(
       ::capnp::bounded<1>() * ::capnp::ELEMENTS);
 }
 
-inline  ::int32_t Node::Builder::getLatitude() {
-  return _builder.getDataField< ::int32_t>(
+inline float Node::Builder::getLatitude() {
+  return _builder.getDataField<float>(
       ::capnp::bounded<1>() * ::capnp::ELEMENTS);
 }
-inline void Node::Builder::setLatitude( ::int32_t value) {
-  _builder.setDataField< ::int32_t>(
+inline void Node::Builder::setLatitude(float value) {
+  _builder.setDataField<float>(
       ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
 }
 
-inline  ::int32_t Node::Reader::getLongitude() const {
-  return _reader.getDataField< ::int32_t>(
+inline float Node::Reader::getLongitude() const {
+  return _reader.getDataField<float>(
       ::capnp::bounded<2>() * ::capnp::ELEMENTS);
 }
 
-inline  ::int32_t Node::Builder::getLongitude() {
-  return _builder.getDataField< ::int32_t>(
+inline float Node::Builder::getLongitude() {
+  return _builder.getDataField<float>(
       ::capnp::bounded<2>() * ::capnp::ELEMENTS);
 }
-inline void Node::Builder::setLongitude( ::int32_t value) {
-  _builder.setDataField< ::int32_t>(
+inline void Node::Builder::setLongitude(float value) {
+  _builder.setDataField<float>(
       ::capnp::bounded<2>() * ::capnp::ELEMENTS, value);
 }
 
@@ -722,6 +727,20 @@ inline void Node::Builder::adoptTransferableNodesDistances(
 inline ::capnp::Orphan< ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>> Node::Builder::disownTransferableNodesDistances() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::int16_t,  ::capnp::Kind::PRIMITIVE>>::disown(_builder.getPointerField(
       ::capnp::bounded<10>() * ::capnp::POINTERS));
+}
+
+inline  ::int8_t Node::Reader::getIsFrozen() const {
+  return _reader.getDataField< ::int8_t>(
+      ::capnp::bounded<13>() * ::capnp::ELEMENTS);
+}
+
+inline  ::int8_t Node::Builder::getIsFrozen() {
+  return _builder.getDataField< ::int8_t>(
+      ::capnp::bounded<13>() * ::capnp::ELEMENTS);
+}
+inline void Node::Builder::setIsFrozen( ::int8_t value) {
+  _builder.setDataField< ::int8_t>(
+      ::capnp::bounded<13>() * ::capnp::ELEMENTS, value);
 }
 
 }  // namespace

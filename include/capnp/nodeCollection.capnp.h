@@ -188,6 +188,8 @@ public:
 
   inline  ::int16_t getDefaultDwellTimeSeconds() const;
 
+  inline  ::int8_t getIsFrozen() const;
+
 private:
   ::capnp::_::StructReader _reader;
   template <typename, ::capnp::Kind>
@@ -289,6 +291,9 @@ public:
 
   inline  ::int16_t getDefaultDwellTimeSeconds();
   inline void setDefaultDwellTimeSeconds( ::int16_t value);
+
+  inline  ::int8_t getIsFrozen();
+  inline void setIsFrozen( ::int8_t value);
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -706,6 +711,20 @@ inline  ::int16_t Node::Builder::getDefaultDwellTimeSeconds() {
 inline void Node::Builder::setDefaultDwellTimeSeconds( ::int16_t value) {
   _builder.setDataField< ::int16_t>(
       ::capnp::bounded<8>() * ::capnp::ELEMENTS, value);
+}
+
+inline  ::int8_t Node::Reader::getIsFrozen() const {
+  return _reader.getDataField< ::int8_t>(
+      ::capnp::bounded<13>() * ::capnp::ELEMENTS);
+}
+
+inline  ::int8_t Node::Builder::getIsFrozen() {
+  return _builder.getDataField< ::int8_t>(
+      ::capnp::bounded<13>() * ::capnp::ELEMENTS);
+}
+inline void Node::Builder::setIsFrozen( ::int8_t value) {
+  _builder.setDataField< ::int8_t>(
+      ::capnp::bounded<13>() * ::capnp::ELEMENTS, value);
 }
 
 }  // namespace

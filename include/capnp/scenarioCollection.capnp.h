@@ -45,7 +45,7 @@ struct Scenario {
   class Pipeline;
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(d02bfb3e8aaf660b, 1, 6)
+    CAPNP_DECLARE_STRUCT_HEADER(d02bfb3e8aaf660b, 1, 14)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
     #endif  // !CAPNP_LITE
@@ -172,6 +172,32 @@ public:
   inline bool hasServicesUuids() const;
   inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader getServicesUuids() const;
 
+  inline bool hasOnlyLinesUuids() const;
+  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader getOnlyLinesUuids() const;
+
+  inline bool hasExceptLinesUuids() const;
+  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader getExceptLinesUuids() const;
+
+  inline bool hasOnlyAgenciesUuids() const;
+  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader getOnlyAgenciesUuids() const;
+
+  inline bool hasExceptAgenciesUuids() const;
+  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader getExceptAgenciesUuids() const;
+
+  inline bool hasOnlyNodesUuids() const;
+  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader getOnlyNodesUuids() const;
+
+  inline bool hasExceptNodesUuids() const;
+  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader getExceptNodesUuids() const;
+
+  inline bool hasOnlyModesShortnames() const;
+  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader getOnlyModesShortnames() const;
+
+  inline bool hasExceptModesShortnames() const;
+  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader getExceptModesShortnames() const;
+
+  inline  ::int8_t getIsFrozen() const;
+
 private:
   ::capnp::_::StructReader _reader;
   template <typename, ::capnp::Kind>
@@ -245,6 +271,73 @@ public:
   inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder initServicesUuids(unsigned int size);
   inline void adoptServicesUuids(::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value);
   inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> disownServicesUuids();
+
+  inline bool hasOnlyLinesUuids();
+  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder getOnlyLinesUuids();
+  inline void setOnlyLinesUuids( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value);
+  inline void setOnlyLinesUuids(::kj::ArrayPtr<const  ::capnp::Text::Reader> value);
+  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder initOnlyLinesUuids(unsigned int size);
+  inline void adoptOnlyLinesUuids(::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value);
+  inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> disownOnlyLinesUuids();
+
+  inline bool hasExceptLinesUuids();
+  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder getExceptLinesUuids();
+  inline void setExceptLinesUuids( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value);
+  inline void setExceptLinesUuids(::kj::ArrayPtr<const  ::capnp::Text::Reader> value);
+  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder initExceptLinesUuids(unsigned int size);
+  inline void adoptExceptLinesUuids(::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value);
+  inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> disownExceptLinesUuids();
+
+  inline bool hasOnlyAgenciesUuids();
+  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder getOnlyAgenciesUuids();
+  inline void setOnlyAgenciesUuids( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value);
+  inline void setOnlyAgenciesUuids(::kj::ArrayPtr<const  ::capnp::Text::Reader> value);
+  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder initOnlyAgenciesUuids(unsigned int size);
+  inline void adoptOnlyAgenciesUuids(::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value);
+  inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> disownOnlyAgenciesUuids();
+
+  inline bool hasExceptAgenciesUuids();
+  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder getExceptAgenciesUuids();
+  inline void setExceptAgenciesUuids( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value);
+  inline void setExceptAgenciesUuids(::kj::ArrayPtr<const  ::capnp::Text::Reader> value);
+  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder initExceptAgenciesUuids(unsigned int size);
+  inline void adoptExceptAgenciesUuids(::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value);
+  inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> disownExceptAgenciesUuids();
+
+  inline bool hasOnlyNodesUuids();
+  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder getOnlyNodesUuids();
+  inline void setOnlyNodesUuids( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value);
+  inline void setOnlyNodesUuids(::kj::ArrayPtr<const  ::capnp::Text::Reader> value);
+  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder initOnlyNodesUuids(unsigned int size);
+  inline void adoptOnlyNodesUuids(::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value);
+  inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> disownOnlyNodesUuids();
+
+  inline bool hasExceptNodesUuids();
+  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder getExceptNodesUuids();
+  inline void setExceptNodesUuids( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value);
+  inline void setExceptNodesUuids(::kj::ArrayPtr<const  ::capnp::Text::Reader> value);
+  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder initExceptNodesUuids(unsigned int size);
+  inline void adoptExceptNodesUuids(::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value);
+  inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> disownExceptNodesUuids();
+
+  inline bool hasOnlyModesShortnames();
+  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder getOnlyModesShortnames();
+  inline void setOnlyModesShortnames( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value);
+  inline void setOnlyModesShortnames(::kj::ArrayPtr<const  ::capnp::Text::Reader> value);
+  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder initOnlyModesShortnames(unsigned int size);
+  inline void adoptOnlyModesShortnames(::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value);
+  inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> disownOnlyModesShortnames();
+
+  inline bool hasExceptModesShortnames();
+  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder getExceptModesShortnames();
+  inline void setExceptModesShortnames( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value);
+  inline void setExceptModesShortnames(::kj::ArrayPtr<const  ::capnp::Text::Reader> value);
+  inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder initExceptModesShortnames(unsigned int size);
+  inline void adoptExceptModesShortnames(::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value);
+  inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> disownExceptModesShortnames();
+
+  inline  ::int8_t getIsFrozen();
+  inline void setIsFrozen( ::int8_t value);
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -528,6 +621,324 @@ inline void Scenario::Builder::adoptServicesUuids(
 inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> Scenario::Builder::disownServicesUuids() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::disown(_builder.getPointerField(
       ::capnp::bounded<5>() * ::capnp::POINTERS));
+}
+
+inline bool Scenario::Reader::hasOnlyLinesUuids() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<6>() * ::capnp::POINTERS).isNull();
+}
+inline bool Scenario::Builder::hasOnlyLinesUuids() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<6>() * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader Scenario::Reader::getOnlyLinesUuids() const {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_reader.getPointerField(
+      ::capnp::bounded<6>() * ::capnp::POINTERS));
+}
+inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Scenario::Builder::getOnlyLinesUuids() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_builder.getPointerField(
+      ::capnp::bounded<6>() * ::capnp::POINTERS));
+}
+inline void Scenario::Builder::setOnlyLinesUuids( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
+      ::capnp::bounded<6>() * ::capnp::POINTERS), value);
+}
+inline void Scenario::Builder::setOnlyLinesUuids(::kj::ArrayPtr<const  ::capnp::Text::Reader> value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
+      ::capnp::bounded<6>() * ::capnp::POINTERS), value);
+}
+inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Scenario::Builder::initOnlyLinesUuids(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::init(_builder.getPointerField(
+      ::capnp::bounded<6>() * ::capnp::POINTERS), size);
+}
+inline void Scenario::Builder::adoptOnlyLinesUuids(
+    ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::adopt(_builder.getPointerField(
+      ::capnp::bounded<6>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> Scenario::Builder::disownOnlyLinesUuids() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::disown(_builder.getPointerField(
+      ::capnp::bounded<6>() * ::capnp::POINTERS));
+}
+
+inline bool Scenario::Reader::hasExceptLinesUuids() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS).isNull();
+}
+inline bool Scenario::Builder::hasExceptLinesUuids() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader Scenario::Reader::getExceptLinesUuids() const {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_reader.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS));
+}
+inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Scenario::Builder::getExceptLinesUuids() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_builder.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS));
+}
+inline void Scenario::Builder::setExceptLinesUuids( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS), value);
+}
+inline void Scenario::Builder::setExceptLinesUuids(::kj::ArrayPtr<const  ::capnp::Text::Reader> value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS), value);
+}
+inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Scenario::Builder::initExceptLinesUuids(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::init(_builder.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS), size);
+}
+inline void Scenario::Builder::adoptExceptLinesUuids(
+    ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::adopt(_builder.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> Scenario::Builder::disownExceptLinesUuids() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::disown(_builder.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS));
+}
+
+inline bool Scenario::Reader::hasOnlyAgenciesUuids() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<8>() * ::capnp::POINTERS).isNull();
+}
+inline bool Scenario::Builder::hasOnlyAgenciesUuids() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<8>() * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader Scenario::Reader::getOnlyAgenciesUuids() const {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_reader.getPointerField(
+      ::capnp::bounded<8>() * ::capnp::POINTERS));
+}
+inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Scenario::Builder::getOnlyAgenciesUuids() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_builder.getPointerField(
+      ::capnp::bounded<8>() * ::capnp::POINTERS));
+}
+inline void Scenario::Builder::setOnlyAgenciesUuids( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
+      ::capnp::bounded<8>() * ::capnp::POINTERS), value);
+}
+inline void Scenario::Builder::setOnlyAgenciesUuids(::kj::ArrayPtr<const  ::capnp::Text::Reader> value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
+      ::capnp::bounded<8>() * ::capnp::POINTERS), value);
+}
+inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Scenario::Builder::initOnlyAgenciesUuids(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::init(_builder.getPointerField(
+      ::capnp::bounded<8>() * ::capnp::POINTERS), size);
+}
+inline void Scenario::Builder::adoptOnlyAgenciesUuids(
+    ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::adopt(_builder.getPointerField(
+      ::capnp::bounded<8>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> Scenario::Builder::disownOnlyAgenciesUuids() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::disown(_builder.getPointerField(
+      ::capnp::bounded<8>() * ::capnp::POINTERS));
+}
+
+inline bool Scenario::Reader::hasExceptAgenciesUuids() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<9>() * ::capnp::POINTERS).isNull();
+}
+inline bool Scenario::Builder::hasExceptAgenciesUuids() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<9>() * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader Scenario::Reader::getExceptAgenciesUuids() const {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_reader.getPointerField(
+      ::capnp::bounded<9>() * ::capnp::POINTERS));
+}
+inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Scenario::Builder::getExceptAgenciesUuids() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_builder.getPointerField(
+      ::capnp::bounded<9>() * ::capnp::POINTERS));
+}
+inline void Scenario::Builder::setExceptAgenciesUuids( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
+      ::capnp::bounded<9>() * ::capnp::POINTERS), value);
+}
+inline void Scenario::Builder::setExceptAgenciesUuids(::kj::ArrayPtr<const  ::capnp::Text::Reader> value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
+      ::capnp::bounded<9>() * ::capnp::POINTERS), value);
+}
+inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Scenario::Builder::initExceptAgenciesUuids(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::init(_builder.getPointerField(
+      ::capnp::bounded<9>() * ::capnp::POINTERS), size);
+}
+inline void Scenario::Builder::adoptExceptAgenciesUuids(
+    ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::adopt(_builder.getPointerField(
+      ::capnp::bounded<9>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> Scenario::Builder::disownExceptAgenciesUuids() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::disown(_builder.getPointerField(
+      ::capnp::bounded<9>() * ::capnp::POINTERS));
+}
+
+inline bool Scenario::Reader::hasOnlyNodesUuids() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<10>() * ::capnp::POINTERS).isNull();
+}
+inline bool Scenario::Builder::hasOnlyNodesUuids() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<10>() * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader Scenario::Reader::getOnlyNodesUuids() const {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_reader.getPointerField(
+      ::capnp::bounded<10>() * ::capnp::POINTERS));
+}
+inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Scenario::Builder::getOnlyNodesUuids() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_builder.getPointerField(
+      ::capnp::bounded<10>() * ::capnp::POINTERS));
+}
+inline void Scenario::Builder::setOnlyNodesUuids( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
+      ::capnp::bounded<10>() * ::capnp::POINTERS), value);
+}
+inline void Scenario::Builder::setOnlyNodesUuids(::kj::ArrayPtr<const  ::capnp::Text::Reader> value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
+      ::capnp::bounded<10>() * ::capnp::POINTERS), value);
+}
+inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Scenario::Builder::initOnlyNodesUuids(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::init(_builder.getPointerField(
+      ::capnp::bounded<10>() * ::capnp::POINTERS), size);
+}
+inline void Scenario::Builder::adoptOnlyNodesUuids(
+    ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::adopt(_builder.getPointerField(
+      ::capnp::bounded<10>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> Scenario::Builder::disownOnlyNodesUuids() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::disown(_builder.getPointerField(
+      ::capnp::bounded<10>() * ::capnp::POINTERS));
+}
+
+inline bool Scenario::Reader::hasExceptNodesUuids() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<11>() * ::capnp::POINTERS).isNull();
+}
+inline bool Scenario::Builder::hasExceptNodesUuids() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<11>() * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader Scenario::Reader::getExceptNodesUuids() const {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_reader.getPointerField(
+      ::capnp::bounded<11>() * ::capnp::POINTERS));
+}
+inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Scenario::Builder::getExceptNodesUuids() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_builder.getPointerField(
+      ::capnp::bounded<11>() * ::capnp::POINTERS));
+}
+inline void Scenario::Builder::setExceptNodesUuids( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
+      ::capnp::bounded<11>() * ::capnp::POINTERS), value);
+}
+inline void Scenario::Builder::setExceptNodesUuids(::kj::ArrayPtr<const  ::capnp::Text::Reader> value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
+      ::capnp::bounded<11>() * ::capnp::POINTERS), value);
+}
+inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Scenario::Builder::initExceptNodesUuids(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::init(_builder.getPointerField(
+      ::capnp::bounded<11>() * ::capnp::POINTERS), size);
+}
+inline void Scenario::Builder::adoptExceptNodesUuids(
+    ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::adopt(_builder.getPointerField(
+      ::capnp::bounded<11>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> Scenario::Builder::disownExceptNodesUuids() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::disown(_builder.getPointerField(
+      ::capnp::bounded<11>() * ::capnp::POINTERS));
+}
+
+inline bool Scenario::Reader::hasOnlyModesShortnames() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<12>() * ::capnp::POINTERS).isNull();
+}
+inline bool Scenario::Builder::hasOnlyModesShortnames() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<12>() * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader Scenario::Reader::getOnlyModesShortnames() const {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_reader.getPointerField(
+      ::capnp::bounded<12>() * ::capnp::POINTERS));
+}
+inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Scenario::Builder::getOnlyModesShortnames() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_builder.getPointerField(
+      ::capnp::bounded<12>() * ::capnp::POINTERS));
+}
+inline void Scenario::Builder::setOnlyModesShortnames( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
+      ::capnp::bounded<12>() * ::capnp::POINTERS), value);
+}
+inline void Scenario::Builder::setOnlyModesShortnames(::kj::ArrayPtr<const  ::capnp::Text::Reader> value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
+      ::capnp::bounded<12>() * ::capnp::POINTERS), value);
+}
+inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Scenario::Builder::initOnlyModesShortnames(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::init(_builder.getPointerField(
+      ::capnp::bounded<12>() * ::capnp::POINTERS), size);
+}
+inline void Scenario::Builder::adoptOnlyModesShortnames(
+    ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::adopt(_builder.getPointerField(
+      ::capnp::bounded<12>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> Scenario::Builder::disownOnlyModesShortnames() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::disown(_builder.getPointerField(
+      ::capnp::bounded<12>() * ::capnp::POINTERS));
+}
+
+inline bool Scenario::Reader::hasExceptModesShortnames() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<13>() * ::capnp::POINTERS).isNull();
+}
+inline bool Scenario::Builder::hasExceptModesShortnames() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<13>() * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader Scenario::Reader::getExceptModesShortnames() const {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_reader.getPointerField(
+      ::capnp::bounded<13>() * ::capnp::POINTERS));
+}
+inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Scenario::Builder::getExceptModesShortnames() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_builder.getPointerField(
+      ::capnp::bounded<13>() * ::capnp::POINTERS));
+}
+inline void Scenario::Builder::setExceptModesShortnames( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
+      ::capnp::bounded<13>() * ::capnp::POINTERS), value);
+}
+inline void Scenario::Builder::setExceptModesShortnames(::kj::ArrayPtr<const  ::capnp::Text::Reader> value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
+      ::capnp::bounded<13>() * ::capnp::POINTERS), value);
+}
+inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Scenario::Builder::initExceptModesShortnames(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::init(_builder.getPointerField(
+      ::capnp::bounded<13>() * ::capnp::POINTERS), size);
+}
+inline void Scenario::Builder::adoptExceptModesShortnames(
+    ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::adopt(_builder.getPointerField(
+      ::capnp::bounded<13>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> Scenario::Builder::disownExceptModesShortnames() {
+  return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::disown(_builder.getPointerField(
+      ::capnp::bounded<13>() * ::capnp::POINTERS));
+}
+
+inline  ::int8_t Scenario::Reader::getIsFrozen() const {
+  return _reader.getDataField< ::int8_t>(
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
+}
+
+inline  ::int8_t Scenario::Builder::getIsFrozen() {
+  return _builder.getDataField< ::int8_t>(
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
+}
+inline void Scenario::Builder::setIsFrozen( ::int8_t value) {
+  _builder.setDataField< ::int8_t>(
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
 }
 
 }  // namespace

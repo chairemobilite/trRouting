@@ -11,6 +11,7 @@ struct DataSource {
   name                 @3 :Text;
   description          @4 :Text;
   data                 @5 :Text; # json
+  isFrozen             @6 :Int8;
   
   enum Type {
     none                    @0;

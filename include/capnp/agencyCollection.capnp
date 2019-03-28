@@ -16,4 +16,5 @@ struct Agency {
   isEnabled   @5 :Int8;
   description @6 :Text;
   data        @7 :Text;
+  isFrozen    @8 :Int8;
 }

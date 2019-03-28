@@ -48,6 +48,8 @@ namespace TrRouting
     std::vector<int> exceptModesIdx;
     std::vector<int> onlyAgenciesIdx;
     std::vector<int> exceptAgenciesIdx;
+    std::vector<int> onlyNodesIdx;
+    std::vector<int> exceptNodesIdx;
     std::vector<int> accessNodesIdx;
     std::vector<int> accessNodeTravelTimesSeconds;
     std::vector<int> egressNodesIdx;

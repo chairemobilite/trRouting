@@ -9,8 +9,8 @@ struct Node {
   internalId                   @2  :Text;
   code                         @3  :Text;
   name                         @4  :Text;
-  latitude                     @5  :Int32; # divide by 1000000 to get float
-  longitude                    @6  :Int32; # divide by 1000000 to get float
+  latitude                     @5  :Float32;
+  longitude                    @6  :Float32;
   stationUuid                  @7  :Text;
   color                        @8  :Text;
   description                  @9  :Text;
@@ -18,7 +18,8 @@ struct Node {
   isEnabled                    @11 :Int8;
   routingRadiusMeters          @12 :Int16;
   defaultDwellTimeSeconds      @13 :Int16;
-  transferableNodesIdx         @14 :List(Int32);
+  transferableNodesIdx         @14 :List(Int32); # unique in the whole network
   transferableNodesTravelTimes @15 :List(Int16); # seconds
   transferableNodesDistances   @16 :List(Int16); # meters
+  isFrozen                     @17 :Int8;
 }

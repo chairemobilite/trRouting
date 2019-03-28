@@ -188,6 +188,8 @@ public:
 
   inline  ::int8_t getAllowSameLineTransfers() const;
 
+  inline  ::int8_t getIsFrozen() const;
+
 private:
   ::capnp::_::StructReader _reader;
   template <typename, ::capnp::Kind>
@@ -294,6 +296,9 @@ public:
 
   inline  ::int8_t getAllowSameLineTransfers();
   inline void setAllowSameLineTransfers( ::int8_t value);
+
+  inline  ::int8_t getIsFrozen();
+  inline void setIsFrozen( ::int8_t value);
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -737,6 +742,20 @@ inline  ::int8_t Line::Builder::getAllowSameLineTransfers() {
 inline void Line::Builder::setAllowSameLineTransfers( ::int8_t value) {
   _builder.setDataField< ::int8_t>(
       ::capnp::bounded<2>() * ::capnp::ELEMENTS, value);
+}
+
+inline  ::int8_t Line::Reader::getIsFrozen() const {
+  return _reader.getDataField< ::int8_t>(
+      ::capnp::bounded<3>() * ::capnp::ELEMENTS);
+}
+
+inline  ::int8_t Line::Builder::getIsFrozen() {
+  return _builder.getDataField< ::int8_t>(
+      ::capnp::bounded<3>() * ::capnp::ELEMENTS);
+}
+inline void Line::Builder::setIsFrozen( ::int8_t value) {
+  _builder.setDataField< ::int8_t>(
+      ::capnp::bounded<3>() * ::capnp::ELEMENTS, value);
 }
 
 }  // namespace

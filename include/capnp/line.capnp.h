@@ -47,7 +47,7 @@ struct Period {
   class Pipeline;
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(ddeccfbefad43561, 2, 4)
+    CAPNP_DECLARE_STRUCT_HEADER(ddeccfbefad43561, 3, 4)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
     #endif  // !CAPNP_LITE
@@ -131,6 +131,8 @@ public:
   inline  ::int16_t getTotalCapacity() const;
 
   inline  ::int16_t getSeatedCapacity() const;
+
+  inline  ::int8_t getIsFrozen() const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -225,6 +227,9 @@ public:
   inline  ::int16_t getSeatedCapacity();
   inline void setSeatedCapacity( ::int16_t value);
 
+  inline  ::int8_t getIsFrozen();
+  inline void setIsFrozen( ::int8_t value);
+
 private:
   ::capnp::_::StructBuilder _builder;
   template <typename, ::capnp::Kind>
@@ -289,6 +294,8 @@ public:
 
   inline bool hasTrips() const;
   inline  ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>::Reader getTrips() const;
+
+  inline  ::int8_t getIsFrozen() const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -361,6 +368,9 @@ public:
   inline void adoptTrips(::capnp::Orphan< ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>>&& value);
   inline ::capnp::Orphan< ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>> disownTrips();
 
+  inline  ::int8_t getIsFrozen();
+  inline void setIsFrozen( ::int8_t value);
+
 private:
   ::capnp::_::StructBuilder _builder;
   template <typename, ::capnp::Kind>
@@ -417,6 +427,8 @@ public:
   inline  ::capnp::List< ::line::Period,  ::capnp::Kind::STRUCT>::Reader getPeriods() const;
 
   inline  ::int8_t getAllowSecondsBasedSchedules() const;
+
+  inline  ::int8_t getIsFrozen() const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -476,6 +488,9 @@ public:
 
   inline  ::int8_t getAllowSecondsBasedSchedules();
   inline void setAllowSecondsBasedSchedules( ::int8_t value);
+
+  inline  ::int8_t getIsFrozen();
+  inline void setIsFrozen( ::int8_t value);
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -558,6 +573,8 @@ public:
 
   inline bool hasSchedules() const;
   inline  ::capnp::List< ::line::Schedule,  ::capnp::Kind::STRUCT>::Reader getSchedules() const;
+
+  inline  ::int8_t getIsFrozen() const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -672,6 +689,9 @@ public:
   inline  ::capnp::List< ::line::Schedule,  ::capnp::Kind::STRUCT>::Builder initSchedules(unsigned int size);
   inline void adoptSchedules(::capnp::Orphan< ::capnp::List< ::line::Schedule,  ::capnp::Kind::STRUCT>>&& value);
   inline ::capnp::Orphan< ::capnp::List< ::line::Schedule,  ::capnp::Kind::STRUCT>> disownSchedules();
+
+  inline  ::int8_t getIsFrozen();
+  inline void setIsFrozen( ::int8_t value);
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -1011,6 +1031,20 @@ inline void Trip::Builder::setSeatedCapacity( ::int16_t value) {
       ::capnp::bounded<5>() * ::capnp::ELEMENTS, value);
 }
 
+inline  ::int8_t Trip::Reader::getIsFrozen() const {
+  return _reader.getDataField< ::int8_t>(
+      ::capnp::bounded<12>() * ::capnp::ELEMENTS);
+}
+
+inline  ::int8_t Trip::Builder::getIsFrozen() {
+  return _builder.getDataField< ::int8_t>(
+      ::capnp::bounded<12>() * ::capnp::ELEMENTS);
+}
+inline void Trip::Builder::setIsFrozen( ::int8_t value) {
+  _builder.setDataField< ::int8_t>(
+      ::capnp::bounded<12>() * ::capnp::ELEMENTS, value);
+}
+
 inline bool Period::Reader::hasPeriodShortname() const {
   return !_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
@@ -1217,6 +1251,20 @@ inline ::capnp::Orphan< ::capnp::List< ::line::Trip,  ::capnp::Kind::STRUCT>> Pe
       ::capnp::bounded<3>() * ::capnp::POINTERS));
 }
 
+inline  ::int8_t Period::Reader::getIsFrozen() const {
+  return _reader.getDataField< ::int8_t>(
+      ::capnp::bounded<16>() * ::capnp::ELEMENTS);
+}
+
+inline  ::int8_t Period::Builder::getIsFrozen() {
+  return _builder.getDataField< ::int8_t>(
+      ::capnp::bounded<16>() * ::capnp::ELEMENTS);
+}
+inline void Period::Builder::setIsFrozen( ::int8_t value) {
+  _builder.setDataField< ::int8_t>(
+      ::capnp::bounded<16>() * ::capnp::ELEMENTS, value);
+}
+
 inline bool Schedule::Reader::hasUuid() const {
   return !_reader.getPointerField(
       ::capnp::bounded<0>() * ::capnp::POINTERS).isNull();
@@ -1365,6 +1413,20 @@ inline  ::int8_t Schedule::Builder::getAllowSecondsBasedSchedules() {
 inline void Schedule::Builder::setAllowSecondsBasedSchedules( ::int8_t value) {
   _builder.setDataField< ::int8_t>(
       ::capnp::bounded<0>() * ::capnp::ELEMENTS, value);
+}
+
+inline  ::int8_t Schedule::Reader::getIsFrozen() const {
+  return _reader.getDataField< ::int8_t>(
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
+}
+
+inline  ::int8_t Schedule::Builder::getIsFrozen() {
+  return _builder.getDataField< ::int8_t>(
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS);
+}
+inline void Schedule::Builder::setIsFrozen( ::int8_t value) {
+  _builder.setDataField< ::int8_t>(
+      ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
 }
 
 inline bool Line::Reader::hasUuid() const {
@@ -1781,6 +1843,20 @@ inline void Line::Builder::adoptSchedules(
 inline ::capnp::Orphan< ::capnp::List< ::line::Schedule,  ::capnp::Kind::STRUCT>> Line::Builder::disownSchedules() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::line::Schedule,  ::capnp::Kind::STRUCT>>::disown(_builder.getPointerField(
       ::capnp::bounded<10>() * ::capnp::POINTERS));
+}
+
+inline  ::int8_t Line::Reader::getIsFrozen() const {
+  return _reader.getDataField< ::int8_t>(
+      ::capnp::bounded<3>() * ::capnp::ELEMENTS);
+}
+
+inline  ::int8_t Line::Builder::getIsFrozen() {
+  return _builder.getDataField< ::int8_t>(
+      ::capnp::bounded<3>() * ::capnp::ELEMENTS);
+}
+inline void Line::Builder::setIsFrozen( ::int8_t value) {
+  _builder.setDataField< ::int8_t>(
+      ::capnp::bounded<3>() * ::capnp::ELEMENTS, value);
 }
 
 }  // namespace

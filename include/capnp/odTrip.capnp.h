@@ -171,6 +171,8 @@ public:
   inline bool hasData() const;
   inline  ::capnp::Text::Reader getData() const;
 
+  inline  ::int8_t getIsFrozen() const;
+
 private:
   ::capnp::_::StructReader _reader;
   template <typename, ::capnp::Kind>
@@ -330,6 +332,9 @@ public:
   inline  ::capnp::Text::Builder initData(unsigned int size);
   inline void adoptData(::capnp::Orphan< ::capnp::Text>&& value);
   inline ::capnp::Orphan< ::capnp::Text> disownData();
+
+  inline  ::int8_t getIsFrozen();
+  inline void setIsFrozen( ::int8_t value);
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -985,6 +990,20 @@ inline void OdTrip::Builder::adoptData(
 inline ::capnp::Orphan< ::capnp::Text> OdTrip::Builder::disownData() {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
       ::capnp::bounded<11>() * ::capnp::POINTERS));
+}
+
+inline  ::int8_t OdTrip::Reader::getIsFrozen() const {
+  return _reader.getDataField< ::int8_t>(
+      ::capnp::bounded<34>() * ::capnp::ELEMENTS);
+}
+
+inline  ::int8_t OdTrip::Builder::getIsFrozen() {
+  return _builder.getDataField< ::int8_t>(
+      ::capnp::bounded<34>() * ::capnp::ELEMENTS);
+}
+inline void OdTrip::Builder::setIsFrozen( ::int8_t value) {
+  _builder.setDataField< ::int8_t>(
+      ::capnp::bounded<34>() * ::capnp::ELEMENTS, value);
 }
 
 }  // namespace

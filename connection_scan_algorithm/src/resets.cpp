@@ -233,6 +233,14 @@ namespace TrRouting
           }
         }
 
+        if (tripsEnabled[i] == 1 && params.onlyNodesIdx.size() > 0)
+        {
+          if (std::find(params.onlyNodesIdx.begin(), params.onlyNodesIdx.end(), trip.modeIdx) == params.onlyNodesIdx.end())
+          {
+            tripsEnabled[i] = -1;
+          }
+        }
+
         if (tripsEnabled[i] == 1 && params.onlyAgenciesIdx.size() > 0)
         {
           if (std::find(params.onlyAgenciesIdx.begin(), params.onlyAgenciesIdx.end(), trip.agencyIdx) == params.onlyAgenciesIdx.end())
@@ -252,6 +260,14 @@ namespace TrRouting
         if (tripsEnabled[i] == 1 && params.exceptLinesIdx.size() > 0)
         {
           if (std::find(params.exceptLinesIdx.begin(), params.exceptLinesIdx.end(), trip.lineIdx) != params.exceptLinesIdx.end())
+          {
+            tripsEnabled[i] = -1;
+          }
+        }
+
+        if (tripsEnabled[i] == 1 && params.exceptNodesIdx.size() > 0)
+        {
+          if (std::find(params.exceptNodesIdx.begin(), params.exceptNodesIdx.end(), trip.modeIdx) != params.exceptNodesIdx.end())
           {
             tripsEnabled[i] = -1;
           }

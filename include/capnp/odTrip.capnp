@@ -31,6 +31,7 @@ struct OdTrip {
   destinationNodesDistances   @23 :List(Int16); # meters
   internalId                  @24 :Text;
   data                        @25 :Text; # json
+  isFrozen                    @26 :Int8;
   
   enum Mode {
     none            @0 ;

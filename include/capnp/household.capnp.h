@@ -120,6 +120,8 @@ public:
   inline bool hasData() const;
   inline  ::capnp::Text::Reader getData() const;
 
+  inline  ::int8_t getIsFrozen() const;
+
 private:
   ::capnp::_::StructReader _reader;
   template <typename, ::capnp::Kind>
@@ -226,6 +228,9 @@ public:
   inline  ::capnp::Text::Builder initData(unsigned int size);
   inline void adoptData(::capnp::Orphan< ::capnp::Text>&& value);
   inline ::capnp::Orphan< ::capnp::Text> disownData();
+
+  inline  ::int8_t getIsFrozen();
+  inline void setIsFrozen( ::int8_t value);
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -629,6 +634,20 @@ inline void Household::Builder::adoptData(
 inline ::capnp::Orphan< ::capnp::Text> Household::Builder::disownData() {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
       ::capnp::bounded<6>() * ::capnp::POINTERS));
+}
+
+inline  ::int8_t Household::Reader::getIsFrozen() const {
+  return _reader.getDataField< ::int8_t>(
+      ::capnp::bounded<18>() * ::capnp::ELEMENTS);
+}
+
+inline  ::int8_t Household::Builder::getIsFrozen() {
+  return _builder.getDataField< ::int8_t>(
+      ::capnp::bounded<18>() * ::capnp::ELEMENTS);
+}
+inline void Household::Builder::setIsFrozen( ::int8_t value) {
+  _builder.setDataField< ::int8_t>(
+      ::capnp::bounded<18>() * ::capnp::ELEMENTS, value);
 }
 
 }  // namespace

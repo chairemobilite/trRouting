@@ -278,6 +278,8 @@ int main(int argc, char** argv) {
       calculator.params.exceptModesIdx.clear();
       calculator.params.onlyAgenciesIdx.clear();
       calculator.params.exceptAgenciesIdx.clear();
+      calculator.params.onlyNodesIdx.clear();
+      calculator.params.exceptNodesIdx.clear();
       //calculator.params.odTripsPeriods     = odTripsPeriods;
       //calculator.params.odTripsGenders     = odTripsGenders;
       //calculator.params.odTripsAgeGroups   = odTripsAgeGroups;
@@ -297,6 +299,8 @@ int main(int argc, char** argv) {
       std::vector<std::string> exceptModeShortnamesVector;
       std::vector<std::string> onlyAgencyUuidsVector;
       std::vector<std::string> exceptAgencyUuidsVector;
+      std::vector<std::string> onlyNodeUuidsVector;
+      std::vector<std::string> exceptNodeUuidsVector;
       std::vector<std::string> accessNodeUuidsVector;
       std::vector<std::string> accessNodeTravelTimesSecondsVector;
       std::vector<std::string> egressNodeUuidsVector;
@@ -586,12 +590,51 @@ int main(int argc, char** argv) {
             }
           }
         }
+        else if (parameterWithValueVector[0] == "only_node_uuids")
+        {
+          boost::split(onlyNodeUuidsVector, parameterWithValueVector[1], boost::is_any_of(","));
+          boost::uuids::uuid onlyNodeUuid;
+          for(std::string onlyNodeUuidStr : onlyNodeUuidsVector)
+          {
+            onlyNodeUuid = uuidGenerator(onlyNodeUuidStr);
+            if (calculator.nodeIndexesByUuid.count(onlyNodeUuid) == 1)
+            {
+              calculator.params.onlyNodesIdx.push_back(calculator.nodeIndexesByUuid[onlyNodeUuid]);
+            }
+            if (calculator.params.onlyNodesIdx.size() == 0)
+            {
+              calculator.params.onlyNodesIdx = {0};
+            }
+          }
+        }
+        else if (parameterWithValueVector[0] == "except_node_uuids")
+        {
+          boost::split(exceptNodeUuidsVector, parameterWithValueVector[1], boost::is_any_of(","));
+          boost::uuids::uuid exceptNodeUuid;
+          for(std::string exceptNodeUuidStr : exceptNodeUuidsVector)
+          {
+            exceptNodeUuid = uuidGenerator(exceptNodeUuidStr);
+            if (calculator.nodeIndexesByUuid.count(exceptNodeUuid) == 1)
+            {
+              calculator.params.exceptNodesIdx.push_back(calculator.nodeIndexesByUuid[exceptNodeUuid]);
+            }
+          }
+        }
         else if (parameterWithValueVector[0] == "scenario_uuid")
         {
           boost::uuids::uuid scenarioUuid {uuidGenerator(parameterWithValueVector[1])};
           if (calculator.scenarioIndexesByUuid.count(scenarioUuid) == 1)
           {
-            calculator.params.onlyServicesIdx = calculator.scenarios[calculator.scenarioIndexesByUuid[scenarioUuid]].servicesIdx;
+            Scenario scenario {calculator.scenarios[calculator.scenarioIndexesByUuid[scenarioUuid]]};
+            calculator.params.onlyServicesIdx   = scenario.servicesIdx;
+            calculator.params.onlyLinesIdx      = scenario.onlyLinesIdx;
+            calculator.params.onlyAgenciesIdx   = scenario.onlyAgenciesIdx;
+            calculator.params.onlyNodesIdx      = scenario.onlyNodesIdx;
+            calculator.params.onlyModesIdx      = scenario.onlyModesIdx;
+            calculator.params.exceptLinesIdx    = scenario.exceptLinesIdx;
+            calculator.params.exceptAgenciesIdx = scenario.exceptAgenciesIdx;
+            calculator.params.exceptNodesIdx    = scenario.exceptNodesIdx;
+            calculator.params.exceptModesIdx    = scenario.exceptModesIdx;
             if (calculator.params.onlyServicesIdx.size() == 0)
             {
               calculator.params.onlyServicesIdx = {0};

@@ -20,5 +20,6 @@ struct Place {
   nodesDistances   @12 :List(Int16); # meters
   internalId       @13 :Text;
   data             @14 :Text; # json
+  isFrozen         @15 :Int8;
 
 }
