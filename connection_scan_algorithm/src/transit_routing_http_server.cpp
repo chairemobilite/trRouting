@@ -1207,7 +1207,7 @@ int main(int argc, char** argv) {
         if (fileFormat == "csv" && batchNumber == 1) // write header only on first batch, so we can easily append subsequent batches to the same csv file
         {
           // write csv header:
-          csv += "uuid,status,ageGroup,gender,occupation,destinationActivity,mode,expansionFactor,travelTimeSeconds,onlyWalkingTravelTimeSeconds,"
+          csv += "uuid,internalId,status,ageGroup,gender,occupation,destinationActivity,mode,expansionFactor,travelTimeSeconds,onlyWalkingTravelTimeSeconds,"
                  "declaredDepartureTimeSeconds,departureTimeSeconds,arrivalTimeSeconds,numberOfTransfers,inVehicleTravelTimeSeconds,"
                  "transferTravelTimeSeconds,waitingTimeSeconds,accessTravelTimeSeconds,egressTravelTimeSeconds,transferWaitingTimeSeconds,"
                  "firstWaitingTimeSeconds,nonTransitTravelTimeSeconds,lineUuids,modeShortnames,agencyUuids,boardingNodeUuids,unboardingNodeUuids,tripUuids\n";
@@ -1328,7 +1328,7 @@ int main(int argc, char** argv) {
               {
                 //ageGroup = odTrip.ageGroup;
                 //std::replace( ageGroup.begin(), ageGroup.end(), '-', '_' ); // remove dash so Excel does not convert to age groups to numbers...
-                csv += boost::uuids::to_string(odTrip.uuid) + ",\"" + routingResult.status + "\",\"" /*+ ageGroup*/ + "\",\"" /*+ odTrip.gender*/ + "\",\"" /*+ odTrip.occupation*/ + "\",\"";
+                csv += boost::uuids::to_string(odTrip.uuid) + ",\"" + odTrip.internalId + "\",\"" + routingResult.status + "\",\"" /*+ ageGroup*/ + "\",\"" /*+ odTrip.gender*/ + "\",\"" /*+ odTrip.occupation*/ + "\",\"";
                 csv += odTrip.destinationActivity + "\",\"" + odTrip.mode + "\"," + std::to_string(odTrip.expansionFactor) + "," + std::to_string(routingResult.travelTimeSeconds) + ",";
                 csv += std::to_string(odTrip.walkingTravelTimeSeconds) + "," + std::to_string(odTrip.departureTimeSeconds) + "," + std::to_string(routingResult.departureTimeSeconds) + ",";
                 csv += std::to_string(routingResult.arrivalTimeSeconds) + "," + std::to_string(routingResult.numberOfTransfers) + "," + std::to_string(routingResult.inVehicleTravelTimeSeconds) + ",";
@@ -1409,16 +1409,19 @@ int main(int argc, char** argv) {
                 odTripJson = {};
                 odTripJson["uuid"]                         = boost::uuids::to_string(odTrip.uuid);
                 odTripJson["status"]                       = routingResult.status;
-                //odTripJson["ageGroup"]                     = odTrip.ageGroup;
-                //odTripJson["gender"]                       = odTrip.gender;
-                //odTripJson["occupation"]                   = odTrip.occupation;
-                odTripJson["activity"]                     = odTrip.destinationActivity;
-                odTripJson["mode"]                         = odTrip.mode;
+                odTripJson["ageGroup"]                     = calculator.persons[odTrip.personIdx].ageGroup;
+                odTripJson["gender"]                       = calculator.persons[odTrip.personIdx].gender;
+                odTripJson["occupation"]                   = calculator.persons[odTrip.personIdx].occupation;
+                odTripJson["internalId"]                   = odTrip.internalId;
+                odTripJson["originActivity"]               = odTrip.originActivity;
+                odTripJson["destinationActivity"]          = odTrip.destinationActivity;
+                odTripJson["declaredMode"]                 = odTrip.mode;
                 odTripJson["expansionFactor"]              = odTrip.expansionFactor;
                 odTripJson["travelTimeSeconds"]            = routingResult.travelTimeSeconds;
                 odTripJson["minimizedTravelTimeSeconds"]   = routingResult.travelTimeSeconds - routingResult.firstWaitingTimeSeconds + calculator.params.minWaitingTimeSeconds;
                 odTripJson["onlyWalkingTravelTimeSeconds"] = odTrip.walkingTravelTimeSeconds;
                 odTripJson["declaredDepartureTimeSeconds"] = odTrip.departureTimeSeconds;
+                odTripJson["declaredArrivalTimeSeconds"]   = odTrip.arrivalTimeSeconds;
                 odTripJson["departureTimeSeconds"]         = routingResult.departureTimeSeconds;
                 odTripJson["arrivalTimeSeconds"]           = routingResult.arrivalTimeSeconds;
                 odTripJson["numberOfTransfers"]            = routingResult.numberOfTransfers;
