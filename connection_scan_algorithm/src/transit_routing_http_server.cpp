@@ -571,10 +571,6 @@ int main(int argc, char** argv) {
             {
               calculator.params.onlyServicesIdx.push_back(calculator.serviceIndexesByUuid[onlyServiceUuid]);
             }
-            if (calculator.params.onlyServicesIdx.size() == 0)
-            {
-              calculator.params.onlyServicesIdx = {0};
-            }
           }
         }
         else if (parameterWithValueVector[0] == "except_service_uuids")
@@ -600,10 +596,6 @@ int main(int argc, char** argv) {
             if (calculator.nodeIndexesByUuid.count(onlyNodeUuid) == 1)
             {
               calculator.params.onlyNodesIdx.push_back(calculator.nodeIndexesByUuid[onlyNodeUuid]);
-            }
-            if (calculator.params.onlyNodesIdx.size() == 0)
-            {
-              calculator.params.onlyNodesIdx = {0};
             }
           }
         }
@@ -635,10 +627,6 @@ int main(int argc, char** argv) {
             calculator.params.exceptAgenciesIdx = scenario.exceptAgenciesIdx;
             calculator.params.exceptNodesIdx    = scenario.exceptNodesIdx;
             calculator.params.exceptModesIdx    = scenario.exceptModesIdx;
-            if (calculator.params.onlyServicesIdx.size() == 0)
-            {
-              calculator.params.onlyServicesIdx = {0};
-            }
           }
         }
         else if (parameterWithValueVector[0] == "only_line_uuids")
@@ -651,10 +639,6 @@ int main(int argc, char** argv) {
             if (calculator.lineIndexesByUuid.count(onlyLineUuid) == 1)
             {
               calculator.params.onlyLinesIdx.push_back(calculator.lineIndexesByUuid[onlyLineUuid]);
-            }
-            if (calculator.params.onlyLinesIdx.size() == 0)
-            {
-              calculator.params.onlyLinesIdx = {0};
             }
           }
         }
@@ -680,10 +664,6 @@ int main(int argc, char** argv) {
             {
               calculator.params.onlyModesIdx.push_back(calculator.modeIndexesByShortname[onlyModeShortname]);
             }
-            if (calculator.params.onlyModesIdx.size() == 0)
-            {
-              calculator.params.onlyModesIdx = {0};
-            }
           }
         }
         else if (parameterWithValueVector[0] == "except_modes")
@@ -707,10 +687,6 @@ int main(int argc, char** argv) {
             if (calculator.agencyIndexesByUuid.count(onlyAgencyUuid) == 1)
             {
               calculator.params.onlyAgenciesIdx.push_back(calculator.agencyIndexesByUuid[onlyAgencyUuid]);
-            }
-            if (calculator.params.onlyAgenciesIdx.size() == 0)
-            {
-              calculator.params.onlyAgenciesIdx = {0};
             }
           }
         }
