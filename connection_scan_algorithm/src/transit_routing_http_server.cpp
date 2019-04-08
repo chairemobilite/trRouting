@@ -1385,9 +1385,9 @@ int main(int argc, char** argv) {
                 odTripJson = {};
                 odTripJson["uuid"]                         = boost::uuids::to_string(odTrip.uuid);
                 odTripJson["status"]                       = routingResult.status;
-                odTripJson["ageGroup"]                     = calculator.persons[odTrip.personIdx].ageGroup;
+                /*odTripJson["ageGroup"]                   = calculator.persons[odTrip.personIdx].ageGroup;
                 odTripJson["gender"]                       = calculator.persons[odTrip.personIdx].gender;
-                odTripJson["occupation"]                   = calculator.persons[odTrip.personIdx].occupation;
+                odTripJson["occupation"]                   = calculator.persons[odTrip.personIdx].occupation;*/
                 odTripJson["internalId"]                   = odTrip.internalId;
                 odTripJson["originActivity"]               = odTrip.originActivity;
                 odTripJson["destinationActivity"]          = odTrip.destinationActivity;
