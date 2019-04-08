@@ -1385,7 +1385,7 @@ int main(int argc, char** argv) {
                 odTripJson = {};
                 odTripJson["uuid"]                         = boost::uuids::to_string(odTrip.uuid);
                 odTripJson["status"]                       = routingResult.status;
-                /*odTripJson["ageGroup"]                   = calculator.persons[odTrip.personIdx].ageGroup;
+                /*odTripJson["ageGroup"]                   = calculator.persons[odTrip.personIdx].ageGroup; // this fails (segmentation fault)...
                 odTripJson["gender"]                       = calculator.persons[odTrip.personIdx].gender;
                 odTripJson["occupation"]                   = calculator.persons[odTrip.personIdx].occupation;*/
                 odTripJson["internalId"]                   = odTrip.internalId;
