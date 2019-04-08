@@ -206,16 +206,7 @@ namespace TrRouting
         }
         //std::tie(trips, tripIndexesByUuid, blocks, blockIndexesByUuid, forwardConnections, reverseConnections) = params.cacheFetcher->getTripsAndConnections(agencyIndexesByUuid, lines, lineIndexesByUuid, paths, pathIndexesByUuid, nodeIndexesByUuid, serviceIndexesByUuid, params);
       }
-
-      for (auto & serviceIdx : params.onlyServicesIdx)
-      {
-        std::cout << "including service " << serviceIdx << " " << services[serviceIdx].name << " uuid " << services[serviceIdx].uuid << std::endl;
-      }
-      for (auto & lineIdx : params.exceptLinesIdx)
-      {
-        std::cout << "ignoring line " << lineIdx << " " << lines[lineIdx].shortname << " " << lines[lineIdx].longname << " uuid " << lines[lineIdx].uuid << std::endl;
-      }
-
+      
       for (auto & trip : trips)
       {
         if (tripsEnabled[i] == 1 && params.onlyServicesIdx.size() > 0)
