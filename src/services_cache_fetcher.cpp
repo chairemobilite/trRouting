@@ -44,6 +44,7 @@ namespace TrRouting
 
         T * t        = new T();
         t->uuid      = uuidGenerator(uuid);
+        t->name      = capnpT.getName();
         t->monday    = capnpT.getMonday();
         t->tuesday   = capnpT.getTuesday();
         t->wednesday = capnpT.getWednesday();

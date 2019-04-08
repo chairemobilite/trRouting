@@ -150,7 +150,7 @@ namespace TrRouting
       }
       else
       {
-        std::cerr << "missing schedules cache file for line " << boost::uuids::to_string(line.uuid) << " !" << std::endl;
+        std::cerr << "no schedules found for line " << boost::uuids::to_string(line.uuid) << " (" << line.shortname << " " << line.longname << ")" << std::endl;
       }
     }
     std::cout << "100%         " << std::endl;
