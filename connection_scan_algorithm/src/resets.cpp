@@ -192,7 +192,6 @@ namespace TrRouting
 
 
     // disable trips according to parameters:
-    i = 0;
 
     if (resetFilters)
     {
@@ -207,6 +206,7 @@ namespace TrRouting
         //std::tie(trips, tripIndexesByUuid, blocks, blockIndexesByUuid, forwardConnections, reverseConnections) = params.cacheFetcher->getTripsAndConnections(agencyIndexesByUuid, lines, lineIndexesByUuid, paths, pathIndexesByUuid, nodeIndexesByUuid, serviceIndexesByUuid, params);
       }
       
+      i = 0;
       for (auto & trip : trips)
       {
         if (tripsEnabled[i] == 1 && params.onlyServicesIdx.size() > 0)
@@ -288,9 +288,6 @@ namespace TrRouting
             tripsEnabled[i] = -1;
           }
         }
-
-
-
         i++;
       }
     }

@@ -57,54 +57,81 @@ namespace TrRouting
         for (std::string serviceUuidStr : capnpT.getServicesUuids())
         {
           serviceUuid = uuidGenerator(serviceUuidStr);
-          servicesIdx.push_back(serviceIndexesByUuid[serviceUuid]);
+          if (serviceIndexesByUuid.count(serviceUuid) != 0)
+          {
+            servicesIdx.push_back(serviceIndexesByUuid[serviceUuid]);
+          }
         }
         t->servicesIdx = servicesIdx;
         for (std::string lineUuidStr : capnpT.getOnlyLinesUuids())
         {
           lineUuid = uuidGenerator(lineUuidStr);
-          onlyLinesIdx.push_back(lineIndexesByUuid[lineUuid]);
+          if (lineIndexesByUuid.count(lineUuid) != 0)
+          {
+            onlyLinesIdx.push_back(lineIndexesByUuid[lineUuid]);
+          }
         }
         t->onlyLinesIdx = onlyLinesIdx;
         for (std::string agencyUuidStr : capnpT.getOnlyAgenciesUuids())
         {
           agencyUuid = uuidGenerator(agencyUuidStr);
-          onlyAgenciesIdx.push_back(agencyIndexesByUuid[agencyUuid]);
+          if (agencyIndexesByUuid.count(agencyUuid) != 0)
+          {
+            onlyAgenciesIdx.push_back(agencyIndexesByUuid[agencyUuid]);
+          }
         }
         t->onlyAgenciesIdx = onlyAgenciesIdx;
         for (std::string nodeUuidStr : capnpT.getOnlyNodesUuids())
         {
           nodeUuid = uuidGenerator(nodeUuidStr);
-          onlyNodesIdx.push_back(nodeIndexesByUuid[nodeUuid]);
+          if (nodeIndexesByUuid.count(nodeUuid) != 0)
+          {
+            onlyNodesIdx.push_back(nodeIndexesByUuid[nodeUuid]);
+          }
         }
         t->onlyNodesIdx = onlyNodesIdx;
         for (std::string modeShortnameStr : capnpT.getOnlyModesShortnames())
         {
-          onlyModesIdx.push_back(modeIndexesByShortname[modeShortnameStr]);
+          if (modeIndexesByShortname.count(modeShortnameStr) != 0)
+          {
+            onlyModesIdx.push_back(modeIndexesByShortname[modeShortnameStr]);
+          }
         }
         t->onlyModesIdx = onlyModesIdx;
 
         for (std::string lineUuidStr : capnpT.getExceptLinesUuids())
         {
           lineUuid = uuidGenerator(lineUuidStr);
-          exceptLinesIdx.push_back(lineIndexesByUuid[lineUuid]);
+          if (lineIndexesByUuid.count(lineUuid) != 0)
+          {
+            exceptLinesIdx.push_back(lineIndexesByUuid[lineUuid]);
+          }
         }
         t->exceptLinesIdx = exceptLinesIdx;
         for (std::string agencyUuidStr : capnpT.getExceptAgenciesUuids())
         {
           agencyUuid = uuidGenerator(agencyUuidStr);
-          exceptAgenciesIdx.push_back(agencyIndexesByUuid[agencyUuid]);
+          if (agencyIndexesByUuid.count(agencyUuid) != 0)
+          {
+            exceptAgenciesIdx.push_back(agencyIndexesByUuid[agencyUuid]);
+          }
         }
         t->exceptAgenciesIdx = exceptAgenciesIdx;
         for (std::string nodeUuidStr : capnpT.getExceptNodesUuids())
         {
           nodeUuid = uuidGenerator(nodeUuidStr);
-          exceptNodesIdx.push_back(nodeIndexesByUuid[nodeUuid]);
+          if (nodeIndexesByUuid.count(nodeUuid) != 0)
+          {
+            exceptNodesIdx.push_back(nodeIndexesByUuid[nodeUuid]);
+          }
         }
         t->exceptNodesIdx = exceptNodesIdx;
         for (std::string modeShortnameStr : capnpT.getExceptModesShortnames())
         {
-          exceptModesIdx.push_back(modeIndexesByShortname[modeShortnameStr]);
+          if (modeIndexesByShortname.count(modeShortnameStr) != 0)
+          {
+            exceptModesIdx.push_back(modeIndexesByShortname[modeShortnameStr]);
+          }
         }
         t->exceptModesIdx = exceptModesIdx;
 

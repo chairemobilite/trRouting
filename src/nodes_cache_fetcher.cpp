@@ -47,7 +47,14 @@ namespace TrRouting
         t->id              = capnpT.getId();
         t->code            = capnpT.getCode();
         t->name            = capnpT.getName();
-        t->stationIdx      = stationUuid.length() > 0 ? stationIndexesByUuid[uuidGenerator(stationUuid)] : -1;
+        if (stationUuid.length() > 0 && stationIndexesByUuid.count(uuidGenerator(stationUuid)) != 0)
+        {
+          t->stationIdx = stationIndexesByUuid[uuidGenerator(stationUuid)];
+        }
+        else
+        {
+          t->stationIdx = -1;
+        }
         t->point           = *point;
         t->point.latitude  = ((double)capnpT.getLatitude())  / 1000000.0;
         t->point.longitude = ((double)capnpT.getLongitude()) / 1000000.0;
