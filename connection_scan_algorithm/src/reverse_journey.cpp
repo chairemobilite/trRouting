@@ -248,7 +248,7 @@ namespace TrRouting
             transferTime = std::get<4>(journeyStep);
             if (i == 0) // access
             {
-              transferArrivalTime  = (initialDepartureTimeSeconds != 0-1 ? initialDepartureTimeSeconds : bestDepartureTime) + transferTime;
+              transferArrivalTime  = (initialDepartureTimeSeconds != -1 ? initialDepartureTimeSeconds : bestDepartureTime) + transferTime;
               transferReadyTime    = transferArrivalTime;
               totalWalkingTime    += transferTime;
               accessWalkingTime    = transferTime;
@@ -259,7 +259,7 @@ namespace TrRouting
                 stepJson["type"]                 = "access";
                 stepJson["travelTimeSeconds"]    = transferTime;
                 stepJson["travelTimeMinutes"]    = Toolbox::convertSecondsToMinutes(transferTime);
-                stepJson["departureTime"]        = Toolbox::convertSecondsToFormattedTime((initialDepartureTimeSeconds != 0-1 ? initialDepartureTimeSeconds : bestDepartureTime));
+                stepJson["departureTime"]        = Toolbox::convertSecondsToFormattedTime((initialDepartureTimeSeconds != -1 ? initialDepartureTimeSeconds : bestDepartureTime));
                 stepJson["arrivalTime"]          = Toolbox::convertSecondsToFormattedTime(transferArrivalTime);
                 stepJson["departureTimeSeconds"] = bestDepartureTime;
                 stepJson["arrivalTimeSeconds"]   = transferArrivalTime;

@@ -404,6 +404,9 @@ namespace TrRouting
       json["percentOfReachableNodes"] = round(10000 * (float)reachableNodesCount / (float)(nodesCount))/100.0;
     }
 
+    if (params.debugDisplay)
+      std::cerr << "-- forward result: " << result.status << " dts:" << result.departureTimeSeconds << std::endl;
+
     result.json = json.dump(2); // number of spaces in indent for human readable json, use dump() to put all json content on the same line
     //benchmarking["forward_journey"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
     return result;

@@ -3,45 +3,45 @@
 
 //Added for the json-example
 #define BOOST_SPIRIT_THREADSAFE
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
+//#include <boost/property_tree/ptree.hpp>
+//#include <boost/property_tree/json_parser.hpp>
 
 //Added for the default_resource example
-#include <boost/filesystem.hpp>
-#include <boost/tokenizer.hpp>
-#include <boost/program_options.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/algorithm/string/replace.hpp>
-
-#include <boost/optional.hpp>
-#include <boost/uuid/uuid.hpp>
-#include <boost/uuid/string_generator.hpp>
+//#include <boost/filesystem.hpp>
+//#include <boost/tokenizer.hpp>
+//#include <boost/algorithm/string.hpp>
+//#include <boost/algorithm/string/replace.hpp>
 
 #include <vector>
 #include <algorithm>
 #include <string>
-#include <fstream>
+//#include <fstream>
 #include <iostream>
 #include <iterator>
 #include <curses.h>
-#include <locale>
+//#include <locale>
 
-#include <osrm/osrm.hpp>
-#include <osrm/engine_config.hpp>
-#include <osrm/table_parameters.hpp>
 
-#include "toolbox.hpp"
-#include "gtfs_fetcher.hpp"
-#include "csv_fetcher.hpp"
-#include "cache_fetcher.hpp"
-#include "calculation_time.hpp"
+#include <boost/optional.hpp>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/string_generator.hpp>
+#include <boost/program_options.hpp>
+
+//#include <osrm/osrm.hpp>
+//#include <osrm/engine_config.hpp>
+//#include <osrm/table_parameters.hpp>
+
+//#include "toolbox.hpp"
+//#include "gtfs_fetcher.hpp"
+//#include "csv_fetcher.hpp"
+//#include "cache_fetcher.hpp"
+//#include "calculation_time.hpp"
 #include "parameters.hpp"
 #include "scenario.hpp"
 #include "calculator.hpp"
 #include "combinations.hpp"
+#include "program_options.hpp"
 
-//Added for the json-example:
-//using namespace boost::property_tree;
 using namespace TrRouting;
 
 typedef SimpleWeb::Server<SimpleWeb::HTTP> HttpServer;
@@ -63,99 +63,16 @@ void default_resource_send(const HttpServer &server, const std::shared_ptr<HttpS
 int main(int argc, char** argv) {
   
   int serverPort {4000};
-  std::string dataFetcherStr {"cache"}; // cache, csv or gtfs, only cache is implemented for now
   
-  // Get project shortname from config file:
-  std::string projectShortnameFromFile;
-  std::ifstream projectShortnameFile;
-  projectShortnameFile.open("project_shortname.txt");
-  std::getline(projectShortnameFile, projectShortnameFromFile);
-  projectShortnameFile.close();
-  std::string projectShortname {projectShortnameFromFile};
   boost::uuids::string_generator uuidGeneratorMain;
 
   // Set params:
+  ProgramOptions programOptions;
+  programOptions.parseOptions(argc, argv);
   Parameters algorithmParams;
   algorithmParams.setDefaultValues();
   
   // setup program options:
-  
-  boost::program_options::options_description optionsDesc("Options"); 
-  boost::program_options::variables_map variablesMap;
-  optionsDesc.add_options()
-      ("port", boost::program_options::value<int>(), "http server port");
-  optionsDesc.add_options()
-      ("dataFetcher,data", boost::program_options::value<std::string>(), "data fetcher (csv, gtfs or cache)"); // only cache implemented for now
-  optionsDesc.add_options()
-      ("projectShortname,project", boost::program_options::value<std::string>(), "project shortname (shortname of the project to use or data to use)");
-  optionsDesc.add_options()
-      ("osrmWalkPort",     boost::program_options::value<std::string>(), "osrm walking port");
-  optionsDesc.add_options()
-      ("osrmFilePath",     boost::program_options::value<std::string>(), "osrm file path (PATH/TO/ROUTING_FILE.osrm)");
-  optionsDesc.add_options()
-      ("osrmUseLib",       boost::program_options::value<std::string>(), "osrm use libosrm instead of server (1 or 0)");
-  optionsDesc.add_options()
-      ("odTripsFootpathsMaxTravelTimeMinutes", boost::program_options::value<int>(), "max travel time to use when fetching od_trips footpaths to access and egress nodes");
-  optionsDesc.add_options() 
-      ("updateOdTrips", boost::program_options::value<std::string>(), "update od trips access and egress nodes or not (1 or 0)");
-  
-  boost::program_options::store(boost::program_options::parse_command_line(argc, argv, optionsDesc), variablesMap);
-  
-  if(variablesMap.count("port") == 1)
-  {
-    serverPort = variablesMap["port"].as<int>();
-  }
-  else if (variablesMap.count("p") == 1)
-  {
-    serverPort = variablesMap["p"].as<int>();
-  }
-  if(variablesMap.count("dataFetcher") == 1)
-  {
-    dataFetcherStr = variablesMap["dataFetcher"].as<std::string>();
-  }
-  else if (variablesMap.count("data") == 1)
-  {
-    dataFetcherStr = variablesMap["data"].as<std::string>();
-  }
-  if(variablesMap.count("projectShortname") == 1)
-  {
-    projectShortname = variablesMap["projectShortname"].as<std::string>();
-  }
-  else if(variablesMap.count("project") == 1)
-  {
-    projectShortname = variablesMap["project"].as<std::string>();
-  }
-  if(variablesMap.count("osrmWalkPort") == 1)
-  {
-    algorithmParams.osrmRoutingWalkingPort = variablesMap["osrmWalkPort"].as<std::string>();
-  }
-  if(variablesMap.count("osrmFilePath") == 1)
-  {
-    algorithmParams.osrmFilePath = variablesMap["osrmFilePath"].as<std::string>();
-  }
-  if(variablesMap.count("osrmUseLib") == 1)
-  {
-    algorithmParams.osrmUseLib = (variablesMap["osrmUseLib"].as<std::string>() == "1") ? true : false;
-  }
-  if(variablesMap.count("odTripsFootpathsMaxTravelTimeMinutes") == 1)
-  {
-    algorithmParams.maxAccessWalkingTravelTimeSeconds = variablesMap["odTripsFootpathsMaxTravelTimeMinutes"].as<int>() * 60;
-    algorithmParams.maxEgressWalkingTravelTimeSeconds = algorithmParams.maxAccessWalkingTravelTimeSeconds;
-    std::cerr << "Max access/egress travel time seconds: " << algorithmParams.maxAccessWalkingTravelTimeSeconds << std::endl;
-  }
-  if(variablesMap.count("updateOdTrips") == 1)
-  {
-    algorithmParams.updateOdTrips = (variablesMap["updateOdTrips"].as<std::string>() == "1") ? true : false;
-  }
-  if(variablesMap.count("scenarioUuid") == 1)
-  {
-    algorithmParams.scenarioUuid = uuidGeneratorMain(variablesMap["scenarioUuid"].as<std::string>());
-  }
-  
-  std::cout << "Using http port "         << serverPort << std::endl;
-  std::cout << "Using osrm walk port "    << algorithmParams.osrmRoutingWalkingPort << std::endl;
-  std::cout << "Using data fetcher "      << dataFetcherStr << std::endl;
-  std::cout << "Using project shortname " << projectShortname << std::endl;
   
   // setup console colors:
   // (this will create a new terminal window, check if the terminal is color-capable and then it will close the terminal window with endwin()):
@@ -180,13 +97,26 @@ int main(int argc, char** argv) {
     consoleResetColor = "";
   }
   endwin();
+    
+  std::cout << "Starting transit routing on port " << consoleGreen << programOptions.port << consoleResetColor 
+            << " for the project: " << consoleGreen << programOptions.projectShortname << consoleResetColor 
+            << std::endl << std::endl;
   
-  std::cout << "Starting transit routing for the project: ";
-  std::cout << consoleGreen + projectShortname + consoleResetColor << std::endl << std::endl;
-  
-  algorithmParams.projectShortname     = projectShortname;
-  algorithmParams.dataFetcherShortname = dataFetcherStr;
-  
+  algorithmParams.projectShortname       = programOptions.projectShortname;
+  algorithmParams.dataFetcherShortname   = programOptions.dataFetcherShortname;
+  algorithmParams.osrmWalkingPort        = programOptions.osrmWalkingPort;
+  algorithmParams.osrmCyclingPort        = programOptions.osrmCyclingPort;
+  algorithmParams.osrmDrivingPort        = programOptions.osrmDrivingPort;
+  algorithmParams.osrmWalkingHost        = programOptions.osrmWalkingHost;
+  algorithmParams.osrmCyclingHost        = programOptions.osrmCyclingHost;
+  algorithmParams.osrmDrivingHost        = programOptions.osrmDrivingHost;
+  algorithmParams.osrmWalkingFilePath    = programOptions.osrmWalkingFilePath;
+  algorithmParams.osrmCyclingFilePath    = programOptions.osrmCyclingFilePath;
+  algorithmParams.osrmDrivingFilePath    = programOptions.osrmDrivingFilePath;
+  algorithmParams.osrmWalkingUseLib      = programOptions.osrmWalkingUseLib;
+  algorithmParams.osrmCyclingUseLib      = programOptions.osrmCyclingUseLib;
+  algorithmParams.osrmDrivingUseLib      = programOptions.osrmDrivingUseLib;
+
   GtfsFetcher  gtfsFetcher     = GtfsFetcher();
   algorithmParams.gtfsFetcher  = &gtfsFetcher;
   CsvFetcher   csvFetcher      = CsvFetcher();
@@ -327,6 +257,7 @@ int main(int argc, char** argv) {
       calculator.params.originNodeIdx                          = -1;
       calculator.params.destinationNodeIdx                     = -1;
       calculator.params.odTrip                                 = NULL;
+      calculator.params.debugDisplay                           = false;
       calculator.params.maxNumberOfTransfers                   = -1;
       calculator.params.minWaitingTimeSeconds                  = 5 * 60;
       calculator.params.departureTimeHour                      = -1;
@@ -736,6 +667,10 @@ int main(int argc, char** argv) {
         else if (parameterWithValueVector[0] == "save_to_file")
         {
           if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1") { saveToFile = true; }
+        }
+        else if (parameterWithValueVector[0] == "debug")
+        {
+          if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1") { calculator.params.debugDisplay = true; }
         }
         else if (parameterWithValueVector[0] == "min_waiting_time" || parameterWithValueVector[0] == "min_waiting_time_minutes")
         {

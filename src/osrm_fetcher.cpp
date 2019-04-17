@@ -16,13 +16,8 @@ namespace TrRouting
     float distanceXMeters;
     float distanceYMeters;
 
-    if (params.osrmUseLib)
+    if (params.osrmWalkingUseLib)
     {
-      //osrm::EngineConfig osrmConfig;
-      //osrmConfig.storage_config    = {params.osrmFilePath};
-      //osrmConfig.use_shared_memory = false;
-      //osrmConfig.algorithm         = osrm::EngineConfig::Algorithm::CH;
-      //osrm::OSRM osrmRouter2{osrmConfig};
       osrm::TableParameters osrmParams{};
 
       osrmParams.coordinates.push_back({osrm::util::FloatLongitude{point.longitude}, osrm::util::FloatLatitude{point.latitude}});
@@ -50,7 +45,7 @@ namespace TrRouting
 
       osrm::json::Object result;
       
-      const auto status = params.osrmRouter.get().Table(osrmParams, result);
+      const auto status = params.osrmWalkingRouter.get().Table(osrmParams, result);
       //std::cerr << "numberOfNodes: " << osrmParams.coordinates.size() << std::endl;
       if (status == osrm::Status::Ok)
       {
@@ -116,7 +111,7 @@ namespace TrRouting
 
       // call osrm on bird distance accessible nodes for further filtering by network travel time:
       boost::asio::ip::tcp::iostream s;
-      s.connect(params.osrmRoutingWalkingHost, params.osrmRoutingWalkingPort);
+      s.connect(params.osrmWalkingHost, params.osrmWalkingPort);
       
       if (reversed)
       {

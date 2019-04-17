@@ -91,16 +91,21 @@ namespace TrRouting
     bool calculateAllOdTrips;
     boost::optional<boost::uuids::uuid> scenarioUuid;
 
-    std::string osrmRoutingWalkingPort;
-    std::string osrmRoutingWalkingHost;
-    std::string osrmRoutingDrivingPort;
-    std::string osrmRoutingDrivingHost;
-    std::string osrmRoutingCyclingPort;
-    std::string osrmRoutingCyclingHost;
-    std::string osrmFilePath; // path to .osrm file
-    bool osrmUseLib;
-    boost::optional<osrm::OSRM> osrmRouter;
-    int updateOdTrips; // if 1: update od trips access and egress nodes from database. Set to 1 only if nodes and/or od trips were modified.
+    std::string osrmWalkingPort;
+    std::string osrmCyclingPort;
+    std::string osrmDrivingPort;
+    std::string osrmWalkingHost;
+    std::string osrmCyclingHost;
+    std::string osrmDrivingHost;
+    std::string osrmWalkingFilePath; // path to walking .osrm file
+    std::string osrmCyclingFilePath; // path to cycling .osrm file
+    std::string osrmDrivingFilePath; // path to driving .osrm file
+    bool osrmWalkingUseLib;
+    bool osrmCyclingUseLib;
+    bool osrmDrivingUseLib;
+    boost::optional<osrm::OSRM> osrmWalkingRouter;
+    boost::optional<osrm::OSRM> osrmCyclingRouter;
+    boost::optional<osrm::OSRM> osrmDrivingRouter;
     
     std::string accessMode;
     std::string egressMode;
@@ -141,15 +146,6 @@ namespace TrRouting
       maxTotalWalkingTravelTimeSeconds       = 60*60; // not used right now
       maxOnlyWalkingAccessTravelTimeRatio    = 1.5; // prefer walking only if it is faster than transit and total only walking travel time <= maxAccessWalkingTravelTimeSeconds * this ratio
       transferPenaltySeconds                 = 0; // not used right now
-      updateOdTrips                          = 0;
-      osrmRoutingWalkingHost                 = "localhost";
-      osrmRoutingWalkingPort                 = "5000";
-      osrmRoutingDrivingHost                 = "localhost";
-      osrmRoutingDrivingPort                 = "7000";
-      osrmRoutingCyclingHost                 = "localhost";
-      osrmRoutingCyclingPort                 = "8000";
-      osrmUseLib                             = false;
-      osrmFilePath                           = "osrm/walk/walk.osrm";
       accessMode                             = "walking";
       egressMode                             = "walking";
       noResultSecondMode                     = "driving";
