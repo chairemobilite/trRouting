@@ -955,29 +955,30 @@ int main(int argc, char** argv) {
           }
           
           alternativeJson = {};
-          alternativeJson["status"]                       = routingResult.status;
-          alternativeJson["travelTimeSeconds"]            = routingResult.travelTimeSeconds;
-          alternativeJson["minimizedTravelTimeSeconds"]   = routingResult.travelTimeSeconds - routingResult.firstWaitingTimeSeconds + calculator.params.minWaitingTimeSeconds;
-          alternativeJson["departureTimeSeconds"]         = routingResult.departureTimeSeconds;
-          alternativeJson["arrivalTimeSeconds"]           = routingResult.arrivalTimeSeconds;
-          alternativeJson["numberOfTransfers"]            = routingResult.numberOfTransfers;
-          alternativeJson["inVehicleTravelTimeSeconds"]   = routingResult.inVehicleTravelTimeSeconds;
-          alternativeJson["transferTravelTimeSeconds"]    = routingResult.transferTravelTimeSeconds;
-          alternativeJson["waitingTimeSeconds"]           = routingResult.waitingTimeSeconds;
-          alternativeJson["accessTravelTimeSeconds"]      = routingResult.accessTravelTimeSeconds;
-          alternativeJson["egressTravelTimeSeconds"]      = routingResult.egressTravelTimeSeconds;
-          alternativeJson["transferWaitingTimeSeconds"]   = routingResult.transferWaitingTimeSeconds;
-          alternativeJson["firstWaitingTimeSeconds"]      = routingResult.firstWaitingTimeSeconds;
-          alternativeJson["nonTransitTravelTimeSeconds"]  = routingResult.nonTransitTravelTimeSeconds;
-          alternativeJson["inVehicleTravelTimesSeconds"]  = routingResult.inVehicleTravelTimesSeconds;
-          alternativeJson["lineUuids"]                    = routingResult.lineUuids;
-          alternativeJson["lineShortnames"]               = lineShortnames;
-          alternativeJson["modeShortnames"]               = routingResult.modeShortnames;
-          alternativeJson["agencyUuids"]                  = routingResult.agencyUuids;
-          alternativeJson["boardingNodeUuids"]            = routingResult.boardingNodeUuids;
-          alternativeJson["unboardingNodeUuids"]          = routingResult.unboardingNodeUuids;
-          alternativeJson["tripUuids"]                    = routingResult.tripUuids;
-          alternativeJson["alternativeSequence"]          = numAlternatives;
+          alternativeJson["status"]                        = routingResult.status;
+          alternativeJson["travelTimeSeconds"]             = routingResult.travelTimeSeconds;
+          alternativeJson["minimizedTravelTimeSeconds"]    = routingResult.travelTimeSeconds - routingResult.firstWaitingTimeSeconds + calculator.params.minWaitingTimeSeconds;
+          alternativeJson["departureTimeSeconds"]          = routingResult.departureTimeSeconds;
+          alternativeJson["minimizedDepartureTimeSeconds"] = routingResult.minimizedDepartureTimeSeconds;
+          alternativeJson["arrivalTimeSeconds"]            = routingResult.arrivalTimeSeconds;
+          alternativeJson["numberOfTransfers"]             = routingResult.numberOfTransfers;
+          alternativeJson["inVehicleTravelTimeSeconds"]    = routingResult.inVehicleTravelTimeSeconds;
+          alternativeJson["transferTravelTimeSeconds"]     = routingResult.transferTravelTimeSeconds;
+          alternativeJson["waitingTimeSeconds"]            = routingResult.waitingTimeSeconds;
+          alternativeJson["accessTravelTimeSeconds"]       = routingResult.accessTravelTimeSeconds;
+          alternativeJson["egressTravelTimeSeconds"]       = routingResult.egressTravelTimeSeconds;
+          alternativeJson["transferWaitingTimeSeconds"]    = routingResult.transferWaitingTimeSeconds;
+          alternativeJson["firstWaitingTimeSeconds"]       = routingResult.firstWaitingTimeSeconds;
+          alternativeJson["nonTransitTravelTimeSeconds"]   = routingResult.nonTransitTravelTimeSeconds;
+          alternativeJson["inVehicleTravelTimesSeconds"]   = routingResult.inVehicleTravelTimesSeconds;
+          alternativeJson["lineUuids"]                     = routingResult.lineUuids;
+          alternativeJson["lineShortnames"]                = lineShortnames;
+          alternativeJson["modeShortnames"]                = routingResult.modeShortnames;
+          alternativeJson["agencyUuids"]                   = routingResult.agencyUuids;
+          alternativeJson["boardingNodeUuids"]             = routingResult.boardingNodeUuids;
+          alternativeJson["unboardingNodeUuids"]           = routingResult.unboardingNodeUuids;
+          alternativeJson["tripUuids"]                     = routingResult.tripUuids;
+          alternativeJson["alternativeSequence"]           = numAlternatives;
           json["alternatives"].push_back(alternativeJson);
           json["status"] = "success";
           departureTimeSeconds = routingResult.departureTimeSeconds + routingResult.firstWaitingTimeSeconds - calculator.params.minWaitingTimeSeconds;
@@ -1062,29 +1063,30 @@ int main(int argc, char** argv) {
                   numAlternatives += 1;
                   
                   alternativeJson = {};
-                  alternativeJson["status"]                       = routingResult.status;
-                  alternativeJson["travelTimeSeconds"]            = routingResult.travelTimeSeconds;
-                  alternativeJson["minimizedTravelTimeSeconds"]   = routingResult.travelTimeSeconds - routingResult.firstWaitingTimeSeconds + calculator.params.minWaitingTimeSeconds;
-                  alternativeJson["departureTimeSeconds"]         = routingResult.departureTimeSeconds;
-                  alternativeJson["arrivalTimeSeconds"]           = routingResult.arrivalTimeSeconds;
-                  alternativeJson["numberOfTransfers"]            = routingResult.numberOfTransfers;
-                  alternativeJson["inVehicleTravelTimeSeconds"]   = routingResult.inVehicleTravelTimeSeconds;
-                  alternativeJson["transferTravelTimeSeconds"]    = routingResult.transferTravelTimeSeconds;
-                  alternativeJson["waitingTimeSeconds"]           = routingResult.waitingTimeSeconds;
-                  alternativeJson["accessTravelTimeSeconds"]      = routingResult.accessTravelTimeSeconds;
-                  alternativeJson["egressTravelTimeSeconds"]      = routingResult.egressTravelTimeSeconds;
-                  alternativeJson["transferWaitingTimeSeconds"]   = routingResult.transferWaitingTimeSeconds;
-                  alternativeJson["firstWaitingTimeSeconds"]      = routingResult.firstWaitingTimeSeconds;
-                  alternativeJson["nonTransitTravelTimeSeconds"]  = routingResult.nonTransitTravelTimeSeconds;
-                  alternativeJson["inVehicleTravelTimesSeconds"]  = routingResult.inVehicleTravelTimesSeconds;
-                  alternativeJson["lineUuids"]                    = routingResult.lineUuids;
-                  alternativeJson["lineShortnames"]               = lineShortnames;
-                  alternativeJson["modeShortnames"]               = routingResult.modeShortnames;
-                  alternativeJson["agencyUuids"]                  = routingResult.agencyUuids;
-                  alternativeJson["boardingNodeUuids"]            = routingResult.boardingNodeUuids;
-                  alternativeJson["unboardingNodeUuids"]          = routingResult.unboardingNodeUuids;
-                  alternativeJson["tripUuids"]                    = routingResult.tripUuids;
-                  alternativeJson["alternativeSequence"]          = numAlternatives;
+                  alternativeJson["status"]                        = routingResult.status;
+                  alternativeJson["travelTimeSeconds"]             = routingResult.travelTimeSeconds;
+                  alternativeJson["minimizedTravelTimeSeconds"]    = routingResult.travelTimeSeconds - routingResult.firstWaitingTimeSeconds + calculator.params.minWaitingTimeSeconds;
+                  alternativeJson["departureTimeSeconds"]          = routingResult.departureTimeSeconds;
+                  alternativeJson["minimizedDepartureTimeSeconds"] = routingResult.minimizedDepartureTimeSeconds;
+                  alternativeJson["arrivalTimeSeconds"]            = routingResult.arrivalTimeSeconds;
+                  alternativeJson["numberOfTransfers"]             = routingResult.numberOfTransfers;
+                  alternativeJson["inVehicleTravelTimeSeconds"]    = routingResult.inVehicleTravelTimeSeconds;
+                  alternativeJson["transferTravelTimeSeconds"]     = routingResult.transferTravelTimeSeconds;
+                  alternativeJson["waitingTimeSeconds"]            = routingResult.waitingTimeSeconds;
+                  alternativeJson["accessTravelTimeSeconds"]       = routingResult.accessTravelTimeSeconds;
+                  alternativeJson["egressTravelTimeSeconds"]       = routingResult.egressTravelTimeSeconds;
+                  alternativeJson["transferWaitingTimeSeconds"]    = routingResult.transferWaitingTimeSeconds;
+                  alternativeJson["firstWaitingTimeSeconds"]       = routingResult.firstWaitingTimeSeconds;
+                  alternativeJson["nonTransitTravelTimeSeconds"]   = routingResult.nonTransitTravelTimeSeconds;
+                  alternativeJson["inVehicleTravelTimesSeconds"]   = routingResult.inVehicleTravelTimesSeconds;
+                  alternativeJson["lineUuids"]                     = routingResult.lineUuids;
+                  alternativeJson["lineShortnames"]                = lineShortnames;
+                  alternativeJson["modeShortnames"]                = routingResult.modeShortnames;
+                  alternativeJson["agencyUuids"]                   = routingResult.agencyUuids;
+                  alternativeJson["boardingNodeUuids"]             = routingResult.boardingNodeUuids;
+                  alternativeJson["unboardingNodeUuids"]           = routingResult.unboardingNodeUuids;
+                  alternativeJson["tripUuids"]                     = routingResult.tripUuids;
+                  alternativeJson["alternativeSequence"]           = numAlternatives;
                   json["alternatives"].push_back(alternativeJson);
                 
                   //std::cout << "travelTimeSeconds: " << routingResult.travelTimeSeconds << " line Uuids: ";
@@ -1184,7 +1186,7 @@ int main(int argc, char** argv) {
         {
           // write csv header:
           csv += "uuid,internalId,status,ageGroup,gender,occupation,destinationActivity,mode,expansionFactor,travelTimeSeconds,onlyWalkingTravelTimeSeconds,"
-                 "declaredDepartureTimeSeconds,departureTimeSeconds,arrivalTimeSeconds,numberOfTransfers,inVehicleTravelTimeSeconds,"
+                 "declaredDepartureTimeSeconds,departureTimeSeconds,minimizedDepartureTimeSeconds,arrivalTimeSeconds,numberOfTransfers,inVehicleTravelTimeSeconds,"
                  "transferTravelTimeSeconds,waitingTimeSeconds,accessTravelTimeSeconds,egressTravelTimeSeconds,transferWaitingTimeSeconds,"
                  "firstWaitingTimeSeconds,nonTransitTravelTimeSeconds,lineUuids,modeShortnames,agencyUuids,boardingNodeUuids,unboardingNodeUuids,tripUuids\n";
         }
@@ -1306,7 +1308,7 @@ int main(int argc, char** argv) {
                 //std::replace( ageGroup.begin(), ageGroup.end(), '-', '_' ); // remove dash so Excel does not convert to age groups to numbers...
                 csv += boost::uuids::to_string(odTrip.uuid) + ",\"" + odTrip.internalId + "\",\"" + routingResult.status + "\",\"" /*+ ageGroup*/ + "\",\"" /*+ odTrip.gender*/ + "\",\"" /*+ odTrip.occupation*/ + "\",\"";
                 csv += odTrip.destinationActivity + "\",\"" + odTrip.mode + "\"," + std::to_string(odTrip.expansionFactor) + "," + std::to_string(routingResult.travelTimeSeconds) + ",";
-                csv += std::to_string(odTrip.walkingTravelTimeSeconds) + "," + std::to_string(odTrip.departureTimeSeconds) + "," + std::to_string(routingResult.departureTimeSeconds) + ",";
+                csv += std::to_string(odTrip.walkingTravelTimeSeconds) + "," + std::to_string(odTrip.departureTimeSeconds) + "," + std::to_string(routingResult.departureTimeSeconds) + "," + std::to_string(routingResult.minimizedDepartureTimeSeconds) + ",";
                 csv += std::to_string(routingResult.arrivalTimeSeconds) + "," + std::to_string(routingResult.numberOfTransfers) + "," + std::to_string(routingResult.inVehicleTravelTimeSeconds) + ",";
                 csv += std::to_string(routingResult.transferTravelTimeSeconds) + "," + std::to_string(routingResult.waitingTimeSeconds) + "," + std::to_string(routingResult.accessTravelTimeSeconds) + ",";
                 csv += std::to_string(routingResult.egressTravelTimeSeconds) + "," + std::to_string(routingResult.transferWaitingTimeSeconds) + "," + std::to_string(routingResult.firstWaitingTimeSeconds) + ",";
