@@ -347,29 +347,30 @@ namespace TrRouting
             json["minimumWaitingTimeBeforeEachBoardingMinutes"]    = Toolbox::convertSecondsToMinutes(params.minWaitingTimeSeconds);
             json["minimumWaitingTimeBeforeEachBoardingSeconds"]    = params.minWaitingTimeSeconds;
 
-            result.travelTimeSeconds           = arrivalTime - departureTimeSeconds;
-            result.arrivalTimeSeconds          = arrivalTime;
-            result.departureTimeSeconds        = departureTimeSeconds;
-            result.numberOfTransfers           = numberOfTransfers;
-            result.inVehicleTravelTimeSeconds  = totalInVehicleTime;
-            result.transferTravelTimeSeconds   = totalTransferWalkingTime;
-            result.waitingTimeSeconds          = totalWaitingTime;
-            result.accessTravelTimeSeconds     = accessWalkingTime;
-            result.egressTravelTimeSeconds     = egressWalkingTime;
-            result.transferWaitingTimeSeconds  = totalTransferWaitingTime;
-            result.firstWaitingTimeSeconds     = accessWaitingTime;
-            result.nonTransitTravelTimeSeconds = totalWalkingTime;
-            result.legs                        = legs;
-            result.lineUuids                   = lineUuids;
-            result.linesIdx                    = linesIdx;
-            result.modeShortnames              = modeShortnames;
-            result.agencyUuids                 = agencyUuids;
-            result.boardingNodeUuids           = boardingNodeUuids;
-            result.unboardingNodeUuids         = unboardingNodeUuids;
-            result.tripUuids                   = tripUuids;
-            result.tripsIdx                    = tripsIdx;
-            result.inVehicleTravelTimesSeconds = inVehicleTravelTimesSeconds;
-            result.status                      = "success";
+            result.travelTimeSeconds             = arrivalTime - departureTimeSeconds;
+            result.arrivalTimeSeconds            = arrivalTime;
+            result.departureTimeSeconds          = departureTimeSeconds;
+            result.minimizedDepartureTimeSeconds = minimizedDepartureTime;
+            result.numberOfTransfers             = numberOfTransfers;
+            result.inVehicleTravelTimeSeconds    = totalInVehicleTime;
+            result.transferTravelTimeSeconds     = totalTransferWalkingTime;
+            result.waitingTimeSeconds            = totalWaitingTime;
+            result.accessTravelTimeSeconds       = accessWalkingTime;
+            result.egressTravelTimeSeconds       = egressWalkingTime;
+            result.transferWaitingTimeSeconds    = totalTransferWaitingTime;
+            result.firstWaitingTimeSeconds       = accessWaitingTime;
+            result.nonTransitTravelTimeSeconds   = totalWalkingTime;
+            result.legs                          = legs;
+            result.lineUuids                     = lineUuids;
+            result.linesIdx                      = linesIdx;
+            result.modeShortnames                = modeShortnames;
+            result.agencyUuids                   = agencyUuids;
+            result.boardingNodeUuids             = boardingNodeUuids;
+            result.unboardingNodeUuids           = unboardingNodeUuids;
+            result.tripUuids                     = tripUuids;
+            result.tripsIdx                      = tripsIdx;
+            result.inVehicleTravelTimesSeconds   = inVehicleTravelTimesSeconds;
+            result.status                        = "success";
             
           }
         }
