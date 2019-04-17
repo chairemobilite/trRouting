@@ -62,8 +62,6 @@ void default_resource_send(const HttpServer &server, const std::shared_ptr<HttpS
 
 int main(int argc, char** argv) {
   
-  int serverPort {4000};
-  
   boost::uuids::string_generator uuidGeneratorMain;
 
   // Set params:
@@ -133,7 +131,7 @@ int main(int argc, char** argv) {
   //Unless you do more heavy non-threaded processing in the resources,
   //1 thread is usually faster than several threads
   HttpServer server;
-  server.config.port = serverPort;
+  server.config.port = programOptions.port;
 
   server.resource["^/route/v1/transit[/]?\\?([0-9a-zA-Z&=_,:/.-]+)$"]["GET"]=[&server, &calculator](std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request) {
     
