@@ -8,9 +8,6 @@ namespace TrRouting
 
     int benchmarkingStart  = algorithmCalculationTime.getEpoch();
 
-    //int benchmarking1 {0}, benchmarking2 {0}, benchmarking3 {0}, benchmarking4 {0}, benchmarking5 {0};
-    //int benchmarkingStart1 {0}, benchmarkingStart2 {0}, benchmarkingStart3 {0}, benchmarkingStart4 {0}, benchmarkingStart5 {0};
-
     int  i {0};
     int  connectionsCount = forwardConnections.size();
     int  reachableConnectionsCount {0};
@@ -170,18 +167,16 @@ namespace TrRouting
         i++;
       }
 
-      /*benchmarking["count_1"] += benchmarking1;
-      benchmarking["count_2"] += benchmarking2;
-      benchmarking["count_3"] += benchmarking3;
-      benchmarking["count_4"] += benchmarking4;
-      benchmarking["count_5"] += benchmarking5;*/
+      if (params.debugDisplay)
+        benchmarking["forward_calculation"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
 
-      benchmarking["forward_calculation"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
       return std::make_tuple(bestArrivalTime, bestEgressNodeIndex, bestEgressTravelTime);
     }
     else
     {
-      benchmarking["forward_calculation"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
+      if (params.debugDisplay)
+        benchmarking["forward_calculation"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
+
       return std::make_tuple(MAX_INT, -1, -1);
     }
 

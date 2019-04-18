@@ -3,39 +3,23 @@
 
 //Added for the json-example
 #define BOOST_SPIRIT_THREADSAFE
-//#include <boost/property_tree/ptree.hpp>
-//#include <boost/property_tree/json_parser.hpp>
-
-//Added for the default_resource example
-//#include <boost/filesystem.hpp>
-//#include <boost/tokenizer.hpp>
-//#include <boost/algorithm/string.hpp>
-//#include <boost/algorithm/string/replace.hpp>
 
 #include <vector>
 #include <algorithm>
 #include <string>
-//#include <fstream>
 #include <iostream>
 #include <iterator>
 #include <curses.h>
-//#include <locale>
-
 
 #include <boost/optional.hpp>
 #include <boost/uuid/uuid.hpp>
-#include <boost/uuid/string_generator.hpp>
 #include <boost/program_options.hpp>
 
-//#include <osrm/osrm.hpp>
-//#include <osrm/engine_config.hpp>
-//#include <osrm/table_parameters.hpp>
-
-//#include "toolbox.hpp"
-//#include "gtfs_fetcher.hpp"
-//#include "csv_fetcher.hpp"
-//#include "cache_fetcher.hpp"
-//#include "calculation_time.hpp"
+#include "toolbox.hpp"
+#include "gtfs_fetcher.hpp"
+#include "csv_fetcher.hpp"
+#include "cache_fetcher.hpp"
+#include "calculation_time.hpp"
 #include "parameters.hpp"
 #include "scenario.hpp"
 #include "calculator.hpp"
@@ -46,8 +30,6 @@ using namespace TrRouting;
 
 typedef SimpleWeb::Server<SimpleWeb::HTTP> HttpServer;
 typedef SimpleWeb::Client<SimpleWeb::HTTP> HttpClient;
-
-int stepCount = 1;
 
 std::string consoleRed        = "";
 std::string consoleGreen      = "";
@@ -133,720 +115,76 @@ int main(int argc, char** argv) {
   HttpServer server;
   server.config.port = programOptions.port;
 
+  // updateCache:
+  server.resource["^/updateCache[/]?\\?([0-9a-zA-Z&=_,:/.-]+)$"]["GET"]=[&server, &calculator](std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request) {
+    
+    // todo
+
+    std::string jsonResponse {""};
+    *response << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << jsonResponse.length() << "\r\n\r\n" << jsonResponse;
+
+  };
+
+  // closeServer and exit app:
+  server.resource["^/exit[/]?\\?([0-9a-zA-Z&=_,:/.-]+)$"]["GET"]=[&server, &calculator](std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request) {
+    
+    std::string jsonResponse {""};
+    *response << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << jsonResponse.length() << "\r\n\r\n" << jsonResponse;
+
+    // todo
+
+  };
+
+  // routing request
   server.resource["^/route/v1/transit[/]?\\?([0-9a-zA-Z&=_,:/.-]+)$"]["GET"]=[&server, &calculator](std::shared_ptr<HttpServer::Response> response, std::shared_ptr<HttpServer::Request> request) {
     
+    // prepare benchmarking and timer:
     calculator.algorithmCalculationTime.start();
     calculator.benchmarking.clear();
-
-    /*calculator.benchmarking["reset_1"]             = 0;
-    calculator.benchmarking["reset_2"]             = 0;
-    calculator.benchmarking["reset_3"]             = 0;
-    calculator.benchmarking["reset_4"]             = 0;
-    calculator.benchmarking["reset_5"]             = 0;*/
-    calculator.benchmarking["test"]                = 0;
-    calculator.benchmarking["forward_calculation"] = 0;
-    calculator.benchmarking["reset"]               = 0;
-    //calculator.benchmarking["forward_journey"]     = 0;
-    calculator.benchmarking["reverse_calculation"] = 0;
-    //calculator.benchmarking["reverse_journey"]     = 0;
-    //calculator.benchmarking["generating_results"]  = 0;
-    //calculator.benchmarking["transferable_nodes"]  = 0;
-    /*calculator.benchmarking["count_1"]              = 0;
-    calculator.benchmarking["count_2"]              = 0;
-    calculator.benchmarking["count_3"]              = 0;
-    calculator.benchmarking["count_4"]              = 0;
-    calculator.benchmarking["count_5"]              = 0;*/
-    int countOdTripsCalculated {0};
-
-    //calculator.algorithmCalculationTime.startStep();
     
-    std::cout << "calculating request..." << std::endl;
-    
-    std::string resultStr;
-    std::string csv;
-    
-    std::cout << request->path << std::endl;
-    
-    bool saveToFile {false}; // save result to file instead of returning it in response
-    std::string calculationName {"trRoutingResult"};
-    std::string fileFormat {"json"}; // csv can be used, but only with calculateAllTrips = true
-    
+    // prepare parameters:
+    std::vector<std::string> parametersWithValues;
+    std::string              queryString;
     if (request->path_match.size() >= 1)
     {
-      std::vector<std::string> parametersWithValues;
-      boost::uuids::string_generator uuidGenerator;
+      queryString = request->path_match[1];
+    }
+    boost::split(parametersWithValues, queryString, boost::is_any_of("&"));
+  
+    // clear and initialize benchmarking:
+    if (calculator.params.debugDisplay)
+    {
+      calculator.benchmarking["reset"]               = 0;
+      calculator.benchmarking["forward_calculation"] = 0;
+      //calculator.benchmarking["forward_journey"]     = 0;
+      calculator.benchmarking["reverse_calculation"] = 0;
+      //calculator.benchmarking["reverse_journey"]     = 0;
+      //calculator.benchmarking["generating_results"]  = 0;
+    }
+    
+    std::cout << "calculating request: " << request->path << std::endl;
 
-      std::string queryString = request->path_match[1];
-      
-      boost::split(parametersWithValues, queryString, boost::is_any_of("&"));
-      
-      float originLatitude, originLongitude, destinationLatitude, destinationLongitude;
-      boost::optional<boost::uuids::uuid> startingNodeUuid, endingNodeUuid;
-      boost::optional<boost::uuids::uuid> odTripUuid; // when calculating for only one trip
-      std::vector<int> accessNodeTravelTimesSeconds;
-      std::vector<int> egressNodeTravelTimesSeconds;
-      std::vector<std::pair<int,int>> odTripsPeriods; // pair: start_at_seconds, end_at_seconds
-      std::vector<std::string> odTripsGenders;
-      std::vector<std::string> odTripsAgeGroups;
-      std::vector<std::string> odTripsOccupations;
-      std::vector<std::string> odTripsActivities;
-      std::vector<std::string> odTripsModes;
-      
-      int odTripsSampleSize {-1}; // for testing only
-      int batchNumber  {1}; // when using multiple batches (parallele calculations)
-      int batchesCount {1};
-      bool alternatives {false}; // calculate alternatives or not
-      
-      calculator.params.calculateAllOdTrips = false;
-      calculator.params.onlyServicesIdx.clear();
-      calculator.params.exceptServicesIdx.clear();
-      calculator.params.onlyLinesIdx.clear();
-      calculator.params.exceptLinesIdx.clear();
-      calculator.params.onlyModesIdx.clear();
-      calculator.params.exceptModesIdx.clear();
-      calculator.params.onlyAgenciesIdx.clear();
-      calculator.params.exceptAgenciesIdx.clear();
-      calculator.params.onlyNodesIdx.clear();
-      calculator.params.exceptNodesIdx.clear();
-      //calculator.params.odTripsPeriods     = odTripsPeriods;
-      //calculator.params.odTripsGenders     = odTripsGenders;
-      //calculator.params.odTripsAgeGroups   = odTripsAgeGroups;
-      //calculator.params.odTripsOccupations = odTripsOccupations;
-      //calculator.params.odTripsActivities  = odTripsActivities;
-      //calculator.params.odTripsModes       = odTripsModes;
-      
-      std::vector<std::string> parameterWithValueVector;
-      std::vector<std::string> latitudeLongitudeVector;
-      std::vector<std::string> dateVector;
-      std::vector<std::string> timeVector;
-      std::vector<std::string> onlyServiceUuidsVector;
-      std::vector<std::string> exceptServiceUuidsVector;
-      std::vector<std::string> onlyLineUuidsVector;
-      std::vector<std::string> exceptLineUuidsVector;
-      std::vector<std::string> onlyModeShortnamesVector;
-      std::vector<std::string> exceptModeShortnamesVector;
-      std::vector<std::string> onlyAgencyUuidsVector;
-      std::vector<std::string> exceptAgencyUuidsVector;
-      std::vector<std::string> onlyNodeUuidsVector;
-      std::vector<std::string> exceptNodeUuidsVector;
-      std::vector<std::string> accessNodeUuidsVector;
-      std::vector<std::string> accessNodeTravelTimesSecondsVector;
-      std::vector<std::string> egressNodeUuidsVector;
-      std::vector<std::string> egressNodeTravelTimesSecondsVector;
-      std::vector<std::string> odTripsPeriodsVector;
-      std::vector<std::string> odTripsGendersVector;
-      std::vector<std::string> odTripsAgeGroupsVector;
-      std::vector<std::string> odTripsOccupationsVector;
-      std::vector<std::string> odTripsActivitiesVector;
-      std::vector<std::string> odTripsModesVector;
+    int countOdTripsCalculated {0};
+    std::string jsonResponse {""};
+    std::string csvResponse  {""};
+    
+    // update params:
+    calculator.params.update(parametersWithValues, calculator.scenarioIndexesByUuid, calculator.scenarios, calculator.nodeIndexesByUuid);
 
-      int departureTimeHour, departureTimeMinutes, arrivalTimeHour, arrivalTimeMinutes;
+    if (calculator.params.isCompleteForCalculation())
+    {
       
-      calculator.params.forwardCalculation                     = true;
-      calculator.params.detailedResults                        = false;
-      calculator.params.returnAllNodesResult                   = false;
-      calculator.params.transferOnlyAtSameStation              = false;
-      calculator.params.transferBetweenSameLine                = true;
-      calculator.params.origin                                 = Point();
-      calculator.params.destination                            = Point();
-      calculator.params.routingDateYear                        = 0;
-      calculator.params.routingDateMonth                       = 0;
-      calculator.params.routingDateDay                         = 0;
-      calculator.params.originNodeIdx                          = -1;
-      calculator.params.destinationNodeIdx                     = -1;
-      calculator.params.odTrip                                 = NULL;
-      calculator.params.debugDisplay                           = false;
-      calculator.params.maxNumberOfTransfers                   = -1;
-      calculator.params.minWaitingTimeSeconds                  = 5 * 60;
-      calculator.params.departureTimeHour                      = -1;
-      calculator.params.departureTimeMinutes                   = -1;
-      calculator.params.departureTimeSeconds                   = -1;
-      calculator.params.arrivalTimeHour                        = -1;
-      calculator.params.arrivalTimeMinutes                     = -1;
-      calculator.params.arrivalTimeSeconds                     = -1;
-      calculator.params.maxTotalTravelTimeSeconds              = MAX_INT;
-      calculator.params.maxAccessWalkingTravelTimeSeconds      = 20 * 60;
-      calculator.params.maxEgressWalkingTravelTimeSeconds      = 20 * 60;
-      calculator.params.maxTransferWalkingTravelTimeSeconds    = 20 * 60;
-      calculator.params.maxTotalWalkingTravelTimeSeconds       = 60 * 60;
-      calculator.params.maxOnlyWalkingAccessTravelTimeRatio    = 1.5;
-      calculator.params.transferPenaltySeconds                 = 0;
-      calculator.params.accessMode                             = "walking";
-      calculator.params.egressMode                             = "walking";
-      calculator.params.noResultSecondMode                     = "driving";
-      calculator.params.tryNextModeIfRoutingFails              = false;
-      calculator.params.noResultNextAccessTimeSecondsIncrement = 5 * 60;
-      calculator.params.maxNoResultNextAccessTimeSeconds       = 40 * 60;
-      calculator.params.calculateByNumberOfTransfers           = false;
-      calculator.params.alternatives                           = false;
-      calculator.params.accessNodesIdx.clear();
-      calculator.params.egressNodesIdx.clear();
-      calculator.params.accessNodeTravelTimesSeconds.clear();
-      calculator.params.egressNodeTravelTimesSeconds.clear();
-
-      for(auto & parameterWithValue : parametersWithValues)
+      OdTrip odTrip;
+      bool   foundOdTrip{false};
+      if (calculator.params.odTripUuid.is_initialized() && calculator.odTripIndexesByUuid.count(calculator.params.odTripUuid))
       {
-        boost::split(parameterWithValueVector, parameterWithValue, boost::is_any_of("="));
-        
-        if (parameterWithValueVector[0] == "origin")
-        {
-          boost::split(latitudeLongitudeVector, parameterWithValueVector[1], boost::is_any_of(","));
-          originLatitude           = std::stof(latitudeLongitudeVector[0]);
-          originLongitude          = std::stof(latitudeLongitudeVector[1]);
-          calculator.params.origin = Point(originLatitude, originLongitude);
-        }
-        else if (parameterWithValueVector[0] == "destination")
-        {
-          boost::split(latitudeLongitudeVector, parameterWithValueVector[1], boost::is_any_of(","));
-          destinationLatitude           = std::stof(latitudeLongitudeVector[0]);
-          destinationLongitude          = std::stof(latitudeLongitudeVector[1]);
-          calculator.params.destination = Point(destinationLatitude, destinationLongitude);
-        }
-        else if (parameterWithValueVector[0] == "calculation_name")
-        {
-          calculationName = parameterWithValueVector[1];
-        }
-        else if (parameterWithValueVector[0] == "file_format")
-        {
-          fileFormat = parameterWithValueVector[1];
-        }
-        else if (parameterWithValueVector[0] == "batch")
-        {
-          batchNumber = std::stoi(parameterWithValueVector[1]);
-        }
-        else if (parameterWithValueVector[0] == "num_batches")
-        {
-          batchesCount = std::stoi(parameterWithValueVector[1]);
-        }
-        else if (parameterWithValueVector[0] == "date")
-        {
-          boost::split(dateVector, parameterWithValueVector[1], boost::is_any_of("/"));
-          calculator.params.routingDateYear      = std::stoi(dateVector[0]);
-          calculator.params.routingDateMonth     = std::stoi(dateVector[1]);
-          calculator.params.routingDateDay       = std::stoi(dateVector[2]);
-        }
-        else if (parameterWithValueVector[0] == "time"
-                 || parameterWithValueVector[0] == "departure"
-                 || parameterWithValueVector[0] == "departure_time"
-                 || parameterWithValueVector[0] == "start_time"
-                )
-        {
-          boost::split(timeVector, parameterWithValueVector[1], boost::is_any_of(":"));
-          departureTimeHour    = std::stoi(timeVector[0]);
-          departureTimeMinutes = std::stoi(timeVector[1]);
-        }
-        else if (parameterWithValueVector[0] == "arrival_time"
-                 || parameterWithValueVector[0] == "arrival"
-                 || parameterWithValueVector[0] == "end_time"
-                )
-        {
-          boost::split(timeVector, parameterWithValueVector[1], boost::is_any_of(":"));
-          arrivalTimeHour    = std::stoi(timeVector[0]);
-          arrivalTimeMinutes = std::stoi(timeVector[1]);
-        }
-        else if (parameterWithValueVector[0] == "departure_seconds"
-                 || parameterWithValueVector[0] == "departure_time_seconds"
-                 || parameterWithValueVector[0] == "start_time_seconds"
-                )
-        {
-          calculator.params.departureTimeSeconds = std::stoi(parameterWithValueVector[1]);
-          if (calculator.params.departureTimeSeconds < 0)
-          {
-            calculator.params.departureTimeSeconds = -1;
-          }
-        }
-        else if (parameterWithValueVector[0] == "arrival_seconds"
-                 || parameterWithValueVector[0] == "arrival_time_seconds"
-                 || parameterWithValueVector[0] == "end_time_seconds"
-                )
-        {
-          calculator.params.arrivalTimeSeconds = std::stoi(parameterWithValueVector[1]);
-          if (calculator.params.arrivalTimeSeconds < 0)
-          {
-            calculator.params.arrivalTimeSeconds = -1;
-          }
-        }
-        else if (parameterWithValueVector[0] == "access_node_uuids")
-        {
-          boost::split(accessNodeUuidsVector, parameterWithValueVector[1], boost::is_any_of(","));
-          boost::uuids::uuid accessNodeUuid;
-          for(std::string accessNodeUuidStr : accessNodeUuidsVector)
-          {
-            accessNodeUuid = uuidGenerator(accessNodeUuidStr);
-            if (calculator.nodeIndexesByUuid.count(accessNodeUuid) == 1)
-            {
-              calculator.params.accessNodesIdx.push_back(calculator.nodeIndexesByUuid[accessNodeUuid]);
-            }
-          }
-        }
-        else if (parameterWithValueVector[0] == "egress_node_uuids")
-        {
-          boost::split(egressNodeUuidsVector, parameterWithValueVector[1], boost::is_any_of(","));
-          boost::uuids::uuid egressNodeUuid;
-          for(std::string egressNodeUuidStr : egressNodeUuidsVector)
-          {
-            egressNodeUuid = uuidGenerator(egressNodeUuidStr);
-            if (calculator.nodeIndexesByUuid.count(egressNodeUuid) == 1)
-            {
-              calculator.params.egressNodesIdx.push_back(calculator.nodeIndexesByUuid[egressNodeUuid]);
-            }
-          }
-        }
-        else if (parameterWithValueVector[0] == "od_trip_uuid")
-        {
-          odTripUuid = uuidGenerator(parameterWithValueVector[1]);
-        }
-        else if (parameterWithValueVector[0] == "od_trips")
-        {
-          if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1") { calculator.params.calculateAllOdTrips = true; }
-        }
-        else if (parameterWithValueVector[0] == "od_trips_sample_size")
-        {
-          odTripsSampleSize = std::stoi(parameterWithValueVector[1]);
-        }
-        else if (parameterWithValueVector[0] == "od_trips_periods")
-        {
-          boost::split(odTripsPeriodsVector, parameterWithValueVector[1], boost::is_any_of(","));
-          int periodIndex {0};
-          int startAtSeconds;
-          int endAtSeconds;
-          for(std::string odTripsTime : odTripsPeriodsVector)
-          {
-            if (periodIndex % 2 == 0)
-            {
-              startAtSeconds = std::stoi(odTripsTime);
-            }
-            else
-            {
-              endAtSeconds = std::stoi(odTripsTime);
-              odTripsPeriods.push_back(std::make_pair(startAtSeconds, endAtSeconds));
-            }
-            periodIndex++;
-          }
-          //calculator.params.odTripsPeriods = odTripsPeriods;
-        }
-        else if (parameterWithValueVector[0] == "od_trips_age_groups")
-        {
-          boost::split(odTripsAgeGroupsVector, parameterWithValueVector[1], boost::is_any_of(","));
-          for(std::string odTripsAgeGroup : odTripsAgeGroupsVector)
-          {
-            odTripsAgeGroups.push_back(odTripsAgeGroup);
-          }
-          //calculator.params.odTripsAgeGroups = odTripsAgeGroups;
-        }
-        else if (parameterWithValueVector[0] == "od_trips_genders")
-        {
-          boost::split(odTripsGendersVector, parameterWithValueVector[1], boost::is_any_of(","));
-          for(std::string odTripsGender : odTripsGendersVector)
-          {
-            odTripsGenders.push_back(odTripsGender);
-          }
-          //calculator.params.odTripsGenders = odTripsGenders;
-        }
-        else if (parameterWithValueVector[0] == "od_trips_occupations")
-        {
-          boost::split(odTripsOccupationsVector, parameterWithValueVector[1], boost::is_any_of(","));
-          for(std::string odTripsOccupation : odTripsOccupationsVector)
-          {
-            odTripsOccupations.push_back(odTripsOccupation);
-          }
-          //calculator.params.odTripsOccupations = odTripsOccupations;
-        }
-        else if (parameterWithValueVector[0] == "od_trips_activities")
-        {
-          boost::split(odTripsActivitiesVector, parameterWithValueVector[1], boost::is_any_of(","));
-          for(std::string odTripsActivity : odTripsActivitiesVector)
-          {
-            odTripsActivities.push_back(odTripsActivity);
-          }
-          //calculator.params.odTripsActivities = odTripsActivities;
-        }
-        else if (parameterWithValueVector[0] == "od_trips_modes")
-        {
-          boost::split(odTripsModesVector, parameterWithValueVector[1], boost::is_any_of(","));
-          for(std::string odTripsMode : odTripsModesVector)
-          {
-            odTripsModes.push_back(odTripsMode);
-          }
-          //calculator.params.odTripsModes = odTripsModes;
-        }
-        
-        else if (parameterWithValueVector[0] == "access_node_travel_times_seconds" || parameterWithValueVector[0] == "access_node_travel_times")
-        {
-          boost::split(accessNodeTravelTimesSecondsVector, parameterWithValueVector[1], boost::is_any_of(","));
-          for(std::string accessNodeTravelTimeSeconds : accessNodeTravelTimesSecondsVector)
-          {
-            accessNodeTravelTimesSeconds.push_back(std::stoi(accessNodeTravelTimeSeconds));
-          }
-          calculator.params.accessNodeTravelTimesSeconds = accessNodeTravelTimesSeconds;
-        }
-        else if (parameterWithValueVector[0] == "egress_node_travel_times_seconds" || parameterWithValueVector[0] == "egress_node_travel_times")
-        {
-          boost::split(egressNodeTravelTimesSecondsVector, parameterWithValueVector[1], boost::is_any_of(","));
-          for(std::string egressNodeTravelTimeSeconds : egressNodeTravelTimesSecondsVector)
-          {
-            egressNodeTravelTimesSeconds.push_back(std::stoi(egressNodeTravelTimeSeconds));
-          }
-          calculator.params.egressNodeTravelTimesSeconds = egressNodeTravelTimesSeconds;
-        }
-        else if (parameterWithValueVector[0] == "only_service_uuids")
-        {
-          boost::split(onlyServiceUuidsVector, parameterWithValueVector[1], boost::is_any_of(","));
-          boost::uuids::uuid onlyServiceUuid;
-          for(std::string onlyServiceUuidStr : onlyServiceUuidsVector)
-          {
-            onlyServiceUuid = uuidGenerator(onlyServiceUuidStr);
-            if (calculator.serviceIndexesByUuid.count(onlyServiceUuid) == 1)
-            {
-              calculator.params.onlyServicesIdx.push_back(calculator.serviceIndexesByUuid[onlyServiceUuid]);
-            }
-          }
-        }
-        else if (parameterWithValueVector[0] == "except_service_uuids")
-        {
-          boost::split(exceptServiceUuidsVector, parameterWithValueVector[1], boost::is_any_of(","));
-          boost::uuids::uuid exceptServiceUuid;
-          for(std::string exceptServiceUuidStr : exceptServiceUuidsVector)
-          {
-            exceptServiceUuid = uuidGenerator(exceptServiceUuidStr);
-            if (calculator.serviceIndexesByUuid.count(exceptServiceUuid) == 1)
-            {
-              calculator.params.exceptServicesIdx.push_back(calculator.serviceIndexesByUuid[exceptServiceUuid]);
-            }
-          }
-        }
-        else if (parameterWithValueVector[0] == "only_node_uuids")
-        {
-          boost::split(onlyNodeUuidsVector, parameterWithValueVector[1], boost::is_any_of(","));
-          boost::uuids::uuid onlyNodeUuid;
-          for(std::string onlyNodeUuidStr : onlyNodeUuidsVector)
-          {
-            onlyNodeUuid = uuidGenerator(onlyNodeUuidStr);
-            if (calculator.nodeIndexesByUuid.count(onlyNodeUuid) == 1)
-            {
-              calculator.params.onlyNodesIdx.push_back(calculator.nodeIndexesByUuid[onlyNodeUuid]);
-            }
-          }
-        }
-        else if (parameterWithValueVector[0] == "except_node_uuids")
-        {
-          boost::split(exceptNodeUuidsVector, parameterWithValueVector[1], boost::is_any_of(","));
-          boost::uuids::uuid exceptNodeUuid;
-          for(std::string exceptNodeUuidStr : exceptNodeUuidsVector)
-          {
-            exceptNodeUuid = uuidGenerator(exceptNodeUuidStr);
-            if (calculator.nodeIndexesByUuid.count(exceptNodeUuid) == 1)
-            {
-              calculator.params.exceptNodesIdx.push_back(calculator.nodeIndexesByUuid[exceptNodeUuid]);
-            }
-          }
-        }
-        else if (parameterWithValueVector[0] == "scenario_uuid")
-        {
-          boost::uuids::uuid scenarioUuid {uuidGenerator(parameterWithValueVector[1])};
-          if (calculator.scenarioIndexesByUuid.count(scenarioUuid) == 1)
-          {
-            Scenario scenario {calculator.scenarios[calculator.scenarioIndexesByUuid[scenarioUuid]]};
-            calculator.params.onlyServicesIdx   = scenario.servicesIdx;
-            calculator.params.onlyLinesIdx      = scenario.onlyLinesIdx;
-            calculator.params.onlyAgenciesIdx   = scenario.onlyAgenciesIdx;
-            calculator.params.onlyNodesIdx      = scenario.onlyNodesIdx;
-            calculator.params.onlyModesIdx      = scenario.onlyModesIdx;
-            calculator.params.exceptLinesIdx    = scenario.exceptLinesIdx;
-            calculator.params.exceptAgenciesIdx = scenario.exceptAgenciesIdx;
-            calculator.params.exceptNodesIdx    = scenario.exceptNodesIdx;
-            calculator.params.exceptModesIdx    = scenario.exceptModesIdx;
-          }
-        }
-        else if (parameterWithValueVector[0] == "only_line_uuids")
-        {
-          boost::split(onlyLineUuidsVector, parameterWithValueVector[1], boost::is_any_of(","));
-          boost::uuids::uuid onlyLineUuid;
-          for(std::string onlyLineUuidStr : onlyLineUuidsVector)
-          {
-            onlyLineUuid = uuidGenerator(onlyLineUuidStr);
-            if (calculator.lineIndexesByUuid.count(onlyLineUuid) == 1)
-            {
-              calculator.params.onlyLinesIdx.push_back(calculator.lineIndexesByUuid[onlyLineUuid]);
-            }
-          }
-        }
-        else if (parameterWithValueVector[0] == "except_line_uuids")
-        {
-          boost::split(exceptLineUuidsVector, parameterWithValueVector[1], boost::is_any_of(","));
-          boost::uuids::uuid exceptLineUuid;
-          for(std::string exceptLineUuidStr : exceptLineUuidsVector)
-          {
-            exceptLineUuid = uuidGenerator(exceptLineUuidStr);
-            if (calculator.lineIndexesByUuid.count(exceptLineUuid) == 1)
-            {
-              calculator.params.exceptLinesIdx.push_back(calculator.lineIndexesByUuid[exceptLineUuid]);
-            }
-          }
-        }
-        else if (parameterWithValueVector[0] == "only_modes")
-        {
-          boost::split(onlyModeShortnamesVector, parameterWithValueVector[1], boost::is_any_of(","));
-          for(std::string onlyModeShortname : onlyModeShortnamesVector)
-          {
-            if (calculator.modeIndexesByShortname.count(onlyModeShortname) == 1)
-            {
-              calculator.params.onlyModesIdx.push_back(calculator.modeIndexesByShortname[onlyModeShortname]);
-            }
-          }
-        }
-        else if (parameterWithValueVector[0] == "except_modes")
-        {
-          boost::split(exceptModeShortnamesVector, parameterWithValueVector[1], boost::is_any_of(","));
-          for(std::string exceptModeShortname : exceptModeShortnamesVector)
-          {
-            if (calculator.modeIndexesByShortname.count(exceptModeShortname) == 1)
-            {
-              calculator.params.exceptModesIdx.push_back(calculator.modeIndexesByShortname[exceptModeShortname]);
-            }
-          }
-        }
-        else if (parameterWithValueVector[0] == "only_agency_uuids")
-        {
-          boost::split(onlyAgencyUuidsVector, parameterWithValueVector[1], boost::is_any_of(","));
-          boost::uuids::uuid onlyAgencyUuid;
-          for(std::string onlyAgencyUuidStr : onlyAgencyUuidsVector)
-          {
-            onlyAgencyUuid = uuidGenerator(onlyAgencyUuidStr);
-            if (calculator.agencyIndexesByUuid.count(onlyAgencyUuid) == 1)
-            {
-              calculator.params.onlyAgenciesIdx.push_back(calculator.agencyIndexesByUuid[onlyAgencyUuid]);
-            }
-          }
-        }
-        else if (parameterWithValueVector[0] == "except_agency_uuids")
-        {
-          boost::split(exceptAgencyUuidsVector, parameterWithValueVector[1], boost::is_any_of(","));
-          boost::uuids::uuid exceptAgencyUuid;
-          for(std::string exceptAgencyUuidStr : exceptAgencyUuidsVector)
-          {
-            exceptAgencyUuid = uuidGenerator(exceptAgencyUuidStr);
-            if (calculator.agencyIndexesByUuid.count(exceptAgencyUuid) == 1)
-            {
-              calculator.params.onlyAgenciesIdx.push_back(calculator.agencyIndexesByUuid[exceptAgencyUuid]);
-            }
-          }
-        }
-        else if (parameterWithValueVector[0] == "starting_node_uuid"
-                 || parameterWithValueVector[0] == "start_node_uuid"
-                 || parameterWithValueVector[0] == "origin_node_uuid"
-                )
-        {
-          boost::uuids::uuid originNodeUuid {uuidGenerator(parameterWithValueVector[1])};
-          if (calculator.nodeIndexesByUuid.count(originNodeUuid) == 1)
-          {
-            calculator.params.originNodeIdx = calculator.nodeIndexesByUuid[originNodeUuid];
-          }
-        }
-        else if (parameterWithValueVector[0] == "ending_node_uuid"
-                 || parameterWithValueVector[0] == "end_node_uuid"
-                 || parameterWithValueVector[0] == "destination_node_uuid"
-                )
-        {
-          boost::uuids::uuid destinationNodeUuid {uuidGenerator(parameterWithValueVector[1])};
-          if (calculator.nodeIndexesByUuid.count(destinationNodeUuid) == 1)
-          {
-            calculator.params.destinationNodeIdx = calculator.nodeIndexesByUuid[destinationNodeUuid];
-          }
-        }
-        /*else if (parameterWithValueVector[0] == "max_number_of_transfers" || parameterWithValueVector[0] == "max_transfers")
-        {
-          calculator.params.maxNumberOfTransfers = std::stoi(parameterWithValueVector[1]);
-        }
-        else if (parameterWithValueVector[0] == "calculate_by_number_of_transfers" || parameterWithValueVector[0] == "by_num_transfers")
-        {
-          if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1") { calculator.params.calculateByNumberOfTransfers = true; }
-        }*/ // seems impossible with CSA without calculating all alternatives
-        else if (parameterWithValueVector[0] == "save_to_file")
-        {
-          if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1") { saveToFile = true; }
-        }
-        else if (parameterWithValueVector[0] == "debug")
-        {
-          if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1") { calculator.params.debugDisplay = true; }
-        }
-        else if (parameterWithValueVector[0] == "min_waiting_time" || parameterWithValueVector[0] == "min_waiting_time_minutes")
-        {
-          calculator.params.minWaitingTimeSeconds = std::stoi(parameterWithValueVector[1]) * 60;
-          if (calculator.params.minWaitingTimeSeconds < 0)
-          {
-            calculator.params.minWaitingTimeSeconds = 0;
-          }
-        }
-        else if (parameterWithValueVector[0] == "min_waiting_time_seconds")
-        {
-          calculator.params.minWaitingTimeSeconds = std::stoi(parameterWithValueVector[1]);
-          if (calculator.params.minWaitingTimeSeconds < 0)
-          {
-            calculator.params.minWaitingTimeSeconds = 0;
-          }
-        }
-        else if (parameterWithValueVector[0] == "max_travel_time" || parameterWithValueVector[0] == "max_travel_time_minutes")
-        {
-          calculator.params.maxTotalTravelTimeSeconds = std::stoi(parameterWithValueVector[1]) * 60;
-          if (calculator.params.maxTotalTravelTimeSeconds == 0)
-          {
-            calculator.params.maxTotalTravelTimeSeconds = MAX_INT;
-          }
-        }
-        else if (parameterWithValueVector[0] == "max_travel_time_seconds")
-        {
-          calculator.params.maxTotalTravelTimeSeconds = std::stoi(parameterWithValueVector[1]);
-          if (calculator.params.maxTotalTravelTimeSeconds == 0)
-          {
-            calculator.params.maxTotalTravelTimeSeconds = MAX_INT;
-          }
-        }
-        else if (parameterWithValueVector[0] == "max_access_travel_time" || parameterWithValueVector[0] == "max_access_travel_time_minutes")
-        {
-          calculator.params.maxAccessWalkingTravelTimeSeconds = std::stoi(parameterWithValueVector[1]) * 60;
-        }
-        else if (parameterWithValueVector[0] == "max_access_travel_time_seconds")
-        {
-          calculator.params.maxAccessWalkingTravelTimeSeconds = std::stoi(parameterWithValueVector[1]);
-        }
-        else if (parameterWithValueVector[0] == "alternatives_max_added_travel_time_minutes" || parameterWithValueVector[0] == "alt_max_added_travel_time")
-        {
-          calculator.params.alternativesMaxAddedTravelTimeSeconds = std::stoi(parameterWithValueVector[1]) * 60;
-        }
-        else if (parameterWithValueVector[0] == "alternatives_max_added_travel_time_seconds" || parameterWithValueVector[0] == "alt_max_added_travel_time_seconds")
-        {
-          calculator.params.alternativesMaxAddedTravelTimeSeconds = std::stoi(parameterWithValueVector[1]);
-        }
-        else if (parameterWithValueVector[0] == "max_only_walking_access_travel_time_ratio")
-        {
-          calculator.params.maxOnlyWalkingAccessTravelTimeRatio = std::stof(parameterWithValueVector[1]);
-        }
-        else if (parameterWithValueVector[0] == "alternatives_max_travel_time_ratio" || parameterWithValueVector[0] == "alt_max_ratio")
-        {
-          calculator.params.alternativesMaxTravelTimeRatio = std::stof(parameterWithValueVector[1]);
-        }
-        else if (parameterWithValueVector[0] == "alternatives_min_max_travel_time_minutes" || parameterWithValueVector[0] == "alt_min_max_travel_time")
-        {
-          calculator.params.minAlternativeMaxTravelTimeSeconds = std::stoi(parameterWithValueVector[1]) * 60;
-        }
-        else if (parameterWithValueVector[0] == "alternatives_min_max_travel_time_seconds" || parameterWithValueVector[0] == "alt_min_max_travel_time_seconds")
-        {
-          calculator.params.minAlternativeMaxTravelTimeSeconds = std::stoi(parameterWithValueVector[1]);
-        }
-        else if (parameterWithValueVector[0] == "max_egress_travel_time" || parameterWithValueVector[0] == "max_egress_travel_time_minutes")
-        {
-          calculator.params.maxEgressWalkingTravelTimeSeconds = std::stoi(parameterWithValueVector[1]) * 60;
-        }
-         else if (parameterWithValueVector[0] == "max_egress_travel_time_seconds")
-        {
-          calculator.params.maxEgressWalkingTravelTimeSeconds = std::stoi(parameterWithValueVector[1]);
-        }
-        else if (parameterWithValueVector[0] == "max_transfer_travel_time" || parameterWithValueVector[0] == "max_transfer_travel_time_minutes")
-        {
-          calculator.params.maxTransferWalkingTravelTimeSeconds = std::stoi(parameterWithValueVector[1]) * 60;
-        }
-        else if (parameterWithValueVector[0] == "max_transfer_travel_time_seconds")
-        {
-          calculator.params.maxTransferWalkingTravelTimeSeconds = std::stoi(parameterWithValueVector[1]);
-        }
-        else if (parameterWithValueVector[0] == "transfer_penalty" || parameterWithValueVector[0] == "transfer_penalty_minutes")
-        {
-          calculator.params.transferPenaltySeconds = std::stoi(parameterWithValueVector[1]) * 60;
-        }
-        else if (parameterWithValueVector[0] == "walking_speed_factor" || parameterWithValueVector[0] == "walk_factor") // > 1.0 means faster walking
-        {
-          calculator.params.walkingSpeedFactor = std::stof(parameterWithValueVector[1]);
-        }
-        else if (parameterWithValueVector[0] == "max_alternatives" || parameterWithValueVector[0] == "max_alt")
-        {
-          calculator.params.maxAlternatives = std::stoi(parameterWithValueVector[1]);
-        }
-        else if (parameterWithValueVector[0] == "alternatives" || parameterWithValueVector[0] == "alt")
-        {
-          if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1") { calculator.params.alternatives = true; }
-        }
-        else if (parameterWithValueVector[0] == "return_all_nodes_results"
-                 || parameterWithValueVector[0] == "return_all_nodes_result"
-                 || parameterWithValueVector[0] == "all_nodes"
-                )
-        {
-          if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1") { calculator.params.returnAllNodesResult = true; }
-        }
-        else if (parameterWithValueVector[0] == "transfer_only_at_same_station"
-                 || parameterWithValueVector[0] == "transfer_only_at_station"
-                )
-        {
-          if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1") { calculator.params.transferOnlyAtSameStation = true; }
-        }
-        else if (parameterWithValueVector[0] == "detailed"
-                 || parameterWithValueVector[0] == "detailed_results"
-                 || parameterWithValueVector[0] == "detailed_result"
-                )
-        {
-          if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1") { calculator.params.detailedResults = true; }
-        }
-        else if (parameterWithValueVector[0] == "transfer_between_same_line"
-                 || parameterWithValueVector[0] == "allow_same_line_transfer"
-                 || parameterWithValueVector[0] == "transfers_between_same_line"
-                 || parameterWithValueVector[0] == "allow_same_line_transfers"
-                )
-        {
-          if (parameterWithValueVector[1] == "false" || parameterWithValueVector[1] == "0") { calculator.params.transferBetweenSameLine = false; }
-        }
-        else if (parameterWithValueVector[0] == "reverse")
-        {
-          if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1") { calculator.params.forwardCalculation = false; }
-        }
-        
+        odTrip      = calculator.odTrips[calculator.odTripIndexesByUuid[calculator.params.odTripUuid]];
+        foundOdTrip = true;
       }
 
-      if (calculator.params.departureTimeSeconds >= 0)
-      {
-        calculator.params.forwardCalculation = true;
-      }
-      else if (calculator.params.arrivalTimeSeconds >= 0)
-      {
-        calculator.params.forwardCalculation = false;
-      }
-      else if (departureTimeHour >= 0 && departureTimeMinutes >= 0)
-      {
-        calculator.params.departureTimeHour    = departureTimeHour;
-        calculator.params.departureTimeMinutes = departureTimeMinutes;
-        calculator.params.forwardCalculation   = true;
-      }
-      else if(arrivalTimeHour >= 0 && arrivalTimeMinutes >= 0)
-      {
-        calculator.params.arrivalTimeHour    = arrivalTimeHour;
-        calculator.params.arrivalTimeMinutes = arrivalTimeMinutes;
-        calculator.params.forwardCalculation = false;
-      }
-      
-      //for (auto & ageGroup : odTripsAgeGroups)
-      //{
-      //  std::cerr << ageGroup << std::endl;
-      //}
-      
-            
       if (calculator.params.alternatives)
       {
-        RoutingResult routingResult;
-        
-        OdTrip odTrip;
-        bool foundOdTrip{false};
-        if (odTripUuid.is_initialized())
-        {
-          for (auto & _odTrip : calculator.odTrips) // todo: we should keep a map of odTripIndexesByUuid...
-          {
-            if (_odTrip.uuid == odTripUuid)
-            {
-              odTrip      = _odTrip;
-              foundOdTrip = true;
-              break;
-            }
-          }
-        }
-        
+        RoutingResult  routingResult;
         nlohmann::json json;
         nlohmann::json alternativeJson;
         
@@ -1079,11 +417,11 @@ int main(int argc, char** argv) {
         
         //return 0;
         
-        resultStr = json.dump(2);
+        jsonResponse = json.dump(2);
       }
       
       
-      if (!calculator.params.alternatives && (calculator.params.calculateAllOdTrips || odTripUuid.is_initialized() ))
+      if (!calculator.params.alternatives && (calculator.params.calculateAllOdTrips || foundOdTrip ))
       {
         RoutingResult routingResult;
         //std::map<boost::uuids::uuid, std::map<int, float>> tripsLegsProfile; // parent map key: trip uuid, nested map key: connection sequence, value: number of trips using this connection
@@ -1115,13 +453,13 @@ int main(int argc, char** argv) {
         //nlohmann::json pathsOdTripsProfilesSequenceJson;
         //std::vector<unsigned long long> pathsOdTripsProfilesOdTripUuids;
         
-        if (fileFormat == "csv" && batchNumber == 1) // write header only on first batch, so we can easily append subsequent batches to the same csv file
+        if (calculator.params.responseFormat == "csv" && calculator.params.batchNumber == 1) // write header only on first batch, so we can easily append subsequent batches to the same csv file
         {
           // write csv header:
-          csv += "uuid,internalId,status,ageGroup,gender,occupation,destinationActivity,mode,expansionFactor,travelTimeSeconds,onlyWalkingTravelTimeSeconds,"
-                 "declaredDepartureTimeSeconds,departureTimeSeconds,minimizedDepartureTimeSeconds,arrivalTimeSeconds,numberOfTransfers,inVehicleTravelTimeSeconds,"
-                 "transferTravelTimeSeconds,waitingTimeSeconds,accessTravelTimeSeconds,egressTravelTimeSeconds,transferWaitingTimeSeconds,"
-                 "firstWaitingTimeSeconds,nonTransitTravelTimeSeconds,lineUuids,modeShortnames,agencyUuids,boardingNodeUuids,unboardingNodeUuids,tripUuids\n";
+          csvResponse += "uuid,internalId,status,ageGroup,gender,occupation,destinationActivity,mode,expansionFactor,travelTimeSeconds,onlyWalkingTravelTimeSeconds,"
+                         "declaredDepartureTimeSeconds,departureTimeSeconds,minimizedDepartureTimeSeconds,arrivalTimeSeconds,numberOfTransfers,inVehicleTravelTimeSeconds,"
+                         "transferTravelTimeSeconds,waitingTimeSeconds,accessTravelTimeSeconds,egressTravelTimeSeconds,transferWaitingTimeSeconds,"
+                         "firstWaitingTimeSeconds,nonTransitTravelTimeSeconds,lineUuids,modeShortnames,agencyUuids,boardingNodeUuids,unboardingNodeUuids,tripUuids\n";
         }
         else
         {
@@ -1151,7 +489,7 @@ int main(int argc, char** argv) {
         for (auto & odTrip : calculator.odTrips)
         {
           
-          if ( i % batchesCount != batchNumber - 1) // when using multiple parallel calculators
+          if ( i % calculator.params.batchesCount != calculator.params.batchNumber - 1) // when using multiple parallel calculators
           {
             i++;
             continue;
@@ -1172,7 +510,7 @@ int main(int argc, char** argv) {
           }
 
           // verify that od trip matches at least one selected period:
-          for (auto & period : odTripsPeriods)
+          for (auto & period : calculator.params.odTripsPeriods)
           {
             if (odTrip.departureTimeSeconds >= period.first && odTrip.departureTimeSeconds < period.second)
             {
@@ -1180,9 +518,17 @@ int main(int argc, char** argv) {
             }
           }
           
-          if (attributesMatches && (atLeastOneCompatiblePeriod || odTripsPeriods.size() == 0) && (!odTripUuid.is_initialized() || odTripUuid == odTrip.uuid) )
+          if (attributesMatches && (atLeastOneCompatiblePeriod || calculator.params.odTripsPeriods.size() == 0) && (!odTripUuid.is_initialized() || odTripUuid == odTrip.uuid) )
           {
-            std::cout /*<< /"od trip uuid " << odTrip.uuid << " ("*/ << (i+1) << "/" << odTripsCount /*<< ")"*/ << std::endl;// << " dts: " << odTrip.departureTimeSeconds << " atLeastOneCompatiblePeriod: " << (atLeastOneCompatiblePeriod ? "true " : "false ") << "attributesMatches: " << (attributesMatches ? "true " : "false ") << std::endl;
+
+            if (calculator.params.debugDisplay)
+            {
+            std::cout << "od trip uuid " << odTrip.uuid << " (" << (i+1) << "/" << odTripsCount << ")" << std::endl << " dts: " << odTrip.departureTimeSeconds << " atLeastOneCompatiblePeriod: " << (atLeastOneCompatiblePeriod ? "true " : "false ") << "attributesMatches: " << (attributesMatches ? "true " : "false ") << std::endl;
+            }
+            else
+            {
+              std::cout << (i+1) << "/" << odTripsCount << std::endl;
+            }
             
             calculator.params.origin      = odTrip.origin;
             calculator.params.destination = odTrip.destination;
@@ -1190,13 +536,12 @@ int main(int argc, char** argv) {
             routingResult = calculator.calculate(true, resetFilters); // reset filters only on first calculation
             resetFilters  = false;
             countOdTripsCalculated++;
-            //int benchmarkingStart = calculator.algorithmCalculationTime.getEpoch();
             if (true/*routingResult.status == "success"*/)
             {
               atLeastOneOdTrip = true;
               if (routingResult.legs.size() > 0)
               {
-                if (fileFormat != "csv")
+                if (calculator.params.responseFormat != "csv")
                 {
                   for (auto & leg : routingResult.legs)
                   {
@@ -1235,85 +580,85 @@ int main(int argc, char** argv) {
                 }
               }
               
-              if (fileFormat == "csv")
+              if (calculator.params.responseFormat == "csv")
               {
                 //ageGroup = odTrip.ageGroup;
                 //std::replace( ageGroup.begin(), ageGroup.end(), '-', '_' ); // remove dash so Excel does not convert to age groups to numbers...
-                csv += boost::uuids::to_string(odTrip.uuid) + ",\"" + odTrip.internalId + "\",\"" + routingResult.status + "\",\"" /*+ ageGroup*/ + "\",\"" /*+ odTrip.gender*/ + "\",\"" /*+ odTrip.occupation*/ + "\",\"";
-                csv += odTrip.destinationActivity + "\",\"" + odTrip.mode + "\"," + std::to_string(odTrip.expansionFactor) + "," + std::to_string(routingResult.travelTimeSeconds) + ",";
-                csv += std::to_string(odTrip.walkingTravelTimeSeconds) + "," + std::to_string(odTrip.departureTimeSeconds) + "," + std::to_string(routingResult.departureTimeSeconds) + "," + std::to_string(routingResult.minimizedDepartureTimeSeconds) + ",";
-                csv += std::to_string(routingResult.arrivalTimeSeconds) + "," + std::to_string(routingResult.numberOfTransfers) + "," + std::to_string(routingResult.inVehicleTravelTimeSeconds) + ",";
-                csv += std::to_string(routingResult.transferTravelTimeSeconds) + "," + std::to_string(routingResult.waitingTimeSeconds) + "," + std::to_string(routingResult.accessTravelTimeSeconds) + ",";
-                csv += std::to_string(routingResult.egressTravelTimeSeconds) + "," + std::to_string(routingResult.transferWaitingTimeSeconds) + "," + std::to_string(routingResult.firstWaitingTimeSeconds) + ",";
-                csv += std::to_string(routingResult.nonTransitTravelTimeSeconds) + ",";
+                csvResponse += boost::uuids::to_string(odTrip.uuid) + ",\"" + odTrip.internalId + "\",\"" + routingResult.status + "\",\"" /*+ ageGroup*/ + "\",\"" /*+ odTrip.gender*/ + "\",\"" /*+ odTrip.occupation*/ + "\",\"";
+                csvResponse += odTrip.destinationActivity + "\",\"" + odTrip.mode + "\"," + std::to_string(odTrip.expansionFactor) + "," + std::to_string(routingResult.travelTimeSeconds) + ",";
+                csvResponse += std::to_string(odTrip.walkingTravelTimeSeconds) + "," + std::to_string(odTrip.departureTimeSeconds) + "," + std::to_string(routingResult.departureTimeSeconds) + "," + std::to_string(routingResult.minimizedDepartureTimeSeconds) + ",";
+                csvResponse += std::to_string(routingResult.arrivalTimeSeconds) + "," + std::to_string(routingResult.numberOfTransfers) + "," + std::to_string(routingResult.inVehicleTravelTimeSeconds) + ",";
+                csvResponse += std::to_string(routingResult.transferTravelTimeSeconds) + "," + std::to_string(routingResult.waitingTimeSeconds) + "," + std::to_string(routingResult.accessTravelTimeSeconds) + ",";
+                csvResponse += std::to_string(routingResult.egressTravelTimeSeconds) + "," + std::to_string(routingResult.transferWaitingTimeSeconds) + "," + std::to_string(routingResult.firstWaitingTimeSeconds) + ",";
+                csvResponse += std::to_string(routingResult.nonTransitTravelTimeSeconds) + ",";
                 
                 int countLineUuids = routingResult.lineUuids.size();
                 j = 0;
                 for (auto & lineUuid : routingResult.lineUuids)
                 {
-                  csv += boost::uuids::to_string(lineUuid);
+                  csvResponse += boost::uuids::to_string(lineUuid);
                   if (j < countLineUuids - 1)
                   {
-                    csv += "|";
+                    csvResponse += "|";
                   }
                   j++;
                 }
-                csv += ",";
+                csvResponse += ",";
                 j = 0;
                 for (auto & modeShortname : routingResult.modeShortnames)
                 {
-                  csv += modeShortname;
+                  csvResponse += modeShortname;
                   if (j < countLineUuids - 1)
                   {
-                    csv += "|";
+                    csvResponse += "|";
                   }
                   j++;
                 }
-                csv += ",";
+                csvResponse += ",";
                 j = 0;
                 for (auto & agencyUuid : routingResult.agencyUuids)
                 {
-                  csv += boost::uuids::to_string(agencyUuid);
+                  csvResponse += boost::uuids::to_string(agencyUuid);
                   if (j < countLineUuids - 1)
                   {
-                    csv += "|";
+                    csvResponse += "|";
                   }
                   j++;
                 }
-                csv += ",";
+                csvResponse += ",";
                 j = 0;
                 for (auto & boardingNodeUuid : routingResult.boardingNodeUuids)
                 {
-                  csv += boost::uuids::to_string(boardingNodeUuid);
+                  csvResponse += boost::uuids::to_string(boardingNodeUuid);
                   if (j < countLineUuids - 1)
                   {
-                    csv += "|";
+                    csvResponse += "|";
                   }
                   j++;
                 }
-                csv += ",";
+                csvResponse += ",";
                 j = 0;
                 for (auto & unboardingNodeUuid : routingResult.unboardingNodeUuids)
                 {
-                  csv += boost::uuids::to_string(unboardingNodeUuid);
+                  csvResponse += boost::uuids::to_string(unboardingNodeUuid);
                   if (j < countLineUuids - 1)
                   {
-                    csv += "|";
+                    csvResponse += "|";
                   }
                   j++;
                 }
-                csv += ",";
+                csvResponse += ",";
                 j = 0;
                 for (auto & tripUuid : routingResult.tripUuids)
                 {
-                  csv += boost::uuids::to_string(tripUuid);
+                  csvResponse += boost::uuids::to_string(tripUuid);
                   if (j < countLineUuids - 1)
                   {
-                    csv += "|";
+                    csvResponse += "|";
                   }
                   j++;
                 }
-                csv += "\n";
+                csvResponse += "\n";
               }
               else
               {
@@ -1354,15 +699,14 @@ int main(int argc, char** argv) {
                 json["odTrips"].push_back(odTripJson);
               }
             }
-            //calculator.benchmarking["generating_results"] += calculator.algorithmCalculationTime.getEpoch() - benchmarkingStart;
           }
           i++;
-          if (odTripsSampleSize >= 0 && i >= odTripsSampleSize)
+          if (calculator.params.odTripsSampleSize > 0 && i + 1 >= calculator.params.odTripsSampleSize)
           {
             break;
           }
         }
-        if (fileFormat != "csv")
+        if (calculator.params.responseFormat != "csv")
         {
           json["maxSegmentHourlyDemand"] = maximumSegmentHourlyDemand;
           json["maxSegmentTotalDemand"]  = maximumSegmentTotalDemand;
@@ -1391,27 +735,25 @@ int main(int argc, char** argv) {
             //pathsOdTripsProfilesJson[boost::uuids::to_string(pathProfile.first)] = pathsProfile;
           }
           json["pathProfiles"] = pathProfilesJson;
-          resultStr = json.dump(2);
+          jsonResponse = json.dump(2);
         }
-        if (calculator.params.calculateAllOdTrips && fileFormat == "csv")
+        if (calculator.params.calculateAllOdTrips && calculator.params.responseFormat == "csv")
         {
           
-          if (saveToFile)
+          if (calculator.params.saveResultToFile)
           {
-            calculationName += "__batch_" + std::to_string(batchNumber) + "_of_" + std::to_string(batchesCount);
             std::cerr << "writing csv file" << std::endl;
             std::ofstream csvFile;
             //csvFile.imbue(std::locale("en_US.UTF8"));
-            csvFile.open(calculationName + ".csv", std::ios_base::trunc);
-            csvFile << csv;
+            csvFile.open(calculator.params.calculationName + "__batch_" + std::to_string(calculator.params.batchNumber) + "_of_" + std::to_string(calculator.params.batchesCount) + ".csv", std::ios_base::trunc);
+            csvFile << csvResponse;
             csvFile.close();
-            //resultStr = "{\"status\": \"success\", \"format\": \"csv\", \"filename\": \"" + calculationName + ".csv\"}";
           }
         }
       }
       else if (!calculator.params.alternatives)
       {
-        resultStr = calculator.calculate().json;
+        jsonResponse = calculator.calculate().json;
       }
 
       //calculator.algorithmCalculationTime.stopStep();
@@ -1431,52 +773,51 @@ int main(int argc, char** argv) {
       
       
       //calculator.algorithmCalculationTime.startStep();
-      if (saveToFile && fileFormat != "csv")
+      if (calculator.params.saveResultToFile && calculator.params.responseFormat == "json")
       {
         std::cerr << "writing json file" << std::endl;
         std::ofstream jsonFile;
         //jsonFile.imbue(std::locale("en_US.UTF8"));
-        jsonFile.open(calculationName + ".json", std::ios_base::trunc);
-        jsonFile << resultStr;
+        jsonFile.open(calculator.params.calculationName + ".json", std::ios_base::trunc);
+        jsonFile << jsonResponse;
         jsonFile.close();
       }
       
     }
     else
     {
-      resultStr = "{\"status\": \"failed\", \"error\": \"Wrong or malformed query\"}";
+      jsonResponse = "{\"status\": \"failed\", \"error\": \"Wrong or malformed query\"}";
     }
     
     std::cerr << "-- total -- " << calculator.algorithmCalculationTime.getDurationMicrosecondsNoStop() << " microseconds\n";
-    for (auto & benchmark : calculator.benchmarking)
+    
+    if (calculator.params.debugDisplay)
     {
-      std::cerr << "  -- " << benchmark.first << " -- " << benchmark.second / 1000 << " ms ";
+      for (auto & benchmark : calculator.benchmarking)
+      {
+        std::cerr << "  -- " << benchmark.first << " -- " << benchmark.second / 1000 << " ms ";
+        if (countOdTripsCalculated > 0)
+        {
+          std::cerr << " (" << (benchmark.second / countOdTripsCalculated / 1000) << " per odTrip)";
+        }
+        std::cerr << "\n";
+      }
       if (countOdTripsCalculated > 0)
       {
-        std::cerr << " (" << (benchmark.second / countOdTripsCalculated / 1000) << " per odTrip)";
+        std::cerr << "  -- number of od trips calculated -- " << countOdTripsCalculated << "\n";
       }
-      std::cerr << "\n";
     }
-    if (countOdTripsCalculated > 0)
+        
+    if (calculator.params.responseFormat == "csv")
     {
-      std::cerr << "  -- number of od trips calculated -- " << countOdTripsCalculated << "\n";
-    }
-    
-    //calculator.algorithmCalculationTime.stop();
-      
-    //std::cerr << "-- calculation time -- " << calculator.algorithmCalculationTime.getDurationMicroseconds() << " microseconds\n";
-    
-    if (fileFormat == "csv")
-    {
-      *response << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/csv; charset=utf-8\r\nContent-Length: " << csv.length() << "\r\n\r\n" << csv;
+      *response << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/csv; charset=utf-8\r\nContent-Length: " << csvResponse.length() << "\r\n\r\n" << csvResponse;
     }
     else
     {
-      *response << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << resultStr.length() << "\r\n\r\n" << resultStr;
+      *response << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << jsonResponse.length() << "\r\n\r\n" << jsonResponse;
     }
     
   };
-  
   
   std::cout << "starting server..." << std::endl;
   std::thread server_thread([&server](){

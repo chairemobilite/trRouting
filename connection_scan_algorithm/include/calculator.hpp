@@ -54,8 +54,6 @@
 #include "gtfs_fetcher.hpp"
 #include "csv_fetcher.hpp"
 
-extern int stepCount;
-
 extern std::string consoleRed;
 extern std::string consoleGreen;
 extern std::string consoleYellow;

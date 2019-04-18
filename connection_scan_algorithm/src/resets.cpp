@@ -49,17 +49,9 @@ namespace TrRouting
     {
       departureTimeSeconds = params.departureTimeSeconds;
     }
-    else if (params.departureTimeHour >= 0 && params.departureTimeMinutes >= 0)
-    {
-      departureTimeSeconds = params.departureTimeHour * 3600 + params.departureTimeMinutes * 60;
-    }
     if (params.arrivalTimeSeconds >= 0)
     {
       arrivalTimeSeconds = params.arrivalTimeSeconds;
-    }
-    else if(params.arrivalTimeHour >= 0 && params.arrivalTimeMinutes >= 0)
-    {
-      arrivalTimeSeconds = params.arrivalTimeHour * 3600 + params.arrivalTimeMinutes * 60;
     }
 
     if (params.debugDisplay)
@@ -293,24 +285,13 @@ namespace TrRouting
     }
 
     
-    
-    benchmarking["reset"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
+    if (params.debugDisplay)
+      benchmarking["reset"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
 
     if (params.debugDisplay)
       std::cerr << "-- filter trips -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
     calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
 
-    //benchmarking["reset"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
-
-
-
   }
-
-  /*void Calculator::refreshConnectionsForOnlyServices()
-  {
-    std::tie(trips, tripIndexesByUuid, blocks, blockIndexesByUuid, forwardConnections, reverseConnections) = params.cacheFetcher->getTripsAndConnections(agencyIndexesByUuid, lines, lineIndexesByUuid, paths, pathIndexesByUuid, nodeIndexesByUuid, serviceIndexesByUuid, params);
-  }*/
-
-
 
 }

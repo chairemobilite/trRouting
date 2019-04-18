@@ -90,10 +90,6 @@ namespace TrRouting
       //  forwardConnectionsCanTransferSameLines.push_back(std::get<connectionIndexes::CAN_TRANSFER_SAME_LINE>(connection));
       //}
 
-
-      int total = algorithmCalculationTime.getEpoch() - benchmarkingStart;
-      std::cout << "test took " << total << std::endl;
-
       /*for (auto & node : nodes)
       {
         std::cout << node.toString() << std::endl;

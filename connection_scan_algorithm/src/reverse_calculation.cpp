@@ -161,12 +161,17 @@ namespace TrRouting
         }
         i++;
       }
-      benchmarking["reverse_calculation"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
+
+      if (params.debugDisplay)
+        benchmarking["reverse_calculation"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
+
       return std::make_tuple(bestDepartureTime, bestAccessNodeIndex, bestAccessTravelTime);
     }
     else
     {
-      benchmarking["reverse_calculation"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
+      if (params.debugDisplay)
+        benchmarking["reverse_calculation"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
+      
       return std::make_tuple(-1, -1, -1);
     }
 

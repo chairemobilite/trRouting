@@ -7,8 +7,6 @@ namespace TrRouting
   RoutingResult Calculator::reverseJourney(int bestDepartureTime, int bestAccessNodeIndex, int bestAccessTravelTime)
   {
   
-    //int benchmarkingStart = algorithmCalculationTime.getEpoch();
-
     RoutingResult    result;
     nlohmann::json   json;
     int              nodesCount           {1};
@@ -407,7 +405,6 @@ namespace TrRouting
 
     result.json = json.dump(2); // number of spaces in indent for human readable json, use dump() to put all json content on the same line
     
-    //benchmarking["reverse_journey"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
     return result;
   }
 
