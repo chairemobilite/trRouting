@@ -109,7 +109,7 @@ namespace TrRouting
     transferBetweenSameLine                = true;
     calculateByNumberOfTransfers           = false;
     maxAlternatives                        = 100;
-    debugDisplay                           = false;
+    debugDisplay                           = serverDebugDisplay;
     alternativesMaxTravelTimeRatio         = 1.5;
     minAlternativeMaxTravelTimeSeconds     = 30*60;
     alternativesMaxAddedTravelTimeSeconds  = 30*60;

@@ -95,6 +95,7 @@ int main(int argc, char** argv) {
   algorithmParams.osrmWalkingUseLib      = programOptions.osrmWalkingUseLib;
   algorithmParams.osrmCyclingUseLib      = programOptions.osrmCyclingUseLib;
   algorithmParams.osrmDrivingUseLib      = programOptions.osrmDrivingUseLib;
+  algorithmParams.serverDebugDisplay     = programOptions.debug;
 
   GtfsFetcher  gtfsFetcher     = GtfsFetcher();
   algorithmParams.gtfsFetcher  = &gtfsFetcher;

@@ -16,6 +16,7 @@ namespace TrRouting
 
     std::string projectShortname;
     int         port;
+    bool        debug;
     std::string algorithm;
     std::string dataFetcherShortname;
     std::string osrmWalkingPort;

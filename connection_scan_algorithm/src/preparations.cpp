@@ -30,12 +30,12 @@ namespace TrRouting
       std::cout << forwardConnections.size() << " connections" << std::endl; 
 
       int benchmarkingStart = algorithmCalculationTime.getEpoch();
-      
+
       int lastConnectionIndex = forwardConnections.size() - 1;
 
       forwardConnectionsIndexPerDepartureTimeHour = std::vector<int>(32, -1);
       reverseConnectionsIndexPerArrivalTimeHour   = std::vector<int>(32, lastConnectionIndex);
-
+      
       int hour {0};
       int i = 0;
       for (auto & connection : forwardConnections)

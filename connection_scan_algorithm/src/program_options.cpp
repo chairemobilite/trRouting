@@ -7,6 +7,8 @@ namespace TrRouting {
     options.add_options()
       ("port",                                              boost::program_options::value<int>()        ->default_value(4000), "http server port");
     options.add_options()
+      ("debug",                                             boost::program_options::value<int>()        ->default_value(0), "debug");
+    options.add_options()
       ("dataFetcher,data",                                  boost::program_options::value<std::string>()->default_value("cache"), "data fetcher (csv, gtfs or cache)"); // only cache implemented for now
     options.add_options()
       ("project,projectShortname",                          boost::program_options::value<std::string>()->default_value("demo_transition"), "project shortname (shortname of the project to use or data to use)");
@@ -43,6 +45,7 @@ namespace TrRouting {
     boost::program_options::store(boost::program_options::parse_command_line(argc, argv, options), variablesMap);
 
     port                 = 4000;
+    debug                = false;
     dataFetcherShortname = "cache";
     projectShortname     = "demo_transition";
     osrmWalkingPort      = "5000";
@@ -61,6 +64,10 @@ namespace TrRouting {
     if(variablesMap.count("port") == 1)
     {
       port = variablesMap["port"].as<int>();
+    }
+    if(variablesMap.count("debug") == 1)
+    {
+      debug = (variablesMap["debug"].as<int>() == 1) ? true : false;
     }
     if(variablesMap.count("dataFetcher") == 1)
     {

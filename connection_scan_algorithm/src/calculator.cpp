@@ -45,6 +45,9 @@ namespace TrRouting
         
         if (bestArrivalTime < MAX_INT)
         {
+          if (params.debugDisplay)
+            std::cout << "besArrivalTime after forward journey: " << bestArrivalTime << std::endl;
+          
           departureTimeSeconds = -1;
           arrivalTimeSeconds   = bestArrivalTime;
           
