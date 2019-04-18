@@ -53,6 +53,7 @@
 #include "cache_fetcher.hpp"
 #include "gtfs_fetcher.hpp"
 #include "csv_fetcher.hpp"
+#include "combinations.hpp"
 
 extern std::string consoleRed;
 extern std::string consoleGreen;
@@ -78,7 +79,9 @@ namespace TrRouting
     std::tuple<int,int,int> reverseCalculation(); // best departure time, best access node index, best access travel time: -1,-1,-1 if non routable, too long or all nodes result
     RoutingResult           forwardJourney(int bestArrivalTime, int bestEgressNodeIndex, int bestEgressTravelTime);
     RoutingResult           reverseJourney(int bestDepartureTime, int bestAccessNodeIndex, int bestAccessTravelTime);
-    
+    std::string             alternativesRouting();
+    std::string             odTripsRouting();
+
     std::vector<Agency>                 agencies;
     std::map<boost::uuids::uuid, int>   agencyIndexesByUuid;
 

@@ -11,11 +11,11 @@ namespace TrRouting {
     options.add_options()
       ("project,projectShortname",                          boost::program_options::value<std::string>()->default_value("demo_transition"), "project shortname (shortname of the project to use or data to use)");
     options.add_options()
-      ("osrmPort,osrmWalkPort,osrmWalkingPort",             boost::program_options::value<int>()        ->default_value(5000), "osrm walking port");
+      ("osrmPort,osrmWalkPort,osrmWalkingPort",             boost::program_options::value<std::string>()->default_value("5000"), "osrm walking port");
     options.add_options()
-      ("osrmCyclingPort",                                   boost::program_options::value<int>()        ->default_value(8000), "osrm cycling port");
+      ("osrmCyclingPort",                                   boost::program_options::value<std::string>()->default_value("8000"), "osrm cycling port");
     options.add_options()
-      ("osrmDrivingPort",                                   boost::program_options::value<int>()        ->default_value(7000), "osrm driving port");
+      ("osrmDrivingPort",                                   boost::program_options::value<std::string>()->default_value("7000"), "osrm driving port");
     options.add_options()
       ("osrmHost,osrmWalkHost,osrmWalkingHost",             boost::program_options::value<std::string>()->default_value("localhost"), "osrm walking host");
     options.add_options()
@@ -42,6 +42,22 @@ namespace TrRouting {
     boost::program_options::variables_map variablesMap;
     boost::program_options::store(boost::program_options::parse_command_line(argc, argv, options), variablesMap);
 
+    port                 = 4000;
+    dataFetcherShortname = "cache";
+    projectShortname     = "demo_transition";
+    osrmWalkingPort      = "5000";
+    osrmCyclingPort      = "8000";
+    osrmDrivingPort      = "7000";
+    osrmWalkingHost      = "localhost";
+    osrmCyclingHost      = "localhost";
+    osrmDrivingHost      = "localhost";
+    osrmWalkingFilePath  = "";
+    osrmCyclingFilePath  = "";
+    osrmDrivingFilePath  = "";
+    osrmWalkingUseLib    = false;
+    osrmCyclingUseLib    = false;
+    osrmDrivingUseLib    = false;
+
     if(variablesMap.count("port") == 1)
     {
       port = variablesMap["port"].as<int>();
@@ -65,23 +81,23 @@ namespace TrRouting {
 
     if(variablesMap.count("osrmWalkPort") == 1)
     {
-      osrmWalkingPort = variablesMap["osrmWalkPort"].as<int>();
+      osrmWalkingPort = variablesMap["osrmWalkPort"].as<std::string>();
     }
     else if(variablesMap.count("osrmWalkingPort") == 1)
     {
-      osrmWalkingPort = variablesMap["osrmWalkingPort"].as<int>();
+      osrmWalkingPort = variablesMap["osrmWalkingPort"].as<std::string>();
     }
     else if(variablesMap.count("osrmPort") == 1)
     {
-      osrmWalkingPort = variablesMap["osrmPort"].as<int>();
+      osrmWalkingPort = variablesMap["osrmPort"].as<std::string>();
     }
     if(variablesMap.count("osrmCyclingPort") == 1)
     {
-      osrmCyclingPort = variablesMap["osrmCyclingPort"].as<int>();
+      osrmCyclingPort = variablesMap["osrmCyclingPort"].as<std::string>();
     }
     if(variablesMap.count("osrmDrivingPort") == 1)
     {
-      osrmDrivingPort = variablesMap["osrmDrivingPort"].as<int>();
+      osrmDrivingPort = variablesMap["osrmDrivingPort"].as<std::string>();
     }
 
     if(variablesMap.count("osrmWalkHost") == 1)

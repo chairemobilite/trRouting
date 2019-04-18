@@ -56,11 +56,10 @@ namespace TrRouting
 
     if (params.debugDisplay)
       std::cerr << "-- reset and preparations -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
+
     calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
 
-
     int i {0};
-
 
     // fetch nodes footpaths accessible from origin using params or osrm fetcher if not provided:
     minAccessTravelTime = MAX_INT;
@@ -94,10 +93,12 @@ namespace TrRouting
         }
         else
         {
+          if (params.debugDisplay)
+            std::cout << "  fetching nodes with osrm with mode " << params.accessMode << std::endl;
+
           accessFootpaths = OsrmFetcher::getAccessibleNodesFootpathsFromPoint(params.origin, nodes, params.accessMode, params);
         }
       }
-
 
       int footpathTravelTimeSeconds;
       for (auto & accessFootpath : accessFootpaths)
@@ -176,6 +177,7 @@ namespace TrRouting
 
     if (params.debugDisplay)
       std::cerr << "-- access and egress footpaths -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
+    
     calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
 
 
@@ -288,8 +290,10 @@ namespace TrRouting
     if (params.debugDisplay)
       benchmarking["reset"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
 
+
     if (params.debugDisplay)
       std::cerr << "-- filter trips -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
+
     calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
 
   }

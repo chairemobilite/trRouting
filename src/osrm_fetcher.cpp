@@ -91,6 +91,9 @@ namespace TrRouting
     else
     {
    
+      if (params.debugDisplay)
+        std::cout << "osrm with host " << params.osrmWalkingHost << " and port " << params.osrmWalkingPort << std::endl;
+      
       //std::cout << "mode = " << mode << " speed = " << defaultSpeedMetersPerSecond << " maxTravelTime = " << maxTravelTimeSeconds << " port = " << osrmPort << " host = " << osrmHost << " " << std::endl;
       std::string queryString = "GET /table/v1/" + mode + "/" + std::to_string(point.longitude) +  "," + std::to_string(point.latitude);
 
@@ -111,6 +114,7 @@ namespace TrRouting
 
       // call osrm on bird distance accessible nodes for further filtering by network travel time:
       boost::asio::ip::tcp::iostream s;
+
       s.connect(params.osrmWalkingHost, params.osrmWalkingPort);
       
       if (reversed)

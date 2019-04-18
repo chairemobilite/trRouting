@@ -18,9 +18,9 @@ namespace TrRouting
     int         port;
     std::string algorithm;
     std::string dataFetcherShortname;
-    int         osrmWalkingPort;
-    int         osrmCyclingPort;
-    int         osrmDrivingPort;
+    std::string osrmWalkingPort;
+    std::string osrmCyclingPort;
+    std::string osrmDrivingPort;
     std::string osrmWalkingHost;
     std::string osrmCyclingHost;
     std::string osrmDrivingHost;
