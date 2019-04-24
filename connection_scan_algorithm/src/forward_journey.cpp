@@ -7,8 +7,6 @@ namespace TrRouting
   RoutingResult Calculator::forwardJourney(int bestArrivalTime, int bestEgressNodeIndex, int bestEgressTravelTime)
   {
 
-    //int benchmarkingStart = algorithmCalculationTime.getEpoch();
-
     RoutingResult    result;
     nlohmann::json   json;
     int              nodesCount           {1};
@@ -408,7 +406,6 @@ namespace TrRouting
       std::cerr << "-- forward result: " << result.status << " dts:" << result.departureTimeSeconds << std::endl;
 
     result.json = json.dump(2); // number of spaces in indent for human readable json, use dump() to put all json content on the same line
-    //benchmarking["forward_journey"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
     return result;
 
   }

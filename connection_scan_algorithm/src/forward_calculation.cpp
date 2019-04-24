@@ -93,17 +93,12 @@ namespace TrRouting
               footpathIndex = 0;
               for (int & transferableNodeIndex : nodes[nodeArrivalIndex].transferableNodesIdx)
               {
-                //benchmarking1++;
-                //benchmarkingStart1 = algorithmCalculationTime.getEpoch();
                 if (nodeArrivalIndex != transferableNodeIndex && nodesTentativeTime[transferableNodeIndex] < params.minWaitingTimeSeconds + connectionArrivalTime)
                 {
                   footpathIndex++;
-                  //benchmarking1 += algorithmCalculationTime.getEpoch() - benchmarkingStart1;
                   continue;
                 }
-                //benchmarking1 += algorithmCalculationTime.getEpoch() - benchmarkingStart1;
   
-                //benchmarkingStart2 = algorithmCalculationTime.getEpoch();
                 if (params.walkingSpeedFactor != 1.0)
                 {
                   footpathTravelTime = (int)ceil((float)nodes[nodeArrivalIndex].transferableTravelTimesSeconds[footpathIndex] / params.walkingSpeedFactor);
@@ -112,9 +107,7 @@ namespace TrRouting
                 {
                   footpathTravelTime = nodes[nodeArrivalIndex].transferableTravelTimesSeconds[footpathIndex];
                 }
-                //benchmarking2 += algorithmCalculationTime.getEpoch() - benchmarkingStart2;
 
-                //benchmarkingStart3 = algorithmCalculationTime.getEpoch();
                 if (footpathTravelTime <= params.maxTransferWalkingTravelTimeSeconds)
                 {
                   if (footpathTravelTime + params.minWaitingTimeSeconds + connectionArrivalTime < nodesTentativeTime[transferableNodeIndex])
@@ -127,7 +120,6 @@ namespace TrRouting
                     forwardEgressJourneys[transferableNodeIndex] = std::make_tuple(tripsEnterConnection[tripIndex], i, nodeArrivalIndex, tripIndex, footpathTravelTime, 1);
                   }
                 }
-                //benchmarking3 += algorithmCalculationTime.getEpoch() - benchmarkingStart3;
                 footpathIndex++;
               }
             }
