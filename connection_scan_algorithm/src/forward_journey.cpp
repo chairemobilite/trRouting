@@ -12,7 +12,7 @@ namespace TrRouting
     int              nodesCount           {1};
     int              i                    {0};
     int              reachableNodesCount  {0};
-    bool             foundLine           {false};
+    bool             foundLine            {false};
     
     std::vector<int> resultingNodes;
     if (params.returnAllNodesResult)

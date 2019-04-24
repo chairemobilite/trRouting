@@ -174,7 +174,6 @@ namespace TrRouting
     
     //std::cerr << "-- maxEgressTravelTime = " << maxEgressTravelTime << std::endl;
 
-
     if (params.debugDisplay)
       std::cerr << "-- access and egress footpaths -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
     
