@@ -36,9 +36,8 @@ namespace TrRouting
 
     // main loop:
     i = forwardConnectionsIndexPerDepartureTimeHour[departureTimeHour];
-    auto lastConnection = forwardConnections.end();
+    auto lastConnection = forwardConnections.end(); // cache last connection for loop
     for(auto connection = forwardConnections.begin() + forwardConnectionsIndexPerDepartureTimeHour[departureTimeHour]; connection != lastConnection; ++connection)
-    //for(auto & connection : forwardConnections)
     {
       // ignore connections before departure time + minimum access travel time:
       if (std::get<connectionIndexes::TIME_DEP>(*connection) >= departureTimeSeconds + minAccessTravelTime)
@@ -51,7 +50,12 @@ namespace TrRouting
           connectionDepartureTime = std::get<connectionIndexes::TIME_DEP>(*connection);
 
           // no need to parse next connections if already reached destination from all egress nodes:
-          if ( (!params.returnAllNodesResult && reachedAtLeastOneEgressNode && maxEgressTravelTime >= 0 && tentativeEgressNodeArrivalTime < MAX_INT && connectionDepartureTime > tentativeEgressNodeArrivalTime + maxEgressTravelTime) || (connectionDepartureTime - departureTimeSeconds > params.maxTotalTravelTimeSeconds))
+          if (( !params.returnAllNodesResult
+              && reachedAtLeastOneEgressNode
+              && maxEgressTravelTime >= 0
+              && tentativeEgressNodeArrivalTime < MAX_INT
+              && connectionDepartureTime > tentativeEgressNodeArrivalTime + maxEgressTravelTime
+            ) || (connectionDepartureTime - departureTimeSeconds > params.maxTotalTravelTimeSeconds))
           {
             break;
           }
