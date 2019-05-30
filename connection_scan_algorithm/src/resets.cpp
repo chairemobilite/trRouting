@@ -41,9 +41,9 @@ namespace TrRouting
     departureTimeSeconds = -1;
     arrivalTimeSeconds   = -1;
     
-    if(params.odTrip != NULL && params.forwardCalculation == true)
+    if(odTrip != nullptr && params.forwardCalculation == true)
     {
-      departureTimeSeconds = params.odTrip->departureTimeSeconds;
+      departureTimeSeconds = odTrip->departureTimeSeconds;
     }
     else if (params.departureTimeSeconds >= 0)
     {
@@ -71,13 +71,13 @@ namespace TrRouting
     {
       if (resetAccessPaths)
       {
-        if(params.odTrip != NULL)
+        if(odTrip != nullptr)
         {
           i = 0;
-          accessFootpaths.resize(params.odTrip->originNodesIdx.size());
-          for (auto & accessNodeIdx : params.odTrip->originNodesIdx)
+          accessFootpaths.resize(odTrip->originNodesIdx.size());
+          for (auto & accessNodeIdx : odTrip->originNodesIdx)
           {
-            accessFootpaths[i] = std::make_pair(accessNodeIdx, params.odTrip->originNodesTravelTimesSeconds[i]);
+            accessFootpaths[i] = std::make_pair(accessNodeIdx, odTrip->originNodesTravelTimesSeconds[i]);
             i++;
           }
         }
@@ -125,13 +125,13 @@ namespace TrRouting
       if (resetAccessPaths)
       {
         // fetch nodes footpaths accessible to destination using params or osrm fetcher if not provided:
-        if(params.odTrip != NULL)
+        if(odTrip != nullptr)
         {
           i = 0;
-          egressFootpaths.resize(params.odTrip->destinationNodesIdx.size());
-          for (auto & egressNodeIdx : params.odTrip->destinationNodesIdx)
+          egressFootpaths.resize(odTrip->destinationNodesIdx.size());
+          for (auto & egressNodeIdx : odTrip->destinationNodesIdx)
           {
-            egressFootpaths[i] = std::make_pair(egressNodeIdx, params.odTrip->destinationNodesTravelTimesSeconds[i]);
+            egressFootpaths[i] = std::make_pair(egressNodeIdx, odTrip->destinationNodesTravelTimesSeconds[i]);
             i++;
           }
         }

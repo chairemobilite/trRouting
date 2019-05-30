@@ -57,7 +57,7 @@ namespace TrRouting
     int i {0};
     int j {0};
 
-    for (auto & odTrip : odTrips)
+    for (auto & _odTrip : odTrips)
     {
       
       if ( i % params.batchesCount != params.batchNumber - 1) // when using multiple parallel calculators
@@ -70,11 +70,11 @@ namespace TrRouting
       atLeastOneCompatiblePeriod = false;
       
       // verify that od trip matches selected attributes:
-      if ( (params.odTripsAgeGroups.size()   > 0 && std::find(params.odTripsAgeGroups.begin(), params.odTripsAgeGroups.end(), persons[odTrip.personIdx].ageGroup)       == params.odTripsAgeGroups.end()) 
-        || (params.odTripsGenders.size()     > 0 && std::find(params.odTripsGenders.begin(), params.odTripsGenders.end(), persons[odTrip.personIdx].gender)             == params.odTripsGenders.end())
-        || (params.odTripsOccupations.size() > 0 && std::find(params.odTripsOccupations.begin(), params.odTripsOccupations.end(), persons[odTrip.personIdx].occupation) == params.odTripsOccupations.end())
-        || (params.odTripsActivities.size()  > 0 && std::find(params.odTripsActivities.begin(), params.odTripsActivities.end(), odTrip.destinationActivity)             == params.odTripsActivities.end())
-        || (params.odTripsModes.size()       > 0 && std::find(params.odTripsModes.begin(), params.odTripsModes.end(), odTrip.mode)                                      == params.odTripsModes.end())
+      if ( (params.odTripsAgeGroups.size()   > 0 && std::find(params.odTripsAgeGroups.begin(),   params.odTripsAgeGroups.end(),   persons[_odTrip->personIdx]->ageGroup)   == params.odTripsAgeGroups.end()) 
+        || (params.odTripsGenders.size()     > 0 && std::find(params.odTripsGenders.begin(),     params.odTripsGenders.end(),     persons[_odTrip->personIdx]->gender)     == params.odTripsGenders.end())
+        || (params.odTripsOccupations.size() > 0 && std::find(params.odTripsOccupations.begin(), params.odTripsOccupations.end(), persons[_odTrip->personIdx]->occupation) == params.odTripsOccupations.end())
+        || (params.odTripsActivities.size()  > 0 && std::find(params.odTripsActivities.begin(),  params.odTripsActivities.end(),  _odTrip->destinationActivity)            == params.odTripsActivities.end())
+        || (params.odTripsModes.size()       > 0 && std::find(params.odTripsModes.begin(),       params.odTripsModes.end(),       _odTrip->mode)                           == params.odTripsModes.end())
       )
       {
         attributesMatches = false;
@@ -83,7 +83,7 @@ namespace TrRouting
       // verify that od trip matches at least one selected period:
       for (auto & period : params.odTripsPeriods)
       {
-        if (odTrip.departureTimeSeconds >= period.first && odTrip.departureTimeSeconds < period.second)
+        if (_odTrip->departureTimeSeconds >= period.first && _odTrip->departureTimeSeconds < period.second)
         {
           atLeastOneCompatiblePeriod = true;
         }
@@ -94,16 +94,15 @@ namespace TrRouting
 
         if (params.debugDisplay)
         {
-          std::cout << "od trip uuid " << odTrip.uuid << " (" << (i+1) << "/" << odTripsCount << ")" << std::endl << " dts: " << odTrip.departureTimeSeconds << " atLeastOneCompatiblePeriod: " << (atLeastOneCompatiblePeriod ? "true " : "false ") << "attributesMatches: " << (attributesMatches ? "true " : "false ") << std::endl;
+          std::cout << "od trip uuid " << _odTrip->uuid << " (" << (i+1) << "/" << odTripsCount << ")" << std::endl << " dts: " << _odTrip->departureTimeSeconds << " atLeastOneCompatiblePeriod: " << (atLeastOneCompatiblePeriod ? "true " : "false ") << "attributesMatches: " << (attributesMatches ? "true " : "false ") << std::endl;
         }
         else
         {
           std::cout << (i+1) << "/" << odTripsCount << std::endl;
         }
-        
-        params.origin      = odTrip.origin;
-        params.destination = odTrip.destination;
-        params.odTrip      = &odTrip;
+        odTrip      = _odTrip.get();
+        origin      = odTrip->origin.get();
+        destination = odTrip->destination.get();
         routingResult      = calculate(true, resetFilters); // reset filters only on first calculation
         resetFilters       = false;
         countOdTripsCalculated++;
@@ -123,7 +122,7 @@ namespace TrRouting
                 legPath               = paths[legPathIdx];
                 legConnectionStartIdx = std::get<3>(leg);
                 legConnectionEndIdx   = std::get<4>(leg);
-                lineProfiles[lines[legLineIdx].uuid] += odTrip.expansionFactor;
+                lineProfiles[lines[legLineIdx].uuid] += odTrip->expansionFactor;
 
                 if (pathProfiles.find(legPath.uuid) == pathProfiles.end())
                 {
@@ -134,11 +133,11 @@ namespace TrRouting
                 for (int connectionIndex = legConnectionStartIdx; connectionIndex <= legConnectionEndIdx; connectionIndex++)
                 {
                   connectionDepartureTimeSeconds = tripConnectionDepartureTimes[legTripIdx][connectionIndex];
-                  tripConnectionDemands[legTripIdx][connectionIndex] += odTrip.expansionFactor;
+                  tripConnectionDemands[legTripIdx][connectionIndex] += odTrip->expansionFactor;
                   connectionDepartureTimeHour    = connectionDepartureTimeSeconds / 3600;
                   //std::cout << "pUuid:" << legPath.uuid << " dth:" << connectionDepartureTimeHour << " cI:" << connectionIndex << " oldD:" << pathProfiles[legPath.uuid][connectionIndex][connectionDepartureTimeHour] << std::endl;
-                  pathProfiles[legPath.uuid][connectionIndex][connectionDepartureTimeHour] += odTrip.expansionFactor;
-                  pathTotalProfiles[legPath.uuid][connectionIndex] += odTrip.expansionFactor;
+                  pathProfiles[legPath.uuid][connectionIndex][connectionDepartureTimeHour] += odTrip->expansionFactor;
+                  pathTotalProfiles[legPath.uuid][connectionIndex] += odTrip->expansionFactor;
                   if (maximumSegmentHourlyDemand < pathProfiles[legPath.uuid][connectionIndex][connectionDepartureTimeHour])
                   {
                     maximumSegmentHourlyDemand = pathProfiles[legPath.uuid][connectionIndex][connectionDepartureTimeHour];
@@ -155,9 +154,9 @@ namespace TrRouting
           if (params.responseFormat == "csv")
           {
             //std::replace( ageGroup.begin(), ageGroup.end(), '-', '_' ); // remove dash so Excel does not convert to age groups to numbers...
-            response += boost::uuids::to_string(odTrip.uuid) + ",\"" + odTrip.internalId + "\",\"" + routingResult.status + "\",\"" /*+ ageGroup*/ + "\",\"" /*+ odTrip.gender*/ + "\",\"" /*+ odTrip.occupation*/ + "\",\"";
-            response += odTrip.destinationActivity + "\",\"" + odTrip.mode + "\"," + std::to_string(odTrip.expansionFactor) + "," + std::to_string(routingResult.travelTimeSeconds) + ",";
-            response += std::to_string(odTrip.walkingTravelTimeSeconds) + "," + std::to_string(odTrip.departureTimeSeconds) + "," + std::to_string(routingResult.departureTimeSeconds) + "," + std::to_string(routingResult.minimizedDepartureTimeSeconds) + ",";
+            response += boost::uuids::to_string(odTrip->uuid) + ",\"" + odTrip->internalId + "\",\"" + routingResult.status + "\",\"" /*+ ageGroup*/ + "\",\"" /*+ odTrip->gender*/ + "\",\"" /*+ odTrip->occupation*/ + "\",\"";
+            response += odTrip->destinationActivity + "\",\"" + odTrip->mode + "\"," + std::to_string(odTrip->expansionFactor) + "," + std::to_string(routingResult.travelTimeSeconds) + ",";
+            response += std::to_string(odTrip->walkingTravelTimeSeconds) + "," + std::to_string(odTrip->departureTimeSeconds) + "," + std::to_string(routingResult.departureTimeSeconds) + "," + std::to_string(routingResult.minimizedDepartureTimeSeconds) + ",";
             response += std::to_string(routingResult.arrivalTimeSeconds) + "," + std::to_string(routingResult.numberOfTransfers) + "," + std::to_string(routingResult.inVehicleTravelTimeSeconds) + ",";
             response += std::to_string(routingResult.transferTravelTimeSeconds) + "," + std::to_string(routingResult.waitingTimeSeconds) + "," + std::to_string(routingResult.accessTravelTimeSeconds) + ",";
             response += std::to_string(routingResult.egressTravelTimeSeconds) + "," + std::to_string(routingResult.transferWaitingTimeSeconds) + "," + std::to_string(routingResult.firstWaitingTimeSeconds) + ",";
@@ -234,21 +233,21 @@ namespace TrRouting
           else
           {
             odTripJson = {};
-            odTripJson["uuid"]                          = boost::uuids::to_string(odTrip.uuid);
+            odTripJson["uuid"]                          = boost::uuids::to_string(odTrip->uuid);
             odTripJson["status"]                        = routingResult.status;
-            /*odTripJson["ageGroup"]                    = persons[odTrip.personIdx].ageGroup; // this fails (segmentation fault)...
-            odTripJson["gender"]                        = persons[odTrip.personIdx].gender;
-            odTripJson["occupation"]                    = persons[odTrip.personIdx].occupation;*/
-            odTripJson["internalId"]                    = odTrip.internalId;
-            odTripJson["originActivity"]                = odTrip.originActivity;
-            odTripJson["destinationActivity"]           = odTrip.destinationActivity;
-            odTripJson["declaredMode"]                  = odTrip.mode;
-            odTripJson["expansionFactor"]               = odTrip.expansionFactor;
+            /*odTripJson["ageGroup"]                    = persons[odTrip->personIdx].ageGroup; // this fails (segmentation fault)...
+            odTripJson["gender"]                        = persons[odTrip->personIdx].gender;
+            odTripJson["occupation"]                    = persons[odTrip->personIdx].occupation;*/
+            odTripJson["internalId"]                    = odTrip->internalId;
+            odTripJson["originActivity"]                = odTrip->originActivity;
+            odTripJson["destinationActivity"]           = odTrip->destinationActivity;
+            odTripJson["declaredMode"]                  = odTrip->mode;
+            odTripJson["expansionFactor"]               = odTrip->expansionFactor;
             odTripJson["travelTimeSeconds"]             = routingResult.travelTimeSeconds;
             odTripJson["minimizedTravelTimeSeconds"]    = routingResult.travelTimeSeconds - routingResult.firstWaitingTimeSeconds + params.minWaitingTimeSeconds;
-            odTripJson["onlyWalkingTravelTimeSeconds"]  = odTrip.walkingTravelTimeSeconds;
-            odTripJson["declaredDepartureTimeSeconds"]  = odTrip.departureTimeSeconds;
-            odTripJson["declaredArrivalTimeSeconds"]    = odTrip.arrivalTimeSeconds;
+            odTripJson["onlyWalkingTravelTimeSeconds"]  = odTrip->walkingTravelTimeSeconds;
+            odTripJson["declaredDepartureTimeSeconds"]  = odTrip->departureTimeSeconds;
+            odTripJson["declaredArrivalTimeSeconds"]    = odTrip->arrivalTimeSeconds;
             odTripJson["departureTimeSeconds"]          = routingResult.departureTimeSeconds;
             odTripJson["minimizedDepartureTimeSeconds"] = routingResult.minimizedDepartureTimeSeconds;
             odTripJson["arrivalTimeSeconds"]            = routingResult.arrivalTimeSeconds;

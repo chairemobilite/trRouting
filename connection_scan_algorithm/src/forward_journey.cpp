@@ -312,8 +312,8 @@ namespace TrRouting
           {
 
             json["status"]                                         = "success";
-            json["origin"]                                         = {params.origin.longitude, params.origin.latitude};
-            json["destination"]                                    = {params.destination.longitude, params.destination.latitude};
+            json["origin"]                                         = { origin->longitude,      origin->latitude      };
+            json["destination"]                                    = { destination->longitude, destination->latitude };
             json["departureTime"]                                  = Toolbox::convertSecondsToFormattedTime(departureTimeSeconds);
             json["arrivalTime"]                                    = Toolbox::convertSecondsToFormattedTime(arrivalTime);
             json["departureTimeSeconds"]                           = departureTimeSeconds;
@@ -377,8 +377,8 @@ namespace TrRouting
     else // no line found
     {
       json["status"]                     = "no_routing_found";
-      json["origin"]                     = { params.origin.longitude,      params.origin.latitude };
-      json["destination"]                = { params.destination.longitude, params.destination.latitude };
+      json["origin"]                     = { origin->longitude,      origin->latitude      };
+      json["destination"]                = { destination->longitude, destination->latitude };
       json["departureTime"]              = Toolbox::convertSecondsToFormattedTime(departureTimeSeconds);
       json["departureTimeSeconds"]       = departureTimeSeconds;
       result.status                      = "no_routing_found";

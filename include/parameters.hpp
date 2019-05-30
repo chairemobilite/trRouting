@@ -89,14 +89,13 @@ namespace TrRouting
       float walkingSpeedMetersPerSecond;
       float drivingSpeedMetersPerSecond;
       float cyclingSpeedMetersPerSecond;
-      
+
       Point origin;
       Point destination;
       bool hasOrigin;
       bool hasDestination;
       int originNodeIdx;
       int destinationNodeIdx;
-      OdTrip* odTrip;
       bool calculateAllOdTrips;
       bool saveResultToFile;
       boost::optional<boost::uuids::uuid> scenarioUuid;

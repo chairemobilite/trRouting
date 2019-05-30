@@ -84,12 +84,13 @@ namespace TrRouting
     std::string             alternativesRouting();
     std::string             odTripsRouting();
 
-    void                    updateAgenciesFromCache   (Parameters&  params, std::string customPath = "");
     void                    updateDataSourcesFromCache(Parameters&  params, std::string customPath = "");
     void                    updateHouseholdsFromCache (Parameters&  params, std::string customPath = "");
     void                    updatePersonsFromCache    (Parameters&  params, std::string customPath = "");
     void                    updateOdTripsFromCache    (Parameters&  params, std::string customPath = "");
     void                    updatePlacesFromCache     (Parameters&  params, std::string customPath = "");
+
+    void                    updateAgenciesFromCache   (Parameters&  params, std::string customPath = "");
     void                    updateSchedulesFromCache  (Parameters&  params, std::string customPath = "");
     void                    updateScenariosFromCache  (Parameters&  params, std::string customPath = "");
     void                    updateServicesFromCache   (Parameters&  params, std::string customPath = "");
@@ -151,6 +152,10 @@ namespace TrRouting
 
     Parameters& params;
     CalculationTime algorithmCalculationTime;
+    
+    Point  * origin;
+    Point  * destination;
+    OdTrip * odTrip;
 
   private:
     

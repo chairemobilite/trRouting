@@ -2,11 +2,6 @@
 
 namespace TrRouting
 {
-  
-  void Calculator::updateAgenciesFromCache(Parameters& params, std::string customPath)
-  {
-    params.cacheFetcher->getAgencies(agencies, agencyIndexesByUuid, params, customPath);
-  }
 
   void Calculator::updateDataSourcesFromCache(Parameters& params, std::string customPath)
   {
@@ -22,7 +17,7 @@ namespace TrRouting
   {
     params.cacheFetcher->getPersons(persons, personIndexesByUuid, dataSourceIndexesByUuid, householdIndexesByUuid, params, customPath);
   }
-
+  
   void Calculator::updateOdTripsFromCache(Parameters& params, std::string customPath)
   {
     params.cacheFetcher->getOdTrips(odTrips, odTripIndexesByUuid, dataSourceIndexesByUuid, householdIndexesByUuid, personIndexesByUuid, params, customPath);
@@ -33,6 +28,11 @@ namespace TrRouting
     params.cacheFetcher->getPlaces(places, placeIndexesByUuid, dataSourceIndexesByUuid, params, customPath);
   }
 
+  void Calculator::updateAgenciesFromCache(Parameters& params, std::string customPath)
+  {
+    params.cacheFetcher->getAgencies(agencies, agencyIndexesByUuid, params, customPath);
+  }
+
   void Calculator::prepare()
   {
     
@@ -41,18 +41,20 @@ namespace TrRouting
     if (params.dataFetcherShortname == "cache")
     {
       std::tie(modes, modeIndexesByShortname) = params.cacheFetcher->getModes();
+
       updateDataSourcesFromCache(params);
       updateHouseholdsFromCache(params);
       updatePersonsFromCache(params);
       updateOdTripsFromCache(params);
       updatePlacesFromCache(params);
+
+      updateAgenciesFromCache(params);
+      //updateServicesFromCache(params);
       
       std::tie(services,    serviceIndexesByUuid)    = params.cacheFetcher->getServices(params);
       //std::tie(stations,    stationIndexesByUuid)    = params.cacheFetcher->getStations(params);
       std::tie(nodes,       nodeIndexesByUuid)       = params.cacheFetcher->getNodes(stationIndexesByUuid, params);
                nodes                                 = params.cacheFetcher->getNodeFootpaths(nodes, nodeIndexesByUuid, params);
-      //std::tie(agencies,    agencyIndexesByUuid)     = params.cacheFetcher->getAgencies(params);
-      updateAgenciesFromCache(params);
       std::tie(lines,       lineIndexesByUuid)       = params.cacheFetcher->getLines(agencyIndexesByUuid, modeIndexesByShortname, params);
       std::tie(paths,       pathIndexesByUuid)       = params.cacheFetcher->getPaths(lineIndexesByUuid, nodeIndexesByUuid, params);
       std::tie(scenarios,   scenarioIndexesByUuid)   = params.cacheFetcher->getScenarios(serviceIndexesByUuid, lineIndexesByUuid, agencyIndexesByUuid, nodeIndexesByUuid, modeIndexesByShortname, params);

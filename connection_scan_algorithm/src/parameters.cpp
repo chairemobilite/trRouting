@@ -67,7 +67,6 @@ namespace TrRouting
     alternatives                           = false;
     responseFormat                         = "json";
     saveResultToFile                       = false;
-    odTrip                                 = NULL;
     scenarioUuid                           = boost::none;
     odTripUuid                             = boost::none;
     startingNodeUuid                       = boost::none;
@@ -175,7 +174,7 @@ namespace TrRouting
       else if (parameterWithValueVector[0] == "destination")
       {
         boost::split(latitudeLongitudeVector, parameterWithValueVector[1], boost::is_any_of(","));
-        destination = Point(std::stof(latitudeLongitudeVector[0]), std::stof(latitudeLongitudeVector[1]));
+        destination    = Point(std::stof(latitudeLongitudeVector[0]), std::stof(latitudeLongitudeVector[1]));
         hasDestination = true;
         continue;
       }

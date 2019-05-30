@@ -11,9 +11,9 @@ namespace TrRouting
     nlohmann::json json;
     nlohmann::json alternativeJson;
     
-    if (params.odTrip != NULL) // if odTrip is provided
+    if (odTrip != nullptr) // if odTrip is provided
     {
-      json["odTripUuid"] = boost::uuids::to_string(params.odTrip->uuid);
+      json["odTripUuid"] = boost::uuids::to_string(odTrip->uuid);
     }
 
     json["alternatives"] = nlohmann::json::array();

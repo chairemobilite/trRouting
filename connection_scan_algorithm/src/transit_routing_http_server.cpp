@@ -115,6 +115,11 @@ int main(int argc, char** argv) {
   HttpServer server;
   server.config.port = programOptions.port;
 
+
+
+
+
+
   // updateCache:
   server.resource["^/updateCache[/]?\\?([0-9a-zA-Z&=_,:/.-]+)$"]["GET"]=[&server, &calculator](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
     
@@ -124,7 +129,10 @@ int main(int argc, char** argv) {
     std::vector<std::string> parameterWithValueVector;
     std::string              queryString;
     std::string              customCacheDirectoryPath {""};
-    std::string              cacheName;
+    std::string              cacheNamesStr {""};
+    std::vector<std::string> cacheNames;
+    std::vector<std::string> cacheNamesVector;
+
     if (request->path_match.size() >= 1)
     {
       queryString = request->path_match[1];
@@ -140,7 +148,12 @@ int main(int argc, char** argv) {
 
       if (parameterWithValueVector[0] == "name" || parameterWithValueVector[0] == "cache" || parameterWithValueVector[0] == "cache_name")
       {
-        cacheName = parameterWithValueVector[1];
+
+        boost::split(cacheNamesVector, parameterWithValueVector[1], boost::is_any_of(","));
+        for(std::string cacheName : cacheNamesVector)
+        {
+          cacheNames.push_back(cacheName);
+        }
         continue;
       }
       if (parameterWithValueVector[0] == "path")
@@ -150,20 +163,38 @@ int main(int argc, char** argv) {
       }
     }
 
-    if (cacheName == "agencies")
+    int i {0};
+    bool correctCacheName {false};
+    for(std::string cacheName : cacheNames)
     {
-      calculator.updateAgenciesFromCache(calculator.params, customCacheDirectoryPath);
-      response = "{\"status\": \"success\", \"cache\": \"agencies\"}";
+      if (cacheName == "agencies")
+      {
+        correctCacheName = true;
+        calculator.updateAgenciesFromCache(calculator.params, customCacheDirectoryPath);
+      }
+      else if (cacheName == "data_sources")
+      {
+        correctCacheName = true;
+        calculator.updateDataSourcesFromCache(calculator.params, customCacheDirectoryPath);
+      }
+      else if (cacheName == "households")
+      {
+        correctCacheName = true;
+        calculator.updateHouseholdsFromCache(calculator.params, customCacheDirectoryPath);
+      }
+      if (correctCacheName)
+      {
+        cacheNamesStr += cacheName;
+        if (i < cacheNames.size())
+        {
+          cacheNamesStr += ",";
+        }
+        i++;
+      }
     }
-    else if (cacheName == "data_sources")
+    if (cacheNames.size() > 0)
     {
-      calculator.updateDataSourcesFromCache(calculator.params, customCacheDirectoryPath);
-      response = "{\"status\": \"success\", \"cache\": \"data_sources\"}";
-    }
-    else if (cacheName == "households")
-    {
-      calculator.updateHouseholdsFromCache(calculator.params, customCacheDirectoryPath);
-      response = "{\"status\": \"success\", \"cache\": \"households\"}";
+      response = "{\"status\": \"success\", \"cache_names\": \"" + cacheNamesStr + "\"}";
     }
     else
     {
@@ -174,6 +205,11 @@ int main(int argc, char** argv) {
 
   };
 
+
+
+
+
+
   // closeServer and exit app:
   server.resource["^/exit[/]?\\?([0-9a-zA-Z&=_,:/.-]+)$"]["GET"]=[&server, &calculator](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
     
@@ -183,6 +219,11 @@ int main(int argc, char** argv) {
     // todo
 
   };
+
+
+
+
+
 
   // routing request
   server.resource["^/route/v1/transit[/]?\\?([0-9a-zA-Z&=_,:/.-]+)$"]["GET"]=[&server, &calculator](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
@@ -223,16 +264,19 @@ int main(int argc, char** argv) {
     {
       
       // find OdTrip if provided:
-      OdTrip odTrip;
       bool   foundOdTrip{false};
+
+      calculator.origin      = &calculator.params.origin;
+      calculator.destination = &calculator.params.destination;
+      calculator.odTrip      = nullptr;
+
       if (calculator.params.odTripUuid.is_initialized() && calculator.odTripIndexesByUuid.count(calculator.params.odTripUuid.get()))
       {
-        odTrip      = calculator.odTrips[calculator.odTripIndexesByUuid[calculator.params.odTripUuid.get()]];
+        calculator.odTrip = calculator.odTrips[calculator.odTripIndexesByUuid[calculator.params.odTripUuid.get()]].get();
         foundOdTrip = true;
-        std::cout << "od trip uuid " << odTrip.uuid << std::endl;
-        calculator.params.origin      = odTrip.origin;
-        calculator.params.destination = odTrip.destination;
-        calculator.params.odTrip      = &odTrip;
+        std::cout << "od trip uuid " << calculator.odTrip->uuid << std::endl;
+        calculator.origin      = calculator.odTrip->origin.get();
+        calculator.destination = calculator.odTrip->destination.get();
         response = calculator.calculate().json;
       }
       else if (calculator.params.alternatives)
@@ -287,11 +331,15 @@ int main(int argc, char** argv) {
     
   };
   
+
+
+
+
   std::cout << "starting server..." << std::endl;
   std::thread server_thread([&server](){
       server.start();
   });
-    
+
   // Wait for server to start so that the client can connect:
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
   
@@ -306,6 +354,10 @@ int main(int argc, char** argv) {
 
 
 
+
+
+
+
 void default_resource_send(const HttpServer &server, const std::shared_ptr<HttpServer::Response> &serverResponse, const std::shared_ptr<std::ifstream> &ifs) {
   
   // Read and send 128 KB at a time:
@@ -313,7 +365,7 @@ void default_resource_send(const HttpServer &server, const std::shared_ptr<HttpS
   
   // Safe when server is running on one thread:
   std::streamsize read_length;
-  if ((read_length = ifs->read(&buffer[0], buffer.size()).gcount())>0)
+  if ((read_length = ifs->read(&buffer[0], buffer.size()).gcount()) > 0)
   {
     serverResponse->write(&buffer[0], read_length);
     if (read_length==static_cast<std::streamsize>(buffer.size()))
