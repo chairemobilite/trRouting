@@ -45,9 +45,12 @@ namespace TrRouting
         std::string uuid {capnpT.getUuid()};
         std::vector<int> servicesIdx;
         boost::uuids::uuid serviceUuid;
+        
         std::unique_ptr<T> t = std::make_unique<T>();
+
         t->uuid = uuidGenerator(uuid);
         t->name = capnpT.getName();
+
         switch (capnpT.getType()) {
           case dataSource::DataSource::Type::NONE                     : t->type = "none";                    break;
           case dataSource::DataSource::Type::OTHER                    : t->type = "other";                   break;
@@ -62,6 +65,7 @@ namespace TrRouting
           case dataSource::DataSource::Type::STREET_SEGMENT_SPEEDS    : t->type = "streetSegmentSpeeds";     break;
           case dataSource::DataSource::Type::UNKNOWN                  : t->type = "unknown";                 break;
         }
+
         tIndexesByUuid[t->uuid] = ts.size();
         ts.push_back(std::move(t));
       }

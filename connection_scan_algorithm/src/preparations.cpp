@@ -23,6 +23,16 @@ namespace TrRouting
     params.cacheFetcher->getPersons(persons, personIndexesByUuid, dataSourceIndexesByUuid, householdIndexesByUuid, params, customPath);
   }
 
+  void Calculator::updateOdTripsFromCache(Parameters& params, std::string customPath)
+  {
+    params.cacheFetcher->getOdTrips(odTrips, odTripIndexesByUuid, dataSourceIndexesByUuid, householdIndexesByUuid, personIndexesByUuid, params, customPath);
+  }
+
+  void Calculator::updatePlacesFromCache(Parameters& params, std::string customPath)
+  {
+    params.cacheFetcher->getPlaces(places, placeIndexesByUuid, dataSourceIndexesByUuid, params, customPath);
+  }
+
   void Calculator::prepare()
   {
     
@@ -34,8 +44,9 @@ namespace TrRouting
       updateDataSourcesFromCache(params);
       updateHouseholdsFromCache(params);
       updatePersonsFromCache(params);
-      std::tie(odTrips,     odTripIndexesByUuid)     = params.cacheFetcher->getOdTrips(dataSourceIndexesByUuid, householdIndexesByUuid, personIndexesByUuid, params);
-      //std::tie(places,      placeIndexesByUuid)      = params.cacheFetcher->getPlaces(dataSourceIndexesByUuid, params);
+      updateOdTripsFromCache(params);
+      updatePlacesFromCache(params);
+      
       std::tie(services,    serviceIndexesByUuid)    = params.cacheFetcher->getServices(params);
       //std::tie(stations,    stationIndexesByUuid)    = params.cacheFetcher->getStations(params);
       std::tie(nodes,       nodeIndexesByUuid)       = params.cacheFetcher->getNodes(stationIndexesByUuid, params);

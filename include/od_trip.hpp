@@ -33,11 +33,11 @@ namespace TrRouting
     std::vector<int> destinationNodesIdx;
     std::vector<int> destinationNodesTravelTimesSeconds;
     std::vector<int> destinationNodesDistancesMeters;
-    Point origin;
-    Point destination;
+    std::unique_ptr<Point> origin;
+    std::unique_ptr<Point> destination;
 
     const std::string toString() {
-      return "Person " + boost::uuids::to_string(uuid);
+      return "Od trip " + boost::uuids::to_string(uuid);
     }
 
   };

@@ -22,7 +22,7 @@ namespace TrRouting
     std::string osmFeatureKey;
     std::string osmFeatureValue;
     std::string internalId;
-    Point point;
+    std::unique_ptr<Point> point;
     std::vector<int> nodesIdx;
     std::vector<int> nodesTravelTimesSeconds;
     std::vector<int> nodesDistancesMeters;

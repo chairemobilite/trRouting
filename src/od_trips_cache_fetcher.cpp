@@ -15,8 +15,15 @@
 namespace TrRouting
 {
 
-  const std::pair<std::vector<OdTrip>, std::map<boost::uuids::uuid, int>> CacheFetcher::getOdTrips(std::map<boost::uuids::uuid, int> dataSourceIndexesByUuid, std::map<boost::uuids::uuid, int> householdIndexesByUuid, std::map<boost::uuids::uuid, int> personIndexesByUuid, Parameters& params, std::string customPath)
-  { 
+   void CacheFetcher::getOdTrips(
+    std::vector<std::unique_ptr<OdTrip>>& ts,
+    std::map<boost::uuids::uuid, int>& tIndexesByUuid,
+    std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid,
+    std::map<boost::uuids::uuid, int>& householdIndexesByUuid,
+    std::map<boost::uuids::uuid, int>& personIndexesByUuid,
+    Parameters& params,
+    std::string customPath
+  ) {
 
     using T           = OdTrip;
     using TCollection = odTripCollection::OdTripCollection;
@@ -25,9 +32,7 @@ namespace TrRouting
     std::string tStr  = "odTrips";
     std::string TStr  = "OdTrips";
 
-    std::vector<T> ts;
     std::string cacheFileName{tStr};
-    std::map<boost::uuids::uuid, int> tIndexesByUuid;
     boost::uuids::string_generator uuidGenerator;
 
     std::cout << "Fetching " << tStr << " from cache..." << std::endl;
@@ -57,9 +62,11 @@ namespace TrRouting
             std::string dataSourceUuid {capnpT.getDataSourceUuid()};
             std::string householdUuid  {capnpT.getHouseholdUuid()};
             std::string personUuid     {capnpT.getPersonUuid()};
-            Point * origin              = new Point();
-            Point * destination         = new Point();
-            T     * t                   = new T();
+
+            std::unique_ptr<T> t               = std::make_unique<T>();
+            std::unique_ptr<Point> origin      = std::make_unique<Point>();
+            std::unique_ptr<Point> destination = std::make_unique<Point>();
+
             t->uuid                     = uuidGenerator(uuid);
             t->id                       = capnpT.getId();
             t->expansionFactor          = capnpT.getExpansionFactor();
@@ -69,6 +76,13 @@ namespace TrRouting
             t->walkingTravelTimeSeconds = capnpT.getWalkingTravelTimeSeconds();
             t->cyclingTravelTimeSeconds = capnpT.getCyclingTravelTimeSeconds();
             t->drivingTravelTimeSeconds = capnpT.getDrivingTravelTimeSeconds();
+
+            origin->latitude          = ((double)capnpT.getOriginLatitude())       / 1000000.0;
+            origin->longitude         = ((double)capnpT.getOriginLongitude())      / 1000000.0;
+            destination->latitude     = ((double)capnpT.getDestinationLatitude())  / 1000000.0;
+            destination->longitude    = ((double)capnpT.getDestinationLongitude()) / 1000000.0;
+            t->origin                 = std::move(origin);
+            t->destination            = std::move(destination);
 
             t->dataSourceIdx   = dataSourceUuid.length() > 0 ? dataSourceIndexesByUuid[uuidGenerator(dataSourceUuid)] : -1;
             t->householdIdx    = householdUuid.length()  > 0 ? householdIndexesByUuid[uuidGenerator(householdUuid)]   : -1;
@@ -142,12 +156,6 @@ namespace TrRouting
               case odTrip::OdTrip::Activity::UNKNOWN          : t->destinationActivity = "unknown";         break;
             }
 
-
-
-            t->origin           = *origin;
-            t->origin.latitude  = ((double)capnpT.getOriginLatitude())  / 1000000.0;
-            t->origin.longitude = ((double)capnpT.getOriginLongitude()) / 1000000.0;
-
             const unsigned int originNodesCount {capnpT.getOriginNodesIdx().size()};
             std::vector<int> originNodesIdx(originNodesCount);
             std::vector<int> originNodesTravelTimesSeconds(originNodesCount);
@@ -161,12 +169,6 @@ namespace TrRouting
             t->originNodesIdx                = originNodesIdx;
             t->originNodesTravelTimesSeconds = originNodesTravelTimesSeconds;
             t->originNodesDistancesMeters    = originNodesDistancesMeters;
-
-
-
-            t->destination           = *destination;
-            t->destination.latitude  = ((double)capnpT.getDestinationLatitude())  / 1000000.0;
-            t->destination.longitude = ((double)capnpT.getDestinationLongitude()) / 1000000.0;
 
             const unsigned int destinationNodesCount {capnpT.getDestinationNodesIdx().size()};
             std::vector<int> destinationNodesIdx(destinationNodesCount);
@@ -182,10 +184,9 @@ namespace TrRouting
             t->destinationNodesTravelTimesSeconds = destinationNodesTravelTimesSeconds;
             t->destinationNodesDistancesMeters    = destinationNodesDistancesMeters;
 
+            tIndexesByUuid[t->uuid] = ts.size();
+            ts.push_back(std::move(t));
 
-
-            ts.push_back(*t);
-            tIndexesByUuid[t->uuid] = ts.size() - 1;
           }
           //std::cout << TStr << ":\n" << Toolbox::prettyPrintStructVector(ts) << std::endl;
           close(fd);
@@ -198,8 +199,7 @@ namespace TrRouting
       }
 
     }
-    
-    return std::make_pair(ts, tIndexesByUuid);
+
   }
 
 }

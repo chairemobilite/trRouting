@@ -42,10 +42,13 @@ namespace TrRouting
       for (cT::Reader capnpT : capnpTCollection.getAgencies())
       {
         std::string uuid {capnpT.getUuid()};
+
         std::unique_ptr<T> t = std::make_unique<T>();
+
         t->uuid    = uuidGenerator(uuid);
         t->acronym = capnpT.getAcronym();
         t->name    = capnpT.getName();
+        
         tIndexesByUuid[t->uuid] = ts.size();
         ts.push_back(std::move(t));
       }

@@ -15,8 +15,13 @@
 namespace TrRouting
 {
 
-  const std::pair<std::vector<Place>, std::map<boost::uuids::uuid, int>> CacheFetcher::getPlaces(std::map<boost::uuids::uuid, int> dataSourceIndexesByUuid, Parameters& params, std::string customPath)
-  { 
+  void CacheFetcher::getPlaces(
+    std::vector<std::unique_ptr<Place>>& ts,
+    std::map<boost::uuids::uuid, int>& tIndexesByUuid,
+    std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid,
+    Parameters& params,
+    std::string customPath
+  ) {
 
     using T           = Place;
     using TCollection = placeCollection::PlaceCollection;
@@ -25,9 +30,7 @@ namespace TrRouting
     std::string tStr  = "places";
     std::string TStr  = "Places";
 
-    std::vector<T> ts;
     std::string cacheFileName{tStr};
-    std::map<boost::uuids::uuid, int> tIndexesByUuid;
     boost::uuids::string_generator uuidGenerator;
 
     std::cout << "Fetching " << tStr << " from cache..." << std::endl;
@@ -55,8 +58,10 @@ namespace TrRouting
           {
             std::string uuid           {capnpT.getUuid()};
             std::string dataSourceUuid {capnpT.getDataSourceUuid()};
-            Point * point      = new Point();
-            T     * t          = new T();
+
+            std::unique_ptr<T> t         = std::make_unique<T>();
+            std::unique_ptr<Point> point = std::make_unique<Point>();
+
             t->uuid            = uuidGenerator(uuid);
             t->id              = capnpT.getId();
             t->shortname       = capnpT.getShortname();
@@ -65,9 +70,10 @@ namespace TrRouting
             t->osmFeatureValue = capnpT.getOsmFeatureValue();
             t->internalId      = capnpT.getInternalId();
             t->dataSourceIdx   = dataSourceUuid.length() > 0 ? dataSourceIndexesByUuid[uuidGenerator(dataSourceUuid)] : -1;
-            t->point           = *point;
-            t->point.latitude  = ((double)capnpT.getLatitude())  / 1000000.0;
-            t->point.longitude = ((double)capnpT.getLongitude()) / 1000000.0;
+
+            point->latitude  = ((double)capnpT.getLatitude())  / 1000000.0;
+            point->longitude = ((double)capnpT.getLongitude()) / 1000000.0;
+            t->point         = std::move(point);
 
             const unsigned int nodesCount {capnpT.getNodesIdx().size()};
             std::vector<int> nodesIdx(nodesCount);
@@ -83,8 +89,8 @@ namespace TrRouting
             t->nodesTravelTimesSeconds = nodesTravelTimesSeconds;
             t->nodesDistancesMeters    = nodesDistancesMeters;
 
-            ts.push_back(*t);
-            tIndexesByUuid[t->uuid] = ts.size() - 1;
+            tIndexesByUuid[t->uuid] = ts.size();
+            ts.push_back(std::move(t));
           }
           //std::cout << TStr << ":\n" << Toolbox::prettyPrintStructVector(ts) << std::endl;
           close(fd);
@@ -97,7 +103,6 @@ namespace TrRouting
       }
     }
     
-    return std::make_pair(ts, tIndexesByUuid);
   }
 
 }

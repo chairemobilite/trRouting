@@ -88,6 +88,8 @@ namespace TrRouting
     void                    updateDataSourcesFromCache(Parameters&  params, std::string customPath = "");
     void                    updateHouseholdsFromCache (Parameters&  params, std::string customPath = "");
     void                    updatePersonsFromCache    (Parameters&  params, std::string customPath = "");
+    void                    updateOdTripsFromCache    (Parameters&  params, std::string customPath = "");
+    void                    updatePlacesFromCache     (Parameters&  params, std::string customPath = "");
     void                    updateSchedulesFromCache  (Parameters&  params, std::string customPath = "");
     void                    updateScenariosFromCache  (Parameters&  params, std::string customPath = "");
     void                    updateServicesFromCache   (Parameters&  params, std::string customPath = "");
@@ -106,12 +108,14 @@ namespace TrRouting
     std::vector<std::unique_ptr<Person>>     persons;
     std::map<boost::uuids::uuid, int>        personIndexesByUuid;
   
-    std::vector<OdTrip>                   odTrips;
-    std::map<boost::uuids::uuid, int>     odTripIndexesByUuid;
+    std::vector<std::unique_ptr<OdTrip>>     odTrips;
+    std::map<boost::uuids::uuid, int>        odTripIndexesByUuid;
+
+    std::vector<std::unique_ptr<Place>>      places;
+    std::map<boost::uuids::uuid, int>        placeIndexesByUuid;
+
   
-    std::vector<Place>                    places;
-    std::map<boost::uuids::uuid, int>     placeIndexesByUuid;
-  
+
     std::vector<Scenario>                 scenarios;
     std::map<boost::uuids::uuid, int>     scenarioIndexesByUuid;
   
