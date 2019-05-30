@@ -26,8 +26,8 @@ namespace TrRouting
     std::string gender;
     std::string occupation;
     std::string internalId;
-    Point usualWorkPlace;
-    Point usualSchoolPlace;
+    std::unique_ptr<Point> usualWorkPlace;
+    std::unique_ptr<Point> usualSchoolPlace;
     std::vector<int> usualWorkPlaceNodesIdx;
     std::vector<int> usualWorkPlaceNodesTravelTimesSeconds;
     std::vector<int> usualWorkPlaceNodesDistancesMeters;

@@ -71,7 +71,9 @@ namespace TrRouting
     
     std::map<std::string, int> benchmarking;
     std::string projectShortname;
+    
     Calculator(Parameters& theParams);
+
     void                    prepare();
     void                    reset(bool resetAccessPaths = true, bool resetFilters = true);
     RoutingResult           calculate(bool resetAccessPaths = true, bool resetFilters = true);
@@ -81,25 +83,28 @@ namespace TrRouting
     RoutingResult           reverseJourney(int bestDepartureTime, int bestAccessNodeIndex, int bestAccessTravelTime);
     std::string             alternativesRouting();
     std::string             odTripsRouting();
-    void                    updateAgenciesFromCache(Parameters&  params, std::string customPath = "");
-    void                    updateDataSourcesFromCache(Parameters&  params, std::string customPath = "");
-    void                    updateSchedulesFromCache(Parameters&  params, std::string customPath = "");
-    void                    updateScenariosFromCache(Parameters&  params, std::string customPath = "");
-    void                    updateServicesFromCache(Parameters&  params, std::string customPath = "");
-    void                    updatePathsFromCache(Parameters&  params, std::string customPath = "");
-    void                    updateNodesFromCache(Parameters&  params, std::string customPath = "");
 
+    void                    updateAgenciesFromCache   (Parameters&  params, std::string customPath = "");
+    void                    updateDataSourcesFromCache(Parameters&  params, std::string customPath = "");
+    void                    updateHouseholdsFromCache (Parameters&  params, std::string customPath = "");
+    void                    updatePersonsFromCache    (Parameters&  params, std::string customPath = "");
+    void                    updateSchedulesFromCache  (Parameters&  params, std::string customPath = "");
+    void                    updateScenariosFromCache  (Parameters&  params, std::string customPath = "");
+    void                    updateServicesFromCache   (Parameters&  params, std::string customPath = "");
+    void                    updatePathsFromCache      (Parameters&  params, std::string customPath = "");
+    void                    updateNodesFromCache      (Parameters&  params, std::string customPath = "");
+    
     std::vector<std::unique_ptr<Agency>>     agencies;
     std::map<boost::uuids::uuid, int>        agencyIndexesByUuid;
 
     std::vector<std::unique_ptr<DataSource>> dataSources;
     std::map<boost::uuids::uuid, int>        dataSourceIndexesByUuid;
 
-    std::vector<Household>                households;
-    std::map<boost::uuids::uuid, int>     householdIndexesByUuid;
+    std::vector<std::unique_ptr<Household>>  households;
+    std::map<boost::uuids::uuid, int>        householdIndexesByUuid;
   
-    std::vector<Person>                   persons;
-    std::map<boost::uuids::uuid, int>     personIndexesByUuid;
+    std::vector<std::unique_ptr<Person>>     persons;
+    std::map<boost::uuids::uuid, int>        personIndexesByUuid;
   
     std::vector<OdTrip>                   odTrips;
     std::map<boost::uuids::uuid, int>     odTripIndexesByUuid;

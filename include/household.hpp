@@ -24,7 +24,7 @@ namespace TrRouting
     std::string incomeLevelGroup;
     std::string category;
     std::string internalId;
-    Point point;
+    std::unique_ptr<Point> point;
     std::vector<int> homeNodesIdx;
     std::vector<int> homeNodesTravelTimesSeconds;
     std::vector<int> homeNodesDistancesMeters;

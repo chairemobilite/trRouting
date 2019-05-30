@@ -9,7 +9,7 @@ namespace TrRouting
     algorithmCalculationTime = CalculationTime();
 
     //agencies            = std::vector<std::unique_ptr<Agency>>();
-    agencyIndexesByUuid = std::map<boost::uuids::uuid, int>();
+    //agencyIndexesByUuid = std::map<boost::uuids::uuid, int>();
 
     std::cout << "calculator constructor initialized agencies" << std::endl;
 

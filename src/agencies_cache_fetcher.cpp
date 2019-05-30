@@ -12,13 +12,17 @@
 namespace TrRouting
 {
 
-  void CacheFetcher::getAgencies(std::vector<std::unique_ptr<Agency>>& ts, std::map<boost::uuids::uuid, int>& tIndexesByUuid, Parameters& params, std::string customPath)
-  {
+  void CacheFetcher::getAgencies(
+    std::vector<std::unique_ptr<Agency>>& ts,
+    std::map<boost::uuids::uuid, int>& tIndexesByUuid,
+    Parameters& params,
+    std::string customPath
+  ) {
 
     using T           = Agency;
     using TCollection = agencyCollection::AgencyCollection;
     using cT          = agencyCollection::Agency;
-    
+
     ts.clear();
     tIndexesByUuid.clear();
 

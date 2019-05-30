@@ -13,8 +13,12 @@
 namespace TrRouting
 {
 
-  void CacheFetcher::getDataSources(std::vector<std::unique_ptr<DataSource>>& ts, std::map<boost::uuids::uuid, int>& tIndexesByUuid, Parameters& params, std::string customPath)
-  { 
+  void CacheFetcher::getDataSources(
+    std::vector<std::unique_ptr<DataSource>>& ts,
+    std::map<boost::uuids::uuid, int>& tIndexesByUuid,
+    Parameters& params,
+    std::string customPath
+  ) { 
 
     using T           = DataSource;
     using TCollection = dataSourceCollection::DataSourceCollection;

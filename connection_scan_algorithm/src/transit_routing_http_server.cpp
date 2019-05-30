@@ -150,15 +150,20 @@ int main(int argc, char** argv) {
       }
     }
 
-    if (cacheName == "agency" || cacheName == "agencies")
+    if (cacheName == "agencies")
     {
       calculator.updateAgenciesFromCache(calculator.params, customCacheDirectoryPath);
       response = "{\"status\": \"success\", \"cache\": \"agencies\"}";
     }
-    else if (cacheName == "data_source" || cacheName == "data_sources")
+    else if (cacheName == "data_sources")
     {
       calculator.updateDataSourcesFromCache(calculator.params, customCacheDirectoryPath);
       response = "{\"status\": \"success\", \"cache\": \"data_sources\"}";
+    }
+    else if (cacheName == "households")
+    {
+      calculator.updateHouseholdsFromCache(calculator.params, customCacheDirectoryPath);
+      response = "{\"status\": \"success\", \"cache\": \"households\"}";
     }
     else
     {

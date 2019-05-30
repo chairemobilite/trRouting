@@ -15,19 +15,26 @@
 namespace TrRouting
 {
 
-  const std::pair<std::vector<Person>, std::map<boost::uuids::uuid, int>> CacheFetcher::getPersons(std::map<boost::uuids::uuid, int> dataSourceIndexesByUuid, std::map<boost::uuids::uuid, int> householdIndexesByUuid, Parameters& params, std::string customPath)
-  { 
+  void CacheFetcher::getPersons(
+    std::vector<std::unique_ptr<Person>>& ts,
+    std::map<boost::uuids::uuid, int>& tIndexesByUuid,
+    std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid,
+    std::map<boost::uuids::uuid, int>& householdIndexesByUuid,
+    Parameters& params,
+    std::string customPath
+  ) { 
 
     using T           = Person;
     using TCollection = personCollection::PersonCollection;
     using cT          = person::Person;
 
+    ts.clear();
+    tIndexesByUuid.clear();
+
     std::string tStr  = "persons";
     std::string TStr  = "Persons";
 
-    std::vector<T> ts;
     std::string cacheFileName{tStr};
-    std::map<boost::uuids::uuid, int> tIndexesByUuid;
     boost::uuids::string_generator uuidGenerator;
 
     std::cout << "Fetching " << tStr << " from cache..." << std::endl;
@@ -56,9 +63,11 @@ namespace TrRouting
             std::string uuid           {capnpT.getUuid()};
             std::string dataSourceUuid {capnpT.getDataSourceUuid()};
             std::string householdUuid  {capnpT.getHouseholdUuid()};
-            Point * usualWorkPlace   = new Point();
-            Point * usualSchoolPlace = new Point();
-            T     * t                = new T();
+
+            std::unique_ptr<Point> usualWorkPlace   = std::make_unique<Point>();
+            std::unique_ptr<Point> usualSchoolPlace = std::make_unique<Point>();
+            std::unique_ptr<T> t                    = std::make_unique<T>();
+            
             t->uuid                  = uuidGenerator(uuid);
             t->id                    = capnpT.getId();
             t->expansionFactor       = capnpT.getExpansionFactor();
@@ -119,9 +128,9 @@ namespace TrRouting
 
 
 
-            t->usualWorkPlace           = *usualWorkPlace;
-            t->usualWorkPlace.latitude  = ((double)capnpT.getUsualWorkPlaceLatitude())  / 1000000.0;
-            t->usualWorkPlace.longitude = ((double)capnpT.getUsualWorkPlaceLongitude()) / 1000000.0;
+            usualWorkPlace->latitude  = ((double)capnpT.getUsualWorkPlaceLatitude())  / 1000000.0;
+            usualWorkPlace->longitude = ((double)capnpT.getUsualWorkPlaceLongitude()) / 1000000.0;
+            t->usualWorkPlace         = std::move(usualWorkPlace);
 
             const unsigned int usualWorkPlaceNodesCount {capnpT.getUsualWorkPlaceNodesIdx().size()};
             std::vector<int> usualWorkPlaceNodesIdx(usualWorkPlaceNodesCount);
@@ -139,9 +148,9 @@ namespace TrRouting
 
 
 
-            t->usualSchoolPlace           = *usualSchoolPlace;
-            t->usualSchoolPlace.latitude  = ((double)capnpT.getUsualSchoolPlaceLatitude())  / 1000000.0;
-            t->usualSchoolPlace.longitude = ((double)capnpT.getUsualSchoolPlaceLongitude()) / 1000000.0;
+            usualSchoolPlace->latitude  = ((double)capnpT.getUsualSchoolPlaceLatitude())  / 1000000.0;
+            usualSchoolPlace->longitude = ((double)capnpT.getUsualSchoolPlaceLongitude()) / 1000000.0;
+            t->usualSchoolPlace         = std::move(usualSchoolPlace);
 
             const unsigned int usualSchoolPlaceNodesCount {capnpT.getUsualSchoolPlaceNodesIdx().size()};
             std::vector<int> usualSchoolPlaceNodesIdx(usualSchoolPlaceNodesCount);
@@ -157,8 +166,8 @@ namespace TrRouting
             t->usualSchoolPlaceNodesTravelTimesSeconds = usualSchoolPlaceNodesTravelTimesSeconds;
             t->usualSchoolPlaceNodesDistancesMeters    = usualSchoolPlaceNodesDistancesMeters;
 
-            ts.push_back(*t);
-            tIndexesByUuid[t->uuid] = ts.size() - 1;
+            tIndexesByUuid[t->uuid] = ts.size();
+            ts.push_back(std::move(t));
           }
           //std::cout << TStr << ":\n" << Toolbox::prettyPrintStructVector(ts) << std::endl;
           close(fd);
@@ -171,7 +180,6 @@ namespace TrRouting
       }
     }
     
-    return std::make_pair(ts, tIndexesByUuid);
   }
 
 }
