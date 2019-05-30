@@ -2,7 +2,17 @@
 
 namespace TrRouting
 {
-    
+  
+  void Calculator::updateAgenciesFromCache(Parameters& params, std::string customPath)
+  {
+    params.cacheFetcher->getAgencies(agencies, agencyIndexesByUuid, params, customPath);
+  }
+
+  void Calculator::updateDataSourcesFromCache(Parameters& params, std::string customPath)
+  {
+    params.cacheFetcher->getDataSources(dataSources, dataSourceIndexesByUuid, params, customPath);
+  }
+
   void Calculator::prepare()
   {
     
@@ -11,7 +21,7 @@ namespace TrRouting
     if (params.dataFetcherShortname == "cache")
     {
       std::tie(modes,       modeIndexesByShortname)  = params.cacheFetcher->getModes();
-      std::tie(dataSources, dataSourceIndexesByUuid) = params.cacheFetcher->getDataSources(params);
+      updateDataSourcesFromCache(params);
       //std::tie(households,  householdIndexesByUuid)  = params.cacheFetcher->getHouseholds(dataSourceIndexesByUuid, params);
       //std::tie(persons,     personIndexesByUuid)     = params.cacheFetcher->getPersons(dataSourceIndexesByUuid, householdIndexesByUuid, params);
       std::tie(odTrips,     odTripIndexesByUuid)     = params.cacheFetcher->getOdTrips(dataSourceIndexesByUuid, householdIndexesByUuid, personIndexesByUuid, params);
@@ -20,7 +30,8 @@ namespace TrRouting
       //std::tie(stations,    stationIndexesByUuid)    = params.cacheFetcher->getStations(params);
       std::tie(nodes,       nodeIndexesByUuid)       = params.cacheFetcher->getNodes(stationIndexesByUuid, params);
                nodes                                 = params.cacheFetcher->getNodeFootpaths(nodes, nodeIndexesByUuid, params);
-      std::tie(agencies,    agencyIndexesByUuid)     = params.cacheFetcher->getAgencies(params);
+      //std::tie(agencies,    agencyIndexesByUuid)     = params.cacheFetcher->getAgencies(params);
+      updateAgenciesFromCache(params);
       std::tie(lines,       lineIndexesByUuid)       = params.cacheFetcher->getLines(agencyIndexesByUuid, modeIndexesByShortname, params);
       std::tie(paths,       pathIndexesByUuid)       = params.cacheFetcher->getPaths(lineIndexesByUuid, nodeIndexesByUuid, params);
       std::tie(scenarios,   scenarioIndexesByUuid)   = params.cacheFetcher->getScenarios(serviceIndexesByUuid, lineIndexesByUuid, agencyIndexesByUuid, nodeIndexesByUuid, modeIndexesByShortname, params);

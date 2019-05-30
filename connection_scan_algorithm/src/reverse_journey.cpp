@@ -55,7 +55,7 @@ namespace TrRouting
       Line   journeyStepLine;
       Mode   journeyStepMode;
       Path   journeyStepPath;
-      Agency journeyStepAgency;
+      Agency * journeyStepAgency;
       
       int totalInVehicleTime       { 0}; int transferArrivalTime {-1}; int firstDepartureTime     {-1};
       int totalWalkingTime         { 0}; int transferReadyTime   {-1}; int numberOfTransfers      {-1};
@@ -135,7 +135,7 @@ namespace TrRouting
             journeyStepNodeDeparture    = nodes[std::get<connectionIndexes::NODE_DEP>(journeyStepEnterConnection)];
             journeyStepNodeArrival      = nodes[std::get<connectionIndexes::NODE_ARR>(journeyStepExitConnection)];
             journeyStepTrip             = trips[std::get<3>(journeyStep)];
-            journeyStepAgency           = agencies[journeyStepTrip.agencyIdx];
+            journeyStepAgency           = agencies[journeyStepTrip.agencyIdx].get();
             journeyStepLine             = lines[journeyStepTrip.lineIdx];
             journeyStepPath             = paths[journeyStepTrip.pathIdx];
             journeyStepMode             = modes[journeyStepLine.modeIdx];
@@ -155,7 +155,7 @@ namespace TrRouting
             linesIdx.push_back(journeyStepTrip.lineIdx);
             modeShortnames.push_back(journeyStepMode.shortname);
             inVehicleTravelTimesSeconds.push_back(inVehicleTime);
-            agencyUuids.push_back(journeyStepAgency.uuid);
+            agencyUuids.push_back(journeyStepAgency->uuid);
             boardingNodeUuids.push_back(journeyStepNodeDeparture.uuid);
             unboardingNodeUuids.push_back(journeyStepNodeArrival.uuid);
             tripUuids.push_back(journeyStepTrip.uuid);
@@ -176,9 +176,9 @@ namespace TrRouting
             {
               stepJson                         = {};
               stepJson["action"]               = "board";
-              stepJson["agencyAcronym"]        = journeyStepAgency.acronym;
-              stepJson["agencyName"]           = journeyStepAgency.name;
-              stepJson["agencyUuid"]           = boost::uuids::to_string(journeyStepAgency.uuid);
+              stepJson["agencyAcronym"]        = journeyStepAgency->acronym;
+              stepJson["agencyName"]           = journeyStepAgency->name;
+              stepJson["agencyUuid"]           = boost::uuids::to_string(journeyStepAgency->uuid);
               stepJson["lineShortname"]        = journeyStepLine.shortname;
               stepJson["lineLongname"]         = journeyStepLine.longname;
               stepJson["lineUuid"]             = boost::uuids::to_string(journeyStepLine.uuid);
@@ -199,9 +199,9 @@ namespace TrRouting
 
               stepJson                         = {};
               stepJson["action"]               = "unboard";
-              stepJson["agencyAcronym"]        = journeyStepAgency.acronym;
-              stepJson["agencyName"]           = journeyStepAgency.name;
-              stepJson["agencyUuid"]           = boost::uuids::to_string(journeyStepAgency.uuid);
+              stepJson["agencyAcronym"]        = journeyStepAgency->acronym;
+              stepJson["agencyName"]           = journeyStepAgency->name;
+              stepJson["agencyUuid"]           = boost::uuids::to_string(journeyStepAgency->uuid);
               stepJson["lineShortname"]        = journeyStepLine.shortname;
               stepJson["lineLongname"]         = journeyStepLine.longname;
               stepJson["lineUuid"]             = boost::uuids::to_string(journeyStepLine.uuid);

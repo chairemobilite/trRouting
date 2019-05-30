@@ -12,37 +12,38 @@
 namespace TrRouting
 {
 
-  const std::pair<std::vector<Agency>, std::map<boost::uuids::uuid, int>> CacheFetcher::getAgencies(Parameters& params)
+  void CacheFetcher::getAgencies(std::vector<std::unique_ptr<Agency>>& ts, std::map<boost::uuids::uuid, int>& tIndexesByUuid, Parameters& params, std::string customPath)
   {
 
     using T           = Agency;
     using TCollection = agencyCollection::AgencyCollection;
     using cT          = agencyCollection::Agency;
+    
+    ts.clear();
+    tIndexesByUuid.clear();
 
     std::string tStr  = "agencies";
     std::string TStr  = "Agencies";
 
-    std::vector<T> ts;
     std::string cacheFileName{tStr};
-    std::map<boost::uuids::uuid, int> tIndexesByUuid;
     boost::uuids::string_generator uuidGenerator;
 
     std::cout << "Fetching " << tStr << " from cache..." << std::endl;
     
-    if (CacheFetcher::capnpCacheFileExists(cacheFileName + ".capnpbin", params))
+    if (CacheFetcher::capnpCacheFileExists(cacheFileName + ".capnpbin", params, customPath))
     {
-      int fd = open((CacheFetcher::getFilePath(cacheFileName, params) + ".capnpbin").c_str(), O_RDWR);
+      int fd = open((CacheFetcher::getFilePath(cacheFileName, params, customPath) + ".capnpbin").c_str(), O_RDWR);
       ::capnp::PackedFdMessageReader capnpTCollectionMessage(fd, {16 * 1024 * 1024});
       TCollection::Reader capnpTCollection = capnpTCollectionMessage.getRoot<TCollection>();
       for (cT::Reader capnpT : capnpTCollection.getAgencies())
       {
         std::string uuid {capnpT.getUuid()};
-        T * t               = new T();
-        t->uuid             = uuidGenerator(uuid);
-        t->acronym          = capnpT.getAcronym();
-        t->name             = capnpT.getName();
-        ts.push_back(*t);
-        tIndexesByUuid[t->uuid] = ts.size() - 1;
+        std::unique_ptr<T> t = std::make_unique<T>();
+        t->uuid    = uuidGenerator(uuid);
+        t->acronym = capnpT.getAcronym();
+        t->name    = capnpT.getName();
+        tIndexesByUuid[t->uuid] = ts.size();
+        ts.push_back(std::move(t));
       }
       //std::cout << TStr << ":\n" << Toolbox::prettyPrintStructVector(ts) << std::endl;
       close(fd);
@@ -51,7 +52,6 @@ namespace TrRouting
     {
       std::cerr << "missing " << tStr << " cache file!" << std::endl;
     }
-    return std::make_pair(ts, tIndexesByUuid);
   }
 
 }

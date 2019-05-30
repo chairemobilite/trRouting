@@ -81,57 +81,64 @@ namespace TrRouting
     RoutingResult           reverseJourney(int bestDepartureTime, int bestAccessNodeIndex, int bestAccessTravelTime);
     std::string             alternativesRouting();
     std::string             odTripsRouting();
+    void                    updateAgenciesFromCache(Parameters&  params, std::string customPath = "");
+    void                    updateDataSourcesFromCache(Parameters&  params, std::string customPath = "");
+    void                    updateSchedulesFromCache(Parameters&  params, std::string customPath = "");
+    void                    updateScenariosFromCache(Parameters&  params, std::string customPath = "");
+    void                    updateServicesFromCache(Parameters&  params, std::string customPath = "");
+    void                    updatePathsFromCache(Parameters&  params, std::string customPath = "");
+    void                    updateNodesFromCache(Parameters&  params, std::string customPath = "");
 
-    std::vector<Agency>                 agencies;
-    std::map<boost::uuids::uuid, int>   agencyIndexesByUuid;
+    std::vector<std::unique_ptr<Agency>>     agencies;
+    std::map<boost::uuids::uuid, int>        agencyIndexesByUuid;
 
-    std::vector<DataSource>             dataSources;
-    std::map<boost::uuids::uuid, int>   dataSourceIndexesByUuid;
+    std::vector<std::unique_ptr<DataSource>> dataSources;
+    std::map<boost::uuids::uuid, int>        dataSourceIndexesByUuid;
 
-    std::vector<Household>              households;
-    std::map<boost::uuids::uuid, int>   householdIndexesByUuid;
-
-    std::vector<Person>                 persons;
-    std::map<boost::uuids::uuid, int>   personIndexesByUuid;
-
-    std::vector<OdTrip>                 odTrips;
-    std::map<boost::uuids::uuid, int>   odTripIndexesByUuid;
-
-    std::vector<Place>                  places;
-    std::map<boost::uuids::uuid, int>   placeIndexesByUuid;
-
-    std::vector<Scenario>               scenarios;
-    std::map<boost::uuids::uuid, int>   scenarioIndexesByUuid;
-
-    std::vector<Service>                services;
-    std::map<boost::uuids::uuid, int>   serviceIndexesByUuid;
-
-    std::vector<Line>                   lines;
-    std::map<boost::uuids::uuid, int>   lineIndexesByUuid;
-
-    std::vector<Path>                   paths;
-    std::map<boost::uuids::uuid, int>   pathIndexesByUuid;
-
-    std::vector<Station>                stations;
-    std::map<boost::uuids::uuid, int>   stationIndexesByUuid;
-
-    std::vector<Node>                   nodes;
-    std::map<boost::uuids::uuid, int>   nodeIndexesByUuid;
-
-    std::vector<Stop>                   stops;
-    std::map<boost::uuids::uuid, int>   stopIndexesByUuid;
-    
-    std::vector<Trip>                   trips;
-    std::map<boost::uuids::uuid, int>   tripIndexesByUuid;
-    std::vector<std::vector<int>>       tripConnectionDepartureTimes; // tripIndex: [connectionIndex (sequence in trip): departureTimeSeconds]
-    std::vector<std::vector<float>>     tripConnectionDemands; // tripIndex: [connectionIndex (sequence in trip): sum of od trips weights using this connection (demand)]
-    std::vector<std::vector<int>>       tripIndexesByPathIndex;
-
-    std::vector<Mode>                   modes;
-    std::map<std::string, int>          modeIndexesByShortname;
-
-    std::vector<Block>                  blocks;
-    std::map<boost::uuids::uuid, int>   blockIndexesByUuid;
+    std::vector<Household>                households;
+    std::map<boost::uuids::uuid, int>     householdIndexesByUuid;
+  
+    std::vector<Person>                   persons;
+    std::map<boost::uuids::uuid, int>     personIndexesByUuid;
+  
+    std::vector<OdTrip>                   odTrips;
+    std::map<boost::uuids::uuid, int>     odTripIndexesByUuid;
+  
+    std::vector<Place>                    places;
+    std::map<boost::uuids::uuid, int>     placeIndexesByUuid;
+  
+    std::vector<Scenario>                 scenarios;
+    std::map<boost::uuids::uuid, int>     scenarioIndexesByUuid;
+  
+    std::vector<Service>                  services;
+    std::map<boost::uuids::uuid, int>     serviceIndexesByUuid;
+  
+    std::vector<Line>                     lines;
+    std::map<boost::uuids::uuid, int>     lineIndexesByUuid;
+  
+    std::vector<Path>                     paths;
+    std::map<boost::uuids::uuid, int>     pathIndexesByUuid;
+  
+    std::vector<Station>                  stations;
+    std::map<boost::uuids::uuid, int>     stationIndexesByUuid;
+  
+    std::vector<Node>                     nodes;
+    std::map<boost::uuids::uuid, int>     nodeIndexesByUuid;
+  
+    std::vector<Stop>                     stops;
+    std::map<boost::uuids::uuid, int>     stopIndexesByUuid;
+      
+    std::vector<Trip>                     trips;
+    std::map<boost::uuids::uuid, int>     tripIndexesByUuid;
+    std::vector<std::vector<int>>         tripConnectionDepartureTimes; // tripIndex: [connectionIndex (sequence in trip): departureTimeSeconds]
+    std::vector<std::vector<float>>       tripConnectionDemands; // tripIndex: [connectionIndex (sequence in trip): sum of od trips weights using this connection (demand)]
+    std::vector<std::vector<int>>         tripIndexesByPathIndex;
+  
+    std::vector<Mode>                     modes;
+    std::map<std::string, int>            modeIndexesByShortname;
+  
+    std::vector<Block>                    blocks;
+    std::map<boost::uuids::uuid, int>     blockIndexesByUuid;
 
     Parameters& params;
     CalculationTime algorithmCalculationTime;

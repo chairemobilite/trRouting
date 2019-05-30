@@ -120,7 +120,51 @@ int main(int argc, char** argv) {
     
     // todo
 
+    std::vector<std::string> parametersWithValues;
+    std::vector<std::string> parameterWithValueVector;
+    std::string              queryString;
+    std::string              customCacheDirectoryPath {""};
+    std::string              cacheName;
+    if (request->path_match.size() >= 1)
+    {
+      queryString = request->path_match[1];
+    }
+    
     std::string response {""};
+
+    boost::split(parametersWithValues, queryString, boost::is_any_of("&"));
+
+    for(auto & parameterWithValue : parametersWithValues)
+    {
+      boost::split(parameterWithValueVector, parameterWithValue, boost::is_any_of("="));
+
+      if (parameterWithValueVector[0] == "name" || parameterWithValueVector[0] == "cache" || parameterWithValueVector[0] == "cache_name")
+      {
+        cacheName = parameterWithValueVector[1];
+        continue;
+      }
+      if (parameterWithValueVector[0] == "path")
+      {
+        customCacheDirectoryPath = parameterWithValueVector[1];
+        continue;
+      }
+    }
+
+    if (cacheName == "agency" || cacheName == "agencies")
+    {
+      calculator.updateAgenciesFromCache(calculator.params, customCacheDirectoryPath);
+      response = "{\"status\": \"success\", \"cache\": \"agencies\"}";
+    }
+    else if (cacheName == "data_source" || cacheName == "data_sources")
+    {
+      calculator.updateDataSourcesFromCache(calculator.params, customCacheDirectoryPath);
+      response = "{\"status\": \"success\", \"cache\": \"data_sources\"}";
+    }
+    else
+    {
+      response = "{\"status\": \"failed\", \"error\": \"missing or wrong cache name\"}";
+    }
+
     *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
 
   };

@@ -15,7 +15,7 @@
 namespace TrRouting
 {
 
-  const std::pair<std::vector<Node>, std::map<boost::uuids::uuid, int>> CacheFetcher::getNodes(std::map<boost::uuids::uuid, int> stationIndexesByUuid, Parameters& params)
+  const std::pair<std::vector<Node>, std::map<boost::uuids::uuid, int>> CacheFetcher::getNodes(std::map<boost::uuids::uuid, int> stationIndexesByUuid, Parameters& params, std::string customPath)
   { 
 
     using T           = Node;
@@ -32,9 +32,9 @@ namespace TrRouting
 
     std::cout << "Fetching " << tStr << " from cache..." << std::endl;
     
-    if (CacheFetcher::capnpCacheFileExists(cacheFileName + ".capnpbin", params))
+    if (CacheFetcher::capnpCacheFileExists(cacheFileName + ".capnpbin", params, customPath))
     {
-      int fd = open((CacheFetcher::getFilePath(cacheFileName, params) + ".capnpbin").c_str(), O_RDWR);
+      int fd = open((CacheFetcher::getFilePath(cacheFileName, params, customPath) + ".capnpbin").c_str(), O_RDWR);
       ::capnp::PackedFdMessageReader capnpTCollectionMessage(fd, {64 * 1024 * 1024});
       TCollection::Reader capnpTCollection = capnpTCollectionMessage.getRoot<TCollection>();
       for (cT::Reader capnpT : capnpTCollection.getNodes())
@@ -71,7 +71,7 @@ namespace TrRouting
     return std::make_pair(ts, tIndexesByUuid);
   }
 
-  const std::vector<Node> CacheFetcher::getNodeFootpaths(std::vector<Node> nodes, std::map<boost::uuids::uuid, int> nodeIndexesByUuid, Parameters& params)
+  const std::vector<Node> CacheFetcher::getNodeFootpaths(std::vector<Node> nodes, std::map<boost::uuids::uuid, int> nodeIndexesByUuid, Parameters& params, std::string customPath)
   { 
 
     using T           = Node;
@@ -90,9 +90,9 @@ namespace TrRouting
     for (auto & node : nodes)
     {
       cacheFileName = "nodes/node_" + boost::uuids::to_string(node.uuid);
-      if (CacheFetcher::capnpCacheFileExists(cacheFileName + ".capnpbin", params))
+      if (CacheFetcher::capnpCacheFileExists(cacheFileName + ".capnpbin", params, customPath))
       {
-        int fd = open((CacheFetcher::getFilePath(cacheFileName, params) + ".capnpbin").c_str(), O_RDWR);
+        int fd = open((CacheFetcher::getFilePath(cacheFileName, params, customPath) + ".capnpbin").c_str(), O_RDWR);
         ::capnp::PackedFdMessageReader capnpTMessage(fd, {32 * 1024 * 1024});
         cT::Reader capnpT = capnpTMessage.getRoot<cT>();
         const unsigned int transferableNodesCount {capnpT.getTransferableNodesIdx().size()};

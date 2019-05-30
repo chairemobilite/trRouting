@@ -9,9 +9,11 @@ namespace TrRouting
 {
   
   struct Agency {
-  
+    
   public:
-   
+
+    //Agency() {}
+
     boost::uuids::uuid uuid;
     std::string acronym;
     std::string name;

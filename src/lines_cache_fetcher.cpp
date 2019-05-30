@@ -13,7 +13,7 @@
 namespace TrRouting
 {
 
-  const std::pair<std::vector<Line>, std::map<boost::uuids::uuid, int>> CacheFetcher::getLines(std::map<boost::uuids::uuid, int> agencyIndexesByUuid, std::map<std::string, int> modeIndexesByShortname, Parameters& params)
+  const std::pair<std::vector<Line>, std::map<boost::uuids::uuid, int>> CacheFetcher::getLines(std::map<boost::uuids::uuid, int> agencyIndexesByUuid, std::map<std::string, int> modeIndexesByShortname, Parameters& params, std::string customPath)
   { 
 
     using T           = Line;
@@ -30,9 +30,9 @@ namespace TrRouting
 
     std::cout << "Fetching " << tStr << " from cache..." << std::endl;
     
-    if (CacheFetcher::capnpCacheFileExists(cacheFileName + ".capnpbin", params))
+    if (CacheFetcher::capnpCacheFileExists(cacheFileName + ".capnpbin", params, customPath))
     {
-      int fd = open((CacheFetcher::getFilePath(cacheFileName, params) + ".capnpbin").c_str(), O_RDWR);
+      int fd = open((CacheFetcher::getFilePath(cacheFileName, params, customPath) + ".capnpbin").c_str(), O_RDWR);
       ::capnp::PackedFdMessageReader capnpTCollectionMessage(fd, {64 * 1024 * 1024});
       TCollection::Reader capnpTCollection = capnpTCollectionMessage.getRoot<TCollection>();
       for (cT::Reader capnpT : capnpTCollection.getLines())

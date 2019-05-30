@@ -15,7 +15,7 @@
 namespace TrRouting
 {
 
-  const std::pair<std::vector<Household>, std::map<boost::uuids::uuid, int>> CacheFetcher::getHouseholds(std::map<boost::uuids::uuid, int> dataSourceIndexesByUuid, Parameters& params)
+  const std::pair<std::vector<Household>, std::map<boost::uuids::uuid, int>> CacheFetcher::getHouseholds(std::map<boost::uuids::uuid, int> dataSourceIndexesByUuid, Parameters& params, std::string customPath)
   { 
 
     using T           = Household;
@@ -38,7 +38,7 @@ namespace TrRouting
 
       std::string cacheFilePath {"dataSources/" + boost::uuids::to_string(dataSourceUuid) + "/households/" + cacheFileName};
 
-      int filesCount {CacheFetcher::getCacheFilesCount(cacheFilePath + ".capnpbin.count", params)};
+      int filesCount {CacheFetcher::getCacheFilesCount(cacheFilePath + ".capnpbin.count", params, customPath)};
 
       std::cout << "files count households: " << filesCount << " path: " << cacheFilePath << std::endl;
 
@@ -46,9 +46,9 @@ namespace TrRouting
       {
         std::string filePath {cacheFilePath + ".capnpbin" + (filesCount > 1 ? "." + std::to_string(i) : "")};
 
-        if (CacheFetcher::capnpCacheFileExists(filePath, params))
+        if (CacheFetcher::capnpCacheFileExists(filePath, params, customPath))
         {
-          int fd = open((CacheFetcher::getFilePath(filePath, params)).c_str(), O_RDWR);
+          int fd = open((CacheFetcher::getFilePath(filePath, params, customPath)).c_str(), O_RDWR);
           ::capnp::PackedFdMessageReader capnpTCollectionMessage(fd, {64 * 1024 * 1024});
           TCollection::Reader capnpTCollection = capnpTCollectionMessage.getRoot<TCollection>();
           for (cT::Reader capnpT : capnpTCollection.getHouseholds())

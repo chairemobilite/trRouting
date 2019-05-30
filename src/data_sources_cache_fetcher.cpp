@@ -13,26 +13,27 @@
 namespace TrRouting
 {
 
-  const std::pair<std::vector<DataSource>, std::map<boost::uuids::uuid, int>> CacheFetcher::getDataSources(Parameters& params)
+  void CacheFetcher::getDataSources(std::vector<std::unique_ptr<DataSource>>& ts, std::map<boost::uuids::uuid, int>& tIndexesByUuid, Parameters& params, std::string customPath)
   { 
 
     using T           = DataSource;
     using TCollection = dataSourceCollection::DataSourceCollection;
     using cT          = dataSource::DataSource;
 
+    ts.clear();
+    tIndexesByUuid.clear();
+
     std::string tStr  = "dataSources";
     std::string TStr  = "DataSources";
 
-    std::vector<T> ts;
     std::string cacheFileName{tStr};
-    std::map<boost::uuids::uuid, int> tIndexesByUuid;
     boost::uuids::string_generator uuidGenerator;
 
     std::cout << "Fetching " << tStr << " from cache..." << std::endl;
     
-    if (CacheFetcher::capnpCacheFileExists(cacheFileName + ".capnpbin", params))
+    if (CacheFetcher::capnpCacheFileExists(cacheFileName + ".capnpbin", params, customPath))
     {
-      int fd = open((CacheFetcher::getFilePath(cacheFileName, params) + ".capnpbin").c_str(), O_RDWR);
+      int fd = open((CacheFetcher::getFilePath(cacheFileName, params, customPath) + ".capnpbin").c_str(), O_RDWR);
       ::capnp::PackedFdMessageReader capnpTCollectionMessage(fd, {16 * 1024 * 1024});
       TCollection::Reader capnpTCollection = capnpTCollectionMessage.getRoot<TCollection>();
       for (cT::Reader capnpT : capnpTCollection.getDataSources())
@@ -40,7 +41,7 @@ namespace TrRouting
         std::string uuid {capnpT.getUuid()};
         std::vector<int> servicesIdx;
         boost::uuids::uuid serviceUuid;
-        T * t   = new T();
+        std::unique_ptr<T> t = std::make_unique<T>();
         t->uuid = uuidGenerator(uuid);
         t->name = capnpT.getName();
         switch (capnpT.getType()) {
@@ -57,8 +58,8 @@ namespace TrRouting
           case dataSource::DataSource::Type::STREET_SEGMENT_SPEEDS    : t->type = "streetSegmentSpeeds";     break;
           case dataSource::DataSource::Type::UNKNOWN                  : t->type = "unknown";                 break;
         }
-        ts.push_back(*t);
-        tIndexesByUuid[t->uuid] = ts.size() - 1;
+        tIndexesByUuid[t->uuid] = ts.size();
+        ts.push_back(std::move(t));
       }
       //std::cout << TStr << ":\n" << Toolbox::prettyPrintStructVector(ts) << std::endl;
       close(fd);
@@ -67,7 +68,6 @@ namespace TrRouting
     {
       std::cerr << "missing " << tStr << " cache file!" << std::endl;
     }
-    return std::make_pair(ts, tIndexesByUuid);
   }
 
 }
