@@ -38,7 +38,7 @@ namespace TrRouting
 
     for (auto & line : lines)
     {
-      lineProfiles[line.uuid] = 0.0;
+      lineProfiles[line->uuid] = 0.0;
     }
     for (int i = 0; i <= 28; i++)
     {
@@ -122,7 +122,7 @@ namespace TrRouting
                 legPath               = paths[legPathIdx];
                 legConnectionStartIdx = std::get<3>(leg);
                 legConnectionEndIdx   = std::get<4>(leg);
-                lineProfiles[lines[legLineIdx].uuid] += odTrip->expansionFactor;
+                lineProfiles[lines[legLineIdx].get()->uuid] += odTrip->expansionFactor;
 
                 if (pathProfiles.find(legPath.uuid) == pathProfiles.end())
                 {
@@ -132,7 +132,7 @@ namespace TrRouting
 
                 for (int connectionIndex = legConnectionStartIdx; connectionIndex <= legConnectionEndIdx; connectionIndex++)
                 {
-                  connectionDepartureTimeSeconds = tripConnectionDepartureTimes[legTripIdx][connectionIndex];
+                  connectionDepartureTimeSeconds = tripConnectionDepartureTimes[legTripIdx].get()[connectionIndex];
                   tripConnectionDemands[legTripIdx][connectionIndex] += odTrip->expansionFactor;
                   connectionDepartureTimeHour    = connectionDepartureTimeSeconds / 3600;
                   //std::cout << "pUuid:" << legPath.uuid << " dth:" << connectionDepartureTimeHour << " cI:" << connectionIndex << " oldD:" << pathProfiles[legPath.uuid][connectionIndex][connectionDepartureTimeHour] << std::endl;

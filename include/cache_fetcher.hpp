@@ -142,24 +142,49 @@ namespace TrRouting
       std::string customPath = ""
     );
 
-    /*void getLines(
-      std::vector<std::unique_ptr<Agency>>& ts,
+    void getLines(
+      std::vector<std::unique_ptr<Line>>& ts,
       std::map<boost::uuids::uuid, int>& tIndexesById,
       std::map<boost::uuids::uuid, int>& agencyIndexesByUuid,
       std::map<std::string, int>& modeIndexesByShortname,
       Parameters& params,
       std::string customPath = ""
-    );*/
-    
-    const std::pair<std::vector<Person>    , std::map<boost::uuids::uuid, int>> getPersons(std::map<boost::uuids::uuid, int> dataSourceIndexesByUuid, std::map<boost::uuids::uuid, int> householdIndexesByUuid, Parameters& params, std::string customPath = "");
-    const std::pair<std::vector<Place>     , std::map<boost::uuids::uuid, int>> getPlaces(std::map<boost::uuids::uuid, int> dataSourceIndexesByUuid, Parameters& params, std::string customPath = "");
-    const std::pair<std::vector<Scenario>  , std::map<boost::uuids::uuid, int>> getScenarios(std::map<boost::uuids::uuid, int> serviceIndexesByUuid, std::map<boost::uuids::uuid, int> lineIndexesByUuid, std::map<boost::uuids::uuid, int> agencyIndexesByUuid, std::map<boost::uuids::uuid, int> nodeIndexesByUuid, std::map<std::string, int> modeIndexesByShortname, Parameters& params, std::string customPath = "");
-    const std::pair<std::vector<Line>      , std::map<boost::uuids::uuid, int>> getLines(std::map<boost::uuids::uuid, int> agencyIndexesByUuid, std::map<std::string, int> modeIndexesByShortname, Parameters& params, std::string customPath = "");
-    const std::pair<std::vector<Path>      , std::map<boost::uuids::uuid, int>> getPaths(std::map<boost::uuids::uuid, int> lineIndexesByUuid, std::map<boost::uuids::uuid, int> nodeIndexesByUuid, Parameters& params, std::string customPath = "");
-    const std::tuple<std::vector<Trip>     , std::map<boost::uuids::uuid, int>, std::vector<std::vector<int>>, std::vector<std::vector<float>>, std::vector<Block>, std::map<boost::uuids::uuid, int>, std::vector<std::tuple<int,int,int,int,int,short,short,int,int,int,short>>, std::vector<std::tuple<int,int,int,int,int,short,short,int,int,int,short>>> getTripsAndConnections(std::map<boost::uuids::uuid, int> agencyIndexesByUuid, std::vector<Line> lines, std::map<boost::uuids::uuid, int> lineIndexesByUuid, std::vector<Path> paths, std::map<boost::uuids::uuid, int> pathIndexesByUuid, std::map<boost::uuids::uuid, int> nodeIndexesByUuid, std::map<boost::uuids::uuid, int> serviceIndexesByUuid, Parameters& params);
+    );
 
-    //const std::vector<std::pair<int,int>> getOdTripFootpaths(std::string projectShortname, Parameters& params);
-    //const std::pair<std::vector<OdTrip>, std::map<unsigned long long, int>> getOdTrips(std::string projectShortname, std::vector<Stop> stops, Parameters& params);
+    void getPaths(
+      std::vector<std::unique_ptr<Path>>& ts,
+      std::map<boost::uuids::uuid, int>& tIndexesById,
+      std::map<boost::uuids::uuid, int>& lineIndexesByUuid,
+      std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
+      Parameters& params,
+      std::string customPath = ""
+    );
+
+    void getScenarios(
+      std::vector<std::unique_ptr<Scenario>>& ts,
+      std::map<boost::uuids::uuid, int>& tIndexesById,
+      std::map<boost::uuids::uuid, int>& serviceIndexesByUuid,
+      std::map<boost::uuids::uuid, int>& lineIndexesByUuid,
+      std::map<boost::uuids::uuid, int>& agencyIndexesByUuid,
+      std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
+      std::map<std::string, int>& modeIndexesByShortname,
+      Parameters& params,
+      std::string customPath = ""
+    );
+
+    void getSchedules(
+      std::vector<std::unique_ptr<Trip>>& ts,
+      std::map<boost::uuids::uuid, int>& tIndexesById,
+      std::map<boost::uuids::uuid, int>& serviceIndexesByUuid,
+      std::map<boost::uuids::uuid, int>& lineIndexesByUuid,
+      std::map<boost::uuids::uuid, int>& agencyIndexesByUuid,
+      std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
+      std::map<std::string, int>& modeIndexesByShortname,
+      Parameters& params,
+      std::string customPath = ""
+    );
+    
+    //const std::tuple<std::vector<Trip>, std::map<boost::uuids::uuid, int>, std::vector<std::vector<int>>, std::vector<std::vector<float>>, std::vector<Block>, std::map<boost::uuids::uuid, int>, std::vector<std::tuple<int,int,int,int,int,short,short,int,int,int,short>>, std::vector<std::tuple<int,int,int,int,int,short,short,int,int,int,short>>> getTripsAndConnections(std::map<boost::uuids::uuid, int> agencyIndexesByUuid, std::vector<std::unique_ptr<Line>>& lines, std::map<boost::uuids::uuid, int> lineIndexesByUuid, std::vector<Path> paths, std::map<boost::uuids::uuid, int> pathIndexesByUuid, std::map<boost::uuids::uuid, int> nodeIndexesByUuid, std::map<boost::uuids::uuid, int> serviceIndexesByUuid, Parameters& params);
     
   private:
     

@@ -13,19 +13,26 @@
 namespace TrRouting
 {
 
-  const std::pair<std::vector<Line>, std::map<boost::uuids::uuid, int>> CacheFetcher::getLines(std::map<boost::uuids::uuid, int> agencyIndexesByUuid, std::map<std::string, int> modeIndexesByShortname, Parameters& params, std::string customPath)
-  { 
+  void CacheFetcher::getLines(
+    std::vector<std::unique_ptr<Line>>& ts,
+    std::map<boost::uuids::uuid, int>& tIndexesByUuid,
+    std::map<boost::uuids::uuid, int>& agencyIndexesByUuid,
+    std::map<std::string, int>& modeIndexesByShortname,
+    Parameters& params,
+    std::string customPath
+  ) {
 
     using T           = Line;
     using TCollection = lineCollection::LineCollection;
     using cT          = lineCollection::Line;
 
+    ts.clear();
+    tIndexesByUuid.clear();
+
     std::string tStr  = "lines";
     std::string TStr  = "Lines";
 
-    std::vector<T> ts;
     std::string cacheFileName{tStr};
-    std::map<boost::uuids::uuid, int> tIndexesByUuid;
     boost::uuids::string_generator uuidGenerator;
 
     std::cout << "Fetching " << tStr << " from cache..." << std::endl;
@@ -39,15 +46,18 @@ namespace TrRouting
       {
         std::string uuid       {capnpT.getUuid()};
         std::string agencyUuid {capnpT.getAgencyUuid()};
-        T * t                     = new T();
+        
+        std::unique_ptr<T> t = std::make_unique<T>();
+
         t->uuid                   = uuidGenerator(uuid);
         t->shortname              = capnpT.getShortname();
         t->longname               = capnpT.getLongname();
         t->agencyIdx              = agencyIndexesByUuid[uuidGenerator(agencyUuid)];
         t->modeIdx                = modeIndexesByShortname[capnpT.getMode()];
         t->allowSameLineTransfers = capnpT.getAllowSameLineTransfers();
-        ts.push_back(*t);
-        tIndexesByUuid[t->uuid] = ts.size() - 1;
+        
+        tIndexesByUuid[t->uuid] = ts.size();
+        ts.push_back(std::move(t));
       }
       //std::cout << TStr << ":\n" << Toolbox::prettyPrintStructVector(ts) << std::endl;
       close(fd);
@@ -56,7 +66,6 @@ namespace TrRouting
     {
       std::cerr << "missing " << tStr << " cache file!" << std::endl;
     }
-    return std::make_pair(ts, tIndexesByUuid);
   }
 
 }

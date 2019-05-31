@@ -8,30 +8,31 @@ namespace TrRouting
 
     int benchmarkingStart = algorithmCalculationTime.getEpoch();
 
-    int  i {0};
-    int  connectionsCount = reverseConnections.size();
-    int  reachableConnectionsCount {0};
-    int  tripIndex {-1};
-    int  lineIndex {-1};
-    int  blockIndex {-1};
-    int  nodeDepartureIndex {-1};
-    int  nodeArrivalIndex {-1};
-    int  tripExitConnectionIndex {-1};
-    int  nodeDepartureTentativeTime {MAX_INT};
-    int  nodeArrivalTentativeTime {MAX_INT};
-    int  connectionDepartureTime {-1};
-    int  connectionArrivalTime {-1};
-    long long  footpathsRangeStart {-1};
-    long long  footpathsRangeEnd {-1};
-    long long  footpathIndex {-1};
-    int  footpathTravelTime {-1};
+    int  i                                {0};
+    int  reachableConnectionsCount        {0};
+    int  tripIndex                        {-1};
+    int  lineIndex                        {-1};
+    //int  blockIndex                       {-1};
+    int  nodeDepartureIndex               {-1};
+    int  nodeArrivalIndex                 {-1};
+    int  tripExitConnectionIndex          {-1};
+    int  nodeDepartureTentativeTime       {MAX_INT};
+    int  nodeArrivalTentativeTime         {MAX_INT};
+    int  connectionDepartureTime          {-1};
+    int  connectionArrivalTime            {-1};
+    //long long  footpathsRangeStart        {-1};
+    //long long  footpathsRangeEnd          {-1};
+    int  footpathIndex                    {-1};
+    int  footpathTravelTime               {-1};
     int  tentativeAccessNodeDepartureTime {-1};
-    bool reachedAtLeastOneAccessNode {false};
-    bool canTransferOnSameLine {false};
-    int  bestAccessNodeIndex {-1};
-    int  bestAccessTravelTime {-1};
-    int  bestDepartureTime {-1};
-    int  arrivalTimeHour = arrivalTimeSeconds / 3600;
+    bool reachedAtLeastOneAccessNode      {false};
+    bool canTransferOnSameLine            {false};
+    int  bestAccessNodeIndex              {-1};
+    int  bestAccessTravelTime             {-1};
+    int  bestDepartureTime                {-1};
+
+    int  connectionsCount = reverseConnections.size();
+    int  arrivalTimeHour  = arrivalTimeSeconds / 3600;
 
     // reverse calculation:
     //int time1 {-1};
@@ -151,7 +152,6 @@ namespace TrRouting
         {
           accessTravelTime        = nodesAccessTravelTime[accessFootpath.first];
           accessNodeDepartureTime = std::get<connectionIndexes::TIME_DEP>(reverseConnections[accessEnterConnection]) - accessTravelTime - params.minWaitingTimeSeconds;
-          //std::cerr << nodes[accessFootpath.first].get()->name << ": " << accessTravelTime << " t: " << trips[std::get<connectionIndexes::TRIP>(reverseConnections[accessEnterConnection])].id << " - " << Toolbox::convertSecondsToFormattedTime(accessNodeDepartureTime) << std::endl;
           if (accessNodeDepartureTime >= 0 && arrivalTimeSeconds - accessNodeDepartureTime <= params.maxTotalTravelTimeSeconds && accessNodeDepartureTime > bestDepartureTime && accessNodeDepartureTime < MAX_INT)
           {
             bestDepartureTime    = accessNodeDepartureTime;

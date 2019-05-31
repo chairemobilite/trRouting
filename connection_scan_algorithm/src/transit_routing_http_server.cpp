@@ -207,6 +207,11 @@ int main(int argc, char** argv) {
         correctCacheName = true;
         calculator.updateNodesFromCache(calculator.params, customCacheDirectoryPath);
       }
+      else if (cacheName == "lines")
+      {
+        correctCacheName = true;
+        calculator.updateLinesFromCache(calculator.params, customCacheDirectoryPath);
+      }
 
       if (correctCacheName)
       {

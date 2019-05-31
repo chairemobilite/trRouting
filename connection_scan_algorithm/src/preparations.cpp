@@ -48,6 +48,31 @@ namespace TrRouting
     params.cacheFetcher->getNodes(nodes, nodeIndexesByUuid, stationIndexesByUuid, params, customPath);
   }
 
+  /*void Calculator::updateStopsFromCache(Parameters& params, std::string customPath)
+  {
+    params.cacheFetcher->getStops(stops, stopIndexesByUuid, nodeIndexesByUuid, params, customPath);
+  }*/
+
+  void Calculator::updateLinesFromCache(Parameters& params, std::string customPath)
+  {
+    params.cacheFetcher->getLines(lines, lineIndexesByUuid, agencyIndexesByUuid, modeIndexesByShortname, params, customPath);
+  }
+
+  void Calculator::updatePathsFromCache(Parameters& params, std::string customPath)
+  {
+    params.cacheFetcher->getPaths(paths, pathIndexesByUuid, lineIndexesByUuid, nodeIndexesByUuid, params, customPath);
+  }
+
+  void Calculator::updateScenariosFromCache(Parameters& params, std::string customPath)
+  {
+    params.cacheFetcher->getScenarios(scenarios, scenarioIndexesByUuid, serviceIndexesByUuid, lineIndexesByUuid, agencyIndexesByUuid, nodeIndexesByUuid, modeIndexesByShortname, params, customPath);
+  }
+
+  void Calculator::updateSchedulesFromCache(Parameters& params, std::string customPath)
+  {
+    params.cacheFetcher->getSchedules(trips, tripIndexesByUuid, serviceIndexesByUuid, lineIndexesByUuid, agencyIndexesByUuid, nodeIndexesByUuid, modeIndexesByShortname, params, customPath);
+  }
+
   void Calculator::prepare()
   {
     
@@ -67,11 +92,11 @@ namespace TrRouting
       updateServicesFromCache(params);
       //updateStationsFromCache(params);
       updateNodesFromCache(params);
-      
-      std::tie(lines,       lineIndexesByUuid)       = params.cacheFetcher->getLines(agencyIndexesByUuid, modeIndexesByShortname, params);
-      std::tie(paths,       pathIndexesByUuid)       = params.cacheFetcher->getPaths(lineIndexesByUuid, nodeIndexesByUuid, params);
-      std::tie(scenarios,   scenarioIndexesByUuid)   = params.cacheFetcher->getScenarios(serviceIndexesByUuid, lineIndexesByUuid, agencyIndexesByUuid, nodeIndexesByUuid, modeIndexesByShortname, params);
-      
+      //updateStopsFromCache(params);
+      updateLinesFromCache(params);
+      updatePathsFromCache(params);
+      updateScenariosFromCache(params);
+            
       std::tie(trips, tripIndexesByUuid, tripConnectionDepartureTimes, tripConnectionDemands, blocks, blockIndexesByUuid, forwardConnections, reverseConnections) = params.cacheFetcher->getTripsAndConnections(agencyIndexesByUuid, lines, lineIndexesByUuid, paths, pathIndexesByUuid, nodeIndexesByUuid, serviceIndexesByUuid, params);
 
       std::cout << forwardConnections.size() << " connections" << std::endl; 
@@ -121,21 +146,6 @@ namespace TrRouting
       {
         std::cout << h << ": " << reverseConnectionsIndexPerArrivalTimeHour[h] << std::endl;
       }*/
-
-      //for (auto & connection : forwardConnections)
-      //{
-      //  forwardConnectionsDepartureNodeIndexes.push_back(std::get<connectionIndexes::NODE_DEP>(connection));
-      //  forwardConnectionsArrivalNodeIndexes.push_back(std::get<connectionIndexes::NODE_ARR>(connection));
-      //  forwardConnectionsDepartureTimesSeconds.push_back(std::get<connectionIndexes::TIME_DEP>(connection));
-      //  forwardConnectionsArrivalTimesSeconds.push_back(std::get<connectionIndexes::TIME_ARR>(connection));
-      //  forwardConnectionsTripIndexes.push_back(std::get<connectionIndexes::TRIP>(connection));
-      //  forwardConnectionsCanBoards.push_back(std::get<connectionIndexes::CAN_BOARD>(connection));
-      //  forwardConnectionsCanUnboards.push_back(std::get<connectionIndexes::CAN_UNBOARD>(connection));
-      //  forwardConnectionsSequences.push_back(std::get<connectionIndexes::SEQUENCE>(connection));
-      //  forwardConnectionsLineIndexes.push_back(std::get<connectionIndexes::LINE>(connection));
-      //  forwardConnectionsBlockIndexes.push_back(std::get<connectionIndexes::BLOCK>(connection));
-      //  forwardConnectionsCanTransferSameLines.push_back(std::get<connectionIndexes::CAN_TRANSFER_SAME_LINE>(connection));
-      //}
 
       /*for (auto & node : nodes)
       {

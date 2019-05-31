@@ -90,12 +90,15 @@ namespace TrRouting
     void                    updateOdTripsFromCache    (Parameters&  params, std::string customPath = "");
     void                    updatePlacesFromCache     (Parameters&  params, std::string customPath = "");
 
+    void                    updateStationsFromCache   (Parameters&  params, std::string customPath = "");
     void                    updateAgenciesFromCache   (Parameters&  params, std::string customPath = "");
-    void                    updateSchedulesFromCache  (Parameters&  params, std::string customPath = "");
-    void                    updateScenariosFromCache  (Parameters&  params, std::string customPath = "");
     void                    updateServicesFromCache   (Parameters&  params, std::string customPath = "");
-    void                    updatePathsFromCache      (Parameters&  params, std::string customPath = "");
     void                    updateNodesFromCache      (Parameters&  params, std::string customPath = "");
+    void                    updateStopsFromCache      (Parameters&  params, std::string customPath = "");
+    void                    updateLinesFromCache      (Parameters&  params, std::string customPath = "");
+    void                    updatePathsFromCache      (Parameters&  params, std::string customPath = "");
+    void                    updateScenariosFromCache  (Parameters&  params, std::string customPath = "");
+    void                    updateSchedulesFromCache  (Parameters&  params, std::string customPath = "");
     
     std::vector<Mode>                        modes;
     std::map<std::string, int>               modeIndexesByShortname;
@@ -126,36 +129,31 @@ namespace TrRouting
     std::vector<std::unique_ptr<Station>>    stations;
     std::map<boost::uuids::uuid, int>        stationIndexesByUuid;
 
-    std::vector<std::unique_ptr<Node>>    nodes;
+    std::vector<std::unique_ptr<Node>>       nodes;
     std::map<boost::uuids::uuid, int>        nodeIndexesByUuid;
 
-    //std::vector<std::unique_ptr<Line>>       lines;
-    //std::map<boost::uuids::uuid, int>        lineIndexesByUuid;
+    std::vector<std::unique_ptr<Stop>>       stops;
+    std::map<boost::uuids::uuid, int>        stopIndexesByUuid;
 
-    //
+    std::vector<std::unique_ptr<Line>>       lines;
+    std::map<boost::uuids::uuid, int>        lineIndexesByUuid;
 
+    std::vector<std::unique_ptr<Path>>       paths;
+    std::map<boost::uuids::uuid, int>        pathIndexesByUuid;
 
-    std::vector<Scenario>                 scenarios;
-    std::map<boost::uuids::uuid, int>     scenarioIndexesByUuid;
+    std::vector<std::unique_ptr<Scenario>>   scenarios;
+    std::map<boost::uuids::uuid, int>        scenarioIndexesByUuid;
 
-    std::vector<Line>                     lines;
-    std::map<boost::uuids::uuid, int>     lineIndexesByUuid;
+    std::vector<std::unique_ptr<Trip>>       trips;
+    std::map<boost::uuids::uuid, int>        tripIndexesByUuid;
+
+    /*std::vector<std::unique_ptr<Block>>      blocks;
+    std::map<boost::uuids::uuid, int>        blockIndexesByUuid;*/
+
+    std::vector<std::unique_ptr<std::vector<int>>>   tripConnectionDepartureTimes; // tripIndex: [connectionIndex (sequence in trip): departureTimeSeconds]
+    std::vector<std::unique_ptr<std::vector<float>>> tripConnectionDemands;        // tripIndex: [connectionIndex (sequence in trip): sum of od trips weights using this connection (demand)]
+    std::vector<std::unique_ptr<std::vector<int>>>   tripIndexesByPathIndex;
   
-    std::vector<Path>                     paths;
-    std::map<boost::uuids::uuid, int>     pathIndexesByUuid;
-
-    std::vector<Stop>                     stops;
-    std::map<boost::uuids::uuid, int>     stopIndexesByUuid;
-      
-    std::vector<Trip>                     trips;
-    std::map<boost::uuids::uuid, int>     tripIndexesByUuid;
-    std::vector<std::vector<int>>         tripConnectionDepartureTimes; // tripIndex: [connectionIndex (sequence in trip): departureTimeSeconds]
-    std::vector<std::vector<float>>       tripConnectionDemands;        // tripIndex: [connectionIndex (sequence in trip): sum of od trips weights using this connection (demand)]
-    std::vector<std::vector<int>>         tripIndexesByPathIndex;
-  
-    std::vector<Block>                    blocks;
-    std::map<boost::uuids::uuid, int>     blockIndexesByUuid;
-
     Parameters& params;
     CalculationTime algorithmCalculationTime;
     
@@ -167,51 +165,39 @@ namespace TrRouting
     
     enum connectionIndexes : short { NODE_DEP = 0, NODE_ARR = 1, TIME_DEP = 2, TIME_ARR = 3, TRIP = 4, CAN_BOARD = 5, CAN_UNBOARD = 6, SEQUENCE = 7, LINE = 8, BLOCK = 9, CAN_TRANSFER_SAME_LINE = 10 };
     
-    int                             departureTimeSeconds;
-    int                             initialDepartureTimeSeconds;
-    int                             arrivalTimeSeconds;
-    std::vector<int>                forwardConnectionsIndexPerDepartureTimeHour;
-    std::vector<int>                reverseConnectionsIndexPerArrivalTimeHour;
-    int                             maxTimeValue;
-    int                             minAccessTravelTime;
-    int                             maxEgressTravelTime;
-    int                             maxAccessTravelTime;
-    int                             minEgressTravelTime;
-    int                             maxAccessWalkingTravelTimeFromOriginToFirstNodeSeconds;
-    int                             maxAccessWalkingTravelTimeFromLastNodeToDestinationSeconds;
-    long long                       calculationTime;
-    std::string                     accessMode;
-    std::string                     egressMode;
-    std::vector<int>                nodesTentativeTime; // arrival time at node (MAX_INT if not yet reached or unreachable)
-    std::vector<int>                nodesReverseTentativeTime; // departure time at node (MAX_INT if not yet reached or unreachable)
-    std::vector<int>                nodesAccessTravelTime; // travel time from origin to accessible nodes (-1 if unreachable by access mode)
-    std::vector<int>                nodesEgressTravelTime; // travel time to reach destination (-1 if unreachable by egress mode)
-    std::vector<int>                tripsEnterConnection; // index of the entering connection for each trip index 
-    std::vector<int>                tripsEnterConnectionTransferTravelTime; // index of the entering connection for each trip index 
-    std::vector<int>                tripsExitConnection; // index of the exiting connection for each trip index 
-    std::vector<int>                tripsExitConnectionTransferTravelTime; // index of the exiting connection for each trip index 
-    std::vector<int>                tripsEnabled; // allow/disallow use of this trip during calculation
-    std::vector<int>                tripsUsable; // after forward calculation, keep a list of usable trips in time range for reverse calculation
-    std::vector<std::pair<int,int>> accessFootpaths; // pair: accessNodeIndex, walkingTravelTimeSeconds
-    std::vector<std::pair<int,int>> egressFootpaths; // pair: egressNodeIndex, walkingTravelTimeSeconds
-    std::vector<std::pair<int,int>> odTripFootpaths; // pair: nodeIndex, walkingTravelTimeSeconds
-    std::vector<int> forwardConnectionsDepartureNodeIndexes;
-    std::vector<int> forwardConnectionsArrivalNodeIndexes;
-    std::vector<int> forwardConnectionsDepartureTimesSeconds;
-    std::vector<int> forwardConnectionsArrivalTimesSeconds;
-    std::vector<int> forwardConnectionsTripIndexes;
-    std::vector<int> forwardConnectionsCanBoards;
-    std::vector<int> forwardConnectionsCanUnboards;
-    std::vector<int> forwardConnectionsSequences;
-    std::vector<int> forwardConnectionsLineIndexes;
-    std::vector<int> forwardConnectionsBlockIndexes;
-    std::vector<int> forwardConnectionsCanTransferSameLines;
-    std::vector<std::tuple<int,int,int,int,int,short,short,int,int,int,short>> forwardConnections; // tuple: departureNodeIndex, arrivalNodeIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequence in trip, lineIndex, blockIndex, canTransferSameLine
-    std::vector<std::tuple<int,int,int,int,int,short,short,int,int,int,short>> reverseConnections; // tuple: departureNodeIndex, arrivalNodeIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequence in trip, lineIndex, blockIndex, canTransferSameLine
-    std::vector<std::tuple<int,int,int,int,int,short>> forwardJourneys; // index = node index, tuple: final enter connection, final exit connection, final transferring node index, final exit trip index, transfer travel time, is same node transfer (first, second, third and fourth values = -1 for access and egress journeys)
-    std::vector<std::tuple<int,int,int,int,int,short>> forwardEgressJourneys; // index = node index, tuple: final enter connection, final exit connection, final transferring node index, final exit trip index, transfer travel time, is same node transfer (first, second, third and fourth values = -1 for access and egress journeys)
-    std::vector<std::tuple<int,int,int,int,int,short>> reverseJourneys; // index = node index, tuple: final enter connection, final exit connection, final transferring node index, final exit trip index, transfer travel time, is same node transfer (first, second, third and fourth values = -1 for access and egress journeys)
-    std::vector<std::tuple<int,int,int,int,int,short>> reverseAccessJourneys; // index = node index, tuple: final enter connection, final exit connection, final transferring node index, final exit trip index, transfer travel time, is same node transfer (first, second, third and fourth values = -1 for access and egress journeys)
+    int              departureTimeSeconds;
+    int              initialDepartureTimeSeconds;
+    int              arrivalTimeSeconds;
+    int              maxTimeValue;
+    int              minAccessTravelTime;
+    int              maxEgressTravelTime;
+    int              maxAccessTravelTime;
+    int              minEgressTravelTime;
+    int              maxAccessWalkingTravelTimeFromOriginToFirstNodeSeconds;
+    int              maxAccessWalkingTravelTimeFromLastNodeToDestinationSeconds;
+    long long        calculationTime;
+    std::string      accessMode;
+    std::string      egressMode;
+    std::vector<int> forwardConnectionsIndexPerDepartureTimeHour;
+    std::vector<int> reverseConnectionsIndexPerArrivalTimeHour;
+    std::vector<std::unique_ptr<int>> nodesTentativeTime; // arrival time at node (MAX_INT if not yet reached or unreachable)
+    std::vector<std::unique_ptr<int>> nodesReverseTentativeTime; // departure time at node (MAX_INT if not yet reached or unreachable)
+    std::vector<std::unique_ptr<int>> nodesAccessTravelTime; // travel time from origin to accessible nodes (-1 if unreachable by access mode)
+    std::vector<std::unique_ptr<int>> nodesEgressTravelTime; // travel time to reach destination (-1 if unreachable by egress mode)
+    std::vector<std::unique_ptr<int>> tripsEnterConnection; // index of the entering connection for each trip index 
+    std::vector<std::unique_ptr<int>> tripsEnterConnectionTransferTravelTime; // index of the entering connection for each trip index 
+    std::vector<std::unique_ptr<int>> tripsExitConnection; // index of the exiting connection for each trip index 
+    std::vector<std::unique_ptr<int>> tripsExitConnectionTransferTravelTime; // index of the exiting connection for each trip index 
+    std::vector<std::unique_ptr<int>> tripsEnabled; // allow/disallow use of this trip during calculation
+    std::vector<std::unique_ptr<int>> tripsUsable; // after forward calculation, keep a list of usable trips in time range for reverse calculation
+    std::vector<std::unique_ptr<std::pair<int,int>>> accessFootpaths; // pair: accessNodeIndex, walkingTravelTimeSeconds
+    std::vector<std::unique_ptr<std::pair<int,int>>> egressFootpaths; // pair: egressNodeIndex, walkingTravelTimeSeconds
+    std::vector<std::unique_ptr<std::tuple<int,int,int,int,int,short,short,int,int,int,short>>> forwardConnections; // tuple: departureNodeIndex, arrivalNodeIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequence in trip, lineIndex, blockIndex, canTransferSameLine
+    std::vector<std::unique_ptr<std::tuple<int,int,int,int,int,short,short,int,int,int,short>>> reverseConnections; // tuple: departureNodeIndex, arrivalNodeIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequence in trip, lineIndex, blockIndex, canTransferSameLine
+    std::vector<std::unique_ptr<std::tuple<int,int,int,int,int,short>>> forwardJourneys; // index = node index, tuple: final enter connection, final exit connection, final transferring node index, final exit trip index, transfer travel time, is same node transfer (first, second, third and fourth values = -1 for access and egress journeys)
+    std::vector<std::unique_ptr<std::tuple<int,int,int,int,int,short>>> forwardEgressJourneys; // index = node index, tuple: final enter connection, final exit connection, final transferring node index, final exit trip index, transfer travel time, is same node transfer (first, second, third and fourth values = -1 for access and egress journeys)
+    std::vector<std::unique_ptr<std::tuple<int,int,int,int,int,short>>> reverseJourneys; // index = node index, tuple: final enter connection, final exit connection, final transferring node index, final exit trip index, transfer travel time, is same node transfer (first, second, third and fourth values = -1 for access and egress journeys)
+    std::vector<std::unique_ptr<std::tuple<int,int,int,int,int,short>>> reverseAccessJourneys; // index = node index, tuple: final enter connection, final exit connection, final transferring node index, final exit trip index, transfer travel time, is same node transfer (first, second, third and fourth values = -1 for access and egress journeys)
 
   };
   

@@ -196,7 +196,6 @@ namespace TrRouting
         {
           std::fill(tripConnectionDemand.begin(), tripConnectionDemand.end(), 0.0);
         }
-        //std::tie(trips, tripIndexesByUuid, blocks, blockIndexesByUuid, forwardConnections, reverseConnections) = params.cacheFetcher->getTripsAndConnections(agencyIndexesByUuid, lines, lineIndexesByUuid, paths, pathIndexesByUuid, nodeIndexesByUuid, serviceIndexesByUuid, params);
       }
       
       i = 0;

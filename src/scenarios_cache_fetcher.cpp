@@ -13,19 +13,29 @@
 namespace TrRouting
 {
 
-  const std::pair<std::vector<Scenario>, std::map<boost::uuids::uuid, int>> CacheFetcher::getScenarios(std::map<boost::uuids::uuid, int> serviceIndexesByUuid, std::map<boost::uuids::uuid, int> lineIndexesByUuid, std::map<boost::uuids::uuid, int> agencyIndexesByUuid, std::map<boost::uuids::uuid, int> nodeIndexesByUuid, std::map<std::string, int> modeIndexesByShortname, Parameters& params, std::string customPath)
-  { 
+  void CacheFetcher::getPaths(
+    std::vector<std::unique_ptr<Path>>& ts,
+    std::map<boost::uuids::uuid, int>& tIndexesByUuid,
+    std::map<boost::uuids::uuid, int>& serviceIndexesByUuid,
+    std::map<boost::uuids::uuid, int>& lineIndexesByUuid,
+    std::map<boost::uuids::uuid, int>& agencyIndexesByUuid,
+    std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
+    std::map<std::string, int>& modeIndexesByShortname,
+    Parameters& params,
+    std::string customPath
+  ) {
 
     using T           = Scenario;
     using TCollection = scenarioCollection::ScenarioCollection;
     using cT          = scenarioCollection::Scenario;
 
+    ts.clear();
+    tIndexesByUuid.clear();
+
     std::string tStr  = "scenarios";
     std::string TStr  = "Scenarios";
 
-    std::vector<T> ts;
     std::string cacheFileName{tStr};
-    std::map<boost::uuids::uuid, int> tIndexesByUuid;
     boost::uuids::string_generator uuidGenerator;
 
     std::cout << "Fetching " << tStr << " from cache..." << std::endl;
@@ -51,7 +61,9 @@ namespace TrRouting
         boost::uuids::uuid lineUuid;
         boost::uuids::uuid agencyUuid;
         boost::uuids::uuid nodeUuid;
-        T * t   = new T();
+
+        std::unique_ptr<T> t = std::make_unique<T>();
+
         t->uuid = uuidGenerator(uuid);
         t->name = capnpT.getName();
         for (std::string serviceUuidStr : capnpT.getServicesUuids())
@@ -135,8 +147,8 @@ namespace TrRouting
         }
         t->exceptModesIdx = exceptModesIdx;
 
-        ts.push_back(*t);
-        tIndexesByUuid[t->uuid] = ts.size() - 1;
+        tIndexesByUuid[t->uuid] = ts.size();
+        ts.push_back(std::move(t));
       }
       //std::cout << TStr << ":\n" << Toolbox::prettyPrintStructVector(ts) << std::endl;
       close(fd);
@@ -145,7 +157,6 @@ namespace TrRouting
     {
       std::cerr << "missing " << tStr << " cache file!" << std::endl;
     }
-    return std::make_pair(ts, tIndexesByUuid);
   }
 
 }

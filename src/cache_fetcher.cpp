@@ -36,7 +36,7 @@ namespace TrRouting
     iCacheFile.close();
     return count;
   }
-
+  
   std::string CacheFetcher::getFilePath(std::string cacheFilePath, Parameters& params, std::string customPath) {
     if (customPath.empty())
     {

@@ -8,28 +8,30 @@ namespace TrRouting
 
     int benchmarkingStart  = algorithmCalculationTime.getEpoch();
 
-    int  i {0};
-    int  connectionsCount = forwardConnections.size();
-    int  reachableConnectionsCount {0};
-    int  tripIndex {-1};
-    int  lineIndex {-1};
-    int  blockIndex {-1};
-    int  nodeDepartureIndex {-1};
-    int  nodeArrivalIndex {-1};
-    int  tripEnterConnectionIndex {-1};
-    int  nodeDepartureTentativeTime {MAX_INT};
-    int  nodeArrivalTentativeTime {MAX_INT};
-    int  connectionDepartureTime {-1};
-    int  connectionArrivalTime {-1};
-    int  footpathIndex {-1};
-    int  transferableNodeIndex {0};
-    int  footpathTravelTime {-1};
+    int  i                              {0};
+    int  reachableConnectionsCount      {0};
+    int  tripIndex                      {-1};
+    int  lineIndex                      {-1};
+    //int  blockIndex                   {-1};
+    int  nodeDepartureIndex             {-1};
+    int  nodeArrivalIndex               {-1};
+    int  tripEnterConnectionIndex       {-1};
+    int  nodeDepartureTentativeTime     {MAX_INT};
+    int  nodeArrivalTentativeTime       {MAX_INT};
+    int  connectionDepartureTime        {-1};
+    int  connectionArrivalTime          {-1};
+    //long long  footpathsRangeStart      {-1};
+    //long long  footpathsRangeEnd        {-1};
+    int  footpathIndex                  {-1};
+    int  footpathTravelTime             {-1};
     int  tentativeEgressNodeArrivalTime {MAX_INT};
-    bool reachedAtLeastOneEgressNode {false};
-    bool canTransferOnSameLine {false};
-    int  bestEgressNodeIndex {-1};
-    int  bestEgressTravelTime {-1};
-    int  bestArrivalTime {MAX_INT};
+    bool reachedAtLeastOneEgressNode    {false};
+    bool canTransferOnSameLine          {false};
+    int  bestEgressNodeIndex            {-1};
+    int  bestEgressTravelTime           {-1};
+    int  bestArrivalTime                {MAX_INT};
+    
+    int  connectionsCount  = forwardConnections.size();
     int  departureTimeHour = departureTimeSeconds / 3600;
 
     //std::cout << forwardConnectionsIndexPerDepartureTimeHour[departureTimeHour] << ":" << departureTimeHour << std::endl;
@@ -75,10 +77,6 @@ namespace TrRouting
             // TODO: add constrain for sameLineTransfer (check trip allowSameLineTransfers)
             if (std::get<connectionIndexes::CAN_BOARD>(*connection) == 1 && (tripEnterConnectionIndex == -1 || (std::get<0>(forwardJourneys[nodeDepartureIndex]) == -1 && std::get<4>(forwardJourneys[nodeDepartureIndex]) >= 0 && std::get<4>(forwardJourneys[nodeDepartureIndex]) < tripsEnterConnectionTransferTravelTime[tripIndex])))
             {
-              //if (tripEnterConnectionIndex != -1)
-              //{
-              //  std::cerr << "from_node: " << nodes[std::get<0>(footpaths[std::get<2>(forwardJourneys[nodeDepartureIndex])])].get()->name << " route:" << routes[routeIndexesById[trips[tripIndex].routeId]].shortname << " " << routes[routeIndexesById[trips[tripIndex].routeId]].longname << " old node:" << nodes[std::get<connectionIndexes::NODE_DEP>(forwardConnections[std::get<0>(forwardJourneys[nodeDepartureIndex])])].get()->name << " node:" << nodes[nodeDepartureIndex].get()->name << " tec:" <<  tripEnterConnectionIndex << " i:" <<  i << " jss:" <<  std::get<5>(forwardJourneys[nodeDepartureIndex]) << " jenterc:" << std::get<0>(forwardJourneys[nodeDepartureIndex]) << " jexitc:" << std::get<1>(forwardJourneys[nodeDepartureIndex]) << " jtt:" << std::get<4>(forwardJourneys[nodeDepartureIndex]) << " tectt:" << tripsEnterConnectionTransferTravelTime[tripIndex] << std::endl;
-              //}
               tripsUsable[tripIndex]                            = 1;
               tripsEnterConnection[tripIndex]                   = i;
               tripsEnterConnectionTransferTravelTime[tripIndex] = std::get<4>(forwardJourneys[nodeDepartureIndex]);

@@ -49,7 +49,7 @@ namespace TrRouting
       lineShortnames.clear();
       for(auto lineIdx : routingResult.linesIdx)
       {
-        lineShortnames.push_back(lines[lineIdx].shortname);
+        lineShortnames.push_back(lines[lineIdx].get()->shortname);
       }
       
       alternativeJson = {};
@@ -145,7 +145,7 @@ namespace TrRouting
           //std::cout << "except line Uuids: ";
           //for (auto lineUuid : combination)
           //{
-          //  std::cout << lines[lineIndexesByUuid[lineUuid]].shortname << " ";
+          //  std::cout << lines[lineIndexesByUuid[lineUuid]].get()->shortname << " ";
           //}
           //std::cout << std::endl;
           routingResult = calculate(false, false);
@@ -161,7 +161,7 @@ namespace TrRouting
               lineShortnames.clear();
               for(auto lineIdx : routingResult.linesIdx)
               {
-                lineShortnames.push_back(lines[lineIdx].shortname);
+                lineShortnames.push_back(lines[lineIdx].get()->shortname);
               }
               
               alternativeJson = {};
@@ -194,7 +194,7 @@ namespace TrRouting
               //std::cout << "travelTimeSeconds: " << routingResult.travelTimeSeconds << " line Uuids: ";
               //for (auto lineUuid : foundLineUuids)
               //{
-              //  std::cout << lines[lineIndexesByUuid[lineUuid]].shortname << " ";
+              //  std::cout << lines[lineIndexesByUuid[lineUuid]].get()->shortname << " ";
               //}
               //std::cout << std::endl;
               combinationsKs.clear();
@@ -235,7 +235,7 @@ namespace TrRouting
       //  std::cout << i << ". ";
       //  for(auto lineUuid : foundLineUuids.first)
       //  {
-      //    std::cout << lines[lineIndexesByUuid[lineUuid]].shortname << " ";
+      //    std::cout << lines[lineIndexesByUuid[lineUuid]].get()->shortname << " ";
       //  }
       //  std::cout << " tt: " << (foundLineUuidsTravelTimeSeconds[foundLineUuids.first] / 60);
       //  i++;
