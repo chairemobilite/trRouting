@@ -3,7 +3,7 @@
 namespace TrRouting
 {
   
-  std::vector<std::pair<int,int>> OsrmFetcher::getAccessibleNodesFootpathsFromPoint(const Point point, const std::vector<Node> nodes, std::string mode, Parameters& params, bool reversed)
+  std::vector<std::pair<int,int>> OsrmFetcher::getAccessibleNodesFootpathsFromPoint(const Point point, const std::vector<std::unique_ptr<Node>> &nodes, std::string mode, Parameters& params, bool reversed)
   {
 
     std::vector<int>                birdDistanceAccessibleNodeIndexes;
@@ -24,13 +24,13 @@ namespace TrRouting
       int i {0};
       for (auto & node : nodes)
       {
-        distanceXMeters       = (node.point.longitude - point.longitude) * lengthOfOneDegreeOfLongitude;
-        distanceYMeters       = (node.point.latitude  - point.latitude)  * lengthOfOneDegreeOflatitude ;
+        distanceXMeters       = (node->point.get()->longitude - point.longitude) * lengthOfOneDegreeOfLongitude;
+        distanceYMeters       = (node->point.get()->latitude  - point.latitude)  * lengthOfOneDegreeOflatitude ;
         distanceMetersSquared = distanceXMeters * distanceXMeters + distanceYMeters * distanceYMeters;
         if (distanceMetersSquared <= maxDistanceMetersSquared)
         {
           birdDistanceAccessibleNodeIndexes.push_back(i);
-          osrmParams.coordinates.push_back({osrm::util::FloatLongitude{node.point.longitude}, osrm::util::FloatLatitude{node.point.latitude}});
+          osrmParams.coordinates.push_back({osrm::util::FloatLongitude{node->point.get()->longitude}, osrm::util::FloatLatitude{node->point.get()->latitude}});
         }
         i++;
       }
@@ -101,13 +101,13 @@ namespace TrRouting
       for (auto & node : nodes)
       {
         //std::cerr << node.point.latitude << std::endl;
-        distanceXMeters       = (node.point.longitude - point.longitude) * lengthOfOneDegreeOfLongitude;
-        distanceYMeters       = (node.point.latitude  - point.latitude)  * lengthOfOneDegreeOflatitude ;
+        distanceXMeters       = (node->point.get()->longitude - point.longitude) * lengthOfOneDegreeOfLongitude;
+        distanceYMeters       = (node->point.get()->latitude  - point.latitude)  * lengthOfOneDegreeOflatitude ;
         distanceMetersSquared = distanceXMeters * distanceXMeters + distanceYMeters * distanceYMeters;
         if (distanceMetersSquared <= maxDistanceMetersSquared)
         {
           birdDistanceAccessibleNodeIndexes.push_back(i);
-          queryString += ";" + std::to_string(node.point.longitude) +  "," + std::to_string(node.point.latitude);
+          queryString += ";" + std::to_string(node->point.get()->longitude) +  "," + std::to_string(node->point.get()->latitude);
         }
         i++;
       }

@@ -95,7 +95,7 @@ namespace TrRouting
                 tentativeAccessNodeDepartureTime = connectionDepartureTime;
               }
               footpathIndex = 0;
-              for (int & transferableNodeIndex : nodes[nodeDepartureIndex].transferableNodesIdx)
+              for (int & transferableNodeIndex : nodes[nodeDepartureIndex].get()->transferableNodesIdx)
               {
                 if (nodeDepartureIndex != transferableNodeIndex && nodesReverseTentativeTime[transferableNodeIndex] > connectionDepartureTime - params.minWaitingTimeSeconds)
                 {
@@ -104,11 +104,11 @@ namespace TrRouting
                 }
                 if (params.walkingSpeedFactor != 1.0)
                 {
-                  footpathTravelTime = (int)ceil((float)nodes[nodeDepartureIndex].transferableTravelTimesSeconds[footpathIndex] / params.walkingSpeedFactor);
+                  footpathTravelTime = (int)ceil((float)nodes[nodeDepartureIndex].get()->transferableTravelTimesSeconds[footpathIndex] / params.walkingSpeedFactor);
                 }
                 else
                 {
-                  footpathTravelTime = nodes[nodeDepartureIndex].transferableTravelTimesSeconds[footpathIndex];
+                  footpathTravelTime = nodes[nodeDepartureIndex].get()->transferableTravelTimesSeconds[footpathIndex];
                 }
 
                 if (footpathTravelTime <= params.maxTransferWalkingTravelTimeSeconds)
@@ -151,7 +151,7 @@ namespace TrRouting
         {
           accessTravelTime        = nodesAccessTravelTime[accessFootpath.first];
           accessNodeDepartureTime = std::get<connectionIndexes::TIME_DEP>(reverseConnections[accessEnterConnection]) - accessTravelTime - params.minWaitingTimeSeconds;
-          //std::cerr << nodes[accessFootpath.first].name << ": " << accessTravelTime << " t: " << trips[std::get<connectionIndexes::TRIP>(reverseConnections[accessEnterConnection])].id << " - " << Toolbox::convertSecondsToFormattedTime(accessNodeDepartureTime) << std::endl;
+          //std::cerr << nodes[accessFootpath.first].get()->name << ": " << accessTravelTime << " t: " << trips[std::get<connectionIndexes::TRIP>(reverseConnections[accessEnterConnection])].id << " - " << Toolbox::convertSecondsToFormattedTime(accessNodeDepartureTime) << std::endl;
           if (accessNodeDepartureTime >= 0 && arrivalTimeSeconds - accessNodeDepartureTime <= params.maxTotalTravelTimeSeconds && accessNodeDepartureTime > bestDepartureTime && accessNodeDepartureTime < MAX_INT)
           {
             bestDepartureTime    = accessNodeDepartureTime;

@@ -19,7 +19,7 @@ namespace TrRouting
     std::string code;
     std::string name;
     boost::uuids::uuid nodeUuid;
-    Point point;
+    std::unique_ptr<Point> point;
     std::vector<int> transferableStopsIdx;
     std::vector<int> transferableTravelTimesSeconds;
     std::vector<int> transferableDistancesMeters;

@@ -77,7 +77,7 @@ namespace TrRouting
             {
               //if (tripEnterConnectionIndex != -1)
               //{
-              //  std::cerr << "from_node: " << nodes[std::get<0>(footpaths[std::get<2>(forwardJourneys[nodeDepartureIndex])])].name << " route:" << routes[routeIndexesById[trips[tripIndex].routeId]].shortname << " " << routes[routeIndexesById[trips[tripIndex].routeId]].longname << " old node:" << nodes[std::get<connectionIndexes::NODE_DEP>(forwardConnections[std::get<0>(forwardJourneys[nodeDepartureIndex])])].name << " node:" << nodes[nodeDepartureIndex].name << " tec:" <<  tripEnterConnectionIndex << " i:" <<  i << " jss:" <<  std::get<5>(forwardJourneys[nodeDepartureIndex]) << " jenterc:" << std::get<0>(forwardJourneys[nodeDepartureIndex]) << " jexitc:" << std::get<1>(forwardJourneys[nodeDepartureIndex]) << " jtt:" << std::get<4>(forwardJourneys[nodeDepartureIndex]) << " tectt:" << tripsEnterConnectionTransferTravelTime[tripIndex] << std::endl;
+              //  std::cerr << "from_node: " << nodes[std::get<0>(footpaths[std::get<2>(forwardJourneys[nodeDepartureIndex])])].get()->name << " route:" << routes[routeIndexesById[trips[tripIndex].routeId]].shortname << " " << routes[routeIndexesById[trips[tripIndex].routeId]].longname << " old node:" << nodes[std::get<connectionIndexes::NODE_DEP>(forwardConnections[std::get<0>(forwardJourneys[nodeDepartureIndex])])].get()->name << " node:" << nodes[nodeDepartureIndex].get()->name << " tec:" <<  tripEnterConnectionIndex << " i:" <<  i << " jss:" <<  std::get<5>(forwardJourneys[nodeDepartureIndex]) << " jenterc:" << std::get<0>(forwardJourneys[nodeDepartureIndex]) << " jexitc:" << std::get<1>(forwardJourneys[nodeDepartureIndex]) << " jtt:" << std::get<4>(forwardJourneys[nodeDepartureIndex]) << " tectt:" << tripsEnterConnectionTransferTravelTime[tripIndex] << std::endl;
               //}
               tripsUsable[tripIndex]                            = 1;
               tripsEnterConnection[tripIndex]                   = i;
@@ -95,7 +95,7 @@ namespace TrRouting
                 tentativeEgressNodeArrivalTime = connectionArrivalTime;
               }
               footpathIndex = 0;
-              for (int & transferableNodeIndex : nodes[nodeArrivalIndex].transferableNodesIdx)
+              for (int & transferableNodeIndex : nodes[nodeArrivalIndex].get()->transferableNodesIdx)
               {
                 if (nodeArrivalIndex != transferableNodeIndex && nodesTentativeTime[transferableNodeIndex] < params.minWaitingTimeSeconds + connectionArrivalTime)
                 {
@@ -105,11 +105,11 @@ namespace TrRouting
   
                 if (params.walkingSpeedFactor != 1.0)
                 {
-                  footpathTravelTime = (int)ceil((float)nodes[nodeArrivalIndex].transferableTravelTimesSeconds[footpathIndex] / params.walkingSpeedFactor);
+                  footpathTravelTime = (int)ceil((float)nodes[nodeArrivalIndex].get()->transferableTravelTimesSeconds[footpathIndex] / params.walkingSpeedFactor);
                 }
                 else
                 {
-                  footpathTravelTime = nodes[nodeArrivalIndex].transferableTravelTimesSeconds[footpathIndex];
+                  footpathTravelTime = nodes[nodeArrivalIndex].get()->transferableTravelTimesSeconds[footpathIndex];
                 }
 
                 if (footpathTravelTime <= params.maxTransferWalkingTravelTimeSeconds)
@@ -146,13 +146,13 @@ namespace TrRouting
       i = 0;
       for (auto & egressFootpath : egressFootpaths)
       {
-        //std::cerr << nodes[egressFootpath.first].name << std::endl;
+        //std::cerr << nodes[egressFootpath.first].get()->name << std::endl;
         egressExitConnection  = std::get<1>(forwardEgressJourneys[egressFootpath.first]);
         if (egressExitConnection != -1)
         {
           egressTravelTime      = nodesEgressTravelTime[egressFootpath.first];
           egressNodeArrivalTime = std::get<connectionIndexes::TIME_ARR>(forwardConnections[egressExitConnection]) + egressTravelTime;
-          //std::cerr << nodes[egressFootpath.first].name << ": " << egressTravelTime << " - " << Toolbox::convertSecondsToFormattedTime(egressNodeArrivalTime) << std::endl;
+          //std::cerr << nodes[egressFootpath.first].get()->name << ": " << egressTravelTime << " - " << Toolbox::convertSecondsToFormattedTime(egressNodeArrivalTime) << std::endl;
           if (egressNodeArrivalTime >= 0 && egressNodeArrivalTime - departureTimeSeconds <= params.maxTotalTravelTimeSeconds && egressNodeArrivalTime < bestArrivalTime && egressNodeArrivalTime < MAX_INT)
           {
             bestArrivalTime      = egressNodeArrivalTime;

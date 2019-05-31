@@ -38,6 +38,16 @@ namespace TrRouting
     params.cacheFetcher->getServices(services, serviceIndexesByUuid, params, customPath);
   }
 
+  /*void Calculator::updateStationsFromCache(Parameters& params, std::string customPath)
+  {
+    params.cacheFetcher->getStations(stations, stationIndexesByUuid, params, customPath);
+  }*/
+
+  void Calculator::updateNodesFromCache(Parameters& params, std::string customPath)
+  {
+    params.cacheFetcher->getNodes(nodes, nodeIndexesByUuid, stationIndexesByUuid, params, customPath);
+  }
+
   void Calculator::prepare()
   {
     
@@ -55,10 +65,9 @@ namespace TrRouting
 
       updateAgenciesFromCache(params);
       updateServicesFromCache(params);
+      //updateStationsFromCache(params);
+      updateNodesFromCache(params);
       
-      //std::tie(stations,    stationIndexesByUuid)    = params.cacheFetcher->getStations(params);
-      std::tie(nodes,       nodeIndexesByUuid)       = params.cacheFetcher->getNodes(stationIndexesByUuid, params);
-               nodes                                 = params.cacheFetcher->getNodeFootpaths(nodes, nodeIndexesByUuid, params);
       std::tie(lines,       lineIndexesByUuid)       = params.cacheFetcher->getLines(agencyIndexesByUuid, modeIndexesByShortname, params);
       std::tie(paths,       pathIndexesByUuid)       = params.cacheFetcher->getPaths(lineIndexesByUuid, nodeIndexesByUuid, params);
       std::tie(scenarios,   scenarioIndexesByUuid)   = params.cacheFetcher->getScenarios(serviceIndexesByUuid, lineIndexesByUuid, agencyIndexesByUuid, nodeIndexesByUuid, modeIndexesByShortname, params);
@@ -133,7 +142,7 @@ namespace TrRouting
         std::cout << node.toString() << std::endl;
         for (int transferableNodeIdx : node.transferableNodesIdx)
         {
-          std::cout << "    " << transferableNodeIdx << " (" << nodes[transferableNodeIdx].uuid << ")" << std::endl;
+          std::cout << "    " << transferableNodeIdx << " (" << nodes[transferableNodeIdx].get()->uuid << ")" << std::endl;
         }
         std::cout << std::endl;
       }*/

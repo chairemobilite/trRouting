@@ -127,6 +127,21 @@ namespace TrRouting
       std::string customPath = ""
     );
 
+    void getStations(
+      std::vector<std::unique_ptr<Station>>& ts,
+      std::map<boost::uuids::uuid, int>& tIndexesById,
+      Parameters& params,
+      std::string customPath = ""
+    );
+
+    void getNodes(
+      std::vector<std::unique_ptr<Node>>& ts,
+      std::map<boost::uuids::uuid, int>& tIndexesById,
+      std::map<boost::uuids::uuid, int>& stationIndexesById,
+      Parameters& params,
+      std::string customPath = ""
+    );
+
     /*void getLines(
       std::vector<std::unique_ptr<Agency>>& ts,
       std::map<boost::uuids::uuid, int>& tIndexesById,
@@ -139,9 +154,6 @@ namespace TrRouting
     const std::pair<std::vector<Person>    , std::map<boost::uuids::uuid, int>> getPersons(std::map<boost::uuids::uuid, int> dataSourceIndexesByUuid, std::map<boost::uuids::uuid, int> householdIndexesByUuid, Parameters& params, std::string customPath = "");
     const std::pair<std::vector<Place>     , std::map<boost::uuids::uuid, int>> getPlaces(std::map<boost::uuids::uuid, int> dataSourceIndexesByUuid, Parameters& params, std::string customPath = "");
     const std::pair<std::vector<Scenario>  , std::map<boost::uuids::uuid, int>> getScenarios(std::map<boost::uuids::uuid, int> serviceIndexesByUuid, std::map<boost::uuids::uuid, int> lineIndexesByUuid, std::map<boost::uuids::uuid, int> agencyIndexesByUuid, std::map<boost::uuids::uuid, int> nodeIndexesByUuid, std::map<std::string, int> modeIndexesByShortname, Parameters& params, std::string customPath = "");
-    const std::pair<std::vector<Station>   , std::map<boost::uuids::uuid, int>> getStations(Parameters& params, std::string customPath = "");
-    const std::pair<std::vector<Node>      , std::map<boost::uuids::uuid, int>> getNodes(std::map<boost::uuids::uuid, int> stationIndexesByUuid, Parameters& params, std::string customPath = "");
-    const std::vector<Node>                                                     getNodeFootpaths(std::vector<Node> nodes, std::map<boost::uuids::uuid, int> nodeIndexesByUuid, Parameters& params, std::string customPath = "");
     const std::pair<std::vector<Line>      , std::map<boost::uuids::uuid, int>> getLines(std::map<boost::uuids::uuid, int> agencyIndexesByUuid, std::map<std::string, int> modeIndexesByShortname, Parameters& params, std::string customPath = "");
     const std::pair<std::vector<Path>      , std::map<boost::uuids::uuid, int>> getPaths(std::map<boost::uuids::uuid, int> lineIndexesByUuid, std::map<boost::uuids::uuid, int> nodeIndexesByUuid, Parameters& params, std::string customPath = "");
     const std::tuple<std::vector<Trip>     , std::map<boost::uuids::uuid, int>, std::vector<std::vector<int>>, std::vector<std::vector<float>>, std::vector<Block>, std::map<boost::uuids::uuid, int>, std::vector<std::tuple<int,int,int,int,int,short,short,int,int,int,short>>, std::vector<std::tuple<int,int,int,int,int,short,short,int,int,int,short>>> getTripsAndConnections(std::map<boost::uuids::uuid, int> agencyIndexesByUuid, std::vector<Line> lines, std::map<boost::uuids::uuid, int> lineIndexesByUuid, std::vector<Path> paths, std::map<boost::uuids::uuid, int> pathIndexesByUuid, std::map<boost::uuids::uuid, int> nodeIndexesByUuid, std::map<boost::uuids::uuid, int> serviceIndexesByUuid, Parameters& params);

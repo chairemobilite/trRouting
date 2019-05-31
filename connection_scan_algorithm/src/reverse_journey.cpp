@@ -49,8 +49,8 @@ namespace TrRouting
       nlohmann::json stepJson = {};
       nlohmann::json nodeJson = {};
 
-      Node   journeyStepNodeDeparture;
-      Node   journeyStepNodeArrival;
+      Node * journeyStepNodeDeparture;
+      Node * journeyStepNodeArrival;
       Trip   journeyStepTrip;
       Line   journeyStepLine;
       Mode   journeyStepMode;
@@ -89,7 +89,7 @@ namespace TrRouting
         transferTime             = -1; egressWalkingTime   = -1; 
         waitingTime              = -1; accessWaitingTime   = -1; 
         
-        //std::cerr << nodes[resultingNodeIndex].name << " : " << std::get<0>(reverseAccessJourneys[resultingNodeIndex]) << " tt: " << std::get<4>(reverseAccessJourneys[resultingNodeIndex]) << std::endl; 
+        //std::cerr << nodes[resultingNodeIndex].get()->name << " : " << std::get<0>(reverseAccessJourneys[resultingNodeIndex]) << " tt: " << std::get<4>(reverseAccessJourneys[resultingNodeIndex]) << std::endl; 
         // recreate journey:
         resultingNodeJourneyStep = reverseAccessJourneys[resultingNodeIndex];
         
@@ -97,7 +97,7 @@ namespace TrRouting
         {
           continue;
         }
-        //std::cerr << nodes[bestEgressNodeIndex].name << std::endl;
+        //std::cerr << nodes[bestEgressNodeIndex].get()->name << std::endl;
         i = 0;
         while ((std::get<0>(resultingNodeJourneyStep) != -1 && std::get<1>(resultingNodeJourneyStep) != -1))
         {
@@ -107,7 +107,7 @@ namespace TrRouting
           }
           journey.push_back(resultingNodeJourneyStep);
           bestEgressNodeIndex      = std::get<connectionIndexes::NODE_ARR>(reverseConnections[std::get<1>(resultingNodeJourneyStep)]);
-          //std::cerr << nodes[std::get<connectionIndexes::NODE_DEP>(reverseConnections[std::get<0>(resultingNodeJourneyStep)])].name << " tt: " << std::get<4>(resultingNodeJourneyStep) << " > "  << nodes[std::get<connectionIndexes::NODE_ARR>(reverseConnections[std::get<1>(resultingNodeJourneyStep)])].name << std::endl;
+          //std::cerr << nodes[std::get<connectionIndexes::NODE_DEP>(reverseConnections[std::get<0>(resultingNodeJourneyStep)])].get()->name << " tt: " << std::get<4>(resultingNodeJourneyStep) << " > "  << nodes[std::get<connectionIndexes::NODE_ARR>(reverseConnections[std::get<1>(resultingNodeJourneyStep)])].get()->name << std::endl;
           resultingNodeJourneyStep = reverseJourneys[bestEgressNodeIndex];
           
           i++;
@@ -132,8 +132,8 @@ namespace TrRouting
             // journey tuple: final enter connection, final exit connection, final footpath
             journeyStepEnterConnection  = reverseConnections[std::get<0>(journeyStep)];
             journeyStepExitConnection   = reverseConnections[std::get<1>(journeyStep)];
-            journeyStepNodeDeparture    = nodes[std::get<connectionIndexes::NODE_DEP>(journeyStepEnterConnection)];
-            journeyStepNodeArrival      = nodes[std::get<connectionIndexes::NODE_ARR>(journeyStepExitConnection)];
+            journeyStepNodeDeparture    = nodes[std::get<connectionIndexes::NODE_DEP>(journeyStepEnterConnection)].get();
+            journeyStepNodeArrival      = nodes[std::get<connectionIndexes::NODE_ARR>(journeyStepExitConnection)].get();
             journeyStepTrip             = trips[std::get<3>(journeyStep)];
             journeyStepAgency           = agencies[journeyStepTrip.agencyIdx].get();
             journeyStepLine             = lines[journeyStepTrip.lineIdx];
@@ -156,8 +156,8 @@ namespace TrRouting
             modeShortnames.push_back(journeyStepMode.shortname);
             inVehicleTravelTimesSeconds.push_back(inVehicleTime);
             agencyUuids.push_back(journeyStepAgency->uuid);
-            boardingNodeUuids.push_back(journeyStepNodeDeparture.uuid);
-            unboardingNodeUuids.push_back(journeyStepNodeArrival.uuid);
+            boardingNodeUuids.push_back(journeyStepNodeDeparture->uuid);
+            unboardingNodeUuids.push_back(journeyStepNodeArrival->uuid);
             tripUuids.push_back(journeyStepTrip.uuid);
             tripsIdx.push_back(std::get<3>(journeyStep));
             legs.push_back(std::make_tuple(std::get<3>(journeyStep), journeyStepTrip.lineIdx, journeyStepTrip.pathIdx, boardingSequence - 1, unboardingSequence - 1));
@@ -187,10 +187,10 @@ namespace TrRouting
               stepJson["mode"]                 = journeyStepMode.shortname;
               stepJson["tripUuid"]             = boost::uuids::to_string(journeyStepTrip.uuid);
               stepJson["sequenceInTrip"]       = boardingSequence;
-              stepJson["nodeName"]             = journeyStepNodeDeparture.name;
-              stepJson["nodeCode"]             = journeyStepNodeDeparture.code;
-              stepJson["nodeUuid"]             = boost::uuids::to_string(journeyStepNodeDeparture.uuid);
-              stepJson["nodeCoordinates"]      = {journeyStepNodeDeparture.point.longitude, journeyStepNodeDeparture.point.latitude};
+              stepJson["nodeName"]             = journeyStepNodeDeparture->name;
+              stepJson["nodeCode"]             = journeyStepNodeDeparture->code;
+              stepJson["nodeUuid"]             = boost::uuids::to_string(journeyStepNodeDeparture->uuid);
+              stepJson["nodeCoordinates"]      = {journeyStepNodeDeparture->point.get()->longitude, journeyStepNodeDeparture->point.get()->latitude};
               stepJson["departureTime"]        = Toolbox::convertSecondsToFormattedTime(departureTime);
               stepJson["departureTimeSeconds"] = departureTime;
               stepJson["waitingTimeSeconds"]   = waitingTime;
@@ -210,10 +210,10 @@ namespace TrRouting
               stepJson["mode"]                 = journeyStepMode.shortname;
               stepJson["tripUuid"]             = boost::uuids::to_string(journeyStepTrip.uuid);
               stepJson["sequenceInTrip"]       = unboardingSequence;
-              stepJson["nodeName"]             = journeyStepNodeArrival.name;
-              stepJson["nodeCode"]             = journeyStepNodeArrival.code;
-              stepJson["nodeUuid"]             = boost::uuids::to_string(journeyStepNodeArrival.uuid);
-              stepJson["nodeCoordinates"]      = {journeyStepNodeArrival.point.longitude, journeyStepNodeArrival.point.latitude};
+              stepJson["nodeName"]             = journeyStepNodeArrival->name;
+              stepJson["nodeCode"]             = journeyStepNodeArrival->code;
+              stepJson["nodeUuid"]             = boost::uuids::to_string(journeyStepNodeArrival->uuid);
+              stepJson["nodeCoordinates"]      = {journeyStepNodeArrival->point.get()->longitude, journeyStepNodeArrival->point.get()->latitude};
               stepJson["arrivalTime"]          = Toolbox::convertSecondsToFormattedTime(arrivalTime);
               stepJson["arrivalTimeSeconds"]   = arrivalTime;
               stepJson["inVehicleTimeSeconds"] = inVehicleTime;
@@ -299,7 +299,7 @@ namespace TrRouting
             {
               reachableNodesCount++;
               nodeJson                           = {};
-              nodeJson["id"]                     = boost::uuids::to_string(nodes[resultingNodeIndex].uuid);
+              nodeJson["id"]                     = boost::uuids::to_string(nodes[resultingNodeIndex].get()->uuid);
               nodeJson["departureTime"]          = Toolbox::convertSecondsToFormattedTime(departureTime);
               nodeJson["departureTimeSeconds"]   = departureTime;
               nodeJson["totalTravelTimeSeconds"] = arrivalTimeSeconds - departureTime;

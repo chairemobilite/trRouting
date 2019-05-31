@@ -123,6 +123,12 @@ namespace TrRouting
     std::vector<std::unique_ptr<Service>>    services;
     std::map<boost::uuids::uuid, int>        serviceIndexesByUuid;
 
+    std::vector<std::unique_ptr<Station>>    stations;
+    std::map<boost::uuids::uuid, int>        stationIndexesByUuid;
+
+    std::vector<std::unique_ptr<Node>>    nodes;
+    std::map<boost::uuids::uuid, int>        nodeIndexesByUuid;
+
     //std::vector<std::unique_ptr<Line>>       lines;
     //std::map<boost::uuids::uuid, int>        lineIndexesByUuid;
 
@@ -137,13 +143,7 @@ namespace TrRouting
   
     std::vector<Path>                     paths;
     std::map<boost::uuids::uuid, int>     pathIndexesByUuid;
-  
-    std::vector<Station>                  stations;
-    std::map<boost::uuids::uuid, int>     stationIndexesByUuid;
-  
-    std::vector<Node>                     nodes;
-    std::map<boost::uuids::uuid, int>     nodeIndexesByUuid;
-  
+
     std::vector<Stop>                     stops;
     std::map<boost::uuids::uuid, int>     stopIndexesByUuid;
       

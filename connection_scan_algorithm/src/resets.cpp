@@ -115,8 +115,8 @@ namespace TrRouting
         {
           maxAccessTravelTime = footpathTravelTimeSeconds;
         }
-        //std::cerr << "origin_node: " << nodes[accessFootpath.first].name << " - " << Toolbox::convertSecondsToFormattedTime(nodesTentativeTime[accessFootpath.first]) << std::endl;
-        //std::cerr << std::to_string(nodes[accessFootpath.first].id) + ",";
+        //std::cerr << "origin_node: " << nodes[accessFootpath.first].get()->name << " - " << Toolbox::convertSecondsToFormattedTime(nodesTentativeTime[accessFootpath.first]) << std::endl;
+        //std::cerr << std::to_string(nodes[accessFootpath.first].get()->id) + ",";
       }
     }
   
@@ -167,7 +167,7 @@ namespace TrRouting
           minEgressTravelTime = footpathTravelTimeSeconds;
         }
         //nodesD[egressFootpath.first]                = egressFootpath.second;
-        //result.json += "origin_node: " + nodes[accessFootpath.first].name + " - " + Toolbox::convertSecondsToFormattedTime(nodesTentativeTime[accessFootpath.first]) + "\n";
+        //result.json += "origin_node: " + nodes[accessFootpath.first].get()->name + " - " + Toolbox::convertSecondsToFormattedTime(nodesTentativeTime[accessFootpath.first]) + "\n";
         //result.json += std::to_string((int)(ceil(egressFootpath.second))) + ",";
       }
     }

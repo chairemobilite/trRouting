@@ -167,12 +167,7 @@ int main(int argc, char** argv) {
     bool correctCacheName {false};
     for(std::string cacheName : cacheNames)
     {
-      if (cacheName == "agencies")
-      {
-        correctCacheName = true;
-        calculator.updateAgenciesFromCache(calculator.params, customCacheDirectoryPath);
-      }
-      else if (cacheName == "data_sources")
+      if (cacheName == "data_sources")
       {
         correctCacheName = true;
         calculator.updateDataSourcesFromCache(calculator.params, customCacheDirectoryPath);
@@ -182,6 +177,37 @@ int main(int argc, char** argv) {
         correctCacheName = true;
         calculator.updateHouseholdsFromCache(calculator.params, customCacheDirectoryPath);
       }
+      else if (cacheName == "persons")
+      {
+        correctCacheName = true;
+        calculator.updatePersonsFromCache(calculator.params, customCacheDirectoryPath);
+      }
+      else if (cacheName == "od_trips")
+      {
+        correctCacheName = true;
+        calculator.updateOdTripsFromCache(calculator.params, customCacheDirectoryPath);
+      }
+      else if (cacheName == "places")
+      {
+        correctCacheName = true;
+        calculator.updatePlacesFromCache(calculator.params, customCacheDirectoryPath);
+      }
+      if (cacheName == "agencies")
+      {
+        correctCacheName = true;
+        calculator.updateAgenciesFromCache(calculator.params, customCacheDirectoryPath);
+      }
+      else if (cacheName == "services")
+      {
+        correctCacheName = true;
+        calculator.updateServicesFromCache(calculator.params, customCacheDirectoryPath);
+      }
+      else if (cacheName == "nodes")
+      {
+        correctCacheName = true;
+        calculator.updateNodesFromCache(calculator.params, customCacheDirectoryPath);
+      }
+
       if (correctCacheName)
       {
         cacheNamesStr += cacheName;
