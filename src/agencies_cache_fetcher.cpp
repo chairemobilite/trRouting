@@ -32,7 +32,7 @@ namespace TrRouting
     std::string cacheFileName{tStr};
     boost::uuids::string_generator uuidGenerator;
 
-    std::cout << "Fetching " << tStr << " from cache..." << std::endl;
+    std::cout << "Fetching " << tStr << " from cache..." << " " << customPath << std::endl;
     
     if (CacheFetcher::capnpCacheFileExists(cacheFileName + ".capnpbin", params, customPath))
     {

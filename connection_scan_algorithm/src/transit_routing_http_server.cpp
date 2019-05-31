@@ -146,7 +146,7 @@ int main(int argc, char** argv) {
     {
       boost::split(parameterWithValueVector, parameterWithValue, boost::is_any_of("="));
 
-      if (parameterWithValueVector[0] == "name" || parameterWithValueVector[0] == "cache" || parameterWithValueVector[0] == "cache_name")
+      if (parameterWithValueVector[0] == "names" || parameterWithValueVector[0] == "caches" || parameterWithValueVector[0] == "cache_names" || parameterWithValueVector[0] == "name" || parameterWithValueVector[0] == "cache" || parameterWithValueVector[0] == "cache_name")
       {
 
         boost::split(cacheNamesVector, parameterWithValueVector[1], boost::is_any_of(","));
@@ -162,7 +162,7 @@ int main(int argc, char** argv) {
         continue;
       }
     }
-
+  
     int i {0};
     bool correctCacheName {false};
     for(std::string cacheName : cacheNames)
@@ -211,7 +211,7 @@ int main(int argc, char** argv) {
       if (correctCacheName)
       {
         cacheNamesStr += cacheName;
-        if (i < cacheNames.size())
+        if (i < cacheNames.size() - 1)
         {
           cacheNamesStr += ",";
         }

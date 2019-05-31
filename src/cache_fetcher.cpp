@@ -44,7 +44,7 @@ namespace TrRouting
     }
     else
     {
-      return params.cacheDirectoryPath + "/" + customPath + "/" + params.projectShortname + "/" + cacheFilePath;
+      return params.cacheDirectoryPath + params.projectShortname + "/" + customPath + "/" + cacheFilePath;
     }
   }
 
