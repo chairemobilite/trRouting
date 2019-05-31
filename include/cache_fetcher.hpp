@@ -119,8 +119,23 @@ namespace TrRouting
       Parameters& params,
       std::string customPath = ""
     );
+
+    void getServices(
+      std::vector<std::unique_ptr<Service>>& ts,
+      std::map<boost::uuids::uuid, int>& tIndexesById,
+      Parameters& params,
+      std::string customPath = ""
+    );
+
+    /*void getLines(
+      std::vector<std::unique_ptr<Agency>>& ts,
+      std::map<boost::uuids::uuid, int>& tIndexesById,
+      std::map<boost::uuids::uuid, int>& agencyIndexesByUuid,
+      std::map<std::string, int>& modeIndexesByShortname,
+      Parameters& params,
+      std::string customPath = ""
+    );*/
     
-    const std::pair<std::vector<Service>   , std::map<boost::uuids::uuid, int>> getServices(Parameters& params, std::string customPath = "");
     const std::pair<std::vector<Person>    , std::map<boost::uuids::uuid, int>> getPersons(std::map<boost::uuids::uuid, int> dataSourceIndexesByUuid, std::map<boost::uuids::uuid, int> householdIndexesByUuid, Parameters& params, std::string customPath = "");
     const std::pair<std::vector<Place>     , std::map<boost::uuids::uuid, int>> getPlaces(std::map<boost::uuids::uuid, int> dataSourceIndexesByUuid, Parameters& params, std::string customPath = "");
     const std::pair<std::vector<Scenario>  , std::map<boost::uuids::uuid, int>> getScenarios(std::map<boost::uuids::uuid, int> serviceIndexesByUuid, std::map<boost::uuids::uuid, int> lineIndexesByUuid, std::map<boost::uuids::uuid, int> agencyIndexesByUuid, std::map<boost::uuids::uuid, int> nodeIndexesByUuid, std::map<std::string, int> modeIndexesByShortname, Parameters& params, std::string customPath = "");

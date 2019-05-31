@@ -33,6 +33,11 @@ namespace TrRouting
     params.cacheFetcher->getAgencies(agencies, agencyIndexesByUuid, params, customPath);
   }
 
+  void Calculator::updateServicesFromCache(Parameters& params, std::string customPath)
+  {
+    params.cacheFetcher->getServices(services, serviceIndexesByUuid, params, customPath);
+  }
+
   void Calculator::prepare()
   {
     
@@ -49,9 +54,8 @@ namespace TrRouting
       updatePlacesFromCache(params);
 
       updateAgenciesFromCache(params);
-      //updateServicesFromCache(params);
+      updateServicesFromCache(params);
       
-      std::tie(services,    serviceIndexesByUuid)    = params.cacheFetcher->getServices(params);
       //std::tie(stations,    stationIndexesByUuid)    = params.cacheFetcher->getStations(params);
       std::tie(nodes,       nodeIndexesByUuid)       = params.cacheFetcher->getNodes(stationIndexesByUuid, params);
                nodes                                 = params.cacheFetcher->getNodeFootpaths(nodes, nodeIndexesByUuid, params);

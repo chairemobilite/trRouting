@@ -13,19 +13,24 @@
 namespace TrRouting
 {
 
-  const std::pair<std::vector<Service>, std::map<boost::uuids::uuid, int>> CacheFetcher::getServices(Parameters& params, std::string customPath)
-  { 
+  void CacheFetcher::getServices(
+    std::vector<std::unique_ptr<Service>>& ts,
+    std::map<boost::uuids::uuid, int>& tIndexesByUuid,
+    Parameters& params,
+    std::string customPath
+  ) {  
 
     using T           = Service;
     using TCollection = serviceCollection::ServiceCollection;
     using cT          = serviceCollection::Service;
 
+    ts.clear();
+    tIndexesByUuid.clear();
+
     std::string tStr  = "services";
     std::string TStr  = "Services";
 
-    std::vector<T> ts;
     std::string cacheFileName{tStr};
-    std::map<boost::uuids::uuid, int> tIndexesByUuid;
     boost::uuids::string_generator uuidGenerator;
 
     std::cout << "Fetching " << tStr << " from cache..." << std::endl;
@@ -42,7 +47,8 @@ namespace TrRouting
         std::vector<boost::gregorian::date> onlyDates;
         std::vector<boost::gregorian::date> exceptDates;
 
-        T * t        = new T();
+        std::unique_ptr<T> t = std::make_unique<T>();
+
         t->uuid      = uuidGenerator(uuid);
         t->name      = capnpT.getName();
         t->monday    = capnpT.getMonday();
@@ -72,8 +78,9 @@ namespace TrRouting
         }
         t->onlyDates   = onlyDates;
         t->exceptDates = exceptDates;
-        ts.push_back(*t);
-        tIndexesByUuid[t->uuid] = ts.size() - 1;
+        
+        tIndexesByUuid[t->uuid] = ts.size();
+        ts.push_back(std::move(t));
       }
       //std::cout << TStr << ":\n" << Toolbox::prettyPrintStructVector(ts) << std::endl;
       close(fd);
@@ -82,7 +89,6 @@ namespace TrRouting
     {
       std::cerr << "missing " << tStr << " cache file!" << std::endl;
     }
-    return std::make_pair(ts, tIndexesByUuid);
   }
 
 }

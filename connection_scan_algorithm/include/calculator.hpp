@@ -97,8 +97,9 @@ namespace TrRouting
     void                    updatePathsFromCache      (Parameters&  params, std::string customPath = "");
     void                    updateNodesFromCache      (Parameters&  params, std::string customPath = "");
     
-    std::vector<std::unique_ptr<Agency>>     agencies;
-    std::map<boost::uuids::uuid, int>        agencyIndexesByUuid;
+    std::vector<Mode>                        modes;
+    std::map<std::string, int>               modeIndexesByShortname;
+
 
     std::vector<std::unique_ptr<DataSource>> dataSources;
     std::map<boost::uuids::uuid, int>        dataSourceIndexesByUuid;
@@ -115,14 +116,22 @@ namespace TrRouting
     std::vector<std::unique_ptr<Place>>      places;
     std::map<boost::uuids::uuid, int>        placeIndexesByUuid;
 
-  
+
+    std::vector<std::unique_ptr<Agency>>     agencies;
+    std::map<boost::uuids::uuid, int>        agencyIndexesByUuid;
+
+    std::vector<std::unique_ptr<Service>>    services;
+    std::map<boost::uuids::uuid, int>        serviceIndexesByUuid;
+
+    //std::vector<std::unique_ptr<Line>>       lines;
+    //std::map<boost::uuids::uuid, int>        lineIndexesByUuid;
+
+    //
+
 
     std::vector<Scenario>                 scenarios;
     std::map<boost::uuids::uuid, int>     scenarioIndexesByUuid;
-  
-    std::vector<Service>                  services;
-    std::map<boost::uuids::uuid, int>     serviceIndexesByUuid;
-  
+
     std::vector<Line>                     lines;
     std::map<boost::uuids::uuid, int>     lineIndexesByUuid;
   
@@ -141,11 +150,8 @@ namespace TrRouting
     std::vector<Trip>                     trips;
     std::map<boost::uuids::uuid, int>     tripIndexesByUuid;
     std::vector<std::vector<int>>         tripConnectionDepartureTimes; // tripIndex: [connectionIndex (sequence in trip): departureTimeSeconds]
-    std::vector<std::vector<float>>       tripConnectionDemands; // tripIndex: [connectionIndex (sequence in trip): sum of od trips weights using this connection (demand)]
+    std::vector<std::vector<float>>       tripConnectionDemands;        // tripIndex: [connectionIndex (sequence in trip): sum of od trips weights using this connection (demand)]
     std::vector<std::vector<int>>         tripIndexesByPathIndex;
-  
-    std::vector<Mode>                     modes;
-    std::map<std::string, int>            modeIndexesByShortname;
   
     std::vector<Block>                    blocks;
     std::map<boost::uuids::uuid, int>     blockIndexesByUuid;
