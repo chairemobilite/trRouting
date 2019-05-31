@@ -66,7 +66,7 @@ namespace TrRouting
             std::unique_ptr<T> t               = std::make_unique<T>();
             std::unique_ptr<Point> origin      = std::make_unique<Point>();
             std::unique_ptr<Point> destination = std::make_unique<Point>();
-
+            
             t->uuid                     = uuidGenerator(uuid);
             t->id                       = capnpT.getId();
             t->expansionFactor          = capnpT.getExpansionFactor();

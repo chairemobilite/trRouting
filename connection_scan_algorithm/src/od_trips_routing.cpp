@@ -5,6 +5,8 @@ namespace TrRouting
     
   std::string Calculator::odTripsRouting()
   {
+    if (params.debugDisplay)
+      std::cout << "  preparing odTripsRouting" << std::endl;
 
     RoutingResult  routingResult;
     std::string    response;
@@ -17,22 +19,22 @@ namespace TrRouting
     std::map<boost::uuids::uuid, std::vector<float>> pathTotalProfiles; // key: path uuid, value: [index: segment index, value: totalDemand]
     std::vector<float> demandByHourOfDay;
 
-    int   legTripIdx;
-    int   legLineIdx;
-    int   legPathIdx;
-    Path  legPath;
-    int   legConnectionStartIdx;
-    int   legConnectionEndIdx;
-    int   connectionDepartureTimeSeconds;
-    int   connectionDepartureTimeHour;
-    bool  atLeastOneOdTrip           {false};
-    bool  atLeastOneCompatiblePeriod {false};
-    bool  attributesMatches          {true};
-    bool  resetFilters               {true};
-    int   odTripsCount = odTrips.size();
-    float maximumSegmentHourlyDemand = 0.0;
-    float maximumSegmentTotalDemand  = 0.0;
-    int   countOdTripsCalculated     = 0;
+    int    legTripIdx;
+    int    legLineIdx;
+    int    legPathIdx;
+    Path * legPath;
+    int    legConnectionStartIdx;
+    int    legConnectionEndIdx;
+    int    connectionDepartureTimeSeconds;
+    int    connectionDepartureTimeHour;
+    bool   atLeastOneOdTrip           {false};
+    bool   atLeastOneCompatiblePeriod {false};
+    bool   attributesMatches          {true};
+    bool   resetFilters               {true};
+    int    odTripsCount = odTrips.size();
+    float  maximumSegmentHourlyDemand = 0.0;
+    float  maximumSegmentTotalDemand  = 0.0;
+    int    countOdTripsCalculated     = 0;
 
     json["odTrips"] = nlohmann::json::array();
 
@@ -56,6 +58,9 @@ namespace TrRouting
 
     int i {0};
     int j {0};
+
+    if (params.debugDisplay)
+      std::cout << "  starting odTripsRouting" << std::endl;
 
     for (auto & _odTrip : odTrips)
     {
@@ -119,32 +124,32 @@ namespace TrRouting
                 legTripIdx            = std::get<0>(leg);
                 legLineIdx            = std::get<1>(leg);
                 legPathIdx            = std::get<2>(leg);
-                legPath               = paths[legPathIdx];
+                legPath               = paths[legPathIdx].get();
                 legConnectionStartIdx = std::get<3>(leg);
                 legConnectionEndIdx   = std::get<4>(leg);
                 lineProfiles[lines[legLineIdx].get()->uuid] += odTrip->expansionFactor;
 
-                if (pathProfiles.find(legPath.uuid) == pathProfiles.end())
+                if (pathProfiles.find(legPath->uuid) == pathProfiles.end())
                 {
-                  pathProfiles[legPath.uuid] = std::vector<std::vector<float>>(legPath.nodesIdx.size() - 1, demandByHourOfDay);
-                  pathTotalProfiles[legPath.uuid] = std::vector<float>(legPath.nodesIdx.size() - 1, 0.0);
+                  pathProfiles[legPath->uuid] = std::vector<std::vector<float>>(legPath->nodesIdx.size() - 1, demandByHourOfDay);
+                  pathTotalProfiles[legPath->uuid] = std::vector<float>(legPath->nodesIdx.size() - 1, 0.0);
                 }
 
                 for (int connectionIndex = legConnectionStartIdx; connectionIndex <= legConnectionEndIdx; connectionIndex++)
                 {
-                  connectionDepartureTimeSeconds = tripConnectionDepartureTimes[legTripIdx].get()[connectionIndex];
-                  tripConnectionDemands[legTripIdx][connectionIndex] += odTrip->expansionFactor;
+                  connectionDepartureTimeSeconds = *tripConnectionDepartureTimes[legTripIdx][connectionIndex];
+                  *tripConnectionDemands[legTripIdx][connectionIndex] += odTrip->expansionFactor;
                   connectionDepartureTimeHour    = connectionDepartureTimeSeconds / 3600;
-                  //std::cout << "pUuid:" << legPath.uuid << " dth:" << connectionDepartureTimeHour << " cI:" << connectionIndex << " oldD:" << pathProfiles[legPath.uuid][connectionIndex][connectionDepartureTimeHour] << std::endl;
-                  pathProfiles[legPath.uuid][connectionIndex][connectionDepartureTimeHour] += odTrip->expansionFactor;
-                  pathTotalProfiles[legPath.uuid][connectionIndex] += odTrip->expansionFactor;
-                  if (maximumSegmentHourlyDemand < pathProfiles[legPath.uuid][connectionIndex][connectionDepartureTimeHour])
+                  //std::cout << "pUuid:" << legPath->uuid << " dth:" << connectionDepartureTimeHour << " cI:" << connectionIndex << " oldD:" << pathProfiles[legPath.uuid][connectionIndex][connectionDepartureTimeHour] << std::endl;
+                  pathProfiles[legPath->uuid][connectionIndex][connectionDepartureTimeHour] += odTrip->expansionFactor;
+                  pathTotalProfiles[legPath->uuid][connectionIndex] += odTrip->expansionFactor;
+                  if (maximumSegmentHourlyDemand < pathProfiles[legPath->uuid][connectionIndex][connectionDepartureTimeHour])
                   {
-                    maximumSegmentHourlyDemand = pathProfiles[legPath.uuid][connectionIndex][connectionDepartureTimeHour];
+                    maximumSegmentHourlyDemand = pathProfiles[legPath->uuid][connectionIndex][connectionDepartureTimeHour];
                   }
-                  if (maximumSegmentTotalDemand < pathTotalProfiles[legPath.uuid][connectionIndex])
+                  if (maximumSegmentTotalDemand < pathTotalProfiles[legPath->uuid][connectionIndex])
                   {
-                    maximumSegmentTotalDemand = pathTotalProfiles[legPath.uuid][connectionIndex];
+                    maximumSegmentTotalDemand = pathTotalProfiles[legPath->uuid][connectionIndex];
                   }
                 }
               }

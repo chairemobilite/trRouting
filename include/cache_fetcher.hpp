@@ -173,13 +173,20 @@ namespace TrRouting
     );
 
     void getSchedules(
-      std::vector<std::unique_ptr<Trip>>& ts,
-      std::map<boost::uuids::uuid, int>& tIndexesById,
+      std::vector<std::unique_ptr<Trip>>& trips,
+      std::vector<std::unique_ptr<Line>>& lines,
+      std::vector<std::unique_ptr<Path>>& paths,
+      std::map<boost::uuids::uuid, int>& tripIndexesByUuid,
       std::map<boost::uuids::uuid, int>& serviceIndexesByUuid,
       std::map<boost::uuids::uuid, int>& lineIndexesByUuid,
+      std::map<boost::uuids::uuid, int>& pathIndexesByUuid,
       std::map<boost::uuids::uuid, int>& agencyIndexesByUuid,
       std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
       std::map<std::string, int>& modeIndexesByShortname,
+      std::vector<std::vector<std::unique_ptr<int>>>&   tripConnectionDepartureTimes,
+      std::vector<std::vector<std::unique_ptr<float>>>& tripConnectionDemands,
+      std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,int,int,short>>>& forwardConnections, 
+      std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,int,int,short>>>& reverseConnections,
       Parameters& params,
       std::string customPath = ""
     );

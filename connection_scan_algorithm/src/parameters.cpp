@@ -117,14 +117,14 @@ namespace TrRouting
     
   }
 
-  void Parameters::update(std::vector<std::string> &parameters, std::map<boost::uuids::uuid, int> &scenarioIndexesByUuid, std::vector<Scenario> &scenarios, std::map<boost::uuids::uuid, int> &nodeIndexesByUuid)
+  void Parameters::update(std::vector<std::string> &parameters, std::map<boost::uuids::uuid, int> &scenarioIndexesByUuid, std::vector<std::unique_ptr<Scenario>> &scenarios, std::map<boost::uuids::uuid, int> &nodeIndexesByUuid)
   {
     
     setDefaultValues();
 
     boost::uuids::string_generator uuidGenerator;
 
-    Scenario           scenario;
+    Scenario *         scenario;
     boost::uuids::uuid scenarioUuid;
     boost::uuids::uuid originNodeUuid;
     boost::uuids::uuid destinationNodeUuid;
@@ -261,16 +261,16 @@ namespace TrRouting
         scenarioUuid = uuidGenerator(parameterWithValueVector[1]);
         if (scenarioIndexesByUuid.count(scenarioUuid) == 1)
         {
-          scenario          = scenarios[scenarioIndexesByUuid[scenarioUuid]];
-          onlyServicesIdx   = scenario.servicesIdx;
-          onlyLinesIdx      = scenario.onlyLinesIdx;
-          onlyAgenciesIdx   = scenario.onlyAgenciesIdx;
-          onlyNodesIdx      = scenario.onlyNodesIdx;
-          onlyModesIdx      = scenario.onlyModesIdx;
-          exceptLinesIdx    = scenario.exceptLinesIdx;
-          exceptAgenciesIdx = scenario.exceptAgenciesIdx;
-          exceptNodesIdx    = scenario.exceptNodesIdx;
-          exceptModesIdx    = scenario.exceptModesIdx;
+          scenario          = scenarios[scenarioIndexesByUuid[scenarioUuid]].get();
+          onlyServicesIdx   = scenario->servicesIdx;
+          onlyLinesIdx      = scenario->onlyLinesIdx;
+          onlyAgenciesIdx   = scenario->onlyAgenciesIdx;
+          onlyNodesIdx      = scenario->onlyNodesIdx;
+          onlyModesIdx      = scenario->onlyModesIdx;
+          exceptLinesIdx    = scenario->exceptLinesIdx;
+          exceptAgenciesIdx = scenario->exceptAgenciesIdx;
+          exceptNodesIdx    = scenario->exceptNodesIdx;
+          exceptModesIdx    = scenario->exceptModesIdx;
         }
         continue;
       }

@@ -41,15 +41,16 @@ namespace TrRouting
     auto lastConnection = forwardConnections.end(); // cache last connection for loop
     for(auto connection = forwardConnections.begin() + forwardConnectionsIndexPerDepartureTimeHour[departureTimeHour]; connection != lastConnection; ++connection)
     {
+      
       // ignore connections before departure time + minimum access travel time:
-      if (std::get<connectionIndexes::TIME_DEP>(*connection) >= departureTimeSeconds + minAccessTravelTime)
+      if (std::get<connectionIndexes::TIME_DEP>(**connection) >= departureTimeSeconds + minAccessTravelTime)
       {
-        tripIndex = std::get<connectionIndexes::TRIP>(*connection);
+        tripIndex = std::get<connectionIndexes::TRIP>(**connection);
 
         // enabled trips only here:
         if (tripsEnabled[tripIndex] != -1)
         {
-          connectionDepartureTime = std::get<connectionIndexes::TIME_DEP>(*connection);
+          connectionDepartureTime = std::get<connectionIndexes::TIME_DEP>(**connection);
 
           // no need to parse next connections if already reached destination from all egress nodes:
           if (( !params.returnAllNodesResult
@@ -62,7 +63,7 @@ namespace TrRouting
             break;
           }
           tripEnterConnectionIndex   = tripsEnterConnection[tripIndex];
-          nodeDepartureIndex         = std::get<connectionIndexes::NODE_DEP>(*connection);
+          nodeDepartureIndex         = std::get<connectionIndexes::NODE_DEP>(**connection);
           nodeDepartureTentativeTime = nodesTentativeTime[nodeDepartureIndex];
           
           // reachable connections only here:
@@ -70,23 +71,23 @@ namespace TrRouting
           {
             
             /* Difficult to deal with blocks and no transfer between same line in CSA algorithm! */
-            /*lineIndex             = std::get<connectionIndexes::LINE>(*connection);
-            canTransferOnSameLine = std::get<connectionIndexes::CAN_TRANSFER_SAME_LINE>(*connection);
-            blockIndex            = std::get<connectionIndexes::BLOCK>(*connection);*/
+            /*lineIndex             = std::get<connectionIndexes::LINE>(**connection);
+            canTransferOnSameLine = std::get<connectionIndexes::CAN_TRANSFER_SAME_LINE>(**connection);
+            blockIndex            = std::get<connectionIndexes::BLOCK>(**connection);*/
 
             // TODO: add constrain for sameLineTransfer (check trip allowSameLineTransfers)
-            if (std::get<connectionIndexes::CAN_BOARD>(*connection) == 1 && (tripEnterConnectionIndex == -1 || (std::get<0>(forwardJourneys[nodeDepartureIndex]) == -1 && std::get<4>(forwardJourneys[nodeDepartureIndex]) >= 0 && std::get<4>(forwardJourneys[nodeDepartureIndex]) < tripsEnterConnectionTransferTravelTime[tripIndex])))
+            if (std::get<connectionIndexes::CAN_BOARD>(**connection) == 1 && (tripEnterConnectionIndex == -1 || (std::get<0>(forwardJourneys[nodeDepartureIndex]) == -1 && std::get<4>(forwardJourneys[nodeDepartureIndex]) >= 0 && std::get<4>(forwardJourneys[nodeDepartureIndex]) < tripsEnterConnectionTransferTravelTime[tripIndex])))
             {
               tripsUsable[tripIndex]                            = 1;
               tripsEnterConnection[tripIndex]                   = i;
               tripsEnterConnectionTransferTravelTime[tripIndex] = std::get<4>(forwardJourneys[nodeDepartureIndex]);
             }
             
-            if (std::get<connectionIndexes::CAN_UNBOARD>(*connection) == 1 && tripsEnterConnection[tripIndex] != -1)
+            if (std::get<connectionIndexes::CAN_UNBOARD>(**connection) == 1 && tripsEnterConnection[tripIndex] != -1)
             {
               // get footpaths for the arrival node to get transferable nodes:
-              nodeArrivalIndex      = std::get<connectionIndexes::NODE_ARR>(*connection);
-              connectionArrivalTime = std::get<connectionIndexes::TIME_ARR>(*connection);
+              nodeArrivalIndex      = std::get<connectionIndexes::NODE_ARR>(**connection);
+              connectionArrivalTime = std::get<connectionIndexes::TIME_ARR>(**connection);
               if (!params.returnAllNodesResult && !reachedAtLeastOneEgressNode && nodesEgressTravelTime[nodeArrivalIndex] != -1) // check if the arrival node is egressable
               {
                 reachedAtLeastOneEgressNode    = true;
@@ -117,7 +118,7 @@ namespace TrRouting
                     nodesTentativeTime[transferableNodeIndex] = footpathTravelTime + connectionArrivalTime + params.minWaitingTimeSeconds;
                     forwardJourneys[transferableNodeIndex]    = std::make_tuple(tripsEnterConnection[tripIndex], i, nodeArrivalIndex, tripIndex, footpathTravelTime, (nodeArrivalIndex == transferableNodeIndex ? 1 : -1));
                   }
-                  if (nodeArrivalIndex == transferableNodeIndex && (std::get<4>(forwardEgressJourneys[transferableNodeIndex]) == -1 || std::get<connectionIndexes::TIME_ARR>(forwardConnections[std::get<1>(forwardEgressJourneys[transferableNodeIndex])]) > connectionArrivalTime))
+                  if (nodeArrivalIndex == transferableNodeIndex && (std::get<4>(forwardEgressJourneys[transferableNodeIndex]) == -1 || std::get<connectionIndexes::TIME_ARR>(*forwardConnections[std::get<1>(forwardEgressJourneys[transferableNodeIndex])]) > connectionArrivalTime))
                   {
                     forwardEgressJourneys[transferableNodeIndex] = std::make_tuple(tripsEnterConnection[tripIndex], i, nodeArrivalIndex, tripIndex, footpathTravelTime, 1);
                   }
@@ -149,7 +150,7 @@ namespace TrRouting
         if (egressExitConnection != -1)
         {
           egressTravelTime      = nodesEgressTravelTime[egressFootpath.first];
-          egressNodeArrivalTime = std::get<connectionIndexes::TIME_ARR>(forwardConnections[egressExitConnection]) + egressTravelTime;
+          egressNodeArrivalTime = std::get<connectionIndexes::TIME_ARR>(*forwardConnections[egressExitConnection]) + egressTravelTime;
           //std::cerr << nodes[egressFootpath.first].get()->name << ": " << egressTravelTime << " - " << Toolbox::convertSecondsToFormattedTime(egressNodeArrivalTime) << std::endl;
           if (egressNodeArrivalTime >= 0 && egressNodeArrivalTime - departureTimeSeconds <= params.maxTotalTravelTimeSeconds && egressNodeArrivalTime < bestArrivalTime && egressNodeArrivalTime < MAX_INT)
           {

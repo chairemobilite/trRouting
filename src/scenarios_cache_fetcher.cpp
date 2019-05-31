@@ -13,8 +13,8 @@
 namespace TrRouting
 {
 
-  void CacheFetcher::getPaths(
-    std::vector<std::unique_ptr<Path>>& ts,
+  void CacheFetcher::getScenarios(
+    std::vector<std::unique_ptr<Scenario>>& ts,
     std::map<boost::uuids::uuid, int>& tIndexesByUuid,
     std::map<boost::uuids::uuid, int>& serviceIndexesByUuid,
     std::map<boost::uuids::uuid, int>& lineIndexesByUuid,

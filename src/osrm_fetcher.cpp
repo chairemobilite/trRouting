@@ -169,6 +169,9 @@ namespace TrRouting
         }
       }
     }
+
+    if (params.debugDisplay)
+        std::cout << "fetched osrm footpaths" << std::endl;
     
     return accessibleNodesFootpaths;
   }

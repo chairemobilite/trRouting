@@ -212,6 +212,21 @@ int main(int argc, char** argv) {
         correctCacheName = true;
         calculator.updateLinesFromCache(calculator.params, customCacheDirectoryPath);
       }
+      else if (cacheName == "paths")
+      {
+        correctCacheName = true;
+        calculator.updatePathsFromCache(calculator.params, customCacheDirectoryPath);
+      }
+       else if (cacheName == "scenarios")
+      {
+        correctCacheName = true;
+        calculator.updateScenariosFromCache(calculator.params, customCacheDirectoryPath);
+      }
+      else if (cacheName == "schedules")
+      {
+        correctCacheName = true;
+        calculator.updateSchedulesFromCache(calculator.params, customCacheDirectoryPath);
+      }
 
       if (correctCacheName)
       {

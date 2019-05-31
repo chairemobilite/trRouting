@@ -83,7 +83,9 @@ namespace TrRouting
     {
       departureTimeSeconds = -1;
       initialDepartureTimeSeconds = -1;
-      std::fill(tripsUsable.begin(), tripsUsable.end(), 1); // we need to make all trips usable when not coming from forward result because reverse calculation, by default, checks for usableTrips == 1
+      std::fill(tripsUsable.begin(), tripsUsable.end(), 1);
+      //tripsUsable = std::vector<std::unique_ptr<int>>(trips.size(), std::make_unique<int>(1));
+      //std::fill(tripsUsable.begin(), tripsUsable.end(), std::make_unique<int>(1)); // we need to make all trips usable when not coming from forward result because reverse calculation, by default, checks for usableTrips == 1
       
       std::tie(bestDepartureTime, bestAccessNodeIndex, bestAccessTravelTime) = reverseCalculation();
       if (params.debugDisplay)
