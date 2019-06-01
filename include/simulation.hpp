@@ -1,5 +1,5 @@
-#ifndef TR_AGENCY
-#define TR_AGENCY
+#ifndef TR_SIMULATION
+#define TR_SIMULATION
 
 #include <string>
 #include <boost/uuid/uuid.hpp>
@@ -8,22 +8,21 @@
 namespace TrRouting
 {
   
-  struct Agency {
+  struct Simulation {
     
   public:
 
     boost::uuids::uuid uuid;
-    std::string acronym;
+    std::string shortname;
     std::string name;
     std::string internalId;
-    boost::uuids::uuid simulationUuid;
 
     const std::string toString() {
-      return "Agency " + boost::uuids::to_string(uuid) + "\n  acronym " + acronym + "\n  name " + name;
+      return "Simulation " + boost::uuids::to_string(uuid) + "\n  shortname " + shortname + "\n  name " + name;
     }
 
   };
 
 }
 
-#endif // TR_AGENCY
+#endif // TR_SIMULATION

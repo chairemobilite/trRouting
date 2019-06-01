@@ -9,17 +9,16 @@ struct NetworkCollection {
 
 struct Network {
   uuid           @0  :Text;
-  acronym        @1  :Text;
-  shortname      @2  :Text;
-  name           @3  :Text;
-  internalId     @4  :Text;
-  color          @5  :Text;
-  isEnabled      @6  :Int8;
-  description    @7  :Text;
-  data           @8  :Text;
-  agenciesUuids  @9  :List(Text);
-  servicesUuids  @10 :List(Text);
-  scenariosUuids @11 :List(Text);
-  isFrozen       @12 :Int8;
-  simulationUuid @13 :Text;
+  shortname      @1  :Text;
+  name           @2  :Text;
+  internalId     @3  :Text;
+  color          @4  :Text;
+  isEnabled      @5  :Int8;
+  description    @6  :Text;
+  data           @7  :Text;
+  agenciesUuids  @8  :List(Text);
+  servicesUuids  @9  :List(Text);
+  scenariosUuids @10 :List(Text);
+  isFrozen       @11 :Int8;
+  simulationUuid @12 :Text;
 }

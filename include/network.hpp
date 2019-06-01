@@ -16,6 +16,7 @@ namespace TrRouting
     std::string shortname;
     std::string name;
     std::string internalId;
+    boost::uuids::uuid simulationUuid;
     std::vector<int> agenciesIdx;
     std::vector<int> servicesIdx;
     std::vector<int> scenariosIdx;

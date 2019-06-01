@@ -34,6 +34,7 @@ namespace TrRouting
 
     std::string cacheFileName{tStr};
     boost::uuids::string_generator uuidGenerator;
+    boost::uuids::nil_generator    uuidNilGenerator;
 
     std::cout << "Fetching " << tStr << " from cache..." << " " << customPath << std::endl;
     
@@ -44,7 +45,9 @@ namespace TrRouting
       TCollection::Reader capnpTCollection = capnpTCollectionMessage.getRoot<TCollection>();
       for (cT::Reader capnpT : capnpTCollection.getNetworks())
       {
-        std::string uuid {capnpT.getUuid()};
+        std::string uuid           {capnpT.getUuid()};
+        std::string simulationUuid {capnpT.getSimulationUuid()};
+
         std::vector<int> agenciesIdx;
         std::vector<int> servicesIdx;
         std::vector<int> scenariosIdx;
@@ -54,10 +57,11 @@ namespace TrRouting
 
         std::unique_ptr<T> t = std::make_unique<T>();
 
-        t->uuid       = uuidGenerator(uuid);
-        t->shortname  = capnpT.getShortname();
-        t->name       = capnpT.getName();
-        t->internalId = capnpT.getInternalId();
+        t->uuid           = uuidGenerator(uuid);
+        t->shortname      = capnpT.getShortname();
+        t->name           = capnpT.getName();
+        t->internalId     = capnpT.getInternalId();
+        t->simulationUuid = simulationUuid.empty() > 0 ? uuidGenerator(simulationUuid) : uuidNilGenerator();
         
         for (std::string agencyUuidStr : capnpT.getAgenciesUuids())
         {

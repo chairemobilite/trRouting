@@ -32,6 +32,7 @@ namespace TrRouting
 
     std::string cacheFileName{tStr};
     boost::uuids::string_generator uuidGenerator;
+    boost::uuids::nil_generator    uuidNilGenerator;
 
     std::cout << "Fetching " << tStr << " from cache..." << std::endl;
     
@@ -42,22 +43,25 @@ namespace TrRouting
       TCollection::Reader capnpTCollection = capnpTCollectionMessage.getRoot<TCollection>();
       for (cT::Reader capnpT : capnpTCollection.getServices())
       {
-        std::string uuid       {capnpT.getUuid()};
+        std::string uuid           {capnpT.getUuid()};
+        std::string simulationUuid {capnpT.getSimulationUuid()};
 
         std::vector<boost::gregorian::date> onlyDates;
         std::vector<boost::gregorian::date> exceptDates;
 
         std::unique_ptr<T> t = std::make_unique<T>();
 
-        t->uuid      = uuidGenerator(uuid);
-        t->name      = capnpT.getName();
-        t->monday    = capnpT.getMonday();
-        t->tuesday   = capnpT.getTuesday();
-        t->wednesday = capnpT.getWednesday();
-        t->thursday  = capnpT.getThursday();
-        t->friday    = capnpT.getFriday();
-        t->saturday  = capnpT.getSaturday();
-        t->sunday    = capnpT.getSunday();
+        t->uuid           = uuidGenerator(uuid);
+        t->name           = capnpT.getName();
+        t->internalId     = capnpT.getInternalId();
+        t->simulationUuid = simulationUuid.empty() > 0 ? uuidGenerator(simulationUuid) : uuidNilGenerator();
+        t->monday         = capnpT.getMonday();
+        t->tuesday        = capnpT.getTuesday();
+        t->wednesday      = capnpT.getWednesday();
+        t->thursday       = capnpT.getThursday();
+        t->friday         = capnpT.getFriday();
+        t->saturday       = capnpT.getSaturday();
+        t->sunday         = capnpT.getSunday();
         std::string startDate {capnpT.getStartDate()};
         if (startDate.length() > 0)
         {

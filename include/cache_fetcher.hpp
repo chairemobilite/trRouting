@@ -14,6 +14,7 @@
 #include <boost/uuid/uuid.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <boost/uuid/nil_generator.hpp>
 #include <boost/uuid/string_generator.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 //#include <boost/algorithm/string.hpp>

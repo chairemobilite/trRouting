@@ -45,7 +45,7 @@ struct Network {
   class Pipeline;
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(bc5b966d8fc87bc3, 1, 12)
+    CAPNP_DECLARE_STRUCT_HEADER(bc5b966d8fc87bc3, 1, 11)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
     #endif  // !CAPNP_LITE
@@ -155,9 +155,6 @@ public:
   inline bool hasUuid() const;
   inline  ::capnp::Text::Reader getUuid() const;
 
-  inline bool hasAcronym() const;
-  inline  ::capnp::Text::Reader getAcronym() const;
-
   inline bool hasShortname() const;
   inline  ::capnp::Text::Reader getShortname() const;
 
@@ -226,13 +223,6 @@ public:
   inline  ::capnp::Text::Builder initUuid(unsigned int size);
   inline void adoptUuid(::capnp::Orphan< ::capnp::Text>&& value);
   inline ::capnp::Orphan< ::capnp::Text> disownUuid();
-
-  inline bool hasAcronym();
-  inline  ::capnp::Text::Builder getAcronym();
-  inline void setAcronym( ::capnp::Text::Reader value);
-  inline  ::capnp::Text::Builder initAcronym(unsigned int size);
-  inline void adoptAcronym(::capnp::Orphan< ::capnp::Text>&& value);
-  inline ::capnp::Orphan< ::capnp::Text> disownAcronym();
 
   inline bool hasShortname();
   inline  ::capnp::Text::Builder getShortname();
@@ -409,174 +399,140 @@ inline ::capnp::Orphan< ::capnp::Text> Network::Builder::disownUuid() {
       ::capnp::bounded<0>() * ::capnp::POINTERS));
 }
 
-inline bool Network::Reader::hasAcronym() const {
-  return !_reader.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS).isNull();
-}
-inline bool Network::Builder::hasAcronym() {
-  return !_builder.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS).isNull();
-}
-inline  ::capnp::Text::Reader Network::Reader::getAcronym() const {
-  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_reader.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS));
-}
-inline  ::capnp::Text::Builder Network::Builder::getAcronym() {
-  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_builder.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS));
-}
-inline void Network::Builder::setAcronym( ::capnp::Text::Reader value) {
-  ::capnp::_::PointerHelpers< ::capnp::Text>::set(_builder.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS), value);
-}
-inline  ::capnp::Text::Builder Network::Builder::initAcronym(unsigned int size) {
-  return ::capnp::_::PointerHelpers< ::capnp::Text>::init(_builder.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS), size);
-}
-inline void Network::Builder::adoptAcronym(
-    ::capnp::Orphan< ::capnp::Text>&& value) {
-  ::capnp::_::PointerHelpers< ::capnp::Text>::adopt(_builder.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS), kj::mv(value));
-}
-inline ::capnp::Orphan< ::capnp::Text> Network::Builder::disownAcronym() {
-  return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
-      ::capnp::bounded<1>() * ::capnp::POINTERS));
-}
-
 inline bool Network::Reader::hasShortname() const {
   return !_reader.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<1>() * ::capnp::POINTERS).isNull();
 }
 inline bool Network::Builder::hasShortname() {
   return !_builder.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<1>() * ::capnp::POINTERS).isNull();
 }
 inline  ::capnp::Text::Reader Network::Reader::getShortname() const {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_reader.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS));
+      ::capnp::bounded<1>() * ::capnp::POINTERS));
 }
 inline  ::capnp::Text::Builder Network::Builder::getShortname() {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_builder.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS));
+      ::capnp::bounded<1>() * ::capnp::POINTERS));
 }
 inline void Network::Builder::setShortname( ::capnp::Text::Reader value) {
   ::capnp::_::PointerHelpers< ::capnp::Text>::set(_builder.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<1>() * ::capnp::POINTERS), value);
 }
 inline  ::capnp::Text::Builder Network::Builder::initShortname(unsigned int size) {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::init(_builder.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS), size);
+      ::capnp::bounded<1>() * ::capnp::POINTERS), size);
 }
 inline void Network::Builder::adoptShortname(
     ::capnp::Orphan< ::capnp::Text>&& value) {
   ::capnp::_::PointerHelpers< ::capnp::Text>::adopt(_builder.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS), kj::mv(value));
+      ::capnp::bounded<1>() * ::capnp::POINTERS), kj::mv(value));
 }
 inline ::capnp::Orphan< ::capnp::Text> Network::Builder::disownShortname() {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
-      ::capnp::bounded<2>() * ::capnp::POINTERS));
+      ::capnp::bounded<1>() * ::capnp::POINTERS));
 }
 
 inline bool Network::Reader::hasName() const {
   return !_reader.getPointerField(
-      ::capnp::bounded<3>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<2>() * ::capnp::POINTERS).isNull();
 }
 inline bool Network::Builder::hasName() {
   return !_builder.getPointerField(
-      ::capnp::bounded<3>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<2>() * ::capnp::POINTERS).isNull();
 }
 inline  ::capnp::Text::Reader Network::Reader::getName() const {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_reader.getPointerField(
-      ::capnp::bounded<3>() * ::capnp::POINTERS));
+      ::capnp::bounded<2>() * ::capnp::POINTERS));
 }
 inline  ::capnp::Text::Builder Network::Builder::getName() {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_builder.getPointerField(
-      ::capnp::bounded<3>() * ::capnp::POINTERS));
+      ::capnp::bounded<2>() * ::capnp::POINTERS));
 }
 inline void Network::Builder::setName( ::capnp::Text::Reader value) {
   ::capnp::_::PointerHelpers< ::capnp::Text>::set(_builder.getPointerField(
-      ::capnp::bounded<3>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<2>() * ::capnp::POINTERS), value);
 }
 inline  ::capnp::Text::Builder Network::Builder::initName(unsigned int size) {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::init(_builder.getPointerField(
-      ::capnp::bounded<3>() * ::capnp::POINTERS), size);
+      ::capnp::bounded<2>() * ::capnp::POINTERS), size);
 }
 inline void Network::Builder::adoptName(
     ::capnp::Orphan< ::capnp::Text>&& value) {
   ::capnp::_::PointerHelpers< ::capnp::Text>::adopt(_builder.getPointerField(
-      ::capnp::bounded<3>() * ::capnp::POINTERS), kj::mv(value));
+      ::capnp::bounded<2>() * ::capnp::POINTERS), kj::mv(value));
 }
 inline ::capnp::Orphan< ::capnp::Text> Network::Builder::disownName() {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
-      ::capnp::bounded<3>() * ::capnp::POINTERS));
+      ::capnp::bounded<2>() * ::capnp::POINTERS));
 }
 
 inline bool Network::Reader::hasInternalId() const {
   return !_reader.getPointerField(
-      ::capnp::bounded<4>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<3>() * ::capnp::POINTERS).isNull();
 }
 inline bool Network::Builder::hasInternalId() {
   return !_builder.getPointerField(
-      ::capnp::bounded<4>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<3>() * ::capnp::POINTERS).isNull();
 }
 inline  ::capnp::Text::Reader Network::Reader::getInternalId() const {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_reader.getPointerField(
-      ::capnp::bounded<4>() * ::capnp::POINTERS));
+      ::capnp::bounded<3>() * ::capnp::POINTERS));
 }
 inline  ::capnp::Text::Builder Network::Builder::getInternalId() {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_builder.getPointerField(
-      ::capnp::bounded<4>() * ::capnp::POINTERS));
+      ::capnp::bounded<3>() * ::capnp::POINTERS));
 }
 inline void Network::Builder::setInternalId( ::capnp::Text::Reader value) {
   ::capnp::_::PointerHelpers< ::capnp::Text>::set(_builder.getPointerField(
-      ::capnp::bounded<4>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<3>() * ::capnp::POINTERS), value);
 }
 inline  ::capnp::Text::Builder Network::Builder::initInternalId(unsigned int size) {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::init(_builder.getPointerField(
-      ::capnp::bounded<4>() * ::capnp::POINTERS), size);
+      ::capnp::bounded<3>() * ::capnp::POINTERS), size);
 }
 inline void Network::Builder::adoptInternalId(
     ::capnp::Orphan< ::capnp::Text>&& value) {
   ::capnp::_::PointerHelpers< ::capnp::Text>::adopt(_builder.getPointerField(
-      ::capnp::bounded<4>() * ::capnp::POINTERS), kj::mv(value));
+      ::capnp::bounded<3>() * ::capnp::POINTERS), kj::mv(value));
 }
 inline ::capnp::Orphan< ::capnp::Text> Network::Builder::disownInternalId() {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
-      ::capnp::bounded<4>() * ::capnp::POINTERS));
+      ::capnp::bounded<3>() * ::capnp::POINTERS));
 }
 
 inline bool Network::Reader::hasColor() const {
   return !_reader.getPointerField(
-      ::capnp::bounded<5>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<4>() * ::capnp::POINTERS).isNull();
 }
 inline bool Network::Builder::hasColor() {
   return !_builder.getPointerField(
-      ::capnp::bounded<5>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<4>() * ::capnp::POINTERS).isNull();
 }
 inline  ::capnp::Text::Reader Network::Reader::getColor() const {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_reader.getPointerField(
-      ::capnp::bounded<5>() * ::capnp::POINTERS));
+      ::capnp::bounded<4>() * ::capnp::POINTERS));
 }
 inline  ::capnp::Text::Builder Network::Builder::getColor() {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_builder.getPointerField(
-      ::capnp::bounded<5>() * ::capnp::POINTERS));
+      ::capnp::bounded<4>() * ::capnp::POINTERS));
 }
 inline void Network::Builder::setColor( ::capnp::Text::Reader value) {
   ::capnp::_::PointerHelpers< ::capnp::Text>::set(_builder.getPointerField(
-      ::capnp::bounded<5>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<4>() * ::capnp::POINTERS), value);
 }
 inline  ::capnp::Text::Builder Network::Builder::initColor(unsigned int size) {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::init(_builder.getPointerField(
-      ::capnp::bounded<5>() * ::capnp::POINTERS), size);
+      ::capnp::bounded<4>() * ::capnp::POINTERS), size);
 }
 inline void Network::Builder::adoptColor(
     ::capnp::Orphan< ::capnp::Text>&& value) {
   ::capnp::_::PointerHelpers< ::capnp::Text>::adopt(_builder.getPointerField(
-      ::capnp::bounded<5>() * ::capnp::POINTERS), kj::mv(value));
+      ::capnp::bounded<4>() * ::capnp::POINTERS), kj::mv(value));
 }
 inline ::capnp::Orphan< ::capnp::Text> Network::Builder::disownColor() {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
-      ::capnp::bounded<5>() * ::capnp::POINTERS));
+      ::capnp::bounded<4>() * ::capnp::POINTERS));
 }
 
 inline  ::int8_t Network::Reader::getIsEnabled() const {
@@ -595,184 +551,184 @@ inline void Network::Builder::setIsEnabled( ::int8_t value) {
 
 inline bool Network::Reader::hasDescription() const {
   return !_reader.getPointerField(
-      ::capnp::bounded<6>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<5>() * ::capnp::POINTERS).isNull();
 }
 inline bool Network::Builder::hasDescription() {
   return !_builder.getPointerField(
-      ::capnp::bounded<6>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<5>() * ::capnp::POINTERS).isNull();
 }
 inline  ::capnp::Text::Reader Network::Reader::getDescription() const {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_reader.getPointerField(
-      ::capnp::bounded<6>() * ::capnp::POINTERS));
+      ::capnp::bounded<5>() * ::capnp::POINTERS));
 }
 inline  ::capnp::Text::Builder Network::Builder::getDescription() {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_builder.getPointerField(
-      ::capnp::bounded<6>() * ::capnp::POINTERS));
+      ::capnp::bounded<5>() * ::capnp::POINTERS));
 }
 inline void Network::Builder::setDescription( ::capnp::Text::Reader value) {
   ::capnp::_::PointerHelpers< ::capnp::Text>::set(_builder.getPointerField(
-      ::capnp::bounded<6>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<5>() * ::capnp::POINTERS), value);
 }
 inline  ::capnp::Text::Builder Network::Builder::initDescription(unsigned int size) {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::init(_builder.getPointerField(
-      ::capnp::bounded<6>() * ::capnp::POINTERS), size);
+      ::capnp::bounded<5>() * ::capnp::POINTERS), size);
 }
 inline void Network::Builder::adoptDescription(
     ::capnp::Orphan< ::capnp::Text>&& value) {
   ::capnp::_::PointerHelpers< ::capnp::Text>::adopt(_builder.getPointerField(
-      ::capnp::bounded<6>() * ::capnp::POINTERS), kj::mv(value));
+      ::capnp::bounded<5>() * ::capnp::POINTERS), kj::mv(value));
 }
 inline ::capnp::Orphan< ::capnp::Text> Network::Builder::disownDescription() {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
-      ::capnp::bounded<6>() * ::capnp::POINTERS));
+      ::capnp::bounded<5>() * ::capnp::POINTERS));
 }
 
 inline bool Network::Reader::hasData() const {
   return !_reader.getPointerField(
-      ::capnp::bounded<7>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<6>() * ::capnp::POINTERS).isNull();
 }
 inline bool Network::Builder::hasData() {
   return !_builder.getPointerField(
-      ::capnp::bounded<7>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<6>() * ::capnp::POINTERS).isNull();
 }
 inline  ::capnp::Text::Reader Network::Reader::getData() const {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_reader.getPointerField(
-      ::capnp::bounded<7>() * ::capnp::POINTERS));
+      ::capnp::bounded<6>() * ::capnp::POINTERS));
 }
 inline  ::capnp::Text::Builder Network::Builder::getData() {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_builder.getPointerField(
-      ::capnp::bounded<7>() * ::capnp::POINTERS));
+      ::capnp::bounded<6>() * ::capnp::POINTERS));
 }
 inline void Network::Builder::setData( ::capnp::Text::Reader value) {
   ::capnp::_::PointerHelpers< ::capnp::Text>::set(_builder.getPointerField(
-      ::capnp::bounded<7>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<6>() * ::capnp::POINTERS), value);
 }
 inline  ::capnp::Text::Builder Network::Builder::initData(unsigned int size) {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::init(_builder.getPointerField(
-      ::capnp::bounded<7>() * ::capnp::POINTERS), size);
+      ::capnp::bounded<6>() * ::capnp::POINTERS), size);
 }
 inline void Network::Builder::adoptData(
     ::capnp::Orphan< ::capnp::Text>&& value) {
   ::capnp::_::PointerHelpers< ::capnp::Text>::adopt(_builder.getPointerField(
-      ::capnp::bounded<7>() * ::capnp::POINTERS), kj::mv(value));
+      ::capnp::bounded<6>() * ::capnp::POINTERS), kj::mv(value));
 }
 inline ::capnp::Orphan< ::capnp::Text> Network::Builder::disownData() {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
-      ::capnp::bounded<7>() * ::capnp::POINTERS));
+      ::capnp::bounded<6>() * ::capnp::POINTERS));
 }
 
 inline bool Network::Reader::hasAgenciesUuids() const {
   return !_reader.getPointerField(
-      ::capnp::bounded<8>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<7>() * ::capnp::POINTERS).isNull();
 }
 inline bool Network::Builder::hasAgenciesUuids() {
   return !_builder.getPointerField(
-      ::capnp::bounded<8>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<7>() * ::capnp::POINTERS).isNull();
 }
 inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader Network::Reader::getAgenciesUuids() const {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_reader.getPointerField(
-      ::capnp::bounded<8>() * ::capnp::POINTERS));
+      ::capnp::bounded<7>() * ::capnp::POINTERS));
 }
 inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Network::Builder::getAgenciesUuids() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_builder.getPointerField(
-      ::capnp::bounded<8>() * ::capnp::POINTERS));
+      ::capnp::bounded<7>() * ::capnp::POINTERS));
 }
 inline void Network::Builder::setAgenciesUuids( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
-      ::capnp::bounded<8>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<7>() * ::capnp::POINTERS), value);
 }
 inline void Network::Builder::setAgenciesUuids(::kj::ArrayPtr<const  ::capnp::Text::Reader> value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
-      ::capnp::bounded<8>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<7>() * ::capnp::POINTERS), value);
 }
 inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Network::Builder::initAgenciesUuids(unsigned int size) {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::init(_builder.getPointerField(
-      ::capnp::bounded<8>() * ::capnp::POINTERS), size);
+      ::capnp::bounded<7>() * ::capnp::POINTERS), size);
 }
 inline void Network::Builder::adoptAgenciesUuids(
     ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::adopt(_builder.getPointerField(
-      ::capnp::bounded<8>() * ::capnp::POINTERS), kj::mv(value));
+      ::capnp::bounded<7>() * ::capnp::POINTERS), kj::mv(value));
 }
 inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> Network::Builder::disownAgenciesUuids() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::disown(_builder.getPointerField(
-      ::capnp::bounded<8>() * ::capnp::POINTERS));
+      ::capnp::bounded<7>() * ::capnp::POINTERS));
 }
 
 inline bool Network::Reader::hasServicesUuids() const {
   return !_reader.getPointerField(
-      ::capnp::bounded<9>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<8>() * ::capnp::POINTERS).isNull();
 }
 inline bool Network::Builder::hasServicesUuids() {
   return !_builder.getPointerField(
-      ::capnp::bounded<9>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<8>() * ::capnp::POINTERS).isNull();
 }
 inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader Network::Reader::getServicesUuids() const {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_reader.getPointerField(
-      ::capnp::bounded<9>() * ::capnp::POINTERS));
+      ::capnp::bounded<8>() * ::capnp::POINTERS));
 }
 inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Network::Builder::getServicesUuids() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_builder.getPointerField(
-      ::capnp::bounded<9>() * ::capnp::POINTERS));
+      ::capnp::bounded<8>() * ::capnp::POINTERS));
 }
 inline void Network::Builder::setServicesUuids( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
-      ::capnp::bounded<9>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<8>() * ::capnp::POINTERS), value);
 }
 inline void Network::Builder::setServicesUuids(::kj::ArrayPtr<const  ::capnp::Text::Reader> value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
-      ::capnp::bounded<9>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<8>() * ::capnp::POINTERS), value);
 }
 inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Network::Builder::initServicesUuids(unsigned int size) {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::init(_builder.getPointerField(
-      ::capnp::bounded<9>() * ::capnp::POINTERS), size);
+      ::capnp::bounded<8>() * ::capnp::POINTERS), size);
 }
 inline void Network::Builder::adoptServicesUuids(
     ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::adopt(_builder.getPointerField(
-      ::capnp::bounded<9>() * ::capnp::POINTERS), kj::mv(value));
+      ::capnp::bounded<8>() * ::capnp::POINTERS), kj::mv(value));
 }
 inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> Network::Builder::disownServicesUuids() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::disown(_builder.getPointerField(
-      ::capnp::bounded<9>() * ::capnp::POINTERS));
+      ::capnp::bounded<8>() * ::capnp::POINTERS));
 }
 
 inline bool Network::Reader::hasScenariosUuids() const {
   return !_reader.getPointerField(
-      ::capnp::bounded<10>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<9>() * ::capnp::POINTERS).isNull();
 }
 inline bool Network::Builder::hasScenariosUuids() {
   return !_builder.getPointerField(
-      ::capnp::bounded<10>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<9>() * ::capnp::POINTERS).isNull();
 }
 inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader Network::Reader::getScenariosUuids() const {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_reader.getPointerField(
-      ::capnp::bounded<10>() * ::capnp::POINTERS));
+      ::capnp::bounded<9>() * ::capnp::POINTERS));
 }
 inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Network::Builder::getScenariosUuids() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::get(_builder.getPointerField(
-      ::capnp::bounded<10>() * ::capnp::POINTERS));
+      ::capnp::bounded<9>() * ::capnp::POINTERS));
 }
 inline void Network::Builder::setScenariosUuids( ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Reader value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
-      ::capnp::bounded<10>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<9>() * ::capnp::POINTERS), value);
 }
 inline void Network::Builder::setScenariosUuids(::kj::ArrayPtr<const  ::capnp::Text::Reader> value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::set(_builder.getPointerField(
-      ::capnp::bounded<10>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<9>() * ::capnp::POINTERS), value);
 }
 inline  ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>::Builder Network::Builder::initScenariosUuids(unsigned int size) {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::init(_builder.getPointerField(
-      ::capnp::bounded<10>() * ::capnp::POINTERS), size);
+      ::capnp::bounded<9>() * ::capnp::POINTERS), size);
 }
 inline void Network::Builder::adoptScenariosUuids(
     ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>&& value) {
   ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::adopt(_builder.getPointerField(
-      ::capnp::bounded<10>() * ::capnp::POINTERS), kj::mv(value));
+      ::capnp::bounded<9>() * ::capnp::POINTERS), kj::mv(value));
 }
 inline ::capnp::Orphan< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>> Network::Builder::disownScenariosUuids() {
   return ::capnp::_::PointerHelpers< ::capnp::List< ::capnp::Text,  ::capnp::Kind::BLOB>>::disown(_builder.getPointerField(
-      ::capnp::bounded<10>() * ::capnp::POINTERS));
+      ::capnp::bounded<9>() * ::capnp::POINTERS));
 }
 
 inline  ::int8_t Network::Reader::getIsFrozen() const {
@@ -791,36 +747,36 @@ inline void Network::Builder::setIsFrozen( ::int8_t value) {
 
 inline bool Network::Reader::hasSimulationUuid() const {
   return !_reader.getPointerField(
-      ::capnp::bounded<11>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<10>() * ::capnp::POINTERS).isNull();
 }
 inline bool Network::Builder::hasSimulationUuid() {
   return !_builder.getPointerField(
-      ::capnp::bounded<11>() * ::capnp::POINTERS).isNull();
+      ::capnp::bounded<10>() * ::capnp::POINTERS).isNull();
 }
 inline  ::capnp::Text::Reader Network::Reader::getSimulationUuid() const {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_reader.getPointerField(
-      ::capnp::bounded<11>() * ::capnp::POINTERS));
+      ::capnp::bounded<10>() * ::capnp::POINTERS));
 }
 inline  ::capnp::Text::Builder Network::Builder::getSimulationUuid() {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_builder.getPointerField(
-      ::capnp::bounded<11>() * ::capnp::POINTERS));
+      ::capnp::bounded<10>() * ::capnp::POINTERS));
 }
 inline void Network::Builder::setSimulationUuid( ::capnp::Text::Reader value) {
   ::capnp::_::PointerHelpers< ::capnp::Text>::set(_builder.getPointerField(
-      ::capnp::bounded<11>() * ::capnp::POINTERS), value);
+      ::capnp::bounded<10>() * ::capnp::POINTERS), value);
 }
 inline  ::capnp::Text::Builder Network::Builder::initSimulationUuid(unsigned int size) {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::init(_builder.getPointerField(
-      ::capnp::bounded<11>() * ::capnp::POINTERS), size);
+      ::capnp::bounded<10>() * ::capnp::POINTERS), size);
 }
 inline void Network::Builder::adoptSimulationUuid(
     ::capnp::Orphan< ::capnp::Text>&& value) {
   ::capnp::_::PointerHelpers< ::capnp::Text>::adopt(_builder.getPointerField(
-      ::capnp::bounded<11>() * ::capnp::POINTERS), kj::mv(value));
+      ::capnp::bounded<10>() * ::capnp::POINTERS), kj::mv(value));
 }
 inline ::capnp::Orphan< ::capnp::Text> Network::Builder::disownSimulationUuid() {
   return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
-      ::capnp::bounded<11>() * ::capnp::POINTERS));
+      ::capnp::bounded<10>() * ::capnp::POINTERS));
 }
 
 }  // namespace

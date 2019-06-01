@@ -14,6 +14,7 @@ namespace TrRouting
    
     boost::uuids::uuid uuid;
     std::string name;
+    boost::uuids::uuid simulationUuid;
     std::vector<int> servicesIdx;
     std::vector<int> onlyModesIdx;
     std::vector<int> onlyLinesIdx;
