@@ -12,11 +12,10 @@ namespace TrRouting
     
   public:
 
-    //Agency() {}
-
     boost::uuids::uuid uuid;
     std::string acronym;
     std::string name;
+    std::string internalId;
 
     const std::string toString() {
       return "Agency " + boost::uuids::to_string(uuid) + "\n  acronym " + acronym + "\n  name " + name;

@@ -54,6 +54,7 @@ namespace TrRouting
 
         t->uuid                   = uuidGenerator(uuid);
         t->direction              = capnpT.getDirection();
+        t->internalId             = capnpT.getInternalId();
         t->lineIdx                = lineIndexesByUuid[uuidGenerator(lineUuid)];
         t->tripsIdx               = tripsIdx;
         for (std::string nodeUuidStr : capnpT.getNodesUuids())

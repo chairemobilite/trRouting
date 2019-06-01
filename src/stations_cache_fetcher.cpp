@@ -53,6 +53,7 @@ namespace TrRouting
         //t->id              = capnpT.getId();
         t->code            = capnpT.getCode();
         t->name            = capnpT.getName();
+        t->internalId      = capnpT.getInternalId();
 
         tIndexesByUuid[t->uuid] = ts.size();
         ts.push_back(std::move(t));

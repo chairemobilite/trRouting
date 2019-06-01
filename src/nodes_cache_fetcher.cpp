@@ -53,10 +53,11 @@ namespace TrRouting
         std::unique_ptr<Point> point = std::make_unique<Point>();
         std::unique_ptr<T> t         = std::make_unique<T>();
 
-        t->uuid            = uuidGenerator(uuid);
-        t->id              = capnpT.getId();
-        t->code            = capnpT.getCode();
-        t->name            = capnpT.getName();
+        t->uuid       = uuidGenerator(uuid);
+        t->id         = capnpT.getId();
+        t->code       = capnpT.getCode();
+        t->name       = capnpT.getName();
+        t->internalId = capnpT.getInternalId();
 
         if (stationUuid.length() > 0 && stationIndexesByUuid.count(uuidGenerator(stationUuid)) != 0)
         {

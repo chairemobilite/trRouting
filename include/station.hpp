@@ -19,6 +19,7 @@ namespace TrRouting
     unsigned long long id;
     std::string code;
     std::string name;
+    std::string internalId;
     std::unique_ptr<Point> point;
     
     const std::string toString() {

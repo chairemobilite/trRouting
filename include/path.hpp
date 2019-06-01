@@ -15,6 +15,7 @@ namespace TrRouting
     boost::uuids::uuid uuid;
     int lineIdx;
     std::string direction;
+    std::string internalId;
     std::vector<int> nodesIdx;
     std::vector<int> tripsIdx;
 

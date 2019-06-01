@@ -33,6 +33,7 @@
 #include "toolbox.hpp"
 #include "parameters.hpp"
 #include "agency.hpp"
+#include "network.hpp"
 #include "line.hpp"
 #include "node.hpp"
 #include "data_source.hpp"
@@ -172,6 +173,16 @@ namespace TrRouting
       std::string customPath = ""
     );
 
+    void getNetworks(
+      std::vector<std::unique_ptr<Network>>& ts,
+      std::map<boost::uuids::uuid, int>& tIndexesByUuid,
+      std::map<boost::uuids::uuid, int>& agencyIndexesByUuid,
+      std::map<boost::uuids::uuid, int>& serviceIndexesByUuid,
+      std::map<boost::uuids::uuid, int>& scenarioIndexesByUuid,
+      Parameters& params,
+      std::string customPath = ""
+    );
+
     void getSchedules(
       std::vector<std::unique_ptr<Trip>>& trips,
       std::vector<std::unique_ptr<Line>>& lines,
@@ -190,9 +201,7 @@ namespace TrRouting
       Parameters& params,
       std::string customPath = ""
     );
-    
-    //const std::tuple<std::vector<Trip>, std::map<boost::uuids::uuid, int>, std::vector<std::vector<int>>, std::vector<std::vector<float>>, std::vector<Block>, std::map<boost::uuids::uuid, int>, std::vector<std::tuple<int,int,int,int,int,short,short,int,int,int,short>>, std::vector<std::tuple<int,int,int,int,int,short,short,int,int,int,short>>> getTripsAndConnections(std::map<boost::uuids::uuid, int> agencyIndexesByUuid, std::vector<std::unique_ptr<Line>>& lines, std::map<boost::uuids::uuid, int> lineIndexesByUuid, std::vector<Path> paths, std::map<boost::uuids::uuid, int> pathIndexesByUuid, std::map<boost::uuids::uuid, int> nodeIndexesByUuid, std::map<boost::uuids::uuid, int> serviceIndexesByUuid, Parameters& params);
-    
+        
   private:
     
   };

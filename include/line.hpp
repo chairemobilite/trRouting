@@ -17,6 +17,7 @@ namespace TrRouting
     int modeIdx;
     std::string shortname;
     std::string longname;
+    std::string internalId;
     short allowSameLineTransfers;
 
     const std::string toString() {

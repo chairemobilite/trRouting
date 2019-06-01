@@ -93,6 +93,11 @@ namespace TrRouting
     params.cacheFetcher->getScenarios(scenarios, scenarioIndexesByUuid, serviceIndexesByUuid, lineIndexesByUuid, agencyIndexesByUuid, nodeIndexesByUuid, modeIndexesByShortname, params, customPath);
   }
 
+  void Calculator::updateNetworksFromCache(Parameters& params, std::string customPath)
+  {
+    params.cacheFetcher->getNetworks(networks, networkIndexesByUuid, agencyIndexesByUuid, serviceIndexesByUuid, scenarioIndexesByUuid, params, customPath);
+  }
+
   void Calculator::updateSchedulesFromCache(Parameters& params, std::string customPath)
   {
     params.cacheFetcher->getSchedules(
@@ -217,6 +222,7 @@ namespace TrRouting
       updateLinesFromCache(params);
       updatePathsFromCache(params);
       updateScenariosFromCache(params);
+      updateNetworksFromCache(params);
       updateSchedulesFromCache(params);      
       
     }

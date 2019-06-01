@@ -15,6 +15,7 @@ namespace TrRouting
    
     boost::uuids::uuid uuid;
     std::string name;
+    std::string internalId;
     short monday;
     short tuesday;
     short wednesday;

@@ -52,6 +52,7 @@ namespace TrRouting
         t->uuid                   = uuidGenerator(uuid);
         t->shortname              = capnpT.getShortname();
         t->longname               = capnpT.getLongname();
+        t->internalId             = capnpT.getInternalId();
         t->agencyIdx              = agencyIndexesByUuid[uuidGenerator(agencyUuid)];
         t->modeIdx                = modeIndexesByShortname[capnpT.getMode()];
         t->allowSameLineTransfers = capnpT.getAllowSameLineTransfers();

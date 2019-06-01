@@ -45,9 +45,10 @@ namespace TrRouting
 
         std::unique_ptr<T> t = std::make_unique<T>();
 
-        t->uuid    = uuidGenerator(uuid);
-        t->acronym = capnpT.getAcronym();
-        t->name    = capnpT.getName();
+        t->uuid       = uuidGenerator(uuid);
+        t->acronym    = capnpT.getAcronym();
+        t->name       = capnpT.getName();
+        t->internalId = capnpT.getInternalId();
         
         tIndexesByUuid[t->uuid] = ts.size();
         ts.push_back(std::move(t));

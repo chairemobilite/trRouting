@@ -8,7 +8,8 @@ struct StationCollection {
 }
 
 struct Station {
-  uuid @0 :Text;
-  code @1 :Text;
-  name @2 :Text;
+  uuid       @0 :Text;
+  code       @1 :Text;
+  name       @2 :Text;
+  internalId @3 :Text;
 }
