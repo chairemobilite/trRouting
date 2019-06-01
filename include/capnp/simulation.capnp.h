@@ -29,7 +29,7 @@ struct Simulation {
   class Pipeline;
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(a3747f9518898489, 1, 7)
+    CAPNP_DECLARE_STRUCT_HEADER(a3747f9518898489, 1, 8)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
     #endif  // !CAPNP_LITE
@@ -83,6 +83,9 @@ public:
   inline  ::capnp::Text::Reader getData() const;
 
   inline  ::int8_t getIsFrozen() const;
+
+  inline bool hasSimulationClass() const;
+  inline  ::capnp::Text::Reader getSimulationClass() const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -172,6 +175,13 @@ public:
 
   inline  ::int8_t getIsFrozen();
   inline void setIsFrozen( ::int8_t value);
+
+  inline bool hasSimulationClass();
+  inline  ::capnp::Text::Builder getSimulationClass();
+  inline void setSimulationClass( ::capnp::Text::Reader value);
+  inline  ::capnp::Text::Builder initSimulationClass(unsigned int size);
+  inline void adoptSimulationClass(::capnp::Orphan< ::capnp::Text>&& value);
+  inline ::capnp::Orphan< ::capnp::Text> disownSimulationClass();
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -493,6 +503,40 @@ inline  ::int8_t Simulation::Builder::getIsFrozen() {
 inline void Simulation::Builder::setIsFrozen( ::int8_t value) {
   _builder.setDataField< ::int8_t>(
       ::capnp::bounded<3>() * ::capnp::ELEMENTS, value);
+}
+
+inline bool Simulation::Reader::hasSimulationClass() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS).isNull();
+}
+inline bool Simulation::Builder::hasSimulationClass() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::Text::Reader Simulation::Reader::getSimulationClass() const {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_reader.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS));
+}
+inline  ::capnp::Text::Builder Simulation::Builder::getSimulationClass() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_builder.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS));
+}
+inline void Simulation::Builder::setSimulationClass( ::capnp::Text::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::set(_builder.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS), value);
+}
+inline  ::capnp::Text::Builder Simulation::Builder::initSimulationClass(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::init(_builder.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS), size);
+}
+inline void Simulation::Builder::adoptSimulationClass(
+    ::capnp::Orphan< ::capnp::Text>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::adopt(_builder.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::Text> Simulation::Builder::disownSimulationClass() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS));
 }
 
 }  // namespace

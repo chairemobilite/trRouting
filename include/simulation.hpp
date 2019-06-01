@@ -16,6 +16,7 @@ namespace TrRouting
     std::string shortname;
     std::string name;
     std::string internalId;
+    std::string simulationClass;
 
     const std::string toString() {
       return "Simulation " + boost::uuids::to_string(uuid) + "\n  shortname " + shortname + "\n  name " + name;
