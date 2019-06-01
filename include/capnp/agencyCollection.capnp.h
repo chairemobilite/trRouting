@@ -45,7 +45,7 @@ struct Agency {
   class Pipeline;
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(a7fac5bdf8e50062, 1, 7)
+    CAPNP_DECLARE_STRUCT_HEADER(a7fac5bdf8e50062, 1, 8)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
     #endif  // !CAPNP_LITE
@@ -177,6 +177,9 @@ public:
 
   inline  ::int8_t getIsFrozen() const;
 
+  inline bool hasSimulationUuid() const;
+  inline  ::capnp::Text::Reader getSimulationUuid() const;
+
 private:
   ::capnp::_::StructReader _reader;
   template <typename, ::capnp::Kind>
@@ -259,6 +262,13 @@ public:
 
   inline  ::int8_t getIsFrozen();
   inline void setIsFrozen( ::int8_t value);
+
+  inline bool hasSimulationUuid();
+  inline  ::capnp::Text::Builder getSimulationUuid();
+  inline void setSimulationUuid( ::capnp::Text::Reader value);
+  inline  ::capnp::Text::Builder initSimulationUuid(unsigned int size);
+  inline void adoptSimulationUuid(::capnp::Orphan< ::capnp::Text>&& value);
+  inline ::capnp::Orphan< ::capnp::Text> disownSimulationUuid();
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -586,6 +596,40 @@ inline  ::int8_t Agency::Builder::getIsFrozen() {
 inline void Agency::Builder::setIsFrozen( ::int8_t value) {
   _builder.setDataField< ::int8_t>(
       ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
+}
+
+inline bool Agency::Reader::hasSimulationUuid() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS).isNull();
+}
+inline bool Agency::Builder::hasSimulationUuid() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::Text::Reader Agency::Reader::getSimulationUuid() const {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_reader.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS));
+}
+inline  ::capnp::Text::Builder Agency::Builder::getSimulationUuid() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_builder.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS));
+}
+inline void Agency::Builder::setSimulationUuid( ::capnp::Text::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::set(_builder.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS), value);
+}
+inline  ::capnp::Text::Builder Agency::Builder::initSimulationUuid(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::init(_builder.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS), size);
+}
+inline void Agency::Builder::adoptSimulationUuid(
+    ::capnp::Orphan< ::capnp::Text>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::adopt(_builder.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::Text> Agency::Builder::disownSimulationUuid() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
+      ::capnp::bounded<7>() * ::capnp::POINTERS));
 }
 
 }  // namespace

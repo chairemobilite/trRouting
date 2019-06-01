@@ -45,7 +45,7 @@ struct Network {
   class Pipeline;
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(bc5b966d8fc87bc3, 1, 11)
+    CAPNP_DECLARE_STRUCT_HEADER(bc5b966d8fc87bc3, 1, 12)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
     #endif  // !CAPNP_LITE
@@ -189,6 +189,9 @@ public:
 
   inline  ::int8_t getIsFrozen() const;
 
+  inline bool hasSimulationUuid() const;
+  inline  ::capnp::Text::Reader getSimulationUuid() const;
+
 private:
   ::capnp::_::StructReader _reader;
   template <typename, ::capnp::Kind>
@@ -302,6 +305,13 @@ public:
 
   inline  ::int8_t getIsFrozen();
   inline void setIsFrozen( ::int8_t value);
+
+  inline bool hasSimulationUuid();
+  inline  ::capnp::Text::Builder getSimulationUuid();
+  inline void setSimulationUuid( ::capnp::Text::Reader value);
+  inline  ::capnp::Text::Builder initSimulationUuid(unsigned int size);
+  inline void adoptSimulationUuid(::capnp::Orphan< ::capnp::Text>&& value);
+  inline ::capnp::Orphan< ::capnp::Text> disownSimulationUuid();
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -777,6 +787,40 @@ inline  ::int8_t Network::Builder::getIsFrozen() {
 inline void Network::Builder::setIsFrozen( ::int8_t value) {
   _builder.setDataField< ::int8_t>(
       ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
+}
+
+inline bool Network::Reader::hasSimulationUuid() const {
+  return !_reader.getPointerField(
+      ::capnp::bounded<11>() * ::capnp::POINTERS).isNull();
+}
+inline bool Network::Builder::hasSimulationUuid() {
+  return !_builder.getPointerField(
+      ::capnp::bounded<11>() * ::capnp::POINTERS).isNull();
+}
+inline  ::capnp::Text::Reader Network::Reader::getSimulationUuid() const {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_reader.getPointerField(
+      ::capnp::bounded<11>() * ::capnp::POINTERS));
+}
+inline  ::capnp::Text::Builder Network::Builder::getSimulationUuid() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::get(_builder.getPointerField(
+      ::capnp::bounded<11>() * ::capnp::POINTERS));
+}
+inline void Network::Builder::setSimulationUuid( ::capnp::Text::Reader value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::set(_builder.getPointerField(
+      ::capnp::bounded<11>() * ::capnp::POINTERS), value);
+}
+inline  ::capnp::Text::Builder Network::Builder::initSimulationUuid(unsigned int size) {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::init(_builder.getPointerField(
+      ::capnp::bounded<11>() * ::capnp::POINTERS), size);
+}
+inline void Network::Builder::adoptSimulationUuid(
+    ::capnp::Orphan< ::capnp::Text>&& value) {
+  ::capnp::_::PointerHelpers< ::capnp::Text>::adopt(_builder.getPointerField(
+      ::capnp::bounded<11>() * ::capnp::POINTERS), kj::mv(value));
+}
+inline ::capnp::Orphan< ::capnp::Text> Network::Builder::disownSimulationUuid() {
+  return ::capnp::_::PointerHelpers< ::capnp::Text>::disown(_builder.getPointerField(
+      ::capnp::bounded<11>() * ::capnp::POINTERS));
 }
 
 }  // namespace

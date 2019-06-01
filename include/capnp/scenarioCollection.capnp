@@ -24,5 +24,6 @@ struct Scenario {
   onlyModesShortnames   @13 :List(Text);
   exceptModesShortnames @14 :List(Text);
   isFrozen              @15 :Int8;
+  simulationUuid        @16 :Text;
 }
 

@@ -21,4 +21,5 @@ struct Network {
   servicesUuids  @10 :List(Text);
   scenariosUuids @11 :List(Text);
   isFrozen       @12 :Int8;
+  simulationUuid @13 :Text;
 }
