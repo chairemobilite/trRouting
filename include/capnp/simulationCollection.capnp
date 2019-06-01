@@ -18,4 +18,5 @@ struct Simulation {
   isCompleted    @7  :Int8;
   description    @8  :Text;
   data           @9  :Text;
+  isFrozen       @10 :Int8;
 }
