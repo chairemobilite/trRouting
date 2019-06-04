@@ -167,62 +167,62 @@ int main(int argc, char** argv) {
     bool correctCacheName {false};
     for(std::string cacheName : cacheNames)
     {
-      if (cacheName == "data_sources")
+      if (cacheName == "data_sources" || cacheName == "all")
       {
         correctCacheName = true;
         calculator.updateDataSourcesFromCache(calculator.params, customCacheDirectoryPath);
       }
-      else if (cacheName == "households")
+      if (cacheName == "households" || cacheName == "all")
       {
         correctCacheName = true;
         calculator.updateHouseholdsFromCache(calculator.params, customCacheDirectoryPath);
       }
-      else if (cacheName == "persons")
+      if (cacheName == "persons" || cacheName == "all")
       {
         correctCacheName = true;
         calculator.updatePersonsFromCache(calculator.params, customCacheDirectoryPath);
       }
-      else if (cacheName == "od_trips")
+      if (cacheName == "od_trips" || cacheName == "all")
       {
         correctCacheName = true;
         calculator.updateOdTripsFromCache(calculator.params, customCacheDirectoryPath);
       }
-      else if (cacheName == "places")
+      if (cacheName == "places" || cacheName == "all")
       {
         correctCacheName = true;
         calculator.updatePlacesFromCache(calculator.params, customCacheDirectoryPath);
       }
-      if (cacheName == "agencies")
+      if (cacheName == "agencies" || cacheName == "all")
       {
         correctCacheName = true;
         calculator.updateAgenciesFromCache(calculator.params, customCacheDirectoryPath);
       }
-      else if (cacheName == "services")
+      if (cacheName == "services" || cacheName == "all")
       {
         correctCacheName = true;
         calculator.updateServicesFromCache(calculator.params, customCacheDirectoryPath);
       }
-      else if (cacheName == "nodes")
+      if (cacheName == "nodes" || cacheName == "all")
       {
         correctCacheName = true;
         calculator.updateNodesFromCache(calculator.params, customCacheDirectoryPath);
       }
-      else if (cacheName == "lines")
+      if (cacheName == "lines" || cacheName == "all")
       {
         correctCacheName = true;
         calculator.updateLinesFromCache(calculator.params, customCacheDirectoryPath);
       }
-      else if (cacheName == "paths")
+      if (cacheName == "paths" || cacheName == "all")
       {
         correctCacheName = true;
         calculator.updatePathsFromCache(calculator.params, customCacheDirectoryPath);
       }
-       else if (cacheName == "scenarios")
+      if (cacheName == "scenarios" || cacheName == "all")
       {
         correctCacheName = true;
         calculator.updateScenariosFromCache(calculator.params, customCacheDirectoryPath);
       }
-      else if (cacheName == "schedules")
+      if (cacheName == "schedules" || cacheName == "all")
       {
         correctCacheName = true;
         calculator.updateSchedulesFromCache(calculator.params, customCacheDirectoryPath);
