@@ -240,7 +240,7 @@ int main(int argc, char** argv) {
     }
     if (cacheNames.size() > 0)
     {
-      response = "{\"status\": \"success\", \"cache_names\": \"" + cacheNamesStr + "\"}";
+      response = "{\"status\": \"success\", \"cache_names\": \"" + cacheNamesStr + "\", \"custom_cache_path\": \"" + customCacheDirectoryPath + "\"}";
     }
     else
     {
