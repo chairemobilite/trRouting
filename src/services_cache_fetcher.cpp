@@ -54,7 +54,7 @@ namespace TrRouting
         t->uuid           = uuidGenerator(uuid);
         t->name           = capnpT.getName();
         t->internalId     = capnpT.getInternalId();
-        t->simulationUuid = simulationUuid.empty() > 0 ? uuidGenerator(simulationUuid) : uuidNilGenerator();
+        t->simulationUuid = simulationUuid.empty() ? uuidNilGenerator() : uuidGenerator(simulationUuid);
         t->monday         = capnpT.getMonday();
         t->tuesday        = capnpT.getTuesday();
         t->wednesday      = capnpT.getWednesday();

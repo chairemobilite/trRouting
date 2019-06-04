@@ -69,7 +69,7 @@ namespace TrRouting
 
         t->uuid           = uuidGenerator(uuid);
         t->name           = capnpT.getName();
-        t->simulationUuid = simulationUuid.empty() > 0 ? uuidGenerator(simulationUuid) : uuidNilGenerator();
+        t->simulationUuid = simulationUuid.empty() ? uuidNilGenerator() : uuidGenerator(simulationUuid);
         
         for (std::string serviceUuidStr : capnpT.getServicesUuids())
         {

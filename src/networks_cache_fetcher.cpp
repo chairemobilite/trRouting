@@ -61,7 +61,7 @@ namespace TrRouting
         t->shortname      = capnpT.getShortname();
         t->name           = capnpT.getName();
         t->internalId     = capnpT.getInternalId();
-        t->simulationUuid = simulationUuid.empty() > 0 ? uuidGenerator(simulationUuid) : uuidNilGenerator();
+        t->simulationUuid = simulationUuid.empty() ? uuidNilGenerator() : uuidGenerator(simulationUuid);
         
         for (std::string agencyUuidStr : capnpT.getAgenciesUuids())
         {

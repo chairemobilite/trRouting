@@ -51,7 +51,7 @@ namespace TrRouting
         t->acronym        = capnpT.getAcronym();
         t->name           = capnpT.getName();
         t->internalId     = capnpT.getInternalId();
-        t->simulationUuid = simulationUuid.empty() > 0 ? uuidGenerator(simulationUuid) : uuidNilGenerator();
+        t->simulationUuid = simulationUuid.empty() ? uuidNilGenerator() : uuidGenerator(simulationUuid);
         
         tIndexesByUuid[t->uuid] = ts.size();
         ts.push_back(std::move(t));
