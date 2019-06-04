@@ -156,7 +156,7 @@ int main(int argc, char** argv) {
         }
         continue;
       }
-      if (parameterWithValueVector[0] == "path")
+      if (parameterWithValueVector[0] == "path" || parameterWithValueVector[0] == "custom_path" || parameterWithValueVector[0] == "custom_cache_path")
       {
         customCacheDirectoryPath = parameterWithValueVector[1];
         continue;
