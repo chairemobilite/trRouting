@@ -8,8 +8,6 @@ namespace TrRouting
     
     algorithmCalculationTime = CalculationTime();
     
-    std::cout << "calculator constructor initialized agencies" << std::endl;
-
     if (params.osrmWalkingUseLib == true)
     {
       osrm::EngineConfig osrmConfig;

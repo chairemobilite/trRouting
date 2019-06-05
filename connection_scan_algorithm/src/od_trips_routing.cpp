@@ -50,7 +50,7 @@ namespace TrRouting
     if (params.responseFormat == "csv" && params.batchNumber == 1) // write header only on first batch, so we can easily append subsequent batches to the same csv file
     {
       // write csv header:
-      response += "uuid,internalId,status,ageGroup,gender,occupation,destinationActivity,mode,expansionFactor,travelTimeSeconds,onlyWalkingTravelTimeSeconds,"
+      response += "uuid,internalId,status,ageGroup,gender,occupation,destinationActivity,mode,expansionFactor,travelTimeSeconds,onlyWalkingTravelTimeSeconds,onlyCyclingTravelTimeSeconds,onlyDrivingTravelTimeSeconds,"
                      "declaredDepartureTimeSeconds,departureTimeSeconds,minimizedDepartureTimeSeconds,arrivalTimeSeconds,numberOfTransfers,inVehicleTravelTimeSeconds,"
                      "transferTravelTimeSeconds,waitingTimeSeconds,accessTravelTimeSeconds,egressTravelTimeSeconds,transferWaitingTimeSeconds,"
                      "firstWaitingTimeSeconds,nonTransitTravelTimeSeconds,lineUuids,modeShortnames,agencyUuids,boardingNodeUuids,unboardingNodeUuids,tripUuids\n";
@@ -161,7 +161,7 @@ namespace TrRouting
             //std::replace( ageGroup.begin(), ageGroup.end(), '-', '_' ); // remove dash so Excel does not convert to age groups to numbers...
             response += boost::uuids::to_string(odTrip->uuid) + ",\"" + odTrip->internalId + "\",\"" + routingResult.status + "\",\"" /*+ ageGroup*/ + "\",\"" /*+ odTrip->gender*/ + "\",\"" /*+ odTrip->occupation*/ + "\",\"";
             response += odTrip->destinationActivity + "\",\"" + odTrip->mode + "\"," + std::to_string(odTrip->expansionFactor) + "," + std::to_string(routingResult.travelTimeSeconds) + ",";
-            response += std::to_string(odTrip->walkingTravelTimeSeconds) + "," + std::to_string(odTrip->departureTimeSeconds) + "," + std::to_string(routingResult.departureTimeSeconds) + "," + std::to_string(routingResult.minimizedDepartureTimeSeconds) + ",";
+            response += std::to_string(odTrip->walkingTravelTimeSeconds) + "," + std::to_string(odTrip->cyclingTravelTimeSeconds) + "," + std::to_string(odTrip->drivingTravelTimeSeconds) + "," + std::to_string(odTrip->departureTimeSeconds) + "," + std::to_string(routingResult.departureTimeSeconds) + "," + std::to_string(routingResult.minimizedDepartureTimeSeconds) + ",";
             response += std::to_string(routingResult.arrivalTimeSeconds) + "," + std::to_string(routingResult.numberOfTransfers) + "," + std::to_string(routingResult.inVehicleTravelTimeSeconds) + ",";
             response += std::to_string(routingResult.transferTravelTimeSeconds) + "," + std::to_string(routingResult.waitingTimeSeconds) + "," + std::to_string(routingResult.accessTravelTimeSeconds) + ",";
             response += std::to_string(routingResult.egressTravelTimeSeconds) + "," + std::to_string(routingResult.transferWaitingTimeSeconds) + "," + std::to_string(routingResult.firstWaitingTimeSeconds) + ",";
@@ -251,6 +251,8 @@ namespace TrRouting
             odTripJson["travelTimeSeconds"]             = routingResult.travelTimeSeconds;
             odTripJson["minimizedTravelTimeSeconds"]    = routingResult.travelTimeSeconds - routingResult.firstWaitingTimeSeconds + params.minWaitingTimeSeconds;
             odTripJson["onlyWalkingTravelTimeSeconds"]  = odTrip->walkingTravelTimeSeconds;
+            odTripJson["onlyCyclingTravelTimeSeconds"]  = odTrip->cyclingTravelTimeSeconds;
+            odTripJson["onlyDrivingTravelTimeSeconds"]  = odTrip->drivingTravelTimeSeconds;
             odTripJson["declaredDepartureTimeSeconds"]  = odTrip->departureTimeSeconds;
             odTripJson["declaredArrivalTimeSeconds"]    = odTrip->arrivalTimeSeconds;
             odTripJson["departureTimeSeconds"]          = routingResult.departureTimeSeconds;
