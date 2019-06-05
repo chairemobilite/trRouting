@@ -1,7 +1,6 @@
 #ifndef TR_GTFS_FETCHER
 #define TR_GTFS_FETCHER
 
-#include <pqxx/pqxx> 
 #include <string>
 #include <iostream>
 #include <iomanip>

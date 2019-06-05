@@ -1,7 +1,6 @@
 #ifndef TR_CSV_FETCHER
 #define TR_CSV_FETCHER
 
-#include <pqxx/pqxx> 
 #include <string>
 #include <iostream>
 #include <iomanip>
