@@ -49,7 +49,6 @@ int main(int argc, char** argv) {
   ProgramOptions programOptions;
   programOptions.parseOptions(argc, argv);
   Parameters algorithmParams;
-  algorithmParams.setDefaultValues();
   
   // setup program options:
   
@@ -82,6 +81,7 @@ int main(int argc, char** argv) {
             << std::endl << std::endl;
   
   algorithmParams.projectShortname       = programOptions.projectShortname;
+  algorithmParams.cacheDirectoryPath     = programOptions.cachePath;
   algorithmParams.dataFetcherShortname   = programOptions.dataFetcherShortname;
   algorithmParams.osrmWalkingPort        = programOptions.osrmWalkingPort;
   algorithmParams.osrmCyclingPort        = programOptions.osrmCyclingPort;
@@ -304,7 +304,8 @@ int main(int argc, char** argv) {
     std::string response {""};
     
     // update params:
-    calculator.params.update(parametersWithValues, calculator.scenarioIndexesByUuid, calculator.scenarios, calculator.nodeIndexesByUuid);
+    calculator.params.setDefaultValues();
+    calculator.params.update(parametersWithValues, calculator.scenarioIndexesByUuid, calculator.scenarios, calculator.nodeIndexesByUuid, calculator.dataSourceIndexesByUuid);
 
     if (calculator.params.isCompleteForCalculation())
     {

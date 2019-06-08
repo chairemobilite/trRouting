@@ -51,6 +51,7 @@ namespace TrRouting
       int routingDateYear;   // not implemented, use onlyServicesIdx or exceptServicesIdx for now
       int routingDateMonth;  // not implemented, use onlyServicesIdx or exceptServicesIdx for now
       int routingDateDay;    // not implemented, use onlyServicesIdx or exceptServicesIdx for now
+      int onlyDataSourceIdx;
       std::vector<int> onlyServicesIdx;
       std::vector<int> exceptServicesIdx;
       std::vector<int> onlyLinesIdx;
@@ -99,6 +100,7 @@ namespace TrRouting
       bool calculateAllOdTrips;
       bool saveResultToFile;
       boost::optional<boost::uuids::uuid> scenarioUuid;
+      boost::optional<boost::uuids::uuid> dataSourceUuid;
       boost::optional<boost::uuids::uuid> odTripUuid;
       boost::optional<boost::uuids::uuid> startingNodeUuid;
       boost::optional<boost::uuids::uuid> endingNodeUuid;
@@ -142,7 +144,7 @@ namespace TrRouting
   
       void setDefaultValues();
       bool isCompleteForCalculation();
-      void update(std::vector<std::string> &parameters, std::map<boost::uuids::uuid, int> &scenarioIndexesByUuid, std::vector<std::unique_ptr<Scenario>> &scenarios, std::map<boost::uuids::uuid, int> &nodeIndexesByUuid);
+      void update(std::vector<std::string> &parameters, std::map<boost::uuids::uuid, int> &scenarioIndexesByUuid, std::vector<std::unique_ptr<Scenario>> &scenarios, std::map<boost::uuids::uuid, int> &nodeIndexesByUuid, std::map<boost::uuids::uuid, int> &dataSourceIndexesByUuid);
     
     
   };

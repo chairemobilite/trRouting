@@ -40,11 +40,11 @@ namespace TrRouting
   std::string CacheFetcher::getFilePath(std::string cacheFilePath, Parameters& params, std::string customPath) {
     if (customPath.empty())
     {
-      return params.cacheDirectoryPath + params.projectShortname + "/" + cacheFilePath;
+      return params.cacheDirectoryPath + "/" + params.projectShortname + "/" + cacheFilePath;
     }
     else
     {
-      return params.cacheDirectoryPath + params.projectShortname + "/" + customPath + "/" + cacheFilePath;
+      return params.cacheDirectoryPath + "/" + params.projectShortname + "/" + customPath + "/" + cacheFilePath;
     }
   }
 

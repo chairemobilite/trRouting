@@ -11,6 +11,8 @@ namespace TrRouting {
     options.add_options()
       ("dataFetcher,data",                                  boost::program_options::value<std::string>()->default_value("cache"), "data fetcher (csv, gtfs or cache)"); // only cache implemented for now
     options.add_options()
+      ("cachePath",                                         boost::program_options::value<std::string>()->default_value("cache"), "cache path");
+    options.add_options()
       ("project,projectShortname",                          boost::program_options::value<std::string>()->default_value("demo_transition"), "project shortname (shortname of the project to use or data to use)");
     options.add_options()
       ("osrmPort,osrmWalkPort,osrmWalkingPort",             boost::program_options::value<std::string>()->default_value("5000"), "osrm walking port");
@@ -37,6 +39,8 @@ namespace TrRouting {
     options.add_options()
       ("osrmDrivingUseLib",                                 boost::program_options::value<int>()        ->default_value(0), "osrm use libosrm (driving) instead of server (1 or 0)");
 
+
+
   }
 
   void ProgramOptions::parseOptions(int argc, char** argv) {
@@ -47,6 +51,7 @@ namespace TrRouting {
     port                 = 4000;
     debug                = false;
     dataFetcherShortname = "cache";
+    cachePath            = "cache";
     projectShortname     = "demo_transition";
     osrmWalkingPort      = "5000";
     osrmCyclingPort      = "8000";
@@ -84,6 +89,10 @@ namespace TrRouting {
     else if(variablesMap.count("project") == 1)
     {
       projectShortname = variablesMap["project"].as<std::string>();
+    }
+    if(variablesMap.count("cachePath") == 1)
+    {
+      cachePath = variablesMap["cachePath"].as<std::string>();
     }
 
     if(variablesMap.count("osrmWalkPort") == 1)

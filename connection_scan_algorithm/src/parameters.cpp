@@ -7,15 +7,22 @@ namespace TrRouting
   {
     if (debugDisplay)
     {
-      std::cout << "parameters: "                                           << std::endl;
-      std::cout << " calculateAllOdTrips: "  << calculateAllOdTrips         << std::endl;
-      std::cout << " odTripUuid: "           << odTripUuid.is_initialized() << std::endl;
-      std::cout << " hasOrigin: "            << hasOrigin                   << std::endl;
-      std::cout << " hasDestination: "       << hasDestination              << std::endl;
-      std::cout << " forwardCalculation: "   << forwardCalculation          << std::endl;
-      std::cout << " departureTimeSeconds: " << departureTimeSeconds        << std::endl;
-      std::cout << " arrivalTimeSeconds: "   << arrivalTimeSeconds          << std::endl;
-      std::cout << " returnAllNodesResult: " << returnAllNodesResult        << std::endl;
+      std::cout << "parameters: "            << std::endl;
+      std::cout << " hasScenarioUuid: "      << (scenarioUuid.is_initialized()   ? "true" : "false") << std::endl;
+      std::cout << " hasServices: "          << (onlyServicesIdx.size() >  0     ? "true" : "false") << std::endl;
+      std::cout << " hasDataSourceUuid: "    << (dataSourceUuid.is_initialized() ? "true" : "false") << std::endl;
+      std::cout << " hasOdTripUuid: "        << (odTripUuid.is_initialized()     ? "true" : "false") << std::endl;
+      std::cout << " calculateAllOdTrips: "  << calculateAllOdTrips  << std::endl;
+      std::cout << " hasOrigin: "            << hasOrigin            << std::endl;
+      std::cout << " hasDestination: "       << hasDestination       << std::endl;
+      std::cout << " forwardCalculation: "   << forwardCalculation   << std::endl;
+      std::cout << " departureTimeSeconds: " << departureTimeSeconds << std::endl;
+      std::cout << " arrivalTimeSeconds: "   << arrivalTimeSeconds   << std::endl;
+      std::cout << " returnAllNodesResult: " << returnAllNodesResult << std::endl;
+    }  
+    if (!scenarioUuid.is_initialized() || onlyServicesIdx.size() == 0) // scenario and only services is mandatory
+    {
+      return false;
     }
     if (calculateAllOdTrips || odTripUuid.is_initialized())
     {
@@ -49,6 +56,7 @@ namespace TrRouting
     odTripsActivities.clear();
     odTripsModes.clear();
 
+    onlyDataSourceIdx = -1;
     onlyServicesIdx.clear();
     exceptServicesIdx.clear();
     onlyLinesIdx.clear();
@@ -60,7 +68,6 @@ namespace TrRouting
     onlyNodesIdx.clear();
     exceptNodesIdx.clear();
 
-    cacheDirectoryPath                     = "cache/";
     calculationName                        = "trRouting";
     batchNumber                            = 1;
     batchesCount                           = 1;
@@ -68,6 +75,7 @@ namespace TrRouting
     responseFormat                         = "json";
     saveResultToFile                       = false;
     scenarioUuid                           = boost::none;
+    dataSourceUuid                         = boost::none;
     odTripUuid                             = boost::none;
     startingNodeUuid                       = boost::none;
     endingNodeUuid                         = boost::none;
@@ -117,7 +125,7 @@ namespace TrRouting
     
   }
 
-  void Parameters::update(std::vector<std::string> &parameters, std::map<boost::uuids::uuid, int> &scenarioIndexesByUuid, std::vector<std::unique_ptr<Scenario>> &scenarios, std::map<boost::uuids::uuid, int> &nodeIndexesByUuid)
+  void Parameters::update(std::vector<std::string> &parameters, std::map<boost::uuids::uuid, int> &scenarioIndexesByUuid, std::vector<std::unique_ptr<Scenario>> &scenarios, std::map<boost::uuids::uuid, int> &nodeIndexesByUuid, std::map<boost::uuids::uuid, int> &dataSourceIndexesByUuid)
   {
     
     setDefaultValues();
@@ -125,7 +133,8 @@ namespace TrRouting
     boost::uuids::string_generator uuidGenerator;
 
     Scenario *         scenario;
-    boost::uuids::uuid scenarioUuid;
+    scenarioUuid   = boost::none;
+    dataSourceUuid = boost::none;
     boost::uuids::uuid originNodeUuid;
     boost::uuids::uuid destinationNodeUuid;
     
@@ -259,9 +268,9 @@ namespace TrRouting
       else if (parameterWithValueVector[0] == "scenario_uuid")
       {
         scenarioUuid = uuidGenerator(parameterWithValueVector[1]);
-        if (scenarioIndexesByUuid.count(scenarioUuid) == 1)
+        if (scenarioIndexesByUuid.count(*scenarioUuid) == 1)
         {
-          scenario          = scenarios[scenarioIndexesByUuid[scenarioUuid]].get();
+          scenario          = scenarios[scenarioIndexesByUuid[*scenarioUuid]].get();
           onlyServicesIdx   = scenario->servicesIdx;
           onlyLinesIdx      = scenario->onlyLinesIdx;
           onlyAgenciesIdx   = scenario->onlyAgenciesIdx;
@@ -272,6 +281,13 @@ namespace TrRouting
           exceptNodesIdx    = scenario->exceptNodesIdx;
           exceptModesIdx    = scenario->exceptModesIdx;
         }
+        continue;
+      }
+
+      else if (parameterWithValueVector[0] == "data_source_uuid")
+      {
+        dataSourceUuid    = uuidGenerator(parameterWithValueVector[1]);
+        onlyDataSourceIdx = dataSourceIndexesByUuid[*dataSourceUuid];
         continue;
       }
 

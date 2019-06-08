@@ -85,6 +85,12 @@ namespace TrRouting
         attributesMatches = false;
       }
 
+      // filter wrong data source if only data source is provided:
+      if (params.onlyDataSourceIdx != -1 && _odTrip->dataSourceIdx != params.onlyDataSourceIdx)
+      {
+        attributesMatches = false;
+      }
+
       // verify that od trip matches at least one selected period:
       for (auto & period : params.odTripsPeriods)
       {

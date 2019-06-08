@@ -15,6 +15,7 @@ namespace TrRouting
     
 
     std::string projectShortname;
+    std::string cachePath;
     int         port;
     bool        debug;
     std::string algorithm;
