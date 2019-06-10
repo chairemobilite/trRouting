@@ -14,6 +14,9 @@
 #include <boost/optional.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/program_options.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/filesystem.hpp>
 
 #include "toolbox.hpp"
 #include "gtfs_fetcher.hpp"
@@ -36,10 +39,6 @@ std::string consoleYellow     = "";
 std::string consoleCyan       = "";
 std::string consoleMagenta    = "";
 std::string consoleResetColor = "";
-
-//Added for the default_resource example
-void default_resource_send(const HttpServer &server, const std::shared_ptr<HttpServer::Response> &serverResponse,
-                           const std::shared_ptr<std::ifstream> &ifs);
 
 int main(int argc, char** argv) {
   
@@ -117,14 +116,36 @@ int main(int argc, char** argv) {
 
 
 
+  server.resource["^/saveCache[/]?$"]["POST"] = [&server, &calculator](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
+    
+    std::string response {""};
 
+
+    try {
+      boost::property_tree::ptree pt;
+      boost::property_tree::read_json(request->content, pt);
+
+      //auto name = pt.get<string>("firstName") + " " + pt.get<string>("lastName");
+
+      //response = "{\"status\": \"failed\", \"error\": \"missing or wrong cache name\"}";
+    }
+    catch(const std::exception &e) {
+      std::string error(e.what());
+      response = "{\"status\": \"failed\", \"error\": \"" + error + "\"}";
+    }
+
+
+    response = "{\"status\": \"failed\", \"error\": \"missing or wrong cache name\"}";
+
+    *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
+
+  };
 
 
   // updateCache:
-  server.resource["^/updateCache[/]?\\?([0-9a-zA-Z&=_,:/.-]+)$"]["GET"]=[&server, &calculator](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
+  server.resource["^/updateCache[/]?$"]["GET"]=[&server, &calculator](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
     
-    // todo
-
+    std::string              response {""};
     std::vector<std::string> parametersWithValues;
     std::vector<std::string> parameterWithValueVector;
     std::string              queryString;
@@ -133,14 +154,12 @@ int main(int argc, char** argv) {
     std::vector<std::string> cacheNames;
     std::vector<std::string> cacheNamesVector;
 
-    if (request->path_match.size() >= 1)
+    // prepare parameters:
+    auto queryFields = request->parse_query_string();
+    for(auto &field : queryFields)
     {
-      queryString = request->path_match[1];
+      parametersWithValues.push_back(field.first + "=" + field.second);
     }
-    
-    std::string response {""};
-
-    boost::split(parametersWithValues, queryString, boost::is_any_of("&"));
 
     for(auto & parameterWithValue : parametersWithValues)
     {
@@ -272,7 +291,7 @@ int main(int argc, char** argv) {
 
 
   // routing request
-  server.resource["^/route/v1/transit[/]?\\?([0-9a-zA-Z&=_,:/.-]+)$"]["GET"]=[&server, &calculator](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
+  server.resource["^/route/v1/transit[/]?$"]["GET"]=[&server, &calculator](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
     
     // prepare benchmarking and timer:
     calculator.algorithmCalculationTime.start();
@@ -280,12 +299,11 @@ int main(int argc, char** argv) {
     
     // prepare parameters:
     std::vector<std::string> parametersWithValues;
-    std::string              queryString;
-    if (request->path_match.size() >= 1)
+    auto queryFields = request->parse_query_string();
+    for(auto &field : queryFields)
     {
-      queryString = request->path_match[1];
+      parametersWithValues.push_back(field.first + "=" + field.second);
     }
-    boost::split(parametersWithValues, queryString, boost::is_any_of("&"));
   
     // clear and initialize benchmarking:
     if (calculator.params.debugDisplay)
@@ -380,11 +398,22 @@ int main(int argc, char** argv) {
   
 
 
+  server.default_resource["GET"] = [](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
+    std::cout << "calculating request: " << request->content.string() << std::endl;
+    
+    std::string response = "{\"status\": \"failed\", \"error\": \"missing params\"}";
 
+    *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
+  };
+
+  server.on_error = [](std::shared_ptr<HttpServer::Request> /*request*/, const SimpleWeb::error_code & /*ec*/) {
+    // Handle errors here
+    // Note that connection timeouts will also call this handle with ec set to SimpleWeb::errc::operation_canceled
+  };
 
   std::cout << "starting server..." << std::endl;
   std::thread server_thread([&server](){
-      server.start();
+    server.start();
   });
 
   // Wait for server to start so that the client can connect:
@@ -393,9 +422,7 @@ int main(int argc, char** argv) {
   std::cout << "ready." << std::endl;
   
   server_thread.join();
-  
-  std::cout << "done..." << std::endl;
-  
+    
   return 0;
 }
 
@@ -405,29 +432,5 @@ int main(int argc, char** argv) {
 
 
 
-void default_resource_send(const HttpServer &server, const std::shared_ptr<HttpServer::Response> &serverResponse, const std::shared_ptr<std::ifstream> &ifs) {
-  
-  // Read and send 128 KB at a time:
-  static std::vector<char> buffer(131072);
-  
-  // Safe when server is running on one thread:
-  std::streamsize read_length;
-  if ((read_length = ifs->read(&buffer[0], buffer.size()).gcount()) > 0)
-  {
-    serverResponse->write(&buffer[0], read_length);
-    if (read_length==static_cast<std::streamsize>(buffer.size()))
-    {
-      server.send(serverResponse, [&server, serverResponse, ifs](const boost::system::error_code &ec)
-      {
-        if (!ec)
-        {
-          default_resource_send(server, serverResponse, ifs);
-        }
-        else
-        {
-          std::cerr << "Connection interrupted" << std::endl;
-        }
-      });
-    }
-  }
-}
+
+

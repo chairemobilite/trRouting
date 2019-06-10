@@ -19,7 +19,7 @@ namespace TrRouting
       std::cout << " departureTimeSeconds: " << departureTimeSeconds << std::endl;
       std::cout << " arrivalTimeSeconds: "   << arrivalTimeSeconds   << std::endl;
       std::cout << " returnAllNodesResult: " << returnAllNodesResult << std::endl;
-    }  
+    }
     if (!scenarioUuid.is_initialized() || onlyServicesIdx.size() == 0) // scenario and only services is mandatory
     {
       return false;
