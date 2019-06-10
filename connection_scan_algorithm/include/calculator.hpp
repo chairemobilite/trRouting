@@ -12,6 +12,8 @@
 #include <vector>
 #include <math.h>
 #include <algorithm>
+#include <random>
+#include <chrono>
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 #include <boost/filesystem.hpp>

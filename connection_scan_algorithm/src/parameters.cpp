@@ -74,6 +74,7 @@ namespace TrRouting
     alternatives                           = false;
     responseFormat                         = "json";
     saveResultToFile                       = false;
+    odTripsSampleRatio                     = 1.0;
     scenarioUuid                           = boost::none;
     dataSourceUuid                         = boost::none;
     odTripUuid                             = boost::none;
@@ -409,6 +410,11 @@ namespace TrRouting
       else if (parameterWithValueVector[0] == "od_trips_sample_size" || parameterWithValueVector[0] == "sample_size" || parameterWithValueVector[0] == "sample")
       {
         odTripsSampleSize = std::stoi(parameterWithValueVector[1]);
+        continue;
+      }
+      else if (parameterWithValueVector[0] == "od_trips_sample_ratio" || parameterWithValueVector[0] == "od_trips_sample_ratio") // example: 0.5 means only 50% of od trips will be calculated (od trips will be shuffled before)
+      {
+        odTripsSampleRatio = std::stof(parameterWithValueVector[1]);
         continue;
       }
       else if (parameterWithValueVector[0] == "od_trips_periods")

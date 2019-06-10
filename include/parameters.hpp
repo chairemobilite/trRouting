@@ -85,6 +85,7 @@ namespace TrRouting
       int maxEgressWalkingTravelTimeSeconds;
       int maxTransferWalkingTravelTimeSeconds;
       int maxTotalWalkingTravelTimeSeconds;
+      float odTripsSampleRatio;
       float maxOnlyWalkingAccessTravelTimeRatio;
       float walkingSpeedFactor;
       float walkingSpeedMetersPerSecond;

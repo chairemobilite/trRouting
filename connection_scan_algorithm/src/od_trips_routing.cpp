@@ -62,6 +62,14 @@ namespace TrRouting
     if (params.debugDisplay)
       std::cout << "  starting odTripsRouting" << std::endl;
 
+    int stopAtI {-1};
+    if (params.odTripsSampleRatio > 0.0 && params.odTripsSampleRatio < 1.0)
+    {
+      unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+      std::shuffle(odTrips.begin(), odTrips.end(), std::default_random_engine(seed));
+      stopAtI = ceil((float)(odTrips.size()) * params.odTripsSampleRatio);
+    }
+
     for (auto & _odTrip : odTrips)
     {
       
@@ -69,6 +77,11 @@ namespace TrRouting
       {
         i++;
         continue;
+      }
+
+      if (stopAtI != -1 && i == stopAtI)
+      {
+        break;
       }
       
       attributesMatches          = true;
