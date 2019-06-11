@@ -133,6 +133,7 @@ namespace TrRouting
 
         if (true/*routingResult.status == "success"*/)
         {
+          float correctedExpansionFactor = odTrip->expansionFactor / params.odTripsSampleRatio;
           atLeastOneOdTrip = true;
           if (routingResult.legs.size() > 0)
           {
@@ -146,8 +147,8 @@ namespace TrRouting
                 legPath               = paths[legPathIdx].get();
                 legConnectionStartIdx = std::get<3>(leg);
                 legConnectionEndIdx   = std::get<4>(leg);
-                lineProfiles[lines[legLineIdx].get()->uuid] += odTrip->expansionFactor;
-
+                lineProfiles[lines[legLineIdx].get()->uuid] += correctedExpansionFactor;
+                
                 if (pathProfiles.find(legPath->uuid) == pathProfiles.end())
                 {
                   pathProfiles[legPath->uuid] = std::vector<std::vector<float>>(legPath->nodesIdx.size() - 1, demandByHourOfDay);
@@ -157,11 +158,11 @@ namespace TrRouting
                 for (int connectionIndex = legConnectionStartIdx; connectionIndex <= legConnectionEndIdx; connectionIndex++)
                 {
                   connectionDepartureTimeSeconds = *tripConnectionDepartureTimes[legTripIdx][connectionIndex];
-                  *tripConnectionDemands[legTripIdx][connectionIndex] += odTrip->expansionFactor;
+                  *tripConnectionDemands[legTripIdx][connectionIndex] += correctedExpansionFactor;
                   connectionDepartureTimeHour    = connectionDepartureTimeSeconds / 3600;
                   //std::cout << "pUuid:" << legPath->uuid << " dth:" << connectionDepartureTimeHour << " cI:" << connectionIndex << " oldD:" << pathProfiles[legPath.uuid][connectionIndex][connectionDepartureTimeHour] << std::endl;
-                  pathProfiles[legPath->uuid][connectionIndex][connectionDepartureTimeHour] += odTrip->expansionFactor;
-                  pathTotalProfiles[legPath->uuid][connectionIndex] += odTrip->expansionFactor;
+                  pathProfiles[legPath->uuid][connectionIndex][connectionDepartureTimeHour] += correctedExpansionFactor;
+                  pathTotalProfiles[legPath->uuid][connectionIndex] += correctedExpansionFactor;
                   if (maximumSegmentHourlyDemand < pathProfiles[legPath->uuid][connectionIndex][connectionDepartureTimeHour])
                   {
                     maximumSegmentHourlyDemand = pathProfiles[legPath->uuid][connectionIndex][connectionDepartureTimeHour];
@@ -179,7 +180,7 @@ namespace TrRouting
           {
             //std::replace( ageGroup.begin(), ageGroup.end(), '-', '_' ); // remove dash so Excel does not convert to age groups to numbers...
             response += boost::uuids::to_string(odTrip->uuid) + ",\"" + odTrip->internalId + "\",\"" + routingResult.status + "\",\"" /*+ ageGroup*/ + "\",\"" /*+ odTrip->gender*/ + "\",\"" /*+ odTrip->occupation*/ + "\",\"";
-            response += odTrip->destinationActivity + "\",\"" + odTrip->mode + "\"," + std::to_string(odTrip->expansionFactor) + "," + std::to_string(routingResult.travelTimeSeconds) + ",";
+            response += odTrip->destinationActivity + "\",\"" + odTrip->mode + "\"," + std::to_string(correctedExpansionFactor) + "," + std::to_string(routingResult.travelTimeSeconds) + ",";
             response += std::to_string(odTrip->walkingTravelTimeSeconds) + "," + std::to_string(odTrip->cyclingTravelTimeSeconds) + "," + std::to_string(odTrip->drivingTravelTimeSeconds) + "," + std::to_string(odTrip->departureTimeSeconds) + "," + std::to_string(routingResult.departureTimeSeconds) + "," + std::to_string(routingResult.minimizedDepartureTimeSeconds) + ",";
             response += std::to_string(routingResult.arrivalTimeSeconds) + "," + std::to_string(routingResult.numberOfTransfers) + "," + std::to_string(routingResult.inVehicleTravelTimeSeconds) + ",";
             response += std::to_string(routingResult.transferTravelTimeSeconds) + "," + std::to_string(routingResult.waitingTimeSeconds) + "," + std::to_string(routingResult.accessTravelTimeSeconds) + ",";
@@ -266,7 +267,7 @@ namespace TrRouting
             odTripJson["originActivity"]                = odTrip->originActivity;
             odTripJson["destinationActivity"]           = odTrip->destinationActivity;
             odTripJson["declaredMode"]                  = odTrip->mode;
-            odTripJson["expansionFactor"]               = odTrip->expansionFactor;
+            odTripJson["expansionFactor"]               = correctedExpansionFactor;
             odTripJson["travelTimeSeconds"]             = routingResult.travelTimeSeconds;
             odTripJson["minimizedTravelTimeSeconds"]    = routingResult.travelTimeSeconds - routingResult.firstWaitingTimeSeconds + params.minWaitingTimeSeconds;
             odTripJson["onlyWalkingTravelTimeSeconds"]  = odTrip->walkingTravelTimeSeconds;
