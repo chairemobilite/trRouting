@@ -20,16 +20,13 @@ use -DBUILD_SHARED_LIBS=ON to install libraries needed to compile trRouting
 ## Mac OS X Install with homebrew
 ```
 brew install boost
-brew install libpqxx
 brew install capnp
-brew tap nlohmann/json
-brew install nlohmann/json/nlohmann_json
 ```
 
 ## Ubuntu 16.04 Install
 
 ```
-sudo apt-get install clang libboost-all-dev libexpat1-dev libjsoncpp-dev libpqxx-4.0 libpqxx-dev libncurses5-dev
+sudo apt-get install clang libboost-all-dev libexpat1-dev libjsoncpp-dev libncurses5-dev
 ```
 
 ## Compilation
