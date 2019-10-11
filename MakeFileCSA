@@ -13,10 +13,10 @@ CAPNP_OBJS = $(addprefix include/capnp/obj/,$(notdir $(SPECIFIC_CAPNP_C++_FILES:
 LDFLAGS  := -I/usr/local/include -Iinclude -Iconnection_scan_algorithm/include -I/usr/local/include/osrm
 
 ifeq ($(OS),Darwin)
-	# macox
+	# macos
 	CXXFLAGS += -std=c++14 -stdlib=libc++
-	#LINKFLAGS = -lboost_thread-mt -lboost_serialization -lboost_system -lboost_filesystem -lboost_regex -lboost_program_options
-	LINKFLAGS = -L/usr/local/lib -lboost_iostreams -losrm -lcurses -lcapnp -lkj -lboost_thread-mt -lboost_serialization -lboost_system -lboost_filesystem -lboost_regex -lboost_program_options -lboost_date_time
+	#LINKFLAGS = -lboost_thread -lboost_serialization -lboost_system -lboost_filesystem -lboost_regex -lboost_program_options
+	LINKFLAGS = -lboost_iostreams -losrm -lcurses -lcapnp -lkj -lboost_thread-mt -lboost_serialization -lboost_system -lboost_filesystem -lboost_regex -lboost_program_options -lboost_date_time
 else
 	# linux or other (only linux ubuntu and debian are supported right now)
 	CXXFLAGS += -std=c++14 -stdlib=libstdc++
