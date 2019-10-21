@@ -137,7 +137,7 @@ namespace TrRouting
           atLeastOneOdTrip = true;
           if (routingResult.legs.size() > 0)
           {
-            if (params.responseFormat != "csv")
+            if (params.responseFormat != "csv" && params.calculateProfiles)
             {
               for (auto & leg : routingResult.legs)
               {
@@ -263,16 +263,16 @@ namespace TrRouting
             /*odTripJson["ageGroup"]                    = persons[odTrip->personIdx].ageGroup; // this fails (segmentation fault)...
             odTripJson["gender"]                        = persons[odTrip->personIdx].gender;
             odTripJson["occupation"]                    = persons[odTrip->personIdx].occupation;*/
-            odTripJson["internalId"]                    = odTrip->internalId;
-            odTripJson["originActivity"]                = odTrip->originActivity;
-            odTripJson["destinationActivity"]           = odTrip->destinationActivity;
-            odTripJson["declaredMode"]                  = odTrip->mode;
+            //odTripJson["internalId"]                    = odTrip->internalId;
+            //odTripJson["originActivity"]                = odTrip->originActivity;
+            //odTripJson["destinationActivity"]           = odTrip->destinationActivity;
+            //odTripJson["declaredMode"]                  = odTrip->mode;
             odTripJson["expansionFactor"]               = correctedExpansionFactor;
             odTripJson["travelTimeSeconds"]             = routingResult.travelTimeSeconds;
             odTripJson["minimizedTravelTimeSeconds"]    = routingResult.travelTimeSeconds - routingResult.firstWaitingTimeSeconds + params.minWaitingTimeSeconds;
             odTripJson["onlyWalkingTravelTimeSeconds"]  = odTrip->walkingTravelTimeSeconds;
-            odTripJson["onlyCyclingTravelTimeSeconds"]  = odTrip->cyclingTravelTimeSeconds;
-            odTripJson["onlyDrivingTravelTimeSeconds"]  = odTrip->drivingTravelTimeSeconds;
+            //odTripJson["onlyCyclingTravelTimeSeconds"]  = odTrip->cyclingTravelTimeSeconds;
+            //odTripJson["onlyDrivingTravelTimeSeconds"]  = odTrip->drivingTravelTimeSeconds;
             odTripJson["declaredDepartureTimeSeconds"]  = odTrip->departureTimeSeconds;
             odTripJson["declaredArrivalTimeSeconds"]    = odTrip->arrivalTimeSeconds;
             odTripJson["departureTimeSeconds"]          = routingResult.departureTimeSeconds;
@@ -287,12 +287,12 @@ namespace TrRouting
             odTripJson["transferWaitingTimeSeconds"]    = routingResult.transferWaitingTimeSeconds;
             odTripJson["firstWaitingTimeSeconds"]       = routingResult.firstWaitingTimeSeconds;
             odTripJson["nonTransitTravelTimeSeconds"]   = routingResult.nonTransitTravelTimeSeconds;
-            odTripJson["lineUuids"]                     = Toolbox::uuidsToStrings(routingResult.lineUuids);
-            odTripJson["modesShortnames"]               = routingResult.modeShortnames;
-            odTripJson["agencyUuids"]                   = Toolbox::uuidsToStrings(routingResult.agencyUuids);
-            odTripJson["boardingNodeUuids"]             = Toolbox::uuidsToStrings(routingResult.boardingNodeUuids);
-            odTripJson["unboardingNodeUuids"]           = Toolbox::uuidsToStrings(routingResult.unboardingNodeUuids);
-            odTripJson["tripUuids"]                     = Toolbox::uuidsToStrings(routingResult.tripUuids);
+            //odTripJson["lineUuids"]                     = Toolbox::uuidsToStrings(routingResult.lineUuids);
+            //odTripJson["modesShortnames"]               = routingResult.modeShortnames;
+            //odTripJson["agencyUuids"]                   = Toolbox::uuidsToStrings(routingResult.agencyUuids);
+            //odTripJson["boardingNodeUuids"]             = Toolbox::uuidsToStrings(routingResult.boardingNodeUuids);
+            //odTripJson["unboardingNodeUuids"]           = Toolbox::uuidsToStrings(routingResult.unboardingNodeUuids);
+            //odTripJson["tripUuids"]                     = Toolbox::uuidsToStrings(routingResult.tripUuids);
             json["odTrips"].push_back(odTripJson);
           }
         }

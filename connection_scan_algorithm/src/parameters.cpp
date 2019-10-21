@@ -122,6 +122,7 @@ namespace TrRouting
     minAlternativeMaxTravelTimeSeconds     = 30*60;
     alternativesMaxAddedTravelTimeSeconds  = 30*60;
     odTripsSampleSize                      = -1;
+    calculateProfiles                      = true;
     walkingSpeedFactor                     = 1.0; // all walking segments are weighted with this value. > 1.0 means faster walking, < 1.0 means slower walking
     
   }
@@ -534,6 +535,7 @@ namespace TrRouting
               )
       {
         if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1") { transferOnlyAtSameStation = true; }
+        continue;
       }
       else if (parameterWithValueVector[0] == "detailed"
                || parameterWithValueVector[0] == "detailed_results"
@@ -541,6 +543,14 @@ namespace TrRouting
               )
       {
         if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1") { detailedResults = true; }
+        continue;
+      }
+      else if (parameterWithValueVector[0] == "profiles"
+               || parameterWithValueVector[0] == "calculate_profiles"
+              )
+      {
+        if (parameterWithValueVector[1] == "false" || parameterWithValueVector[1] == "0") { calculateProfiles = false; }
+        continue;
       }
       else if (parameterWithValueVector[0] == "transfer_between_same_line"
                || parameterWithValueVector[0] == "allow_same_line_transfer"
@@ -549,12 +559,14 @@ namespace TrRouting
               )
       {
         if (parameterWithValueVector[1] == "false" || parameterWithValueVector[1] == "0") { transferBetweenSameLine = false; }
+        continue;
       }
 
       // not yet implemented
       else if (parameterWithValueVector[0] == "max_number_of_transfers" || parameterWithValueVector[0] == "max_transfers")
       {
         maxNumberOfTransfers = std::stoi(parameterWithValueVector[1]);
+        continue;
       }
       // not yet implemented
       else if (parameterWithValueVector[0] == "calculate_by_number_of_transfers" || parameterWithValueVector[0] == "by_num_transfers")
@@ -563,6 +575,7 @@ namespace TrRouting
         { 
           calculateByNumberOfTransfers = true;
         }
+        continue;
       }
 
       /*
@@ -795,6 +808,7 @@ namespace TrRouting
       else if (parameterWithValueVector[0] == "debug")
       {
         if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1") { debugDisplay = true; }
+        continue;
       }
 
     }

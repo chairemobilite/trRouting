@@ -142,7 +142,8 @@ namespace TrRouting
       bool transferBetweenSameLine;      // allow transfers between the same line
       bool calculateByNumberOfTransfers; // calculate first the fastest route, then calculate with decreasing number of transfers until no route is found, return results for each number of transfers.
       bool alternatives;                 // calculate alternatives or not
-  
+      bool calculateProfiles;            // calculate profiles for lines, paths and trips (od trips only)
+
       void setDefaultValues();
       bool isCompleteForCalculation();
       void update(std::vector<std::string> &parameters, std::map<boost::uuids::uuid, int> &scenarioIndexesByUuid, std::vector<std::unique_ptr<Scenario>> &scenarios, std::map<boost::uuids::uuid, int> &nodeIndexesByUuid, std::map<boost::uuids::uuid, int> &dataSourceIndexesByUuid);
