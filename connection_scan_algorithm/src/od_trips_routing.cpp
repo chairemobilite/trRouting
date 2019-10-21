@@ -263,10 +263,10 @@ namespace TrRouting
             /*odTripJson["ageGroup"]                    = persons[odTrip->personIdx].ageGroup; // this fails (segmentation fault)...
             odTripJson["gender"]                        = persons[odTrip->personIdx].gender;
             odTripJson["occupation"]                    = persons[odTrip->personIdx].occupation;*/
-            //odTripJson["internalId"]                    = odTrip->internalId;
-            //odTripJson["originActivity"]                = odTrip->originActivity;
-            //odTripJson["destinationActivity"]           = odTrip->destinationActivity;
-            //odTripJson["declaredMode"]                  = odTrip->mode;
+            odTripJson["internalId"]                    = odTrip->internalId;
+            odTripJson["originActivity"]                = odTrip->originActivity;
+            odTripJson["destinationActivity"]           = odTrip->destinationActivity;
+            odTripJson["declaredMode"]                  = odTrip->mode;
             odTripJson["expansionFactor"]               = correctedExpansionFactor;
             odTripJson["travelTimeSeconds"]             = routingResult.travelTimeSeconds;
             odTripJson["minimizedTravelTimeSeconds"]    = routingResult.travelTimeSeconds - routingResult.firstWaitingTimeSeconds + params.minWaitingTimeSeconds;
