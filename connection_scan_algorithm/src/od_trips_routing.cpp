@@ -121,7 +121,7 @@ namespace TrRouting
         {
           std::cout << "od trip uuid " << _odTrip->uuid << " (" << (i+1) << "/" << odTripsCount << ")" << std::endl << " dts: " << _odTrip->departureTimeSeconds << " atLeastOneCompatiblePeriod: " << (atLeastOneCompatiblePeriod ? "true " : "false ") << "attributesMatches: " << (attributesMatches ? "true " : "false ") << std::endl;
         }
-        else if (i % 1000 == 0)
+        else if ((i + 1) % 1000 == 0)
         {
           if (stopAtI > 0)
           {
@@ -315,31 +315,42 @@ namespace TrRouting
       json["maxSegmentHourlyDemand"] = maximumSegmentHourlyDemand;
       json["maxSegmentTotalDemand"]  = maximumSegmentTotalDemand;
       json["totalTravelTimeSeconds"] = totalTravelTimeSeconds;
-      lineProfilesJson = {};
-      for (auto & lineCount : lineProfiles)
-      {
-        lineProfilesJson[boost::uuids::to_string(lineCount.first)] = lineCount.second;
-      }
-      json["lineProfiles"] = lineProfilesJson;
       
-      pathProfilesJson = {};
-      for (auto & pathProfile : pathProfiles)
+      if (params.calculateProfiles == true)
       {
-        pathProfilesJson[boost::uuids::to_string(pathProfile.first)] = pathProfile.second;
-        //pathsOdTripsProfilesSequenceJson = {};
-        /*for (auto & segmentProfile : pathProfile)
+
+        lineProfilesJson = {};
+
+        for (auto & lineCount : lineProfiles)
         {
-          
-          //pathsOdTripsProfilesOdTripUuids.clear();
-          //for (auto & odTripUuid : std::get<1>(sequenceProfile.second))
-          //{
-          //  pathsOdTripsProfilesOdTripUuids.push_back()
-          //}
-          //pathsOdTripsProfilesSequenceJson[std::to_string(sequenceProfile.first)] = {{"demand", std::get<0>(sequenceProfile.second)}, {"odTripUuids", Toolbox::uuidsToStrings(std::get<1>(sequenceProfile.second))}};
-        }*/
-        //pathsOdTripsProfilesJson[boost::uuids::to_string(pathProfile.first)] = pathsProfile;
+          lineProfilesJson[boost::uuids::to_string(lineCount.first)] = lineCount.second;
+        }
+
+        json["lineProfiles"] = lineProfilesJson;
+
+        pathProfilesJson = {};
+
+        for (auto & pathProfile : pathProfiles)
+        {
+          pathProfilesJson[boost::uuids::to_string(pathProfile.first)] = pathProfile.second;
+          //pathsOdTripsProfilesSequenceJson = {};
+          /*for (auto & segmentProfile : pathProfile)
+          {
+
+            //pathsOdTripsProfilesOdTripUuids.clear();
+            //for (auto & odTripUuid : std::get<1>(sequenceProfile.second))
+            //{
+            //  pathsOdTripsProfilesOdTripUuids.push_back()
+            //}
+            //pathsOdTripsProfilesSequenceJson[std::to_string(sequenceProfile.first)] = {{"demand", std::get<0>(sequenceProfile.second)}, {"odTripUuids", Toolbox::uuidsToStrings(std::get<1>(sequenceProfile.second))}};
+          }*/
+          //pathsOdTripsProfilesJson[boost::uuids::to_string(pathProfile.first)] = pathsProfile;
+        }
+
+        json["pathProfiles"] = pathProfilesJson;
+        
       }
-      json["pathProfiles"] = pathProfilesJson;
+      
     }
     if (params.calculateAllOdTrips && params.responseFormat == "csv")
     {
