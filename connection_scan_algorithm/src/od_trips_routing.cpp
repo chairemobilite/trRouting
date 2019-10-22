@@ -123,184 +123,186 @@ namespace TrRouting
         }
         else if (i % 1000 == 0)
         {
-          std::cout << (i+1) << "/" << odTripsCount << std::endl;
-        }
-        odTrip      = _odTrip.get();
-        origin      = odTrip->origin.get();
-        destination = odTrip->destination.get();
-        routingResult      = calculate(true, resetFilters); // reset filters only on first calculation
-        resetFilters       = false;
-        countOdTripsCalculated++;
-
-        if (true/*routingResult.status == "success"*/)
-        {
-          float correctedExpansionFactor = odTrip->expansionFactor / params.odTripsSampleRatio;
-          atLeastOneOdTrip = true;
-          if (routingResult.legs.size() > 0)
+          if (stopAtI > 0)
           {
-
-            totalTravelTimeSeconds += correctedExpansionFactor * routingResult.travelTimeSeconds;
-
-            if (params.responseFormat != "csv" && params.calculateProfiles)
-            {
-              for (auto & leg : routingResult.legs)
-              {
-                legTripIdx            = std::get<0>(leg);
-                legLineIdx            = std::get<1>(leg);
-                legPathIdx            = std::get<2>(leg);
-                legPath               = paths[legPathIdx].get();
-                legConnectionStartIdx = std::get<3>(leg);
-                legConnectionEndIdx   = std::get<4>(leg);
-                lineProfiles[lines[legLineIdx].get()->uuid] += correctedExpansionFactor;
-                
-                if (pathProfiles.find(legPath->uuid) == pathProfiles.end())
-                {
-                  pathProfiles[legPath->uuid] = std::vector<std::vector<float>>(legPath->nodesIdx.size() - 1, demandByHourOfDay);
-                  pathTotalProfiles[legPath->uuid] = std::vector<float>(legPath->nodesIdx.size() - 1, 0.0);
-                }
-
-                for (int connectionIndex = legConnectionStartIdx; connectionIndex <= legConnectionEndIdx; connectionIndex++)
-                {
-                  connectionDepartureTimeSeconds = *tripConnectionDepartureTimes[legTripIdx][connectionIndex];
-                  *tripConnectionDemands[legTripIdx][connectionIndex] += correctedExpansionFactor;
-                  connectionDepartureTimeHour    = connectionDepartureTimeSeconds / 3600;
-                  //std::cout << "pUuid:" << legPath->uuid << " dth:" << connectionDepartureTimeHour << " cI:" << connectionIndex << " oldD:" << pathProfiles[legPath.uuid][connectionIndex][connectionDepartureTimeHour] << std::endl;
-                  pathProfiles[legPath->uuid][connectionIndex][connectionDepartureTimeHour] += correctedExpansionFactor;
-                  pathTotalProfiles[legPath->uuid][connectionIndex] += correctedExpansionFactor;
-                  if (maximumSegmentHourlyDemand < pathProfiles[legPath->uuid][connectionIndex][connectionDepartureTimeHour])
-                  {
-                    maximumSegmentHourlyDemand = pathProfiles[legPath->uuid][connectionIndex][connectionDepartureTimeHour];
-                  }
-                  if (maximumSegmentTotalDemand < pathTotalProfiles[legPath->uuid][connectionIndex])
-                  {
-                    maximumSegmentTotalDemand = pathTotalProfiles[legPath->uuid][connectionIndex];
-                  }
-                }
-              }
-            }
-          }
-          
-          if (params.responseFormat == "csv")
-          {
-            //std::replace( ageGroup.begin(), ageGroup.end(), '-', '_' ); // remove dash so Excel does not convert to age groups to numbers...
-            response += boost::uuids::to_string(odTrip->uuid) + ",\"" + odTrip->internalId + "\",\"" + routingResult.status + "\",\"" /*+ ageGroup*/ + "\",\"" /*+ odTrip->gender*/ + "\",\"" /*+ odTrip->occupation*/ + "\",\"";
-            response += odTrip->destinationActivity + "\",\"" + odTrip->mode + "\"," + std::to_string(correctedExpansionFactor) + "," + std::to_string(routingResult.travelTimeSeconds) + ",";
-            response += std::to_string(odTrip->walkingTravelTimeSeconds) + "," + std::to_string(odTrip->cyclingTravelTimeSeconds) + "," + std::to_string(odTrip->drivingTravelTimeSeconds) + "," + std::to_string(odTrip->departureTimeSeconds) + "," + std::to_string(routingResult.departureTimeSeconds) + "," + std::to_string(routingResult.minimizedDepartureTimeSeconds) + ",";
-            response += std::to_string(routingResult.arrivalTimeSeconds) + "," + std::to_string(routingResult.numberOfTransfers) + "," + std::to_string(routingResult.inVehicleTravelTimeSeconds) + ",";
-            response += std::to_string(routingResult.transferTravelTimeSeconds) + "," + std::to_string(routingResult.waitingTimeSeconds) + "," + std::to_string(routingResult.accessTravelTimeSeconds) + ",";
-            response += std::to_string(routingResult.egressTravelTimeSeconds) + "," + std::to_string(routingResult.transferWaitingTimeSeconds) + "," + std::to_string(routingResult.firstWaitingTimeSeconds) + ",";
-            response += std::to_string(routingResult.nonTransitTravelTimeSeconds) + ",";
-            
-            int countLineUuids = routingResult.lineUuids.size();
-            j = 0;
-            for (auto & lineUuid : routingResult.lineUuids)
-            {
-              response += boost::uuids::to_string(lineUuid);
-              if (j < countLineUuids - 1)
-              {
-                response += "|";
-              }
-              j++;
-            }
-            response += ",";
-            j = 0;
-            for (auto & modeShortname : routingResult.modeShortnames)
-            {
-              response += modeShortname;
-              if (j < countLineUuids - 1)
-              {
-                response += "|";
-              }
-              j++;
-            }
-            response += ",";
-            j = 0;
-            for (auto & agencyUuid : routingResult.agencyUuids)
-            {
-              response += boost::uuids::to_string(agencyUuid);
-              if (j < countLineUuids - 1)
-              {
-                response += "|";
-              }
-              j++;
-            }
-            response += ",";
-            j = 0;
-            for (auto & boardingNodeUuid : routingResult.boardingNodeUuids)
-            {
-              response += boost::uuids::to_string(boardingNodeUuid);
-              if (j < countLineUuids - 1)
-              {
-                response += "|";
-              }
-              j++;
-            }
-            response += ",";
-            j = 0;
-            for (auto & unboardingNodeUuid : routingResult.unboardingNodeUuids)
-            {
-              response += boost::uuids::to_string(unboardingNodeUuid);
-              if (j < countLineUuids - 1)
-              {
-                response += "|";
-              }
-              j++;
-            }
-            response += ",";
-            j = 0;
-            for (auto & tripUuid : routingResult.tripUuids)
-            {
-              response += boost::uuids::to_string(tripUuid);
-              if (j < countLineUuids - 1)
-              {
-                response += "|";
-              }
-              j++;
-            }
-            response += "\n";
+            std::cout << (i+1) << "/" << (stopAtI + 1) << std::endl;
           }
           else
           {
-            odTripJson = {};
-            odTripJson["uuid"]                          = boost::uuids::to_string(odTrip->uuid);
-            odTripJson["status"]                        = routingResult.status;
-            /*odTripJson["ageGroup"]                    = persons[odTrip->personIdx].ageGroup; // this fails (segmentation fault)...
-            odTripJson["gender"]                        = persons[odTrip->personIdx].gender;
-            odTripJson["occupation"]                    = persons[odTrip->personIdx].occupation;*/
-            odTripJson["internalId"]                    = odTrip->internalId;
-            odTripJson["originActivity"]                = odTrip->originActivity;
-            odTripJson["destinationActivity"]           = odTrip->destinationActivity;
-            odTripJson["declaredMode"]                  = odTrip->mode;
-            odTripJson["expansionFactor"]               = correctedExpansionFactor;
-            odTripJson["travelTimeSeconds"]             = routingResult.travelTimeSeconds;
-            odTripJson["minimizedTravelTimeSeconds"]    = routingResult.travelTimeSeconds - routingResult.firstWaitingTimeSeconds + params.minWaitingTimeSeconds;
-            odTripJson["onlyWalkingTravelTimeSeconds"]  = odTrip->walkingTravelTimeSeconds;
-            //odTripJson["onlyCyclingTravelTimeSeconds"]  = odTrip->cyclingTravelTimeSeconds;
-            //odTripJson["onlyDrivingTravelTimeSeconds"]  = odTrip->drivingTravelTimeSeconds;
-            odTripJson["declaredDepartureTimeSeconds"]  = odTrip->departureTimeSeconds;
-            odTripJson["declaredArrivalTimeSeconds"]    = odTrip->arrivalTimeSeconds;
-            odTripJson["departureTimeSeconds"]          = routingResult.departureTimeSeconds;
-            odTripJson["minimizedDepartureTimeSeconds"] = routingResult.minimizedDepartureTimeSeconds;
-            odTripJson["arrivalTimeSeconds"]            = routingResult.arrivalTimeSeconds;
-            odTripJson["numberOfTransfers"]             = routingResult.numberOfTransfers;
-            odTripJson["inVehicleTravelTimeSeconds"]    = routingResult.inVehicleTravelTimeSeconds;
-            odTripJson["transferTravelTimeSeconds"]     = routingResult.transferTravelTimeSeconds;
-            odTripJson["waitingTimeSeconds"]            = routingResult.waitingTimeSeconds;
-            odTripJson["accessTravelTimeSeconds"]       = routingResult.accessTravelTimeSeconds;
-            odTripJson["egressTravelTimeSeconds"]       = routingResult.egressTravelTimeSeconds;
-            odTripJson["transferWaitingTimeSeconds"]    = routingResult.transferWaitingTimeSeconds;
-            odTripJson["firstWaitingTimeSeconds"]       = routingResult.firstWaitingTimeSeconds;
-            odTripJson["nonTransitTravelTimeSeconds"]   = routingResult.nonTransitTravelTimeSeconds;
-            odTripJson["lineUuids"]                     = Toolbox::uuidsToStrings(routingResult.lineUuids);
-            odTripJson["modesShortnames"]               = routingResult.modeShortnames;
-            odTripJson["agencyUuids"]                   = Toolbox::uuidsToStrings(routingResult.agencyUuids);
-            odTripJson["boardingNodeUuids"]             = Toolbox::uuidsToStrings(routingResult.boardingNodeUuids);
-            odTripJson["unboardingNodeUuids"]           = Toolbox::uuidsToStrings(routingResult.unboardingNodeUuids);
-            //odTripJson["tripUuids"]                     = Toolbox::uuidsToStrings(routingResult.tripUuids);
-            json["odTrips"].push_back(odTripJson);
+            std::cout << (i+1) << "/" << odTripsCount << std::endl;
           }
         }
+        odTrip        = _odTrip.get();
+        origin        = odTrip->origin.get();
+        destination   = odTrip->destination.get();
+        routingResult = calculate(true, resetFilters); // reset filters only on first calculation
+        resetFilters  = false;
+        countOdTripsCalculated++;
+
+        float correctedExpansionFactor = odTrip->expansionFactor / params.odTripsSampleRatio;
+        atLeastOneOdTrip = true;
+        if (routingResult.legs.size() > 0)
+        {
+          totalTravelTimeSeconds += correctedExpansionFactor * routingResult.travelTimeSeconds;
+          if (params.responseFormat != "csv" && params.calculateProfiles == true)
+          {
+            for (auto & leg : routingResult.legs)
+            {
+              legTripIdx            = std::get<0>(leg);
+              legLineIdx            = std::get<1>(leg);
+              legPathIdx            = std::get<2>(leg);
+              legPath               = paths[legPathIdx].get();
+              legConnectionStartIdx = std::get<3>(leg);
+              legConnectionEndIdx   = std::get<4>(leg);
+              lineProfiles[lines[legLineIdx].get()->uuid] += correctedExpansionFactor;
+              
+              if (pathProfiles.find(legPath->uuid) == pathProfiles.end())
+              {
+                pathProfiles[legPath->uuid] = std::vector<std::vector<float>>(legPath->nodesIdx.size() - 1, demandByHourOfDay);
+                pathTotalProfiles[legPath->uuid] = std::vector<float>(legPath->nodesIdx.size() - 1, 0.0);
+              }
+              for (int connectionIndex = legConnectionStartIdx; connectionIndex <= legConnectionEndIdx; connectionIndex++)
+              {
+                connectionDepartureTimeSeconds = *tripConnectionDepartureTimes[legTripIdx][connectionIndex];
+                *tripConnectionDemands[legTripIdx][connectionIndex] += correctedExpansionFactor;
+                connectionDepartureTimeHour    = connectionDepartureTimeSeconds / 3600;
+                //std::cout << "pUuid:" << legPath->uuid << " dth:" << connectionDepartureTimeHour << " cI:" << connectionIndex << " oldD:" << pathProfiles[legPath.uuid][connectionIndex][connectionDepartureTimeHour] << std::endl;
+                pathProfiles[legPath->uuid][connectionIndex][connectionDepartureTimeHour] += correctedExpansionFactor;
+                pathTotalProfiles[legPath->uuid][connectionIndex] += correctedExpansionFactor;
+                if (maximumSegmentHourlyDemand < pathProfiles[legPath->uuid][connectionIndex][connectionDepartureTimeHour])
+                {
+                  maximumSegmentHourlyDemand = pathProfiles[legPath->uuid][connectionIndex][connectionDepartureTimeHour];
+                }
+                if (maximumSegmentTotalDemand < pathTotalProfiles[legPath->uuid][connectionIndex])
+                {
+                  maximumSegmentTotalDemand = pathTotalProfiles[legPath->uuid][connectionIndex];
+                }
+              }
+            }
+          }
+        }
+          
+        if (params.responseFormat == "csv")
+        {
+          //std::replace( ageGroup.begin(), ageGroup.end(), '-', '_' ); // remove dash so Excel does not convert to age groups to numbers...
+          response += boost::uuids::to_string(odTrip->uuid) + ",\"" + odTrip->internalId + "\",\"" + routingResult.status + "\",\"" /*+ ageGroup*/ + "\",\"" /*+ odTrip->gender*/ + "\",\"" /*+ odTrip->occupation*/ + "\",\"";
+          response += odTrip->destinationActivity + "\",\"" + odTrip->mode + "\"," + std::to_string(correctedExpansionFactor) + "," + std::to_string(routingResult.travelTimeSeconds) + ",";
+          response += std::to_string(odTrip->walkingTravelTimeSeconds) + "," + std::to_string(odTrip->cyclingTravelTimeSeconds) + "," + std::to_string(odTrip->drivingTravelTimeSeconds) + "," + std::to_string(odTrip->departureTimeSeconds) + "," + std::to_string(routingResult.departureTimeSeconds) + "," + std::to_string(routingResult.minimizedDepartureTimeSeconds) + ",";
+          response += std::to_string(routingResult.arrivalTimeSeconds) + "," + std::to_string(routingResult.numberOfTransfers) + "," + std::to_string(routingResult.inVehicleTravelTimeSeconds) + ",";
+          response += std::to_string(routingResult.transferTravelTimeSeconds) + "," + std::to_string(routingResult.waitingTimeSeconds) + "," + std::to_string(routingResult.accessTravelTimeSeconds) + ",";
+          response += std::to_string(routingResult.egressTravelTimeSeconds) + "," + std::to_string(routingResult.transferWaitingTimeSeconds) + "," + std::to_string(routingResult.firstWaitingTimeSeconds) + ",";
+          response += std::to_string(routingResult.nonTransitTravelTimeSeconds) + ",";
+          
+          int countLineUuids = routingResult.lineUuids.size();
+          j = 0;
+          for (auto & lineUuid : routingResult.lineUuids)
+          {
+            response += boost::uuids::to_string(lineUuid);
+            if (j < countLineUuids - 1)
+            {
+              response += "|";
+            }
+            j++;
+          }
+          response += ",";
+          j = 0;
+          for (auto & modeShortname : routingResult.modeShortnames)
+          {
+            response += modeShortname;
+            if (j < countLineUuids - 1)
+            {
+              response += "|";
+            }
+            j++;
+          }
+          response += ",";
+          j = 0;
+          for (auto & agencyUuid : routingResult.agencyUuids)
+          {
+            response += boost::uuids::to_string(agencyUuid);
+            if (j < countLineUuids - 1)
+            {
+              response += "|";
+            }
+            j++;
+          }
+          response += ",";
+          j = 0;
+          for (auto & boardingNodeUuid : routingResult.boardingNodeUuids)
+          {
+            response += boost::uuids::to_string(boardingNodeUuid);
+            if (j < countLineUuids - 1)
+            {
+              response += "|";
+            }
+            j++;
+          }
+          response += ",";
+          j = 0;
+          for (auto & unboardingNodeUuid : routingResult.unboardingNodeUuids)
+          {
+            response += boost::uuids::to_string(unboardingNodeUuid);
+            if (j < countLineUuids - 1)
+            {
+              response += "|";
+            }
+            j++;
+          }
+          response += ",";
+          j = 0;
+          for (auto & tripUuid : routingResult.tripUuids)
+          {
+            response += boost::uuids::to_string(tripUuid);
+            if (j < countLineUuids - 1)
+            {
+              response += "|";
+            }
+            j++;
+          }
+          response += "\n";
+        }
+        else
+        {
+          odTripJson = {};
+          odTripJson["uuid"]                          = boost::uuids::to_string(odTrip->uuid);
+          odTripJson["status"]                        = routingResult.status;
+          /*odTripJson["ageGroup"]                    = persons[odTrip->personIdx].ageGroup; // this fails (segmentation fault)...
+          odTripJson["gender"]                        = persons[odTrip->personIdx].gender;
+          odTripJson["occupation"]                    = persons[odTrip->personIdx].occupation;*/
+          odTripJson["internalId"]                    = odTrip->internalId;
+          odTripJson["originActivity"]                = odTrip->originActivity;
+          odTripJson["destinationActivity"]           = odTrip->destinationActivity;
+          odTripJson["declaredMode"]                  = odTrip->mode;
+          odTripJson["expansionFactor"]               = correctedExpansionFactor;
+          odTripJson["travelTimeSeconds"]             = routingResult.travelTimeSeconds;
+          odTripJson["minimizedTravelTimeSeconds"]    = routingResult.travelTimeSeconds - routingResult.firstWaitingTimeSeconds + params.minWaitingTimeSeconds;
+          odTripJson["onlyWalkingTravelTimeSeconds"]  = odTrip->walkingTravelTimeSeconds;
+          //odTripJson["onlyCyclingTravelTimeSeconds"]  = odTrip->cyclingTravelTimeSeconds;
+          //odTripJson["onlyDrivingTravelTimeSeconds"]  = odTrip->drivingTravelTimeSeconds;
+          odTripJson["declaredDepartureTimeSeconds"]  = odTrip->departureTimeSeconds;
+          odTripJson["declaredArrivalTimeSeconds"]    = odTrip->arrivalTimeSeconds;
+          odTripJson["departureTimeSeconds"]          = routingResult.departureTimeSeconds;
+          odTripJson["minimizedDepartureTimeSeconds"] = routingResult.minimizedDepartureTimeSeconds;
+          odTripJson["arrivalTimeSeconds"]            = routingResult.arrivalTimeSeconds;
+          odTripJson["numberOfTransfers"]             = routingResult.numberOfTransfers;
+          odTripJson["inVehicleTravelTimeSeconds"]    = routingResult.inVehicleTravelTimeSeconds;
+          odTripJson["transferTravelTimeSeconds"]     = routingResult.transferTravelTimeSeconds;
+          odTripJson["waitingTimeSeconds"]            = routingResult.waitingTimeSeconds;
+          odTripJson["accessTravelTimeSeconds"]       = routingResult.accessTravelTimeSeconds;
+          odTripJson["egressTravelTimeSeconds"]       = routingResult.egressTravelTimeSeconds;
+          odTripJson["transferWaitingTimeSeconds"]    = routingResult.transferWaitingTimeSeconds;
+          odTripJson["firstWaitingTimeSeconds"]       = routingResult.firstWaitingTimeSeconds;
+          odTripJson["nonTransitTravelTimeSeconds"]   = routingResult.nonTransitTravelTimeSeconds;
+          odTripJson["lineUuids"]                     = Toolbox::uuidsToStrings(routingResult.lineUuids);
+          odTripJson["modesShortnames"]               = routingResult.modeShortnames;
+          odTripJson["agencyUuids"]                   = Toolbox::uuidsToStrings(routingResult.agencyUuids);
+          odTripJson["boardingNodeUuids"]             = Toolbox::uuidsToStrings(routingResult.boardingNodeUuids);
+          odTripJson["unboardingNodeUuids"]           = Toolbox::uuidsToStrings(routingResult.unboardingNodeUuids);
+          //odTripJson["tripUuids"]                     = Toolbox::uuidsToStrings(routingResult.tripUuids);
+          json["odTrips"].push_back(odTripJson);
+        }
       }
+
       i++;
       if (params.odTripsSampleSize > 0 && i + 1 >= params.odTripsSampleSize)
       {

@@ -13,6 +13,7 @@ namespace TrRouting
       std::cout << " hasDataSourceUuid: "    << (dataSourceUuid.is_initialized() ? "true" : "false") << std::endl;
       std::cout << " hasOdTripUuid: "        << (odTripUuid.is_initialized()     ? "true" : "false") << std::endl;
       std::cout << " calculateAllOdTrips: "  << calculateAllOdTrips  << std::endl;
+      std::cout << " calculateProfiles: "    << calculateProfiles    << std::endl;
       std::cout << " hasOrigin: "            << hasOrigin            << std::endl;
       std::cout << " hasDestination: "       << hasDestination       << std::endl;
       std::cout << " forwardCalculation: "   << forwardCalculation   << std::endl;
@@ -173,7 +174,7 @@ namespace TrRouting
       boost::split(parameterWithValueVector, parameterWithValue, boost::is_any_of("="));
 
       std::cout << " setting parameter " << parameterWithValueVector[0] << " with value " << parameterWithValueVector[1] << std::endl;
-
+      
       // origin and destination:
       if (parameterWithValueVector[0] == "origin")
       {
