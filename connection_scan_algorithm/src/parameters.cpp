@@ -125,7 +125,8 @@ namespace TrRouting
     odTripsSampleSize                      = -1;
     calculateProfiles                      = true;
     walkingSpeedFactor                     = 1.0; // all walking segments are weighted with this value. > 1.0 means faster walking, < 1.0 means slower walking
-    
+    seed                                   = std::chrono::system_clock::now().time_since_epoch().count();
+
   }
 
   void Parameters::update(std::vector<std::string> &parameters, std::map<boost::uuids::uuid, int> &scenarioIndexesByUuid, std::vector<std::unique_ptr<Scenario>> &scenarios, std::map<boost::uuids::uuid, int> &nodeIndexesByUuid, std::map<boost::uuids::uuid, int> &dataSourceIndexesByUuid)
@@ -174,7 +175,7 @@ namespace TrRouting
       boost::split(parameterWithValueVector, parameterWithValue, boost::is_any_of("="));
 
       std::cout << " setting parameter " << parameterWithValueVector[0] << " with value " << parameterWithValueVector[1] << std::endl;
-      
+
       // origin and destination:
       if (parameterWithValueVector[0] == "origin")
       {
@@ -560,6 +561,11 @@ namespace TrRouting
               )
       {
         if (parameterWithValueVector[1] == "false" || parameterWithValueVector[1] == "0") { transferBetweenSameLine = false; }
+        continue;
+      }
+      else if (parameterWithValueVector[0] == "seed" || parameterWithValueVector[0] == "random_seed")
+      {
+        seed = std::stoi(parameterWithValueVector[1]);
         continue;
       }
 

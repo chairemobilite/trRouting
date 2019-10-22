@@ -8,6 +8,7 @@
 #include <sstream>
 #include <algorithm>
 #include <iterator>
+#include <chrono>
 #include <vector>
 #include <map>
 #include <math.h>
@@ -47,7 +48,8 @@ namespace TrRouting
       int batchNumber;
       int batchesCount;
       int odTripsSampleSize;
-  
+      unsigned int seed;
+
       int routingDateYear;   // not implemented, use onlyServicesIdx or exceptServicesIdx for now
       int routingDateMonth;  // not implemented, use onlyServicesIdx or exceptServicesIdx for now
       int routingDateDay;    // not implemented, use onlyServicesIdx or exceptServicesIdx for now

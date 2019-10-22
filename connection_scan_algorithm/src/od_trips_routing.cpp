@@ -66,8 +66,7 @@ namespace TrRouting
     int stopAtI {-1};
     if (params.odTripsSampleRatio > 0.0 && params.odTripsSampleRatio < 1.0)
     {
-      unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-      std::shuffle(odTrips.begin(), odTrips.end(), std::default_random_engine(seed));
+      std::shuffle(odTrips.begin(), odTrips.end(), std::default_random_engine(params.seed));
       stopAtI = ceil((float)(odTrips.size()) * params.odTripsSampleRatio);
     }
 
@@ -348,7 +347,7 @@ namespace TrRouting
         }
 
         json["pathProfiles"] = pathProfilesJson;
-        
+
       }
       
     }
