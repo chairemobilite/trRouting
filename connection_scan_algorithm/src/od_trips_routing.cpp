@@ -35,6 +35,7 @@ namespace TrRouting
     float  maximumSegmentHourlyDemand = 0.0;
     float  maximumSegmentTotalDemand  = 0.0;
     int    countOdTripsCalculated     = 0;
+    int    totalTravelTimeSeconds     = 0;
 
     json["odTrips"] = nlohmann::json::array();
 
@@ -137,6 +138,9 @@ namespace TrRouting
           atLeastOneOdTrip = true;
           if (routingResult.legs.size() > 0)
           {
+
+            totalTravelTimeSeconds += correctedExpansionFactor * routingResult.travelTimeSeconds;
+
             if (params.responseFormat != "csv" && params.calculateProfiles)
             {
               for (auto & leg : routingResult.legs)
@@ -287,11 +291,11 @@ namespace TrRouting
             odTripJson["transferWaitingTimeSeconds"]    = routingResult.transferWaitingTimeSeconds;
             odTripJson["firstWaitingTimeSeconds"]       = routingResult.firstWaitingTimeSeconds;
             odTripJson["nonTransitTravelTimeSeconds"]   = routingResult.nonTransitTravelTimeSeconds;
-            //odTripJson["lineUuids"]                     = Toolbox::uuidsToStrings(routingResult.lineUuids);
-            //odTripJson["modesShortnames"]               = routingResult.modeShortnames;
-            //odTripJson["agencyUuids"]                   = Toolbox::uuidsToStrings(routingResult.agencyUuids);
-            //odTripJson["boardingNodeUuids"]             = Toolbox::uuidsToStrings(routingResult.boardingNodeUuids);
-            //odTripJson["unboardingNodeUuids"]           = Toolbox::uuidsToStrings(routingResult.unboardingNodeUuids);
+            odTripJson["lineUuids"]                     = Toolbox::uuidsToStrings(routingResult.lineUuids);
+            odTripJson["modesShortnames"]               = routingResult.modeShortnames;
+            odTripJson["agencyUuids"]                   = Toolbox::uuidsToStrings(routingResult.agencyUuids);
+            odTripJson["boardingNodeUuids"]             = Toolbox::uuidsToStrings(routingResult.boardingNodeUuids);
+            odTripJson["unboardingNodeUuids"]           = Toolbox::uuidsToStrings(routingResult.unboardingNodeUuids);
             //odTripJson["tripUuids"]                     = Toolbox::uuidsToStrings(routingResult.tripUuids);
             json["odTrips"].push_back(odTripJson);
           }
@@ -308,6 +312,7 @@ namespace TrRouting
     {
       json["maxSegmentHourlyDemand"] = maximumSegmentHourlyDemand;
       json["maxSegmentTotalDemand"]  = maximumSegmentTotalDemand;
+      json["totalTravelTimeSeconds"] = totalTravelTimeSeconds;
       lineProfilesJson = {};
       for (auto & lineCount : lineProfiles)
       {
