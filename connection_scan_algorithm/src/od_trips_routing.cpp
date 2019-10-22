@@ -121,7 +121,7 @@ namespace TrRouting
         {
           std::cout << "od trip uuid " << _odTrip->uuid << " (" << (i+1) << "/" << odTripsCount << ")" << std::endl << " dts: " << _odTrip->departureTimeSeconds << " atLeastOneCompatiblePeriod: " << (atLeastOneCompatiblePeriod ? "true " : "false ") << "attributesMatches: " << (attributesMatches ? "true " : "false ") << std::endl;
         }
-        else
+        else if (i % 1000 == 0)
         {
           std::cout << (i+1) << "/" << odTripsCount << std::endl;
         }
