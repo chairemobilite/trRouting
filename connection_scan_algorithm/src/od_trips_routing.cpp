@@ -57,49 +57,69 @@ namespace TrRouting
                      "firstWaitingTimeSeconds,nonTransitTravelTimeSeconds,lineUuids,modeShortnames,agencyUuids,boardingNodeUuids,unboardingNodeUuids,tripUuids\n";
     }
 
-    int i {0};
-    int j {0};
+    
 
     if (params.debugDisplay)
       std::cout << "  starting odTripsRouting" << std::endl;
 
     int stopAtI {-1};
+    std::vector<int> odTripIndexes(odTripsCount);
+    std::iota(odTripIndexes.begin(), odTripIndexes.end(), 0);
     if (params.odTripsSampleRatio > 0.0 && params.odTripsSampleRatio < 1.0)
     {
-      std::shuffle(odTrips.begin(), odTrips.end(), std::default_random_engine(params.seed));
-      stopAtI = ceil((float)(odTrips.size()) * params.odTripsSampleRatio);
+
+      //std::random_device rd;
+      //std::mt19937 engine(rd(params.seed));
+
+      //std::cout << " shuffle odTrips with seed: " << params.seed << " generates number " << engine() << std::endl;
+      //engine.seed(params.seed);
+      // sort by departure time seconds before shuffling so seeds are consistent:
+      
+      std::cout << " first ODTrip uuid: " << odTripIndexes[0] << std::endl;
+      std::shuffle(odTripIndexes.begin(), odTripIndexes.end(), std::mt19937{params.seed});
+      std::cout << " first ODTrip uuid after shuffle: " << odTripIndexes[0] << std::endl;
+      //stopAtI = ceil((float)(odTrips.size()) * params.odTripsSampleRatio);
     }
 
-    for (auto & _odTrip : odTrips)
+    int i {0};
+    int j {0};
+    int odTripIndex {0}; // for shuffle
+    int sampleSize {(int)(ceil((float)(odTripsCount) * params.odTripsSampleRatio))};
+
+    for (int i = 0; i < sampleSize; i++)
     {
-      
+
+      odTripIndex = odTripIndexes[i];
+      odTrip      = odTrips[odTripIndex].get();
+      //std::cout << odTrip->uuid << std::endl;
+
       if ( i % params.batchesCount != params.batchNumber - 1) // when using multiple parallel calculators
       {
-        i++;
+        //i++;
         continue;
       }
 
-      if (stopAtI != -1 && i == stopAtI)
+      /*if (stopAtI != -1 && i == stopAtI)
       {
         break;
-      }
+      }*/
       
       attributesMatches          = true;
       atLeastOneCompatiblePeriod = false;
       
       // verify that od trip matches selected attributes:
-      if ( (params.odTripsAgeGroups.size()   > 0 && std::find(params.odTripsAgeGroups.begin(),   params.odTripsAgeGroups.end(),   persons[_odTrip->personIdx]->ageGroup)   == params.odTripsAgeGroups.end()) 
-        || (params.odTripsGenders.size()     > 0 && std::find(params.odTripsGenders.begin(),     params.odTripsGenders.end(),     persons[_odTrip->personIdx]->gender)     == params.odTripsGenders.end())
-        || (params.odTripsOccupations.size() > 0 && std::find(params.odTripsOccupations.begin(), params.odTripsOccupations.end(), persons[_odTrip->personIdx]->occupation) == params.odTripsOccupations.end())
-        || (params.odTripsActivities.size()  > 0 && std::find(params.odTripsActivities.begin(),  params.odTripsActivities.end(),  _odTrip->destinationActivity)            == params.odTripsActivities.end())
-        || (params.odTripsModes.size()       > 0 && std::find(params.odTripsModes.begin(),       params.odTripsModes.end(),       _odTrip->mode)                           == params.odTripsModes.end())
+      if ( (params.odTripsAgeGroups.size()   > 0 && std::find(params.odTripsAgeGroups.begin(),   params.odTripsAgeGroups.end(),   persons[odTrip->personIdx]->ageGroup)   == params.odTripsAgeGroups.end()) 
+        || (params.odTripsGenders.size()     > 0 && std::find(params.odTripsGenders.begin(),     params.odTripsGenders.end(),     persons[odTrip->personIdx]->gender)     == params.odTripsGenders.end())
+        || (params.odTripsOccupations.size() > 0 && std::find(params.odTripsOccupations.begin(), params.odTripsOccupations.end(), persons[odTrip->personIdx]->occupation) == params.odTripsOccupations.end())
+        || (params.odTripsActivities.size()  > 0 && std::find(params.odTripsActivities.begin(),  params.odTripsActivities.end(),  odTrip->destinationActivity)            == params.odTripsActivities.end())
+        || (params.odTripsModes.size()       > 0 && std::find(params.odTripsModes.begin(),       params.odTripsModes.end(),       odTrip->mode)                           == params.odTripsModes.end())
       )
       {
         attributesMatches = false;
       }
 
       // filter wrong data source if only data source is provided:
-      if (params.onlyDataSourceIdx != -1 && _odTrip->dataSourceIdx != params.onlyDataSourceIdx)
+      if (params.onlyDataSourceIdx != -1 && odTrip->dataSourceIdx != params.onlyDataSourceIdx)
       {
         attributesMatches = false;
       }
@@ -107,7 +127,7 @@ namespace TrRouting
       // verify that od trip matches at least one selected period:
       for (auto & period : params.odTripsPeriods)
       {
-        if (_odTrip->departureTimeSeconds >= period.first && _odTrip->departureTimeSeconds < period.second)
+        if (odTrip->departureTimeSeconds >= period.first && odTrip->departureTimeSeconds < period.second)
         {
           atLeastOneCompatiblePeriod = true;
         }
@@ -118,7 +138,7 @@ namespace TrRouting
 
         if (params.debugDisplay)
         {
-          std::cout << "od trip uuid " << _odTrip->uuid << " (" << (i+1) << "/" << odTripsCount << ")" << std::endl << " dts: " << _odTrip->departureTimeSeconds << " atLeastOneCompatiblePeriod: " << (atLeastOneCompatiblePeriod ? "true " : "false ") << "attributesMatches: " << (attributesMatches ? "true " : "false ") << std::endl;
+          std::cout << "od trip uuid " << odTrip->uuid << " (" << (i+1) << "/" << odTripsCount << ")" << std::endl << " dts: " << odTrip->departureTimeSeconds << " atLeastOneCompatiblePeriod: " << (atLeastOneCompatiblePeriod ? "true " : "false ") << "attributesMatches: " << (attributesMatches ? "true " : "false ") << std::endl;
         }
         else if ((i + 1) % 1000 == 0)
         {
@@ -131,7 +151,6 @@ namespace TrRouting
             std::cout << (i+1) << "/" << odTripsCount << std::endl;
           }
         }
-        odTrip        = _odTrip.get();
         origin        = odTrip->origin.get();
         destination   = odTrip->destination.get();
         routingResult = calculate(true, resetFilters); // reset filters only on first calculation
@@ -302,7 +321,7 @@ namespace TrRouting
         }
       }
 
-      i++;
+      //i++;
       if (params.odTripsSampleSize > 0 && i + 1 >= params.odTripsSampleSize)
       {
         break;
