@@ -58,14 +58,14 @@ namespace TrRouting
 
     calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
 
-    int i {0};
-
     // fetch nodes footpaths accessible from origin using params or osrm fetcher if not provided:
     minAccessTravelTime = MAX_INT;
     maxEgressTravelTime = -1;
     minEgressTravelTime = MAX_INT;
     maxAccessTravelTime = -1;
-    
+
+    int j {0};
+
     if (!params.returnAllNodesResult || departureTimeSeconds >= -1)
     {
       if (resetAccessPaths)
@@ -80,17 +80,21 @@ namespace TrRouting
             std::cerr << "  using odTrip with " << odTrip->originNodesIdx.size() << " accessible nodes" << std::endl;
 
           accessFootpaths.clear();
+          j = 0;
           for (auto & accessNodeIdx : odTrip->originNodesIdx)
           {
-            accessFootpaths.push_back(std::make_pair(accessNodeIdx, odTrip->originNodesTravelTimesSeconds[i]));
+            accessFootpaths.push_back(std::make_pair(accessNodeIdx, odTrip->originNodesTravelTimesSeconds[j]));
+            j++;
           }
         }
         else if (params.accessNodesIdx.size() > 0 && params.accessNodeTravelTimesSeconds.size() == params.accessNodesIdx.size())
         {
           accessFootpaths.clear();
+          j = 0;
           for (auto & accessNodeIdx : params.accessNodesIdx)
           {
-            accessFootpaths.push_back(std::make_pair(accessNodeIdx, params.accessNodeTravelTimesSeconds[i]));
+            accessFootpaths.push_back(std::make_pair(accessNodeIdx, params.accessNodeTravelTimesSeconds[j]));
+            j++;
           }
         }
         else
@@ -139,17 +143,21 @@ namespace TrRouting
             std::cerr << "  using odTrip with " << odTrip->destinationNodesIdx.size() << " egressible nodes" << std::endl;
 
           egressFootpaths.clear();
+          j = 0;
           for (auto & egressNodeIdx : odTrip->destinationNodesIdx)
           {
-            egressFootpaths.push_back(std::make_pair(egressNodeIdx, odTrip->destinationNodesTravelTimesSeconds[i]));
+            egressFootpaths.push_back(std::make_pair(egressNodeIdx, odTrip->destinationNodesTravelTimesSeconds[j]));
+            j++;
           }
         }
         else if (params.egressNodesIdx.size() > 0 && params.egressNodeTravelTimesSeconds.size() == params.egressNodesIdx.size())
         {
           egressFootpaths.clear();
+          j = 0;
           for (auto & egressNodeIdx : params.egressNodesIdx)
           {
-            egressFootpaths.push_back(std::make_pair(egressNodeIdx, params.egressNodeTravelTimesSeconds[i]));
+            egressFootpaths.push_back(std::make_pair(egressNodeIdx, params.egressNodeTravelTimesSeconds[j]));
+            j++;
           }
         }
         else
@@ -208,7 +216,7 @@ namespace TrRouting
         }
       }
       
-      i = 0;
+      int i {0};
       for (auto & trip : trips)
       {
         if (tripsEnabled[i] == 1 && params.onlyServicesIdx.size() > 0)

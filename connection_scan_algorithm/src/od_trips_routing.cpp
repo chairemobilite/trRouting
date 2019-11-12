@@ -287,6 +287,10 @@ namespace TrRouting
           /*odTripJson["ageGroup"]                    = persons[odTrip->personIdx].ageGroup; // this fails (segmentation fault)...
           odTripJson["gender"]                        = persons[odTrip->personIdx].gender;
           odTripJson["occupation"]                    = persons[odTrip->personIdx].occupation;*/
+          odTripJson["originLat"]                     = odTrip->origin->latitude;
+          odTripJson["originLon"]                     = odTrip->origin->longitude;
+          odTripJson["destinationLat"]                = odTrip->destination->latitude;
+          odTripJson["destinationLon"]                = odTrip->destination->longitude;
           odTripJson["internalId"]                    = odTrip->internalId;
           odTripJson["originActivity"]                = odTrip->originActivity;
           odTripJson["destinationActivity"]           = odTrip->destinationActivity;

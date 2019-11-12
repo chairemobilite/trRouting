@@ -173,7 +173,7 @@ namespace TrRouting
             const unsigned int destinationNodesCount {capnpT.getDestinationNodesIdx().size()};
             std::vector<int> destinationNodesIdx(destinationNodesCount);
             std::vector<int> destinationNodesTravelTimesSeconds(destinationNodesCount);
-            std::vector<int> destinationNodesDistancesMeters(destinationNodesCount);
+            //std::vector<int> destinationNodesDistancesMeters(destinationNodesCount);
             for (int i = 0; i < destinationNodesCount; i++)
             {
               destinationNodesIdx               [i] = capnpT.getDestinationNodesIdx()[i];
