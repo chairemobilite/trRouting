@@ -42,8 +42,6 @@ std::string consoleResetColor = "";
 
 int main(int argc, char** argv) {
   
-  boost::uuids::string_generator uuidGeneratorMain;
-
   // Set params:
   ProgramOptions programOptions;
   programOptions.parseOptions(argc, argv);

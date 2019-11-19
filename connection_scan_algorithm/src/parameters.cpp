@@ -415,7 +415,7 @@ namespace TrRouting
         odTripsSampleSize = std::stoi(parameterWithValueVector[1]);
         continue;
       }
-      else if (parameterWithValueVector[0] == "od_trips_sample_ratio" || parameterWithValueVector[0] == "od_trips_sample_ratio") // example: 0.5 means only 50% of od trips will be calculated (od trips will be shuffled before)
+      else if (parameterWithValueVector[0] == "od_trips_sample_ratio" || parameterWithValueVector[0] == "sample_ratio") // example: 0.5 means only 50% of od trips will be calculated (od trips will be shuffled before)
       {
         odTripsSampleRatio = std::stof(parameterWithValueVector[1]);
         continue;
