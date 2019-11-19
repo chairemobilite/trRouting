@@ -46,14 +46,14 @@ namespace TrRouting
 
     if (routingResult.status == "success")
     {
-      lineShortnames.clear();
+      /*lineShortnames.clear();
       for(auto lineIdx : routingResult.linesIdx)
       {
         lineShortnames.push_back(lines[lineIdx].get()->shortname);
-      }
+      }*/
       
-      alternativeJson = {};
-      alternativeJson["status"]                        = routingResult.status;
+      alternativeJson = routingResult.json;
+      /*alternativeJson["status"]                        = routingResult.status;
       alternativeJson["travelTimeSeconds"]             = routingResult.travelTimeSeconds;
       alternativeJson["minimizedTravelTimeSeconds"]    = routingResult.travelTimeSeconds - routingResult.firstWaitingTimeSeconds + params.minWaitingTimeSeconds;
       alternativeJson["departureTimeSeconds"]          = routingResult.departureTimeSeconds;
@@ -75,7 +75,7 @@ namespace TrRouting
       alternativeJson["agencyUuids"]                   = routingResult.agencyUuids;
       alternativeJson["boardingNodeUuids"]             = routingResult.boardingNodeUuids;
       alternativeJson["unboardingNodeUuids"]           = routingResult.unboardingNodeUuids;
-      alternativeJson["tripUuids"]                     = routingResult.tripUuids;
+      alternativeJson["tripUuids"]                     = routingResult.tripUuids;*/
       alternativeJson["alternativeSequence"]           = alternativeSequence;
 
       alternativeSequence += 1;
@@ -108,12 +108,16 @@ namespace TrRouting
       alreadyFoundLinesIdx[foundLinesIdx]           = true;
       foundLinesIdxTravelTimeSeconds[foundLinesIdx] = routingResult.travelTimeSeconds;
       lastFoundedAtNum = 1;
-      //std::cout << "fastest line ids: ";
-      //for (auto lineUuid : foundLineUuids)
-      //{
-      //  std::cout << lines[lineIndexesByUuid[lineUuid]].shortname << " ";
-      //}
-      //std::cout << std::endl;
+
+
+      std::cout << "fastest line ids: ";
+      for (auto lineIdx : foundLinesIdx)
+      {
+        std::cout << lines[lineIdx].get()->shortname << " ";
+      }
+      std::cout << std::endl;
+
+
       combinationsKs.clear();
       for (int i = 1; i <= foundLinesIdx.size(); i++) { combinationsKs.push_back(i); }
       for (auto k : combinationsKs)
@@ -142,13 +146,18 @@ namespace TrRouting
             std::cout << "calculating alternative " << alternativeSequence << "..." << std::endl;
           }
 
-          //std::cout << "except line Uuids: ";
-          //for (auto lineUuid : combination)
-          //{
-          //  std::cout << lines[lineIndexesByUuid[lineUuid]].get()->shortname << " ";
-          //}
-          //std::cout << std::endl;
-          routingResult = calculate(false, false);
+
+
+          std::cout << "except lines: ";
+          for (auto lineIdx : combination)
+          {
+            std::cout << lines[lineIdx].get()->shortname << " ";
+          }
+          std::cout << std::endl;
+
+
+
+          routingResult = calculate(false, true);
           
           if (routingResult.status == "success")
           {
@@ -164,8 +173,8 @@ namespace TrRouting
                 lineShortnames.push_back(lines[lineIdx].get()->shortname);
               }
               
-              alternativeJson = {};
-              alternativeJson["status"]                        = routingResult.status;
+              alternativeJson = routingResult.json;
+              /*alternativeJson["status"]                        = routingResult.status;
               alternativeJson["travelTimeSeconds"]             = routingResult.travelTimeSeconds;
               alternativeJson["minimizedTravelTimeSeconds"]    = routingResult.travelTimeSeconds - routingResult.firstWaitingTimeSeconds + params.minWaitingTimeSeconds;
               alternativeJson["departureTimeSeconds"]          = routingResult.departureTimeSeconds;
@@ -187,16 +196,16 @@ namespace TrRouting
               alternativeJson["agencyUuids"]                   = routingResult.agencyUuids;
               alternativeJson["boardingNodeUuids"]             = routingResult.boardingNodeUuids;
               alternativeJson["unboardingNodeUuids"]           = routingResult.unboardingNodeUuids;
-              alternativeJson["tripUuids"]                     = routingResult.tripUuids;
+              alternativeJson["tripUuids"]                     = routingResult.tripUuids;*/
               alternativeJson["alternativeSequence"]           = alternativeSequence;
               json["alternatives"].push_back(alternativeJson);
             
-              //std::cout << "travelTimeSeconds: " << routingResult.travelTimeSeconds << " line Uuids: ";
-              //for (auto lineUuid : foundLineUuids)
-              //{
-              //  std::cout << lines[lineIndexesByUuid[lineUuid]].get()->shortname << " ";
-              //}
-              //std::cout << std::endl;
+              std::cout << "travelTimeSeconds: " << routingResult.travelTimeSeconds << " line Uuids: ";
+              for (auto lineIdx : foundLinesIdx)
+              {
+                std::cout << lines[lineIdx].get()->shortname << " ";
+              }
+              std::cout << std::endl;
               combinationsKs.clear();
               
               lastFoundedAtNum = alternativeSequence;
@@ -230,17 +239,17 @@ namespace TrRouting
 
       std::cout << std::endl;
       int i {1};
-      //for (auto foundLineUuids : alreadyFoundLineUuids)
-      //{
-      //  std::cout << i << ". ";
-      //  for(auto lineUuid : foundLineUuids.first)
-      //  {
-      //    std::cout << lines[lineIndexesByUuid[lineUuid]].get()->shortname << " ";
-      //  }
-      //  std::cout << " tt: " << (foundLineUuidsTravelTimeSeconds[foundLineUuids.first] / 60);
-      //  i++;
-      //  std::cout << std::endl;
-      //}
+      for (auto foundLinesIdx : alreadyFoundLinesIdx)
+      {
+        std::cout << i << ". ";
+        for(auto lineIdx : foundLinesIdx.first)
+        {
+          std::cout << lines[lineIdx].get()->shortname << " ";
+        }
+        std::cout << " tt: " << (foundLinesIdxTravelTimeSeconds[foundLinesIdx.first] / 60);
+        i++;
+        std::cout << std::endl;
+      }
       
       std::cout << "last alternative found at: " << lastFoundedAtNum << " on a total of " << maxAlternatives << " calculations" << std::endl;
       

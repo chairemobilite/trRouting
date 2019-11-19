@@ -9,7 +9,7 @@ namespace TrRouting
 
     RoutingResult result;
     
-    result.json = "";
+    result.json = {};
     
     std::tuple<int,int,int> forwardResult;
     std::tuple<int,int,int> reverseResult;

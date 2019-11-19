@@ -129,7 +129,7 @@ namespace TrRouting
 
   }
 
-  void Parameters::update(std::vector<std::string> &parameters, std::map<boost::uuids::uuid, int> &scenarioIndexesByUuid, std::vector<std::unique_ptr<Scenario>> &scenarios, std::map<boost::uuids::uuid, int> &nodeIndexesByUuid, std::map<boost::uuids::uuid, int> &dataSourceIndexesByUuid)
+  void Parameters::update(std::vector<std::string> &parameters, std::map<boost::uuids::uuid, int> &scenarioIndexesByUuid, std::vector<std::unique_ptr<Scenario>> &scenarios, std::map<boost::uuids::uuid, int> &nodeIndexesByUuid, std::map<boost::uuids::uuid, int> &agencyIndexesByUuid, std::map<boost::uuids::uuid, int> &lineIndexesByUuid, std::map<boost::uuids::uuid, int> &serviceIndexesByUuid, std::map<std::string, int> &modeIndexesByShortname, std::map<boost::uuids::uuid, int> &dataSourceIndexesByUuid)
   {
     
     setDefaultValues();
@@ -524,6 +524,7 @@ namespace TrRouting
       // other:
       else if (parameterWithValueVector[0] == "transfer_penalty" || parameterWithValueVector[0] == "transfer_penalty_minutes")
       {
+        // not used right now
         transferPenaltySeconds = std::stoi(parameterWithValueVector[1]) * 60;
         continue;
       }
@@ -594,9 +595,9 @@ namespace TrRouting
         for(std::string accessNodeUuidStr : accessNodeUuidsVector)
         {
           accessNodeUuid = uuidGenerator(accessNodeUuidStr);
-          if (calculator.nodeIndexesByUuid.count(accessNodeUuid) == 1)
+          if (nodeIndexesByUuid.count(accessNodeUuid) == 1)
           {
-            accessNodesIdx.push_back(calculator.nodeIndexesByUuid[accessNodeUuid]);
+            accessNodesIdx.push_back(nodeIndexesByUuid[accessNodeUuid]);
           }
         }
         continue;
@@ -608,9 +609,9 @@ namespace TrRouting
         for(std::string egressNodeUuidStr : egressNodeUuidsVector)
         {
           egressNodeUuid = uuidGenerator(egressNodeUuidStr);
-          if (calculator.nodeIndexesByUuid.count(egressNodeUuid) == 1)
+          if (nodeIndexesByUuid.count(egressNodeUuid) == 1)
           {
-            calculator.params.egressNodesIdx.push_back(calculator.nodeIndexesByUuid[egressNodeUuid]);
+            egressNodesIdx.push_back(nodeIndexesByUuid[egressNodeUuid]);
           }
         }
         continue;
@@ -622,7 +623,7 @@ namespace TrRouting
         {
           accessNodeTravelTimesSeconds.push_back(std::stoi(accessNodeTravelTimeSeconds));
         }
-        calculator.params.accessNodeTravelTimesSeconds = accessNodeTravelTimesSeconds;
+        accessNodeTravelTimesSeconds = accessNodeTravelTimesSeconds;
         continue;
       }
       else if (parameterWithValueVector[0] == "egress_node_travel_times_seconds" || parameterWithValueVector[0] == "egress_node_travel_times")
@@ -632,23 +633,26 @@ namespace TrRouting
         {
           egressNodeTravelTimesSeconds.push_back(std::stoi(egressNodeTravelTimeSeconds));
         }
-        calculator.params.egressNodeTravelTimesSeconds = egressNodeTravelTimesSeconds;
+        egressNodeTravelTimesSeconds = egressNodeTravelTimesSeconds;
         continue;
       }
       */
       
-      /*
-      // we should use the scenario instead to simplify request:
+      // those are optional and are replaced by scenario uuid for standard queries:
       else if (parameterWithValueVector[0] == "only_service_uuids")
       {
+        // these service uuids must be in the provided scenario, otherwise they will be ignored and the onlyServiceIds may be emptied
         boost::split(onlyServiceUuidsVector, parameterWithValueVector[1], boost::is_any_of(","));
         boost::uuids::uuid onlyServiceUuid;
+        std::vector<int> onlyServicesIdx;
+        onlyServicesIdx = onlyServicesIdx;
+        onlyServicesIdx.clear();
         for(std::string onlyServiceUuidStr : onlyServiceUuidsVector)
         {
           onlyServiceUuid = uuidGenerator(onlyServiceUuidStr);
-          if (calculator.serviceIndexesByUuid.count(onlyServiceUuid) == 1)
+          if (serviceIndexesByUuid.count(onlyServiceUuid) == 1 && std::find(onlyServicesIdx.begin(), onlyServicesIdx.end(), serviceIndexesByUuid[onlyServiceUuid]) != onlyServicesIdx.end())
           {
-            calculator.params.onlyServicesIdx.push_back(calculator.serviceIndexesByUuid[onlyServiceUuid]);
+            onlyServicesIdx.push_back(serviceIndexesByUuid[onlyServiceUuid]);
           }
         }
         continue;
@@ -657,126 +661,141 @@ namespace TrRouting
       {
         boost::split(exceptServiceUuidsVector, parameterWithValueVector[1], boost::is_any_of(","));
         boost::uuids::uuid exceptServiceUuid;
+        exceptServicesIdx.clear();
         for(std::string exceptServiceUuidStr : exceptServiceUuidsVector)
         {
           exceptServiceUuid = uuidGenerator(exceptServiceUuidStr);
-          if (calculator.serviceIndexesByUuid.count(exceptServiceUuid) == 1)
+          if (serviceIndexesByUuid.count(exceptServiceUuid) == 1)
           {
-            calculator.params.exceptServicesIdx.push_back(calculator.serviceIndexesByUuid[exceptServiceUuid]);
+            exceptServicesIdx.push_back(serviceIndexesByUuid[exceptServiceUuid]);
           }
         }
         continue;
       }
       else if (parameterWithValueVector[0] == "only_node_uuids")
-      {
+      {        
+        // will replace scenario only line uuids
         boost::split(onlyNodeUuidsVector, parameterWithValueVector[1], boost::is_any_of(","));
         boost::uuids::uuid onlyNodeUuid;
+        onlyNodesIdx.clear();
         for(std::string onlyNodeUuidStr : onlyNodeUuidsVector)
         {
           onlyNodeUuid = uuidGenerator(onlyNodeUuidStr);
-          if (calculator.nodeIndexesByUuid.count(onlyNodeUuid) == 1)
+          if (nodeIndexesByUuid.count(onlyNodeUuid) == 1)
           {
-            calculator.params.onlyNodesIdx.push_back(calculator.nodeIndexesByUuid[onlyNodeUuid]);
+            onlyNodesIdx.push_back(nodeIndexesByUuid[onlyNodeUuid]);
           }
         }
         continue;
       }
       else if (parameterWithValueVector[0] == "except_node_uuids")
       {
+        // will replace scenario except node uuids
         boost::split(exceptNodeUuidsVector, parameterWithValueVector[1], boost::is_any_of(","));
         boost::uuids::uuid exceptNodeUuid;
+        exceptNodesIdx.clear();
         for(std::string exceptNodeUuidStr : exceptNodeUuidsVector)
         {
           exceptNodeUuid = uuidGenerator(exceptNodeUuidStr);
-          if (calculator.nodeIndexesByUuid.count(exceptNodeUuid) == 1)
+          if (nodeIndexesByUuid.count(exceptNodeUuid) == 1)
           {
-            calculator.params.exceptNodesIdx.push_back(calculator.nodeIndexesByUuid[exceptNodeUuid]);
+            exceptNodesIdx.push_back(nodeIndexesByUuid[exceptNodeUuid]);
           }
         }
         continue;
       }
       else if (parameterWithValueVector[0] == "only_line_uuids")
       {
+        // will replace scenario only line uuids
         boost::split(onlyLineUuidsVector, parameterWithValueVector[1], boost::is_any_of(","));
         boost::uuids::uuid onlyLineUuid;
+        onlyLinesIdx.clear();
         for(std::string onlyLineUuidStr : onlyLineUuidsVector)
         {
           onlyLineUuid = uuidGenerator(onlyLineUuidStr);
-          if (calculator.lineIndexesByUuid.count(onlyLineUuid) == 1)
+          if (lineIndexesByUuid.count(onlyLineUuid) == 1)
           {
-            calculator.params.onlyLinesIdx.push_back(calculator.lineIndexesByUuid[onlyLineUuid]);
+            onlyLinesIdx.push_back(lineIndexesByUuid[onlyLineUuid]);
           }
         }
         continue;
       }
       else if (parameterWithValueVector[0] == "except_line_uuids")
       {
+        // will replace scenario except line uuids
         boost::split(exceptLineUuidsVector, parameterWithValueVector[1], boost::is_any_of(","));
         boost::uuids::uuid exceptLineUuid;
+        exceptLinesIdx.clear();
         for(std::string exceptLineUuidStr : exceptLineUuidsVector)
         {
           exceptLineUuid = uuidGenerator(exceptLineUuidStr);
-          if (calculator.lineIndexesByUuid.count(exceptLineUuid) == 1)
+          if (lineIndexesByUuid.count(exceptLineUuid) == 1)
           {
-            calculator.params.exceptLinesIdx.push_back(calculator.lineIndexesByUuid[exceptLineUuid]);
+            exceptLinesIdx.push_back(lineIndexesByUuid[exceptLineUuid]);
           }
         }
         continue;
       }
       else if (parameterWithValueVector[0] == "only_modes")
       {
+        // will replace scenario only modes
+        onlyModesIdx.clear();
         boost::split(onlyModeShortnamesVector, parameterWithValueVector[1], boost::is_any_of(","));
         for(std::string onlyModeShortname : onlyModeShortnamesVector)
         {
-          if (calculator.modeIndexesByShortname.count(onlyModeShortname) == 1)
+          if (modeIndexesByShortname.count(onlyModeShortname) == 1)
           {
-            calculator.params.onlyModesIdx.push_back(calculator.modeIndexesByShortname[onlyModeShortname]);
+            onlyModesIdx.push_back(modeIndexesByShortname[onlyModeShortname]);
           }
         }
         continue;
       }
       else if (parameterWithValueVector[0] == "except_modes")
       {
+        // will replace scenario except modes
+        exceptModesIdx.clear();
         boost::split(exceptModeShortnamesVector, parameterWithValueVector[1], boost::is_any_of(","));
         for(std::string exceptModeShortname : exceptModeShortnamesVector)
         {
-          if (calculator.modeIndexesByShortname.count(exceptModeShortname) == 1)
+          if (modeIndexesByShortname.count(exceptModeShortname) == 1)
           {
-            calculator.params.exceptModesIdx.push_back(calculator.modeIndexesByShortname[exceptModeShortname]);
+            exceptModesIdx.push_back(modeIndexesByShortname[exceptModeShortname]);
           }
         }
         continue;
       }
       else if (parameterWithValueVector[0] == "only_agency_uuids")
       {
+        // will replace scenario only agency uuids
         boost::split(onlyAgencyUuidsVector, parameterWithValueVector[1], boost::is_any_of(","));
         boost::uuids::uuid onlyAgencyUuid;
+        onlyAgenciesIdx.clear();
         for(std::string onlyAgencyUuidStr : onlyAgencyUuidsVector)
         {
           onlyAgencyUuid = uuidGenerator(onlyAgencyUuidStr);
-          if (calculator.agencyIndexesByUuid.count(onlyAgencyUuid) == 1)
+          if (agencyIndexesByUuid.count(onlyAgencyUuid) == 1)
           {
-            calculator.params.onlyAgenciesIdx.push_back(calculator.agencyIndexesByUuid[onlyAgencyUuid]);
+            onlyAgenciesIdx.push_back(agencyIndexesByUuid[onlyAgencyUuid]);
           }
         }
         continue;
       }
       else if (parameterWithValueVector[0] == "except_agency_uuids")
       {
+        // will replace scenario except agency uuids
         boost::split(exceptAgencyUuidsVector, parameterWithValueVector[1], boost::is_any_of(","));
         boost::uuids::uuid exceptAgencyUuid;
+        exceptAgenciesIdx.clear();
         for(std::string exceptAgencyUuidStr : exceptAgencyUuidsVector)
         {
           exceptAgencyUuid = uuidGenerator(exceptAgencyUuidStr);
-          if (calculator.agencyIndexesByUuid.count(exceptAgencyUuid) == 1)
+          if (agencyIndexesByUuid.count(exceptAgencyUuid) == 1)
           {
-            calculator.params.onlyAgenciesIdx.push_back(calculator.agencyIndexesByUuid[exceptAgencyUuid]);
+            exceptAgenciesIdx.push_back(agencyIndexesByUuid[exceptAgencyUuid]);
           }
         }
         continue;
       }
-      */
-
 
       else if (parameterWithValueVector[0] == "date")
       {

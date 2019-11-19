@@ -323,7 +323,7 @@ int main(int argc, char** argv) {
     
     // update params:
     calculator.params.setDefaultValues();
-    calculator.params.update(parametersWithValues, calculator.scenarioIndexesByUuid, calculator.scenarios, calculator.nodeIndexesByUuid, calculator.dataSourceIndexesByUuid);
+    calculator.params.update(parametersWithValues, calculator.scenarioIndexesByUuid, calculator.scenarios, calculator.nodeIndexesByUuid, calculator.agencyIndexesByUuid, calculator.lineIndexesByUuid, calculator.serviceIndexesByUuid, calculator.modeIndexesByShortname, calculator.dataSourceIndexesByUuid);
 
     if (calculator.params.isCompleteForCalculation())
     {
@@ -342,7 +342,7 @@ int main(int argc, char** argv) {
         std::cout << "od trip uuid " << calculator.odTrip->uuid << std::endl;
         calculator.origin      = calculator.odTrip->origin.get();
         calculator.destination = calculator.odTrip->destination.get();
-        response = calculator.calculate().json;
+        response = calculator.calculate().json.dump(2);
       }
       else if (calculator.params.alternatives)
       {
@@ -354,7 +354,7 @@ int main(int argc, char** argv) {
       }
       else
       {
-        response = calculator.calculate().json;
+        response = calculator.calculate().json.dump(2);
       }
       
       if (calculator.params.saveResultToFile)

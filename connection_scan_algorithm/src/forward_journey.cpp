@@ -405,7 +405,7 @@ namespace TrRouting
     if (params.debugDisplay)
       std::cerr << "-- forward result: " << result.status << " dts:" << result.departureTimeSeconds << std::endl;
 
-    result.json = json.dump(2); // number of spaces in indent for human readable json, use dump() to put all json content on the same line
+    result.json = json;
     return result;
 
   }

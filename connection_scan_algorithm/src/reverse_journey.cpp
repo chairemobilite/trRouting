@@ -403,7 +403,7 @@ namespace TrRouting
       json["percentOfReachableNodes"] = round(10000 * (float)reachableNodesCount / (float)(nodesCount))/100.0;
     }
 
-    result.json = json.dump(2); // number of spaces in indent for human readable json, use dump() to put all json content on the same line
+    result.json = json;
     
     return result;
   }

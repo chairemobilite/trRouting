@@ -24,7 +24,7 @@ namespace TrRouting
     int nonTransitTravelTimeSeconds;
     int calculationTimeMilliseconds;
     std::string status;
-    std::string json;
+    nlohmann::json json;
     std::vector<boost::uuids::uuid> lineUuids;
     std::vector<boost::uuids::uuid> tripUuids;
     std::vector<boost::uuids::uuid> boardingNodeUuids;
