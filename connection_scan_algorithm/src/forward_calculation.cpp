@@ -3,7 +3,7 @@
 namespace TrRouting
 {
     
-  std::tuple<int,int,int> Calculator::forwardCalculation()
+  std::tuple<int,int,int,int> Calculator::forwardCalculation()
   {
 
     int benchmarkingStart  = algorithmCalculationTime.getEpoch();
@@ -24,11 +24,13 @@ namespace TrRouting
     //long long  footpathsRangeEnd        {-1};
     int  footpathIndex                  {-1};
     int  footpathTravelTime             {-1};
+    int  footpathDistance               {-1};
     int  tentativeEgressNodeArrivalTime {MAX_INT};
     bool reachedAtLeastOneEgressNode    {false};
     bool canTransferOnSameLine          {false};
     int  bestEgressNodeIndex            {-1};
     int  bestEgressTravelTime           {-1};
+    int  bestEgressDistance             {-1};
     int  bestArrivalTime                {MAX_INT};
     
     int  connectionsCount  = forwardConnections.size();
@@ -113,14 +115,15 @@ namespace TrRouting
 
                 if (footpathTravelTime <= params.maxTransferWalkingTravelTimeSeconds)
                 {
+                  footpathDistance = nodes[nodeArrivalIndex].get()->transferableDistancesMeters[footpathIndex];
                   if (footpathTravelTime + params.minWaitingTimeSeconds + connectionArrivalTime < nodesTentativeTime[transferableNodeIndex])
                   {
                     nodesTentativeTime[transferableNodeIndex] = footpathTravelTime + connectionArrivalTime + params.minWaitingTimeSeconds;
-                    forwardJourneys[transferableNodeIndex]    = std::make_tuple(tripsEnterConnection[tripIndex], i, nodeArrivalIndex, tripIndex, footpathTravelTime, (nodeArrivalIndex == transferableNodeIndex ? 1 : -1));
+                    forwardJourneys[transferableNodeIndex]    = std::make_tuple(tripsEnterConnection[tripIndex], i, nodeArrivalIndex, tripIndex, footpathTravelTime, (nodeArrivalIndex == transferableNodeIndex ? 1 : -1), footpathDistance);
                   }
                   if (nodeArrivalIndex == transferableNodeIndex && (std::get<4>(forwardEgressJourneys[transferableNodeIndex]) == -1 || std::get<connectionIndexes::TIME_ARR>(*forwardConnections[std::get<1>(forwardEgressJourneys[transferableNodeIndex])]) > connectionArrivalTime))
                   {
-                    forwardEgressJourneys[transferableNodeIndex] = std::make_tuple(tripsEnterConnection[tripIndex], i, nodeArrivalIndex, tripIndex, footpathTravelTime, 1);
+                    forwardEgressJourneys[transferableNodeIndex] = std::make_tuple(tripsEnterConnection[tripIndex], i, nodeArrivalIndex, tripIndex, footpathTravelTime, 1, footpathDistance);
                   }
                 }
                 footpathIndex++;
@@ -139,24 +142,27 @@ namespace TrRouting
     int egressNodeArrivalTime {-1};
     int egressExitConnection  {-1};
     int egressTravelTime      {-1};
+    int egressDistance        {-1};
     // find best egress node:
     if (!params.returnAllNodesResult)
     {
       i = 0;
       for (auto & egressFootpath : egressFootpaths)
       {
-        //std::cerr << nodes[egressFootpath.first].get()->name << std::endl;
-        egressExitConnection  = std::get<1>(forwardEgressJourneys[egressFootpath.first]);
+        //std::cerr << nodes[std::get<0>(egressFootpath)].get()->name << std::endl;
+        egressExitConnection  = std::get<1>(forwardEgressJourneys[std::get<0>(egressFootpath)]);
         if (egressExitConnection != -1)
         {
-          egressTravelTime      = nodesEgressTravelTime[egressFootpath.first];
+          egressTravelTime      = nodesEgressTravelTime[std::get<0>(egressFootpath)];
+          egressDistance        = nodesEgressDistance[std::get<0>(egressFootpath)];
           egressNodeArrivalTime = std::get<connectionIndexes::TIME_ARR>(*forwardConnections[egressExitConnection]) + egressTravelTime;
-          //std::cerr << nodes[egressFootpath.first].get()->name << ": " << egressTravelTime << " - " << Toolbox::convertSecondsToFormattedTime(egressNodeArrivalTime) << std::endl;
+          //std::cerr << nodes[std::get<0>(egressFootpath)].get()->name << ": " << egressTravelTime << " - " << Toolbox::convertSecondsToFormattedTime(egressNodeArrivalTime) << std::endl;
           if (egressNodeArrivalTime >= 0 && egressNodeArrivalTime - departureTimeSeconds <= params.maxTotalTravelTimeSeconds && egressNodeArrivalTime < bestArrivalTime && egressNodeArrivalTime < MAX_INT)
           {
             bestArrivalTime      = egressNodeArrivalTime;
-            bestEgressNodeIndex  = egressFootpath.first;
+            bestEgressNodeIndex  = std::get<0>(egressFootpath);
             bestEgressTravelTime = egressTravelTime;
+            bestEgressDistance   = egressDistance;
           }
         }
         i++;
@@ -165,14 +171,14 @@ namespace TrRouting
       if (params.debugDisplay)
         benchmarking["forward_calculation"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
 
-      return std::make_tuple(bestArrivalTime, bestEgressNodeIndex, bestEgressTravelTime);
+      return std::make_tuple(bestArrivalTime, bestEgressNodeIndex, bestEgressTravelTime, bestEgressDistance);
     }
     else
     {
       if (params.debugDisplay)
         benchmarking["forward_calculation"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
 
-      return std::make_tuple(MAX_INT, -1, -1);
+      return std::make_tuple(MAX_INT, -1, -1, -1);
     }
 
   }

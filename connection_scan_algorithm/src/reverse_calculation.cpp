@@ -3,7 +3,7 @@
 namespace TrRouting
 {
     
-  std::tuple<int,int,int> Calculator::reverseCalculation()
+  std::tuple<int,int,int,int> Calculator::reverseCalculation()
   {
 
     int benchmarkingStart = algorithmCalculationTime.getEpoch();
@@ -24,11 +24,13 @@ namespace TrRouting
     //long long  footpathsRangeEnd          {-1};
     int  footpathIndex                    {-1};
     int  footpathTravelTime               {-1};
+    int  footpathDistance                 {-1};
     int  tentativeAccessNodeDepartureTime {-1};
     bool reachedAtLeastOneAccessNode      {false};
     bool canTransferOnSameLine            {false};
     int  bestAccessNodeIndex              {-1};
     int  bestAccessTravelTime             {-1};
+    int  bestAccessDistance               {-1};
     int  bestDepartureTime                {-1};
 
     int  connectionsCount = reverseConnections.size();
@@ -114,14 +116,15 @@ namespace TrRouting
 
                 if (footpathTravelTime <= params.maxTransferWalkingTravelTimeSeconds)
                 {
+                  footpathDistance = nodes[nodeDepartureIndex].get()->transferableDistancesMeters[footpathIndex];
                   if (connectionDepartureTime - footpathTravelTime - params.minWaitingTimeSeconds >= nodesReverseTentativeTime[transferableNodeIndex])
                   {
                     nodesReverseTentativeTime[transferableNodeIndex] = connectionDepartureTime - footpathTravelTime - params.minWaitingTimeSeconds;
-                    reverseJourneys[transferableNodeIndex]           = std::make_tuple(i, tripsExitConnection[tripIndex], nodeDepartureIndex, tripIndex, footpathTravelTime, (nodeDepartureIndex == transferableNodeIndex ? 1 : -1));
+                    reverseJourneys[transferableNodeIndex]           = std::make_tuple(i, tripsExitConnection[tripIndex], nodeDepartureIndex, tripIndex, footpathTravelTime, (nodeDepartureIndex == transferableNodeIndex ? 1 : -1), footpathDistance);
                   }
                   if (nodeDepartureIndex == transferableNodeIndex && (std::get<4>(reverseAccessJourneys[transferableNodeIndex]) == -1 || std::get<connectionIndexes::TIME_DEP>(*reverseConnections[std::get<1>(reverseAccessJourneys[transferableNodeIndex])].get()) <= connectionDepartureTime))
                   {
-                    reverseAccessJourneys[transferableNodeIndex] = std::make_tuple(i, tripsExitConnection[tripIndex], nodeDepartureIndex, tripIndex, footpathTravelTime, 1);
+                    reverseAccessJourneys[transferableNodeIndex] = std::make_tuple(i, tripsExitConnection[tripIndex], nodeDepartureIndex, tripIndex, footpathTravelTime, 1, footpathDistance);
                   }
                 }
                 footpathIndex++;
@@ -141,22 +144,25 @@ namespace TrRouting
     int accessNodeDepartureTime {-1};
     int accessEnterConnection   {-1};
     int accessTravelTime        {-1};
+    int accessDistance          {-1};
     // find best access node:
     if (!params.returnAllNodesResult)
     {
       i = 0;
       for (auto & accessFootpath : accessFootpaths)
       {
-        accessEnterConnection  = std::get<0>(reverseAccessJourneys[accessFootpath.first]);
+        accessEnterConnection  = std::get<0>(reverseAccessJourneys[std::get<0>(accessFootpath)]);
         if (accessEnterConnection != -1)
         {
-          accessTravelTime        = nodesAccessTravelTime[accessFootpath.first];
+          accessTravelTime        = nodesAccessTravelTime[std::get<0>(accessFootpath)];
+          accessDistance          = nodesAccessDistance[std::get<0>(accessFootpath)];
           accessNodeDepartureTime = std::get<connectionIndexes::TIME_DEP>(*reverseConnections[accessEnterConnection]) - accessTravelTime - params.minWaitingTimeSeconds;
           if (accessNodeDepartureTime >= 0 && arrivalTimeSeconds - accessNodeDepartureTime <= params.maxTotalTravelTimeSeconds && accessNodeDepartureTime > bestDepartureTime && accessNodeDepartureTime < MAX_INT)
           {
             bestDepartureTime    = accessNodeDepartureTime;
-            bestAccessNodeIndex  = accessFootpath.first;
+            bestAccessNodeIndex  = std::get<0>(accessFootpath);
             bestAccessTravelTime = accessTravelTime;
+            bestAccessDistance   = accessDistance;
           }
         }
         i++;
@@ -165,14 +171,14 @@ namespace TrRouting
       if (params.debugDisplay)
         benchmarking["reverse_calculation"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
 
-      return std::make_tuple(bestDepartureTime, bestAccessNodeIndex, bestAccessTravelTime);
+      return std::make_tuple(bestDepartureTime, bestAccessNodeIndex, bestAccessTravelTime, bestAccessDistance);
     }
     else
     {
       if (params.debugDisplay)
         benchmarking["reverse_calculation"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
       
-      return std::make_tuple(-1, -1, -1);
+      return std::make_tuple(-1, -1, -1, -1);
     }
 
 

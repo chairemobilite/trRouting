@@ -159,30 +159,30 @@ namespace TrRouting
             const unsigned int originNodesCount {capnpT.getOriginNodesIdx().size()};
             std::vector<int> originNodesIdx(originNodesCount);
             std::vector<int> originNodesTravelTimesSeconds(originNodesCount);
-            //std::vector<int> originNodesDistancesMeters(originNodesCount);
+            std::vector<int> originNodesDistancesMeters(originNodesCount);
             for (int i = 0; i < originNodesCount; i++)
             {
               originNodesIdx               [i] = capnpT.getOriginNodesIdx()[i];
               originNodesTravelTimesSeconds[i] = capnpT.getOriginNodesTravelTimes()[i];
-              //originNodesDistancesMeters   [i] = capnpT.getOriginNodesDistances()[i];
+              originNodesDistancesMeters   [i] = capnpT.getOriginNodesDistances()[i];
             }
             t->originNodesIdx                = originNodesIdx;
             t->originNodesTravelTimesSeconds = originNodesTravelTimesSeconds;
-            //t->originNodesDistancesMeters    = originNodesDistancesMeters;
+            t->originNodesDistancesMeters    = originNodesDistancesMeters;
 
             const unsigned int destinationNodesCount {capnpT.getDestinationNodesIdx().size()};
             std::vector<int> destinationNodesIdx(destinationNodesCount);
             std::vector<int> destinationNodesTravelTimesSeconds(destinationNodesCount);
-            //std::vector<int> destinationNodesDistancesMeters(destinationNodesCount);
+            std::vector<int> destinationNodesDistancesMeters(destinationNodesCount);
             for (int i = 0; i < destinationNodesCount; i++)
             {
               destinationNodesIdx               [i] = capnpT.getDestinationNodesIdx()[i];
               destinationNodesTravelTimesSeconds[i] = capnpT.getDestinationNodesTravelTimes()[i];
-              //destinationNodesDistancesMeters   [i] = capnpT.getDestinationNodesDistances()[i];
+              destinationNodesDistancesMeters   [i] = capnpT.getDestinationNodesDistances()[i];
             }
             t->destinationNodesIdx                = destinationNodesIdx;
             t->destinationNodesTravelTimesSeconds = destinationNodesTravelTimesSeconds;
-            //t->destinationNodesDistancesMeters    = destinationNodesDistancesMeters;
+            t->destinationNodesDistancesMeters    = destinationNodesDistancesMeters;
 
             tIndexesByUuid[t->uuid] = ts.size();
             ts.push_back(std::move(t));

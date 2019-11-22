@@ -161,8 +161,10 @@ namespace TrRouting
     std::vector<std::string> exceptNodeUuidsVector;
     std::vector<std::string> accessNodeUuidsVector;
     std::vector<std::string> accessNodeTravelTimesSecondsVector;
+    std::vector<std::string> accessNodeDistancesMetersVector;
     std::vector<std::string> egressNodeUuidsVector;
     std::vector<std::string> egressNodeTravelTimesSecondsVector;
+    std::vector<std::string> egressNodeDistancesMetersVector;
     std::vector<std::string> odTripsPeriodsVector;
     std::vector<std::string> odTripsGendersVector;
     std::vector<std::string> odTripsAgeGroupsVector;

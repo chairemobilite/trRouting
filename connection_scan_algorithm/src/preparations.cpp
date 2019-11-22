@@ -56,9 +56,15 @@ namespace TrRouting
     nodesAccessTravelTime.clear();
     nodesAccessTravelTime.shrink_to_fit();
     nodesAccessTravelTime.resize(nodes.size());
+    nodesAccessDistance.clear();
+    nodesAccessDistance.shrink_to_fit();
+    nodesAccessDistance.resize(nodes.size());
     nodesEgressTravelTime.clear();
     nodesEgressTravelTime.shrink_to_fit();
     nodesEgressTravelTime.resize(nodes.size());
+    nodesEgressDistance.clear();
+    nodesEgressDistance.shrink_to_fit();
+    nodesEgressDistance.resize(nodes.size());
     forwardJourneys.clear();
     forwardJourneys.shrink_to_fit();
     forwardJourneys.resize(nodes.size());

@@ -8,6 +8,7 @@
 #include "cache_fetcher.hpp"
 #include "path.hpp"
 #include "capnp/pathCollection.capnp.h"
+#include "json.hpp"
 //#include "toolbox.hpp"
 
 namespace TrRouting
@@ -39,6 +40,7 @@ namespace TrRouting
     
     if (CacheFetcher::capnpCacheFileExists(cacheFileName + ".capnpbin", params, customPath))
     {
+
       int fd = open((CacheFetcher::getFilePath(cacheFileName, params, customPath) + ".capnpbin").c_str(), O_RDWR);
       ::capnp::PackedFdMessageReader capnpTCollectionMessage(fd, {64 * 1024 * 1024});
       TCollection::Reader capnpTCollection = capnpTCollectionMessage.getRoot<TCollection>();
@@ -48,6 +50,8 @@ namespace TrRouting
         std::string lineUuid {capnpT.getLineUuid()};
         std::vector<int> nodesIdx;
         std::vector<int> tripsIdx;
+        std::vector<int> distancesMeters;
+        std::vector<int> travelTimesSeconds;
         boost::uuids::uuid nodeUuid;
         
         std::unique_ptr<T> t = std::make_unique<T>();
@@ -64,6 +68,23 @@ namespace TrRouting
         }
         t->nodesIdx = nodesIdx;
 
+        auto jsonData = nlohmann::json::parse(capnpT.getData());
+
+        for (int i=0; i < t->nodesIdx.size(); i++)
+        {
+          if (jsonData["segments"][i]["distanceMeters"] != nullptr)
+          {
+            distancesMeters.push_back(jsonData["segments"][i]["distanceMeters"]);
+          }
+          if (jsonData["segments"][i]["travelTimeSeconds"] != nullptr)
+          {
+            travelTimesSeconds.push_back(jsonData["segments"][i]["travelTimeSeconds"]);
+          }
+        }
+        
+        t->segmentsDistanceMeters    = distancesMeters;
+        t->segmentsTravelTimeSeconds = travelTimesSeconds;
+        
         tIndexesByUuid[t->uuid] = ts.size();
         ts.push_back(std::move(t));
       }

@@ -29,10 +29,10 @@ namespace TrRouting
     std::string internalId;
     std::vector<int> originNodesIdx;
     std::vector<int> originNodesTravelTimesSeconds;
-    //std::vector<int> originNodesDistancesMeters;
+    std::vector<int> originNodesDistancesMeters;
     std::vector<int> destinationNodesIdx;
     std::vector<int> destinationNodesTravelTimesSeconds;
-    //std::vector<int> destinationNodesDistancesMeters;
+    std::vector<int> destinationNodesDistancesMeters;
     std::unique_ptr<Point> origin;
     std::unique_ptr<Point> destination;
 

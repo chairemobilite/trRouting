@@ -66,8 +66,10 @@ namespace TrRouting
       std::vector<int> exceptNodesIdx;
       std::vector<int> accessNodesIdx;
       std::vector<int> accessNodeTravelTimesSeconds;
+      std::vector<int> accessNodeDistancesMeters;
       std::vector<int> egressNodesIdx;
       std::vector<int> egressNodeTravelTimesSeconds;
+      std::vector<int> egressNodeDistancesMeters;
       
       std::vector<std::pair<int,int>> odTripsPeriods; // pair: start_at_seconds, end_at_seconds
       std::vector<std::string>        odTripsGenders;

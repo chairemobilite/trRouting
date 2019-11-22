@@ -81,18 +81,20 @@ namespace TrRouting
 
           std::vector<int> transferableNodesIdx(transferableNodesCount);
           std::vector<int> transferableTravelTimesSeconds(transferableNodesCount);
-          //std::vector<int> transferableDistancesMeters(transferableNodesCount);
+          std::vector<int> transferableDistancesMeters(transferableNodesCount);
           for (int i = 0; i < transferableNodesCount; i++)
           {
             transferableNodesIdx          [i] = capnpT.getTransferableNodesIdx()[i];
             transferableTravelTimesSeconds[i] = capnpT.getTransferableNodesTravelTimes()[i];
-            //transferableDistancesMeters   [i] = capnpT.getTransferableNodesDistances()[i];
+            transferableDistancesMeters   [i] = capnpT.getTransferableNodesDistances()[i];
           }
           t->transferableNodesIdx           = transferableNodesIdx;
           t->transferableTravelTimesSeconds = transferableTravelTimesSeconds;
-          //t->transferableDistancesMeters    = transferableDistancesMeters;
+          t->transferableDistancesMeters    = transferableDistancesMeters;
           close(fd);
         }
+
+        //std::cout << TStr << ":\n" << t->toString() << "---" << t->transferableDistancesMeters[1] << std::endl;
 
         tIndexesByUuid[t->uuid] = ts.size();
         ts.push_back(std::move(t));

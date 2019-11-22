@@ -4,7 +4,7 @@
 namespace TrRouting
 {
 
-  RoutingResult Calculator::reverseJourney(int bestDepartureTime, int bestAccessNodeIndex, int bestAccessTravelTime)
+  RoutingResult Calculator::reverseJourney(int bestDepartureTime, int bestAccessNodeIndex, int bestAccessTravelTime, int bestAccessDistance)
   {
   
     RoutingResult    result;
@@ -31,9 +31,9 @@ namespace TrRouting
     if (foundRoute || params.returnAllNodesResult)
     {
 
-      std::deque<std::tuple<int,int,int,int,int,short>> journey;
-      std::tuple<int,int,int,int,int,short>             resultingNodeJourneyStep;
-      std::tuple<int,int,int,int,int,short>             emptyJourneyStep {-1,-1,-1,-1,-1,-1};
+      std::deque<std::tuple<int,int,int,int,int,short,int>> journey;
+      std::tuple<int,int,int,int,int,short,int>         resultingNodeJourneyStep;
+      std::tuple<int,int,int,int,int,short,int>         emptyJourneyStep {-1,-1,-1,-1,-1,-1,-1};
       std::tuple<int,int,int,int,int,short,short,int,int,int,short> * journeyStepEnterConnection; // connection tuple: departureNodeIndex, arrivalNodeIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequenceinTrip
       std::tuple<int,int,int,int,int,short,short,int,int,int,short> * journeyStepExitConnection;
       std::vector<boost::uuids::uuid>                   lineUuids;
@@ -62,6 +62,7 @@ namespace TrRouting
       int totalWaitingTime         { 0}; int departureTime       {-1}; int boardingSequence       {-1};
       int totalTransferWalkingTime { 0}; int arrivalTime         {-1}; int unboardingSequence     {-1};
       int totalTransferWaitingTime { 0}; int inVehicleTime       {-1}; int bestEgressNodeIndex    {-1};
+      int totalDistance            { 0}; int distance            {-1};
       int journeyStepTravelTime    {-1}; int accessWalkingTime   {-1}; 
       int transferTime             {-1}; int egressWalkingTime   {-1}; 
       int waitingTime              {-1}; int accessWaitingTime   {-1}; 
@@ -85,6 +86,7 @@ namespace TrRouting
         totalWaitingTime         =  0; departureTime       = -1; boardingSequence    = -1;
         totalTransferWalkingTime =  0; arrivalTime         = -1; unboardingSequence  = -1;
         totalTransferWaitingTime =  0; inVehicleTime       = -1; bestEgressNodeIndex = -1;
+        totalDistance            =  0; distance            = -1;
         journeyStepTravelTime    = -1; accessWalkingTime   = -1; 
         transferTime             = -1; egressWalkingTime   = -1; 
         waitingTime              = -1; accessWaitingTime   = -1; 
@@ -116,9 +118,9 @@ namespace TrRouting
         if (!params.returnAllNodesResult)
         {
           json["steps"] = nlohmann::json::array();
-          journey.push_front(std::make_tuple(-1,-1,-1,-1,nodesAccessTravelTime[resultingNodeIndex],-1));
+          journey.push_front(std::make_tuple(-1,-1,-1,-1,nodesAccessTravelTime[resultingNodeIndex],-1,nodesAccessDistance[resultingNodeIndex]));
         }
-        journey.push_back(std::make_tuple(-1,-1,-1,-1,nodesEgressTravelTime[bestEgressNodeIndex],-1));
+        journey.push_back(std::make_tuple(-1,-1,-1,-1,nodesEgressTravelTime[bestEgressNodeIndex],-1,nodesEgressDistance[bestEgressNodeIndex]));
         
         //std::string stepsJson = "  \"steps\":\n  [\n";
        

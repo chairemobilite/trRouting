@@ -1,13 +1,14 @@
 #include "osrm_fetcher.hpp"
+#include "json.hpp"
 
 namespace TrRouting
 {
   
-  std::vector<std::pair<int,int>> OsrmFetcher::getAccessibleNodesFootpathsFromPoint(const Point point, const std::vector<std::unique_ptr<Node>> &nodes, std::string mode, Parameters& params, bool reversed)
+  std::vector<std::tuple<int,int,int>> OsrmFetcher::getAccessibleNodesFootpathsFromPoint(const Point point, const std::vector<std::unique_ptr<Node>> &nodes, std::string mode, Parameters& params, bool reversed)
   {
 
-    std::vector<int>                birdDistanceAccessibleNodeIndexes;
-    std::vector<std::pair<int,int>> accessibleNodesFootpaths;
+    std::vector<int>                     birdDistanceAccessibleNodeIndexes;
+    std::vector<std::tuple<int,int,int>> accessibleNodesFootpaths;
 
     float lengthOfOneDegreeOfLongitude = 111412.84 * cos(point.latitude * M_PI / 180) -93.5 * cos (3 * point.latitude * M_PI / 180);
     float lengthOfOneDegreeOflatitude  = 111132.92 - 559.82 * cos(2 * point.latitude * M_PI / 180) + 1.175 * cos(4 * point.latitude * M_PI / 180);
@@ -34,6 +35,8 @@ namespace TrRouting
         }
         i++;
       }
+      //osrmParams.annotations.push_back("durations"); // not sure it works like this, needs more testing...
+      //osrmParams.annotations.push_back("distances"); // not sure it works like this, needs more testing...
       if (reversed)
       {
         osrmParams.destinations.push_back(0);
@@ -52,28 +55,28 @@ namespace TrRouting
         if (reversed)
         {
           auto &durations = result.values["durations"].get<osrm::json::Array>().values;
-          //auto &distances = result.values["distances"].get<osrm::json::Array>().values.at(0).get<osrm::json::Array>().values;
+          auto &distances = result.values["distances"].get<osrm::json::Array>().values.at(0).get<osrm::json::Array>().values;
           for (int i = 0; i < birdDistanceAccessibleNodeIndexes.size(); i++)
           {
             const int duration = durations.at(i+1).get<osrm::json::Array>().values.at(0).get<osrm::json::Number>().value; // ignore i = 0 (source with itself)
-            //const int distance = distances.at(i+1).get<osrm::json::Number>().value;
+            const int distance = distances.at(i+1).get<osrm::json::Number>().value;
             if (duration <= params.maxAccessWalkingTravelTimeSeconds)
             {
-              accessibleNodesFootpaths.push_back(std::make_pair(birdDistanceAccessibleNodeIndexes[i], duration));
+              accessibleNodesFootpaths.push_back(std::make_tuple(birdDistanceAccessibleNodeIndexes[i], duration, distance));
             }
           }
         }
         else
         {
           auto &durations = result.values["durations"].get<osrm::json::Array>().values.at(0).get<osrm::json::Array>().values;
-          //auto &distances = result.values["distances"].get<osrm::json::Array>().values.at(0).get<osrm::json::Array>().values;
+          auto &distances = result.values["distances"].get<osrm::json::Array>().values.at(0).get<osrm::json::Array>().values;
           for (int i = 0; i < birdDistanceAccessibleNodeIndexes.size(); i++)
           {
             const int duration = durations.at(i+1).get<osrm::json::Number>().value; // ignore i = 0 (source with itself)
-            //const int distance = distances.at(i+1).get<osrm::json::Number>().value;
+            const int distance = distances.at(i+1).get<osrm::json::Number>().value;
             if (duration <= params.maxAccessWalkingTravelTimeSeconds)
             {
-              accessibleNodesFootpaths.push_back(std::make_pair(birdDistanceAccessibleNodeIndexes[i], duration));
+              accessibleNodesFootpaths.push_back(std::make_tuple(birdDistanceAccessibleNodeIndexes[i], duration, distance));
             }
           }
         }
@@ -112,6 +115,8 @@ namespace TrRouting
         i++;
       }
 
+      queryString += "?annotations=duration,distance";
+
       // call osrm on bird distance accessible nodes for further filtering by network travel time:
       boost::asio::ip::tcp::iostream s;
 
@@ -119,11 +124,11 @@ namespace TrRouting
       
       if (reversed)
       {
-        queryString += "?destinations=0";
+        queryString += "&destinations=0";
       }
       else
       {
-        queryString += "?sources=0";
+        queryString += "&sources=0";
       }
       queryString += " HTTP/1.1\r\n\r\n";
 
@@ -137,36 +142,34 @@ namespace TrRouting
       std::stringstream responseJsonSs;
       responseJsonSs << s.rdbuf();
 
-      boost::property_tree::ptree pt;
-      boost::property_tree::read_json(responseJsonSs, pt);
-
-      //std::cerr << responseJsonSs.str() << std::endl;
-
-      using boost::property_tree::ptree;
-
-      //std::cout << "duration count = " << pt.count("durations") << std::endl;
-
-      i = -1;
-
-      if (pt.count("durations") == 1)
+      nlohmann::json responseJson = nlohmann::json::parse(responseJsonSs.str());
+      int numberOfDurations = responseJson["durations"].size();
+      //std::cout << "numberOfDurations: " << responseJson["durations"][0].dump(2) << std::endl;
+      int numberOfDistances = responseJson["distances"].size();
+      //std::cout << "numberOfDistances: " << responseJson["distances"][0].dump(2) << std::endl;
+      
+      if (responseJson["durations"] != nullptr && responseJson["distances"] != nullptr && responseJson["durations"][0] != nullptr && responseJson["distances"][0] != nullptr)
       {
-        ptree durations = pt.get_child("durations");
-
-        int travelTimeSeconds;
-
-        for (const auto& v : durations) {
-          for (const auto& v2 : v.second) {
-            if(i >= 0) // first value is duration with self, we must ignore it (i was initialized with -1)
+        int numberOfDurations = responseJson["durations"][0].size();
+        //std::cout << "numberOfDurations: " << responseJson["durations"][0].dump(2) << std::endl;
+        int numberOfDistances = responseJson["distances"][0].size();
+        //std::cout << "numberOfDistances: " << responseJson["distances"][0].dump(2) << std::endl;
+        int j = 0;
+        if (numberOfDurations > 0 && numberOfDistances > 0)
+        {
+          int travelTimeSeconds;
+          int distanceMeters;
+          for (int i = 1; i < numberOfDurations; i++) // ignore first (duration with itself)
+          {
+            travelTimeSeconds = (int)ceil((float)responseJson["durations"][0][i]);
+            if (travelTimeSeconds <= params.maxAccessWalkingTravelTimeSeconds)
             {
-              travelTimeSeconds = (int)ceil(std::stod(v2.second.data()));
-              if (travelTimeSeconds <= params.maxAccessWalkingTravelTimeSeconds)
-              {
-                accessibleNodesFootpaths.push_back(std::make_pair(birdDistanceAccessibleNodeIndexes[i], travelTimeSeconds));
-              }
+              distanceMeters = (int)ceil((float)responseJson["distances"][0][i]);
+              accessibleNodesFootpaths.push_back(std::make_tuple(birdDistanceAccessibleNodeIndexes[i-1], travelTimeSeconds, distanceMeters));
             }
-            i++;
           }
         }
+        
       }
     }
 
