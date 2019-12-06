@@ -338,9 +338,17 @@ int main(int argc, char** argv) {
         calculator.odTrip = calculator.odTrips[calculator.odTripIndexesByUuid[calculator.params.odTripUuid.get()]].get();
         foundOdTrip = true;
         std::cout << "od trip uuid " << calculator.odTrip->uuid << std::endl;
+        std::cout << "dts " << calculator.odTrip->departureTimeSeconds << std::endl;
         calculator.origin      = calculator.odTrip->origin.get();
         calculator.destination = calculator.odTrip->destination.get();
-        response = calculator.calculate().json.dump(2);
+        if (calculator.params.alternatives)
+        {
+          response = calculator.alternativesRouting();
+        }
+        else
+        {
+          response = calculator.calculate().json.dump(2);
+        }
       }
       else if (calculator.params.alternatives)
       {

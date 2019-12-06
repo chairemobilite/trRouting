@@ -20,15 +20,19 @@ namespace TrRouting
 
     std::vector<int>                 foundLinesIdx;
     std::vector< std::vector<int> >  allCombinations;
+    std::vector< std::vector<int> >  failedCombinations;
+    bool                             combinationMatchesWithFailed {false};
+    bool                             combinationMatchesWithAtLeastOneFailed {false};
     std::map<std::vector<int>, bool> alreadyCalculatedCombinations;
     std::map<std::vector<int>, bool> alreadyFoundLinesIdx;
     std::map<std::vector<int>, int>  foundLinesIdxTravelTimeSeconds;
     std::vector<int>                 combinationsKs;
     int maxTravelTime;
     int alternativeSequence = 1;
+    int alternativesCalculatedCount = 0;
     int maxAlternatives = params.maxAlternatives;
     int lastFoundedAtNum = 0;
-    int departureTimeSeconds = -1;
+    //int departureTimeSeconds = -1;
     std::vector<std::string> lineShortnames;
     
     if (params.debugDisplay)
@@ -43,6 +47,8 @@ namespace TrRouting
     }
     
     routingResult = calculate();
+
+
 
     if (routingResult.status == "success")
     {
@@ -82,7 +88,7 @@ namespace TrRouting
 
       json["alternatives"].push_back(alternativeJson);
       json["status"] = "success";
-      departureTimeSeconds = routingResult.departureTimeSeconds + routingResult.firstWaitingTimeSeconds - params.minWaitingTimeSeconds;
+      //departureTimeSeconds = routingResult.departureTimeSeconds + routingResult.firstWaitingTimeSeconds - params.minWaitingTimeSeconds;
             
       maxTravelTime = params.alternativesMaxTravelTimeRatio * routingResult.travelTimeSeconds;
       if (maxTravelTime < params.minAlternativeMaxTravelTimeSeconds)
@@ -98,7 +104,7 @@ namespace TrRouting
         params.maxTotalTravelTimeSeconds = maxTravelTime;
       }
       
-      params.departureTimeSeconds = departureTimeSeconds;
+      //params.departureTimeSeconds = departureTimeSeconds;
       
       if (params.debugDisplay)
         std::cout << "  fastestTravelTimeSeconds: " << routingResult.travelTimeSeconds << std::endl;
@@ -109,13 +115,15 @@ namespace TrRouting
       foundLinesIdxTravelTimeSeconds[foundLinesIdx] = routingResult.travelTimeSeconds;
       lastFoundedAtNum = 1;
 
-
-      std::cout << "fastest line ids: ";
-      for (auto lineIdx : foundLinesIdx)
+      if (params.debugDisplay)
       {
-        std::cout << lines[lineIdx].get()->shortname << " ";
+        std::cout << "fastest line ids: ";
+        for (auto lineIdx : foundLinesIdx)
+        {
+          std::cout << lines[lineIdx].get()->shortname << " ";
+        }
+        std::cout << std::endl;
       }
-      std::cout << std::endl;
 
 
       combinationsKs.clear();
@@ -135,7 +143,7 @@ namespace TrRouting
       std::vector<int> combination;
       for (int i = 0; i < allCombinations.size(); i++)
       {
-        if (alternativeSequence <= maxAlternatives)
+        if (alternativesCalculatedCount <= maxAlternatives)
         {
 
           combination = allCombinations.at(i);
@@ -143,27 +151,34 @@ namespace TrRouting
 
           if (params.debugDisplay)
           {
-            std::cout << "calculating alternative " << alternativeSequence << "..." << std::endl;
+            std::cout << "calculating alternative " << alternativesCalculatedCount << "..." << std::endl;
           }
 
 
-
-          std::cout << "except lines: ";
-          for (auto lineIdx : combination)
+          if (params.debugDisplay)
           {
-            std::cout << lines[lineIdx].get()->shortname << " ";
+            std::cout << "except lines: ";
+            for (auto lineIdx : combination)
+            {
+              std::cout << lines[lineIdx].get()->shortname << " ";
+            }
+            std::cout << std::endl;
           }
-          std::cout << std::endl;
+          
+
+          
+          //std::cout << std::endl;
 
 
 
           routingResult = calculate(false, true);
+          alternativesCalculatedCount++;
           
           if (routingResult.status == "success")
           {
           
             foundLinesIdx = routingResult.linesIdx;
-            std::stable_sort(foundLinesIdx.begin(),foundLinesIdx.end());
+            std::stable_sort(foundLinesIdx.begin(), foundLinesIdx.end());
             
             if (foundLinesIdx.size() > 0 && alreadyFoundLinesIdx.count(foundLinesIdx) == 0)
             {
@@ -199,16 +214,20 @@ namespace TrRouting
               alternativeJson["tripUuids"]                     = routingResult.tripUuids;*/
               alternativeJson["alternativeSequence"]           = alternativeSequence;
               json["alternatives"].push_back(alternativeJson);
-            
-              std::cout << "travelTimeSeconds: " << routingResult.travelTimeSeconds << " line Uuids: ";
-              for (auto lineIdx : foundLinesIdx)
+
+              if (params.debugDisplay)
               {
-                std::cout << lines[lineIdx].get()->shortname << " ";
+                std::cout << "travelTimeSeconds: " << routingResult.travelTimeSeconds << " line Uuids: ";
+                for (auto lineIdx : foundLinesIdx)
+                {
+                  std::cout << lines[lineIdx].get()->shortname << " ";
+                }
+                std::cout << std::endl;
               }
-              std::cout << std::endl;
+              
               combinationsKs.clear();
               
-              lastFoundedAtNum = alternativeSequence;
+              lastFoundedAtNum = alternativesCalculatedCount;
               alreadyFoundLinesIdx[foundLinesIdx] = true;
               foundLinesIdxTravelTimeSeconds[foundLinesIdx] = routingResult.travelTimeSeconds;
               for (int i = 1; i <= foundLinesIdx.size(); i++) { combinationsKs.push_back(i); }
@@ -218,11 +237,33 @@ namespace TrRouting
                 //std::cout << "\nk = " << k << std::endl;
                 for (auto newCombination : combinations)
                 {
+                  
                   newCombination.insert( newCombination.end(), combination.begin(), combination.end() );
                   std::stable_sort(newCombination.begin(), newCombination.end());
                   if (alreadyCalculatedCombinations.count(newCombination) == 0)
                   {
-                    allCombinations.push_back(newCombination);
+                    combinationMatchesWithAtLeastOneFailed = false;
+                    for (auto failedCombination : failedCombinations)
+                    {
+                      combinationMatchesWithFailed = true;
+                      for (int failedLineIdx : failedCombination)
+                      {
+                        if (std::find(newCombination.begin(), newCombination.end(), failedLineIdx) == newCombination.end())
+                        {
+                          combinationMatchesWithFailed = false;
+                          break;
+                        }
+                      }
+                      if (combinationMatchesWithFailed)
+                      {
+                        combinationMatchesWithAtLeastOneFailed = true;
+                        break;
+                      }
+                    }
+                    if (!combinationMatchesWithAtLeastOneFailed)
+                    {
+                      allCombinations.push_back(newCombination);
+                    }
                     alreadyCalculatedCombinations[newCombination] = true;
                   }
                 }
@@ -234,24 +275,51 @@ namespace TrRouting
 
             }
           }
+          else // failed
+          {
+            //std::cout << "failed" << std::endl;
+            failedCombinations.push_back(combination);
+          }
+
+          if (params.debugDisplay)
+          {
+            if (failedCombinations.size() > 0)
+            {
+              std::cout << "failed combinations: ";
+              for (auto failedCombination : failedCombinations)
+              {
+                for (auto lineIdx : failedCombination)
+                {
+                  std::cout << "  " << lines[lineIdx].get()->shortname << " ";
+                }
+                std::cout << std::endl;
+              }
+            }
+          }
+
         }
       }
 
       std::cout << std::endl;
-      int i {1};
-      for (auto foundLinesIdx : alreadyFoundLinesIdx)
+      int i {0};
+
+      if (params.debugDisplay)
       {
-        std::cout << i << ". ";
-        for(auto lineIdx : foundLinesIdx.first)
+        for (auto foundLinesIdx : alreadyFoundLinesIdx)
         {
-          std::cout << lines[lineIdx].get()->shortname << " ";
+          std::cout << i << ". ";
+          for(auto lineIdx : foundLinesIdx.first)
+          {
+            std::cout << lines[lineIdx].get()->shortname << " ";
+          }
+          std::cout << " tt: " << (foundLinesIdxTravelTimeSeconds[foundLinesIdx.first] / 60);
+          i++;
+          std::cout << std::endl;
         }
-        std::cout << " tt: " << (foundLinesIdxTravelTimeSeconds[foundLinesIdx.first] / 60);
-        i++;
-        std::cout << std::endl;
-      }
+        
+        std::cout << "last alternative found at: " << lastFoundedAtNum << " on a total of " << maxAlternatives << " calculations" << std::endl;
       
-      std::cout << "last alternative found at: " << lastFoundedAtNum << " on a total of " << maxAlternatives << " calculations" << std::endl;
+      }
       
     }
     else
