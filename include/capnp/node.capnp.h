@@ -69,9 +69,9 @@ public:
   inline bool hasName() const;
   inline  ::capnp::Text::Reader getName() const;
 
-  inline float getLatitude() const;
+  inline  ::int32_t getLatitude() const;
 
-  inline float getLongitude() const;
+  inline  ::int32_t getLongitude() const;
 
   inline bool hasStationUuid() const;
   inline  ::capnp::Text::Reader getStationUuid() const;
@@ -161,11 +161,11 @@ public:
   inline void adoptName(::capnp::Orphan< ::capnp::Text>&& value);
   inline ::capnp::Orphan< ::capnp::Text> disownName();
 
-  inline float getLatitude();
-  inline void setLatitude(float value);
+  inline  ::int32_t getLatitude();
+  inline void setLatitude( ::int32_t value);
 
-  inline float getLongitude();
-  inline void setLongitude(float value);
+  inline  ::int32_t getLongitude();
+  inline void setLongitude( ::int32_t value);
 
   inline bool hasStationUuid();
   inline  ::capnp::Text::Builder getStationUuid();
@@ -409,31 +409,31 @@ inline ::capnp::Orphan< ::capnp::Text> Node::Builder::disownName() {
       ::capnp::bounded<3>() * ::capnp::POINTERS));
 }
 
-inline float Node::Reader::getLatitude() const {
-  return _reader.getDataField<float>(
+inline  ::int32_t Node::Reader::getLatitude() const {
+  return _reader.getDataField< ::int32_t>(
       ::capnp::bounded<1>() * ::capnp::ELEMENTS);
 }
 
-inline float Node::Builder::getLatitude() {
-  return _builder.getDataField<float>(
+inline  ::int32_t Node::Builder::getLatitude() {
+  return _builder.getDataField< ::int32_t>(
       ::capnp::bounded<1>() * ::capnp::ELEMENTS);
 }
-inline void Node::Builder::setLatitude(float value) {
-  _builder.setDataField<float>(
+inline void Node::Builder::setLatitude( ::int32_t value) {
+  _builder.setDataField< ::int32_t>(
       ::capnp::bounded<1>() * ::capnp::ELEMENTS, value);
 }
 
-inline float Node::Reader::getLongitude() const {
-  return _reader.getDataField<float>(
+inline  ::int32_t Node::Reader::getLongitude() const {
+  return _reader.getDataField< ::int32_t>(
       ::capnp::bounded<2>() * ::capnp::ELEMENTS);
 }
 
-inline float Node::Builder::getLongitude() {
-  return _builder.getDataField<float>(
+inline  ::int32_t Node::Builder::getLongitude() {
+  return _builder.getDataField< ::int32_t>(
       ::capnp::bounded<2>() * ::capnp::ELEMENTS);
 }
-inline void Node::Builder::setLongitude(float value) {
-  _builder.setDataField<float>(
+inline void Node::Builder::setLongitude( ::int32_t value) {
+  _builder.setDataField< ::int32_t>(
       ::capnp::bounded<2>() * ::capnp::ELEMENTS, value);
 }
 

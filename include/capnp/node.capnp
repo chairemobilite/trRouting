@@ -9,8 +9,8 @@ struct Node {
   internalId                   @2  :Text;
   code                         @3  :Text;
   name                         @4  :Text;
-  latitude                     @5  :Float32;
-  longitude                    @6  :Float32;
+  latitude                     @5  :Int32;
+  longitude                    @6  :Int32;
   stationUuid                  @7  :Text;
   color                        @8  :Text;
   description                  @9  :Text;
