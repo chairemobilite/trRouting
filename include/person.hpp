@@ -34,6 +34,12 @@ namespace TrRouting
     std::vector<int> usualSchoolPlaceNodesIdx;
     std::vector<int> usualSchoolPlaceNodesTravelTimesSeconds;
     std::vector<int> usualSchoolPlaceNodesDistancesMeters;
+    int usualWorkPlaceWalkingTravelTimeSeconds;
+    int usualWorkPlaceCyclingTravelTimeSeconds;
+    int usualWorkPlaceDrivingTravelTimeSeconds;
+    int usualSchoolPlaceWalkingTravelTimeSeconds;
+    int usualSchoolPlaceCyclingTravelTimeSeconds;
+    int usualSchoolPlaceDrivingTravelTimeSeconds;
 
     const std::string toString() {
       return "Person " + boost::uuids::to_string(uuid) + " age " + std::to_string(age);

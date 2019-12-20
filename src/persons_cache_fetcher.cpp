@@ -166,6 +166,14 @@ namespace TrRouting
             t->usualSchoolPlaceNodesTravelTimesSeconds = usualSchoolPlaceNodesTravelTimesSeconds;
             t->usualSchoolPlaceNodesDistancesMeters    = usualSchoolPlaceNodesDistancesMeters;
 
+            t->internalId                               = capnpT.getInternalId();
+            t->usualWorkPlaceWalkingTravelTimeSeconds   = capnpT.getUsualWorkPlaceWalkingTravelTimeSeconds();
+            t->usualWorkPlaceCyclingTravelTimeSeconds   = capnpT.getUsualWorkPlaceCyclingTravelTimeSeconds();
+            t->usualWorkPlaceDrivingTravelTimeSeconds   = capnpT.getUsualWorkPlaceDrivingTravelTimeSeconds();
+            t->usualSchoolPlaceWalkingTravelTimeSeconds = capnpT.getUsualSchoolPlaceWalkingTravelTimeSeconds();
+            t->usualSchoolPlaceCyclingTravelTimeSeconds = capnpT.getUsualSchoolPlaceCyclingTravelTimeSeconds();
+            t->usualSchoolPlaceDrivingTravelTimeSeconds = capnpT.getUsualSchoolPlaceDrivingTravelTimeSeconds();
+
             tIndexesByUuid[t->uuid] = ts.size();
             ts.push_back(std::move(t));
           }

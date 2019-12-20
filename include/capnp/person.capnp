@@ -29,6 +29,12 @@ struct Person {
   internalId                       @21 :Text;
   data                             @22 :Text; # json
   isFrozen                         @23 :Int8;
+  usualWorkPlaceWalkingTravelTimeSeconds   @24 :Int32;
+  usualWorkPlaceCyclingTravelTimeSeconds   @25 :Int32;
+  usualWorkPlaceDrivingTravelTimeSeconds   @26 :Int32;
+  usualSchoolPlaceWalkingTravelTimeSeconds @27 :Int32;
+  usualSchoolPlaceCyclingTravelTimeSeconds @28 :Int32;
+  usualSchoolPlaceDrivingTravelTimeSeconds @29 :Int32;
 
   enum AgeGroup {
     none     @0 ;

@@ -85,7 +85,7 @@ struct Person {
 
 
   struct _capnpPrivate {
-    CAPNP_DECLARE_STRUCT_HEADER(e900aec85ed9b47f, 5, 11)
+    CAPNP_DECLARE_STRUCT_HEADER(e900aec85ed9b47f, 8, 11)
     #if !CAPNP_LITE
     static constexpr ::capnp::_::RawBrandedSchema const* brand() { return &schema->defaultBrand; }
     #endif  // !CAPNP_LITE
@@ -169,6 +169,18 @@ public:
   inline  ::capnp::Text::Reader getData() const;
 
   inline  ::int8_t getIsFrozen() const;
+
+  inline  ::int32_t getUsualWorkPlaceWalkingTravelTimeSeconds() const;
+
+  inline  ::int32_t getUsualWorkPlaceCyclingTravelTimeSeconds() const;
+
+  inline  ::int32_t getUsualWorkPlaceDrivingTravelTimeSeconds() const;
+
+  inline  ::int32_t getUsualSchoolPlaceWalkingTravelTimeSeconds() const;
+
+  inline  ::int32_t getUsualSchoolPlaceCyclingTravelTimeSeconds() const;
+
+  inline  ::int32_t getUsualSchoolPlaceDrivingTravelTimeSeconds() const;
 
 private:
   ::capnp::_::StructReader _reader;
@@ -319,6 +331,24 @@ public:
 
   inline  ::int8_t getIsFrozen();
   inline void setIsFrozen( ::int8_t value);
+
+  inline  ::int32_t getUsualWorkPlaceWalkingTravelTimeSeconds();
+  inline void setUsualWorkPlaceWalkingTravelTimeSeconds( ::int32_t value);
+
+  inline  ::int32_t getUsualWorkPlaceCyclingTravelTimeSeconds();
+  inline void setUsualWorkPlaceCyclingTravelTimeSeconds( ::int32_t value);
+
+  inline  ::int32_t getUsualWorkPlaceDrivingTravelTimeSeconds();
+  inline void setUsualWorkPlaceDrivingTravelTimeSeconds( ::int32_t value);
+
+  inline  ::int32_t getUsualSchoolPlaceWalkingTravelTimeSeconds();
+  inline void setUsualSchoolPlaceWalkingTravelTimeSeconds( ::int32_t value);
+
+  inline  ::int32_t getUsualSchoolPlaceCyclingTravelTimeSeconds();
+  inline void setUsualSchoolPlaceCyclingTravelTimeSeconds( ::int32_t value);
+
+  inline  ::int32_t getUsualSchoolPlaceDrivingTravelTimeSeconds();
+  inline void setUsualSchoolPlaceDrivingTravelTimeSeconds( ::int32_t value);
 
 private:
   ::capnp::_::StructBuilder _builder;
@@ -926,6 +956,90 @@ inline  ::int8_t Person::Builder::getIsFrozen() {
 inline void Person::Builder::setIsFrozen( ::int8_t value) {
   _builder.setDataField< ::int8_t>(
       ::capnp::bounded<18>() * ::capnp::ELEMENTS, value);
+}
+
+inline  ::int32_t Person::Reader::getUsualWorkPlaceWalkingTravelTimeSeconds() const {
+  return _reader.getDataField< ::int32_t>(
+      ::capnp::bounded<9>() * ::capnp::ELEMENTS);
+}
+
+inline  ::int32_t Person::Builder::getUsualWorkPlaceWalkingTravelTimeSeconds() {
+  return _builder.getDataField< ::int32_t>(
+      ::capnp::bounded<9>() * ::capnp::ELEMENTS);
+}
+inline void Person::Builder::setUsualWorkPlaceWalkingTravelTimeSeconds( ::int32_t value) {
+  _builder.setDataField< ::int32_t>(
+      ::capnp::bounded<9>() * ::capnp::ELEMENTS, value);
+}
+
+inline  ::int32_t Person::Reader::getUsualWorkPlaceCyclingTravelTimeSeconds() const {
+  return _reader.getDataField< ::int32_t>(
+      ::capnp::bounded<10>() * ::capnp::ELEMENTS);
+}
+
+inline  ::int32_t Person::Builder::getUsualWorkPlaceCyclingTravelTimeSeconds() {
+  return _builder.getDataField< ::int32_t>(
+      ::capnp::bounded<10>() * ::capnp::ELEMENTS);
+}
+inline void Person::Builder::setUsualWorkPlaceCyclingTravelTimeSeconds( ::int32_t value) {
+  _builder.setDataField< ::int32_t>(
+      ::capnp::bounded<10>() * ::capnp::ELEMENTS, value);
+}
+
+inline  ::int32_t Person::Reader::getUsualWorkPlaceDrivingTravelTimeSeconds() const {
+  return _reader.getDataField< ::int32_t>(
+      ::capnp::bounded<11>() * ::capnp::ELEMENTS);
+}
+
+inline  ::int32_t Person::Builder::getUsualWorkPlaceDrivingTravelTimeSeconds() {
+  return _builder.getDataField< ::int32_t>(
+      ::capnp::bounded<11>() * ::capnp::ELEMENTS);
+}
+inline void Person::Builder::setUsualWorkPlaceDrivingTravelTimeSeconds( ::int32_t value) {
+  _builder.setDataField< ::int32_t>(
+      ::capnp::bounded<11>() * ::capnp::ELEMENTS, value);
+}
+
+inline  ::int32_t Person::Reader::getUsualSchoolPlaceWalkingTravelTimeSeconds() const {
+  return _reader.getDataField< ::int32_t>(
+      ::capnp::bounded<12>() * ::capnp::ELEMENTS);
+}
+
+inline  ::int32_t Person::Builder::getUsualSchoolPlaceWalkingTravelTimeSeconds() {
+  return _builder.getDataField< ::int32_t>(
+      ::capnp::bounded<12>() * ::capnp::ELEMENTS);
+}
+inline void Person::Builder::setUsualSchoolPlaceWalkingTravelTimeSeconds( ::int32_t value) {
+  _builder.setDataField< ::int32_t>(
+      ::capnp::bounded<12>() * ::capnp::ELEMENTS, value);
+}
+
+inline  ::int32_t Person::Reader::getUsualSchoolPlaceCyclingTravelTimeSeconds() const {
+  return _reader.getDataField< ::int32_t>(
+      ::capnp::bounded<13>() * ::capnp::ELEMENTS);
+}
+
+inline  ::int32_t Person::Builder::getUsualSchoolPlaceCyclingTravelTimeSeconds() {
+  return _builder.getDataField< ::int32_t>(
+      ::capnp::bounded<13>() * ::capnp::ELEMENTS);
+}
+inline void Person::Builder::setUsualSchoolPlaceCyclingTravelTimeSeconds( ::int32_t value) {
+  _builder.setDataField< ::int32_t>(
+      ::capnp::bounded<13>() * ::capnp::ELEMENTS, value);
+}
+
+inline  ::int32_t Person::Reader::getUsualSchoolPlaceDrivingTravelTimeSeconds() const {
+  return _reader.getDataField< ::int32_t>(
+      ::capnp::bounded<14>() * ::capnp::ELEMENTS);
+}
+
+inline  ::int32_t Person::Builder::getUsualSchoolPlaceDrivingTravelTimeSeconds() {
+  return _builder.getDataField< ::int32_t>(
+      ::capnp::bounded<14>() * ::capnp::ELEMENTS);
+}
+inline void Person::Builder::setUsualSchoolPlaceDrivingTravelTimeSeconds( ::int32_t value) {
+  _builder.setDataField< ::int32_t>(
+      ::capnp::bounded<14>() * ::capnp::ELEMENTS, value);
 }
 
 }  // namespace
