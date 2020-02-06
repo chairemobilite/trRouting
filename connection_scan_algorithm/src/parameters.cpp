@@ -709,11 +709,13 @@ namespace TrRouting
       else if (parameterWithValueVector[0] == "only_line_uuids")
       {
         // will replace scenario only line uuids
+        std::cerr << " only line uuids: " << std::endl;
         boost::split(onlyLineUuidsVector, parameterWithValueVector[1], boost::is_any_of(","));
         boost::uuids::uuid onlyLineUuid;
         onlyLinesIdx.clear();
         for(std::string onlyLineUuidStr : onlyLineUuidsVector)
         {
+          std::cerr << "  " << onlyLineUuidStr << std::endl;
           onlyLineUuid = uuidGenerator(onlyLineUuidStr);
           if (lineIndexesByUuid.count(onlyLineUuid) == 1)
           {
