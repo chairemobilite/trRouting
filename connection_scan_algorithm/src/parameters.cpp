@@ -276,16 +276,43 @@ namespace TrRouting
         scenarioUuid = uuidGenerator(parameterWithValueVector[1]);
         if (scenarioIndexesByUuid.count(*scenarioUuid) == 1)
         {
-          scenario          = scenarios[scenarioIndexesByUuid[*scenarioUuid]].get();
-          onlyServicesIdx   = scenario->servicesIdx;
-          onlyLinesIdx      = scenario->onlyLinesIdx;
-          onlyAgenciesIdx   = scenario->onlyAgenciesIdx;
-          onlyNodesIdx      = scenario->onlyNodesIdx;
-          onlyModesIdx      = scenario->onlyModesIdx;
-          exceptLinesIdx    = scenario->exceptLinesIdx;
-          exceptAgenciesIdx = scenario->exceptAgenciesIdx;
-          exceptNodesIdx    = scenario->exceptNodesIdx;
-          exceptModesIdx    = scenario->exceptModesIdx;
+          scenario = scenarios[scenarioIndexesByUuid[*scenarioUuid]].get();
+          if (onlyServicesIdx.size() == 0) // these can be already set by another parameter which has priority
+          {
+            onlyServicesIdx = scenario->servicesIdx;
+          }
+          if (onlyLinesIdx.size() == 0)
+          {
+            onlyLinesIdx = scenario->onlyLinesIdx;
+          }
+          if (onlyAgenciesIdx.size() == 0)
+          {
+            onlyAgenciesIdx = scenario->onlyAgenciesIdx;
+          }
+          if (onlyNodesIdx.size() == 0)
+          {
+            onlyNodesIdx = scenario->onlyNodesIdx;
+          }
+          if (onlyModesIdx.size() == 0)
+          {
+            onlyModesIdx = scenario->onlyModesIdx;
+          }
+          if (exceptLinesIdx.size() == 0)
+          {
+            exceptLinesIdx = scenario->exceptLinesIdx;
+          }
+          if (exceptAgenciesIdx.size() == 0)
+          {
+            exceptAgenciesIdx = scenario->exceptAgenciesIdx;
+          }
+          if (exceptNodesIdx.size() == 0)
+          {
+            exceptNodesIdx = scenario->exceptNodesIdx;
+          }
+          if (exceptModesIdx.size() == 0)
+          {
+            exceptModesIdx = scenario->exceptModesIdx;
+          }
         }
         continue;
       }
