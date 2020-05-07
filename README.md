@@ -25,6 +25,7 @@ brew install capnp
 
 ## Ubuntu 16.04 Install
 
+[Install Cap'nProto](https://capnproto.org/install.html)
 ```
 sudo apt-get install clang libboost-all-dev libexpat1-dev libjsoncpp-dev libncurses5-dev
 ```
