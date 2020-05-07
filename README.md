@@ -26,7 +26,7 @@ brew install capnp
 ## Ubuntu 16.04 Install
 
 ```
-sudo apt-get install clang libboost-all-dev libexpat1-dev libjsoncpp-dev libncurses5-dev libcapnp-dev
+sudo apt-get install clang libboost-all-dev libexpat1-dev libjsoncpp-dev libncurses5-dev
 ```
 
 ## Compilation
