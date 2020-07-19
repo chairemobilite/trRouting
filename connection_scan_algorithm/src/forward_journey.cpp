@@ -166,12 +166,22 @@ namespace TrRouting
             tripsIdx.push_back(std::get<3>(journeyStep));
             legs.push_back(std::make_tuple(std::get<3>(journeyStep), journeyStepTrip->lineIdx, journeyStepTrip->pathIdx, boardingSequence - 1, unboardingSequence - 1));
 
-            for (int seqI = boardingSequence - 1; seqI < unboardingSequence; seqI++)
+            if (unboardingSequence - 1 < journeyStepPath->segmentsDistanceMeters.size()) // check if distances are available for this path
             {
-              inVehicleDistance += journeyStepPath->segmentsDistanceMeters[seqI];
+              for (int seqI = boardingSequence - 1; seqI < unboardingSequence; seqI++)
+              {
+                std::cerr << "seqI: " << seqI << ":" << journeyStepPath->segmentsDistanceMeters[seqI] << std::endl;
+                inVehicleDistance += journeyStepPath->segmentsDistanceMeters[seqI];
+              }
+              totalDistance          += inVehicleDistance;
+              totalInVehicleDistance += inVehicleDistance;
             }
-            totalDistance          += inVehicleDistance;
-            totalInVehicleDistance += inVehicleDistance;
+            else
+            {
+              inVehicleDistance      = -1;
+              totalDistance          = -1;
+              totalInVehicleDistance = -1;
+            }
 
             if (i == 1) // first leg
             {
@@ -229,14 +239,17 @@ namespace TrRouting
               stepJson["arrivalTimeSeconds"]          = arrivalTime;
               stepJson["inVehicleTimeSeconds"]        = inVehicleTime;
               stepJson["inVehicleTimeMinutes"]        = Toolbox::convertSecondsToMinutes(inVehicleTime);
-              stepJson["inVehicleTimeDistanceMeters"] = inVehicleDistance;
+              stepJson["inVehicleDistanceMeters"]     = inVehicleDistance;
               json["steps"].push_back(stepJson);
             }
             if (i < journeyStepsCount - 2) // if not the last transit leg
             {
               totalTransferWalkingTime += transferTime;
               totalWalkingTime         += transferTime;
-              totalDistance            += distance;
+              if (totalDistance != -1)
+              {
+                totalDistance += distance;
+              }
               totalWalkingDistance     += distance;
               totalTransferDistance    += distance;
               if (!params.returnAllNodesResult)
@@ -261,7 +274,10 @@ namespace TrRouting
             
             transferTime          = std::get<4>(journeyStep);
             distance              = std::get<6>(journeyStep);
-            totalDistance        += distance;
+            if (totalDistance != -1)
+            {
+              totalDistance += distance;
+            }
             totalWalkingDistance += distance;
             if (i == 0) // access
             {
@@ -337,7 +353,6 @@ namespace TrRouting
         {
           if (numberOfTransfers >= 0)
           {
-
             json["status"]                                         = "success";
             json["origin"]                                         = { origin->longitude,      origin->latitude      };
             json["destination"]                                    = { destination->longitude, destination->latitude };
