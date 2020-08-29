@@ -76,6 +76,10 @@ namespace TrRouting
     T t14 = {"other", "Other", 3, 1700};
     ts.push_back(t14);
     tIndexesByShortname[t14.shortname] = ts.size() - 1;
+
+    T t15 = {"transferable", "Transferable", -1, -1};
+    ts.push_back(t15);
+    tIndexesByShortname[t15.shortname] = ts.size() - 1;
     
     //std::cout << "Modes: \n" << Toolbox::prettyPrintStructVector(ts) << std::endl;
 

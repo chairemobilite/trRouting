@@ -14,6 +14,8 @@ namespace TrRouting
     int              reachableNodesCount  {0};
     bool             foundLine            {false};
     
+    int transferableModeIdx {modeIndexesByShortname["transferable"]};
+
     std::vector<int> resultingNodes;
     if (params.returnAllNodesResult)
     {
@@ -34,8 +36,8 @@ namespace TrRouting
       std::deque<std::tuple<int,int,int,int,int,short,int>> journey;
       std::tuple<int,int,int,int,int,short,int>         resultingNodeJourneyStep;
       std::tuple<int,int,int,int,int,short,int>         emptyJourneyStep {-1,-1,-1,-1,-1,-1,-1};
-      std::tuple<int,int,int,int,int,short,short,int,int,int,short> * journeyStepEnterConnection; // connection tuple: departureNodeIndex, arrivalNodeIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequenceinTrip
-      std::tuple<int,int,int,int,int,short,short,int,int,int,short> * journeyStepExitConnection;
+      std::tuple<int,int,int,int,int,short,short,int,int,int,short,short> * journeyStepEnterConnection; // connection tuple: departureNodeIndex, arrivalNodeIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequenceinTrip
+      std::tuple<int,int,int,int,int,short,short,int,int,int,short,short> * journeyStepExitConnection;
       std::vector<boost::uuids::uuid>                   lineUuids;
       std::vector<int>                                  linesIdx;
       std::vector<std::string>                          modeShortnames;
@@ -152,9 +154,18 @@ namespace TrRouting
             waitingTime                = departureTime - transferArrivalTime;
             transferArrivalTime        = arrivalTime   + transferTime;
             transferReadyTime          = transferArrivalTime;
+            
+            if (journey.size() > i + 1 && std::get<0>(journey[i+1]) != -1)
+            {
+              transferReadyTime += (std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*forwardConnections[std::get<0>(journey[i+1])].get()) >= 0 ? std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*forwardConnections[std::get<0>(journey[i+1])].get()) : params.minWaitingTimeSeconds);
+            }
+            
             totalInVehicleTime         += inVehicleTime;
             totalWaitingTime           += waitingTime;
-            numberOfTransfers          += 1;
+            if (transferableModeIdx != journeyStepLine->modeIdx)
+            {
+              numberOfTransfers += 1;
+            }
             lineUuids.push_back(journeyStepLine->uuid);
             linesIdx.push_back(journeyStepTrip->lineIdx);
             modeShortnames.push_back(journeyStepMode.shortname);
@@ -170,11 +181,20 @@ namespace TrRouting
             {
               for (int seqI = boardingSequence - 1; seqI < unboardingSequence; seqI++)
               {
-                std::cerr << "seqI: " << seqI << ":" << journeyStepPath->segmentsDistanceMeters[seqI] << std::endl;
                 inVehicleDistance += journeyStepPath->segmentsDistanceMeters[seqI];
               }
-              totalDistance          += inVehicleDistance;
-              totalInVehicleDistance += inVehicleDistance;
+              totalDistance += inVehicleDistance;
+              if (transferableModeIdx == journeyStepLine->modeIdx)
+              {
+                totalWalkingDistance     += inVehicleDistance;
+                totalWalkingTime         += inVehicleTime;
+                totalTransferDistance    += inVehicleDistance;
+                totalTransferWalkingTime += inVehicleTime;
+              }
+              else
+              {
+                totalInVehicleDistance += inVehicleDistance;
+              }
             }
             else
             {
@@ -264,7 +284,7 @@ namespace TrRouting
                 stepJson["arrivalTime"]          = Toolbox::convertSecondsToFormattedTime(transferArrivalTime);
                 stepJson["departureTimeSeconds"] = arrivalTime;
                 stepJson["arrivalTimeSeconds"]   = transferArrivalTime;
-                stepJson["readyToBoardAt"]       = Toolbox::convertSecondsToFormattedTime(transferReadyTime + params.minWaitingTimeSeconds);
+                stepJson["readyToBoardAt"]       = Toolbox::convertSecondsToFormattedTime(transferReadyTime);
                 json["steps"].push_back(stepJson);
               }
             }
@@ -283,6 +303,12 @@ namespace TrRouting
             {
               transferArrivalTime  = departureTimeSeconds + transferTime;
               transferReadyTime    = transferArrivalTime;
+
+              if (journey.size() > i + 1 && std::get<0>(journey[i+1]) != -1)
+              {
+                transferReadyTime += (std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*forwardConnections[std::get<0>(journey[i+1])].get()) >= 0 ? std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*forwardConnections[std::get<0>(journey[i+1])].get()) : params.minWaitingTimeSeconds);
+              }
+
               totalWalkingTime    += transferTime;
               accessWalkingTime    = transferTime;
               accessDistance       = distance;
@@ -298,7 +324,7 @@ namespace TrRouting
                 stepJson["arrivalTime"]          = Toolbox::convertSecondsToFormattedTime(transferArrivalTime);
                 stepJson["departureTimeSeconds"] = departureTimeSeconds;
                 stepJson["arrivalTimeSeconds"]   = transferArrivalTime;
-                stepJson["readyToBoardAt"]       = Toolbox::convertSecondsToFormattedTime(transferReadyTime + params.minWaitingTimeSeconds);
+                stepJson["readyToBoardAt"]       = Toolbox::convertSecondsToFormattedTime(transferReadyTime);
                 json["steps"].push_back(stepJson);
                 
               }
@@ -329,7 +355,7 @@ namespace TrRouting
           i++;
         }
         
-        minimizedDepartureTime = firstDepartureTime - accessWalkingTime - params.minWaitingTimeSeconds;
+        minimizedDepartureTime = firstDepartureTime - accessWalkingTime; //- (std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*forwardConnections[std::get<1>(forwardEgressJourneys[resultingNodeIndex])].get()) >= 0 ? std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*forwardConnections[std::get<1>(forwardEgressJourneys[resultingNodeIndex])].get()) : params.minWaitingTimeSeconds);
         
         if (params.returnAllNodesResult)
         {
@@ -351,7 +377,7 @@ namespace TrRouting
         }
         else if (!params.returnAllNodesResult)
         {
-          if (numberOfTransfers >= 0)
+          if (json["steps"].size() > 0)
           {
             json["status"]                                         = "success";
             json["origin"]                                         = { origin->longitude,      origin->latitude      };
@@ -370,7 +396,7 @@ namespace TrRouting
             json["totalNonTransitTravelTimeSeconds"]               = totalWalkingTime;
             json["totalNonTransitDistanceMeters"]                  = totalWalkingDistance;
             json["numberOfBoardings"]                              = numberOfTransfers + 1;
-            json["numberOfTransfers"]                              = numberOfTransfers;
+            json["numberOfTransfers"]                              = numberOfTransfers == -1 ? 0 : numberOfTransfers;
             json["transferWalkingTimeMinutes"]                     = Toolbox::convertSecondsToMinutes(totalTransferWalkingTime);
             json["transferWalkingTimeSeconds"]                     = totalTransferWalkingTime;
             json["transferWalkingDistanceMeters"]                  = totalTransferDistance;

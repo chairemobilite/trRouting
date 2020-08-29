@@ -125,9 +125,9 @@ namespace TrRouting
         footpathDistanceMeters    = std::get<2>(accessFootpath);
 
         nodesAccessTravelTime[std::get<0>(accessFootpath)] = footpathTravelTimeSeconds;
-        nodesAccessDistance[std::get<0>(accessFootpath)] = footpathDistanceMeters;
+        nodesAccessDistance[std::get<0>(accessFootpath)]   = footpathDistanceMeters;
         forwardJourneys[std::get<0>(accessFootpath)]       = std::make_tuple(-1, -1, -1, -1, footpathTravelTimeSeconds, -1, footpathDistanceMeters);
-        nodesTentativeTime[std::get<0>(accessFootpath)]    = departureTimeSeconds + footpathTravelTimeSeconds + params.minWaitingTimeSeconds;
+        nodesTentativeTime[std::get<0>(accessFootpath)]    = departureTimeSeconds + footpathTravelTimeSeconds;
         if (footpathTravelTimeSeconds < minAccessTravelTime)
         {
           minAccessTravelTime = footpathTravelTimeSeconds;

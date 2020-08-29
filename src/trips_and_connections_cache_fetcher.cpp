@@ -28,14 +28,14 @@ namespace TrRouting
     std::map<std::string, int>& modeIndexesByShortname,
     std::vector<std::vector<std::unique_ptr<int>>>&   tripConnectionDepartureTimes,
     std::vector<std::vector<std::unique_ptr<float>>>& tripConnectionDemands,
-    std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,int,int,short>>>& forwardConnections, 
-    std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,int,int,short>>>& reverseConnections,
+    std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>>>& forwardConnections, 
+    std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>>>& reverseConnections,
     Parameters& params,
     std::string customPath
   )
   {
 
-    using ConnectionTuple = std::tuple<int,int,int,int,int,short,short,int,int,int,short>;
+    using ConnectionTuple = std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>;
 
     trips.clear();
     trips.shrink_to_fit();
@@ -48,6 +48,8 @@ namespace TrRouting
     forwardConnections.shrink_to_fit();
     reverseConnections.clear();
     reverseConnections.shrink_to_fit();
+
+    int transferableModeIdx {modeIndexesByShortname["transferable"]};
 
     //std::vector<Block> blocks;
     //std::map<boost::uuids::uuid, int> blockIndexesByUuid;
@@ -160,7 +162,8 @@ namespace TrRouting
                     nodeTimeI + 1,
                     trip->lineIdx,
                     trip->blockIdx,
-                    trip->allowSameLineTransfers
+                    trip->allowSameLineTransfers,
+                    transferableModeIdx == line->modeIdx ? 0 : -1
                   )));
                   std::shared_ptr<ConnectionTuple> reverseConnection = forwardConnection;
 
@@ -194,7 +197,7 @@ namespace TrRouting
     std::cout << "Sorting connections..." << std::endl;
     std::stable_sort(forwardConnections.begin(), forwardConnections.end(), [](const std::shared_ptr<ConnectionTuple>& connectionA, const std::shared_ptr<ConnectionTuple>& connectionB)
     {
-      // { NODE_DEP = 0, NODE_ARR = 1, TIME_DEP = 2, TIME_ARR = 3, TRIP = 4, CAN_BOARD = 5, CAN_UNBOARD = 6, SEQUENCE = 7, LINE = 8, BLOCK = 9, CAN_TRANSFER_SAME_LINE = 10 };
+      // { NODE_DEP = 0, NODE_ARR = 1, TIME_DEP = 2, TIME_ARR = 3, TRIP = 4, CAN_BOARD = 5, CAN_UNBOARD = 6, SEQUENCE = 7, LINE = 8, BLOCK = 9, CAN_TRANSFER_SAME_LINE = 10, MIN_WAITING_TIME_SECONDS = 11 };
       if (std::get<2>(*connectionA) < std::get<2>(*connectionB))
       {
         return true;
@@ -223,7 +226,7 @@ namespace TrRouting
     });
     std::stable_sort(reverseConnections.begin(), reverseConnections.end(), [](const std::shared_ptr<ConnectionTuple>& connectionA, const std::shared_ptr<ConnectionTuple>& connectionB)
     {
-      // { NODE_DEP = 0, NODE_ARR = 1, TIME_DEP = 2, TIME_ARR = 3, TRIP = 4, CAN_BOARD = 5, CAN_UNBOARD = 6, SEQUENCE = 7, LINE = 8, BLOCK = 9, CAN_TRANSFER_SAME_LINE = 10 };
+      // { NODE_DEP = 0, NODE_ARR = 1, TIME_DEP = 2, TIME_ARR = 3, TRIP = 4, CAN_BOARD = 5, CAN_UNBOARD = 6, SEQUENCE = 7, LINE = 8, BLOCK = 9, CAN_TRANSFER_SAME_LINE = 10, MIN_WAITING_TIME_SECONDS = 11 };
       if (std::get<3>(*connectionA) > std::get<3>(*connectionB))
       {
         return true;
@@ -251,21 +254,6 @@ namespace TrRouting
       return false;
     });
 
-    //for (auto & connection : forwardConnections)
-    //{
-    //  std::cout 
-    //  << " nD" << std::get<0>(connection) 
-    //  << " nA" << std::get<1>(connection) 
-    //  << " D" << std::get<2>(connection) 
-    //  << " A" << std::get<3>(connection) 
-    //  << " T" << std::get<4>(connection) 
-    //  << " B" << std::get<5>(connection) 
-    //  << " U" << std::get<6>(connection) 
-    //  << " S" << std::get<7>(connection) 
-    //  << std::endl;
-    //}
-
-    //return std::make_tuple(trips, tripIndexesByUuid, tripConnectionDepartureTimes, tripConnectionDemands, blocks, blockIndexesByUuid, forwardConnections, reverseConnections);
   }
 
 }
