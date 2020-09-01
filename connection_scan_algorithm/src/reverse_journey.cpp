@@ -232,7 +232,8 @@ namespace TrRouting
               stepJson["modeName"]             = journeyStepMode.name;
               stepJson["mode"]                 = journeyStepMode.shortname;
               stepJson["tripUuid"]             = boost::uuids::to_string(journeyStepTrip->uuid);
-              stepJson["sequenceInTrip"]       = boardingSequence;
+              stepJson["legSequenceInTrip"]    = boardingSequence;
+              stepJson["stopSequenceInTrip"]   = boardingSequence;
               stepJson["nodeName"]             = journeyStepNodeDeparture->name;
               stepJson["nodeCode"]             = journeyStepNodeDeparture->code;
               stepJson["nodeUuid"]             = boost::uuids::to_string(journeyStepNodeDeparture->uuid);
@@ -255,7 +256,8 @@ namespace TrRouting
               stepJson["modeName"]                    = journeyStepMode.name;
               stepJson["mode"]                        = journeyStepMode.shortname;
               stepJson["tripUuid"]                    = boost::uuids::to_string(journeyStepTrip->uuid);
-              stepJson["sequenceInTrip"]              = unboardingSequence;
+              stepJson["legSequenceInTrip"]           = unboardingSequence;
+              stepJson["stopSequenceInTrip"]          = unboardingSequence + 1;
               stepJson["nodeName"]                    = journeyStepNodeArrival->name;
               stepJson["nodeCode"]                    = journeyStepNodeArrival->code;
               stepJson["nodeUuid"]                    = boost::uuids::to_string(journeyStepNodeArrival->uuid);
