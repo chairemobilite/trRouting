@@ -155,7 +155,7 @@ namespace TrRouting
       for (auto & egressFootpath : egressFootpaths)
       {
         //std::cerr << nodes[std::get<0>(egressFootpath)].get()->name << std::endl;
-        egressExitConnection  = std::get<1>(forwardEgressJourneys[std::get<0>(egressFootpath)]);
+        egressExitConnection  = std::get<journeyIndexes::FINAL_EXIT_CONNECTION>(forwardEgressJourneys[std::get<0>(egressFootpath)]);
         if (egressExitConnection != -1)
         {
           egressTravelTime      = nodesEgressTravelTime[std::get<0>(egressFootpath)];
