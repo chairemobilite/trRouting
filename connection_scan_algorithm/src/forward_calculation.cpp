@@ -57,17 +57,18 @@ namespace TrRouting
           connectionMinWaitingTimeSeconds = std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(**connection) >= 0 ? std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(**connection) : params.minWaitingTimeSeconds;
 
           // no need to parse next connections if already reached destination from all egress nodes:
+          // yes, we mean connectionDepartureTime and not connectionArrivalTime because travel time for each connections, otherwise you can catch a very short/long connection
           if (( !params.returnAllNodesResult
               && reachedAtLeastOneEgressNode
               && maxEgressTravelTime >= 0
               && tentativeEgressNodeArrivalTime < MAX_INT
-              && connectionDepartureTime > tentativeEgressNodeArrivalTime + maxEgressTravelTime
+              && connectionDepartureTime /* ! not connectionArrivalTime */ > tentativeEgressNodeArrivalTime + maxEgressTravelTime
             ) || (connectionDepartureTime - departureTimeSeconds > params.maxTotalTravelTimeSeconds))
           {
             break;
           }
 
-          tripEnterConnectionIndex   = tripsEnterConnection[tripIndex];
+          tripEnterConnectionIndex   = tripsEnterConnection[tripIndex]; // -1 if trip has not yet been used
           nodeDepartureIndex         = std::get<connectionIndexes::NODE_DEP>(**connection);
           nodeDepartureTentativeTime = nodesTentativeTime[nodeDepartureIndex];
           
@@ -81,7 +82,7 @@ namespace TrRouting
             blockIndex            = std::get<connectionIndexes::BLOCK>(**connection);*/
 
             // TODO: add constrain for sameLineTransfer (check trip allowSameLineTransfers)
-            if (std::get<connectionIndexes::CAN_BOARD>(**connection) == 1 && (tripEnterConnectionIndex == -1 || (std::get<0>(forwardJourneys[nodeDepartureIndex]) == -1 && std::get<4>(forwardJourneys[nodeDepartureIndex]) >= 0 && std::get<4>(forwardJourneys[nodeDepartureIndex]) < tripsEnterConnectionTransferTravelTime[tripIndex])))
+            if (std::get<connectionIndexes::CAN_BOARD>(**connection) == 1 && (tripEnterConnectionIndex == -1 || (std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(forwardJourneys[nodeDepartureIndex]) == -1 && std::get<journeyIndexes::TRANSFER_TRAVEL_TIME>(forwardJourneys[nodeDepartureIndex]) >= 0 && std::get<journeyIndexes::TRANSFER_TRAVEL_TIME>(forwardJourneys[nodeDepartureIndex]) < tripsEnterConnectionTransferTravelTime[tripIndex])))
             {
               tripsUsable[tripIndex]                            = 1;
               tripsEnterConnection[tripIndex]                   = i;
@@ -124,7 +125,7 @@ namespace TrRouting
                     nodesTentativeTime[transferableNodeIndex] = footpathTravelTime + connectionArrivalTime;
                     forwardJourneys[transferableNodeIndex]    = std::make_tuple(tripsEnterConnection[tripIndex], i, nodeArrivalIndex, tripIndex, footpathTravelTime, (nodeArrivalIndex == transferableNodeIndex ? 1 : -1), footpathDistance);
                   }
-                  if (nodeArrivalIndex == transferableNodeIndex && (std::get<4>(forwardEgressJourneys[transferableNodeIndex]) == -1 || std::get<connectionIndexes::TIME_ARR>(*forwardConnections[std::get<1>(forwardEgressJourneys[transferableNodeIndex])]) > connectionArrivalTime))
+                  if (nodeArrivalIndex == transferableNodeIndex && (std::get<journeyIndexes::TRANSFER_TRAVEL_TIME>(forwardEgressJourneys[transferableNodeIndex]) == -1 || std::get<connectionIndexes::TIME_ARR>(*forwardConnections[std::get<journeyIndexes::FINAL_EXIT_CONNECTION>(forwardEgressJourneys[transferableNodeIndex])]) > connectionArrivalTime))
                   {
                     footpathDistance = nodes[nodeArrivalIndex].get()->transferableDistancesMeters[footpathIndex];
                     forwardEgressJourneys[transferableNodeIndex] = std::make_tuple(tripsEnterConnection[tripIndex], i, nodeArrivalIndex, tripIndex, footpathTravelTime, 1, footpathDistance);

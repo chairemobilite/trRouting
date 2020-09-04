@@ -83,6 +83,7 @@ namespace TrRouting
       alternativeJson["unboardingNodeUuids"]           = routingResult.unboardingNodeUuids;
       alternativeJson["tripUuids"]                     = routingResult.tripUuids;*/
       alternativeJson["alternativeSequence"]           = alternativeSequence;
+      alternativeJson["alternativeTotalSequence"]      = alternativesCalculatedCount + 1;
 
       alternativeSequence += 1;
 
@@ -213,6 +214,7 @@ namespace TrRouting
               alternativeJson["unboardingNodeUuids"]           = routingResult.unboardingNodeUuids;
               alternativeJson["tripUuids"]                     = routingResult.tripUuids;*/
               alternativeJson["alternativeSequence"]           = alternativeSequence;
+              alternativeJson["alternativeTotalSequence"]      = alternativesCalculatedCount + 1;
               json["alternatives"].push_back(alternativeJson);
 
               if (params.debugDisplay)

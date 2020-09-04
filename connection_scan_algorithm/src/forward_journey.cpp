@@ -110,7 +110,7 @@ namespace TrRouting
         while ((std::get<0>(resultingNodeJourneyStep) != -1 && std::get<1>(resultingNodeJourneyStep) != -1))
         {
           journey.push_front(resultingNodeJourneyStep);
-          bestAccessNodeIndex = std::get<connectionIndexes::NODE_DEP>(*forwardConnections[std::get<0>(resultingNodeJourneyStep)].get());
+          bestAccessNodeIndex = std::get<connectionIndexes::NODE_DEP>(*forwardConnections[std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(resultingNodeJourneyStep)].get());
           //std::cerr << "sequence: " << std::get<connectionIndexes::SEQUENCE>(forwardConnections[std::get<0>(resultingNodeJourneyStep)]) << " sequence2: " << std::get<connectionIndexes::SEQUENCE>(forwardConnections[std::get<1>(journeyStep)]) << " node:" << nodes[bestAccessNodeIndex].get()->name << " tenterc:" <<  std::get<0>(journeyStep) << " texitc:" <<  std::get<1>(journeyStep) << " jss:" <<  std::get<5>(journeyStep) << " jtt:" << std::get<4>(journeyStep) << " tectt:" << tripsEnterConnectionTransferTravelTime[std::get<3>(journeyStep)] << std::endl;
           //std::cerr << nodes[bestAccessNodeIndex].get()0>name << " > " << nodes[std::get<connectionIndexes::NODE_ARR>(forwardConnections[std::get<1>(resultingNodeJourneyStep)])].get()->name << std::endl;
           resultingNodeJourneyStep = forwardJourneys[bestAccessNodeIndex];
@@ -131,20 +131,20 @@ namespace TrRouting
         for (auto & journeyStep : journey)
         {
           
-          if (std::get<0>(journeyStep) != -1 && std::get<1>(journeyStep) != -1)
+          if (std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(journeyStep) != -1 && std::get<journeyIndexes::FINAL_EXIT_CONNECTION>(journeyStep) != -1)
           {
             // journey tuple: final enter connection, final exit connection, final footpath
-            journeyStepEnterConnection = forwardConnections[std::get<0>(journeyStep)].get();
-            journeyStepExitConnection  = forwardConnections[std::get<1>(journeyStep)].get();
+            journeyStepEnterConnection = forwardConnections[std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(journeyStep)].get();
+            journeyStepExitConnection  = forwardConnections[std::get<journeyIndexes::FINAL_EXIT_CONNECTION>(journeyStep)].get();
             journeyStepNodeDeparture   = nodes[std::get<connectionIndexes::NODE_DEP>(*journeyStepEnterConnection)].get();
             journeyStepNodeArrival     = nodes[std::get<connectionIndexes::NODE_ARR>(*journeyStepExitConnection)].get();
-            journeyStepTrip            = trips[std::get<3>(journeyStep)].get();
+            journeyStepTrip            = trips[std::get<journeyIndexes::FINAL_TRIP>(journeyStep)].get();
             journeyStepAgency          = agencies[journeyStepTrip->agencyIdx].get();
             journeyStepLine            = lines[journeyStepTrip->lineIdx].get();
             journeyStepPath            = paths[journeyStepTrip->pathIdx].get();
             journeyStepMode            = modes[journeyStepLine->modeIdx];
-            transferTime               = std::get<4>(journeyStep);
-            distance                   = std::get<6>(journeyStep);
+            transferTime               = std::get<journeyIndexes::TRANSFER_TRAVEL_TIME>(journeyStep);
+            distance                   = std::get<journeyIndexes::TRANSFER_DISTANCE>(journeyStep);
             inVehicleDistance          = 0;
             departureTime              = std::get<connectionIndexes::TIME_DEP>(*journeyStepEnterConnection);
             arrivalTime                = std::get<connectionIndexes::TIME_ARR>(*journeyStepExitConnection);
@@ -157,7 +157,7 @@ namespace TrRouting
             
             if (journey.size() > i + 1 && std::get<0>(journey[i+1]) != -1)
             {
-              transferReadyTime += (std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*forwardConnections[std::get<0>(journey[i+1])].get()) >= 0 ? std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*forwardConnections[std::get<0>(journey[i+1])].get()) : params.minWaitingTimeSeconds);
+              transferReadyTime += (std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*forwardConnections[std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(journey[i+1])].get()) >= 0 ? std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*forwardConnections[std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(journey[i+1])].get()) : params.minWaitingTimeSeconds);
             }
             
             totalInVehicleTime         += inVehicleTime;
@@ -174,8 +174,8 @@ namespace TrRouting
             boardingNodeUuids.push_back(journeyStepNodeDeparture->uuid);
             unboardingNodeUuids.push_back(journeyStepNodeArrival->uuid);
             tripUuids.push_back(journeyStepTrip->uuid);
-            tripsIdx.push_back(std::get<3>(journeyStep));
-            legs.push_back(std::make_tuple(std::get<3>(journeyStep), journeyStepTrip->lineIdx, journeyStepTrip->pathIdx, boardingSequence - 1, unboardingSequence - 1));
+            tripsIdx.push_back(std::get<journeyIndexes::FINAL_TRIP>(journeyStep));
+            legs.push_back(std::make_tuple(std::get<journeyIndexes::FINAL_TRIP>(journeyStep), journeyStepTrip->lineIdx, journeyStepTrip->pathIdx, boardingSequence - 1, unboardingSequence - 1));
 
             if (unboardingSequence - 1 < journeyStepPath->segmentsDistanceMeters.size()) // check if distances are available for this path
             {
@@ -294,8 +294,8 @@ namespace TrRouting
           else // access or egress journey step
           {
             
-            transferTime          = std::get<4>(journeyStep);
-            distance              = std::get<6>(journeyStep);
+            transferTime          = std::get<journeyIndexes::TRANSFER_TRAVEL_TIME>(journeyStep);
+            distance              = std::get<journeyIndexes::TRANSFER_DISTANCE>(journeyStep);
             if (totalDistance != -1)
             {
               totalDistance += distance;
@@ -306,9 +306,9 @@ namespace TrRouting
               transferArrivalTime  = departureTimeSeconds + transferTime;
               transferReadyTime    = transferArrivalTime;
 
-              if (journey.size() > i + 1 && std::get<0>(journey[i+1]) != -1)
+              if (journey.size() > i + 1 && std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(journey[i+1]) != -1)
               {
-                transferReadyTime += (std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*forwardConnections[std::get<0>(journey[i+1])].get()) >= 0 ? std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*forwardConnections[std::get<0>(journey[i+1])].get()) : params.minWaitingTimeSeconds);
+                transferReadyTime += (std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*forwardConnections[std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(journey[i+1])].get()) >= 0 ? std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*forwardConnections[std::get<0>(journey[i+1])].get()) : params.minWaitingTimeSeconds);
               }
 
               totalWalkingTime    += transferTime;
@@ -357,13 +357,14 @@ namespace TrRouting
           i++;
         }
         
+        // TODO: we must also add the minimum waiting time here:
         minimizedDepartureTime = firstDepartureTime - accessWalkingTime; //- (std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*forwardConnections[std::get<1>(forwardEgressJourneys[resultingNodeIndex])].get()) >= 0 ? std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*forwardConnections[std::get<1>(forwardEgressJourneys[resultingNodeIndex])].get()) : params.minWaitingTimeSeconds);
         
         if (params.returnAllNodesResult)
         {
           if (std::get<0>(forwardEgressJourneys[resultingNodeIndex]) != -1)
           {
-            arrivalTime = std::get<connectionIndexes::TIME_ARR>(*forwardConnections[std::get<1>(forwardEgressJourneys[resultingNodeIndex])].get());
+            arrivalTime = std::get<connectionIndexes::TIME_ARR>(*forwardConnections[std::get<journeyIndexes::FINAL_EXIT_CONNECTION>(forwardEgressJourneys[resultingNodeIndex])].get());
             if (arrivalTime - departureTimeSeconds <= params.maxTotalTravelTimeSeconds)
             {
               reachableNodesCount++;
