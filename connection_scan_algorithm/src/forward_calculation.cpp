@@ -86,7 +86,7 @@ namespace TrRouting
             {
               tripsUsable[tripIndex]                            = 1;
               tripsEnterConnection[tripIndex]                   = i;
-              tripsEnterConnectionTransferTravelTime[tripIndex] = std::get<4>(forwardJourneys[nodeDepartureIndex]);
+              tripsEnterConnectionTransferTravelTime[tripIndex] = std::get<journeyIndexes::TRANSFER_TRAVEL_TIME>(forwardJourneys[nodeDepartureIndex]);
             }
             
             if (std::get<connectionIndexes::CAN_UNBOARD>(**connection) == 1 && tripsEnterConnection[tripIndex] != -1)
