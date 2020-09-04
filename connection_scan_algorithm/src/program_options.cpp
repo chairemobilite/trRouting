@@ -7,7 +7,7 @@ namespace TrRouting {
     options.add_options()
       ("port",                                              boost::program_options::value<int>()        ->default_value(4000), "http server port");
     options.add_options()
-      ("debug",                                             boost::program_options::value<int>()        ->default_value(0), "debug");
+      ("debug",                                             boost::program_options::value<int>()        ->default_value(1), "debug");
     options.add_options()
       ("dataFetcher,data",                                  boost::program_options::value<std::string>()->default_value("cache"), "data fetcher (csv, gtfs or cache)"); // only cache implemented for now
     options.add_options()

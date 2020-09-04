@@ -97,7 +97,6 @@ namespace TrRouting
         transferTime                = -1; egressWalkingTime      = -1; 
         waitingTime                 = -1; accessWaitingTime      = -1; 
         
-        //std::cerr << nodes[resultingNodeIndex].get()->name << " : " << std::get<0>(reverseAccessJourneys[resultingNodeIndex]) << " tt: " << std::get<4>(reverseAccessJourneys[resultingNodeIndex]) << std::endl; 
         // recreate journey:
         resultingNodeJourneyStep = reverseAccessJourneys[resultingNodeIndex];
         
@@ -116,7 +115,6 @@ namespace TrRouting
           }
           journey.push_back(resultingNodeJourneyStep);
           bestEgressNodeIndex      = std::get<connectionIndexes::NODE_ARR>(*reverseConnections[std::get<journeyIndexes::FINAL_EXIT_CONNECTION>(resultingNodeJourneyStep)].get());
-          //std::cerr << nodes[std::get<connectionIndexes::NODE_DEP>(reverseConnections[std::get<0>(resultingNodeJourneyStep)])].get()->name << " tt: " << std::get<4>(resultingNodeJourneyStep) << " > "  << nodes[std::get<connectionIndexes::NODE_ARR>(reverseConnections[std::get<1>(resultingNodeJourneyStep)])].get()->name << std::endl;
           resultingNodeJourneyStep = reverseJourneys[bestEgressNodeIndex];
           
           i++;
@@ -128,9 +126,7 @@ namespace TrRouting
           journey.push_front(std::make_tuple(-1,-1,-1,-1,nodesAccessTravelTime[resultingNodeIndex],-1,nodesAccessDistance[resultingNodeIndex]));
         }
         journey.push_back(std::make_tuple(-1,-1,-1,-1,nodesEgressTravelTime[bestEgressNodeIndex],-1,nodesEgressDistance[bestEgressNodeIndex]));
-        
-        //std::string stepsJson = "  \"steps\":\n  [\n";
-       
+               
         i = 0;
         int journeyStepsCount = journey.size();
         for (auto & journeyStep : journey)

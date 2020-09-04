@@ -107,12 +107,10 @@ namespace TrRouting
         }
         
         i = 0;
-        while ((std::get<0>(resultingNodeJourneyStep) != -1 && std::get<1>(resultingNodeJourneyStep) != -1))
+        while ((std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(resultingNodeJourneyStep) != -1 && std::get<journeyIndexes::FINAL_EXIT_CONNECTION>(resultingNodeJourneyStep) != -1))
         {
           journey.push_front(resultingNodeJourneyStep);
           bestAccessNodeIndex = std::get<connectionIndexes::NODE_DEP>(*forwardConnections[std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(resultingNodeJourneyStep)].get());
-          //std::cerr << "sequence: " << std::get<connectionIndexes::SEQUENCE>(forwardConnections[std::get<0>(resultingNodeJourneyStep)]) << " sequence2: " << std::get<connectionIndexes::SEQUENCE>(forwardConnections[std::get<1>(journeyStep)]) << " node:" << nodes[bestAccessNodeIndex].get()->name << " tenterc:" <<  std::get<0>(journeyStep) << " texitc:" <<  std::get<1>(journeyStep) << " jss:" <<  std::get<5>(journeyStep) << " jtt:" << std::get<4>(journeyStep) << " tectt:" << tripsEnterConnectionTransferTravelTime[std::get<3>(journeyStep)] << std::endl;
-          //std::cerr << nodes[bestAccessNodeIndex].get()0>name << " > " << nodes[std::get<connectionIndexes::NODE_ARR>(forwardConnections[std::get<1>(resultingNodeJourneyStep)])].get()->name << std::endl;
           resultingNodeJourneyStep = forwardJourneys[bestAccessNodeIndex];
           i++;
         }
@@ -155,7 +153,7 @@ namespace TrRouting
             transferArrivalTime        = arrivalTime   + transferTime;
             transferReadyTime          = transferArrivalTime;
             
-            if (journey.size() > i + 1 && std::get<0>(journey[i+1]) != -1)
+            if (journey.size() > i + 1 && std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(journey[i+1]) != -1)
             {
               transferReadyTime += (std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*forwardConnections[std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(journey[i+1])].get()) >= 0 ? std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*forwardConnections[std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(journey[i+1])].get()) : params.minWaitingTimeSeconds);
             }
@@ -308,7 +306,7 @@ namespace TrRouting
 
               if (journey.size() > i + 1 && std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(journey[i+1]) != -1)
               {
-                transferReadyTime += (std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*forwardConnections[std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(journey[i+1])].get()) >= 0 ? std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*forwardConnections[std::get<0>(journey[i+1])].get()) : params.minWaitingTimeSeconds);
+                transferReadyTime += (std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*forwardConnections[std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(journey[i+1])].get()) >= 0 ? std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*forwardConnections[std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(journey[i+1])].get()) : params.minWaitingTimeSeconds);
               }
 
               totalWalkingTime    += transferTime;
@@ -358,11 +356,11 @@ namespace TrRouting
         }
         
         // TODO: we must also add the minimum waiting time here:
-        minimizedDepartureTime = firstDepartureTime - accessWalkingTime; //- (std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*forwardConnections[std::get<1>(forwardEgressJourneys[resultingNodeIndex])].get()) >= 0 ? std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*forwardConnections[std::get<1>(forwardEgressJourneys[resultingNodeIndex])].get()) : params.minWaitingTimeSeconds);
+        minimizedDepartureTime = firstDepartureTime - accessWalkingTime - (std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*forwardConnections[std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(journey[1])].get()) >= 0 ? std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*forwardConnections[std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(journey[1])].get()) : params.minWaitingTimeSeconds);
         
         if (params.returnAllNodesResult)
         {
-          if (std::get<0>(forwardEgressJourneys[resultingNodeIndex]) != -1)
+          if (std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(forwardEgressJourneys[resultingNodeIndex]) != -1)
           {
             arrivalTime = std::get<connectionIndexes::TIME_ARR>(*forwardConnections[std::get<journeyIndexes::FINAL_EXIT_CONNECTION>(forwardEgressJourneys[resultingNodeIndex])].get());
             if (arrivalTime - departureTimeSeconds <= params.maxTotalTravelTimeSeconds)

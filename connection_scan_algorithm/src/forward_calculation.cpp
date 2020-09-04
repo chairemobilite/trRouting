@@ -94,6 +94,7 @@ namespace TrRouting
               // get footpaths for the arrival node to get transferable nodes:
               nodeArrivalIndex                = std::get<connectionIndexes::NODE_ARR>(**connection);
               connectionArrivalTime           = std::get<connectionIndexes::TIME_ARR>(**connection);
+
               if (!params.returnAllNodesResult && !reachedAtLeastOneEgressNode && nodesEgressTravelTime[nodeArrivalIndex] != -1) // check if the arrival node is egressable
               {
                 reachedAtLeastOneEgressNode    = true;
@@ -108,14 +109,7 @@ namespace TrRouting
                   continue;
                 }
   
-                if (params.walkingSpeedFactor != 1.0)
-                {
-                  footpathTravelTime = (int)ceil((float)nodes[nodeArrivalIndex].get()->transferableTravelTimesSeconds[footpathIndex] / params.walkingSpeedFactor);
-                }
-                else
-                {
-                  footpathTravelTime = nodes[nodeArrivalIndex].get()->transferableTravelTimesSeconds[footpathIndex];
-                }
+                footpathTravelTime = params.walkingSpeedFactor == 1.0 ? nodes[nodeArrivalIndex].get()->transferableTravelTimesSeconds[footpathIndex] : (int)ceil((float)nodes[nodeArrivalIndex].get()->transferableTravelTimesSeconds[footpathIndex] / params.walkingSpeedFactor);
 
                 if (footpathTravelTime <= params.maxTransferWalkingTravelTimeSeconds)
                 {
