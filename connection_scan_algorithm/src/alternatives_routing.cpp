@@ -19,6 +19,7 @@ namespace TrRouting
     json["alternatives"] = nlohmann::json::array();
 
     std::vector<int>                 foundLinesIdx;
+    std::vector<int>                 exceptLinesIdxFromParameters = params.exceptLinesIdx; // make a copy of lines that are already disabled in parameters
     std::vector< std::vector<int> >  allCombinations;
     std::vector< std::vector<int> >  failedCombinations;
     bool                             combinationMatchesWithFailed {false};
@@ -148,7 +149,11 @@ namespace TrRouting
         {
 
           combination = allCombinations.at(i);
-          params.exceptLinesIdx = combination;
+          params.exceptLinesIdx = exceptLinesIdxFromParameters; // reset except lines using parameters
+          for (auto lineIdx : combination)
+          {
+            params.exceptLinesIdx.push_back(lineIdx);
+          }
 
           if (params.debugDisplay)
           {

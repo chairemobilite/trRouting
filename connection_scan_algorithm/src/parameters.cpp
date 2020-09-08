@@ -117,10 +117,10 @@ namespace TrRouting
     transferOnlyAtSameStation              = false;
     transferBetweenSameLine                = true;
     calculateByNumberOfTransfers           = false;
-    maxAlternatives                        = 100;
+    maxAlternatives                        = 200;
     debugDisplay                           = serverDebugDisplay;
-    alternativesMaxTravelTimeRatio         = 2.0;
-    minAlternativeMaxTravelTimeSeconds     = 60*60;
+    alternativesMaxTravelTimeRatio         = 1.8;
+    minAlternativeMaxTravelTimeSeconds     = 30*60;
     alternativesMaxAddedTravelTimeSeconds  = 60*60;
     odTripsSampleSize                      = -1;
     calculateProfiles                      = true;

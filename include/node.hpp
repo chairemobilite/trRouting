@@ -26,6 +26,9 @@ namespace TrRouting
     std::vector<int> transferableNodesIdx;
     std::vector<int> transferableTravelTimesSeconds;
     std::vector<int> transferableDistancesMeters;
+    std::vector<int> reverseTransferableNodesIdx;
+    std::vector<int> reverseTransferableTravelTimesSeconds;
+    std::vector<int> reverseTransferableDistancesMeters;
 
     const std::string toString() {
       return "Node " + boost::uuids::to_string(uuid) + " (id " + std::to_string(id) + ")\n  code " + code + "\n  name " + name + "\n  latitude " + std::to_string(point.get()->latitude)  + "\n  longitude " + std::to_string(point.get()->longitude);

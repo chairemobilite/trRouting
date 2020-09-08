@@ -82,7 +82,21 @@ namespace TrRouting
             blockIndex            = std::get<connectionIndexes::BLOCK>(**connection);*/
 
             // TODO: add constrain for sameLineTransfer (check trip allowSameLineTransfers)
-            if (std::get<connectionIndexes::CAN_BOARD>(**connection) == 1 && (tripEnterConnectionIndex == -1 || (std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(forwardJourneys[nodeDepartureIndex]) == -1 && std::get<journeyIndexes::TRANSFER_TRAVEL_TIME>(forwardJourneys[nodeDepartureIndex]) >= 0 && std::get<journeyIndexes::TRANSFER_TRAVEL_TIME>(forwardJourneys[nodeDepartureIndex]) < tripsEnterConnectionTransferTravelTime[tripIndex])))
+            if (
+              std::get<connectionIndexes::CAN_BOARD>(**connection) == 1 
+              && 
+              (
+                tripEnterConnectionIndex == -1 
+                || 
+                (
+                  std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(forwardJourneys[nodeDepartureIndex]) == -1 
+                  &&
+                  std::get<journeyIndexes::TRANSFER_TRAVEL_TIME>(forwardJourneys[nodeDepartureIndex]) >= 0 
+                  && 
+                  std::get<journeyIndexes::TRANSFER_TRAVEL_TIME>(forwardJourneys[nodeDepartureIndex]) < tripsEnterConnectionTransferTravelTime[tripIndex]
+                )
+              )
+            )
             {
               tripsUsable[tripIndex]                            = 1;
               tripsEnterConnection[tripIndex]                   = i;
@@ -119,7 +133,15 @@ namespace TrRouting
                     nodesTentativeTime[transferableNodeIndex] = footpathTravelTime + connectionArrivalTime;
                     forwardJourneys[transferableNodeIndex]    = std::make_tuple(tripsEnterConnection[tripIndex], i, nodeArrivalIndex, tripIndex, footpathTravelTime, (nodeArrivalIndex == transferableNodeIndex ? 1 : -1), footpathDistance);
                   }
-                  if (nodeArrivalIndex == transferableNodeIndex && (std::get<journeyIndexes::TRANSFER_TRAVEL_TIME>(forwardEgressJourneys[transferableNodeIndex]) == -1 || std::get<connectionIndexes::TIME_ARR>(*forwardConnections[std::get<journeyIndexes::FINAL_EXIT_CONNECTION>(forwardEgressJourneys[transferableNodeIndex])]) > connectionArrivalTime))
+                  if (
+                    nodeArrivalIndex == transferableNodeIndex 
+                    && 
+                    (
+                      std::get<journeyIndexes::TRANSFER_TRAVEL_TIME>(forwardEgressJourneys[transferableNodeIndex]) == -1 
+                      ||
+                      std::get<connectionIndexes::TIME_ARR>(*forwardConnections[std::get<journeyIndexes::FINAL_EXIT_CONNECTION>(forwardEgressJourneys[transferableNodeIndex])]) > connectionArrivalTime
+                    )
+                  )
                   {
                     footpathDistance = nodes[nodeArrivalIndex].get()->transferableDistancesMeters[footpathIndex];
                     forwardEgressJourneys[transferableNodeIndex] = std::make_tuple(tripsEnterConnection[tripIndex], i, nodeArrivalIndex, tripIndex, footpathTravelTime, 1, footpathDistance);

@@ -108,6 +108,7 @@ namespace TrRouting
         i = 0;
         while ((std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(resultingNodeJourneyStep) != -1 && std::get<journeyIndexes::FINAL_EXIT_CONNECTION>(resultingNodeJourneyStep) != -1))
         {
+          // here we inverse the transfers (putting them after the exit connection, instead of before the enter connection):
           if (journey.size() > 0)
           {
             std::get<journeyIndexes::TRANSFER_TRAVEL_TIME>(journey[journey.size()-1]) = std::get<journeyIndexes::TRANSFER_TRAVEL_TIME>(resultingNodeJourneyStep);
@@ -421,7 +422,13 @@ namespace TrRouting
             json["minimizedTotalTravelTimeSeconds"]                = arrivalTime - bestDepartureTime;
             json["minimumWaitingTimeBeforeEachBoardingMinutes"]    = Toolbox::convertSecondsToMinutes(params.minWaitingTimeSeconds);
             json["minimumWaitingTimeBeforeEachBoardingSeconds"]    = params.minWaitingTimeSeconds;
+            json["exceptLineShortnames"]                           = nlohmann::json::array();
             
+            for (auto & lineIdx : params.exceptLinesIdx)
+            {
+              json["exceptLineShortnames"].push_back(lines[lineIdx]->shortname);
+            }
+
             result.travelTimeSeconds             = arrivalTime - (initialDepartureTimeSeconds != -1 ? initialDepartureTimeSeconds : bestDepartureTime);
             result.arrivalTimeSeconds            = arrivalTime;
             result.departureTimeSeconds          = (initialDepartureTimeSeconds != -1 ? initialDepartureTimeSeconds : bestDepartureTime);

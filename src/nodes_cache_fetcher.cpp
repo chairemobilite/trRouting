@@ -10,6 +10,7 @@
 #include "point.hpp"
 #include "capnp/nodeCollection.capnp.h"
 #include "capnp/node.capnp.h"
+#include "calculation_time.hpp"
 //#include "toolbox.hpp"
 
 namespace TrRouting
@@ -91,6 +92,11 @@ namespace TrRouting
           t->transferableNodesIdx           = transferableNodesIdx;
           t->transferableTravelTimesSeconds = transferableTravelTimesSeconds;
           t->transferableDistancesMeters    = transferableDistancesMeters;
+
+          // put same node transfer at the beginning:
+          t->reverseTransferableNodesIdx.push_back(ts.size());
+          t->reverseTransferableTravelTimesSeconds.push_back(0);
+          t->reverseTransferableDistancesMeters.push_back(0);
           close(fd);
         }
 
@@ -100,6 +106,40 @@ namespace TrRouting
         ts.push_back(std::move(t));
         
       }
+
+      /*CalculationTime algorithmCalculationTime = CalculationTime();
+      algorithmCalculationTime.start();
+      long long       calculationTime;
+      calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();*/
+
+      auto nodesCount {ts.size()};
+      //std::vector<int>::iterator nodeIndex;
+      // find reverse transferable nodes:
+      //std::cerr << "-- start node with nodesCount -- " << nodesCount << "\n";
+      for (int i = 0; i < nodesCount; i++)
+      {
+
+        int transferableNodesCount = ts[i]->transferableNodesIdx.size();
+        for (int j = 0; j < transferableNodesCount; j++)
+        {
+
+          int transferableNodeIdx = ts[i]->transferableNodesIdx[j];
+
+          if (transferableNodeIdx == i)
+          {
+            continue;
+          }
+
+          ts[transferableNodeIdx]->reverseTransferableNodesIdx.push_back(i);
+          ts[transferableNodeIdx]->reverseTransferableTravelTimesSeconds.push_back(ts[i]->transferableTravelTimesSeconds[j]);
+          ts[transferableNodeIdx]->reverseTransferableDistancesMeters.push_back(ts[i]->transferableDistancesMeters[j]);
+        }
+
+      }
+
+      
+      //std::cerr << "-- node reverse transferable nodes preparation -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
+
       //std::cout << TStr << ":\n" << Toolbox::prettyPrintStructVector(ts) << std::endl;
       close(fd);
     }
