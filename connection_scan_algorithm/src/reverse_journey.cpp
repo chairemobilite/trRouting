@@ -422,12 +422,12 @@ namespace TrRouting
             json["minimizedTotalTravelTimeSeconds"]                = arrivalTime - bestDepartureTime;
             json["minimumWaitingTimeBeforeEachBoardingMinutes"]    = Toolbox::convertSecondsToMinutes(params.minWaitingTimeSeconds);
             json["minimumWaitingTimeBeforeEachBoardingSeconds"]    = params.minWaitingTimeSeconds;
-            json["exceptLineShortnames"]                           = nlohmann::json::array();
+            //json["exceptLineShortnames"]                           = nlohmann::json::array();
             
-            for (auto & lineIdx : params.exceptLinesIdx)
+            /*for (auto & lineIdx : params.exceptLinesIdx)
             {
               json["exceptLineShortnames"].push_back(lines[lineIdx]->shortname);
-            }
+            }*/
 
             result.travelTimeSeconds             = arrivalTime - (initialDepartureTimeSeconds != -1 ? initialDepartureTimeSeconds : bestDepartureTime);
             result.arrivalTimeSeconds            = arrivalTime;
