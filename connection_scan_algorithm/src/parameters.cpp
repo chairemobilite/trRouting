@@ -98,7 +98,7 @@ namespace TrRouting
     cyclingSpeedMetersPerSecond            = 25/3.6; // 25 km/h
     maxTotalTravelTimeSeconds              = MAX_INT;
     maxNumberOfTransfers                   = -1; // -1 means no limit
-    minWaitingTimeSeconds                  = 5*60;
+    minWaitingTimeSeconds                  = 3*60;
     maxAccessWalkingTravelTimeSeconds      = 20*60;
     maxEgressWalkingTravelTimeSeconds      = 20*60;
     maxTransferWalkingTravelTimeSeconds    = 20*60; // depends of transfer data provided
