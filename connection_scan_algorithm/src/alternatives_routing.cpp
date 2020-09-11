@@ -145,7 +145,7 @@ namespace TrRouting
       std::vector<int> combination;
       for (int i = 0; i < allCombinations.size(); i++)
       {
-        if (alternativesCalculatedCount <= maxAlternatives)
+        if (alternativesCalculatedCount < maxAlternatives)
         {
 
           combination = allCombinations.at(i);
@@ -219,7 +219,7 @@ namespace TrRouting
               alternativeJson["unboardingNodeUuids"]           = routingResult.unboardingNodeUuids;
               alternativeJson["tripUuids"]                     = routingResult.tripUuids;*/
               alternativeJson["alternativeSequence"]           = alternativeSequence;
-              alternativeJson["alternativeTotalSequence"]      = alternativesCalculatedCount + 1;
+              alternativeJson["alternativeTotalSequence"]      = alternativesCalculatedCount;
               json["alternatives"].push_back(alternativeJson);
 
               if (params.debugDisplay)

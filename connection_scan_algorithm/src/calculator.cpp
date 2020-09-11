@@ -50,8 +50,7 @@ namespace TrRouting
           if (params.debugDisplay)
             std::cout << "bestArrivalTime after forward journey: " << bestArrivalTime << std::endl;
           
-          departureTimeSeconds = -1;
-          arrivalTimeSeconds   = bestArrivalTime;
+          arrivalTimeSeconds = bestArrivalTime;
           
           for (auto & egressFootpath : egressFootpaths) // reset nodes reverse tentative times with new arrival time:
           {
