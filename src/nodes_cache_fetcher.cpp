@@ -4,6 +4,8 @@
 
 #include <string>
 #include <vector>
+#include <numeric>
+
 
 #include "cache_fetcher.hpp"
 #include "node.hpp"
@@ -125,7 +127,7 @@ namespace TrRouting
 
           int transferableNodeIdx = ts[i]->transferableNodesIdx[j];
 
-          if (transferableNodeIdx == i)
+          if (transferableNodeIdx == i) // we already put same node transfer at the beginning
           {
             continue;
           }
@@ -133,6 +135,55 @@ namespace TrRouting
           ts[transferableNodeIdx]->reverseTransferableNodesIdx.push_back(i);
           ts[transferableNodeIdx]->reverseTransferableTravelTimesSeconds.push_back(ts[i]->transferableTravelTimesSeconds[j]);
           ts[transferableNodeIdx]->reverseTransferableDistancesMeters.push_back(ts[i]->transferableDistancesMeters[j]);
+        }
+
+      }
+
+      // sort by increasing travel times so we don't get longer transfers when shorter exists:
+      for (auto & node : ts)
+      {
+        
+        std::vector<size_t> sortedIdx(node->transferableNodesIdx.size());
+        std::iota(sortedIdx.begin(), sortedIdx.end(), 0);
+        std::stable_sort(sortedIdx.begin(), sortedIdx.end(),
+          [&](int i1, int i2) {
+            return node->transferableTravelTimesSeconds[i1] < node->transferableTravelTimesSeconds[i2];
+        });
+
+        std::vector<int> transferableNodesIdx(node->transferableNodesIdx.size());
+        std::vector<int> transferableTravelTimesSeconds(node->transferableNodesIdx.size());
+        std::vector<int> transferableDistancesMeters(node->transferableNodesIdx.size());
+        transferableNodesIdx           = node->transferableNodesIdx;
+        transferableTravelTimesSeconds = node->transferableTravelTimesSeconds;
+        transferableDistancesMeters    = node->transferableDistancesMeters;
+
+        for (int i = 0; i < sortedIdx.size(); i++)
+        {
+          node->transferableNodesIdx[i]           = transferableNodesIdx[sortedIdx[i]];
+          node->transferableTravelTimesSeconds[i] = transferableTravelTimesSeconds[sortedIdx[i]];
+          node->transferableDistancesMeters[i]    = transferableDistancesMeters[sortedIdx[i]];
+        }
+
+
+        std::vector<size_t> sortedReverseIdx(node->reverseTransferableNodesIdx.size());
+        std::iota(sortedReverseIdx.begin(), sortedReverseIdx.end(), 0);
+        std::stable_sort(sortedReverseIdx.begin(), sortedReverseIdx.end(),
+          [&](int i1, int i2) {
+            return node->reverseTransferableTravelTimesSeconds[i1] < node->reverseTransferableTravelTimesSeconds[i2];
+        });
+
+        std::vector<int> reverseTransferableNodesIdx(node->reverseTransferableNodesIdx.size());
+        std::vector<int> reverseTransferableTravelTimesSeconds(node->reverseTransferableNodesIdx.size());
+        std::vector<int> reverseTransferableDistancesMeters(node->reverseTransferableNodesIdx.size());
+        reverseTransferableNodesIdx           = node->reverseTransferableNodesIdx;
+        reverseTransferableTravelTimesSeconds = node->reverseTransferableTravelTimesSeconds;
+        reverseTransferableDistancesMeters    = node->reverseTransferableDistancesMeters;
+
+        for (int i = 0; i < sortedReverseIdx.size(); i++)
+        {
+          node->reverseTransferableNodesIdx[i]           = reverseTransferableNodesIdx[sortedReverseIdx[i]];
+          node->reverseTransferableTravelTimesSeconds[i] = reverseTransferableTravelTimesSeconds[sortedReverseIdx[i]];
+          node->reverseTransferableDistancesMeters[i]    = reverseTransferableDistancesMeters[sortedReverseIdx[i]];
         }
 
       }

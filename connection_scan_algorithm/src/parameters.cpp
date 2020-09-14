@@ -119,7 +119,7 @@ namespace TrRouting
     calculateByNumberOfTransfers           = false;
     maxAlternatives                        = 200;
     debugDisplay                           = serverDebugDisplay;
-    alternativesMaxTravelTimeRatio         = 1.8;
+    alternativesMaxTravelTimeRatio         = 1.75;
     minAlternativeMaxTravelTimeSeconds     = 30*60;
     alternativesMaxAddedTravelTimeSeconds  = 60*60;
     odTripsSampleSize                      = -1;

@@ -20,6 +20,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
+#include <boost/range/adaptor/reversed.hpp>
 //#include <boost/compute.hpp>
 #include <boost/tokenizer.hpp>
 #include <boost/optional.hpp>

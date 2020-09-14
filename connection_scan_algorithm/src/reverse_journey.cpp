@@ -127,12 +127,73 @@ namespace TrRouting
           journey.push_front(std::make_tuple(-1,-1,-1,-1,nodesAccessTravelTime[resultingNodeIndex],-1,nodesAccessDistance[resultingNodeIndex]));
         }
         journey.push_back(std::make_tuple(-1,-1,-1,-1,nodesEgressTravelTime[bestEgressNodeIndex],-1,nodesEgressDistance[bestEgressNodeIndex]));
-               
-        i = 0;
+        
         int journeyStepsCount = journey.size();
+
+
+
+        // start of remove superfluous segments:
+        /*json["canBeOptimized"] = nlohmann::json::array();
+        int j {journeyStepsCount - 1};
+        std::vector<int> journeyStepsIdxToRemove;
+        std::vector<int> journeyStepUnboardingIdx;
+        for (auto & journeyStep1 : boost::adaptors::reverse(journey))
+        {
+          // check if it is an in-vehicle journey:
+          if (std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(journeyStep1) != -1 && std::get<journeyIndexes::FINAL_EXIT_CONNECTION>(journeyStep1) != -1)
+          {
+            auto departureNodeIdx = std::get<connectionIndexes::NODE_DEP>(*(reverseConnections[std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(journeyStep1)].get()));
+            journeyStepNodeDeparture = nodes[departureNodeIdx].get();
+            i = 0;
+            for (auto & journeyStep2 : journey)
+            {
+              if (i < j)
+              {
+                if (std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(journeyStep2) != -1 && std::get<journeyIndexes::FINAL_EXIT_CONNECTION>(journeyStep2) != -1)
+                {
+                  boardingSequence   = std::get<connectionIndexes::SEQUENCE>(*(reverseConnections[std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(journeyStep2)].get()));
+                  unboardingSequence = std::get<connectionIndexes::SEQUENCE>(*(reverseConnections[std::get<journeyIndexes::FINAL_EXIT_CONNECTION>(journeyStep2)].get())) + 1;
+                  journeyStepTrip    = trips[std::get<journeyIndexes::FINAL_TRIP>(journeyStep2)].get();
+                  journeyStepPath    = paths[journeyStepTrip->pathIdx].get();
+                  int k = 0;
+                  for (auto & nodeIdx : journeyStepPath->nodesIdx)
+                  {
+                    if (k >= boardingSequence - 1 && k < unboardingSequence - 1)
+                    {
+                      if (nodeIdx == departureNodeIdx)
+                      {
+                        int l = 1;
+                        while (l < j - i)
+                        {
+                          journeyStepsIdxToRemove.push_back(i + l);
+                          journeyStepUnboardingIdx.push_back(k);
+                          //json["canBeOptimized"].push_back(journeyStepNodeDeparture->code + "|uidx" + std::to_string(k) + "|jstr" + std::to_string(i + l) + "|i" + std::to_string(i) + "|j" + std::to_string(j) + "|jsc" + std::to_string(journeyStepsCount) + "|" + lines[journeyStepPath->lineIdx]->shortname);
+                          l++;
+                        }
+
+                      }
+                    }
+                    k++;
+                  }
+                }
+              }
+              i++;
+            }
+          }
+          j--;
+        }*/
+
+        // end of remove superfuous segments
+
+
+
+
+
+        i = 0;
         for (auto & journeyStep : journey)
         {
           
+          // check if it is an in-vehicle journey:
           if (std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(journeyStep) != -1 && std::get<journeyIndexes::FINAL_EXIT_CONNECTION>(journeyStep) != -1)
           {
             // journey tuple: final enter connection, final exit connection, final footpath

@@ -21,6 +21,7 @@ namespace TrRouting
     int  connectionDepartureTime          {-1};
     int  connectionArrivalTime            {-1};
     short connectionMinWaitingTimeSeconds {-1};
+    short journeyConnectionMinWaitingTimeSeconds {-1};
     //long long  footpathsRangeStart        {-1};
     //long long  footpathsRangeEnd          {-1};
     int  footpathIndex                    {-1};
@@ -78,24 +79,35 @@ namespace TrRouting
           if (tripExitConnectionIndex != -1 || nodeArrivalTentativeTime >= connectionArrivalTime)
           {
             
-            if (
-              std::get<connectionIndexes::CAN_UNBOARD>(**connection) == 1 
-              && 
-              (
-                tripExitConnectionIndex == -1 
-                || 
-                (
-                  std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(reverseJourneys[nodeArrivalIndex]) == -1 
-                  && 
-                  std::get<journeyIndexes::TRANSFER_TRAVEL_TIME>(reverseJourneys[nodeArrivalIndex]) >= 0 
-                  && 
-                  std::get<journeyIndexes::TRANSFER_TRAVEL_TIME>(reverseJourneys[nodeArrivalIndex]) <= tripsExitConnectionTransferTravelTime[tripIndex]
-                )
-              )
-            ) // <= to make sure we get the same result as forward calculation, which uses >
+            if (std::get<connectionIndexes::CAN_UNBOARD>(**connection) == 1)
             {
-              tripsExitConnection[tripIndex]                   = i;
-              tripsExitConnectionTransferTravelTime[tripIndex] = std::get<4>(reverseJourneys[nodeArrivalIndex]);
+
+              if (tripExitConnectionIndex == -1) // <= to make sure we get the same result as forward calculation, which uses >
+              {
+                tripsExitConnection[tripIndex]                   = i;
+                tripsExitConnectionTransferTravelTime[tripIndex] = std::get<journeyIndexes::TRANSFER_TRAVEL_TIME>(reverseJourneys[nodeArrivalIndex]);
+              }
+              else if (
+                std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(reverseJourneys[nodeArrivalIndex]) != -1
+                &&
+                std::get<journeyIndexes::TRANSFER_TRAVEL_TIME>(reverseJourneys[nodeArrivalIndex]) >= 0 
+                && 
+                std::get<journeyIndexes::TRANSFER_TRAVEL_TIME>(reverseJourneys[nodeArrivalIndex]) < tripsExitConnectionTransferTravelTime[tripIndex]
+              )
+              {
+                journeyConnectionMinWaitingTimeSeconds = params.minWaitingTimeSeconds;
+                if(std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*reverseConnections[std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(reverseJourneys[nodeArrivalIndex])].get()) >= 0)
+                {
+                  journeyConnectionMinWaitingTimeSeconds = std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*reverseConnections[std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(reverseJourneys[nodeArrivalIndex])].get());
+                }
+
+                if (nodeArrivalTentativeTime - journeyConnectionMinWaitingTimeSeconds >= connectionArrivalTime)
+                {
+                  tripsExitConnection[tripIndex]                   = i;
+                  tripsExitConnectionTransferTravelTime[tripIndex] = std::get<journeyIndexes::TRANSFER_TRAVEL_TIME>(reverseJourneys[nodeArrivalIndex]);
+                }
+              }
+
             }
             
             if (std::get<connectionIndexes::CAN_BOARD>(**connection) == 1 && tripsExitConnection[tripIndex] != -1)
