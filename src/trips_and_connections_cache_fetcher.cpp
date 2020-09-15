@@ -261,16 +261,20 @@ namespace TrRouting
     calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
 
     // assign connections to trips:
+    int i {0};
     for(auto & connection : forwardConnections)
     {
       tripIdx = std::get<4>(*connection);
-      trips[tripIdx]->forwardConnections.push_back(connection);
+      trips[tripIdx]->forwardConnectionsIdx.push_back(i);
+      i++;
     }
 
+    i = 0;
     for(auto & connection : reverseConnections)
     {
       tripIdx = std::get<4>(*connection);
-      trips[tripIdx]->reverseConnections.push_back(connection);
+      trips[tripIdx]->reverseConnectionsIdx.push_back(i);
+      i++;
     }
     
     std::cerr << "-- assign connections to trips -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";

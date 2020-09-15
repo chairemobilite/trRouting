@@ -21,8 +21,8 @@ namespace TrRouting
     int totalCapacity;
     int seatedCapacity;
     short allowSameLineTransfers;
-    std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>>> forwardConnections;
-    std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>>> reverseConnections;
+    std::vector<int> forwardConnectionsIdx;
+    std::vector<int> reverseConnectionsIdx;
 
   };
 
