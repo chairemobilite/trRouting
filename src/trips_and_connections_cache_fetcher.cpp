@@ -10,6 +10,7 @@
 #include "line.hpp"
 #include "block.hpp"
 #include "capnp/line.capnp.h"
+#include "calculation_time.hpp"
 //#include "toolbox.hpp"
 
 namespace TrRouting
@@ -253,6 +254,26 @@ namespace TrRouting
       }
       return false;
     });
+
+    CalculationTime algorithmCalculationTime = CalculationTime();
+    algorithmCalculationTime.start();
+    long long       calculationTime;
+    calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
+
+    // assign connections to trips:
+    for(auto & connection : forwardConnections)
+    {
+      tripIdx = std::get<4>(*connection);
+      trips[tripIdx]->forwardConnections.push_back(connection);
+    }
+
+    for(auto & connection : reverseConnections)
+    {
+      tripIdx = std::get<4>(*connection);
+      trips[tripIdx]->reverseConnections.push_back(connection);
+    }
+    
+    std::cerr << "-- assign connections to trips -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
 
   }
 
