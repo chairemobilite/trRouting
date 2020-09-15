@@ -101,7 +101,7 @@ namespace TrRouting
                   journeyConnectionMinWaitingTimeSeconds = std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*reverseConnections[std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(reverseJourneys[nodeArrivalIndex])].get());
                 }
 
-                if (nodeArrivalTentativeTime - journeyConnectionMinWaitingTimeSeconds >= connectionArrivalTime)
+                if (connectionArrivalTime + journeyConnectionMinWaitingTimeSeconds <= nodeArrivalTentativeTime)
                 {
                   tripsExitConnection[tripIndex]                   = i;
                   tripsExitConnectionTransferTravelTime[tripIndex] = std::get<journeyIndexes::TRANSFER_TRAVEL_TIME>(reverseJourneys[nodeArrivalIndex]);

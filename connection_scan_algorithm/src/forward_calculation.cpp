@@ -87,14 +87,14 @@ namespace TrRouting
               && 
               (
                 tripEnterConnectionIndex == -1 
-                || 
+                /*|| 
                 (
                   std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(forwardJourneys[nodeDepartureIndex]) == -1 
                   &&
                   std::get<journeyIndexes::TRANSFER_TRAVEL_TIME>(forwardJourneys[nodeDepartureIndex]) >= 0 
                   && 
                   std::get<journeyIndexes::TRANSFER_TRAVEL_TIME>(forwardJourneys[nodeDepartureIndex]) < tripsEnterConnectionTransferTravelTime[tripIndex]
-                )
+                )*/
               )
             )
             {

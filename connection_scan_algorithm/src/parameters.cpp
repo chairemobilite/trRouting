@@ -122,6 +122,7 @@ namespace TrRouting
     alternativesMaxTravelTimeRatio         = 1.75;
     minAlternativeMaxTravelTimeSeconds     = 30*60;
     alternativesMaxAddedTravelTimeSeconds  = 60*60;
+    maxValidAlternatives                   = 50;
     odTripsSampleSize                      = -1;
     calculateProfiles                      = true;
     walkingSpeedFactor                     = 1.0; // all walking segments are weighted with this value. > 1.0 means faster walking, < 1.0 means slower walking

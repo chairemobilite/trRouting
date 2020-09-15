@@ -145,7 +145,7 @@ namespace TrRouting
       std::vector<int> combination;
       for (int i = 0; i < allCombinations.size(); i++)
       {
-        if (alternativesCalculatedCount < maxAlternatives)
+        if (alternativesCalculatedCount < maxAlternatives && alternativeSequence - 1 < params.maxValidAlternatives)
         {
 
           combination = allCombinations.at(i);
