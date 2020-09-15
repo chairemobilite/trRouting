@@ -259,7 +259,7 @@ namespace TrRouting
               //std::cerr << " sequenceStartIdx: " << sequenceStartIdx << " sequenceEndIdx: " << sequenceEndIdx << " reverseConnectionsCountInTrip " << trips[tripIdx]->reverseConnectionsIdx.size() << std::endl;
               //std::cerr << " Start " << nodes[nodeStartIdx]->name << " /// ";
           
-              for(int sequenceIdx = trips[tripIdx]->reverseConnectionsIdx.size() - sequenceEndIdx; sequenceIdx <= trips[tripIdx]->reverseConnectionsIdx.size() - sequenceStartIdx; ++sequenceIdx)
+              for(int sequenceIdx = trips[tripIdx]->reverseConnectionsIdx.size() - 1 - sequenceEndIdx; sequenceIdx <= trips[tripIdx]->reverseConnectionsIdx.size() - 1 - sequenceStartIdx; ++sequenceIdx)
               {
                 connectionIdx    = trips[tripIdx]->reverseConnectionsIdx[sequenceIdx];
                 nodeDepartureIdx = std::get<connectionIndexes::NODE_DEP>(*(reverseConnections[connectionIdx]));
