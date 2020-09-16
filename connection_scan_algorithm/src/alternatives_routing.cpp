@@ -30,7 +30,7 @@ namespace TrRouting
     std::vector<int>                 combinationsKs;
     int maxTravelTime;
     int alternativeSequence = 1;
-    int alternativesCalculatedCount = 0;
+    int alternativesCalculatedCount = 1;
     int maxAlternatives = params.maxAlternatives;
     int lastFoundedAtNum = 0;
     //int departureTimeSeconds = -1;
@@ -86,7 +86,8 @@ namespace TrRouting
       alternativeJson["alternativeSequence"]           = alternativeSequence;
       alternativeJson["alternativeTotalSequence"]      = alternativesCalculatedCount + 1;
 
-      alternativeSequence += 1;
+      alternativeSequence++;
+      alternativesCalculatedCount++;
 
       json["alternatives"].push_back(alternativeJson);
       json["status"] = "success";
@@ -155,10 +156,10 @@ namespace TrRouting
             params.exceptLinesIdx.push_back(lineIdx);
           }
 
-          if (params.debugDisplay)
-          {
-            std::cout << "calculating alternative " << alternativesCalculatedCount << "..." << std::endl;
-          }
+          //if (params.debugDisplay)
+          //{
+            std::cerr << "calculating alternative " << alternativeSequence << " from a total of " << alternativesCalculatedCount << "..." << std::endl;
+          //}
 
 
           if (params.debugDisplay)
@@ -178,7 +179,6 @@ namespace TrRouting
 
 
           routingResult = calculate(false, true);
-          alternativesCalculatedCount++;
           
           if (routingResult.status == "success")
           {
@@ -278,7 +278,7 @@ namespace TrRouting
               
               combination.clear();
 
-              alternativeSequence += 1;
+              alternativeSequence++;
 
             }
           }
@@ -287,6 +287,8 @@ namespace TrRouting
             //std::cout << "failed" << std::endl;
             failedCombinations.push_back(combination);
           }
+
+          alternativesCalculatedCount++;
 
           if (params.debugDisplay)
           {
@@ -307,7 +309,10 @@ namespace TrRouting
         }
       }
 
-      std::cout << std::endl;
+      if (params.debugDisplay)
+      {
+        std::cout << std::endl;
+      }
       int i {0};
 
       if (params.debugDisplay)

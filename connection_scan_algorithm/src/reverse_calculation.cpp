@@ -85,26 +85,26 @@ namespace TrRouting
               if (tripExitConnectionIndex == -1) // <= to make sure we get the same result as forward calculation, which uses >
               {
                 tripsExitConnection[tripIndex]                   = i;
-                tripsExitConnectionTransferTravelTime[tripIndex] = std::get<journeyIndexes::TRANSFER_TRAVEL_TIME>(reverseJourneys[nodeArrivalIndex]);
+                tripsExitConnectionTransferTravelTime[tripIndex] = std::get<journeyStepIndexes::TRANSFER_TRAVEL_TIME>(reverseJourneysSteps[nodeArrivalIndex]);
               }
               else if (
-                std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(reverseJourneys[nodeArrivalIndex]) != -1
+                std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(reverseJourneysSteps[nodeArrivalIndex]) != -1
                 &&
-                std::get<journeyIndexes::TRANSFER_TRAVEL_TIME>(reverseJourneys[nodeArrivalIndex]) >= 0 
+                std::get<journeyStepIndexes::TRANSFER_TRAVEL_TIME>(reverseJourneysSteps[nodeArrivalIndex]) >= 0 
                 && 
-                std::get<journeyIndexes::TRANSFER_TRAVEL_TIME>(reverseJourneys[nodeArrivalIndex]) < tripsExitConnectionTransferTravelTime[tripIndex]
+                std::get<journeyStepIndexes::TRANSFER_TRAVEL_TIME>(reverseJourneysSteps[nodeArrivalIndex]) < tripsExitConnectionTransferTravelTime[tripIndex]
               )
               {
                 journeyConnectionMinWaitingTimeSeconds = params.minWaitingTimeSeconds;
-                if(std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*reverseConnections[std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(reverseJourneys[nodeArrivalIndex])].get()) >= 0)
+                if(std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(reverseJourneysSteps[nodeArrivalIndex])].get()) >= 0)
                 {
-                  journeyConnectionMinWaitingTimeSeconds = std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*reverseConnections[std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(reverseJourneys[nodeArrivalIndex])].get());
+                  journeyConnectionMinWaitingTimeSeconds = std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(reverseJourneysSteps[nodeArrivalIndex])].get());
                 }
 
                 if (connectionArrivalTime + journeyConnectionMinWaitingTimeSeconds <= nodeArrivalTentativeTime)
                 {
                   tripsExitConnection[tripIndex]                   = i;
-                  tripsExitConnectionTransferTravelTime[tripIndex] = std::get<journeyIndexes::TRANSFER_TRAVEL_TIME>(reverseJourneys[nodeArrivalIndex]);
+                  tripsExitConnectionTransferTravelTime[tripIndex] = std::get<journeyStepIndexes::TRANSFER_TRAVEL_TIME>(reverseJourneysSteps[nodeArrivalIndex]);
                 }
               }
 
@@ -139,22 +139,22 @@ namespace TrRouting
                   {
                     footpathDistance = nodes[nodeDepartureIndex].get()->reverseTransferableDistancesMeters[footpathIndex];
                     nodesReverseTentativeTime[transferableNodeIndex] = connectionDepartureTime - footpathTravelTime - connectionMinWaitingTimeSeconds;
-                    reverseJourneys[transferableNodeIndex]           = std::make_tuple(i, tripsExitConnection[tripIndex], nodeDepartureIndex, tripIndex, footpathTravelTime, (nodeDepartureIndex == transferableNodeIndex ? 1 : -1), footpathDistance);
+                    reverseJourneysSteps[transferableNodeIndex]           = std::make_tuple(i, tripsExitConnection[tripIndex], nodeDepartureIndex, tripIndex, footpathTravelTime, (nodeDepartureIndex == transferableNodeIndex ? 1 : -1), footpathDistance);
                   }
                   if (
                     nodeDepartureIndex == transferableNodeIndex
                     && 
                     (
-                      std::get<journeyIndexes::TRANSFER_TRAVEL_TIME>(reverseAccessJourneys[transferableNodeIndex]) == -1 
+                      std::get<journeyStepIndexes::TRANSFER_TRAVEL_TIME>(reverseAccessJourneysSteps[transferableNodeIndex]) == -1 
                       || 
-                      std::get<connectionIndexes::TIME_DEP>(*reverseConnections[std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(reverseAccessJourneys[transferableNodeIndex])].get()) <= connectionDepartureTime - connectionMinWaitingTimeSeconds
+                      std::get<connectionIndexes::TIME_DEP>(*reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(reverseAccessJourneysSteps[transferableNodeIndex])].get()) <= connectionDepartureTime - connectionMinWaitingTimeSeconds
                     )
                   )
                   {
                     if (initialDepartureTimeSeconds == -1 || connectionDepartureTime - nodesAccessTravelTime[nodeDepartureIndex] - connectionMinWaitingTimeSeconds >= initialDepartureTimeSeconds)
                     {
                       footpathDistance = nodes[nodeDepartureIndex].get()->reverseTransferableDistancesMeters[footpathIndex];
-                      reverseAccessJourneys[transferableNodeIndex] = std::make_tuple(i, tripsExitConnection[tripIndex], nodeDepartureIndex, tripIndex, footpathTravelTime, 1, footpathDistance);
+                      reverseAccessJourneysSteps[transferableNodeIndex] = std::make_tuple(i, tripsExitConnection[tripIndex], nodeDepartureIndex, tripIndex, footpathTravelTime, 1, footpathDistance);
                     }
                   }
                 }
@@ -182,7 +182,7 @@ namespace TrRouting
       i = 0;
       for (auto & accessFootpath : accessFootpaths)
       {
-        accessEnterConnection  = std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(reverseAccessJourneys[std::get<0>(accessFootpath)]);
+        accessEnterConnection  = std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(reverseAccessJourneysSteps[std::get<0>(accessFootpath)]);
         if (accessEnterConnection != -1)
         {
           accessTravelTime                           = nodesAccessTravelTime[std::get<0>(accessFootpath)];

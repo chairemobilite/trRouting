@@ -37,7 +37,7 @@ namespace TrRouting
       
       if (params.returnAllNodesResult)
       {
-        result = forwardJourney(bestArrivalTime, bestEgressNodeIndex, bestEgressTravelTime, bestEgressDistance);
+        result = forwardJourneyStep(bestArrivalTime, bestEgressNodeIndex, bestEgressTravelTime, bestEgressDistance);
         if (params.debugDisplay)
           std::cerr << "-- forward journey -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
         calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
@@ -62,7 +62,7 @@ namespace TrRouting
             std::cerr << "-- reverse calculation -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
           calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
           
-          result = reverseJourney(bestDepartureTime, bestAccessNodeIndex, bestAccessTravelTime, bestAccessDistance);
+          result = reverseJourneyStep(bestDepartureTime, bestAccessNodeIndex, bestAccessTravelTime, bestAccessDistance);
           if (params.debugDisplay)
             std::cerr << "-- reverse journey -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
           calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
@@ -71,7 +71,7 @@ namespace TrRouting
         else
         {
           
-          result = forwardJourney(bestArrivalTime, bestEgressNodeIndex, bestEgressTravelTime, bestEgressDistance);
+          result = forwardJourneyStep(bestArrivalTime, bestEgressNodeIndex, bestEgressTravelTime, bestEgressDistance);
           if (params.debugDisplay)
             std::cerr << "-- forward journey -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
           calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
@@ -93,7 +93,7 @@ namespace TrRouting
         std::cerr << "-- reverse calculation -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
       calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
 
-      result = reverseJourney(bestDepartureTime, bestAccessNodeIndex, bestAccessTravelTime, bestAccessDistance);
+      result = reverseJourneyStep(bestDepartureTime, bestAccessNodeIndex, bestAccessTravelTime, bestAccessDistance);
       if (params.debugDisplay)
         std::cerr << "-- reverse journey -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
       calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();

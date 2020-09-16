@@ -128,15 +128,253 @@ namespace TrRouting
         }
         journey.push_back(std::make_tuple(-1,-1,-1,-1,nodesEgressTravelTime[bestEgressNodeIndex],-1,nodesEgressDistance[bestEgressNodeIndex]));
 
+        CalculationTime algorithmCalculationTime = CalculationTime();
+        algorithmCalculationTime.start();
+        long long       calculationTime;
+        calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
+
+        // start of remove superfluous segments:
+        json["canBeOptimized"] = nlohmann::json::array();
+
+        int  nodeToSplitIdx {-1};
+        std::vector<int> ignoreNodesidx;
+        bool startedCheckingSuperfluousJourneys {false};
+
+        while(startedCheckingSuperfluousJourneys == false || nodeToSplitIdx != -1)
+        {
+          startedCheckingSuperfluousJourneys = true;
+          nodeToSplitIdx                     = -1;
+
+          std::vector<int> allJourneyNodesInSequence;
+          int  journeyIdx                   {-1};
+          int  beforeCutJourneyIdx          {-1};
+          int  cutJourneyIdx                {-1};
+          int  tripIdx                      {-1};
+          int  sequenceStartIdx             {-1};
+          int  sequenceEndIdx               {-1};
+          int  nodeStartIdx                 {-1};
+          int  nodeEndIdx                   {-1};
+          int  nodeIdx                      {-1};
+          int  nodeDepartureIdx             {-1};
+          int  nodeArrivalIdx               {-1};
+          int  previousNodeIdx              {-1};
+          int  connectionIdx                {-1};
+          int  footpathTravelTime           {-1};
+          int  footpathDistance             {-1};
+          int  footpathIndex                {-1};
+          int  beforeCutExitConnectionIdx   {-1};
+          bool madeChanged                  {false};
+          //bool foundNodeToSplitInJourney {false};
+          //bool isBeforeOrAfterCutJourney {false};
+
+          journeyIdx =  0;
+          for (auto & journeyStep : journey)
+          {
+
+            if (std::get<journeyStepIndexes::FINAL_TRIP>(journeyStep) && std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journeyStep) != -1 && std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION>(journeyStep) != -1)
+            {
+              previousNodeIdx  = -1;
+              connectionIdx    = -1;
+              tripIdx          = std::get<journeyStepIndexes::FINAL_TRIP>(journeyStep);
+              sequenceStartIdx = std::get<connectionIndexes::SEQUENCE>(*(reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journeyStep)].get())) - 1;
+              sequenceEndIdx   = std::get<connectionIndexes::SEQUENCE>(*(reverseConnections[std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION >(journeyStep)].get())) - 1;
+              nodeStartIdx     = std::get<connectionIndexes::NODE_DEP>(*(reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journeyStep)].get()));
+              nodeEndIdx       = std::get<connectionIndexes::NODE_ARR>(*(reverseConnections[std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION >(journeyStep)].get()));
+
+              std::vector<int> journeyNodesInSequence;
+
+              journeyNodesInSequence.push_back(nodeStartIdx); // we need to allow same node twice on the same trip (some lines have loops that stop at same node twice)
+
+              //std::cerr << "ss" << sequenceStartIdx  << "/" << ((int)trips[tripIdx]->reverseConnections.size() - sequenceEndIdx) << " | " << "se" << sequenceEndIdx << "/" << ((int)trips[tripIdx]->reverseConnections.size() - sequenceStartIdx) << std::endl;
+              std::cerr << " Line " << lines[trips[tripIdx]->lineIdx]->shortname << std::endl;
+              std::cerr << " Start " << nodes[nodeStartIdx]->code << " /// ";
+              // ignore start node in the connections (we already have it and we don't want to check if it is repeated because at each transfer at same node, it will be and that is correct)
+              for(int sequenceIdx = sequenceStartIdx + 1; sequenceIdx <= sequenceEndIdx; ++sequenceIdx)
+              //for(auto connection = trips[tripIdx]->reverseConnections.end() - sequenceEndIdx - 1; connection <= trips[tripIdx]->reverseConnections.end() - sequenceStartIdx - 1; ++connection)
+              {
+                connectionIdx = trips[tripIdx]->forwardConnectionsIdx[sequenceIdx];
+                nodeIdx       = std::get<connectionIndexes::NODE_DEP>(*(forwardConnections[connectionIdx]));
+                // check if node was seen before on another segment (make sure we ignore if the same node is repeated on the same trip (this can happen when importing from gtfs data with very short distance between some consecutive stops)):
+                if (std::find(allJourneyNodesInSequence.begin(), allJourneyNodesInSequence.end(), nodeIdx) != allJourneyNodesInSequence.end() && std::find(ignoreNodesidx.begin(), ignoreNodesidx.end(), nodeIdx) == ignoreNodesidx.end())
+                {
+                  json["canBeOptimized"].push_back(nodes[nodeIdx]->code);
+                  nodeToSplitIdx = nodeIdx;
+                }
+                journeyNodesInSequence.push_back(nodeIdx);
+                
+                std::cerr << nodes[nodeIdx]->code << " ";
+              }
+
+              if (std::find(allJourneyNodesInSequence.begin(), allJourneyNodesInSequence.end(), nodeEndIdx) != allJourneyNodesInSequence.end() && std::find(ignoreNodesidx.begin(), ignoreNodesidx.end(), nodeEndIdx) == ignoreNodesidx.end())
+              {
+                json["canBeOptimized"].push_back(nodes[nodeEndIdx]->code);
+                nodeToSplitIdx = nodeEndIdx;
+              }
+
+              journeyNodesInSequence.push_back(nodeEndIdx);
+              
+              int sequenceI {0};
+              for (int sequenceI = 0; sequenceI < journeyNodesInSequence.size(); ++sequenceI)
+              {
+                allJourneyNodesInSequence.push_back(journeyNodesInSequence[sequenceI]);
+              }
+
+              std::cerr << " /// End " << nodes[nodeEndIdx]->code << std::endl;
+            }
+            journeyIdx++;
+          }
+
+          if (nodeToSplitIdx == -1)
+          {
+            //std::cerr << "did not find any node to split" << std::endl;
+            break;
+          }
+
+          std::cerr << "found node to split: " << nodes[nodeToSplitIdx]->name << " [" << nodes[nodeToSplitIdx]->code << "]" << std::endl;
+
+          // put back journey nodes in forward order:
+          //std::reverse(allJourneyNodesInSequence.begin(), allJourneyNodesInSequence.end());
+
+          tripIdx                    = -1;
+          sequenceStartIdx           = -1;
+          sequenceEndIdx             = -1;
+          nodeStartIdx               = -1;
+          nodeEndIdx                 = -1;
+          nodeIdx                    = -1;
+          nodeDepartureIdx           = -1;
+          nodeArrivalIdx             = -1;
+          connectionIdx              = -1;
+          footpathTravelTime         = -1;
+          footpathDistance           = -1;
+          footpathIndex              = -1;
+          journeyIdx                 =  0;
+          cutJourneyIdx              = -1;
+          beforeCutExitConnectionIdx = -1;
+          madeChanged                = false;
+          //isBeforeOrAfterCutJourney = false;
+
+          for (auto & journeyStep : journey)
+          {
+            //foundNodeToSplitInJourney = false;
+            if (std::get<journeyStepIndexes::FINAL_TRIP>(journeyStep) && std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journeyStep) != -1 && std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION>(journeyStep) != -1)
+            {
+              tripIdx          = std::get<journeyStepIndexes::FINAL_TRIP>(journeyStep);
+              sequenceStartIdx = std::get<connectionIndexes::SEQUENCE>(*(reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journeyStep)].get())) - 1;
+              sequenceEndIdx   = std::get<connectionIndexes::SEQUENCE>(*(reverseConnections[std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION >(journeyStep)].get())) - 1;
+              nodeStartIdx     = std::get<connectionIndexes::NODE_DEP>(*(reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journeyStep)].get()));
+              nodeEndIdx       = std::get<connectionIndexes::NODE_ARR>(*(reverseConnections[std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION >(journeyStep)].get()));
+
+              //std::cerr << " Line " << lines[trips[tripIdx]->lineIdx]->shortname << std::endl;
+              //std::cerr << " sequenceStartIdx: " << sequenceStartIdx << " sequenceEndIdx: " << sequenceEndIdx << " reverseConnectionsCountInTrip " << trips[tripIdx]->reverseConnectionsIdx.size() << std::endl;
+              //std::cerr << " Start " << nodes[nodeStartIdx]->name << " /// ";
+          
+              for(int sequenceIdx = trips[tripIdx]->reverseConnectionsIdx.size() - 1 - sequenceEndIdx; sequenceIdx <= trips[tripIdx]->reverseConnectionsIdx.size() - 1 - sequenceStartIdx; ++sequenceIdx)
+              {
+                connectionIdx    = trips[tripIdx]->reverseConnectionsIdx[sequenceIdx];
+                nodeDepartureIdx = std::get<connectionIndexes::NODE_DEP>(*(reverseConnections[connectionIdx]));
+                nodeArrivalIdx   = std::get<connectionIndexes::NODE_ARR>(*(reverseConnections[connectionIdx]));
+                std::cerr << nodes[nodeDepartureIdx]->code << " ";
+                if (nodes[nodeArrivalIdx]->code == "53057")
+                {
+                  std::cerr << std::endl << " !!!FOUND ARRIVAL 53057!!! " << "nodeToSplitIdx: " << nodes[nodeToSplitIdx]->code << " beforeCutJourneyIdx: " << beforeCutJourneyIdx << std::endl;
+                }
+                if (nodeArrivalIdx == nodeToSplitIdx && beforeCutJourneyIdx == -1)
+                {
+                  beforeCutJourneyIdx        = journeyIdx;
+                  beforeCutExitConnectionIdx = connectionIdx;
+                  //isBeforeOrAfterCutJourney = true;
+                  //foundNodeToSplitInJourney = true;
+                  //std::cerr << " !!! splitting @ " << nodes[nodeToSplitIdx]->name << " !!! ";
+                  break;
+                }
+                else if (nodeDepartureIdx == nodeToSplitIdx && cutJourneyIdx == -1 && beforeCutJourneyIdx >= 0)
+                {
+                  if (nodes[nodeDepartureIdx]->code == "53057")
+                  {
+                    std::cerr << std::endl << " !!!FOUND DEPARTURE 53057!!! " << "nodeToSplitIdx: " << nodes[nodeToSplitIdx]->code << " beforeCutExitConnectionIdx: " << beforeCutExitConnectionIdx << std::endl;
+                  }
+                  if (sequenceIdx == trips[tripIdx]->reverseConnectionsIdx.size() - 1 - sequenceStartIdx) // cut only if the nodeToSplitIdx is the last node of the segment
+                  {
+                    cutJourneyIdx = journeyIdx;
+                  }
+                  //isBeforeOrAfterCutJourney = true;
+                  //std::cerr << "changing exit connection from " << std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION>(journey[journeyIdx - 1]) << " to " << beforeCutExitConnectionIdx;
+                  std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION>(journey[journeyIdx - 1]) = beforeCutExitConnectionIdx;
+                  std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journeyStep) = connectionIdx;
+                  std::get<journeyStepIndexes::TRANSFER_TRAVEL_TIME>(journeyStep)   = 0;
+                  std::get<journeyStepIndexes::TRANSFER_DISTANCE>(journeyStep)      = 0;
+                  madeChanged = true;
+                  break;
+                }
+                else if (nodeDepartureIdx != nodeToSplitIdx && cutJourneyIdx == -1 && beforeCutJourneyIdx >= 0)
+                {
+                  footpathIndex = 0;
+                  for (int & transferableNodeIndex : nodes[nodeDepartureIdx].get()->reverseTransferableNodesIdx)
+                  {
+                    if (transferableNodeIndex == nodeToSplitIdx)
+                    {
+                      footpathTravelTime = params.walkingSpeedFactor == 1.0 ? nodes[nodeDepartureIdx].get()->reverseTransferableTravelTimesSeconds[footpathIndex] : (int)ceil((float)nodes[nodeDepartureIdx].get()->reverseTransferableTravelTimesSeconds[footpathIndex] / params.walkingSpeedFactor);
+                      footpathDistance   = nodes[nodeDepartureIdx].get()->reverseTransferableDistancesMeters[footpathIndex];
+                    }
+                    footpathIndex++;
+                  }
+                  if (footpathTravelTime >= 0)
+                  {
+                    if (sequenceIdx == trips[tripIdx]->reverseConnectionsIdx.size() - 1 - sequenceStartIdx) // cut only if the nodeToSplitIdx is the last node of the segment
+                    {
+                      cutJourneyIdx = journeyIdx;
+                    }
+                    //isBeforeOrAfterCutJourney = true;
+                    //std::cerr << "changing exit connection from " << std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION>(journey[journeyIdx - 1]) << " to " << beforeCutExitConnectionIdx;
+                    std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION>(journey[journeyIdx - 1]) = beforeCutExitConnectionIdx;
+                    std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journeyStep) = connectionIdx;
+                    std::get<journeyStepIndexes::TRANSFER_TRAVEL_TIME>(journeyStep)   = footpathTravelTime;
+                    std::get<journeyStepIndexes::TRANSFER_DISTANCE>(journeyStep)      = footpathDistance;
+                    madeChanged = true;
+                    break;
+                  }
+                  else
+                  {
+                    break;
+                  }
+                 
+                }
+              }
+              
+              //std::cerr << " /// End " << nodes[nodeEndIdx]->name << std::endl;
+              
+              /*if (!isBeforeOrAfterCutJourney && afterCutJourneyIdx == -1 && beforeCutJourneyIdx >= 0)
+              {
+                removeJourneyIdx.push_back(journeyIdx);
+              }*/
+            }
+            if (madeChanged)
+            {
+              break;
+            }
+
+            journeyIdx++;
+          } 
+
+          //std::cerr << " cutJourneyIdx: " << cutJourneyIdx << std::endl;
+
+          if (cutJourneyIdx >= 0)
+          {
+            journey.erase(journey.begin() + cutJourneyIdx);
+          }
+          else // could not split correctly...
+          {
+            ignoreNodesidx.push_back(nodeToSplitIdx);
+          }
+        
+        }
+
         
 
+        std::cerr << "-- remove superfluous segments -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
 
+        // end of remove superfuous segments
 
-
-        optimizeJourney(journey);
-
-
-        
 
 
 

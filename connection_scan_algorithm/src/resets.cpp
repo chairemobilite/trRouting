@@ -33,11 +33,11 @@ namespace TrRouting
     {
       std::fill(tripsEnabled.begin(), tripsEnabled.end(), 1);
     }
-    std::fill(tripsUsable.begin()          , tripsUsable.end()          , -1);
-    std::fill(forwardJourneys.begin()      , forwardJourneys.end()      , JourneyTuple(-1,-1,-1,-1,-1,-1,-1));
-    std::fill(forwardEgressJourneys.begin(), forwardEgressJourneys.end(), JourneyTuple(-1,-1,-1,-1,-1,-1,-1));
-    std::fill(reverseJourneys.begin()      , reverseJourneys.end()      , JourneyTuple(-1,-1,-1,-1,-1,-1,-1));
-    std::fill(reverseAccessJourneys.begin(), reverseAccessJourneys.end(), JourneyTuple(-1,-1,-1,-1,-1,-1,-1));
+    std::fill(tripsUsable.begin()               , tripsUsable.end()               , -1);
+    std::fill(forwardJourneysSteps.begin()      , forwardJourneysSteps.end()      , JourneyTuple(-1,-1,-1,-1,-1,-1,-1));
+    std::fill(forwardEgressJourneysSteps.begin(), forwardEgressJourneysSteps.end(), JourneyTuple(-1,-1,-1,-1,-1,-1,-1));
+    std::fill(reverseJourneysSteps.begin()      , reverseJourneysSteps.end()      , JourneyTuple(-1,-1,-1,-1,-1,-1,-1));
+    std::fill(reverseAccessJourneysSteps.begin(), reverseAccessJourneysSteps.end(), JourneyTuple(-1,-1,-1,-1,-1,-1,-1));
     
     departureTimeSeconds = -1;
     arrivalTimeSeconds   = -1;
@@ -126,7 +126,7 @@ namespace TrRouting
 
         nodesAccessTravelTime[std::get<0>(accessFootpath)] = footpathTravelTimeSeconds;
         nodesAccessDistance[std::get<0>(accessFootpath)]   = footpathDistanceMeters;
-        forwardJourneys[std::get<0>(accessFootpath)]       = std::make_tuple(-1, -1, -1, -1, footpathTravelTimeSeconds, -1, footpathDistanceMeters);
+        forwardJourneysSteps[std::get<0>(accessFootpath)]  = std::make_tuple(-1, -1, -1, -1, footpathTravelTimeSeconds, -1, footpathDistanceMeters);
         nodesTentativeTime[std::get<0>(accessFootpath)]    = departureTimeSeconds + footpathTravelTimeSeconds;
         if (footpathTravelTimeSeconds < minAccessTravelTime)
         {
@@ -193,7 +193,7 @@ namespace TrRouting
         footpathDistanceMeters     = std::get<2>(egressFootpath);
         nodesEgressTravelTime[std::get<0>(egressFootpath)]     = footpathTravelTimeSeconds;
         nodesEgressDistance[std::get<0>(egressFootpath)]       = footpathDistanceMeters;
-        reverseJourneys[std::get<0>(egressFootpath)]           = std::make_tuple(-1, -1, -1, -1, footpathTravelTimeSeconds, -1, footpathDistanceMeters);
+        reverseJourneysSteps[std::get<0>(egressFootpath)]      = std::make_tuple(-1, -1, -1, -1, footpathTravelTimeSeconds, -1, footpathDistanceMeters);
         nodesReverseTentativeTime[std::get<0>(egressFootpath)] = arrivalTimeSeconds - footpathTravelTimeSeconds;
         if (footpathTravelTimeSeconds > maxEgressTravelTime)
         {

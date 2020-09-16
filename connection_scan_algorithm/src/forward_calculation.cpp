@@ -89,18 +89,18 @@ namespace TrRouting
                 tripEnterConnectionIndex == -1 
                 /*|| 
                 (
-                  std::get<journeyIndexes::FINAL_ENTER_CONNECTION>(forwardJourneys[nodeDepartureIndex]) == -1 
+                  std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(forwardJourneysSteps[nodeDepartureIndex]) == -1 
                   &&
-                  std::get<journeyIndexes::TRANSFER_TRAVEL_TIME>(forwardJourneys[nodeDepartureIndex]) >= 0 
+                  std::get<journeyStepIndexes::TRANSFER_TRAVEL_TIME>(forwardJourneysSteps[nodeDepartureIndex]) >= 0 
                   && 
-                  std::get<journeyIndexes::TRANSFER_TRAVEL_TIME>(forwardJourneys[nodeDepartureIndex]) < tripsEnterConnectionTransferTravelTime[tripIndex]
+                  std::get<journeyStepIndexes::TRANSFER_TRAVEL_TIME>(forwardJourneysSteps[nodeDepartureIndex]) < tripsEnterConnectionTransferTravelTime[tripIndex]
                 )*/
               )
             )
             {
               tripsUsable[tripIndex]                            = 1;
               tripsEnterConnection[tripIndex]                   = i;
-              tripsEnterConnectionTransferTravelTime[tripIndex] = std::get<journeyIndexes::TRANSFER_TRAVEL_TIME>(forwardJourneys[nodeDepartureIndex]);
+              tripsEnterConnectionTransferTravelTime[tripIndex] = std::get<journeyStepIndexes::TRANSFER_TRAVEL_TIME>(forwardJourneysSteps[nodeDepartureIndex]);
             }
             
             if (std::get<connectionIndexes::CAN_UNBOARD>(**connection) == 1 && tripsEnterConnection[tripIndex] != -1)
@@ -131,20 +131,20 @@ namespace TrRouting
                   {
                     footpathDistance = nodes[nodeArrivalIndex].get()->transferableDistancesMeters[footpathIndex];
                     nodesTentativeTime[transferableNodeIndex] = footpathTravelTime + connectionArrivalTime;
-                    forwardJourneys[transferableNodeIndex]    = std::make_tuple(tripsEnterConnection[tripIndex], i, nodeArrivalIndex, tripIndex, footpathTravelTime, (nodeArrivalIndex == transferableNodeIndex ? 1 : -1), footpathDistance);
+                    forwardJourneysSteps[transferableNodeIndex]    = std::make_tuple(tripsEnterConnection[tripIndex], i, nodeArrivalIndex, tripIndex, footpathTravelTime, (nodeArrivalIndex == transferableNodeIndex ? 1 : -1), footpathDistance);
                   }
                   if (
                     nodeArrivalIndex == transferableNodeIndex 
                     && 
                     (
-                      std::get<journeyIndexes::TRANSFER_TRAVEL_TIME>(forwardEgressJourneys[transferableNodeIndex]) == -1 
+                      std::get<journeyStepIndexes::TRANSFER_TRAVEL_TIME>(forwardEgressJourneysSteps[transferableNodeIndex]) == -1 
                       ||
-                      std::get<connectionIndexes::TIME_ARR>(*forwardConnections[std::get<journeyIndexes::FINAL_EXIT_CONNECTION>(forwardEgressJourneys[transferableNodeIndex])]) > connectionArrivalTime
+                      std::get<connectionIndexes::TIME_ARR>(*forwardConnections[std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION>(forwardEgressJourneysSteps[transferableNodeIndex])]) > connectionArrivalTime
                     )
                   )
                   {
                     footpathDistance = nodes[nodeArrivalIndex].get()->transferableDistancesMeters[footpathIndex];
-                    forwardEgressJourneys[transferableNodeIndex] = std::make_tuple(tripsEnterConnection[tripIndex], i, nodeArrivalIndex, tripIndex, footpathTravelTime, 1, footpathDistance);
+                    forwardEgressJourneysSteps[transferableNodeIndex] = std::make_tuple(tripsEnterConnection[tripIndex], i, nodeArrivalIndex, tripIndex, footpathTravelTime, 1, footpathDistance);
                   }
                 }
                 footpathIndex++;
@@ -171,7 +171,7 @@ namespace TrRouting
       for (auto & egressFootpath : egressFootpaths)
       {
         //std::cerr << nodes[std::get<0>(egressFootpath)].get()->name << std::endl;
-        egressExitConnection  = std::get<journeyIndexes::FINAL_EXIT_CONNECTION>(forwardEgressJourneys[std::get<0>(egressFootpath)]);
+        egressExitConnection  = std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION>(forwardEgressJourneysSteps[std::get<0>(egressFootpath)]);
         if (egressExitConnection != -1)
         {
           egressTravelTime      = nodesEgressTravelTime[std::get<0>(egressFootpath)];

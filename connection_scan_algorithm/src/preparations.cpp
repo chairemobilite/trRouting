@@ -65,18 +65,18 @@ namespace TrRouting
     nodesEgressDistance.clear();
     nodesEgressDistance.shrink_to_fit();
     nodesEgressDistance.resize(nodes.size());
-    forwardJourneys.clear();
-    forwardJourneys.shrink_to_fit();
-    forwardJourneys.resize(nodes.size());
-    forwardEgressJourneys.clear();
-    forwardEgressJourneys.shrink_to_fit();
-    forwardEgressJourneys.resize(nodes.size());
-    reverseJourneys.clear();
-    reverseJourneys.shrink_to_fit();
-    reverseJourneys.resize(nodes.size());
-    reverseAccessJourneys.clear();
-    reverseAccessJourneys.shrink_to_fit();
-    reverseAccessJourneys.resize(nodes.size());
+    forwardJourneysSteps.clear();
+    forwardJourneysSteps.shrink_to_fit();
+    forwardJourneysSteps.resize(nodes.size());
+    forwardEgressJourneysSteps.clear();
+    forwardEgressJourneysSteps.shrink_to_fit();
+    forwardEgressJourneysSteps.resize(nodes.size());
+    reverseJourneysSteps.clear();
+    reverseJourneysSteps.shrink_to_fit();
+    reverseJourneysSteps.resize(nodes.size());
+    reverseAccessJourneysSteps.clear();
+    reverseAccessJourneysSteps.shrink_to_fit();
+    reverseAccessJourneysSteps.resize(nodes.size());
   }
 
   /*void Calculator::updateStopsFromCache(Parameters& params, std::string customPath)
