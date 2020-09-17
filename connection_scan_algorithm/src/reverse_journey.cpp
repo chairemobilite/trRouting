@@ -131,28 +131,35 @@ namespace TrRouting
         
 
 
-        json["optimizeCases"] = nlohmann::json::array();
+        std::string optimizeCasesStr = "";
         std::vector<int> optimizeCases = optimizeJourney(journey);
 
         for (int optimizeCase : optimizeCases)
         {
           if (optimizeCase == 1)
           {
-            json["optimizeCases"].push_back("CSL");
+            optimizeCasesStr += "CSL|";
           }
           else if (optimizeCase == 2)
           {
-            json["optimizeCases"].push_back("BTS");
+            optimizeCasesStr += "BTS|";
           }
           else if (optimizeCase == 3)
           {
-            json["optimizeCases"].push_back("GTF");
+            optimizeCasesStr += "GTF|";
           }
           else if (optimizeCase == 4)
           {
-            json["optimizeCases"].push_back("CSS");
+            optimizeCasesStr += "CSS|";
           }
         }
+
+        if (optimizeCasesStr.size() > 0)
+        {
+          optimizeCasesStr.pop_back();
+        }
+
+        json["optimizeCases"] = optimizeCasesStr;
 
 
 

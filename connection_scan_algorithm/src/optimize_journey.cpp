@@ -101,7 +101,7 @@ namespace TrRouting
               commonNodeI = std::find(inBetweenNodesIdxByJourneyStepIdx[i].begin(), inBetweenNodesIdxByJourneyStepIdx[i].end(), firstNodeIdxByJourneyStepIdx[journeyStepIdx]);
               if (commonNodeI != inBetweenNodesIdxByJourneyStepIdx[i].end() && std::find(ignoreOptimizationNodesIdx.begin(), ignoreOptimizationNodesIdx.end(), firstNodeIdxByJourneyStepIdx[journeyStepIdx]) == ignoreOptimizationNodesIdx.end())
               {
-                optimizationCase    = 2;
+                optimizationCase    = 3;
                 optimizationNodeIdx = firstNodeIdxByJourneyStepIdx[journeyStepIdx];
                 fromJourneyStepIdx  = i;
                 toJourneyStepIdx    = journeyStepIdx;
@@ -193,11 +193,9 @@ namespace TrRouting
         int tripIdx          = std::get<journeyStepIndexes::FINAL_TRIP>(journey[toJourneyStepIdx]);
         int sequenceStartIdx = std::get<connectionIndexes::SEQUENCE>(*(reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journey[toJourneyStepIdx])].get())) - 1;
         int sequenceEndIdx   = std::get<connectionIndexes::SEQUENCE>(*(reverseConnections[std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION >(journey[toJourneyStepIdx])].get())) - 1;
-
         for(int sequenceIdx = trips[tripIdx]->reverseConnectionsIdx.size() - 1 - sequenceEndIdx; sequenceIdx <= trips[tripIdx]->reverseConnectionsIdx.size() - 1 - sequenceStartIdx; ++sequenceIdx)
         {
           int connectionIdx = trips[tripIdx]->reverseConnectionsIdx[sequenceIdx];
-          
           if (optimizationNodeIdx == std::get<connectionIndexes::NODE_DEP>(*(reverseConnections[connectionIdx])))
           {
             if (std::get<connectionIndexes::CAN_BOARD>(*(reverseConnections[connectionIdx])) != 1)
@@ -215,7 +213,7 @@ namespace TrRouting
             }
           }
         }
-        //optimizationCase = -1;
+        optimizationCase = -1;
       }
 
       else if (optimizationCase == 3) // GTF // untested
