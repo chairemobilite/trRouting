@@ -3,13 +3,15 @@
 namespace TrRouting
 {
   
-  void Calculator::optimizeJourney(std::deque<std::tuple<int,int,int,int,int,short,int>> &journey)
+  std::vector<int> Calculator::optimizeJourney(std::deque<std::tuple<int,int,int,int,int,short,int>> &journey)
   {
 
     CalculationTime algorithmCalculationTime = CalculationTime();
     algorithmCalculationTime.start();
     long long       calculationTime;
     calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
+
+    std::vector<int> usedOptimizationCases;
 
     //json["optimizedNodes"] = nlohmann::json::array();
 
@@ -52,7 +54,11 @@ namespace TrRouting
           // get in-between nodes for the journet step trip segment (boarding and unboarding excluded):
           for(int sequenceIdx = sequenceStartIdx + 1; sequenceIdx <= sequenceEndIdx; ++sequenceIdx)
           {
-            inBetweenNodesIdxByJourneyStepIdx[journeyStepIdx].push_back( std::get<connectionIndexes::NODE_DEP>(*(forwardConnections[ trips[tripIdx]->forwardConnectionsIdx[sequenceIdx] ])) );
+            int nodeDepIdx = std::get<connectionIndexes::NODE_DEP>(*(forwardConnections[ trips[tripIdx]->forwardConnectionsIdx[sequenceIdx] ]));
+            if (nodeDepIdx != firstNodeIdxByJourneyStepIdx[journeyStepIdx] && nodeDepIdx != lastNodeIdxByJourneyStepIdx[journeyStepIdx]) // ignore repeated nodes at beginning or end
+            {
+              inBetweenNodesIdxByJourneyStepIdx[journeyStepIdx].push_back( std::get<connectionIndexes::NODE_DEP>(*(forwardConnections[ trips[tripIdx]->forwardConnectionsIdx[sequenceIdx] ])) );
+            }
           }
           
           for (int i = 0; i < journeyStepIdx; i++)
@@ -131,7 +137,10 @@ namespace TrRouting
 
           if (optimizationCase >= 0) // no need to check further journey steps if we found an optimization node already
           {
-            std::cerr << " Found optimization case: " << optimizationCase << " @node: " << nodes[optimizationNodeIdx]->name << "[" << nodes[optimizationNodeIdx]->code << "]" << std::endl;
+            if (params.debugDisplay)
+            {
+              std::cerr << " Found optimization case: " << optimizationCase << " @node: " << nodes[optimizationNodeIdx]->name << "[" << nodes[optimizationNodeIdx]->code << "]" << std::endl;
+            }
             break;
           }
 
@@ -161,6 +170,7 @@ namespace TrRouting
             }
             else
             {
+              usedOptimizationCases.push_back(1);
               if (toJourneyStepIdx - fromJourneyStepIdx == 1)
               {
                 journey.erase(journey.begin() + toJourneyStepIdx);
@@ -177,14 +187,64 @@ namespace TrRouting
 
       }
 
-      else if (optimizationCase == 2) // BTS
+      else if (optimizationCase == 2) // BTS // untested
       {
-        optimizationCase = -1;
+
+        int tripIdx          = std::get<journeyStepIndexes::FINAL_TRIP>(journey[toJourneyStepIdx]);
+        int sequenceStartIdx = std::get<connectionIndexes::SEQUENCE>(*(reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journey[toJourneyStepIdx])].get())) - 1;
+        int sequenceEndIdx   = std::get<connectionIndexes::SEQUENCE>(*(reverseConnections[std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION >(journey[toJourneyStepIdx])].get())) - 1;
+
+        for(int sequenceIdx = trips[tripIdx]->reverseConnectionsIdx.size() - 1 - sequenceEndIdx; sequenceIdx <= trips[tripIdx]->reverseConnectionsIdx.size() - 1 - sequenceStartIdx; ++sequenceIdx)
+        {
+          int connectionIdx = trips[tripIdx]->reverseConnectionsIdx[sequenceIdx];
+          
+          if (optimizationNodeIdx == std::get<connectionIndexes::NODE_DEP>(*(reverseConnections[connectionIdx])))
+          {
+            if (std::get<connectionIndexes::CAN_BOARD>(*(reverseConnections[connectionIdx])) != 1)
+            {
+              ignoreOptimizationNodesIdx.push_back(optimizationNodeIdx);
+              break;
+            }
+            else
+            {
+              usedOptimizationCases.push_back(2);
+              std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journey[toJourneyStepIdx]) = connectionIdx;
+              std::get<journeyStepIndexes::TRANSFER_TRAVEL_TIME>(journey[toJourneyStepIdx])   = 0;
+              std::get<journeyStepIndexes::TRANSFER_DISTANCE>(journey[toJourneyStepIdx])      = 0;
+              break;
+            }
+          }
+        }
+        //optimizationCase = -1;
       }
 
-      else if (optimizationCase == 3) // GTF
+      else if (optimizationCase == 3) // GTF // untested
       {
-        optimizationCase = -1;
+        int tripIdx          = std::get<journeyStepIndexes::FINAL_TRIP>(journey[fromJourneyStepIdx]);
+        int sequenceStartIdx = std::get<connectionIndexes::SEQUENCE>(*(reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journey[fromJourneyStepIdx])].get())) - 1;
+        int sequenceEndIdx   = std::get<connectionIndexes::SEQUENCE>(*(reverseConnections[std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION >(journey[fromJourneyStepIdx])].get())) - 1;
+
+        for(int sequenceIdx = trips[tripIdx]->reverseConnectionsIdx.size() - 1 - sequenceEndIdx; sequenceIdx <= trips[tripIdx]->reverseConnectionsIdx.size() - 1 - sequenceStartIdx; ++sequenceIdx)
+        {
+          int connectionIdx = trips[tripIdx]->reverseConnectionsIdx[sequenceIdx];
+          
+          if (optimizationNodeIdx == std::get<connectionIndexes::NODE_ARR>(*(reverseConnections[connectionIdx])))
+          {
+            if (std::get<connectionIndexes::CAN_UNBOARD>(*(reverseConnections[connectionIdx])) != 1)
+            {
+              ignoreOptimizationNodesIdx.push_back(optimizationNodeIdx);
+              break;
+            }
+            else
+            {
+              usedOptimizationCases.push_back(3);
+              std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION>(journey[fromJourneyStepIdx]) = connectionIdx;
+              std::get<journeyStepIndexes::TRANSFER_TRAVEL_TIME>(journey[toJourneyStepIdx])    = 0;
+              std::get<journeyStepIndexes::TRANSFER_DISTANCE>(journey[toJourneyStepIdx])       = 0;
+              break;
+            }
+          }
+        }
       }
 
       else if (optimizationCase == 4) // CSS
@@ -197,20 +257,20 @@ namespace TrRouting
         int departureJourneyStepSequenceStartIdx = std::get<connectionIndexes::SEQUENCE>(*(reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journey[toJourneyStepIdx])].get())) - 1;
         int departureJourneyStepSequenceEndIdx   = std::get<connectionIndexes::SEQUENCE>(*(reverseConnections[std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION >(journey[toJourneyStepIdx])].get())) - 1;
 
-        
+        int  exitConnectionIdx {-1};
+
         {
           for(int sequenceIdx = trips[arrivalJourneyStepTripIdx]->reverseConnectionsIdx.size() - 1 - arrivalJourneyStepSequenceEndIdx; sequenceIdx <= trips[arrivalJourneyStepTripIdx]->reverseConnectionsIdx.size() - 1 - arrivalJourneyStepSequenceStartIdx; ++sequenceIdx)
           {
             int connectionIdx = trips[arrivalJourneyStepTripIdx]->reverseConnectionsIdx[sequenceIdx];
             if (optimizationNodeIdx == std::get<connectionIndexes::NODE_ARR>(*(reverseConnections[ trips[arrivalJourneyStepTripIdx]->reverseConnectionsIdx[sequenceIdx] ])))
             {
-              if (std::get<connectionIndexes::CAN_UNBOARD>(*(reverseConnections[ trips[arrivalJourneyStepTripIdx  ]->reverseConnectionsIdx[sequenceIdx] ])) == 1)
+              if (std::get<connectionIndexes::CAN_UNBOARD>(*(reverseConnections[ trips[arrivalJourneyStepTripIdx]->reverseConnectionsIdx[sequenceIdx] ])) == 1)
               {
-                std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION>(journey[fromJourneyStepIdx]) = connectionIdx;
+                exitConnectionIdx = connectionIdx;
               }
               else
               {
-                ignoreOptimizationNodesIdx.push_back(optimizationNodeIdx);
                 break;
               }
             }
@@ -221,9 +281,11 @@ namespace TrRouting
             int connectionIdx = trips[departureJourneyStepTripIdx]->reverseConnectionsIdx[sequenceIdx];
             if (optimizationNodeIdx == std::get<connectionIndexes::NODE_DEP>(*(reverseConnections[ trips[departureJourneyStepTripIdx]->reverseConnectionsIdx[sequenceIdx] ])))
             {
-              if (std::get<connectionIndexes::CAN_BOARD>(*(reverseConnections[ trips[departureJourneyStepTripIdx  ]->reverseConnectionsIdx[sequenceIdx] ])) == 1)
+              if (exitConnectionIdx >= 0 && std::get<connectionIndexes::CAN_BOARD>(*(reverseConnections[ trips[departureJourneyStepTripIdx]->reverseConnectionsIdx[sequenceIdx] ])) == 1)
               {
-                std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journey[toJourneyStepIdx]) = connectionIdx;
+                usedOptimizationCases.push_back(4);
+                std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION>(journey[fromJourneyStepIdx]) = exitConnectionIdx;
+                std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journey[toJourneyStepIdx])  = connectionIdx;
               }
               else
               {
@@ -235,15 +297,16 @@ namespace TrRouting
         }
 
       }
-      // temporary start
-      //optimizationCase = -1;
-      // temporary end
 
     }
 
 
+    if (params.debugDisplay)
+    {
+      std::cerr << "-- remove superfluous segments -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
+    }
 
-    std::cerr << "-- remove superfluous segments -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
+    return usedOptimizationCases;
 
 
   }

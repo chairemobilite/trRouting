@@ -89,7 +89,7 @@ namespace TrRouting
     std::string             alternativesRouting();
     std::string             odTripsRouting();
     
-    void                    optimizeJourney(std::deque<std::tuple<int,int,int,int,int,short,int>> &journey);
+    std::vector<int>        optimizeJourney(std::deque<std::tuple<int,int,int,int,int,short,int>> &journey);
 
     void                    updateDataSourcesFromCache(Parameters&  params, std::string customPath = "");
     void                    updateHouseholdsFromCache (Parameters&  params, std::string customPath = "");
