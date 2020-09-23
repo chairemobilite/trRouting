@@ -12,7 +12,7 @@ namespace TrRouting
     int travelTimeSeconds;
     int arrivalTimeSeconds;
     int departureTimeSeconds;
-    int minimizedDepartureTimeSeconds;
+    int initialDepartureTimeSeconds;
     int numberOfTransfers;
     int inVehicleTravelTimeSeconds;
     int transferTravelTimeSeconds;

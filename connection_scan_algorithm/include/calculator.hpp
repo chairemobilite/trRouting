@@ -175,7 +175,7 @@ namespace TrRouting
   private:
     
     enum connectionIndexes : short { NODE_DEP = 0, NODE_ARR = 1, TIME_DEP = 2, TIME_ARR = 3, TRIP = 4, CAN_BOARD = 5, CAN_UNBOARD = 6, SEQUENCE = 7, LINE = 8, BLOCK = 9, CAN_TRANSFER_SAME_LINE = 10, MIN_WAITING_TIME_SECONDS = 11 };
-    enum journeyStepIndexes    : short { FINAL_ENTER_CONNECTION = 0, FINAL_EXIT_CONNECTION = 1, FINAL_TRANSFERRING_NODE = 2, FINAL_TRIP = 3, TRANSFER_TRAVEL_TIME = 4, IS_SAME_NODE_TRANSFER = 5, TRANSFER_DISTANCE = 6 };
+    enum journeyStepIndexes: short { FINAL_ENTER_CONNECTION = 0, FINAL_EXIT_CONNECTION = 1, FINAL_TRANSFERRING_NODE = 2, FINAL_TRIP = 3, TRANSFER_TRAVEL_TIME = 4, IS_SAME_NODE_TRANSFER = 5, TRANSFER_DISTANCE = 6 };
     
     int              departureTimeSeconds;
     int              initialDepartureTimeSeconds;

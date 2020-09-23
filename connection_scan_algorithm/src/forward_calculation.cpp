@@ -29,6 +29,7 @@ namespace TrRouting
     int   tentativeEgressNodeArrivalTime  {MAX_INT};
     bool  reachedAtLeastOneEgressNode     {false};
     bool  canTransferOnSameLine           {false};
+    bool  nodeWasAccessedFromOrigin       {false};
     int   bestEgressNodeIndex             {-1};
     int   bestEgressTravelTime            {-1};
     int   bestEgressDistance              {-1};
@@ -71,10 +72,25 @@ namespace TrRouting
           tripEnterConnectionIndex   = tripsEnterConnection[tripIndex]; // -1 if trip has not yet been used
           nodeDepartureIndex         = std::get<connectionIndexes::NODE_DEP>(**connection);
           nodeDepartureTentativeTime = nodesTentativeTime[nodeDepartureIndex];
-          
+          nodeWasAccessedFromOrigin  = params.maxFirstWaitingTimeSeconds > 0 && nodesAccessTravelTime[nodeDepartureIndex] >= 0 && std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(forwardJourneysSteps[nodeDepartureIndex]) == -1;
+
           // reachable connections only here:
-          if (tripEnterConnectionIndex != -1 || nodeDepartureTentativeTime <= connectionDepartureTime - connectionMinWaitingTimeSeconds)
+          if (
+            (
+              tripEnterConnectionIndex != -1 
+              || 
+              nodeDepartureTentativeTime <= connectionDepartureTime - connectionMinWaitingTimeSeconds
+            )
+            &&
+            (
+              !nodeWasAccessedFromOrigin
+              ||
+              connectionDepartureTime - nodeDepartureTentativeTime <= params.maxFirstWaitingTimeSeconds
+            )
+          )
           {
+
+            
             
             /* Difficult to deal with blocks and no transfer between same line in CSA algorithm! */
             /*lineIndex             = std::get<connectionIndexes::LINE>(**connection);

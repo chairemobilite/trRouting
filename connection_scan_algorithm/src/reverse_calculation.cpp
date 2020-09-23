@@ -69,14 +69,18 @@ namespace TrRouting
             break;
           }
 
-          tripExitConnectionIndex  = tripsExitConnection[tripIndex];
-          nodeArrivalIndex         = std::get<connectionIndexes::NODE_ARR>(**connection);
-          nodeArrivalTentativeTime = nodesReverseTentativeTime[nodeArrivalIndex];
+          tripExitConnectionIndex   = tripsExitConnection[tripIndex];
+          nodeArrivalIndex          = std::get<connectionIndexes::NODE_ARR>(**connection);
+          nodeArrivalTentativeTime  = nodesReverseTentativeTime[nodeArrivalIndex];
           
           //std::cerr << "nodeArrivalTentativeTime: " << nodeArrivalTentativeTime << " connectionArrivalTime: " << connectionArrivalTime << " tripExitConnectionIndex: " << tripExitConnectionIndex << std::endl;
           
           // reachable connections only here:
-          if (tripExitConnectionIndex != -1 || nodeArrivalTentativeTime >= connectionArrivalTime)
+          if (
+            tripExitConnectionIndex != -1
+            ||
+            nodeArrivalTentativeTime >= connectionArrivalTime
+          )
           {
             
             if (std::get<connectionIndexes::CAN_UNBOARD>(**connection) == 1)
@@ -119,8 +123,17 @@ namespace TrRouting
 
               if (!params.returnAllNodesResult && !reachedAtLeastOneAccessNode && nodesAccessTravelTime[nodeDepartureIndex] != -1) // check if the departure node is accessable
               {
-                reachedAtLeastOneAccessNode      = true;
-                tentativeAccessNodeDepartureTime = connectionDepartureTime;
+                /*if (
+                  initialDepartureTimeSeconds == -1
+                  ||
+                  params.maxFirstWaitingTimeSeconds < connectionMinWaitingTimeSeconds
+                  ||
+                  connectionDepartureTime - initialDepartureTimeSeconds + nodesAccessTravelTime[nodeDepartureIndex] <= params.maxFirstWaitingTimeSeconds
+                )
+                {*/
+                  reachedAtLeastOneAccessNode      = true;
+                  tentativeAccessNodeDepartureTime = connectionDepartureTime;
+                //}
               }
               footpathIndex = 0;
               for (int & transferableNodeIndex : nodes[nodeDepartureIndex].get()->reverseTransferableNodesIdx)
@@ -151,10 +164,22 @@ namespace TrRouting
                     )
                   )
                   {
-                    if (initialDepartureTimeSeconds == -1 || connectionDepartureTime - nodesAccessTravelTime[nodeDepartureIndex] - connectionMinWaitingTimeSeconds >= initialDepartureTimeSeconds)
+                    if (
+                      initialDepartureTimeSeconds == -1
+                      ||
+                      connectionDepartureTime - nodesAccessTravelTime[nodeDepartureIndex] - connectionMinWaitingTimeSeconds >= initialDepartureTimeSeconds
+                    )
                     {
-                      footpathDistance = nodes[nodeDepartureIndex].get()->reverseTransferableDistancesMeters[footpathIndex];
-                      reverseAccessJourneysSteps[transferableNodeIndex] = std::make_tuple(i, tripsExitConnection[tripIndex], nodeDepartureIndex, tripIndex, footpathTravelTime, 1, footpathDistance);
+                      if (
+                        initialDepartureTimeSeconds == -1
+                        ||
+                        params.maxFirstWaitingTimeSeconds < connectionMinWaitingTimeSeconds
+                        ||
+                        connectionDepartureTime - initialDepartureTimeSeconds - nodesAccessTravelTime[nodeDepartureIndex] <= params.maxFirstWaitingTimeSeconds
+                      )
+                      {
+                        reverseAccessJourneysSteps[transferableNodeIndex] = std::make_tuple(i, tripsExitConnection[tripIndex], nodeDepartureIndex, tripIndex, 0, 1, 0);
+                      }
                     }
                   }
                 }

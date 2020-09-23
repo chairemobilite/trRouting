@@ -128,7 +128,6 @@ namespace TrRouting
         }
         journey.push_back(std::make_tuple(-1,-1,-1,-1,nodesEgressTravelTime[bestEgressNodeIndex],-1,nodesEgressDistance[bestEgressNodeIndex]));
 
-        
 
 
         std::string optimizeCasesStr = "";
@@ -163,6 +162,7 @@ namespace TrRouting
 
 
 
+        std::string stepsStr = "";
 
 
         int journeyStepsCount = journey.size();
@@ -303,6 +303,15 @@ namespace TrRouting
               stepJson["inVehicleTimeMinutes"]        = Toolbox::convertSecondsToMinutes(inVehicleTime);
               stepJson["inVehicleDistanceMeters"]     = inVehicleDistance;
               json["steps"].push_back(stepJson);
+              stepsStr += "wait" + std::to_string(waitingTime) + "s|";
+              if (transferableModeIdx == journeyStepLine->modeIdx)
+              {
+                stepsStr += "transferable" + std::to_string(inVehicleTime) + "s" + std::to_string(inVehicleDistance) + "m|";
+              }
+              else
+              {
+                stepsStr += "ride" + std::to_string(inVehicleTime) + "s" + std::to_string(inVehicleDistance) + "m|";
+              }
             }
             if (i < journeyStepsCount - 2) // if not the last transit leg
             {
@@ -328,6 +337,7 @@ namespace TrRouting
                 stepJson["arrivalTimeSeconds"]   = transferArrivalTime;
                 stepJson["readyToBoardAt"]       = Toolbox::convertSecondsToFormattedTime(transferReadyTime);
                 json["steps"].push_back(stepJson);
+                stepsStr += "transfer" + std::to_string(transferTime) + "s" + std::to_string(distance) + "m|";
               }
             }
           }
@@ -344,7 +354,7 @@ namespace TrRouting
             if (i == 0) // access
             {
               
-              transferArrivalTime  = (initialDepartureTimeSeconds != -1 ? initialDepartureTimeSeconds : bestDepartureTime) + transferTime;
+              transferArrivalTime  = bestDepartureTime + transferTime;
               transferReadyTime    = transferArrivalTime;
 
               if (journey.size() > i + 1 && std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journey[i+1]) != -1)
@@ -357,19 +367,21 @@ namespace TrRouting
               accessDistance       = distance;
               if (!params.returnAllNodesResult)
               {
-                stepJson                         = {};
-                stepJson["action"]               = "walking";
-                stepJson["type"]                 = "access";
-                stepJson["travelTimeSeconds"]    = transferTime;
-                stepJson["travelTimeMinutes"]    = Toolbox::convertSecondsToMinutes(transferTime);
-                stepJson["distanceMeters"]       = distance;
-                stepJson["departureTime"]        = Toolbox::convertSecondsToFormattedTime((initialDepartureTimeSeconds != -1 ? initialDepartureTimeSeconds : bestDepartureTime));
-                stepJson["arrivalTime"]          = Toolbox::convertSecondsToFormattedTime(transferArrivalTime);
-                stepJson["departureTimeSeconds"] = bestDepartureTime;
-                stepJson["arrivalTimeSeconds"]   = transferArrivalTime;
-                stepJson["readyToBoardAt"]       = Toolbox::convertSecondsToFormattedTime(transferReadyTime);
+                stepJson                          = {};
+                stepJson["action"]                = "walking";
+                stepJson["type"]                  = "access";
+                stepJson["travelTimeSeconds"]     = transferTime;
+                stepJson["travelTimeMinutes"]     = Toolbox::convertSecondsToMinutes(transferTime);
+                stepJson["distanceMeters"]        = distance;
+                stepJson["departureTime"]         = Toolbox::convertSecondsToFormattedTime(bestDepartureTime);
+                stepJson["departureTime"]         = Toolbox::convertSecondsToFormattedTime(bestDepartureTime);
+                stepJson["arrivalTime"]           = Toolbox::convertSecondsToFormattedTime(transferArrivalTime);
+                stepJson["departureTimeSeconds"]  = bestDepartureTime;
+                stepJson["arrivalTimeSeconds"]    = transferArrivalTime;
+                stepJson["readyToBoardAtSeconds"] = transferReadyTime;
+                stepJson["readyToBoardAt"]        = Toolbox::convertSecondsToFormattedTime(transferReadyTime);
                 json["steps"].push_back(stepJson);
-                
+                stepsStr += "access" + std::to_string(transferTime) + "s" + std::to_string(distance) + "m|";
               }
             }
             else // egress
@@ -391,6 +403,7 @@ namespace TrRouting
                 stepJson["departureTimeSeconds"] = arrivalTime;
                 stepJson["arrivalTimeSeconds"]   = arrivalTime + transferTime;
                 json["steps"].push_back(stepJson);
+                stepsStr += "egress" + std::to_string(transferTime) + "s" + std::to_string(distance) + "m|";
               }
               arrivalTime = transferArrivalTime;
             }
@@ -418,18 +431,56 @@ namespace TrRouting
         }
         else if (!params.returnAllNodesResult)
         {
+
+
+
           if (json["steps"].size() > 0)
           {
+
+
+            // get modes and lines as strings
+
+            std::string modesStr = "";
+            for (std::string modeShortname : modeShortnames)
+            {
+              modesStr += modeShortname + "|";
+            }
+            if (modesStr.size() > 0)
+            {
+              modesStr.pop_back();
+            }
+
+            std::string lineUuidsStr = "";
+            for (boost::uuids::uuid lineUuid : lineUuids)
+            {
+              lineUuidsStr += boost::uuids::to_string(lineUuid) + "|";
+            }
+            if (lineUuidsStr.size() > 0)
+            {
+              lineUuidsStr.pop_back();
+            }
+
+            if (stepsStr.size() > 0)
+            {
+              stepsStr.pop_back();
+            }
 
             json["status"]                                         = "success";
             json["origin"]                                         = { origin->longitude,      origin->latitude      };
             json["destination"]                                    = { destination->longitude, destination->latitude };
-            json["departureTime"]                                  = initialDepartureTimeSeconds != -1 ? Toolbox::convertSecondsToFormattedTime(initialDepartureTimeSeconds) : Toolbox::convertSecondsToFormattedTime(bestDepartureTime);
+            json["departureTime"]                                  = Toolbox::convertSecondsToFormattedTime(bestDepartureTime);
+            json["departureTimeSeconds"]                           = bestDepartureTime;
+            if (initialDepartureTimeSeconds != -1)
+            {
+              json["initialDepartureTime"]                         = Toolbox::convertSecondsToFormattedTime(initialDepartureTimeSeconds);
+              json["initialDepartureTimeSeconds"]                  = initialDepartureTimeSeconds;
+              json["initialLostTimeAtDepartureSeconds"]            = bestDepartureTime - initialDepartureTimeSeconds;
+              json["initialLostTimeAtDepartureMinutes"]            = Toolbox::convertSecondsToMinutes(bestDepartureTime - initialDepartureTimeSeconds);
+            }
             json["arrivalTime"]                                    = Toolbox::convertSecondsToFormattedTime(arrivalTime);
-            json["departureTimeSeconds"]                           = initialDepartureTimeSeconds != -1 ? initialDepartureTimeSeconds : bestDepartureTime;
             json["arrivalTimeSeconds"]                             = arrivalTime;
-            json["totalTravelTimeMinutes"]                         = Toolbox::convertSecondsToMinutes(arrivalTime - (initialDepartureTimeSeconds != -1 ? initialDepartureTimeSeconds : bestDepartureTime));
-            json["totalTravelTimeSeconds"]                         = arrivalTime - (initialDepartureTimeSeconds != -1 ? initialDepartureTimeSeconds : bestDepartureTime);
+            json["totalTravelTimeMinutes"]                         = Toolbox::convertSecondsToMinutes(arrivalTime - bestDepartureTime);
+            json["totalTravelTimeSeconds"]                         = arrivalTime - bestDepartureTime;
             json["totalDistanceMeters"]                            = totalDistance;
             json["totalInVehicleTimeMinutes"]                      = Toolbox::convertSecondsToMinutes(totalInVehicleTime);
             json["totalInVehicleTimeSeconds"]                      = totalInVehicleTime;
@@ -454,12 +505,9 @@ namespace TrRouting
             json["firstWaitingTimeSeconds"]                        = accessWaitingTime;
             json["totalWaitingTimeMinutes"]                        = Toolbox::convertSecondsToMinutes(totalWaitingTime);
             json["totalWaitingTimeSeconds"]                        = totalWaitingTime;
-            json["departureTimeToMinimizeFirstWaitingTime"]        = Toolbox::convertSecondsToFormattedTime(bestDepartureTime);
-            json["departureTimeSecondsToMinimizeFirstWaitingTime"] = bestDepartureTime;
-            json["minimizedTotalTravelTimeMinutes"]                = Toolbox::convertSecondsToMinutes(arrivalTime - bestDepartureTime);
-            json["minimizedTotalTravelTimeSeconds"]                = arrivalTime - bestDepartureTime;
-            json["minimumWaitingTimeBeforeEachBoardingMinutes"]    = Toolbox::convertSecondsToMinutes(params.minWaitingTimeSeconds);
-            json["minimumWaitingTimeBeforeEachBoardingSeconds"]    = params.minWaitingTimeSeconds;
+            json["modes"]                                          = modesStr;
+            json["lineUuids"]                                      = lineUuidsStr;
+            json["stepsSummary"]                                   = stepsStr;
             /*json["exceptLineShortnames"]                           = nlohmann::json::array();
             
             for (auto & lineIdx : params.exceptLinesIdx)
@@ -467,10 +515,10 @@ namespace TrRouting
               json["exceptLineShortnames"].push_back(lines[lineIdx]->shortname);
             }*/
 
-            result.travelTimeSeconds             = arrivalTime - (initialDepartureTimeSeconds != -1 ? initialDepartureTimeSeconds : bestDepartureTime);
+            result.travelTimeSeconds             = arrivalTime - bestDepartureTime;
             result.arrivalTimeSeconds            = arrivalTime;
-            result.departureTimeSeconds          = (initialDepartureTimeSeconds != -1 ? initialDepartureTimeSeconds : bestDepartureTime);
-            result.minimizedDepartureTimeSeconds = bestDepartureTime;
+            result.departureTimeSeconds          = bestDepartureTime;
+            result.initialDepartureTimeSeconds   = initialDepartureTimeSeconds;
             result.numberOfTransfers             = numberOfTransfers;
             result.inVehicleTravelTimeSeconds    = totalInVehicleTime;
             result.transferTravelTimeSeconds     = totalTransferWalkingTime;

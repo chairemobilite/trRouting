@@ -99,6 +99,7 @@ namespace TrRouting
     maxTotalTravelTimeSeconds              = MAX_INT;
     maxNumberOfTransfers                   = -1; // -1 means no limit
     minWaitingTimeSeconds                  = 3*60;
+    maxFirstWaitingTimeSeconds             = 30*60; // Ignore all connections at access nodes if waiting time would be more than this value.
     maxAccessWalkingTravelTimeSeconds      = 20*60;
     maxEgressWalkingTravelTimeSeconds      = 20*60;
     maxTransferWalkingTravelTimeSeconds    = 20*60; // depends of transfer data provided
@@ -354,7 +355,7 @@ namespace TrRouting
       else if (parameterWithValueVector[0] == "max_travel_time" || parameterWithValueVector[0] == "max_travel_time_minutes")
       {
         maxTotalTravelTimeSeconds = std::stoi(parameterWithValueVector[1]) * 60;
-        if (maxTotalTravelTimeSeconds == 0)
+        if (maxTotalTravelTimeSeconds <= 0)
         {
           maxTotalTravelTimeSeconds = MAX_INT;
         }
@@ -363,7 +364,7 @@ namespace TrRouting
       else if (parameterWithValueVector[0] == "max_travel_time_seconds")
       {
         maxTotalTravelTimeSeconds = std::stoi(parameterWithValueVector[1]);
-        if (maxTotalTravelTimeSeconds == 0)
+        if (maxTotalTravelTimeSeconds <= 0)
         {
           maxTotalTravelTimeSeconds = MAX_INT;
         }
@@ -372,7 +373,7 @@ namespace TrRouting
       else if (parameterWithValueVector[0] == "max_access_travel_time" || parameterWithValueVector[0] == "max_access_travel_time_minutes")
       {
         maxAccessWalkingTravelTimeSeconds = std::stoi(parameterWithValueVector[1]) * 60;
-        if (maxAccessWalkingTravelTimeSeconds == 0)
+        if (maxAccessWalkingTravelTimeSeconds <= 0)
         {
           maxAccessWalkingTravelTimeSeconds = MAX_INT;
         }
@@ -381,7 +382,7 @@ namespace TrRouting
       else if (parameterWithValueVector[0] == "max_access_travel_time_seconds")
       {
         maxAccessWalkingTravelTimeSeconds = std::stoi(parameterWithValueVector[1]);
-        if (maxAccessWalkingTravelTimeSeconds == 0)
+        if (maxAccessWalkingTravelTimeSeconds <= 0)
         {
           maxAccessWalkingTravelTimeSeconds = MAX_INT;
         }
@@ -390,7 +391,7 @@ namespace TrRouting
       else if (parameterWithValueVector[0] == "max_egress_travel_time" || parameterWithValueVector[0] == "max_egress_travel_time_minutes")
       {
         maxEgressWalkingTravelTimeSeconds = std::stoi(parameterWithValueVector[1]) * 60;
-        if (maxEgressWalkingTravelTimeSeconds == 0)
+        if (maxEgressWalkingTravelTimeSeconds <= 0)
         {
           maxEgressWalkingTravelTimeSeconds = MAX_INT;
         }
@@ -399,7 +400,7 @@ namespace TrRouting
       else if (parameterWithValueVector[0] == "max_egress_travel_time_seconds")
       {
         maxEgressWalkingTravelTimeSeconds = std::stoi(parameterWithValueVector[1]);
-        if (maxEgressWalkingTravelTimeSeconds == 0)
+        if (maxEgressWalkingTravelTimeSeconds <= 0)
         {
           maxEgressWalkingTravelTimeSeconds = MAX_INT;
         }
@@ -408,7 +409,7 @@ namespace TrRouting
       else if (parameterWithValueVector[0] == "max_transfer_travel_time" || parameterWithValueVector[0] == "max_transfer_travel_time_minutes")
       {
         maxTransferWalkingTravelTimeSeconds = std::stoi(parameterWithValueVector[1]) * 60;
-        if (maxTransferWalkingTravelTimeSeconds == 0)
+        if (maxTransferWalkingTravelTimeSeconds <= 0)
         {
           maxTransferWalkingTravelTimeSeconds = MAX_INT;
         }
@@ -417,9 +418,18 @@ namespace TrRouting
       else if (parameterWithValueVector[0] == "max_transfer_travel_time_seconds")
       {
         maxTransferWalkingTravelTimeSeconds = std::stoi(parameterWithValueVector[1]);
-        if (maxTransferWalkingTravelTimeSeconds == 0)
+        if (maxTransferWalkingTravelTimeSeconds <= 0)
         {
           maxTransferWalkingTravelTimeSeconds = MAX_INT;
+        }
+        continue;
+      }
+      else if (parameterWithValueVector[0] == "max_first_waiting_time_seconds")
+      {
+        maxFirstWaitingTimeSeconds = std::stoi(parameterWithValueVector[1]);
+        if (maxFirstWaitingTimeSeconds <= 0)
+        {
+          maxFirstWaitingTimeSeconds = -1;
         }
         continue;
       }
