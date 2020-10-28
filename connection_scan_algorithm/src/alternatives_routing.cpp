@@ -93,7 +93,7 @@ namespace TrRouting
       json["status"] = "success";
       //departureTimeSeconds = routingResult.departureTimeSeconds + routingResult.firstWaitingTimeSeconds - params.minWaitingTimeSeconds;
             
-      maxTravelTime = params.alternativesMaxTravelTimeRatio * routingResult.travelTimeSeconds;
+      maxTravelTime = params.alternativesMaxTravelTimeRatio * routingResult.travelTimeSeconds + (routingResult.initialDepartureTimeSeconds ? routingResult.departureTimeSeconds - routingResult.initialDepartureTimeSeconds : 0);
       if (maxTravelTime < params.minAlternativeMaxTravelTimeSeconds)
       {
         params.maxTotalTravelTimeSeconds = params.minAlternativeMaxTravelTimeSeconds;
