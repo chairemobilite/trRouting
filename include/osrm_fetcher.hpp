@@ -25,6 +25,7 @@
 #include "point.hpp"
 #include "node.hpp"
 #include "parameters.hpp"
+#include "client_http.hpp"
 
 using namespace osrm;
 

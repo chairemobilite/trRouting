@@ -100,7 +100,10 @@ namespace TrRouting
         std::cout << "osrm with host " << params.osrmWalkingHost << " and port " << params.osrmWalkingPort << std::endl;
       
       //std::cout << "mode = " << mode << " speed = " << defaultSpeedMetersPerSecond << " maxTravelTime = " << maxTravelTimeSeconds << " port = " << osrmPort << " host = " << osrmHost << " " << std::endl;
-      std::string queryString = "GET /table/v1/" + mode + "/" + std::to_string(point.longitude) +  "," + std::to_string(point.latitude);
+      //std::string queryString = "GET /table/v1/" + mode + "/" + std::to_string(point.longitude) +  "," + std::to_string(point.latitude);
+      std::string queryString = "/table/v1/" + mode + "/" + std::to_string(point.longitude) +  "," + std::to_string(point.latitude);
+
+      
 
       int i {0};
       for (auto & node : nodes)
@@ -119,12 +122,7 @@ namespace TrRouting
       
       queryString += "?annotations=duration,distance";
 
-      // call osrm on bird distance accessible nodes for further filtering by network travel time:
-      boost::asio::ip::tcp::iostream s;
-
-      s.connect(params.osrmWalkingHost, params.osrmWalkingPort);
-      
-      if (reversed)
+      if (reversed) 
       {
         queryString += "&destinations=0";
       }
@@ -132,19 +130,15 @@ namespace TrRouting
       {
         queryString += "&sources=0";
       }
-      queryString += " HTTP/1.1\r\n\r\n";
-
-      // std::cerr << queryString << std::endl;
-
-      s << queryString;
-
-      std::string header;
-      while (std::getline(s, header) && header != "\r"){} // ignore first line
+      
+      using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
+      HttpClient client(params.osrmWalkingHost + ":" + params.osrmWalkingPort);
+      auto s = client.request("GET", queryString);
 
       std::stringstream responseJsonSs;
-      responseJsonSs << s.rdbuf();
-
+      responseJsonSs << s->content.rdbuf();
       nlohmann::json responseJson = nlohmann::json::parse(responseJsonSs.str());
+      
       int numberOfDurations = responseJson["durations"].size();
       //std::cout << "numberOfDurations: " << responseJson["durations"][0].dump(2) << std::endl;
       int numberOfDistances = responseJson["distances"].size();
