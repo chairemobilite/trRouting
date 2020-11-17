@@ -1,6 +1,7 @@
 #include "osrm_fetcher.hpp"
 #include "json.hpp"
 
+
 namespace TrRouting
 {
   
@@ -44,18 +45,19 @@ namespace TrRouting
       else
       {
         osrmParams.sources.push_back(0);
-      }
+      }      
 
-      osrm::json::Object result;
-      
+      auto result = osrm::engine::api::ResultT();
       const auto status = params.osrmWalkingRouter.get().Table(osrmParams, result);
+      auto out = result.get<osrm::json::Object>();
+
       //std::cerr << "numberOfNodes: " << osrmParams.coordinates.size() << std::endl;
       if (status == osrm::Status::Ok)
       {
         if (reversed)
         {
-          auto &durations = result.values["durations"].get<osrm::json::Array>().values;
-          auto &distances = result.values["distances"].get<osrm::json::Array>().values.at(0).get<osrm::json::Array>().values;
+          auto &durations = out.values.at("durations").get<osrm::json::Array>().values;
+          auto &distances = out.values.at("distances").get<osrm::json::Array>().values.at(0).get<osrm::json::Array>().values;
           for (int i = 0; i < birdDistanceAccessibleNodeIndexes.size(); i++)
           {
             const int duration = durations.at(i+1).get<osrm::json::Array>().values.at(0).get<osrm::json::Number>().value; // ignore i = 0 (source with itself)
@@ -68,8 +70,8 @@ namespace TrRouting
         }
         else
         {
-          auto &durations = result.values["durations"].get<osrm::json::Array>().values.at(0).get<osrm::json::Array>().values;
-          auto &distances = result.values["distances"].get<osrm::json::Array>().values.at(0).get<osrm::json::Array>().values;
+          auto &durations = out.values.at("durations").get<osrm::json::Array>().values.at(0).get<osrm::json::Array>().values;
+          auto &distances = out.values.at("distances").get<osrm::json::Array>().values.at(0).get<osrm::json::Array>().values;
           for (int i = 0; i < birdDistanceAccessibleNodeIndexes.size(); i++)
           {
             const int duration = durations.at(i+1).get<osrm::json::Number>().value; // ignore i = 0 (source with itself)
@@ -83,8 +85,8 @@ namespace TrRouting
       }
       else if (status == osrm::Status::Error)
       {
-          const auto code = result.values["code"].get<osrm::json::String>().value;
-          const auto message = result.values["message"].get<osrm::json::String>().value;
+          const auto code = out.values.at("code").get<osrm::json::String>().value;
+          const auto message = out.values.at("message").get<osrm::json::String>().value;
 
           std::cerr << "OSRM routing failed with code: " << code << std::endl;
           std::cerr << "Error message: " << code << std::endl;
@@ -114,7 +116,7 @@ namespace TrRouting
         }
         i++;
       }
-
+      
       queryString += "?annotations=duration,distance";
 
       // call osrm on bird distance accessible nodes for further filtering by network travel time:

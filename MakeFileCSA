@@ -10,7 +10,7 @@ SPECIFIC_OBJS = $(addprefix connection_scan_algorithm/obj/,$(notdir $(SPECIFIC_C
 CAPNP_OBJS = $(addprefix include/capnp/obj/,$(notdir $(SPECIFIC_CAPNP_C++_FILES:.c++=.o)))
 
 #LDFLAGS  := -DBOOST_TEST_DYN_LINK -DBOOST_SPIRIT_USE_PHOENIX_V3 -DBOOST_RESULT_OF_USE_DECLTYPE -DBOOST_FILESYSTEM_NO_DEPRECATED -I/usr/local/include -Iinclude -Iconnection_scan_algorithm/include -I/usr/local/Cellar/osrm-backend/5.18.0/include -I/usr/local/Cellar/$
-LDFLAGS  := -I/usr/local/include -Iinclude -Iconnection_scan_algorithm/include -I/usr/local/include/osrm
+LDFLAGS  := -I/usr/local/include -Iinclude -Iconnection_scan_algorithm/include -I/usr/local/include/osrm -DBOOST_BIND_GLOBAL_PLACEHOLDERS
 
 ifeq ($(OS),Darwin)
 	# macos

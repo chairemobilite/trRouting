@@ -20,6 +20,7 @@
 #include <osrm/json_container.hpp>
 #include <osrm/engine_config.hpp>
 #include <osrm/table_parameters.hpp>
+#include <osrm/engine/api/base_result.hpp>
 
 #include "point.hpp"
 #include "node.hpp"
