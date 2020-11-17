@@ -336,7 +336,7 @@ namespace TrRouting
     }
     else
     {
-      json["status"] = "failed";
+      json["status"] = "no_routing_found";
     }
 
     response = json.dump(2);

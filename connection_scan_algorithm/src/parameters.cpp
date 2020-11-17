@@ -128,7 +128,7 @@ namespace TrRouting
     calculateProfiles                      = true;
     walkingSpeedFactor                     = 1.0; // all walking segments are weighted with this value. > 1.0 means faster walking, < 1.0 means slower walking
     seed                                   = std::chrono::system_clock::now().time_since_epoch().count();
-
+    
   }
 
   void Parameters::update(std::vector<std::string> &parameters, std::map<boost::uuids::uuid, int> &scenarioIndexesByUuid, std::vector<std::unique_ptr<Scenario>> &scenarios, std::map<boost::uuids::uuid, int> &nodeIndexesByUuid, std::map<boost::uuids::uuid, int> &agencyIndexesByUuid, std::map<boost::uuids::uuid, int> &lineIndexesByUuid, std::map<boost::uuids::uuid, int> &serviceIndexesByUuid, std::map<std::string, int> &modeIndexesByShortname, std::map<boost::uuids::uuid, int> &dataSourceIndexesByUuid)
