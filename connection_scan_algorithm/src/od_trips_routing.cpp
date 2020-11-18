@@ -199,7 +199,17 @@ namespace TrRouting
             }
           }
         }
-          
+        
+        std::vector<std::string> lineShortnames;
+        //std::vector<std::string> lineLongnames;
+        std::vector<std::string> agencyAcronyms;
+        for (auto & lineIdx : routingResult.linesIdx)
+        {
+          lineShortnames.push_back(lines[lineIdx].get()->shortname);
+          //lineLongnames.push_back(lines[lineIdx].get()->longname);
+          agencyAcronyms.push_back(agencies[lines[lineIdx].get()->agencyIdx].get()->acronym);
+        }
+
         if (params.responseFormat == "csv")
         {
           //std::replace( ageGroup.begin(), ageGroup.end(), '-', '_' ); // remove dash so Excel does not convert to age groups to numbers...
@@ -210,8 +220,41 @@ namespace TrRouting
           response += std::to_string(routingResult.transferTravelTimeSeconds) + "," + std::to_string(routingResult.waitingTimeSeconds) + "," + std::to_string(routingResult.accessTravelTimeSeconds) + ",";
           response += std::to_string(routingResult.egressTravelTimeSeconds) + "," + std::to_string(routingResult.transferWaitingTimeSeconds) + "," + std::to_string(routingResult.firstWaitingTimeSeconds) + ",";
           response += std::to_string(routingResult.nonTransitTravelTimeSeconds) + ",";
-          
+
           int countLineUuids = routingResult.lineUuids.size();
+          j = 0;
+          for (auto & lineShortname : lineShortnames)
+          {
+            response += lineShortname;
+            if (j < countLineUuids - 1)
+            {
+              response += "|";
+            }
+            j++;
+          }
+          response += ",";
+          /*j = 0;
+          for (auto & lineLongname : lineLongnames)
+          {
+            response += lineLongname;
+            if (j < countLineUuids - 1)
+            {
+              response += "|";
+            }
+            j++;
+          }
+          response += ",";*/
+          j = 0;
+          for (auto & agencyAcronym : agencyAcronyms)
+          {
+            response += agencyAcronym;
+            if (j < countLineUuids - 1)
+            {
+              response += "|";
+            }
+            j++;
+          }
+          response += ",";
           j = 0;
           for (auto & lineUuid : routingResult.lineUuids)
           {
@@ -313,9 +356,13 @@ namespace TrRouting
           odTripJson["transferWaitingTimeSeconds"]    = routingResult.transferWaitingTimeSeconds;
           odTripJson["firstWaitingTimeSeconds"]       = routingResult.firstWaitingTimeSeconds;
           odTripJson["nonTransitTravelTimeSeconds"]   = routingResult.nonTransitTravelTimeSeconds;
-          odTripJson["lineUuids"]                     = Toolbox::uuidsToStrings(routingResult.lineUuids);
+
+          odTripJson["linesShortnames"]               = lineShortnames;
+          //odTripJson["linesLongname"]                 = lineLongnames;
+          odTripJson["agenciesAcronyms"]              = agencyAcronyms;
           odTripJson["modesShortnames"]               = routingResult.modeShortnames;
           odTripJson["agencyUuids"]                   = Toolbox::uuidsToStrings(routingResult.agencyUuids);
+          odTripJson["lineUuids"]                     = Toolbox::uuidsToStrings(routingResult.lineUuids);
           odTripJson["boardingNodeUuids"]             = Toolbox::uuidsToStrings(routingResult.boardingNodeUuids);
           odTripJson["unboardingNodeUuids"]           = Toolbox::uuidsToStrings(routingResult.unboardingNodeUuids);
           //odTripJson["tripUuids"]                     = Toolbox::uuidsToStrings(routingResult.tripUuids);
