@@ -43,4 +43,15 @@ Then:
 ./configure
 make
 ```
+
+## Docker
+A provided dockerfile allows to easily build an image
+
+### Build
+`docker build -t LOCAL_IMAGE_NAME .`
+
+### Running as a deamon
+`docker run -t LOCAL_IMAGE_NAME`
+
+
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fkaligrafy%2FtrRouting.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fkaligrafy%2FtrRouting?ref=badge_large)
