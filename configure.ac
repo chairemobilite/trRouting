@@ -1,13 +1,15 @@
 AC_INIT([trRouting], [1.0], [TODO@TODO.PRG])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 
+AC_CONFIG_MACRO_DIRS([m4])
+
 AC_PROG_CC
 AC_PROG_CXX
 AM_PROG_AR
 
 LT_INIT
 
-# AX_ macros from on autoconf-archive
+# AX_ macros copied from the autoconf-archive
 
 # TODO Do we need the strict mode or not here ?
 AX_CXX_COMPILE_STDCXX_14(noext)
