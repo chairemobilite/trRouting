@@ -31,9 +31,16 @@ sudo apt-get install clang libboost-all-dev libexpat1-dev libjsoncpp-dev libncur
 ```
 
 ## Compilation
-### Connection Scan Algorithm
+trRouting use autoconf/automake as its build system. A recap of the usual commands: 
 
+If you are running out of a git checkout: 
 ```
-make -f MakeFileCSA
+autoreconf -i
+```
+
+Then: 
+```
+./configure
+make
 ```
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fkaligrafy%2FtrRouting.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fkaligrafy%2FtrRouting?ref=badge_large)
