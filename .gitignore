@@ -60,3 +60,22 @@ swift/trRouting/Package.resolved
 *.exe
 *.out
 *.app
+
+# makefiles
+Makefile
+Makefile.in
+/missing
+/configure
+/depcomp
+/install-sh
+/config.sub
+/config.status
+/config.log
+/config.guess
+/compile
+/aclocal.m4
+/ar-lib
+/libtool
+/ltmain.sh
+/src/trRouting
+.deps
