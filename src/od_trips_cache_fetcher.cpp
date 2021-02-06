@@ -21,6 +21,7 @@ namespace TrRouting
     std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid,
     std::map<boost::uuids::uuid, int>& householdIndexesByUuid,
     std::map<boost::uuids::uuid, int>& personIndexesByUuid,
+    std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
     Parameters& params,
     std::string customPath
   ) {
@@ -156,13 +157,14 @@ namespace TrRouting
               case odTrip::OdTrip::Activity::UNKNOWN          : t->destinationActivity = "unknown";         break;
             }
 
-            const unsigned int originNodesCount {capnpT.getOriginNodesIdx().size()};
+            const unsigned int originNodesCount {capnpT.getOriginNodesUuids().size()};
             std::vector<int> originNodesIdx(originNodesCount);
             std::vector<int> originNodesTravelTimesSeconds(originNodesCount);
             std::vector<int> originNodesDistancesMeters(originNodesCount);
             for (int i = 0; i < originNodesCount; i++)
             {
-              originNodesIdx               [i] = capnpT.getOriginNodesIdx()[i];
+              std::string nodeUuid {capnpT.getOriginNodesUuids()[i]};
+              originNodesIdx               [i] = nodeIndexesByUuid[uuidGenerator(nodeUuid)];
               originNodesTravelTimesSeconds[i] = capnpT.getOriginNodesTravelTimes()[i];
               originNodesDistancesMeters   [i] = capnpT.getOriginNodesDistances()[i];
             }
@@ -170,13 +172,14 @@ namespace TrRouting
             t->originNodesTravelTimesSeconds = originNodesTravelTimesSeconds;
             t->originNodesDistancesMeters    = originNodesDistancesMeters;
 
-            const unsigned int destinationNodesCount {capnpT.getDestinationNodesIdx().size()};
+            const unsigned int destinationNodesCount {capnpT.getDestinationNodesUuids().size()};
             std::vector<int> destinationNodesIdx(destinationNodesCount);
             std::vector<int> destinationNodesTravelTimesSeconds(destinationNodesCount);
             std::vector<int> destinationNodesDistancesMeters(destinationNodesCount);
             for (int i = 0; i < destinationNodesCount; i++)
             {
-              destinationNodesIdx               [i] = capnpT.getDestinationNodesIdx()[i];
+              std::string nodeUuid {capnpT.getDestinationNodesUuids()[i]};
+              destinationNodesIdx               [i] = nodeIndexesByUuid[uuidGenerator(nodeUuid)];
               destinationNodesTravelTimesSeconds[i] = capnpT.getDestinationNodesTravelTimes()[i];
               destinationNodesDistancesMeters   [i] = capnpT.getDestinationNodesDistances()[i];
             }

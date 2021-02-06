@@ -19,6 +19,7 @@ void CacheFetcher::getHouseholds(
   std::vector<std::unique_ptr<Household>>& ts,
   std::map<boost::uuids::uuid, int>& tIndexesByUuid,
   std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid,
+  std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
   Parameters& params,
   std::string customPath
 ) {
@@ -96,13 +97,14 @@ void CacheFetcher::getHouseholds(
             point->longitude = ((double)capnpT.getHomeLongitude()) / 1000000.0;
             t->point         = std::move(point);
             
-            const unsigned int homeNodesCount {capnpT.getHomeNodesIdx().size()};
+            const unsigned int homeNodesCount {capnpT.getHomeNodesUuids().size()};
             std::vector<int> homeNodesIdx(homeNodesCount);
             std::vector<int> homeNodesTravelTimesSeconds(homeNodesCount);
             std::vector<int> homeNodesDistancesMeters(homeNodesCount);
             for (int i = 0; i < homeNodesCount; i++)
             {
-              homeNodesIdx               [i] = capnpT.getHomeNodesIdx()[i];
+              std::string nodeUuid {capnpT.getHomeNodesUuids()[i]};
+              homeNodesIdx               [i] = nodeIndexesByUuid[uuidGenerator(nodeUuid)];
               homeNodesTravelTimesSeconds[i] = capnpT.getHomeNodesTravelTimes()[i];
               homeNodesDistancesMeters   [i] = capnpT.getHomeNodesDistances()[i];
             }

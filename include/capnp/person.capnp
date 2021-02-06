@@ -16,14 +16,14 @@ struct Person {
   ageGroup                         @8  :AgeGroup;
   gender                           @9  :Gender;
   occupation                       @10 :Occupation;
-  usualWorkPlaceLatitude           @11 :Int32; # divide by 1000000 to get float
-  usualWorkPlaceLongitude          @12 :Int32; # divide by 1000000 to get float
-  usualSchoolPlaceLatitude         @13 :Int32; # divide by 1000000 to get float
-  usualSchoolPlaceLongitude        @14 :Int32; # divide by 1000000 to get float
-  usualWorkPlaceNodesIdx           @15 :List(Int32);
+  usualWorkPlaceLatitude           @11 :Int32; # divide by 1000000 to get float, -1 means null
+  usualWorkPlaceLongitude          @12 :Int32; # divide by 1000000 to get float, -1 means null
+  usualSchoolPlaceLatitude         @13 :Int32; # divide by 1000000 to get float, -1 means null
+  usualSchoolPlaceLongitude        @14 :Int32; # divide by 1000000 to get float, -1 means null
+  usualWorkPlaceNodesUuids         @15 :List(Text);
   usualWorkPlaceNodesTravelTimes   @16 :List(Int16); # seconds
   usualWorkPlaceNodesDistances     @17 :List(Int16); # meters
-  usualSchoolPlaceNodesIdx         @18 :List(Int32);
+  usualSchoolPlaceNodesUuids       @18 :List(Text);
   usualSchoolPlaceNodesTravelTimes @19 :List(Int16); # seconds
   usualSchoolPlaceNodesDistances   @20 :List(Int16); # meters
   internalId                       @21 :Text;

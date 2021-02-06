@@ -3,10 +3,6 @@
 using Cxx = import "/capnp/c++.capnp";
 $Cxx.namespace("networkCollection");
 
-struct NetworkCollection {
-  networks @0 :List(Network);
-}
-
 struct Network {
   uuid           @0  :Text;
   shortname      @1  :Text;
@@ -21,4 +17,8 @@ struct Network {
   scenariosUuids @10 :List(Text);
   isFrozen       @11 :Int8;
   simulationUuid @12 :Text;
+}
+
+struct NetworkCollection {
+  networks @0 :List(Network);
 }

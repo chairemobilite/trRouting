@@ -3,10 +3,6 @@
 using Cxx = import "/capnp/c++.capnp";
 $Cxx.namespace("lineCollection");
 
-struct LineCollection {
-  lines @0 :List(Line);
-}
-
 struct Line {
   uuid                   @0  :Text;
   internalId             @1  :Text;
@@ -22,4 +18,8 @@ struct Line {
   isAutonomous           @11 :Int8;
   allowSameLineTransfers @12 :Int8;
   isFrozen               @13 :Int8;
+}
+
+struct LineCollection {
+  lines @0 :List(Line);
 }

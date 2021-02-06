@@ -70,39 +70,12 @@ namespace TrRouting
         {
           t->stationIdx = -1;
         }
+
         point->latitude  = ((double)capnpT.getLatitude())  / 1000000.0;
         point->longitude = ((double)capnpT.getLongitude()) / 1000000.0;
         t->point         = std::move(point);
 
-        nodeCacheFileName = "nodes/node_" + boost::uuids::to_string(t->uuid);
-        if (CacheFetcher::capnpCacheFileExists(nodeCacheFileName + ".capnpbin", params, customPath))
-        {
-          int fd = open((CacheFetcher::getFilePath(nodeCacheFileName, params, customPath) + ".capnpbin").c_str(), O_RDWR);
-          ::capnp::PackedFdMessageReader capnpTMessage(fd, {32 * 1024 * 1024});
-          cNode::Reader capnpT = capnpTMessage.getRoot<cNode>();
-          const unsigned int transferableNodesCount {capnpT.getTransferableNodesIdx().size()};
-
-          std::vector<int> transferableNodesIdx(transferableNodesCount);
-          std::vector<int> transferableTravelTimesSeconds(transferableNodesCount);
-          std::vector<int> transferableDistancesMeters(transferableNodesCount);
-          for (int i = 0; i < transferableNodesCount; i++)
-          {
-            transferableNodesIdx          [i] = capnpT.getTransferableNodesIdx()[i];
-            transferableTravelTimesSeconds[i] = capnpT.getTransferableNodesTravelTimes()[i];
-            transferableDistancesMeters   [i] = capnpT.getTransferableNodesDistances()[i];
-          }
-          t->transferableNodesIdx           = transferableNodesIdx;
-          t->transferableTravelTimesSeconds = transferableTravelTimesSeconds;
-          t->transferableDistancesMeters    = transferableDistancesMeters;
-
-          // put same node transfer at the beginning:
-          t->reverseTransferableNodesIdx.push_back(ts.size());
-          t->reverseTransferableTravelTimesSeconds.push_back(0);
-          t->reverseTransferableDistancesMeters.push_back(0);
-          close(fd);
-        }
-
-        //std::cout << TStr << ":\n" << t->toString() << "---" << t->transferableDistancesMeters[1] << std::endl;
+        //std::cout << TStr << ":\n" << t->toString() << std::endl;
 
         tIndexesByUuid[t->uuid] = ts.size();
         ts.push_back(std::move(t));
@@ -117,10 +90,54 @@ namespace TrRouting
       auto nodesCount {ts.size()};
       //std::vector<int>::iterator nodeIndex;
       // find reverse transferable nodes:
-      //std::cerr << "-- start node with nodesCount -- " << nodesCount << "\n";
+      //std::cout << "-- start node with nodesCount -- " << nodesCount << "\n";
       for (int i = 0; i < nodesCount; i++)
       {
 
+        Node * t = ts[i].get();
+
+        nodeCacheFileName = "nodes/node_" + boost::uuids::to_string(t->uuid);
+        if (CacheFetcher::capnpCacheFileExists(nodeCacheFileName + ".capnpbin", params, customPath))
+        {
+          int fd = open((CacheFetcher::getFilePath(nodeCacheFileName, params, customPath) + ".capnpbin").c_str(), O_RDWR);
+          ::capnp::PackedFdMessageReader capnpTMessage(fd, {32 * 1024 * 1024});
+          cNode::Reader capnpT = capnpTMessage.getRoot<cNode>();
+          const unsigned int transferableNodesCount {capnpT.getTransferableNodesUuids().size()};
+
+          std::vector<int> transferableNodesIdx(transferableNodesCount);
+          std::vector<int> transferableTravelTimesSeconds(transferableNodesCount);
+          std::vector<int> transferableDistancesMeters(transferableNodesCount);
+          std::vector<int> reverseTransferableNodesIdx(transferableNodesCount);
+          std::vector<int> reverseTransferableTravelTimesSeconds(transferableNodesCount);
+          std::vector<int> reverseTransferableDistancesMeters(transferableNodesCount);
+
+          for (int j = 0; j < transferableNodesCount; j++)
+          {
+            std::string nodeUuid {capnpT.getTransferableNodesUuids()[j]};
+            transferableNodesIdx          [j] = tIndexesByUuid[uuidGenerator(nodeUuid)];
+            transferableTravelTimesSeconds[j] = capnpT.getTransferableNodesTravelTimes()[j];
+            transferableDistancesMeters   [j] = capnpT.getTransferableNodesDistances()[j];
+          }
+          t->transferableNodesIdx           = transferableNodesIdx;
+          t->transferableTravelTimesSeconds = transferableTravelTimesSeconds;
+          t->transferableDistancesMeters    = transferableDistancesMeters;
+
+          // put same node transfer at the beginning:
+          t->reverseTransferableNodesIdx.push_back(i);
+          t->reverseTransferableTravelTimesSeconds.push_back(0);
+          t->reverseTransferableDistancesMeters.push_back(0);
+          close(fd);
+        }
+
+      }
+
+      //std::cout << "generate reverse transferable nodes " << std::endl;
+
+      // generate reverse transferable nodes 
+      // travel time is not the same in both direction so we need to reverse these, 
+      // especially with modes like car and bicycle which must follow one way and restrictions
+      for (int i = 0; i < nodesCount; i++)
+      {
         int transferableNodesCount = ts[i]->transferableNodesIdx.size();
         for (int j = 0; j < transferableNodesCount; j++)
         {
@@ -136,8 +153,9 @@ namespace TrRouting
           ts[transferableNodeIdx]->reverseTransferableTravelTimesSeconds.push_back(ts[i]->transferableTravelTimesSeconds[j]);
           ts[transferableNodeIdx]->reverseTransferableDistancesMeters.push_back(ts[i]->transferableDistancesMeters[j]);
         }
-
       }
+
+      //std::cout << "sort by increasing travel times " << std::endl;
 
       // sort by increasing travel times so we don't get longer transfers when shorter exists:
       for (auto & node : ts)
@@ -163,7 +181,6 @@ namespace TrRouting
           node->transferableTravelTimesSeconds[i] = transferableTravelTimesSeconds[sortedIdx[i]];
           node->transferableDistancesMeters[i]    = transferableDistancesMeters[sortedIdx[i]];
         }
-
 
         std::vector<size_t> sortedReverseIdx(node->reverseTransferableNodesIdx.size());
         std::iota(sortedReverseIdx.begin(), sortedReverseIdx.end(), 0);

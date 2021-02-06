@@ -20,6 +20,7 @@ namespace TrRouting
     std::map<boost::uuids::uuid, int>& tIndexesByUuid,
     std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid,
     std::map<boost::uuids::uuid, int>& householdIndexesByUuid,
+    std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
     Parameters& params,
     std::string customPath
   ) { 
@@ -132,13 +133,14 @@ namespace TrRouting
             usualWorkPlace->longitude = ((double)capnpT.getUsualWorkPlaceLongitude()) / 1000000.0;
             t->usualWorkPlace         = std::move(usualWorkPlace);
 
-            const unsigned int usualWorkPlaceNodesCount {capnpT.getUsualWorkPlaceNodesIdx().size()};
+            const unsigned int usualWorkPlaceNodesCount {capnpT.getUsualWorkPlaceNodesUuids().size()};
             std::vector<int> usualWorkPlaceNodesIdx(usualWorkPlaceNodesCount);
             std::vector<int> usualWorkPlaceNodesTravelTimesSeconds(usualWorkPlaceNodesCount);
             std::vector<int> usualWorkPlaceNodesDistancesMeters(usualWorkPlaceNodesCount);
             for (int i = 0; i < usualWorkPlaceNodesCount; i++)
             {
-              usualWorkPlaceNodesIdx               [i] = capnpT.getUsualWorkPlaceNodesIdx()[i];
+              std::string nodeUuid {capnpT.getUsualWorkPlaceNodesUuids()[i]};
+              usualWorkPlaceNodesIdx               [i] = nodeIndexesByUuid[uuidGenerator(nodeUuid)];
               usualWorkPlaceNodesTravelTimesSeconds[i] = capnpT.getUsualWorkPlaceNodesTravelTimes()[i];
               usualWorkPlaceNodesDistancesMeters   [i] = capnpT.getUsualWorkPlaceNodesDistances()[i];
             }
@@ -152,13 +154,14 @@ namespace TrRouting
             usualSchoolPlace->longitude = ((double)capnpT.getUsualSchoolPlaceLongitude()) / 1000000.0;
             t->usualSchoolPlace         = std::move(usualSchoolPlace);
 
-            const unsigned int usualSchoolPlaceNodesCount {capnpT.getUsualSchoolPlaceNodesIdx().size()};
+            const unsigned int usualSchoolPlaceNodesCount {capnpT.getUsualSchoolPlaceNodesUuids().size()};
             std::vector<int> usualSchoolPlaceNodesIdx(usualSchoolPlaceNodesCount);
             std::vector<int> usualSchoolPlaceNodesTravelTimesSeconds(usualSchoolPlaceNodesCount);
             std::vector<int> usualSchoolPlaceNodesDistancesMeters(usualSchoolPlaceNodesCount);
             for (int i = 0; i < usualSchoolPlaceNodesCount; i++)
             {
-              usualSchoolPlaceNodesIdx               [i] = capnpT.getUsualSchoolPlaceNodesIdx()[i];
+              std::string nodeUuid {capnpT.getUsualSchoolPlaceNodesUuids()[i]};
+              usualSchoolPlaceNodesIdx               [i] = nodeIndexesByUuid[uuidGenerator(nodeUuid)];
               usualSchoolPlaceNodesTravelTimesSeconds[i] = capnpT.getUsualSchoolPlaceNodesTravelTimes()[i];
               usualSchoolPlaceNodesDistancesMeters   [i] = capnpT.getUsualSchoolPlaceNodesDistances()[i];
             }

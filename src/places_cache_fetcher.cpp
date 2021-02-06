@@ -19,6 +19,7 @@ namespace TrRouting
     std::vector<std::unique_ptr<Place>>& ts,
     std::map<boost::uuids::uuid, int>& tIndexesByUuid,
     std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid,
+    std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
     Parameters& params,
     std::string customPath
   ) {
@@ -66,8 +67,6 @@ namespace TrRouting
             t->id              = capnpT.getId();
             t->shortname       = capnpT.getShortname();
             t->name            = capnpT.getName();
-            t->osmFeatureKey   = capnpT.getOsmFeatureKey();
-            t->osmFeatureValue = capnpT.getOsmFeatureValue();
             t->internalId      = capnpT.getInternalId();
             t->dataSourceIdx   = dataSourceUuid.length() > 0 ? dataSourceIndexesByUuid[uuidGenerator(dataSourceUuid)] : -1;
 
@@ -75,13 +74,14 @@ namespace TrRouting
             point->longitude = ((double)capnpT.getLongitude()) / 1000000.0;
             t->point         = std::move(point);
 
-            const unsigned int nodesCount {capnpT.getNodesIdx().size()};
+            const unsigned int nodesCount {capnpT.getNodesUuids().size()};
             std::vector<int> nodesIdx(nodesCount);
             std::vector<int> nodesTravelTimesSeconds(nodesCount);
             std::vector<int> nodesDistancesMeters(nodesCount);
             for (int i = 0; i < nodesCount; i++)
             {
-              nodesIdx               [i] = capnpT.getNodesIdx()[i];
+              std::string nodeUuid {capnpT.getNodesUuids()[i]};
+              nodesIdx               [i] = nodeIndexesByUuid[uuidGenerator(nodeUuid)];
               nodesTravelTimesSeconds[i] = capnpT.getNodesTravelTimes()[i];
               nodesDistancesMeters   [i] = capnpT.getNodesDistances()[i];
             }

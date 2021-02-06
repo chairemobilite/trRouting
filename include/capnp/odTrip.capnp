@@ -23,10 +23,10 @@ struct OdTrip {
   originLongitude             @15 :Int32; # divide by 1000000 to get float
   destinationLatitude         @16 :Int32; # divide by 1000000 to get float
   destinationLongitude        @17 :Int32; # divide by 1000000 to get float
-  originNodesIdx              @18 :List(Int32);
+  originNodesUuids            @18 :List(Text);
   originNodesTravelTimes      @19 :List(Int16); # seconds
   originNodesDistances        @20 :List(Int16); # meters
-  destinationNodesIdx         @21 :List(Int32);
+  destinationNodesUuids       @21 :List(Text);
   destinationNodesTravelTimes @22 :List(Int16); # seconds
   destinationNodesDistances   @23 :List(Int16); # meters
   internalId                  @24 :Text;

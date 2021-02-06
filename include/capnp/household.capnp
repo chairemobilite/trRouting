@@ -16,7 +16,7 @@ struct Household {
   category             @8  :Category;
   homeLatitude         @9  :Int32; # divide by 1000000 to get float
   homeLongitude        @10 :Int32; # divide by 1000000 to get float
-  homeNodesIdx         @11 :List(Int32); # unique in the whole network (integer_id in database)
+  homeNodesUuids       @11 :List(Text);
   homeNodesTravelTimes @12 :List(Int16); # seconds
   homeNodesDistances   @13 :List(Int16); # meters
   internalId           @14 :Text;

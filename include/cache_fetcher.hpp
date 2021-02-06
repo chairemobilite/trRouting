@@ -84,6 +84,7 @@ namespace TrRouting
       std::vector<std::unique_ptr<Household>>& ts,
       std::map<boost::uuids::uuid, int>& tIndexesById, 
       std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid, 
+      std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
       Parameters& params,
       std::string customPath = ""
     );
@@ -93,6 +94,7 @@ namespace TrRouting
       std::map<boost::uuids::uuid, int>& tIndexesById, 
       std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid,
       std::map<boost::uuids::uuid, int>& householdIndexesByUuid, 
+      std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
       Parameters& params,
       std::string customPath = ""
     );
@@ -102,7 +104,8 @@ namespace TrRouting
       std::map<boost::uuids::uuid, int>& tIndexesById, 
       std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid,
       std::map<boost::uuids::uuid, int>& householdIndexesByUuid, 
-      std::map<boost::uuids::uuid, int>& personIndexesByUuid, 
+      std::map<boost::uuids::uuid, int>& personIndexesByUuid,
+      std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
       Parameters& params,
       std::string customPath = ""
     );
@@ -111,6 +114,7 @@ namespace TrRouting
       std::vector<std::unique_ptr<Place>>& ts,
       std::map<boost::uuids::uuid, int>& tIndexesById, 
       std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid,
+      std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
       Parameters& params,
       std::string customPath = ""
     );

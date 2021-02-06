@@ -3,10 +3,6 @@
 using Cxx = import "/capnp/c++.capnp";
 $Cxx.namespace("serviceCollection");
 
-struct ServiceCollection {
-  services @0 :List(Service);
-}
-
 struct Service {
   uuid           @0  :Text;
   name           @1  :Text;
@@ -29,4 +25,9 @@ struct Service {
   isFrozen       @18 :Int8;
   simulationUuid @19 :Text;
 }
+
+struct ServiceCollection {
+  services @0 :List(Service);
+}
+
 

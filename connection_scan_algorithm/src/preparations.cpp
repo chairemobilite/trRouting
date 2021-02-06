@@ -3,45 +3,16 @@
 namespace TrRouting
 {
 
-  void Calculator::updateDataSourcesFromCache(Parameters& params, std::string customPath)
-  {
-    params.cacheFetcher->getDataSources(dataSources, dataSourceIndexesByUuid, params, customPath);
-  }
-
-  void Calculator::updateHouseholdsFromCache(Parameters& params, std::string customPath)
-  {
-    params.cacheFetcher->getHouseholds(households, householdIndexesByUuid, dataSourceIndexesByUuid, params, customPath);
-  }
-
-  void Calculator::updatePersonsFromCache(Parameters& params, std::string customPath)
-  {
-    params.cacheFetcher->getPersons(persons, personIndexesByUuid, dataSourceIndexesByUuid, householdIndexesByUuid, params, customPath);
-  }
-  
-  void Calculator::updateOdTripsFromCache(Parameters& params, std::string customPath)
-  {
-    params.cacheFetcher->getOdTrips(odTrips, odTripIndexesByUuid, dataSourceIndexesByUuid, householdIndexesByUuid, personIndexesByUuid, params, customPath);
-  }
-
-  void Calculator::updatePlacesFromCache(Parameters& params, std::string customPath)
-  {
-    params.cacheFetcher->getPlaces(places, placeIndexesByUuid, dataSourceIndexesByUuid, params, customPath);
-  }
-
-  void Calculator::updateAgenciesFromCache(Parameters& params, std::string customPath)
-  {
-    params.cacheFetcher->getAgencies(agencies, agencyIndexesByUuid, params, customPath);
-  }
-
-  void Calculator::updateServicesFromCache(Parameters& params, std::string customPath)
-  {
-    params.cacheFetcher->getServices(services, serviceIndexesByUuid, params, customPath);
-  }
-
   /*void Calculator::updateStationsFromCache(Parameters& params, std::string customPath)
   {
     params.cacheFetcher->getStations(stations, stationIndexesByUuid, params, customPath);
   }*/
+
+  /*void Calculator::updateStopsFromCache(Parameters& params, std::string customPath)
+  {
+    params.cacheFetcher->getStops(stops, stopIndexesByUuid, nodeIndexesByUuid, params, customPath);
+  }*/
+
 
   void Calculator::updateNodesFromCache(Parameters& params, std::string customPath)
   {
@@ -79,10 +50,42 @@ namespace TrRouting
     reverseAccessJourneysSteps.resize(nodes.size());
   }
 
-  /*void Calculator::updateStopsFromCache(Parameters& params, std::string customPath)
+  void Calculator::updateDataSourcesFromCache(Parameters& params, std::string customPath)
   {
-    params.cacheFetcher->getStops(stops, stopIndexesByUuid, nodeIndexesByUuid, params, customPath);
-  }*/
+    params.cacheFetcher->getDataSources(dataSources, dataSourceIndexesByUuid, params, customPath);
+  }
+
+  void Calculator::updateHouseholdsFromCache(Parameters& params, std::string customPath)
+  {
+    params.cacheFetcher->getHouseholds(households, householdIndexesByUuid, dataSourceIndexesByUuid, nodeIndexesByUuid, params, customPath);
+  }
+
+  void Calculator::updatePersonsFromCache(Parameters& params, std::string customPath)
+  {
+    params.cacheFetcher->getPersons(persons, personIndexesByUuid, dataSourceIndexesByUuid, householdIndexesByUuid, nodeIndexesByUuid, params, customPath);
+  }
+  
+  void Calculator::updateOdTripsFromCache(Parameters& params, std::string customPath)
+  {
+    params.cacheFetcher->getOdTrips(odTrips, odTripIndexesByUuid, dataSourceIndexesByUuid, householdIndexesByUuid, personIndexesByUuid, nodeIndexesByUuid, params, customPath);
+  }
+
+  void Calculator::updatePlacesFromCache(Parameters& params, std::string customPath)
+  {
+    params.cacheFetcher->getPlaces(places, placeIndexesByUuid, dataSourceIndexesByUuid, nodeIndexesByUuid, params, customPath);
+  }
+
+  void Calculator::updateAgenciesFromCache(Parameters& params, std::string customPath)
+  {
+    params.cacheFetcher->getAgencies(agencies, agencyIndexesByUuid, params, customPath);
+  }
+
+  void Calculator::updateServicesFromCache(Parameters& params, std::string customPath)
+  {
+    params.cacheFetcher->getServices(services, serviceIndexesByUuid, params, customPath);
+  }
+
+  
 
   void Calculator::updateLinesFromCache(Parameters& params, std::string customPath)
   {
@@ -214,6 +217,10 @@ namespace TrRouting
     {
       std::tie(modes, modeIndexesByShortname) = params.cacheFetcher->getModes();
 
+      //updateStationsFromCache(params);
+      //updateStopsFromCache(params);
+      updateNodesFromCache(params);
+
       updateDataSourcesFromCache(params);
       updateHouseholdsFromCache(params);
       updatePersonsFromCache(params);
@@ -222,9 +229,7 @@ namespace TrRouting
 
       updateAgenciesFromCache(params);
       updateServicesFromCache(params);
-      //updateStationsFromCache(params);
-      updateNodesFromCache(params);
-      //updateStopsFromCache(params);
+      
       updateLinesFromCache(params);
       updatePathsFromCache(params);
       updateScenariosFromCache(params);
