@@ -79,3 +79,5 @@ Makefile.in
 /ltmain.sh
 /src/trRouting
 .deps
+/include/capnp/*.c++
+/include/capnp/*.h
