@@ -3,6 +3,50 @@
 namespace TrRouting
 {
   
+  int Calculator::countStations() {
+    return stations.size();
+  }
+
+  int Calculator::countAgencies() {
+    return stations.size();
+  }
+
+  int Calculator::countServices() {
+    return services.size();
+  }
+
+  int Calculator::countNodes() {
+    return nodes.size();
+  }
+
+  int Calculator::countStops() {
+    return stops.size();
+  }
+
+  int Calculator::countLines() {
+    return lines.size();
+  }
+
+  int Calculator::countPaths() {
+    return paths.size();
+  }
+
+  int Calculator::countScenarios() {
+    return scenarios.size();
+  }
+
+  int Calculator::countTrips() {
+    return trips.size();
+  }
+
+  long long Calculator::countConnections() {
+    return forwardConnections.size();
+  }
+
+  int Calculator::countNetworks() {
+    return networks.size();
+  }
+
   RoutingResult Calculator::calculate(bool resetAccessPaths, bool resetFilters) {
     
     reset(resetAccessPaths, resetFilters);

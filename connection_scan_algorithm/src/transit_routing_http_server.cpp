@@ -125,15 +125,15 @@ int main(int argc, char** argv) {
 
       //auto name = pt.get<string>("firstName") + " " + pt.get<string>("lastName");
 
-      //response = "{\"status\": \"failed\", \"error\": \"missing or wrong cache name\"}";
+      //response = "{\"status\": \"error\", \"error\": \"missing or wrong cache name\"}";
     }
     catch(const std::exception &e) {
       std::string error(e.what());
-      response = "{\"status\": \"failed\", \"error\": \"" + error + "\"}";
+      response = "{\"status\": \"error\", \"error\": \"" + error + "\"}";
     }
 
 
-    response = "{\"status\": \"failed\", \"error\": \"missing or wrong cache name\"}";
+    response = "{\"status\": \"error\", \"error\": \"missing or wrong cache name\"}";
 
     *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
 
@@ -261,7 +261,7 @@ int main(int argc, char** argv) {
     }
     else
     {
-      response = "{\"status\": \"failed\", \"error\": \"missing or wrong cache name\"}";
+      response = "{\"status\": \"error\", \"error\": \"missing or wrong cache name\"}";
     }
 
     *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
@@ -291,112 +291,147 @@ int main(int argc, char** argv) {
   // routing request
   server.resource["^/route/v1/transit[/]?$"]["GET"]=[&server, &calculator](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
     
-    // prepare benchmarking and timer:
-    calculator.algorithmCalculationTime.start();
-    calculator.benchmarking.clear();
-    
-    // prepare parameters:
-    std::vector<std::string> parametersWithValues;
-    auto queryFields = request->parse_query_string();
-    for(auto &field : queryFields)
-    {
-      parametersWithValues.push_back(field.first + "=" + field.second);
-    }
-  
-    // clear and initialize benchmarking:
-    if (calculator.params.debugDisplay)
-    {
-      calculator.benchmarking["reset"]               = 0;
-      calculator.benchmarking["forward_calculation"] = 0;
-      //calculator.benchmarking["forward_journey"]     = 0;
-      calculator.benchmarking["reverse_calculation"] = 0;
-      //calculator.benchmarking["reverse_journey"]     = 0;
-      //calculator.benchmarking["generating_results"]  = 0;
-    }
-    
-    std::cout << "calculating request: " << request->path << std::endl;
-
-    int countOdTripsCalculated {0};
     std::string response {""};
-    
-    // update params:
-    calculator.params.setDefaultValues();
-    calculator.params.update(parametersWithValues, calculator.scenarioIndexesByUuid, calculator.scenarios, calculator.nodeIndexesByUuid, calculator.agencyIndexesByUuid, calculator.lineIndexesByUuid, calculator.serviceIndexesByUuid, calculator.modeIndexesByShortname, calculator.dataSourceIndexesByUuid);
 
-    if (calculator.params.isCompleteForCalculation())
+    if (calculator.countAgencies() == 0)
     {
-      
-      // find OdTrip if provided:
-      bool   foundOdTrip{false};
+      response = "{\"status\": \"error\", \"error\": \"No agencies found\", \"code\": \"MISSING_DATA_AGENCIES\"}";
+    }
+    else if (calculator.countServices() == 0)
+    {
+      response = "{\"status\": \"error\", \"error\": \"No services found\", \"code\": \"MISSING_DATA_SERVICES\"}";
+    }
+    else if (calculator.countNodes() == 0)
+    {
+      response = "{\"status\": \"error\", \"error\": \"No nodes found\", \"code\": \"MISSING_DATA_NODES\"}";
+    }
+    else if (calculator.countLines() == 0)
+    {
+      response = "{\"status\": \"error\", \"error\": \"No lines found\", \"code\": \"MISSING_DATA_LINES\"}";
+    }
+    else if (calculator.countPaths() == 0)
+    {
+      response = "{\"status\": \"error\", \"error\": \"No paths found\", \"code\": \"MISSING_DATA_PATHS\"}";
+    }
+    else if (calculator.countScenarios() == 0)
+    {
+      response = "{\"status\": \"error\", \"error\": \"No scenarios found\", \"code\": \"MISSING_DATA_SCENARIOS\"}";
+    }
+    else if (calculator.countConnections() == 0  || calculator.countTrips() == 0)
+    {
+      response = "{\"status\": \"error\", \"error\": \"No schedules found\", \"code\": \"MISSING_DATA_SCHEDULES\"}";
+    }
+    else
+    {
+      // prepare benchmarking and timer:
+      calculator.algorithmCalculationTime.start();
+      calculator.benchmarking.clear();
 
-      calculator.origin      = &calculator.params.origin;
-      calculator.destination = &calculator.params.destination;
-      calculator.odTrip      = nullptr;
-
-      if (calculator.params.odTripUuid.is_initialized() && calculator.odTripIndexesByUuid.count(calculator.params.odTripUuid.get()))
+      // prepare parameters:
+      std::vector<std::string> parametersWithValues;
+      auto queryFields = request->parse_query_string();
+      for(auto &field : queryFields)
       {
-        calculator.odTrip = calculator.odTrips[calculator.odTripIndexesByUuid[calculator.params.odTripUuid.get()]].get();
-        foundOdTrip = true;
-        std::cout << "od trip uuid " << calculator.odTrip->uuid << std::endl;
-        std::cout << "dts " << calculator.odTrip->departureTimeSeconds << std::endl;
-        calculator.origin      = calculator.odTrip->origin.get();
-        calculator.destination = calculator.odTrip->destination.get();
-        if (calculator.params.alternatives)
+        parametersWithValues.push_back(field.first + "=" + field.second);
+      }
+
+      // clear and initialize benchmarking:
+      if (calculator.params.debugDisplay)
+      {
+        calculator.benchmarking["reset"]               = 0;
+        calculator.benchmarking["forward_calculation"] = 0;
+        //calculator.benchmarking["forward_journey"]     = 0;
+        calculator.benchmarking["reverse_calculation"] = 0;
+        //calculator.benchmarking["reverse_journey"]     = 0;
+        //calculator.benchmarking["generating_results"]  = 0;
+      }
+
+      std::cout << "calculating request: " << request->path << std::endl;
+
+      int countOdTripsCalculated {0};
+      
+
+      // update params:
+      calculator.params.setDefaultValues();
+      calculator.params.update(parametersWithValues, calculator.scenarioIndexesByUuid, calculator.scenarios, calculator.nodeIndexesByUuid, calculator.agencyIndexesByUuid, calculator.lineIndexesByUuid, calculator.serviceIndexesByUuid, calculator.modeIndexesByShortname, calculator.dataSourceIndexesByUuid);
+
+      if (calculator.params.isCompleteForCalculation())
+      {
+
+        // find OdTrip if provided:
+        bool   foundOdTrip{false};
+
+        calculator.origin      = &calculator.params.origin;
+        calculator.destination = &calculator.params.destination;
+        calculator.odTrip      = nullptr;
+
+        if (calculator.params.odTripUuid.is_initialized() && calculator.odTripIndexesByUuid.count(calculator.params.odTripUuid.get()))
+        {
+          calculator.odTrip = calculator.odTrips[calculator.odTripIndexesByUuid[calculator.params.odTripUuid.get()]].get();
+          foundOdTrip = true;
+          std::cout << "od trip uuid " << calculator.odTrip->uuid << std::endl;
+          std::cout << "dts " << calculator.odTrip->departureTimeSeconds << std::endl;
+          calculator.origin      = calculator.odTrip->origin.get();
+          calculator.destination = calculator.odTrip->destination.get();
+          if (calculator.params.alternatives)
+          {
+            response = calculator.alternativesRouting();
+          }
+          else
+          {
+            response = calculator.calculate().json.dump(2);
+          }
+        }
+        else if (calculator.params.alternatives)
         {
           response = calculator.alternativesRouting();
+        }
+        else if (!calculator.params.alternatives && (calculator.params.calculateAllOdTrips || foundOdTrip ))
+        {
+          response = calculator.odTripsRouting();
         }
         else
         {
           response = calculator.calculate().json.dump(2);
         }
-      }
-      else if (calculator.params.alternatives)
-      {
-        response = calculator.alternativesRouting();
-      }
-      else if (!calculator.params.alternatives && (calculator.params.calculateAllOdTrips || foundOdTrip ))
-      {
-        response = calculator.odTripsRouting();
+
+        if (calculator.params.saveResultToFile)
+        {
+          std::cerr << "writing file" << std::endl;
+          std::ofstream file;
+          //file.imbue(std::locale("en_US.UTF8"));
+          file.open(calculator.params.calculationName + "." + calculator.params.responseFormat, std::ios_base::trunc);
+          file << response;
+          file.close();
+        }
+
       }
       else
       {
-        response = calculator.calculate().json.dump(2);
+        response = "{\"status\": \"error\", \"error\": \"Wrong or malformed query\"}";
       }
-      
-      if (calculator.params.saveResultToFile)
+
+      std::cerr << "-- total -- " << calculator.algorithmCalculationTime.getDurationMicrosecondsNoStop() << " microseconds\n";
+
+      if (calculator.params.debugDisplay)
       {
-        std::cerr << "writing file" << std::endl;
-        std::ofstream file;
-        //file.imbue(std::locale("en_US.UTF8"));
-        file.open(calculator.params.calculationName + "." + calculator.params.responseFormat, std::ios_base::trunc);
-        file << response;
-        file.close();
-      }
-      
-    }
-    else
-    {
-      response = "{\"status\": \"failed\", \"error\": \"Wrong or malformed query\"}";
-    }
-    
-    std::cerr << "-- total -- " << calculator.algorithmCalculationTime.getDurationMicrosecondsNoStop() << " microseconds\n";
-    
-    if (calculator.params.debugDisplay)
-    {
-      for (auto & benchmark : calculator.benchmarking)
-      {
-        std::cerr << "  -- " << benchmark.first << " -- " << benchmark.second / 1000 << " ms ";
+        for (auto & benchmark : calculator.benchmarking)
+        {
+          std::cerr << "  -- " << benchmark.first << " -- " << benchmark.second / 1000 << " ms ";
+          if (countOdTripsCalculated > 0)
+          {
+            std::cerr << " (" << (benchmark.second / countOdTripsCalculated / 1000) << " per odTrip)";
+          }
+          std::cerr << "\n";
+        }
         if (countOdTripsCalculated > 0)
         {
-          std::cerr << " (" << (benchmark.second / countOdTripsCalculated / 1000) << " per odTrip)";
+          std::cerr << "  -- number of od trips calculated -- " << countOdTripsCalculated << "\n";
         }
-        std::cerr << "\n";
-      }
-      if (countOdTripsCalculated > 0)
-      {
-        std::cerr << "  -- number of od trips calculated -- " << countOdTripsCalculated << "\n";
       }
     }
+
+    
     
     *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/" << calculator.params.responseFormat << "; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
     
@@ -407,7 +442,7 @@ int main(int argc, char** argv) {
   server.default_resource["GET"] = [](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
     std::cout << "calculating request: " << request->content.string() << std::endl;
     
-    std::string response = "{\"status\": \"failed\", \"error\": \"missing params\"}";
+    std::string response = "{\"status\": \"error\", \"error\": \"missing params\"}";
 
     *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
   };

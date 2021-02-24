@@ -108,6 +108,20 @@ namespace TrRouting
     void                    updateNetworksFromCache   (Parameters&  params, std::string customPath = "");
     void                    updateSchedulesFromCache  (Parameters&  params, std::string customPath = "");
     
+    int               countStations();
+    int               countAgencies();
+    int               countServices();
+    int               countNodes();
+    int               countStops();
+    int               countLines();
+    int               countPaths();
+    int               countScenarios();
+    int               countTrips();
+    long long         countConnections();
+    int               countNetworks();
+
+
+
     std::vector<Mode>                        modes;
     std::map<std::string, int>               modeIndexesByShortname;
 
