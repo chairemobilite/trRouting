@@ -295,31 +295,31 @@ int main(int argc, char** argv) {
 
     if (calculator.countAgencies() == 0)
     {
-      response = "{\"status\": \"error\", \"error\": \"No agencies found\", \"code\": \"MISSING_DATA_AGENCIES\"}";
+      response = "{\"status\": \"error\", \"error\": {\"error\": \"No agencies found\", \"code\": \"MISSING_DATA_AGENCIES\"}}";
     }
     else if (calculator.countServices() == 0)
     {
-      response = "{\"status\": \"error\", \"error\": \"No services found\", \"code\": \"MISSING_DATA_SERVICES\"}";
+      response = "{\"status\": \"error\", \"error\": {\"error\": \"No services found\", \"code\": \"MISSING_DATA_SERVICES\"}}";
     }
     else if (calculator.countNodes() == 0)
     {
-      response = "{\"status\": \"error\", \"error\": \"No nodes found\", \"code\": \"MISSING_DATA_NODES\"}";
+      response = "{\"status\": \"error\", \"error\": {\"error\": \"No nodes found\", \"code\": \"MISSING_DATA_NODES\"}}";
     }
     else if (calculator.countLines() == 0)
     {
-      response = "{\"status\": \"error\", \"error\": \"No lines found\", \"code\": \"MISSING_DATA_LINES\"}";
+      response = "{\"status\": \"error\", \"error\": {\"error\": \"No lines found\", \"code\": \"MISSING_DATA_LINES\"}}";
     }
     else if (calculator.countPaths() == 0)
     {
-      response = "{\"status\": \"error\", \"error\": \"No paths found\", \"code\": \"MISSING_DATA_PATHS\"}";
+      response = "{\"status\": \"error\", \"error\": {\"error\": \"No paths found\", \"code\": \"MISSING_DATA_PATHS\"}}";
     }
     else if (calculator.countScenarios() == 0)
     {
-      response = "{\"status\": \"error\", \"error\": \"No scenarios found\", \"code\": \"MISSING_DATA_SCENARIOS\"}";
+      response = "{\"status\": \"error\", \"error\": {\"error\": \"No scenarios found\", \"code\": \"MISSING_DATA_SCENARIOS\"}}";
     }
     else if (calculator.countConnections() == 0  || calculator.countTrips() == 0)
     {
-      response = "{\"status\": \"error\", \"error\": \"No schedules found\", \"code\": \"MISSING_DATA_SCHEDULES\"}";
+      response = "{\"status\": \"error\", \"error\": {\"error\": \"No schedules found\", \"code\": \"MISSING_DATA_SCHEDULES\"}}";
     }
     else
     {
