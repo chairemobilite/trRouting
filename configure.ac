@@ -1,5 +1,5 @@
 AC_INIT([trRouting], [1.0], [TODO@TODO.PRG])
-AM_INIT_AUTOMAKE([-Wall -Werror foreign])
+AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
 
 AC_CONFIG_MACRO_DIRS([m4])
 
@@ -47,6 +47,7 @@ LDFLAGS+=" $CAPNP_LIBS"
 AC_CONFIG_FILES([
  Makefile
  src/Makefile
+ tests/Makefile
  include/Makefile
  include/capnp/Makefile
  connection_scan_algorithm/Makefile
