@@ -44,6 +44,17 @@ Then:
 make
 ```
 
+## Test
+
+trRouting uses [Googletest](https://github.com/google/googletest) to unit test the application. To run the tests, you must first fetch the googletest submodule once into the repo:
+
+```
+git submodule init
+git submodule update
+```
+
+Then, to run the unit tests individually, simply run `make check`.
+
 ## Docker
 A provided dockerfile allows to easily build an image
 
