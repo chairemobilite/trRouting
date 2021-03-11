@@ -57,14 +57,22 @@ namespace TrRouting
                      "firstWaitingTimeSeconds,nonTransitTravelTimeSeconds,lineUuids,modeShortnames,agencyUuids,boardingNodeUuids,unboardingNodeUuids,tripUuids\n";
     }
 
-    
-
     if (params.debugDisplay)
       std::cout << "  starting odTripsRouting" << std::endl;
 
     int stopAtI {-1};
     std::vector<int> odTripIndexes(odTripsCount);
+    std::cerr << odTripsCount << std::endl;
     std::iota(odTripIndexes.begin(), odTripIndexes.end(), 0);
+
+    if (odTripsCount == 0)
+    {
+      if (params.responseFormat == "json")
+      {
+        response = json.dump(2);
+      }
+      return response;
+    }
     if (params.odTripsSampleRatio > 0.0 && params.odTripsSampleRatio < 1.0)
     {
 

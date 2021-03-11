@@ -55,7 +55,7 @@ namespace TrRouting
         if (CacheFetcher::capnpCacheFileExists(filePath, params, customPath))
         {
           int fd = open((CacheFetcher::getFilePath(filePath, params, customPath)).c_str(), O_RDWR);
-          ::capnp::PackedFdMessageReader capnpTCollectionMessage(fd, {64 * 1024 * 1024});
+          ::capnp::PackedFdMessageReader capnpTCollectionMessage(fd, {512 * 1024 * 1024});
           TCollection::Reader capnpTCollection = capnpTCollectionMessage.getRoot<TCollection>();
           for (cT::Reader capnpT : capnpTCollection.getOdTrips())
           {
@@ -67,10 +67,13 @@ namespace TrRouting
             std::unique_ptr<T> t               = std::make_unique<T>();
             std::unique_ptr<Point> origin      = std::make_unique<Point>();
             std::unique_ptr<Point> destination = std::make_unique<Point>();
-            
+
             t->uuid                     = uuidGenerator(uuid);
             t->id                       = capnpT.getId();
             t->expansionFactor          = capnpT.getExpansionFactor();
+            if (t->expansionFactor == -1.0) {
+              t->expansionFactor = 1.0;
+            }
             t->internalId               = capnpT.getInternalId();
             t->departureTimeSeconds     = capnpT.getDepartureTimeSeconds();
             t->arrivalTimeSeconds       = capnpT.getArrivalTimeSeconds();
@@ -192,6 +195,7 @@ namespace TrRouting
 
           }
           //std::cout << TStr << ":\n" << Toolbox::prettyPrintStructVector(ts) << std::endl;
+          std::cerr << "parsed " << ts.size() << " od trips" << std::endl;
           close(fd);
         }
         else
