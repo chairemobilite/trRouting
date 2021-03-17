@@ -78,8 +78,8 @@ namespace TrRouting
             t->departureTimeSeconds     = capnpT.getDepartureTimeSeconds();
             t->arrivalTimeSeconds       = capnpT.getArrivalTimeSeconds();
             t->walkingTravelTimeSeconds = capnpT.getWalkingTravelTimeSeconds();
-            //t->cyclingTravelTimeSeconds = capnpT.getCyclingTravelTimeSeconds();
-            //t->drivingTravelTimeSeconds = capnpT.getDrivingTravelTimeSeconds();
+            t->cyclingTravelTimeSeconds = capnpT.getCyclingTravelTimeSeconds();
+            t->drivingTravelTimeSeconds = capnpT.getDrivingTravelTimeSeconds();
 
             origin->latitude          = ((double)capnpT.getOriginLatitude())       / 1000000.0;
             origin->longitude         = ((double)capnpT.getOriginLongitude())      / 1000000.0;
