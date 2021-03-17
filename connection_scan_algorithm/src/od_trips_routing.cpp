@@ -349,8 +349,8 @@ namespace TrRouting
           odTripJson["expansionFactor"]               = correctedExpansionFactor;
           odTripJson["travelTimeSeconds"]             = routingResult.travelTimeSeconds;
           odTripJson["onlyWalkingTravelTimeSeconds"]  = odTrip->walkingTravelTimeSeconds;
-          //odTripJson["onlyCyclingTravelTimeSeconds"]  = odTrip->cyclingTravelTimeSeconds;
-          //odTripJson["onlyDrivingTravelTimeSeconds"]  = odTrip->drivingTravelTimeSeconds;
+          odTripJson["onlyCyclingTravelTimeSeconds"]  = odTrip->cyclingTravelTimeSeconds;
+          odTripJson["onlyDrivingTravelTimeSeconds"]  = odTrip->drivingTravelTimeSeconds;
           odTripJson["declaredDepartureTimeSeconds"]  = odTrip->departureTimeSeconds;
           odTripJson["declaredArrivalTimeSeconds"]    = odTrip->arrivalTimeSeconds;
           odTripJson["departureTimeSeconds"]          = routingResult.departureTimeSeconds;
