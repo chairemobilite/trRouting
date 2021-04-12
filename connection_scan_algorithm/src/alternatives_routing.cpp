@@ -1,4 +1,5 @@
 #include "calculator.hpp"
+#include "constants.hpp"
 
 namespace TrRouting
 {
@@ -51,7 +52,7 @@ namespace TrRouting
 
 
 
-    if (routingResult.status == "success")
+    if (routingResult.status == STATUS_SUCCESS)
     {
       /*lineShortnames.clear();
       for(auto lineIdx : routingResult.linesIdx)
@@ -90,7 +91,7 @@ namespace TrRouting
       alternativesCalculatedCount++;
 
       json["alternatives"].push_back(alternativeJson);
-      json["status"] = "success";
+      json["status"] = STATUS_SUCCESS;
       //departureTimeSeconds = routingResult.departureTimeSeconds + routingResult.firstWaitingTimeSeconds - params.minWaitingTimeSeconds;
             
       maxTravelTime = params.alternativesMaxTravelTimeRatio * routingResult.travelTimeSeconds + (routingResult.initialDepartureTimeSeconds ? routingResult.departureTimeSeconds - routingResult.initialDepartureTimeSeconds : 0);
@@ -180,7 +181,7 @@ namespace TrRouting
 
           routingResult = calculate(false, true);
           
-          if (routingResult.status == "success")
+          if (routingResult.status == STATUS_SUCCESS)
           {
           
             foundLinesIdx = routingResult.linesIdx;
@@ -336,7 +337,7 @@ namespace TrRouting
     }
     else
     {
-      json["status"] = "no_routing_found";
+      json["status"] = STATUS_NO_ROUTING_FOUND;
     }
 
     response = json.dump(2);
