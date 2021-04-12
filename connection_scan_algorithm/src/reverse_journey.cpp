@@ -1,4 +1,5 @@
 #include "calculator.hpp"
+#include "constants.hpp"
 #include "json.hpp"
 
 namespace TrRouting
@@ -20,6 +21,8 @@ namespace TrRouting
     if (params.returnAllNodesResult)
     {
       nodesCount     = nodes.size();
+      // Initialize status to no routing
+      json["status"] = STATUS_NO_ROUTING_FOUND;
       json["nodes"]  = nlohmann::json::array();
       resultingNodes = std::vector<int>(nodesCount);
       std::iota (std::begin(resultingNodes), std::end(resultingNodes), 0); // generate sequencial indexes of each nodes
@@ -419,6 +422,7 @@ namespace TrRouting
             if (arrivalTimeSeconds - departureTime <= params.maxTotalTravelTimeSeconds)
             {
               reachableNodesCount++;
+              json["status"]                     = STATUS_SUCCESS;
               nodeJson                           = {};
               nodeJson["id"]                     = boost::uuids::to_string(nodes[resultingNodeIndex].get()->uuid);
               nodeJson["departureTime"]          = Toolbox::convertSecondsToFormattedTime(departureTime);
@@ -465,7 +469,7 @@ namespace TrRouting
               stepsStr.pop_back();
             }
 
-            json["status"]                                         = "success";
+            json["status"]                                         = STATUS_SUCCESS;
             json["origin"]                                         = { origin->longitude,      origin->latitude      };
             json["destination"]                                    = { destination->longitude, destination->latitude };
             json["departureTime"]                                  = Toolbox::convertSecondsToFormattedTime(bestDepartureTime);
@@ -538,7 +542,7 @@ namespace TrRouting
             result.tripUuids                     = tripUuids;
             result.tripsIdx                      = tripsIdx;
             result.inVehicleTravelTimesSeconds   = inVehicleTravelTimesSeconds;
-            result.status                        = "success";
+            result.status                        = STATUS_SUCCESS;
             
           }
         }
@@ -546,12 +550,12 @@ namespace TrRouting
     }
     else // no route found
     {
-      json["status"]                     = "no_routing_found";
+      json["status"]                     = STATUS_NO_ROUTING_FOUND;
       json["origin"]                     = { origin->longitude,      origin->latitude      };
       json["destination"]                = { destination->longitude, destination->latitude };
       json["arrivalTime"]                = Toolbox::convertSecondsToFormattedTime(arrivalTimeSeconds);
       json["arrivalTimeSeconds"]         = arrivalTimeSeconds;
-      result.status                      = "no_routing_found";
+      result.status                      = STATUS_NO_ROUTING_FOUND;
       result.travelTimeSeconds           = -1;
       result.arrivalTimeSeconds          = arrivalTimeSeconds;
       result.numberOfTransfers           = -1;
