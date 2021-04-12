@@ -419,6 +419,7 @@ namespace TrRouting
             if (arrivalTimeSeconds - departureTime <= params.maxTotalTravelTimeSeconds)
             {
               reachableNodesCount++;
+              json["status"]                     = "success";
               nodeJson                           = {};
               nodeJson["id"]                     = boost::uuids::to_string(nodes[resultingNodeIndex].get()->uuid);
               nodeJson["departureTime"]          = Toolbox::convertSecondsToFormattedTime(departureTime);
