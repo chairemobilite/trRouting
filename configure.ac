@@ -48,6 +48,7 @@ AC_CONFIG_FILES([
  Makefile
  src/Makefile
  tests/Makefile
+ tests/cache_fetch/Makefile
  include/Makefile
  include/capnp/Makefile
  connection_scan_algorithm/Makefile

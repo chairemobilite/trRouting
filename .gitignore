@@ -84,8 +84,8 @@ Makefile.in
 
 # tests
 test-driver
-tests/gtest
-tests/gtest.log
-tests/gtest.trs
-tests/test-suite.log
+tests/**/gtest
+tests/**/gtest.log
+tests/**/gtest.trs
+tests/**/test-suite.log
 tests/*/.dirstamp

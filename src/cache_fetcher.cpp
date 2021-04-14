@@ -38,13 +38,20 @@ namespace TrRouting
   }
   
   std::string CacheFetcher::getFilePath(std::string cacheFilePath, Parameters& params, std::string customPath) {
+    std::string filePath = "";
+    if (!params.cacheDirectoryPath.empty()) {
+      filePath += params.cacheDirectoryPath + "/";
+    }
+    if (!params.projectShortname.empty()) {
+      filePath += params.projectShortname + "/";
+    }
     if (customPath.empty())
     {
-      return params.cacheDirectoryPath + "/" + params.projectShortname + "/" + cacheFilePath;
+      return filePath + cacheFilePath;
     }
     else
     {
-      return params.cacheDirectoryPath + "/" + params.projectShortname + "/" + customPath + "/" + cacheFilePath;
+      return filePath + customPath + "/" + cacheFilePath;
     }
   }
 
