@@ -39,6 +39,7 @@ namespace TrRouting
 
     std::string cacheFileName{tStr};
     std::string nodeCacheFileName{""};
+    std::string nodeCacheFileNameComplete{""};
     boost::uuids::string_generator uuidGenerator;
 
     std::cout << "Fetching " << tStr << " from cache..." << std::endl;
@@ -97,36 +98,45 @@ namespace TrRouting
         Node * t = ts[i].get();
 
         nodeCacheFileName = "nodes/node_" + boost::uuids::to_string(t->uuid);
+        nodeCacheFileNameComplete = CacheFetcher::getFilePath(nodeCacheFileName, params, customPath) + ".capnpbin";
         if (CacheFetcher::capnpCacheFileExists(nodeCacheFileName + ".capnpbin", params, customPath))
         {
-          int fd = open((CacheFetcher::getFilePath(nodeCacheFileName, params, customPath) + ".capnpbin").c_str(), O_RDWR);
-          ::capnp::PackedFdMessageReader capnpTMessage(fd, {32 * 1024 * 1024});
-          cNode::Reader capnpT = capnpTMessage.getRoot<cNode>();
-          const unsigned int transferableNodesCount {capnpT.getTransferableNodesUuids().size()};
+          int fd = open(nodeCacheFileNameComplete.c_str(), O_RDWR);
+          try {
+            ::capnp::PackedFdMessageReader capnpTMessage(fd, {32 * 1024 * 1024});
+          
+            cNode::Reader capnpT = capnpTMessage.getRoot<cNode>();
+            const unsigned int transferableNodesCount {capnpT.getTransferableNodesUuids().size()};
 
-          std::vector<int> transferableNodesIdx(transferableNodesCount);
-          std::vector<int> transferableTravelTimesSeconds(transferableNodesCount);
-          std::vector<int> transferableDistancesMeters(transferableNodesCount);
-          std::vector<int> reverseTransferableNodesIdx(transferableNodesCount);
-          std::vector<int> reverseTransferableTravelTimesSeconds(transferableNodesCount);
-          std::vector<int> reverseTransferableDistancesMeters(transferableNodesCount);
+            std::vector<int> transferableNodesIdx(transferableNodesCount);
+            std::vector<int> transferableTravelTimesSeconds(transferableNodesCount);
+            std::vector<int> transferableDistancesMeters(transferableNodesCount);
+            std::vector<int> reverseTransferableNodesIdx(transferableNodesCount);
+            std::vector<int> reverseTransferableTravelTimesSeconds(transferableNodesCount);
+            std::vector<int> reverseTransferableDistancesMeters(transferableNodesCount);
 
-          for (int j = 0; j < transferableNodesCount; j++)
-          {
-            std::string nodeUuid {capnpT.getTransferableNodesUuids()[j]};
-            transferableNodesIdx          [j] = tIndexesByUuid[uuidGenerator(nodeUuid)];
-            transferableTravelTimesSeconds[j] = capnpT.getTransferableNodesTravelTimes()[j];
-            transferableDistancesMeters   [j] = capnpT.getTransferableNodesDistances()[j];
+            for (int j = 0; j < transferableNodesCount; j++)
+            {
+              std::string nodeUuid {capnpT.getTransferableNodesUuids()[j]};
+              transferableNodesIdx          [j] = tIndexesByUuid[uuidGenerator(nodeUuid)];
+              transferableTravelTimesSeconds[j] = capnpT.getTransferableNodesTravelTimes()[j];
+              transferableDistancesMeters   [j] = capnpT.getTransferableNodesDistances()[j];
+            }
+            t->transferableNodesIdx           = transferableNodesIdx;
+            t->transferableTravelTimesSeconds = transferableTravelTimesSeconds;
+            t->transferableDistancesMeters    = transferableDistancesMeters;
+
+            // put same node transfer at the beginning:
+            t->reverseTransferableNodesIdx.push_back(i);
+            t->reverseTransferableTravelTimesSeconds.push_back(0);
+            t->reverseTransferableDistancesMeters.push_back(0);
+            close(fd);
+          } catch (...) {
+            std::cerr << "-- Error reading node cache file -- " <<  nodeCacheFileNameComplete;
+            close(fd);
+            continue;
           }
-          t->transferableNodesIdx           = transferableNodesIdx;
-          t->transferableTravelTimesSeconds = transferableTravelTimesSeconds;
-          t->transferableDistancesMeters    = transferableDistancesMeters;
 
-          // put same node transfer at the beginning:
-          t->reverseTransferableNodesIdx.push_back(i);
-          t->reverseTransferableTravelTimesSeconds.push_back(0);
-          t->reverseTransferableDistancesMeters.push_back(0);
-          close(fd);
         }
 
       }
