@@ -72,10 +72,10 @@ namespace TrRouting
     for (auto & line : lines)
     {
       cacheFileName = "lines/line_" + boost::uuids::to_string(line->uuid);
-      
-      if (CacheFetcher::capnpCacheFileExists(cacheFileName + ".capnpbin", params, customPath))
+      std::string cacheFilePath = CacheFetcher::getFilePath(cacheFileName, params, customPath) + ".capnpbin";
+      if (CacheFetcher::capnpCacheFileExists(cacheFilePath))
       {
-        int fd = open((CacheFetcher::getFilePath(cacheFileName, params, customPath) + ".capnpbin").c_str(), O_RDWR);
+        int fd = open(cacheFilePath.c_str(), O_RDWR);
         ::capnp::PackedFdMessageReader capnpLineMessage(fd, {32 * 1024 * 1024});
         line::Line::Reader capnpLine = capnpLineMessage.getRoot<line::Line>();
         

@@ -46,17 +46,18 @@ namespace TrRouting
 
       std::string cacheFilePath {"dataSources/" + boost::uuids::to_string(dataSourceUuid) + "/persons/" + cacheFileName};
 
-      int filesCount {CacheFetcher::getCacheFilesCount(cacheFilePath + ".capnpbin.count", params, customPath)};
+      int filesCount {CacheFetcher::getCacheFilesCount(CacheFetcher::getFilePath(cacheFilePath + ".capnpbin.count", params, customPath))};
 
       std::cout << "files count persons: " << filesCount << " path: " << cacheFilePath << std::endl;
 
       for (int i = 0; i < filesCount; i++)
       {
         std::string filePath {cacheFilePath + ".capnpbin" + (filesCount > 1 ? "." + std::to_string(i) : "")};
+        std::string cacheFilePath = CacheFetcher::getFilePath(filePath, params, customPath);
 
-        if (CacheFetcher::capnpCacheFileExists(filePath, params, customPath))
+        if (CacheFetcher::capnpCacheFileExists(cacheFilePath))
         {
-          int fd = open((CacheFetcher::getFilePath(filePath, params, customPath)).c_str(), O_RDWR);
+          int fd = open(cacheFilePath.c_str(), O_RDWR);
           ::capnp::PackedFdMessageReader capnpTCollectionMessage(fd, {64 * 1024 * 1024});
           TCollection::Reader capnpTCollection = capnpTCollectionMessage.getRoot<TCollection>();
           for (cT::Reader capnpT : capnpTCollection.getPersons())

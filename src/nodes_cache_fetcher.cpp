@@ -39,14 +39,15 @@ namespace TrRouting
 
     std::string cacheFileName{tStr};
     std::string nodeCacheFileName{""};
-    std::string nodeCacheFileNameComplete{""};
+    std::string nodeCacheFileNamePath{""};
     boost::uuids::string_generator uuidGenerator;
 
     std::cout << "Fetching " << tStr << " from cache..." << std::endl;
     
-    if (CacheFetcher::capnpCacheFileExists(cacheFileName + ".capnpbin", params, customPath))
+    std::string cacheFilePath = CacheFetcher::getFilePath(cacheFileName, params, customPath) + ".capnpbin";
+    if (CacheFetcher::capnpCacheFileExists(cacheFilePath))
     {
-      int fd = open((CacheFetcher::getFilePath(cacheFileName, params, customPath) + ".capnpbin").c_str(), O_RDWR);
+      int fd = open(cacheFilePath.c_str(), O_RDWR);
       ::capnp::PackedFdMessageReader capnpTCollectionMessage(fd, {64 * 1024 * 1024});
       TCollection::Reader capnpTCollection = capnpTCollectionMessage.getRoot<TCollection>();
       for (cT::Reader capnpT : capnpTCollection.getNodes())
@@ -98,10 +99,10 @@ namespace TrRouting
         Node * t = ts[i].get();
 
         nodeCacheFileName = "nodes/node_" + boost::uuids::to_string(t->uuid);
-        nodeCacheFileNameComplete = CacheFetcher::getFilePath(nodeCacheFileName, params, customPath) + ".capnpbin";
-        if (CacheFetcher::capnpCacheFileExists(nodeCacheFileName + ".capnpbin", params, customPath))
+        nodeCacheFileNamePath = CacheFetcher::getFilePath(nodeCacheFileName, params, customPath) + ".capnpbin";
+        if (CacheFetcher::capnpCacheFileExists(nodeCacheFileNamePath))
         {
-          int fd = open(nodeCacheFileNameComplete.c_str(), O_RDWR);
+          int fd = open(nodeCacheFileNamePath.c_str(), O_RDWR);
           try {
             ::capnp::PackedFdMessageReader capnpTMessage(fd, {32 * 1024 * 1024});
           
@@ -132,7 +133,7 @@ namespace TrRouting
             t->reverseTransferableDistancesMeters.push_back(0);
             close(fd);
           } catch (...) {
-            std::cerr << "-- Error reading node cache file -- " <<  nodeCacheFileNameComplete;
+            std::cerr << "-- Error reading node cache file -- " <<  nodeCacheFileNamePath;
             close(fd);
             continue;
           }
