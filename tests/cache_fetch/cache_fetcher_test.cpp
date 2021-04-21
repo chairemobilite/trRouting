@@ -5,10 +5,10 @@
 class CacheFetcherFixtureTests : public ::testing::Test {
 protected:
     TrRouting::Parameters params;
-    std::string cacheFile = "cacheFile.capnp";
+    std::string cacheFile = "cacheFile.capnpbin";
     std::string customPath = "test";
     std::string relativeCacheDir = "cache";
-    std::string projectName = "test";
+    std::string projectName = "testCache";
 };
 
 TEST_F(CacheFetcherFixtureTests, TestGetFilePath)
@@ -36,3 +36,31 @@ TEST_F(CacheFetcherFixtureTests, TestGetFilePath)
     filePath = TrRouting::CacheFetcher::getFilePath(cacheFile, params, "");
     EXPECT_STREQ(filePath.c_str(), (projectName + '/' + cacheFile).c_str());
 }
+
+TEST_F(CacheFetcherFixtureTests, TestFileExists)
+{
+    // Test a file that exists
+    std::string cacheFile = "testCache/invalidCacheFiles/agencies.capnpbin";
+    ASSERT_TRUE(TrRouting::CacheFetcher::capnpCacheFileExists(cacheFile));
+
+    // Test a file that does not exist
+    cacheFile = "testCache/notexists.capnpbin";
+    ASSERT_FALSE(TrRouting::CacheFetcher::capnpCacheFileExists(cacheFile));
+}
+
+TEST_F(CacheFetcherFixtureTests, TestGetFileCount)
+{
+    // Test count with a count file that does not exist
+    std::string cacheFile = "testCache/notexists.capnpbin";
+    ASSERT_EQ(1, TrRouting::CacheFetcher::getCacheFilesCount(cacheFile));
+
+    // Test a file that contains a count
+    cacheFile = "testCache/someCache.capnpbin.count";
+    ASSERT_EQ(10, TrRouting::CacheFetcher::getCacheFilesCount(cacheFile));
+
+    // Read a value from an invalid file.
+    // TODO It returns 0, is this the right expected value?
+    cacheFile = "testCache/invalidCacheFiles/agencies.capnpbin";
+    ASSERT_EQ(0, TrRouting::CacheFetcher::getCacheFilesCount(cacheFile));
+}
+

@@ -4,28 +4,28 @@ namespace TrRouting
 {
   
   template<class T>
-  void CacheFetcher::saveToCapnpCacheFile(T& data, std::string cacheFilePath, Parameters& params, std::string customPath) {
+  void CacheFetcher::saveToCapnpCacheFile(T& data, std::string cacheFilePath) {
     std::ofstream oCacheFile;
-    oCacheFile.open(CacheFetcher::getFilePath(cacheFilePath, params, customPath), std::ios::out | std::ios::trunc | std::ios::binary);
+    oCacheFile.open(cacheFilePath, std::ios::out | std::ios::trunc | std::ios::binary);
     oCacheFile.close();
-    int fd = open(CacheFetcher::getFilePath(cacheFilePath, params, customPath).c_str(), O_WRONLY);
+    int fd = open(cacheFilePath.c_str(), O_WRONLY);
     ::capnp::writePackedMessageToFd(fd, data);
     close(fd);
   }
 
-  bool CacheFetcher::capnpCacheFileExists(std::string cacheFilePath, Parameters& params, std::string customPath) {
+  bool CacheFetcher::capnpCacheFileExists(std::string cacheFilePath) {
     std::ifstream iCacheFile;
     bool notEmpty = false;
-    iCacheFile.open(CacheFetcher::getFilePath(cacheFilePath, params, customPath));
+    iCacheFile.open(cacheFilePath);
     notEmpty = iCacheFile.is_open();
     //std::cout << "capnpCacheFileExists: " << CacheFetcher::getFilePath(cacheFilePath, params, customPath) << " : " << (notEmpty ? "TRUE" : "FALSE") << std::endl;
     iCacheFile.close();
     return notEmpty;
   }
 
-  int CacheFetcher::getCacheFilesCount(std::string cacheFilePath, Parameters& params, std::string customPath) {
+  int CacheFetcher::getCacheFilesCount(std::string cacheFilePath) {
     std::ifstream iCacheFile;
-    iCacheFile.open(CacheFetcher::getFilePath(cacheFilePath, params, customPath));
+    iCacheFile.open(cacheFilePath);
     std::string strCount;
     int count {1};
     if (iCacheFile.is_open())

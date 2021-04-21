@@ -66,9 +66,26 @@ namespace TrRouting
     
     template<class T>
 
-    static void saveToCapnpCacheFile(T& data, std::string cacheFilePath, Parameters& params, std::string customPath = "");
-    static bool capnpCacheFileExists(         std::string cacheFilePath, Parameters& params, std::string customPath = "");
-    static int  getCacheFilesCount  (         std::string cacheFilePath, Parameters& params, std::string customPath = "");
+    /**
+     * Save data to a cache file. The cache file path can be obtained using the
+     * getFilePath function
+     */
+    static void saveToCapnpCacheFile(T& data, std::string cacheFilePath);
+    /**
+     * Returns whether a cache file exists. The cache file path can be obtained
+     * using the getFilePath function
+     */
+    static bool capnpCacheFileExists(         std::string cacheFilePath);
+    /**
+     * Get the number of cache files in a directory. The cache file path can be
+     * obtained using the getFilePath function
+     */
+    static int  getCacheFilesCount  (         std::string cacheFilePath);
+    /**
+     * Get the complete file path from the parameters and configuration
+     * 
+     * Returns the complete file path in the cache
+     */
     static std::string getFilePath  (         std::string cacheFilePath, Parameters& params, std::string customPath = "");
     
     const std::pair<std::vector<Mode>, std::map<std::string, int>> getModes();
