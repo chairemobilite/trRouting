@@ -89,3 +89,4 @@ tests/**/gtest.log
 tests/**/gtest.trs
 tests/**/test-suite.log
 tests/*/.dirstamp
+!tests/**/*.capnpbin

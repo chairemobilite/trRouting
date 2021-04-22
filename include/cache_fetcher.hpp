@@ -136,7 +136,16 @@ namespace TrRouting
       std::string customPath = ""
     );
 
-    void getAgencies(
+    /**
+     * Read the agencies cache file and fill the agencies vector.
+     * 
+     * @return 0 in case of success, values below 0 when errors occurred:
+     * -EBADMSG if deserialization did not work
+     * -ENOENT if the file does not exist
+     * -EINVAL For any other data related error
+     * -(error codes from the open system call)
+     */
+    int getAgencies(
       std::vector<std::unique_ptr<Agency>>& ts,
       std::map<boost::uuids::uuid, int>& tIndexesById,
       Parameters& params,
