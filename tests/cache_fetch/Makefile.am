@@ -7,7 +7,8 @@ gtest_SOURCES = gtest.cpp \
     ../../src/nodes_cache_fetcher.cpp nodes_cache_fetcher_test.cpp \
     ../../src/services_cache_fetcher.cpp services_cache_fetcher_test.cpp \
     ../../src/scenarios_cache_fetcher.cpp scenarios_cache_fetcher_test.cpp \
-    ../../src/lines_cache_fetcher.cpp lines_cache_fetcher_test.cpp
+    ../../src/lines_cache_fetcher.cpp lines_cache_fetcher_test.cpp \
+    ../../src/data_sources_cache_fetcher.cpp data_sources_cache_fetcher_test.cpp
 
 gtest_LDADD = $(top_srcdir)/tests/libgtest.la
 
