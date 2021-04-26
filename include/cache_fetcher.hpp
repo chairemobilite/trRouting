@@ -249,7 +249,16 @@ namespace TrRouting
       std::string customPath = ""
     );
 
-    void getNetworks(
+    /**
+     * Read the networks cache file and fill the networks vector.
+     * 
+     * @return 0 in case of success, values below 0 when errors occurred:
+     * -EBADMSG if deserialization did not work
+     * -ENOENT if the file does not exist
+     * -EINVAL For any other data related error
+     * -(error codes from the open system call)
+     */
+    int getNetworks(
       std::vector<std::unique_ptr<Network>>& ts,
       std::map<boost::uuids::uuid, int>& tIndexesByUuid,
       std::map<boost::uuids::uuid, int>& agencyIndexesByUuid,
