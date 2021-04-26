@@ -4,7 +4,8 @@ check_PROGRAMS = gtest
 gtest_SOURCES = gtest.cpp \
     ../../src/cache_fetcher.cpp cache_fetcher_test.cpp \
     ../../src/agencies_cache_fetcher.cpp agencies_cache_fetcher_test.cpp \
-    ../../src/nodes_cache_fetcher.cpp nodes_cache_fetcher_test.cpp
+    ../../src/nodes_cache_fetcher.cpp nodes_cache_fetcher_test.cpp \
+    ../../src/services_cache_fetcher.cpp services_cache_fetcher_test.cpp
 
 gtest_LDADD = $(top_srcdir)/tests/libgtest.la
 
