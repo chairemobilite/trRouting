@@ -5,7 +5,8 @@
 #include <string>
 #include <vector>
 #include <numeric>
-
+#include <errno.h>
+#include <kj/exception.h>
 
 #include "cache_fetcher.hpp"
 #include "node.hpp"
@@ -18,13 +19,14 @@
 namespace TrRouting
 {
 
-  void CacheFetcher::getNodes(
+  int CacheFetcher::getNodes(
     std::vector<std::unique_ptr<Node>>& ts,
     std::map<boost::uuids::uuid, int>& tIndexesByUuid,
     std::map<boost::uuids::uuid, int>& stationIndexesByUuid,
     Parameters& params,
     std::string customPath
-  ) { 
+  )
+  {
 
     using T           = Node;
     using TCollection = nodeCollection::NodeCollection;
@@ -45,9 +47,24 @@ namespace TrRouting
     std::cout << "Fetching " << tStr << " from cache..." << std::endl;
     
     std::string cacheFilePath = CacheFetcher::getFilePath(cacheFileName, params, customPath) + ".capnpbin";
-    if (CacheFetcher::capnpCacheFileExists(cacheFilePath))
+
+    int fd = open(cacheFilePath.c_str(), O_RDWR);
+    if (fd < 0)
     {
-      int fd = open(cacheFilePath.c_str(), O_RDWR);
+      int err = errno;
+      if (err == ENOENT)
+      {
+        std::cerr << "missing " << tStr << " cache file!" << std::endl;
+      }
+      else
+      {
+        std::cerr << "Error opening cache file " << tStr << ": " << err << std::endl;
+      }
+      return -err;
+    }
+
+    try
+    {
       ::capnp::PackedFdMessageReader capnpTCollectionMessage(fd, {64 * 1024 * 1024});
       TCollection::Reader capnpTCollection = capnpTCollectionMessage.getRoot<TCollection>();
       for (cT::Reader capnpT : capnpTCollection.getNodes())
@@ -83,65 +100,89 @@ namespace TrRouting
         ts.push_back(std::move(t));
         
       }
+      close(fd);
+    }
+    catch (const kj::Exception& e)
+    {
+      std::cerr << "Error opening cache file " << tStr << ": " << e.getDescription().cStr() << std::endl;
+      close(fd);
+      return -EBADMSG;
+    }
+    catch (...)
+    {
+      std::cerr << "Unknown error occurred " << tStr << std::endl;
+      close(fd);
+      return -EINVAL;
+    }
 
-      /*CalculationTime algorithmCalculationTime = CalculationTime();
-      algorithmCalculationTime.start();
-      long long       calculationTime;
-      calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();*/
+    /*CalculationTime algorithmCalculationTime = CalculationTime();
+    algorithmCalculationTime.start();
+    long long       calculationTime;
+    calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();*/
 
-      auto nodesCount {ts.size()};
-      //std::vector<int>::iterator nodeIndex;
-      // find reverse transferable nodes:
-      //std::cout << "-- start node with nodesCount -- " << nodesCount << "\n";
-      for (int i = 0; i < nodesCount; i++)
+    auto nodesCount {ts.size()};
+    //std::vector<int>::iterator nodeIndex;
+    // find reverse transferable nodes:
+    //std::cout << "-- start node with nodesCount -- " << nodesCount << "\n";
+    for (int i = 0; i < nodesCount; i++)
+    {
+
+      Node * t = ts[i].get();
+
+      nodeCacheFileName = "nodes/node_" + boost::uuids::to_string(t->uuid);
+      nodeCacheFileNamePath = CacheFetcher::getFilePath(nodeCacheFileName, params, customPath) + ".capnpbin";
+
+      int fd = open(nodeCacheFileNamePath.c_str(), O_RDWR);
+      if (fd < 0)
       {
-
-        Node * t = ts[i].get();
-
-        nodeCacheFileName = "nodes/node_" + boost::uuids::to_string(t->uuid);
-        nodeCacheFileNamePath = CacheFetcher::getFilePath(nodeCacheFileName, params, customPath) + ".capnpbin";
-        if (CacheFetcher::capnpCacheFileExists(nodeCacheFileNamePath))
-        {
-          int fd = open(nodeCacheFileNamePath.c_str(), O_RDWR);
-          try {
-            ::capnp::PackedFdMessageReader capnpTMessage(fd, {32 * 1024 * 1024});
-          
-            cNode::Reader capnpT = capnpTMessage.getRoot<cNode>();
-            const unsigned int transferableNodesCount {capnpT.getTransferableNodesUuids().size()};
-
-            std::vector<int> transferableNodesIdx(transferableNodesCount);
-            std::vector<int> transferableTravelTimesSeconds(transferableNodesCount);
-            std::vector<int> transferableDistancesMeters(transferableNodesCount);
-            std::vector<int> reverseTransferableNodesIdx(transferableNodesCount);
-            std::vector<int> reverseTransferableTravelTimesSeconds(transferableNodesCount);
-            std::vector<int> reverseTransferableDistancesMeters(transferableNodesCount);
-
-            for (int j = 0; j < transferableNodesCount; j++)
-            {
-              std::string nodeUuid {capnpT.getTransferableNodesUuids()[j]};
-              transferableNodesIdx          [j] = tIndexesByUuid[uuidGenerator(nodeUuid)];
-              transferableTravelTimesSeconds[j] = capnpT.getTransferableNodesTravelTimes()[j];
-              transferableDistancesMeters   [j] = capnpT.getTransferableNodesDistances()[j];
-            }
-            t->transferableNodesIdx           = transferableNodesIdx;
-            t->transferableTravelTimesSeconds = transferableTravelTimesSeconds;
-            t->transferableDistancesMeters    = transferableDistancesMeters;
-
-            // put same node transfer at the beginning:
-            t->reverseTransferableNodesIdx.push_back(i);
-            t->reverseTransferableTravelTimesSeconds.push_back(0);
-            t->reverseTransferableDistancesMeters.push_back(0);
-            close(fd);
-          } catch (...) {
-            std::cerr << "-- Error reading node cache file -- " <<  nodeCacheFileNamePath;
-            close(fd);
-            continue;
-          }
-
-        }
-
+        int err = errno;
+        // TODO Do something about missing or faulty cache files?
+        std::cerr << "Error opening cache file " << nodeCacheFileNamePath << ": " << err << std::endl;
+        continue;
       }
 
+      try
+      {
+        ::capnp::PackedFdMessageReader capnpTMessage(fd, {32 * 1024 * 1024});
+
+        cNode::Reader capnpT = capnpTMessage.getRoot<cNode>();
+        const unsigned int transferableNodesCount {capnpT.getTransferableNodesUuids().size()};
+
+        std::vector<int> transferableNodesIdx(transferableNodesCount);
+        std::vector<int> transferableTravelTimesSeconds(transferableNodesCount);
+        std::vector<int> transferableDistancesMeters(transferableNodesCount);
+        std::vector<int> reverseTransferableNodesIdx(transferableNodesCount);
+        std::vector<int> reverseTransferableTravelTimesSeconds(transferableNodesCount);
+        std::vector<int> reverseTransferableDistancesMeters(transferableNodesCount);
+
+        for (int j = 0; j < transferableNodesCount; j++)
+        {
+          std::string nodeUuid {capnpT.getTransferableNodesUuids()[j]};
+          transferableNodesIdx          [j] = tIndexesByUuid[uuidGenerator(nodeUuid)];
+          transferableTravelTimesSeconds[j] = capnpT.getTransferableNodesTravelTimes()[j];
+          transferableDistancesMeters   [j] = capnpT.getTransferableNodesDistances()[j];
+        }
+        t->transferableNodesIdx           = transferableNodesIdx;
+        t->transferableTravelTimesSeconds = transferableTravelTimesSeconds;
+        t->transferableDistancesMeters    = transferableDistancesMeters;
+
+        // put same node transfer at the beginning:
+        t->reverseTransferableNodesIdx.push_back(i);
+        t->reverseTransferableTravelTimesSeconds.push_back(0);
+        t->reverseTransferableDistancesMeters.push_back(0);
+        close(fd);
+      }
+      catch (const kj::Exception& e)
+      {
+        std::cerr << "-- Error reading node cache file -- " <<  nodeCacheFileNamePath << ": " << e.getDescription().cStr() << std::endl;
+        close(fd);
+        return -EBADMSG;
+      }
+
+    }
+
+    try
+    {
       //std::cout << "generate reverse transferable nodes " << std::endl;
 
       // generate reverse transferable nodes 
@@ -215,17 +256,19 @@ namespace TrRouting
         }
 
       }
-
-      
+  
       //std::cerr << "-- node reverse transferable nodes preparation -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
 
       //std::cout << TStr << ":\n" << Toolbox::prettyPrintStructVector(ts) << std::endl;
-      close(fd);
+      
+      return 0;
     }
-    else
+    catch (const std::exception& ex)
     {
-      std::cerr << "missing " << tStr << " cache file!" << std::endl;
+      std::cerr << "-- Error processing node data -- " << ex.what() << std::endl;
+      return -EINVAL;
     }
+    
   }
 
 }

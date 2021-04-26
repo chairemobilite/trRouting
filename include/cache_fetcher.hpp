@@ -166,7 +166,16 @@ namespace TrRouting
       std::string customPath = ""
     );
 
-    void getNodes(
+    /**
+     * Read the nodes cache file and fill the nodes and stations vector.
+     * 
+     * @return 0 in case of success, values below 0 when errors occurred:
+     * -EBADMSG if deserialization did not work
+     * -ENOENT if the file does not exist
+     * -EINVAL For any other data related error
+     * -(error codes from the open system call)
+     */
+    int getNodes(
       std::vector<std::unique_ptr<Node>>& ts,
       std::map<boost::uuids::uuid, int>& tIndexesById,
       std::map<boost::uuids::uuid, int>& stationIndexesById,
