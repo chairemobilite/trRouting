@@ -90,7 +90,16 @@ namespace TrRouting
     
     const std::pair<std::vector<Mode>, std::map<std::string, int>> getModes();
     
-    void getDataSources(
+    /**
+     * Read the data sources cache file and fill the data sources vector.
+     * 
+     * @return 0 in case of success, values below 0 when errors occurred:
+     * -EBADMSG if deserialization did not work
+     * -ENOENT if the file does not exist
+     * -EINVAL For any other data related error
+     * -(error codes from the open system call)
+     */
+    int getDataSources(
       std::vector<std::unique_ptr<DataSource>>& ts, 
       std::map<boost::uuids::uuid, int>& tIndexesById, 
       Parameters& params,
