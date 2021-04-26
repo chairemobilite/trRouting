@@ -4,6 +4,8 @@
 
 #include <string>
 #include <vector>
+#include <errno.h>
+#include <kj/exception.h>
 
 #include "cache_fetcher.hpp"
 #include "network.hpp"
@@ -12,7 +14,7 @@
 namespace TrRouting
 {
 
-  void CacheFetcher::getNetworks(
+  int CacheFetcher::getNetworks(
     std::vector<std::unique_ptr<Network>>& ts,
     std::map<boost::uuids::uuid, int>& tIndexesByUuid,
     std::map<boost::uuids::uuid, int>& agencyIndexesByUuid,
@@ -20,7 +22,8 @@ namespace TrRouting
     std::map<boost::uuids::uuid, int>& scenarioIndexesByUuid,
     Parameters& params,
     std::string customPath
-  ) {
+  )
+  {
 
     using T           = Network;
     using TCollection = networkCollection::NetworkCollection;
@@ -39,9 +42,24 @@ namespace TrRouting
     std::cout << "Fetching " << tStr << " from cache..." << " " << customPath << std::endl;
     
     std::string cacheFilePath = CacheFetcher::getFilePath(cacheFileName, params, customPath) + ".capnpbin";
-    if (CacheFetcher::capnpCacheFileExists(cacheFilePath))
+
+    int fd = open(cacheFilePath.c_str(), O_RDWR);
+    if (fd < 0)
     {
-      int fd = open(cacheFilePath.c_str(), O_RDWR);
+      int err = errno;
+      if (err == ENOENT)
+      {
+        std::cerr << "missing " << tStr << " cache file!" << std::endl;
+      }
+      else
+      {
+        std::cerr << "Error opening cache file " << tStr << ": " << err << std::endl;
+      }
+      return -err;
+    }
+
+    try
+    {
       ::capnp::PackedFdMessageReader capnpTCollectionMessage(fd, {16 * 1024 * 1024});
       TCollection::Reader capnpTCollection = capnpTCollectionMessage.getRoot<TCollection>();
       for (cT::Reader capnpT : capnpTCollection.getNetworks())
@@ -90,10 +108,19 @@ namespace TrRouting
       }
       //std::cout << TStr << ":\n" << Toolbox::prettyPrintStructVector(ts) << std::endl;
       close(fd);
-    }
-    else
+      return 0;
+    } 
+    catch (const kj::Exception& e) 
     {
-      std::cerr << "missing " << tStr << " cache file!" << std::endl;
+      std::cerr << "Error opening cache file " << tStr << ": " << e.getDescription().cStr() << std::endl;
+      close(fd);
+      return -EBADMSG;
+    } 
+    catch (...) 
+    {
+      std::cerr << "Unknown error occurred " << tStr << std::endl;
+      close(fd);
+      return -EINVAL;
     }
   }
 
