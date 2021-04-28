@@ -4,6 +4,8 @@
 
 #include <string>
 #include <vector>
+#include <errno.h>
+#include <kj/exception.h>
 
 #include "cache_fetcher.hpp"
 #include "trip.hpp"
@@ -16,7 +18,7 @@
 namespace TrRouting
 {
   
-  void CacheFetcher::getSchedules(
+  int CacheFetcher::getSchedules(
     std::vector<std::unique_ptr<Trip>>& trips,
     std::vector<std::unique_ptr<Line>>& lines,
     std::vector<std::unique_ptr<Path>>& paths,
@@ -73,9 +75,16 @@ namespace TrRouting
     {
       cacheFileName = "lines/line_" + boost::uuids::to_string(line->uuid);
       std::string cacheFilePath = CacheFetcher::getFilePath(cacheFileName, params, customPath) + ".capnpbin";
-      if (CacheFetcher::capnpCacheFileExists(cacheFilePath))
+      int fd = open(cacheFilePath.c_str(), O_RDWR);
+      if (fd < 0)
       {
-        int fd = open(cacheFilePath.c_str(), O_RDWR);
+        int err = errno;
+        std::cerr << "no schedules found for line " << boost::uuids::to_string(line->uuid) << " (" << line->shortname << " " << line->longname << ")" << std::endl;
+        continue;
+      }
+
+      try
+      {
         ::capnp::PackedFdMessageReader capnpLineMessage(fd, {32 * 1024 * 1024});
         line::Line::Reader capnpLine = capnpLineMessage.getRoot<line::Line>();
         
@@ -188,96 +197,108 @@ namespace TrRouting
         lineI++;
         std::cout << ((((double) lineI) / linesCount) * 100) << "%      \r" << std::flush; // \r is used to stay on the same line
       }
-      else
+      catch (const kj::Exception& e)
       {
-        std::cerr << "no schedules found for line " << boost::uuids::to_string(line->uuid) << " (" << line->shortname << " " << line->longname << ")" << std::endl;
+        // TODO Do something about faulty cache files?
+        std::cerr << "-- Error reading line cache file -- " <<  cacheFilePath << ": " << e.getDescription().cStr() << std::endl;
+        close(fd);
+        continue;
       }
     }
-    std::cout << "100%         " << std::endl;
+    std::cout << "100%" << std::endl;
 
-    std::cout << "Sorting connections..." << std::endl;
-    std::stable_sort(forwardConnections.begin(), forwardConnections.end(), [](const std::shared_ptr<ConnectionTuple>& connectionA, const std::shared_ptr<ConnectionTuple>& connectionB)
+    try
     {
-      // { NODE_DEP = 0, NODE_ARR = 1, TIME_DEP = 2, TIME_ARR = 3, TRIP = 4, CAN_BOARD = 5, CAN_UNBOARD = 6, SEQUENCE = 7, LINE = 8, BLOCK = 9, CAN_TRANSFER_SAME_LINE = 10, MIN_WAITING_TIME_SECONDS = 11 };
-      if (std::get<2>(*connectionA) < std::get<2>(*connectionB))
+      std::cout << "Sorting connections..." << std::endl;
+      std::stable_sort(forwardConnections.begin(), forwardConnections.end(), [](const std::shared_ptr<ConnectionTuple>& connectionA, const std::shared_ptr<ConnectionTuple>& connectionB)
       {
-        return true;
-      }
-      else if (std::get<2>(*connectionA) > std::get<2>(*connectionB))
-      {
+        // { NODE_DEP = 0, NODE_ARR = 1, TIME_DEP = 2, TIME_ARR = 3, TRIP = 4, CAN_BOARD = 5, CAN_UNBOARD = 6, SEQUENCE = 7, LINE = 8, BLOCK = 9, CAN_TRANSFER_SAME_LINE = 10, MIN_WAITING_TIME_SECONDS = 11 };
+        if (std::get<2>(*connectionA) < std::get<2>(*connectionB))
+        {
+          return true;
+        }
+        else if (std::get<2>(*connectionA) > std::get<2>(*connectionB))
+        {
+          return false;
+        }
+        if (std::get<4>(*connectionA) < std::get<4>(*connectionB))
+        {
+          return true;
+        }
+        else if (std::get<4>(*connectionA) > std::get<4>(*connectionB))
+        {
+          return false;
+        }
+        if (std::get<7>(*connectionA) < std::get<7>(*connectionB))
+        {
+          return true;
+        }
+        else if (std::get<7>(*connectionA) > std::get<7>(*connectionB))
+        {
+          return false;
+        }
         return false;
-      }
-      if (std::get<4>(*connectionA) < std::get<4>(*connectionB))
+      });
+      std::stable_sort(reverseConnections.begin(), reverseConnections.end(), [](const std::shared_ptr<ConnectionTuple>& connectionA, const std::shared_ptr<ConnectionTuple>& connectionB)
       {
-        return true;
-      }
-      else if (std::get<4>(*connectionA) > std::get<4>(*connectionB))
-      {
+        // { NODE_DEP = 0, NODE_ARR = 1, TIME_DEP = 2, TIME_ARR = 3, TRIP = 4, CAN_BOARD = 5, CAN_UNBOARD = 6, SEQUENCE = 7, LINE = 8, BLOCK = 9, CAN_TRANSFER_SAME_LINE = 10, MIN_WAITING_TIME_SECONDS = 11 };
+        if (std::get<3>(*connectionA) > std::get<3>(*connectionB))
+        {
+          return true;
+        }
+        else if (std::get<3>(*connectionA) < std::get<3>(*connectionB))
+        {
+          return false;
+        }
+        if (std::get<4>(*connectionA) > std::get<4>(*connectionB)) // here we need to reverse sequence!
+        {
+          return true;
+        }
+        else if (std::get<4>(*connectionA) < std::get<4>(*connectionB))
+        {
+          return false;
+        }
+        if (std::get<7>(*connectionA) > std::get<7>(*connectionB)) // here we need to reverse sequence!
+        {
+          return true;
+        }
+        else if (std::get<7>(*connectionA) < std::get<7>(*connectionB))
+        {
+          return false;
+        }
         return false;
-      }
-      if (std::get<7>(*connectionA) < std::get<7>(*connectionB))
-      {
-        return true;
-      }
-      else if (std::get<7>(*connectionA) > std::get<7>(*connectionB))
-      {
-        return false;
-      }
-      return false;
-    });
-    std::stable_sort(reverseConnections.begin(), reverseConnections.end(), [](const std::shared_ptr<ConnectionTuple>& connectionA, const std::shared_ptr<ConnectionTuple>& connectionB)
-    {
-      // { NODE_DEP = 0, NODE_ARR = 1, TIME_DEP = 2, TIME_ARR = 3, TRIP = 4, CAN_BOARD = 5, CAN_UNBOARD = 6, SEQUENCE = 7, LINE = 8, BLOCK = 9, CAN_TRANSFER_SAME_LINE = 10, MIN_WAITING_TIME_SECONDS = 11 };
-      if (std::get<3>(*connectionA) > std::get<3>(*connectionB))
-      {
-        return true;
-      }
-      else if (std::get<3>(*connectionA) < std::get<3>(*connectionB))
-      {
-        return false;
-      }
-      if (std::get<4>(*connectionA) > std::get<4>(*connectionB)) // here we need to reverse sequence!
-      {
-        return true;
-      }
-      else if (std::get<4>(*connectionA) < std::get<4>(*connectionB))
-      {
-        return false;
-      }
-      if (std::get<7>(*connectionA) > std::get<7>(*connectionB)) // here we need to reverse sequence!
-      {
-        return true;
-      }
-      else if (std::get<7>(*connectionA) < std::get<7>(*connectionB))
-      {
-        return false;
-      }
-      return false;
-    });
+      });
 
-    CalculationTime algorithmCalculationTime = CalculationTime();
-    algorithmCalculationTime.start();
-    long long       calculationTime;
-    calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
+      CalculationTime algorithmCalculationTime = CalculationTime();
+      algorithmCalculationTime.start();
+      long long       calculationTime;
+      calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
 
-    // assign connections to trips:
-    int i {0};
-    for(auto & connection : forwardConnections)
-    {
-      tripIdx = std::get<4>(*connection);
-      trips[tripIdx]->forwardConnectionsIdx.push_back(i);
-      i++;
+      // assign connections to trips:
+      int i {0};
+      for(auto & connection : forwardConnections)
+      {
+        tripIdx = std::get<4>(*connection);
+        trips[tripIdx]->forwardConnectionsIdx.push_back(i);
+        i++;
+      }
+
+      i = 0;
+      for(auto & connection : reverseConnections)
+      {
+        tripIdx = std::get<4>(*connection);
+        trips[tripIdx]->reverseConnectionsIdx.push_back(i);
+        i++;
+      }
+      
+      std::cerr << "-- assign connections to trips -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
+      return 0;
     }
-
-    i = 0;
-    for(auto & connection : reverseConnections)
+    catch (const std::exception& ex)
     {
-      tripIdx = std::get<4>(*connection);
-      trips[tripIdx]->reverseConnectionsIdx.push_back(i);
-      i++;
+      std::cerr << "-- Error assigning connections to trips -- " << ex.what() << std::endl;
+      return -EINVAL;
     }
-    
-    std::cerr << "-- assign connections to trips -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
 
   }
 

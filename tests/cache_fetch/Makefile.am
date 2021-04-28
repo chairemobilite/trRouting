@@ -11,7 +11,9 @@ gtest_SOURCES = gtest.cpp \
     ../../src/data_sources_cache_fetcher.cpp data_sources_cache_fetcher_test.cpp \
     ../../src/networks_cache_fetcher.cpp networks_cache_fetcher_test.cpp \
     ../../src/stations_cache_fetcher.cpp stations_cache_fetcher_test.cpp \
-    ../../src/paths_cache_fetcher.cpp paths_cache_fetcher_test.cpp
+    ../../src/paths_cache_fetcher.cpp paths_cache_fetcher_test.cpp \
+    ../../src/calculation_time.cpp \
+    ../../src/trips_and_connections_cache_fetcher.cpp schedules_cache_fetcher_test.cpp
 
 gtest_LDADD = $(top_srcdir)/tests/libgtest.la
 
