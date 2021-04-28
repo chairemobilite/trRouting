@@ -438,8 +438,6 @@ int main(int argc, char** argv) {
       }
     }
 
-    
-    
     *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/" << calculator.params.responseFormat << "; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
     
   };
