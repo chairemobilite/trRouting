@@ -208,9 +208,9 @@ namespace TrRouting
 
   }
 
-  void Calculator::prepare()
+  int Calculator::prepare()
   {
-    
+    int ret = 0;
     if (params.debugDisplay)
       std::cerr << "preparing nodes, routes, trips, connections and footpaths..." << std::endl;
     if (params.dataFetcherShortname == "cache")
@@ -247,7 +247,7 @@ namespace TrRouting
     }
     
     std::cout << "preparing nodes tentative times, trips enter connections and journeys..." << std::endl;
-    
+    return ret;
   }
   
 }
