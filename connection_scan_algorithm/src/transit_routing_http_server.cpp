@@ -102,6 +102,9 @@ int main(int argc, char** argv) {
   algorithmParams.cacheFetcher = &cacheFetcher;
   
   Calculator calculator(algorithmParams);
+  std::cout << "preparing calculator..." << std::endl;
+  int dataStatus = calculator.prepare();
+
   int i = 0;
   
   std::cout << "preparing server..." << std::endl;
@@ -289,11 +292,15 @@ int main(int argc, char** argv) {
 
 
   // routing request
-  server.resource["^/route/v1/transit[/]?$"]["GET"]=[&server, &calculator](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
+  server.resource["^/route/v1/transit[/]?$"]["GET"]=[&server, &calculator, &dataStatus](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
     
     std::string response {""};
 
-    if (calculator.countAgencies() == 0)
+    if (dataStatus < 0) {
+      // TODO Should this return a 500 http code?
+      response = "{\"status\": \"data_error\"}";
+    }
+    else if (calculator.countAgencies() == 0)
     {
       response = "{\"status\": \"error\", \"error\": {\"error\": \"No agencies found\", \"code\": \"MISSING_DATA_AGENCIES\"}}";
     }

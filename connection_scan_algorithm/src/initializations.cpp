@@ -35,10 +35,6 @@ namespace TrRouting
       osrm::OSRM osrmDrivingRouter{osrmConfig};
       params.osrmDrivingRouter     = std::move(osrmDrivingRouter);
     }
-    
-    std::cout << "preparing calculator..." << std::endl;
-
-    prepare();
 
   }
   
