@@ -15,7 +15,7 @@
 namespace TrRouting
 {
 
-   void CacheFetcher::getOdTrips(
+  int CacheFetcher::getOdTrips(
     std::vector<std::unique_ptr<OdTrip>>& ts,
     std::map<boost::uuids::uuid, int>& tIndexesByUuid,
     std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid,
@@ -24,7 +24,8 @@ namespace TrRouting
     std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
     Parameters& params,
     std::string customPath
-  ) {
+  )
+  {
 
     using T           = OdTrip;
     using TCollection = odTripCollection::OdTripCollection;
@@ -53,9 +54,23 @@ namespace TrRouting
         std::string filePath {cacheFilePath + ".capnpbin" + (filesCount > 1 ? "." + std::to_string(i) : "")};
         std::string cacheFilePath = CacheFetcher::getFilePath(filePath, params, customPath);
 
-        if (CacheFetcher::capnpCacheFileExists(cacheFilePath))
+        int fd = open(cacheFilePath.c_str(), O_RDWR);
+        if (fd < 0)
         {
-          int fd = open(cacheFilePath.c_str(), O_RDWR);
+          int err = errno;
+          if (err == ENOENT)
+          {
+            std::cerr << "missing " << filePath << " cache file!" << std::endl;
+          }
+          else
+          {
+            std::cerr << "Error opening cache file " << filePath << ": " << err << std::endl;
+          }
+          continue;
+        }
+
+        try
+        {   
           ::capnp::PackedFdMessageReader capnpTCollectionMessage(fd, {512 * 1024 * 1024});
           TCollection::Reader capnpTCollection = capnpTCollectionMessage.getRoot<TCollection>();
           for (cT::Reader capnpT : capnpTCollection.getOdTrips())
@@ -199,14 +214,21 @@ namespace TrRouting
           std::cerr << "parsed " << ts.size() << " od trips" << std::endl;
           close(fd);
         }
-        else
+        catch (const kj::Exception& e)
         {
-          std::cerr << "missing " << filePath << " cache file!" << std::endl;
+          std::cerr << "Error reading cache file " << filePath << ": " << e.getDescription().cStr() << std::endl;
+          close(fd);
+        }
+        catch (...)
+        {
+          std::cerr << "Unknown error occurred " << filePath << std::endl;
+          close(fd);
         }
 
       }
 
     }
+    return 0;
 
   }
 
