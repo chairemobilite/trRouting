@@ -79,7 +79,12 @@ namespace TrRouting
     
     Calculator(Parameters& theParams);
 
-    void                    prepare();
+    /**
+     * Prepare the data for the calculator
+     *
+     * @return 0 in case of success -1 in case of error
+     */
+    int                     prepare();
     void                    reset(bool resetAccessPaths = true, bool resetFilters = true);
     RoutingResult           calculate(bool resetAccessPaths = true, bool resetFilters = true);
     std::tuple<int,int,int,int> forwardCalculation(); // best arrival time,   best egress node index, best egress travel time: MAX_INT,-1,-1 if non routable, too long or all nodes result
