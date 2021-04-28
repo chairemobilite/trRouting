@@ -286,7 +286,16 @@ namespace TrRouting
       std::string customPath = ""
     );
 
-    void getSchedules(
+    /**
+     * Read the lines with schedules cache file and fill the trips vector.
+     * 
+     * @return 0 in case of success, values below 0 when errors occurred:
+     * -EBADMSG if deserialization did not work
+     * -ENOENT if the file does not exist
+     * -EINVAL For any other data related error
+     * -(error codes from the open system call)
+     */
+    int getSchedules(
       std::vector<std::unique_ptr<Trip>>& trips,
       std::vector<std::unique_ptr<Line>>& lines,
       std::vector<std::unique_ptr<Path>>& paths,
