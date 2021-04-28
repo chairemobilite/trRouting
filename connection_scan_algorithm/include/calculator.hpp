@@ -96,22 +96,31 @@ namespace TrRouting
     
     std::vector<int>        optimizeJourney(std::deque<std::tuple<int,int,int,int,int,short,int>> &journey);
 
-    void                    updateDataSourcesFromCache(Parameters&  params, std::string customPath = "");
-    void                    updateHouseholdsFromCache (Parameters&  params, std::string customPath = "");
-    void                    updatePersonsFromCache    (Parameters&  params, std::string customPath = "");
-    void                    updateOdTripsFromCache    (Parameters&  params, std::string customPath = "");
-    void                    updatePlacesFromCache     (Parameters&  params, std::string customPath = "");
+    /**
+     * The update*FromCache methods get the data from the cache
+     * 
+     * @return 0 in case of success, values below 0 when errors occurred:
+     * -EBADMSG if deserialization did not work
+     * -ENOENT if the file does not exist
+     * -EINVAL For any other data related error
+     * -(error codes from the open system call)
+     */
+    int                    updateDataSourcesFromCache(Parameters&  params, std::string customPath = "");
+    int                    updateHouseholdsFromCache (Parameters&  params, std::string customPath = "");
+    int                    updatePersonsFromCache    (Parameters&  params, std::string customPath = "");
+    int                    updateOdTripsFromCache    (Parameters&  params, std::string customPath = "");
+    int                    updatePlacesFromCache     (Parameters&  params, std::string customPath = "");
 
-    void                    updateStationsFromCache   (Parameters&  params, std::string customPath = "");
-    void                    updateAgenciesFromCache   (Parameters&  params, std::string customPath = "");
-    void                    updateServicesFromCache   (Parameters&  params, std::string customPath = "");
-    void                    updateNodesFromCache      (Parameters&  params, std::string customPath = "");
-    void                    updateStopsFromCache      (Parameters&  params, std::string customPath = "");
-    void                    updateLinesFromCache      (Parameters&  params, std::string customPath = "");
-    void                    updatePathsFromCache      (Parameters&  params, std::string customPath = "");
-    void                    updateScenariosFromCache  (Parameters&  params, std::string customPath = "");
-    void                    updateNetworksFromCache   (Parameters&  params, std::string customPath = "");
-    void                    updateSchedulesFromCache  (Parameters&  params, std::string customPath = "");
+    int                    updateStationsFromCache   (Parameters&  params, std::string customPath = "");
+    int                    updateAgenciesFromCache   (Parameters&  params, std::string customPath = "");
+    int                    updateServicesFromCache   (Parameters&  params, std::string customPath = "");
+    int                    updateNodesFromCache      (Parameters&  params, std::string customPath = "");
+    int                    updateStopsFromCache      (Parameters&  params, std::string customPath = "");
+    int                    updateLinesFromCache      (Parameters&  params, std::string customPath = "");
+    int                    updatePathsFromCache      (Parameters&  params, std::string customPath = "");
+    int                    updateScenariosFromCache  (Parameters&  params, std::string customPath = "");
+    int                    updateNetworksFromCache   (Parameters&  params, std::string customPath = "");
+    int                    updateSchedulesFromCache  (Parameters&  params, std::string customPath = "");
     
     int               countStations();
     int               countAgencies();
