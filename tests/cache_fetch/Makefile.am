@@ -13,7 +13,8 @@ gtest_SOURCES = gtest.cpp \
     ../../src/stations_cache_fetcher.cpp stations_cache_fetcher_test.cpp \
     ../../src/paths_cache_fetcher.cpp paths_cache_fetcher_test.cpp \
     ../../src/calculation_time.cpp \
-    ../../src/trips_and_connections_cache_fetcher.cpp schedules_cache_fetcher_test.cpp
+    ../../src/trips_and_connections_cache_fetcher.cpp schedules_cache_fetcher_test.cpp \
+    ../../src/households_cache_fetcher.cpp households_cache_fetcher_test.cpp
 
 gtest_LDADD = $(top_srcdir)/tests/libgtest.la
 
