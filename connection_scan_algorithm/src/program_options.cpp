@@ -26,20 +26,6 @@ namespace TrRouting {
       ("osrmCyclingHost",                                   boost::program_options::value<std::string>()->default_value("localhost"), "osrm cycling host");
     options.add_options()
       ("osrmDrivingHost",                                   boost::program_options::value<std::string>()->default_value("localhost"), "osrm driving host");
-    options.add_options()
-      ("osrmFilePath,osrmWalkFilePath,osrmWalkingFilePath", boost::program_options::value<std::string>()->default_value(""), "osrm file path (walking) (PATH/TO/ROUTING_FILE.osrm)");
-    options.add_options()
-      ("osrmCyclingFilePath",                               boost::program_options::value<std::string>()->default_value(""), "osrm file path (cycling) (PATH/TO/ROUTING_FILE.osrm)");
-    options.add_options()
-      ("osrmDrivingFilePath",                               boost::program_options::value<std::string>()->default_value(""), "osrm file path (driving) (PATH/TO/ROUTING_FILE.osrm)");
-    options.add_options()
-      ("osrmUseLib,osrmWalkUseLib,osrmWalkingUseLib",       boost::program_options::value<int>()        ->default_value(0), "osrm use libosrm (walking) instead of server (1 or 0)");
-    options.add_options()
-      ("osrmCyclingUseLib",                                 boost::program_options::value<int>()        ->default_value(0), "osrm use libosrm (cycling) instead of server (1 or 0)");
-    options.add_options()
-      ("osrmDrivingUseLib",                                 boost::program_options::value<int>()        ->default_value(0), "osrm use libosrm (driving) instead of server (1 or 0)");
-
-
 
   }
 
@@ -59,12 +45,6 @@ namespace TrRouting {
     osrmWalkingHost      = "localhost";
     osrmCyclingHost      = "localhost";
     osrmDrivingHost      = "localhost";
-    osrmWalkingFilePath  = "";
-    osrmCyclingFilePath  = "";
-    osrmDrivingFilePath  = "";
-    osrmWalkingUseLib    = false;
-    osrmCyclingUseLib    = false;
-    osrmDrivingUseLib    = false;
 
     if(variablesMap.count("port") == 1)
     {
@@ -135,48 +115,6 @@ namespace TrRouting {
     if(variablesMap.count("osrmDrivingHost") == 1)
     {
       osrmDrivingHost = variablesMap["osrmDrivingHost"].as<std::string>();
-    }
-
-    if(variablesMap.count("osrmFilePath") == 1)
-    {
-      osrmWalkingFilePath = variablesMap["osrmFilePath"].as<std::string>();
-    }
-    else if(variablesMap.count("osrmWalkingFilePath") == 1)
-    {
-      osrmWalkingFilePath = variablesMap["osrmWalkingFilePath"].as<std::string>();
-    }
-    else if(variablesMap.count("osrmWalkFilePath") == 1)
-    {
-      osrmWalkingFilePath = variablesMap["osrmWalkFilePath"].as<std::string>();
-    }
-    if(variablesMap.count("osrmCyclingFilePath") == 1)
-    {
-      osrmCyclingFilePath = variablesMap["osrmCyclingFilePath"].as<std::string>();
-    }
-    if(variablesMap.count("osrmDrivingFilePath") == 1)
-    {
-      osrmDrivingFilePath = variablesMap["osrmDrivingFilePath"].as<std::string>();
-    }
-    
-    if(variablesMap.count("osrmUseLib") == 1)
-    {
-      osrmWalkingUseLib = (variablesMap["osrmUseLib"].as<int>() == 1) ? true : false;
-    }
-    else if(variablesMap.count("osrmWalkUseLib") == 1)
-    {
-      osrmWalkingUseLib = (variablesMap["osrmWalkUseLib"].as<int>() == 1) ? true : false;
-    }
-    else if(variablesMap.count("osrmWalkingUseLib") == 1)
-    {
-      osrmWalkingUseLib = (variablesMap["osrmWalkingUseLib"].as<int>() == 1) ? true : false;
-    }
-    if(variablesMap.count("osrmCyclingUseLib") == 1)
-    {
-      osrmCyclingUseLib = (variablesMap["osrmCyclingUseLib"].as<int>() == 1) ? true : false;
-    }
-    if(variablesMap.count("osrmDrivingUseLib") == 1)
-    {
-      osrmDrivingUseLib = (variablesMap["osrmDrivingUseLib"].as<int>() == 1) ? true : false;
     }
 
   }

@@ -26,12 +26,6 @@ namespace TrRouting
     std::string osrmWalkingHost;
     std::string osrmCyclingHost;
     std::string osrmDrivingHost;
-    std::string osrmWalkingFilePath;
-    std::string osrmCyclingFilePath;
-    std::string osrmDrivingFilePath;
-    bool        osrmWalkingUseLib;
-    bool        osrmCyclingUseLib;
-    bool        osrmDrivingUseLib;
 
     ProgramOptions();
     void parseOptions(int argc, char** argv);

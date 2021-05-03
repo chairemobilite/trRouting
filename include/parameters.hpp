@@ -12,7 +12,6 @@
 #include <vector>
 #include <map>
 #include <math.h>
-#include <osrm/osrm.hpp>
 #include <boost/optional.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/string_generator.hpp>
@@ -117,15 +116,6 @@ namespace TrRouting
       std::string osrmWalkingHost;
       std::string osrmCyclingHost;
       std::string osrmDrivingHost;
-      std::string osrmWalkingFilePath; // path to walking .osrm file
-      std::string osrmCyclingFilePath; // path to cycling .osrm file
-      std::string osrmDrivingFilePath; // path to driving .osrm file
-      bool osrmWalkingUseLib;
-      bool osrmCyclingUseLib;
-      bool osrmDrivingUseLib;
-      boost::optional<osrm::OSRM> osrmWalkingRouter;
-      boost::optional<osrm::OSRM> osrmCyclingRouter;
-      boost::optional<osrm::OSRM> osrmDrivingRouter;
       
       std::string accessMode;
       std::string egressMode;

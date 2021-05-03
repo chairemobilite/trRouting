@@ -1,5 +1,3 @@
-# We need the osrm-backend lib to build trRouting so we rely on a fork of the official image
-FROM greenscientist/osrm-backend:busterlib
 WORKDIR /source
 # Install dependencies in an intermediate image
 RUN apt-get update && \
