@@ -55,6 +55,14 @@ git submodule update
 
 Then, to run the unit tests individually, simply run `make check`.
 
+If you get the following error when running `make check`, that's because the submodule initiation and update was done after the compilation configuration. Simply run again `autoreconf -i && ./configure` and it should work.
+
+```
+Makefile:443: ../googletest/googletest/src/.deps/libgtest_la-gtest-all.Plo: No such file or directory
+make[1]: *** No rule to make target '../googletest/googletest/src/.deps/libgtest_la-gtest-all.Plo'.  Stop.
+```
+
+
 ## Docker
 A provided dockerfile allows to easily build an image
 
