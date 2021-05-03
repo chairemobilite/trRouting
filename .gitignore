@@ -8,6 +8,7 @@
 /trRoutingTripBasedConfig.yml
 /osrm
 /cache
+/src/.dirstamp
 
 *.csv
 *.json
@@ -81,6 +82,7 @@ Makefile.in
 .deps
 /include/capnp/*.c++
 /include/capnp/*.h
+/configure~
 
 # tests
 test-driver
