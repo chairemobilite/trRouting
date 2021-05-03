@@ -9,8 +9,7 @@ With random origin and destination (multiple accessible stops at origin and dest
 [Trib-Based Algorithm (TBA)][2] (not yet released)
 
 ## Dependencies
-[Open Source Routing Machine (OSRM)][3] (must be installed separately, see [install and usage instructions in OSRM Wiki][4])
-use -DBUILD_SHARED_LIBS=ON to install libraries needed to compile trRouting
+[Open Source Routing Machine (OSRM)][3] (an osrm server with a walking profile must be running for the transit region while making queries to the trRouting server)
 
 [1]: http://i11www.iti.uni-karlsruhe.de/extra/publications/dpsw-isftr-13.pdf "Intriguingly Simple and Fast Transit Routing"
 [2]: https://arxiv.org/pdf/1504.07149v2.pdf "Trip-Based Public Transit Routing"

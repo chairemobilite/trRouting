@@ -86,12 +86,6 @@ int main(int argc, char** argv) {
   algorithmParams.osrmWalkingHost        = programOptions.osrmWalkingHost;
   algorithmParams.osrmCyclingHost        = programOptions.osrmCyclingHost;
   algorithmParams.osrmDrivingHost        = programOptions.osrmDrivingHost;
-  algorithmParams.osrmWalkingFilePath    = programOptions.osrmWalkingFilePath;
-  algorithmParams.osrmCyclingFilePath    = programOptions.osrmCyclingFilePath;
-  algorithmParams.osrmDrivingFilePath    = programOptions.osrmDrivingFilePath;
-  algorithmParams.osrmWalkingUseLib      = programOptions.osrmWalkingUseLib;
-  algorithmParams.osrmCyclingUseLib      = programOptions.osrmCyclingUseLib;
-  algorithmParams.osrmDrivingUseLib      = programOptions.osrmDrivingUseLib;
   algorithmParams.serverDebugDisplay     = programOptions.debug;
 
   GtfsFetcher  gtfsFetcher     = GtfsFetcher();
