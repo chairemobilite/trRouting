@@ -63,11 +63,6 @@ namespace TrRouting
     responseJsonSs << s->content.rdbuf();
     nlohmann::json responseJson = nlohmann::json::parse(responseJsonSs.str());
     
-    int numberOfDurations = responseJson["durations"].size();
-    //std::cout << "numberOfDurations: " << responseJson["durations"][0].dump(2) << std::endl;
-    int numberOfDistances = responseJson["distances"].size();
-    //std::cout << "numberOfDistances: " << responseJson["distances"][0].dump(2) << std::endl;
-    
     if (responseJson["durations"] != nullptr && responseJson["distances"] != nullptr && responseJson["durations"][0] != nullptr && responseJson["distances"][0] != nullptr)
     {
       int numberOfDurations = responseJson["durations"][0].size();
