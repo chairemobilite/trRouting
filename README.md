@@ -9,12 +9,14 @@ With random origin and destination (multiple accessible stops at origin and dest
 [Trib-Based Algorithm (TBA)][2] (not yet released)
 
 ## Dependencies
-[Open Source Routing Machine (OSRM)][3] (an osrm server with a walking profile must be running for the transit region while making queries to the trRouting server)
+[Open Source Routing Machine (OSRM)][3] (an osrm server with a walking profile must be running for the transit region while making queries to the trRouting server, see [OSRM profiles][5] for more profile info and [Running OSRM][6] to know how to prepare osm data for OSRM and start the server)
 
 [1]: http://i11www.iti.uni-karlsruhe.de/extra/publications/dpsw-isftr-13.pdf "Intriguingly Simple and Fast Transit Routing"
 [2]: https://arxiv.org/pdf/1504.07149v2.pdf "Trip-Based Public Transit Routing"
 [3]: https://github.com/Project-OSRM/osrm-backend/ "Open Source Routing Machine Github Repository"
 [4]: https://github.com/Project-OSRM/osrm-backend/wiki "OSRM Wiki"
+[5]: https://github.com/Project-OSRM/osrm-backend/blob/master/docs/profiles.md "OSRM profiles"
+[6]: https://github.com/Project-OSRM/osrm-backend/wiki/Running-OSRM "Running OSRM"
 
 ## Mac OS X Install with homebrew
 ```
