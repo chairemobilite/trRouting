@@ -100,7 +100,6 @@ namespace TrRouting
         ts.push_back(std::move(t));
         
       }
-      close(fd);
     }
     catch (const kj::Exception& e)
     {
@@ -114,6 +113,8 @@ namespace TrRouting
       close(fd);
       return -EINVAL;
     }
+
+    close(fd);
 
     /*CalculationTime algorithmCalculationTime = CalculationTime();
     algorithmCalculationTime.start();
@@ -170,7 +171,6 @@ namespace TrRouting
         t->reverseTransferableNodesIdx.push_back(i);
         t->reverseTransferableTravelTimesSeconds.push_back(0);
         t->reverseTransferableDistancesMeters.push_back(0);
-        close(fd);
       }
       catch (const kj::Exception& e)
       {
@@ -178,7 +178,7 @@ namespace TrRouting
         close(fd);
         return -EBADMSG;
       }
-
+      close(fd);
     }
 
     try

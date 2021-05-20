@@ -26,6 +26,7 @@ namespace TrRouting
     using T           = Service;
     using TCollection = serviceCollection::ServiceCollection;
     using cT          = serviceCollection::Service;
+    int ret = 0;
 
     ts.clear();
     tIndexesByUuid.clear();
@@ -105,22 +106,20 @@ namespace TrRouting
         tIndexesByUuid[t->uuid] = ts.size();
         ts.push_back(std::move(t));
       }
-      //std::cout << TStr << ":\n" << Toolbox::prettyPrintStructVector(ts) << std::endl;
-      close(fd);
-      return 0;
     }
     catch (const kj::Exception& e)
     {
       std::cerr << "Error opening cache file " << tStr << ": " << e.getDescription().cStr() << std::endl;
-      close(fd);
-      return -EBADMSG;
+      ret = -EBADMSG;
     }
     catch (...)
     {
       std::cerr << "Unknown error occurred " << tStr << std::endl;
-      close(fd);
-      return -EINVAL;
+      ret = -EINVAL;
     }
+
+    close(fd);
+    return ret;
   }
 
 }

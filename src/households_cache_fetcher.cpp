@@ -30,6 +30,7 @@ namespace TrRouting
     using T           = Household;
     using TCollection = householdCollection::HouseholdCollection;
     using cT          = household::Household;
+    int ret = 0;
 
     std::string tStr  = "households";
     std::string TStr  = "Households";
@@ -133,22 +134,20 @@ namespace TrRouting
             tIndexesByUuid[t->uuid] = ts.size();
             ts.push_back(std::move(t));
           }
-          //std::cout << TStr << ":\n" << Toolbox::prettyPrintStructVector(ts) << std::endl;
-          close(fd);
         }
         catch (const kj::Exception& e)
         {
           std::cerr << "Error reading cache file " << filePath << ": " << e.getDescription().cStr() << std::endl;
-          close(fd);
         }
         catch (...)
         {
           std::cerr << "Unknown error occurred " << filePath << std::endl;
-          close(fd);
         }
+
+        close(fd);
       }
     }
-    return 0;
+    return ret;
     
   }
 
