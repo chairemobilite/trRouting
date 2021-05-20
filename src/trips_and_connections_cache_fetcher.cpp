@@ -193,7 +193,6 @@ namespace TrRouting
             }
           }
         }
-        close(fd);
         lineI++;
         std::cout << ((((double) lineI) / linesCount) * 100) << "%      \r" << std::flush; // \r is used to stay on the same line
       }
@@ -201,9 +200,9 @@ namespace TrRouting
       {
         // TODO Do something about faulty cache files?
         std::cerr << "-- Error reading line cache file -- " <<  cacheFilePath << ": " << e.getDescription().cStr() << std::endl;
-        close(fd);
-        continue;
       }
+
+      close(fd);
     }
     std::cout << "100%" << std::endl;
 

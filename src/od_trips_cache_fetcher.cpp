@@ -212,18 +212,17 @@ namespace TrRouting
           }
           //std::cout << TStr << ":\n" << Toolbox::prettyPrintStructVector(ts) << std::endl;
           std::cerr << "parsed " << ts.size() << " od trips" << std::endl;
-          close(fd);
         }
         catch (const kj::Exception& e)
         {
           std::cerr << "Error reading cache file " << filePath << ": " << e.getDescription().cStr() << std::endl;
-          close(fd);
         }
         catch (...)
         {
           std::cerr << "Unknown error occurred " << filePath << std::endl;
-          close(fd);
         }
+
+        close(fd);
 
       }
 
