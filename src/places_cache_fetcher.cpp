@@ -41,7 +41,7 @@ namespace TrRouting
     {
       boost::uuids::uuid dataSourceUuid = iter->first;
 
-      std::string cacheFilePath {"dataSources/" + boost::uuids::to_string(dataSourceUuid) + "/places/" + cacheFileName};
+      std::string cacheFilePath {"dataSources/" + boost::uuids::to_string(dataSourceUuid) + "/" + cacheFileName};
 
       int filesCount {CacheFetcher::getCacheFilesCount(CacheFetcher::getFilePath(cacheFilePath + ".capnpbin.count", params, customPath))};
 
