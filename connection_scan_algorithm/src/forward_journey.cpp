@@ -430,6 +430,7 @@ namespace TrRouting
             result.arrivalTimeSeconds            = arrivalTime;
             result.departureTimeSeconds          = minimizedDepartureTime;
             result.initialDepartureTimeSeconds   = departureTimeSeconds;
+            result.initialLostTimeAtDepartureSeconds = minimizedDepartureTime - departureTimeSeconds;
             result.numberOfTransfers             = numberOfTransfers;
             result.inVehicleTravelTimeSeconds    = totalInVehicleTime;
             result.transferTravelTimeSeconds     = totalTransferWalkingTime;
@@ -466,6 +467,8 @@ namespace TrRouting
       result.travelTimeSeconds           = -1;
       result.arrivalTimeSeconds          = -1;
       result.departureTimeSeconds        = departureTimeSeconds;
+      result.initialDepartureTimeSeconds = -1;
+      result.initialLostTimeAtDepartureSeconds = -1;
       result.numberOfTransfers           = -1;
       result.inVehicleTravelTimeSeconds  = -1;
       result.transferTravelTimeSeconds   = -1;
@@ -475,6 +478,7 @@ namespace TrRouting
       result.transferWaitingTimeSeconds  = -1;
       result.firstWaitingTimeSeconds     = -1;
       result.nonTransitTravelTimeSeconds = -1;
+
     }
 
     if (params.returnAllNodesResult)

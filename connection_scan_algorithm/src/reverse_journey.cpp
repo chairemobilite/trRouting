@@ -523,6 +523,7 @@ namespace TrRouting
             result.arrivalTimeSeconds            = arrivalTime;
             result.departureTimeSeconds          = bestDepartureTime;
             result.initialDepartureTimeSeconds   = initialDepartureTimeSeconds;
+            result.initialLostTimeAtDepartureSeconds = initialDepartureTimeSeconds != -1 ? bestDepartureTime - initialDepartureTimeSeconds: -1;
             result.numberOfTransfers             = numberOfTransfers;
             result.inVehicleTravelTimeSeconds    = totalInVehicleTime;
             result.transferTravelTimeSeconds     = totalTransferWalkingTime;
@@ -558,6 +559,9 @@ namespace TrRouting
       result.status                      = STATUS_NO_ROUTING_FOUND;
       result.travelTimeSeconds           = -1;
       result.arrivalTimeSeconds          = arrivalTimeSeconds;
+      result.departureTimeSeconds        = -1;
+      result.initialDepartureTimeSeconds = -1;
+      result.initialLostTimeAtDepartureSeconds = -1;
       result.numberOfTransfers           = -1;
       result.inVehicleTravelTimeSeconds  = -1;
       result.transferTravelTimeSeconds   = -1;
