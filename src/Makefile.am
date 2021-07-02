@@ -26,4 +26,4 @@ stops_cache_fetcher.cpp \
 trips_and_connections_cache_fetcher.cpp
 
 
-trRouting_LDADD = ../connection_scan_algorithm/src/libcsa.a
+trRouting_LDADD = ../connection_scan_algorithm/src/libcsa.la
