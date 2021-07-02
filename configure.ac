@@ -42,6 +42,9 @@ LDFLAGS+=" $BOOST_LDFLAGS $BOOST_REGEX_LIB $BOOST_FILESYSTEM_LIB $BOOST_IOSTREAM
 # Add various flags
 LDFLAGS+=" $CURSES_LIBS"
 LDFLAGS+=" $CAPNP_LIBS"
+# Seems to be require by the boost library, at least on debian/ubuntu.
+# TODO: Probably need to be wrapped in a test
+LDFLAGS+=" -fuse-ld=gold"
 
 AC_CONFIG_FILES([
  Makefile
