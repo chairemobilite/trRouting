@@ -34,6 +34,14 @@ namespace TrRouting
     
     static std::vector<std::tuple<int,int,int>> getAccessibleNodesFootpathsFromPoint(const Point point, const std::vector<std::unique_ptr<Node>> &nodes, std::string mode, Parameters& params, bool reversed = false);
     
+    private:
+    static std::vector<std::tuple<int,int,int>> getNodesFromBirdDistance(const Point& point, const std::vector<std::unique_ptr<Node>>& nodes, Parameters& params);
+    static std::vector<std::tuple<int,int,int>> getNodesFromOsmr(const Point& point, const std::vector<std::unique_ptr<Node>>& nodes, std::string mode, Parameters& params, bool reversed);
+    
+    static std::tuple<float,float> calculateLengthOfOneDegree(const Point& point);
+    static float calculateMaxDistanceSquared(Parameters& params); 
+    static float calculateNodeDistanceSquared(const Point* node, const Point& point, const std::tuple<float, float>& lengthOfOneDegree);
+
   };
   
 }
