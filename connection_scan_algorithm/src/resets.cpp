@@ -6,7 +6,7 @@ namespace TrRouting
   void Calculator::reset(bool resetAccessPaths, bool resetFilters)
   {
     
-    using JourneyTuple = std::tuple<int,int,int,int,int,short,int>;
+    using JourneyTuple = std::tuple<int,int,int,int,int,short,int,int>;
 
     int benchmarkingStart = algorithmCalculationTime.getEpoch();
 
@@ -18,6 +18,8 @@ namespace TrRouting
     std::fill(nodesAccessDistance.begin()      , nodesAccessDistance.end()      , -1);
     std::fill(nodesEgressTravelTime.begin()    , nodesEgressTravelTime.end()    , -1);
     std::fill(nodesEgressDistance.begin()      , nodesEgressDistance.end()      , -1);
+    std::fill(nearestNetworkNodeNodesAccessDistance.begin()      , nearestNetworkNodeNodesAccessDistance.end()      , -1);
+    std::fill(nearestNetworkNodeNodesEgressDistance.begin()      , nearestNetworkNodeNodesEgressDistance.end()      , -1);
     if (resetAccessPaths)
     {
       accessFootpaths.clear();
@@ -34,10 +36,10 @@ namespace TrRouting
       std::fill(tripsEnabled.begin(), tripsEnabled.end(), 1);
     }
     std::fill(tripsUsable.begin()               , tripsUsable.end()               , -1);
-    std::fill(forwardJourneysSteps.begin()      , forwardJourneysSteps.end()      , JourneyTuple(-1,-1,-1,-1,-1,-1,-1));
-    std::fill(forwardEgressJourneysSteps.begin(), forwardEgressJourneysSteps.end(), JourneyTuple(-1,-1,-1,-1,-1,-1,-1));
-    std::fill(reverseJourneysSteps.begin()      , reverseJourneysSteps.end()      , JourneyTuple(-1,-1,-1,-1,-1,-1,-1));
-    std::fill(reverseAccessJourneysSteps.begin(), reverseAccessJourneysSteps.end(), JourneyTuple(-1,-1,-1,-1,-1,-1,-1));
+    std::fill(forwardJourneysSteps.begin()      , forwardJourneysSteps.end()      , JourneyTuple(-1,-1,-1,-1,-1,-1,-1,-1));
+    std::fill(forwardEgressJourneysSteps.begin(), forwardEgressJourneysSteps.end(), JourneyTuple(-1,-1,-1,-1,-1,-1,-1,-1));
+    std::fill(reverseJourneysSteps.begin()      , reverseJourneysSteps.end()      , JourneyTuple(-1,-1,-1,-1,-1,-1,-1,-1));
+    std::fill(reverseAccessJourneysSteps.begin(), reverseAccessJourneysSteps.end(), JourneyTuple(-1,-1,-1,-1,-1,-1,-1,-1));
     
     departureTimeSeconds = -1;
     arrivalTimeSeconds   = -1;
@@ -85,7 +87,7 @@ namespace TrRouting
           j = 0;
           for (auto & accessNodeIdx : odTrip->originNodesIdx)
           {
-            accessFootpaths.push_back(std::make_tuple(accessNodeIdx, odTrip->originNodesTravelTimesSeconds[j], odTrip->originNodesDistancesMeters[j]));
+            accessFootpaths.push_back(std::make_tuple(accessNodeIdx, odTrip->originNodesTravelTimesSeconds[j], odTrip->originNodesDistancesMeters[j], -1));
             j++;
           }
         }
@@ -100,7 +102,7 @@ namespace TrRouting
             {
               distanceMeters = params.accessNodeDistancesMeters[j];
             }
-            accessFootpaths.push_back(std::make_tuple(accessNodeIdx, params.accessNodeTravelTimesSeconds[j], distanceMeters));
+            accessFootpaths.push_back(std::make_tuple(accessNodeIdx, params.accessNodeTravelTimesSeconds[j], distanceMeters, -1));
             j++;
           }
         }
@@ -119,14 +121,16 @@ namespace TrRouting
 
       int footpathTravelTimeSeconds;
       int footpathDistanceMeters;
+      int nearestNetworkNodeDistanceMeters;
       for (auto & accessFootpath : accessFootpaths)
       {
         footpathTravelTimeSeconds = (int)ceil((float)(std::get<1>(accessFootpath)) / params.walkingSpeedFactor);
         footpathDistanceMeters    = std::get<2>(accessFootpath);
-
+        nearestNetworkNodeDistanceMeters = std::get<3>(accessFootpath);
         nodesAccessTravelTime[std::get<0>(accessFootpath)] = footpathTravelTimeSeconds;
         nodesAccessDistance[std::get<0>(accessFootpath)]   = footpathDistanceMeters;
-        forwardJourneysSteps[std::get<0>(accessFootpath)]  = std::make_tuple(-1, -1, -1, -1, footpathTravelTimeSeconds, -1, footpathDistanceMeters);
+        nearestNetworkNodeNodesAccessDistance[std::get<0>(accessFootpath)]   = nearestNetworkNodeDistanceMeters;
+        forwardJourneysSteps[std::get<0>(accessFootpath)]  = std::make_tuple(-1, -1, -1, -1, footpathTravelTimeSeconds, -1, footpathDistanceMeters, nearestNetworkNodeDistanceMeters);
         nodesTentativeTime[std::get<0>(accessFootpath)]    = departureTimeSeconds + footpathTravelTimeSeconds;
         if (footpathTravelTimeSeconds < minAccessTravelTime)
         {
@@ -156,7 +160,7 @@ namespace TrRouting
           j = 0;
           for (auto & egressNodeIdx : odTrip->destinationNodesIdx)
           {
-            egressFootpaths.push_back(std::make_tuple(egressNodeIdx, odTrip->destinationNodesTravelTimesSeconds[j], odTrip->destinationNodesDistancesMeters[j]));
+            egressFootpaths.push_back(std::make_tuple(egressNodeIdx, odTrip->destinationNodesTravelTimesSeconds[j], odTrip->destinationNodesDistancesMeters[j], -1));
             j++;
           }
         }
@@ -171,7 +175,7 @@ namespace TrRouting
             {
               distanceMeters = params.egressNodeDistancesMeters[j];
             }
-            egressFootpaths.push_back(std::make_tuple(egressNodeIdx, params.egressNodeTravelTimesSeconds[j], distanceMeters));
+            egressFootpaths.push_back(std::make_tuple(egressNodeIdx, params.egressNodeTravelTimesSeconds[j], distanceMeters, -1));
             j++;
           }
         }
@@ -187,13 +191,16 @@ namespace TrRouting
 
       int footpathTravelTimeSeconds;
       int footpathDistanceMeters;
+      int nearestNetworkNodeDistanceMeters;
       for (auto & egressFootpath : egressFootpaths)
       {
         footpathTravelTimeSeconds  = (int)ceil((float)(std::get<1>(egressFootpath)) / params.walkingSpeedFactor);
         footpathDistanceMeters     = std::get<2>(egressFootpath);
+        nearestNetworkNodeDistanceMeters  = std::get<3>(egressFootpath);
         nodesEgressTravelTime[std::get<0>(egressFootpath)]     = footpathTravelTimeSeconds;
         nodesEgressDistance[std::get<0>(egressFootpath)]       = footpathDistanceMeters;
-        reverseJourneysSteps[std::get<0>(egressFootpath)]      = std::make_tuple(-1, -1, -1, -1, footpathTravelTimeSeconds, -1, footpathDistanceMeters);
+        nearestNetworkNodeNodesEgressDistance[std::get<0>(egressFootpath)] = nearestNetworkNodeDistanceMeters;
+        reverseJourneysSteps[std::get<0>(egressFootpath)]      = std::make_tuple(-1, -1, -1, -1, footpathTravelTimeSeconds, -1, footpathDistanceMeters, nearestNetworkNodeDistanceMeters);
         nodesReverseTentativeTime[std::get<0>(egressFootpath)] = arrivalTimeSeconds - footpathTravelTimeSeconds;
         if (footpathTravelTimeSeconds > maxEgressTravelTime)
         {

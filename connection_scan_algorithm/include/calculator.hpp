@@ -93,7 +93,7 @@ namespace TrRouting
     std::string             alternativesRouting();
     std::string             odTripsRouting();
     
-    std::vector<int>        optimizeJourney(std::deque<std::tuple<int,int,int,int,int,short,int>> &journey);
+    std::vector<int>        optimizeJourney(std::deque<std::tuple<int,int,int,int,int,short,int,int>> &journey);
 
     /**
      * The update*FromCache methods get the data from the cache
@@ -202,7 +202,7 @@ namespace TrRouting
   private:
     
     enum connectionIndexes : short { NODE_DEP = 0, NODE_ARR = 1, TIME_DEP = 2, TIME_ARR = 3, TRIP = 4, CAN_BOARD = 5, CAN_UNBOARD = 6, SEQUENCE = 7, LINE = 8, BLOCK = 9, CAN_TRANSFER_SAME_LINE = 10, MIN_WAITING_TIME_SECONDS = 11 };
-    enum journeyStepIndexes: short { FINAL_ENTER_CONNECTION = 0, FINAL_EXIT_CONNECTION = 1, FINAL_TRANSFERRING_NODE = 2, FINAL_TRIP = 3, TRANSFER_TRAVEL_TIME = 4, IS_SAME_NODE_TRANSFER = 5, TRANSFER_DISTANCE = 6 };
+    enum journeyStepIndexes: short { FINAL_ENTER_CONNECTION = 0, FINAL_EXIT_CONNECTION = 1, FINAL_TRANSFERRING_NODE = 2, FINAL_TRIP = 3, TRANSFER_TRAVEL_TIME = 4, IS_SAME_NODE_TRANSFER = 5, TRANSFER_DISTANCE = 6, NEAREST_NODE_DISTANCE_METERS = 7 };
     
     int              departureTimeSeconds;
     int              initialDepartureTimeSeconds;
@@ -225,20 +225,22 @@ namespace TrRouting
     std::vector<int> nodesEgressTravelTime; // travel time to reach destination (-1 if unreachable by egress mode)
     std::vector<int> nodesAccessDistance; // distance from origin to accessible nodes (-1 if unreachable by access mode)
     std::vector<int> nodesEgressDistance; // distance to reach destination (-1 if unreachable by egress mode)
+    std::vector<int> nearestNetworkNodeNodesAccessDistance; // distance from origin to nearest osrm network node
+    std::vector<int> nearestNetworkNodeNodesEgressDistance; // distance from nearest osrm network node to destination
     std::vector<int> tripsEnterConnection; // index of the entering connection for each trip index 
     std::vector<int> tripsEnterConnectionTransferTravelTime; // index of the entering connection for each trip index 
     std::vector<int> tripsExitConnection; // index of the exiting connection for each trip index 
     std::vector<int> tripsExitConnectionTransferTravelTime; // index of the exiting connection for each trip index 
     std::vector<int> tripsEnabled; // allow/disallow use of this trip during calculation
     std::vector<int> tripsUsable; // after forward calculation, keep a list of usable trips in time range for reverse calculation
-    std::vector<std::tuple<int,int,int>> accessFootpaths; // pair: accessNodeIndex, walkingTravelTimeSeconds, walkingDistanceMeters
-    std::vector<std::tuple<int,int,int>> egressFootpaths; // pair: egressNodeIndex, walkingTravelTimeSeconds, walkingDistanceMeters
+    std::vector<std::tuple<int,int,int,int>> accessFootpaths; // pair: accessNodeIndex, walkingTravelTimeSeconds, walkingDistanceMeters, nearest osrm node distance from point (only for access and egress journey steps))
+    std::vector<std::tuple<int,int,int,int>> egressFootpaths; // pair: egressNodeIndex, walkingTravelTimeSeconds, walkingDistanceMeters, nearest osrm node distance from point (only for access and egress journey steps))
     std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>>> forwardConnections; // tuple: departureNodeIndex, arrivalNodeIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequence in trip, lineIndex, blockIndex, canTransferSameLine, minWaitingTimeSeconds
     std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>>> reverseConnections; // tuple: departureNodeIndex, arrivalNodeIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequence in trip, lineIndex, blockIndex, canTransferSameLine, minWaitingTimeSeconds
-    std::vector<std::tuple<int,int,int,int,int,short,int>> forwardJourneysSteps; // index = node index, tuple: final enter connection, final exit connection, final transferring node index, final trip index, transfer travel time, is same node transfer (first, second, third and fourth values = -1 for access and egress journeys)
-    std::vector<std::tuple<int,int,int,int,int,short,int>> forwardEgressJourneysSteps; // index = node index, tuple: final enter connection, final exit connection, final transferring node index, final trip index, transfer travel time, is same node transfer (first, second, third and fourth values = -1 for access and egress journeys)
-    std::vector<std::tuple<int,int,int,int,int,short,int>> reverseJourneysSteps; // index = node index, tuple: final enter connection, final exit connection, final transferring node index, final trip index, transfer travel time, is same node transfer (first, second, third and fourth values = -1 for access and egress journeys)
-    std::vector<std::tuple<int,int,int,int,int,short,int>> reverseAccessJourneysSteps; // index = node index, tuple: final enter connection, final exit connection, final transferring node index, final trip index, transfer travel time, is same node transfer (first, second, third and fourth values = -1 for access and egress journeys)
+    std::vector<std::tuple<int,int,int,int,int,short,int,int>> forwardJourneysSteps; // index = node index, tuple: final enter connection, final exit connection, final transferring node index, final trip index, transfer travel time, is same node transfer (first, second, third and fourth values = -1 for access and egress journeys, nearest osrm node distance from point (only for acees and egress journey steps))
+    std::vector<std::tuple<int,int,int,int,int,short,int,int>> forwardEgressJourneysSteps; // index = node index, tuple: final enter connection, final exit connection, final transferring node index, final trip index, transfer travel time, is same node transfer (first, second, third and fourth values = -1 for access and egress journeys, nearest osrm node distance from point (only for acees and egress journey steps))
+    std::vector<std::tuple<int,int,int,int,int,short,int,int>> reverseJourneysSteps; // index = node index, tuple: final enter connection, final exit connection, final transferring node index, final trip index, transfer travel time, is same node transfer (first, second, third and fourth values = -1 for access and egress journeys, nearest osrm node distance from point (only for acees and egress journey steps))
+    std::vector<std::tuple<int,int,int,int,int,short,int,int>> reverseAccessJourneysSteps; // index = node index, tuple: final enter connection, final exit connection, final transferring node index, final trip index, transfer travel time, is same node transfer (first, second, third and fourth values = -1 for access and egress journeys, nearest osrm node distance from point (only for acees and egress journey steps))
 
   };
   

@@ -32,7 +32,7 @@ namespace TrRouting
       
     }
     
-    static std::vector<std::tuple<int,int,int>> getAccessibleNodesFootpathsFromPoint(const Point point, const std::vector<std::unique_ptr<Node>> &nodes, std::string mode, Parameters& params, bool reversed = false);
+    static std::vector<std::tuple<int,int,int,int>> getAccessibleNodesFootpathsFromPoint(const Point point, const std::vector<std::unique_ptr<Node>> &nodes, std::string mode, Parameters& params, bool reversed = false);
     
   };
   

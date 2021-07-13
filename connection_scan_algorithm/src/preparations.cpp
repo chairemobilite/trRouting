@@ -43,6 +43,12 @@ namespace TrRouting
     forwardJourneysSteps.clear();
     forwardJourneysSteps.shrink_to_fit();
     forwardJourneysSteps.resize(nodes.size());
+    nearestNetworkNodeNodesAccessDistance.clear();
+    nearestNetworkNodeNodesAccessDistance.shrink_to_fit();
+    nearestNetworkNodeNodesAccessDistance.resize(nodes.size());
+    nearestNetworkNodeNodesEgressDistance.clear();
+    nearestNetworkNodeNodesEgressDistance.shrink_to_fit();
+    nearestNetworkNodeNodesEgressDistance.resize(nodes.size());
     forwardEgressJourneysSteps.clear();
     forwardEgressJourneysSteps.shrink_to_fit();
     forwardEgressJourneysSteps.resize(nodes.size());
