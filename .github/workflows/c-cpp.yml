@@ -14,9 +14,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install deps
-    - run: apt install libboost-all-dev libexpat1-dev libjsoncpp-dev libncurses5-dev
+      run: apt install libboost-all-dev libexpat1-dev libjsoncpp-dev libncurses5-dev
     - name: Gen configure
-    - run: autoreconf -i
+      run: autoreconf -i
     - name: configure
       run: ./configure
     - name: make
