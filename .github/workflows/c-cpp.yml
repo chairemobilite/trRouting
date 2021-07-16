@@ -8,17 +8,26 @@ on:
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
-
+    name: Test build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix: 
+       os: [ubuntu-latest, macOS-latest]
     steps:
     - uses: actions/checkout@v2
       with:
         submodules: recursive
     - name: Install deps
+      if: matrix.os == 'ubuntu-latest'
       run: |
           sudo apt-get update
           sudo apt-get install libboost-all-dev libexpat1-dev libjsoncpp-dev libncurses5-dev libcapnp-dev capnproto
+    - name: Install deps
+      if: matrix.os == 'macOS-latest'
+      run: |
+          brew update
+          brew install boost
+          brew install capnp          
     - name: Gen configure
       run: autoreconf -i
     - name: configure
