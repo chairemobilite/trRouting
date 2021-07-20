@@ -28,6 +28,9 @@ AX_BOOST_FILESYSTEM
 AX_WITH_CURSES
 
 PKG_CHECK_MODULES(CAPNP, capnp)
+# Check for the capnp binary presence
+AC_PATH_PROG(CAPNP_BIN, capnp, no)
+AS_IF([test x"$CAPNP_BIN" = x"no"], [AC_MSG_ERROR([Please install capnp binary.])])
 
 # TODO There's probably a cleaner way to add -lrt required by boost::interprocess
 AC_CHECK_LIB(rt, shm_open)
