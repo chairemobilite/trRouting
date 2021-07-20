@@ -1,7 +1,7 @@
 SUFFIXES = .capnp .capnp.h
 
 .capnp.capnp.h:
-	capnp compile -oc++ $<
+	$(CAPNP_BIN) compile -oc++ $<
 
 clean-local:
 	rm *.capnp.h *.capnp.c++
