@@ -47,7 +47,7 @@ make
 
 On ARM mac with boost installed by homebrew:
 ```
-./configure --with-boost-libdir="/opt/homebrew/lib/"
+CPPFLAGS=-I/opt/homebrew/include/ ./configure --with-boost-libdir="/opt/homebrew/lib/"
 make
 ```
 
