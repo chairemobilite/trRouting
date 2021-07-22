@@ -45,6 +45,12 @@ Then:
 make
 ```
 
+On ARM mac with boost installed by homebrew:
+```
+./configure --with-boost-libdir="/opt/homebrew/lib/"
+make
+```
+
 ## Test
 
 trRouting uses [Googletest](https://github.com/google/googletest) to unit test the application. To run the tests, you must first fetch the googletest submodule once into the repo:
