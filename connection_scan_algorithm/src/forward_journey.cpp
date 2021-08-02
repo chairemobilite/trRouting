@@ -36,9 +36,9 @@ namespace TrRouting
     if (foundLine || params.returnAllNodesResult)
     {
 
-      std::deque<std::tuple<int,int,int,int,int,short,int>> journey;
-      std::tuple<int,int,int,int,int,short,int>         resultingNodeJourneyStep;
-      std::tuple<int,int,int,int,int,short,int>         emptyJourneyStep {-1,-1,-1,-1,-1,-1,-1};
+      std::deque<std::tuple<int,int,int,int,int,short,int,int>> journey;
+      std::tuple<int,int,int,int,int,short,int,int>         resultingNodeJourneyStep;
+      std::tuple<int,int,int,int,int,short,int,int>         emptyJourneyStep {-1,-1,-1,-1,-1,-1,-1,-1};
       std::tuple<int,int,int,int,int,short,short,int,int,int,short,short> * journeyStepEnterConnection; // connection tuple: departureNodeIndex, arrivalNodeIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequenceinTrip
       std::tuple<int,int,int,int,int,short,short,int,int,int,short,short> * journeyStepExitConnection;
       std::vector<boost::uuids::uuid>                   lineUuids;
@@ -121,9 +121,9 @@ namespace TrRouting
         if (!params.returnAllNodesResult)
         {
           json["steps"] = nlohmann::json::array();
-          journey.push_back(std::make_tuple(-1,-1,-1,-1,nodesEgressTravelTime[resultingNodeIndex],-1,nodesEgressDistance[resultingNodeIndex]));
+          journey.push_back(std::make_tuple(-1,-1,-1,-1,nodesEgressTravelTime[resultingNodeIndex],-1,nodesEgressDistance[resultingNodeIndex],nearestNetworkNodeNodesEgressDistance[resultingNodeIndex]));
         }
-        journey.push_front(std::make_tuple(-1,-1,-1,-1,nodesAccessTravelTime[bestAccessNodeIndex],-1,nodesAccessDistance[bestAccessNodeIndex]));
+        journey.push_front(std::make_tuple(-1,-1,-1,-1,nodesAccessTravelTime[bestAccessNodeIndex],-1,nodesAccessDistance[bestAccessNodeIndex],nearestNetworkNodeNodesAccessDistance[bestAccessNodeIndex]));
         
         //std::string stepsJson = "  \"steps\":\n  [\n";
        

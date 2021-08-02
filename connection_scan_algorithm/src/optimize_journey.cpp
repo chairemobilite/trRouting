@@ -3,7 +3,7 @@
 namespace TrRouting
 {
   
-  std::vector<int> Calculator::optimizeJourney(std::deque<std::tuple<int,int,int,int,int,short,int>> &journey)
+  std::vector<int> Calculator::optimizeJourney(std::deque<std::tuple<int,int,int,int,int,short,int,int>> &journey)
   {
 
     CalculationTime algorithmCalculationTime = CalculationTime();

@@ -36,9 +36,9 @@ namespace TrRouting
     if (foundRoute || params.returnAllNodesResult)
     {
 
-      std::deque<std::tuple<int,int,int,int,int,short,int>> journey;
-      std::tuple<int,int,int,int,int,short,int>         resultingNodeJourneyStep;
-      std::tuple<int,int,int,int,int,short,int>         emptyJourneyStep {-1,-1,-1,-1,-1,-1,-1};
+      std::deque<std::tuple<int,int,int,int,int,short,int,int>> journey;
+      std::tuple<int,int,int,int,int,short,int,int>         resultingNodeJourneyStep;
+      std::tuple<int,int,int,int,int,short,int,int>         emptyJourneyStep {-1,-1,-1,-1,-1,-1,-1,-1};
       std::tuple<int,int,int,int,int,short,short,int,int,int,short,short> * journeyStepEnterConnection; // connection tuple: departureNodeIndex, arrivalNodeIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequenceinTrip
       std::tuple<int,int,int,int,int,short,short,int,int,int,short,short> * journeyStepExitConnection;
       std::vector<boost::uuids::uuid>                   lineUuids;
@@ -70,9 +70,9 @@ namespace TrRouting
       int totalDistance            { 0}; int distance               {-1};
       int inVehicleDistance        {-1}; int totalInVehicleDistance { 0}; int totalWalkingDistance { 0};
       int totalTransferDistance    {-1}; int accessDistance         { 0}; int egressDistance       { 0};
-      int journeyStepTravelTime    {-1}; int accessWalkingTime      {-1};
-      int transferTime             {-1}; int egressWalkingTime      {-1};
-      int waitingTime              {-1}; int accessWaitingTime      {-1};
+      int journeyStepTravelTime    {-1}; int accessWalkingTime      {-1}; int nearestNetworkNodeDistanceMeters { -1};
+      int transferTime             {-1}; int egressWalkingTime      {-1}; int nearestOriginNodeDistanceMeters { -1};
+      int waitingTime              {-1}; int accessWaitingTime      {-1}; int nearestDestinationNodeDistanceMeters { -1};
   
       for (auto & resultingNodeIndex : resultingNodes)
       {
@@ -96,9 +96,9 @@ namespace TrRouting
         totalDistance               =  0; distance               = -1; 
         inVehicleDistance           =  0; totalInVehicleDistance =  0; totalWalkingDistance =  0;
         totalTransferDistance       =  0; accessDistance         =  0; egressDistance       =  0;
-        journeyStepTravelTime       = -1; accessWalkingTime      = -1; 
-        transferTime                = -1; egressWalkingTime      = -1; 
-        waitingTime                 = -1; accessWaitingTime      = -1; 
+        journeyStepTravelTime       = -1; accessWalkingTime      = -1; nearestNetworkNodeDistanceMeters = -1;
+        transferTime                = -1; egressWalkingTime      = -1; nearestOriginNodeDistanceMeters = -1;
+        waitingTime                 = -1; accessWaitingTime      = -1; nearestDestinationNodeDistanceMeters = -1;
         
         // recreate journey:
         resultingNodeJourneyStep = reverseAccessJourneysSteps[resultingNodeIndex];
@@ -127,9 +127,9 @@ namespace TrRouting
         if (!params.returnAllNodesResult)
         {
           json["steps"] = nlohmann::json::array();
-          journey.push_front(std::make_tuple(-1,-1,-1,-1,nodesAccessTravelTime[resultingNodeIndex],-1,nodesAccessDistance[resultingNodeIndex]));
+          journey.push_front(std::make_tuple(-1,-1,-1,-1,nodesAccessTravelTime[resultingNodeIndex],-1,nodesAccessDistance[resultingNodeIndex],nearestNetworkNodeNodesAccessDistance[resultingNodeIndex]));
         }
-        journey.push_back(std::make_tuple(-1,-1,-1,-1,nodesEgressTravelTime[bestEgressNodeIndex],-1,nodesEgressDistance[bestEgressNodeIndex]));
+        journey.push_back(std::make_tuple(-1,-1,-1,-1,nodesEgressTravelTime[bestEgressNodeIndex],-1,nodesEgressDistance[bestEgressNodeIndex],nearestNetworkNodeNodesEgressDistance[bestEgressNodeIndex]));
 
 
 
@@ -349,6 +349,7 @@ namespace TrRouting
             
             transferTime          = std::get<journeyStepIndexes::TRANSFER_TRAVEL_TIME>(journeyStep);
             distance              = std::get<journeyStepIndexes::TRANSFER_DISTANCE>(journeyStep);
+            nearestNetworkNodeDistanceMeters = std::get<journeyStepIndexes::NEAREST_NODE_DISTANCE_METERS>(journeyStep);
             if (totalDistance != -1)
             {
               totalDistance += distance;
@@ -368,6 +369,7 @@ namespace TrRouting
               totalWalkingTime    += transferTime;
               accessWalkingTime    = transferTime;
               accessDistance       = distance;
+              nearestOriginNodeDistanceMeters = nearestNetworkNodeDistanceMeters;
               if (!params.returnAllNodesResult)
               {
                 stepJson                          = {};
@@ -381,6 +383,7 @@ namespace TrRouting
                 stepJson["arrivalTime"]           = Toolbox::convertSecondsToFormattedTime(transferArrivalTime);
                 stepJson["departureTimeSeconds"]  = bestDepartureTime;
                 stepJson["arrivalTimeSeconds"]    = transferArrivalTime;
+                stepJson["nearestNetworkNodeDistanceMeters"] = nearestNetworkNodeDistanceMeters;
                 stepJson["readyToBoardAtSeconds"] = transferReadyTime;
                 stepJson["readyToBoardAt"]        = Toolbox::convertSecondsToFormattedTime(transferReadyTime);
                 json["steps"].push_back(stepJson);
@@ -393,6 +396,7 @@ namespace TrRouting
               egressWalkingTime   = transferTime;
               transferArrivalTime = arrivalTime + transferTime;
               egressDistance      = distance;
+              nearestDestinationNodeDistanceMeters = nearestNetworkNodeDistanceMeters;
               if (!params.returnAllNodesResult)
               {
                 stepJson                         = {};
@@ -405,6 +409,7 @@ namespace TrRouting
                 stepJson["arrivalTime"]          = Toolbox::convertSecondsToFormattedTime(arrivalTime + transferTime);
                 stepJson["departureTimeSeconds"] = arrivalTime;
                 stepJson["arrivalTimeSeconds"]   = arrivalTime + transferTime;
+                stepJson["nearestNetworkNodeDistanceMeters"] = nearestNetworkNodeDistanceMeters;
                 json["steps"].push_back(stepJson);
                 stepsStr += "egress" + std::to_string(transferTime) + "s" + std::to_string(distance) + "m|";
               }
@@ -492,6 +497,8 @@ namespace TrRouting
             json["totalNonTransitTravelTimeMinutes"]               = Toolbox::convertSecondsToMinutes(totalWalkingTime);
             json["totalNonTransitTravelTimeSeconds"]               = totalWalkingTime;
             json["totalNonTransitDistanceMeters"]                  = totalWalkingDistance;
+            json["nearestNetworkNodeOriginDistanceMeters"]         = nearestOriginNodeDistanceMeters;
+            json["nearestNetworkNodeDestinationDistanceMeters"]    = nearestDestinationNodeDistanceMeters;
             json["numberOfBoardings"]                              = numberOfTransfers + 1;
             json["numberOfTransfers"]                              = numberOfTransfers == -1 ? 0 : numberOfTransfers;
             json["transferWalkingTimeMinutes"]                     = Toolbox::convertSecondsToMinutes(totalTransferWalkingTime);

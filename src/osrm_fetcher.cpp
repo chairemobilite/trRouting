@@ -5,11 +5,11 @@
 namespace TrRouting
 {
   
-  std::vector<std::tuple<int,int,int>> OsrmFetcher::getAccessibleNodesFootpathsFromPoint(const Point point, const std::vector<std::unique_ptr<Node>> &nodes, std::string mode, Parameters& params, bool reversed)
+  std::vector<std::tuple<int,int,int,int>> OsrmFetcher::getAccessibleNodesFootpathsFromPoint(const Point point, const std::vector<std::unique_ptr<Node>> &nodes, std::string mode, Parameters& params, bool reversed)
   {
 
-    std::vector<int>                     birdDistanceAccessibleNodeIndexes;
-    std::vector<std::tuple<int,int,int>> accessibleNodesFootpaths;
+    std::vector<int>                         birdDistanceAccessibleNodeIndexes;
+    std::vector<std::tuple<int,int,int,int>> accessibleNodesFootpaths;
 
     float lengthOfOneDegreeOfLongitude = 111412.84 * cos(point.latitude * M_PI / 180) -93.5 * cos (3 * point.latitude * M_PI / 180);
     float lengthOfOneDegreeOflatitude  = 111132.92 - 559.82 * cos(2 * point.latitude * M_PI / 180) + 1.175 * cos(4 * point.latitude * M_PI / 180);
@@ -68,6 +68,7 @@ namespace TrRouting
       int numberOfDurations = responseJson["durations"][0].size();
       //std::cout << "numberOfDurations: " << responseJson["durations"][0].dump(2) << std::endl;
       int numberOfDistances = responseJson["distances"][0].size();
+      int nearestNetworkNodeDistanceMeters = (int)ceil((float)responseJson["sources"][0]["distance"]); // the distance in meters between point and nearest osrm routable node
       //std::cout << "numberOfDistances: " << responseJson["distances"][0].dump(2) << std::endl;
       int j = 0;
       if (numberOfDurations > 0 && numberOfDistances > 0)
@@ -80,7 +81,7 @@ namespace TrRouting
           if (travelTimeSeconds <= params.maxAccessWalkingTravelTimeSeconds)
           {
             distanceMeters = (int)ceil((float)responseJson["distances"][0][i]);
-            accessibleNodesFootpaths.push_back(std::make_tuple(birdDistanceAccessibleNodeIndexes[i-1], travelTimeSeconds, distanceMeters));
+            accessibleNodesFootpaths.push_back(std::make_tuple(birdDistanceAccessibleNodeIndexes[i-1], travelTimeSeconds, distanceMeters, nearestNetworkNodeDistanceMeters));
           }
         }
       }

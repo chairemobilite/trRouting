@@ -152,7 +152,7 @@ namespace TrRouting
                   {
                     footpathDistance = nodes[nodeDepartureIndex].get()->reverseTransferableDistancesMeters[footpathIndex];
                     nodesReverseTentativeTime[transferableNodeIndex] = connectionDepartureTime - footpathTravelTime - connectionMinWaitingTimeSeconds;
-                    reverseJourneysSteps[transferableNodeIndex]           = std::make_tuple(i, tripsExitConnection[tripIndex], nodeDepartureIndex, tripIndex, footpathTravelTime, (nodeDepartureIndex == transferableNodeIndex ? 1 : -1), footpathDistance);
+                    reverseJourneysSteps[transferableNodeIndex]           = std::make_tuple(i, tripsExitConnection[tripIndex], nodeDepartureIndex, tripIndex, footpathTravelTime, (nodeDepartureIndex == transferableNodeIndex ? 1 : -1), footpathDistance, -1);
                   }
                   if (
                     nodeDepartureIndex == transferableNodeIndex
@@ -178,7 +178,7 @@ namespace TrRouting
                         connectionDepartureTime - initialDepartureTimeSeconds - nodesAccessTravelTime[nodeDepartureIndex] <= params.maxFirstWaitingTimeSeconds
                       )
                       {
-                        reverseAccessJourneysSteps[transferableNodeIndex] = std::make_tuple(i, tripsExitConnection[tripIndex], nodeDepartureIndex, tripIndex, 0, 1, 0);
+                        reverseAccessJourneysSteps[transferableNodeIndex] = std::make_tuple(i, tripsExitConnection[tripIndex], nodeDepartureIndex, tripIndex, 0, 1, 0, std::get<journeyStepIndexes::NEAREST_NODE_DISTANCE_METERS>(reverseJourneysSteps[transferableNodeIndex]));
                       }
                     }
                   }
