@@ -117,6 +117,7 @@ namespace TrRouting
       std::string osrmCyclingHost;
       std::string osrmDrivingHost;
       
+      bool birdDistanceAccessibilityEnabled = false; // true if the accessibility information is obtained using bird distances instead of osrm
       std::string accessMode;
       std::string egressMode;
       bool debugDisplay; // display performance and debug info when set to true
