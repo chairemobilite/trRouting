@@ -83,62 +83,6 @@ protected:
     return true;
   }
 
-  std::vector<std::string> createCalculationQuery()
-  {
-    std::vector<std::string> parametersWithValues;
-    pair<string, string> queryFields[] = {
-        make_pair("destination", "45.55239801892435,-73.57786713522127"),
-        make_pair("alternatives", "1"),
-        make_pair("scenario_uuid", "4b39c2bc-fa43-4ca3-8bae-e21b6c89f1db"),
-        make_pair("origin", "45.542273017129446,-73.62259417256861"),
-        make_pair("max_transfer_travel_time_seconds", "600"),
-        make_pair("max_egress_travel_time_seconds", "900"),
-        make_pair("max_access_travel_time_seconds", "900"),
-        make_pair("departure_time_seconds", "28800"),
-        make_pair("min_waiting_time_seconds", "180")};
-
-    for (auto &field : queryFields)
-    {
-      parametersWithValues.push_back(field.first + "=" + field.second);
-    }
-    return parametersWithValues;
-  }
-
-  bool updateCalculatorParams(Calculator *calculator, std::vector<std::string> *parametersWithValues)
-  {
-
-    // update params:
-    calculator->params.setDefaultValues();
-    calculator->params.update(*parametersWithValues, calculator->scenarioIndexesByUuid, calculator->scenarios, calculator->nodeIndexesByUuid, calculator->agencyIndexesByUuid, calculator->lineIndexesByUuid, calculator->serviceIndexesByUuid, calculator->modeIndexesByShortname, calculator->dataSourceIndexesByUuid);
-    if (calculator->params.isCompleteForCalculation())
-    {
-
-      // find OdTrip if provided:
-      bool foundOdTrip{false};
-
-      calculator->origin = &calculator->params.origin;
-      calculator->destination = &calculator->params.destination;
-      calculator->odTrip = nullptr;
-      std::cout << "odTripUuid.is_initialized: " << calculator->params.odTripUuid.is_initialized() << std::endl;
-      std::cout << "calculator->odTripIndexesByUuid.count(calculator->params.odTripUuid.get()): " << calculator->odTripIndexesByUuid.count(calculator->params.odTripUuid.get()) << std::endl;
-      if (calculator->params.odTripUuid.is_initialized() && calculator->odTripIndexesByUuid.count(calculator->params.odTripUuid.get()))
-      {
-        calculator->odTrip = calculator->odTrips[calculator->odTripIndexesByUuid[calculator->params.odTripUuid.get()]].get();
-        foundOdTrip = true;
-        std::cout << "od trip uuid " << calculator->odTrip->uuid << std::endl;
-        std::cout << "dts " << calculator->odTrip->departureTimeSeconds << std::endl;
-        calculator->origin = calculator->odTrip->origin.get();
-        calculator->destination = calculator->odTrip->destination.get();
-
-        if (calculator->params.alternatives)
-        {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
   int assertCacheOk(Calculator *calculator)
   {
     if (calculator->countAgencies() == 0)
@@ -175,6 +119,58 @@ protected:
     return 0;
   }
 
+  std::vector<std::string> createCalculationQuery()
+  {
+    std::vector<std::string> parametersWithValues;
+    pair<string, string> queryFields[] = {
+        make_pair("destination", "45.55239801892435,-73.57786713522127"),
+        make_pair("alternatives", "1"),
+        make_pair("scenario_uuid", "4b39c2bc-fa43-4ca3-8bae-e21b6c89f1db"),
+        make_pair("origin", "45.542273017129446,-73.62259417256861"),
+        make_pair("max_transfer_travel_time_seconds", "600"),
+        make_pair("max_egress_travel_time_seconds", "900"),
+        make_pair("max_access_travel_time_seconds", "900"),
+        make_pair("departure_time_seconds", "28800"),
+        make_pair("min_waiting_time_seconds", "180")};
+
+    for (auto &field : queryFields)
+    {
+      parametersWithValues.push_back(field.first + "=" + field.second);
+    }
+    return parametersWithValues;
+  }
+
+  bool updateCalculatorParams(Calculator *calculator, std::vector<std::string> *parametersWithValues)
+  {
+    calculator->params.setDefaultValues();
+    calculator->params.update(*parametersWithValues, calculator->scenarioIndexesByUuid, calculator->scenarios, calculator->nodeIndexesByUuid, calculator->agencyIndexesByUuid, calculator->lineIndexesByUuid, calculator->serviceIndexesByUuid, calculator->modeIndexesByShortname, calculator->dataSourceIndexesByUuid);
+    if (calculator->params.isCompleteForCalculation())
+    {
+      // find OdTrip if provided:
+      bool foundOdTrip{false};
+
+      calculator->origin = &calculator->params.origin;
+      calculator->destination = &calculator->params.destination;
+      calculator->odTrip = nullptr;
+
+      if (calculator->params.odTripUuid.is_initialized() && calculator->odTripIndexesByUuid.count(calculator->params.odTripUuid.get()))
+      {
+        calculator->odTrip = calculator->odTrips[calculator->odTripIndexesByUuid[calculator->params.odTripUuid.get()]].get();
+        foundOdTrip = true;
+        std::cout << "od trip uuid " << calculator->odTrip->uuid << std::endl;
+        std::cout << "dts " << calculator->odTrip->departureTimeSeconds << std::endl;
+        calculator->origin = calculator->odTrip->origin.get();
+        calculator->destination = calculator->odTrip->destination.get();
+      }
+
+      if (calculator->params.alternatives)
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+
   long long get_time()
   {
     struct timeval t;
@@ -185,7 +181,6 @@ protected:
 
   long long benchmarkCurrentParams(TrRouting::Calculator *calculator)
   {
-
     int nbIter = 10;
     long long results[nbIter];
     for (int i = 0; i < nbIter; i++)
@@ -213,10 +208,15 @@ TEST_F(BenchmarkCSATests, TestGetFilePath)
   Parameters algorithmParams = setupAlgorithmParams();
 
   Calculator calculator(algorithmParams);
+
   if (!updateCalculatorFromCache(&calculator))
     ASSERT_EQ(true, false);
 
-  //calculator.params.setDefaultValues();
+  calculator.params.setDefaultValues();
+
+  // TODO Shouldn't need to do this, but we do for now, those benchmarks are not the same as those in this program though. Here we loop and have microseconds precision.
+  calculator.algorithmCalculationTime.start();
+  calculator.benchmarking.clear();
 
   std::vector<std::string> parametersWithValues = createCalculationQuery();
 

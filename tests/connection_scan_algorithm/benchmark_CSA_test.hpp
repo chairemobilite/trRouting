@@ -12,9 +12,12 @@ class ConstantBenchmarkCSATests : public ::testing::Test
 protected:
     TrRouting::Parameters setupAlgorithmParams();
     bool updateCalculatorFromCache(TrRouting::Calculator *calculator);
-    std::vector<std::string> createCalculationQuery();
-    bool updateCalculatorParams(Calculator *calculator, std::vector<std::string> *parametersWithValues);
     int assertCacheOk(TrRouting::Calculator *calculator);
+    
+    std::vector<std::string> createCalculationQuery();
+    
+    bool updateCalculatorParams(Calculator *calculator, std::vector<std::string> *parametersWithValues);
+    
     long long get_time();
     long long benchmarkCurrentParams(Calculator *calculator);
 };
