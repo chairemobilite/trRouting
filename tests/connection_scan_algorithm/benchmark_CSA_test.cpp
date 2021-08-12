@@ -13,6 +13,8 @@
 #include <iostream>
 #include <iterator>
 #include <curses.h>
+#include <bits/stdc++.h>
+#include <chrono>
 
 #include <boost/optional.hpp>.evaluateRequests();
 #include <boost/uuid/uuid.hpp>
@@ -171,34 +173,25 @@ protected:
     return false;
   }
 
-  long long get_time()
-  {
-    struct timeval t;
-    struct timezone tzp;
-    gettimeofday(&t, &tzp);
-    return t.tv_sec * 1e6 + t.tv_usec;
-  }
-
-  long long benchmarkCurrentParams(TrRouting::Calculator *calculator)
+  void benchmarkCurrentParams(TrRouting::Calculator *calculator)
   {
     int nbIter = 10;
-    long long results[nbIter];
+    double results[nbIter];
     for (int i = 0; i < nbIter; i++)
     {
-      long long start = get_time();
+      auto start = chrono::high_resolution_clock::now();
       calculator->alternativesRouting();
-      long long end = get_time();
-      results[i] = end - start;
+      auto end = chrono::high_resolution_clock::now();
+      results[i] = chrono::duration_cast<chrono::nanoseconds>(end - start).count() * 1e-9;
     }
-    std::cout << "results: ";
+    std::cout << "Execution time results: " << std::endl;
     long long resultSum = 0;
     for (int i = 0; i < nbIter; i++)
     {
-      std::cout << results[i] << " ";
+      std::cout << "Iteration " << i << ": " << fixed << results[i] << setprecision(9) << " seconds" << std::endl;
       resultSum += results[i];
     }
-    std::cout << std::endl;
-    return resultSum / nbIter;
+    std::cout << "Average execution time: "<< fixed << resultSum / (double)nbIter << setprecision(9) << " seconds per routing calculation" << std::endl;
   }
 };
 
@@ -222,8 +215,7 @@ TEST_F(BenchmarkCSATests, TestGetFilePath)
 
   if (updateCalculatorParams(&calculator, &parametersWithValues))
   {
-    long long result = benchmarkCurrentParams(&calculator);
-    std::cout << "result: " << result << std::endl;
+    benchmarkCurrentParams(&calculator);
     ASSERT_EQ(true, true);
   }
   else

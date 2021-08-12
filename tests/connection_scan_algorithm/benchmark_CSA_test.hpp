@@ -18,8 +18,7 @@ protected:
     
     bool updateCalculatorParams(Calculator *calculator, std::vector<std::string> *parametersWithValues);
     
-    long long get_time();
-    long long benchmarkCurrentParams(Calculator *calculator);
+    void benchmarkCurrentParams(Calculator *calculator);
 };
 
 #endif
