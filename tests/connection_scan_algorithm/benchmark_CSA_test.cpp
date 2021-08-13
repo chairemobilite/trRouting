@@ -15,6 +15,8 @@
 #include <curses.h>
 #include <bits/stdc++.h>
 #include <chrono>
+#include <iostream>
+#include <fstream> 
 
 #include <boost/optional.hpp>.evaluateRequests();
 #include <boost/uuid/uuid.hpp>
@@ -175,6 +177,8 @@ protected:
 
   void benchmarkCurrentParams(TrRouting::Calculator *calculator)
   {
+    ofstream benchmarkResultsFile("benchmarkResults.txt");
+
     int nbIter = 10;
     double results[nbIter];
     for (int i = 0; i < nbIter; i++)
@@ -184,14 +188,15 @@ protected:
       auto end = chrono::high_resolution_clock::now();
       results[i] = chrono::duration_cast<chrono::nanoseconds>(end - start).count() * 1e-9;
     }
-    std::cout << "Execution time results: " << std::endl;
+    benchmarkResultsFile << "Execution time results: " << std::endl;
     long long resultSum = 0;
     for (int i = 0; i < nbIter; i++)
     {
-      std::cout << "Iteration " << i << ": " << fixed << results[i] << setprecision(9) << " seconds" << std::endl;
+      benchmarkResultsFile << "Iteration " << i << ": " << fixed << results[i] << setprecision(9) << " seconds" << std::endl;
       resultSum += results[i];
     }
-    std::cout << "Average execution time: "<< fixed << resultSum / (double)nbIter << setprecision(9) << " seconds per routing calculation" << std::endl;
+    benchmarkResultsFile << "Average execution time: "<< fixed << resultSum / (double)nbIter << setprecision(9) << " seconds per routing calculation" << std::endl;
+    benchmarkResultsFile.close();
   }
 };
 
