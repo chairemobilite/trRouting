@@ -148,6 +148,8 @@ protected:
   {
     calculator->params.setDefaultValues();
     calculator->params.update(*parametersWithValues, calculator->scenarioIndexesByUuid, calculator->scenarios, calculator->nodeIndexesByUuid, calculator->agencyIndexesByUuid, calculator->lineIndexesByUuid, calculator->serviceIndexesByUuid, calculator->modeIndexesByShortname, calculator->dataSourceIndexesByUuid);
+    calculator->params.birdDistanceAccessibilityEnabled = true;
+
     if (calculator->params.isCompleteForCalculation())
     {
       // find OdTrip if provided:
