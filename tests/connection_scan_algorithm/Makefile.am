@@ -20,7 +20,7 @@ gtest_SOURCES = gtest.cpp \
     ../../src/places_cache_fetcher.cpp
 
 
-gtest_LDADD = $(top_srcdir)/tests/libgtest.la ../../connection_scan_algorithm/src/libcsa.a
+gtest_LDADD = $(top_srcdir)/tests/libgtest.la ../../connection_scan_algorithm/src/libcsa.la
 
 gtest_LDFLAGS = -no-pie -pthread -std=c++17 -lstdc++fs
 
