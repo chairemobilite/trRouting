@@ -1,3 +1,9 @@
+// OpenMP header
+#include <omp.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <chrono>
+
 #include "calculator.hpp"
 #include "constants.hpp"
 
@@ -144,9 +150,23 @@ namespace TrRouting
         }
       }
       
+      int nthreads, tid;
+    /* Fork a team of threads */
       std::vector<int> combination;
+      #pragma omp parallel for private(nthreads, tid)
       for (int i = 0; i < allCombinations.size(); i++)
       {
+        /* Obtain thread number */
+        tid = omp_get_thread_num();
+        std::cout << "Hello World from thread = " << tid << std::endl;
+
+        /* Only master thread does this */
+        if (tid == 0)
+        {
+            nthreads = omp_get_num_threads();
+            std::cout << "Number of threads = " << nthreads << std::endl;
+        }
+
         if (alternativesCalculatedCount < maxAlternatives && alternativeSequence - 1 < params.maxValidAlternatives)
         {
 

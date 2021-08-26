@@ -4,5 +4,6 @@ libgtest_la_CPPFLAGS = -I$(top_srcdir)/googletest/googletest/include -I$(top_src
 libgtest_la_LDFLAGS = -pthread
 
 SUBDIRS = . \
-          cache_fetch
+          cache_fetch \
+          connection_scan_algorithm
 
