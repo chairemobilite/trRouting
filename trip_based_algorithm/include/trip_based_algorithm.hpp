@@ -46,14 +46,14 @@ namespace TrRouting
     
     std::string projectShortname;
     TripBasedAlgorithm();
-    TripBasedAlgorithm(Parameters& theParams);
+    TripBasedAlgorithm(ServerParameters& theParams);
     void setup();
     void setParamsFromYaml(std::string yamlFilePath = "");
     json calculate();
     void refresh();
     void destroy();
-    void updateParams(Parameters& theParams);
-    Parameters params;
+    void updateParams(ServerParameters& theParams);
+    ServerParameters params;
     void resetAccessEgressModes();
     CalculationTime algorithmCalculationTime;
     

@@ -37,9 +37,9 @@ class BenchmarkCSATests : public ConstantBenchmarkCSATests
 protected:
   int numberOfRequests = 0;
 
-  Parameters setupAlgorithmParams()
+  ServerParameters setupAlgorithmParams()
   {
-    Parameters algorithmParams;
+    ServerParameters algorithmParams;
 
     algorithmParams.projectShortname = "demo_transition";
     algorithmParams.cacheDirectoryPath = "cache";
@@ -165,7 +165,7 @@ protected:
 TEST_F(BenchmarkCSATests, TestGetFilePath)
 {
 
-  Parameters algorithmParams = setupAlgorithmParams();
+  ServerParameters algorithmParams = setupAlgorithmParams();
 
   Calculator calculator(algorithmParams);
 

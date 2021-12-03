@@ -70,7 +70,7 @@ int main(int argc, char** argv) {
   // Set params:
   ProgramOptions programOptions;
   programOptions.parseOptions(argc, argv);
-  Parameters algorithmParams;
+  ServerParameters algorithmParams;
   
   // setup program options:
   

@@ -32,7 +32,7 @@ namespace TrRouting
     std::vector<std::vector<std::unique_ptr<int>>>&   tripConnectionDepartureTimes,
     std::vector<std::vector<std::unique_ptr<float>>>& tripConnectionDemands,
     std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>>>& connections, 
-    Parameters& params,
+    ServerParameters& params,
     std::string customPath
   )
   {

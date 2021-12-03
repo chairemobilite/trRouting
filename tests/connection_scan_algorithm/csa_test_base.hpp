@@ -47,7 +47,7 @@ protected:
 
     // Parameter object is required to build the calculator.
     // TODO As code evolves, it won't be necessary anymore
-    TrRouting::Parameters params;
+    TrRouting::ServerParameters params;
     // Calculator is the entry point to run the algorithm, it is part of the test object since (for now) there is nothing specific for its initialization.
     TrRouting::Calculator calculator;
 
@@ -63,7 +63,7 @@ protected:
     void setUpSchedules(std::vector<std::shared_ptr<TrRouting::ConnectionTuple>> &connections);
 
 public:
-    BaseCsaFixtureTests() : params(TrRouting::Parameters()), calculator(TrRouting::Calculator(params)) {}
+    BaseCsaFixtureTests() : params(TrRouting::ServerParameters()), calculator(TrRouting::Calculator(params)) {}
     void SetUp();
 
 };

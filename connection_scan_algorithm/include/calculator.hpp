@@ -100,7 +100,7 @@ namespace TrRouting
     std::map<std::string, int> benchmarking;
     std::string projectShortname;
     
-    Calculator(Parameters& theParams);
+    Calculator(ServerParameters& theParams);
 
     /**
      * Prepare the data for the calculator and validate that there are at least
@@ -130,22 +130,22 @@ namespace TrRouting
      * -EINVAL For any other data related error
      * -(error codes from the open system call)
      */
-    int                    updateDataSourcesFromCache(Parameters&  params, std::string customPath = "");
-    int                    updateHouseholdsFromCache (Parameters&  params, std::string customPath = "");
-    int                    updatePersonsFromCache    (Parameters&  params, std::string customPath = "");
-    int                    updateOdTripsFromCache    (Parameters&  params, std::string customPath = "");
-    int                    updatePlacesFromCache     (Parameters&  params, std::string customPath = "");
+    int                    updateDataSourcesFromCache(ServerParameters&  params, std::string customPath = "");
+    int                    updateHouseholdsFromCache (ServerParameters&  params, std::string customPath = "");
+    int                    updatePersonsFromCache    (ServerParameters&  params, std::string customPath = "");
+    int                    updateOdTripsFromCache    (ServerParameters&  params, std::string customPath = "");
+    int                    updatePlacesFromCache     (ServerParameters&  params, std::string customPath = "");
 
-    int                    updateStationsFromCache   (Parameters&  params, std::string customPath = "");
-    int                    updateAgenciesFromCache   (Parameters&  params, std::string customPath = "");
-    int                    updateServicesFromCache   (Parameters&  params, std::string customPath = "");
-    int                    updateNodesFromCache      (Parameters&  params, std::string customPath = "");
-    int                    updateStopsFromCache      (Parameters&  params, std::string customPath = "");
-    int                    updateLinesFromCache      (Parameters&  params, std::string customPath = "");
-    int                    updatePathsFromCache      (Parameters&  params, std::string customPath = "");
-    int                    updateScenariosFromCache  (Parameters&  params, std::string customPath = "");
-    int                    updateNetworksFromCache   (Parameters&  params, std::string customPath = "");
-    int                    updateSchedulesFromCache  (Parameters&  params, std::string customPath = "");
+    int                    updateStationsFromCache   (ServerParameters&  params, std::string customPath = "");
+    int                    updateAgenciesFromCache   (ServerParameters&  params, std::string customPath = "");
+    int                    updateServicesFromCache   (ServerParameters&  params, std::string customPath = "");
+    int                    updateNodesFromCache      (ServerParameters&  params, std::string customPath = "");
+    int                    updateStopsFromCache      (ServerParameters&  params, std::string customPath = "");
+    int                    updateLinesFromCache      (ServerParameters&  params, std::string customPath = "");
+    int                    updatePathsFromCache      (ServerParameters&  params, std::string customPath = "");
+    int                    updateScenariosFromCache  (ServerParameters&  params, std::string customPath = "");
+    int                    updateNetworksFromCache   (ServerParameters&  params, std::string customPath = "");
+    int                    updateSchedulesFromCache  (ServerParameters&  params, std::string customPath = "");
 
     int                    setConnections(std::vector<std::shared_ptr<ConnectionTuple>> connections);
     
@@ -222,8 +222,8 @@ namespace TrRouting
     std::vector<std::vector<std::unique_ptr<int>>>   tripConnectionDepartureTimes; // tripIndex: [connectionIndex (sequence in trip): departureTimeSeconds]
     std::vector<std::vector<std::unique_ptr<float>>> tripConnectionDemands;        // tripIndex: [connectionIndex (sequence in trip): sum of od trips weights using this connection (demand)]
     //std::vector<std::unique_ptr<std::vector<std::unique_ptr<int>>>>   tripIndexesByPathIndex;
-
-    Parameters& params;
+  
+    ServerParameters& params;
     CalculationTime algorithmCalculationTime;
     
     Point  * origin;

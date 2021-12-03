@@ -3,7 +3,7 @@
 
 namespace TrRouting
 {
-  std::vector<std::tuple<int, int, int>> OsrmFetcher::getAccessibleNodesFootpathsFromPoint(const Point &point, const std::vector<std::unique_ptr<Node>> &nodes, std::string mode, Parameters &params, int maxWalkingTravelTime, float walkingSpeedMetersPerSecond, bool reversed)
+  std::vector<std::tuple<int, int, int>> OsrmFetcher::getAccessibleNodesFootpathsFromPoint(const Point &point, const std::vector<std::unique_ptr<Node>> &nodes, std::string mode, ServerParameters &params, int maxWalkingTravelTime, float walkingSpeedMetersPerSecond, bool reversed)
   {
     if (params.birdDistanceAccessibilityEnabled)
     {
@@ -15,7 +15,7 @@ namespace TrRouting
     }
   }
 
-  std::vector<std::tuple<int, int, int>> OsrmFetcher::getNodesFromBirdDistance(const Point &point, const std::vector<std::unique_ptr<Node>> &nodes, Parameters &params, int maxWalkingTravelTime, float walkingSpeedMetersPerSecond)
+  std::vector<std::tuple<int, int, int>> OsrmFetcher::getNodesFromBirdDistance(const Point &point, const std::vector<std::unique_ptr<Node>> &nodes, ServerParameters &params, int maxWalkingTravelTime, float walkingSpeedMetersPerSecond)
   {
     std::vector<std::tuple<int, int, int>> accessibleNodesFootpaths;
 
@@ -46,7 +46,7 @@ namespace TrRouting
     return accessibleNodesFootpaths;
   }
 
-  std::vector<std::tuple<int, int, int>> OsrmFetcher::getNodesFromOsrm(const Point &point, const std::vector<std::unique_ptr<Node>> &nodes, std::string mode, Parameters &params, int maxWalkingTravelTime, float walkingSpeedMetersPerSecond, bool reversed)
+  std::vector<std::tuple<int, int, int>> OsrmFetcher::getNodesFromOsrm(const Point &point, const std::vector<std::unique_ptr<Node>> &nodes, std::string mode, ServerParameters &params, int maxWalkingTravelTime, float walkingSpeedMetersPerSecond, bool reversed)
   {
     std::vector<int> birdDistanceAccessibleNodeIndexes;
     std::vector<std::tuple<int, int, int>> accessibleNodesFootpaths;

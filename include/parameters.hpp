@@ -30,7 +30,7 @@ namespace TrRouting
   class GtfsFetcher;
   class CsvFetcher;
 
-  class Parameters {
+  class ServerParameters {
 
     public:
 

@@ -18,7 +18,7 @@ namespace TrRouting
   int CacheFetcher::getDataSources(
     std::vector<std::unique_ptr<DataSource>>& ts,
     std::map<boost::uuids::uuid, int>& tIndexesByUuid,
-    Parameters& params,
+    ServerParameters& params,
     std::string customPath
   )
   {

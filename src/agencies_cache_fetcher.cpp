@@ -17,7 +17,7 @@ namespace TrRouting
   int CacheFetcher::getAgencies(
     std::vector<std::unique_ptr<Agency>>& ts,
     std::map<boost::uuids::uuid, int>& tIndexesByUuid,
-    Parameters& params,
+    ServerParameters& params,
     std::string customPath
   )
   {

@@ -37,7 +37,7 @@ namespace TrRouting
     return count;
   }
   
-  std::string CacheFetcher::getFilePath(std::string cacheFilePath, Parameters& params, std::string customPath) {
+  std::string CacheFetcher::getFilePath(std::string cacheFilePath, ServerParameters& params, std::string customPath) {
     std::string filePath = "";
     if (!params.cacheDirectoryPath.empty()) {
       filePath += params.cacheDirectoryPath + "/";

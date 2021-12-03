@@ -5,7 +5,7 @@ using json = nlohmann::json;
 namespace TrRouting
 {
   
-  TripBasedAlgorithm::TripBasedAlgorithm(Parameters& theParams) : params(theParams)
+  TripBasedAlgorithm::TripBasedAlgorithm(ServerParameters& theParams) : params(theParams)
   {
     algorithmCalculationTime = CalculationTime();
     setup();
@@ -401,7 +401,7 @@ namespace TrRouting
   }
   
   // Call before each calculation
-  void TripBasedAlgorithm::updateParams(Parameters& theParams)
+  void TripBasedAlgorithm::updateParams(ServerParameters& theParams)
   {
     params = theParams;
   }

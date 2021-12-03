@@ -23,7 +23,7 @@ namespace TrRouting
     std::vector<std::unique_ptr<Node>>& ts,
     std::map<boost::uuids::uuid, int>& tIndexesByUuid,
     std::map<boost::uuids::uuid, int>& stationIndexesByUuid,
-    Parameters& params,
+    ServerParameters& params,
     std::string customPath
   )
   {

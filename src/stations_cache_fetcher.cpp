@@ -19,7 +19,7 @@ namespace TrRouting
   int CacheFetcher::getStations(
     std::vector<std::unique_ptr<Station>>& ts,
     std::map<boost::uuids::uuid, int>& tIndexesByUuid,
-    Parameters& params,
+    ServerParameters& params,
     std::string customPath
   ) 
   {

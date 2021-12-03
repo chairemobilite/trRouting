@@ -132,7 +132,7 @@ int main(int argc, char** argv) {
   std::cerr << dataShortname << std::endl << std::endl;
   
   // Set params:
-  Parameters algorithmParams;
+  ServerParameters algorithmParams;
   TripBasedAlgorithm calculator;
   algorithmParams.projectShortname = dataShortname;
   algorithmParams.dataFetcher          = dataFetcher;

@@ -20,7 +20,7 @@ namespace TrRouting
     std::map<boost::uuids::uuid, int>& tIndexesByUuid,
     std::map<boost::uuids::uuid, int>& agencyIndexesByUuid,
     std::map<std::string, int>& modeIndexesByShortname,
-    Parameters& params,
+    ServerParameters& params,
     std::string customPath
   )
   {

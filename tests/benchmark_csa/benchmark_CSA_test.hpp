@@ -10,7 +10,7 @@ using namespace TrRouting;
 class ConstantBenchmarkCSATests : public ::testing::Test
 {
 protected:
-    TrRouting::Parameters setupAlgorithmParams();
+    TrRouting::ServerParameters setupAlgorithmParams();
     bool updateCalculatorFromCache(TrRouting::Calculator *calculator);
     int assertCacheOk(TrRouting::Calculator *calculator);
     

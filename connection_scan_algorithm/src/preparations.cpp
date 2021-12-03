@@ -3,77 +3,77 @@
 namespace TrRouting
 {
 
-  /*void Calculator::updateStationsFromCache(Parameters& params, std::string customPath)
+  /*void Calculator::updateStationsFromCache(ServerParameters& params, std::string customPath)
   {
     params.cacheFetcher->getStations(stations, stationIndexesByUuid, params, customPath);
   }*/
 
-  /*void Calculator::updateStopsFromCache(Parameters& params, std::string customPath)
+  /*void Calculator::updateStopsFromCache(ServerParameters& params, std::string customPath)
   {
     params.cacheFetcher->getStops(stops, stopIndexesByUuid, nodeIndexesByUuid, params, customPath);
   }*/
 
-  int Calculator::updateNodesFromCache(Parameters& params, std::string customPath)
+  int Calculator::updateNodesFromCache(ServerParameters& params, std::string customPath)
   {
     return params.cacheFetcher->getNodes(nodes, nodeIndexesByUuid, stationIndexesByUuid, params, customPath);
   }
 
-  int Calculator::updateDataSourcesFromCache(Parameters& params, std::string customPath)
+  int Calculator::updateDataSourcesFromCache(ServerParameters& params, std::string customPath)
   {
     return params.cacheFetcher->getDataSources(dataSources, dataSourceIndexesByUuid, params, customPath);
   }
 
-  int Calculator::updateHouseholdsFromCache(Parameters& params, std::string customPath)
+  int Calculator::updateHouseholdsFromCache(ServerParameters& params, std::string customPath)
   {
     return params.cacheFetcher->getHouseholds(households, householdIndexesByUuid, dataSourceIndexesByUuid, nodeIndexesByUuid, params, customPath);
   }
 
-  int Calculator::updatePersonsFromCache(Parameters& params, std::string customPath)
+  int Calculator::updatePersonsFromCache(ServerParameters& params, std::string customPath)
   {
     return params.cacheFetcher->getPersons(persons, personIndexesByUuid, dataSourceIndexesByUuid, householdIndexesByUuid, nodeIndexesByUuid, params, customPath);
   }
   
-  int Calculator::updateOdTripsFromCache(Parameters& params, std::string customPath)
+  int Calculator::updateOdTripsFromCache(ServerParameters& params, std::string customPath)
   {
     return params.cacheFetcher->getOdTrips(odTrips, odTripIndexesByUuid, dataSourceIndexesByUuid, householdIndexesByUuid, personIndexesByUuid, nodeIndexesByUuid, params, customPath);
   }
 
-  int Calculator::updatePlacesFromCache(Parameters& params, std::string customPath)
+  int Calculator::updatePlacesFromCache(ServerParameters& params, std::string customPath)
   {
     return params.cacheFetcher->getPlaces(places, placeIndexesByUuid, dataSourceIndexesByUuid, nodeIndexesByUuid, params, customPath);
   }
 
-  int Calculator::updateAgenciesFromCache(Parameters& params, std::string customPath)
+  int Calculator::updateAgenciesFromCache(ServerParameters& params, std::string customPath)
   {
     return params.cacheFetcher->getAgencies(agencies, agencyIndexesByUuid, params, customPath);
   }
 
-  int Calculator::updateServicesFromCache(Parameters& params, std::string customPath)
+  int Calculator::updateServicesFromCache(ServerParameters& params, std::string customPath)
   {
     return params.cacheFetcher->getServices(services, serviceIndexesByUuid, params, customPath);
   }
 
-  int Calculator::updateLinesFromCache(Parameters& params, std::string customPath)
+  int Calculator::updateLinesFromCache(ServerParameters& params, std::string customPath)
   {
     return params.cacheFetcher->getLines(lines, lineIndexesByUuid, agencyIndexesByUuid, modeIndexesByShortname, params, customPath);
   }
 
-  int Calculator::updatePathsFromCache(Parameters& params, std::string customPath)
+  int Calculator::updatePathsFromCache(ServerParameters& params, std::string customPath)
   {
     return params.cacheFetcher->getPaths(paths, pathIndexesByUuid, lineIndexesByUuid, nodeIndexesByUuid, params, customPath);
   }
 
-  int Calculator::updateScenariosFromCache(Parameters& params, std::string customPath)
+  int Calculator::updateScenariosFromCache(ServerParameters& params, std::string customPath)
   {
     return params.cacheFetcher->getScenarios(scenarios, scenarioIndexesByUuid, serviceIndexesByUuid, lineIndexesByUuid, agencyIndexesByUuid, nodeIndexesByUuid, modeIndexesByShortname, params, customPath);
   }
 
-  int Calculator::updateNetworksFromCache(Parameters& params, std::string customPath)
+  int Calculator::updateNetworksFromCache(ServerParameters& params, std::string customPath)
   {
     return params.cacheFetcher->getNetworks(networks, networkIndexesByUuid, agencyIndexesByUuid, serviceIndexesByUuid, scenarioIndexesByUuid, params, customPath);
   }
 
-  int Calculator::updateSchedulesFromCache(Parameters& params, std::string customPath)
+  int Calculator::updateSchedulesFromCache(ServerParameters& params, std::string customPath)
   {
     std::vector<std::shared_ptr<ConnectionTuple>> connections;
     int ret =  params.cacheFetcher->getSchedules(

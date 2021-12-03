@@ -3,7 +3,7 @@
 namespace TrRouting
 {
 
-  Calculator::Calculator(Parameters& theParams) :
+  Calculator::Calculator(ServerParameters& theParams) :
     projectShortname(""),
     params(theParams),
     odTrip(nullptr),

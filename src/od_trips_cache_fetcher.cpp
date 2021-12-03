@@ -22,7 +22,7 @@ namespace TrRouting
     std::map<boost::uuids::uuid, int>& householdIndexesByUuid,
     std::map<boost::uuids::uuid, int>& personIndexesByUuid,
     std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
-    Parameters& params,
+    ServerParameters& params,
     std::string customPath
   )
   {

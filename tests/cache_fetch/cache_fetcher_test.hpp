@@ -8,7 +8,7 @@
 class ConstantCacheFetcherFixtureTests : public ::testing::Test 
 {
 protected:
-    TrRouting::Parameters params;
+    TrRouting::ServerParameters params;
     std::string cacheFile = "cacheFile.capnpbin";
     const std::string INVALID_CUSTOM_PATH = "invalidCacheFiles";
     const std::string VALID_CUSTOM_PATH = "validCacheFiles";
