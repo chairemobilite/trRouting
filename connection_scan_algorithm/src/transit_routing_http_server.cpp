@@ -40,6 +40,43 @@ std::string consoleCyan       = "";
 std::string consoleMagenta    = "";
 std::string consoleResetColor = "";
 
+std::string intializeResponse(int dataStatus, Calculator& calculator)
+{
+  std::string response {""};
+  if (dataStatus < 0) {
+    response = "{\"status\": \"data_error\"}";
+  }
+  else if (calculator.countAgencies() == 0)
+  {
+    response = "{\"status\": \"error\", \"error\": {\"error\": \"No agencies found\", \"code\": \"MISSING_DATA_AGENCIES\"}}";
+  }
+  else if (calculator.countServices() == 0)
+  {
+    response = "{\"status\": \"error\", \"error\": {\"error\": \"No services found\", \"code\": \"MISSING_DATA_SERVICES\"}}";
+  }
+  else if (calculator.countNodes() == 0)
+  {
+    response = "{\"status\": \"error\", \"error\": {\"error\": \"No nodes found\", \"code\": \"MISSING_DATA_NODES\"}}";
+  }
+  else if (calculator.countLines() == 0)
+  {
+    response = "{\"status\": \"error\", \"error\": {\"error\": \"No lines found\", \"code\": \"MISSING_DATA_LINES\"}}";
+  }
+  else if (calculator.countPaths() == 0)
+  {
+    response = "{\"status\": \"error\", \"error\": {\"error\": \"No paths found\", \"code\": \"MISSING_DATA_PATHS\"}}";
+  }
+  else if (calculator.countScenarios() == 0)
+  {
+    response = "{\"status\": \"error\", \"error\": {\"error\": \"No scenarios found\", \"code\": \"MISSING_DATA_SCENARIOS\"}}";
+  }
+  else if (calculator.countConnections() == 0  || calculator.countTrips() == 0)
+  {
+    response = "{\"status\": \"error\", \"error\": {\"error\": \"No schedules found\", \"code\": \"MISSING_DATA_SCHEDULES\"}}";
+  }
+  return response;
+};
+
 int main(int argc, char** argv) {
   
   // Set params:
@@ -288,41 +325,9 @@ int main(int argc, char** argv) {
   // routing request
   server.resource["^/route/v1/transit[/]?$"]["GET"]=[&server, &calculator, &dataStatus](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
     
-    std::string response {""};
+    std::string response = intializeResponse(dataStatus, calculator);
 
-    if (dataStatus < 0) {
-      // TODO Should this return a 500 http code?
-      response = "{\"status\": \"data_error\"}";
-    }
-    else if (calculator.countAgencies() == 0)
-    {
-      response = "{\"status\": \"error\", \"error\": {\"error\": \"No agencies found\", \"code\": \"MISSING_DATA_AGENCIES\"}}";
-    }
-    else if (calculator.countServices() == 0)
-    {
-      response = "{\"status\": \"error\", \"error\": {\"error\": \"No services found\", \"code\": \"MISSING_DATA_SERVICES\"}}";
-    }
-    else if (calculator.countNodes() == 0)
-    {
-      response = "{\"status\": \"error\", \"error\": {\"error\": \"No nodes found\", \"code\": \"MISSING_DATA_NODES\"}}";
-    }
-    else if (calculator.countLines() == 0)
-    {
-      response = "{\"status\": \"error\", \"error\": {\"error\": \"No lines found\", \"code\": \"MISSING_DATA_LINES\"}}";
-    }
-    else if (calculator.countPaths() == 0)
-    {
-      response = "{\"status\": \"error\", \"error\": {\"error\": \"No paths found\", \"code\": \"MISSING_DATA_PATHS\"}}";
-    }
-    else if (calculator.countScenarios() == 0)
-    {
-      response = "{\"status\": \"error\", \"error\": {\"error\": \"No scenarios found\", \"code\": \"MISSING_DATA_SCENARIOS\"}}";
-    }
-    else if (calculator.countConnections() == 0  || calculator.countTrips() == 0)
-    {
-      response = "{\"status\": \"error\", \"error\": {\"error\": \"No schedules found\", \"code\": \"MISSING_DATA_SCHEDULES\"}}";
-    }
-    else
+    if (response.empty())
     {
       // prepare benchmarking and timer:
       calculator.algorithmCalculationTime.start();
