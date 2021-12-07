@@ -122,10 +122,10 @@ protected:
 
   /**
    * The benchmarks require cache data to be available in the
-   * tests/connection_scan_algorithm/cache/demo_transition directory. The
+   * tests/benchmark_csa/cache/demo_transition directory. The
    * cache data to match the benchmark can be found here:
    * https://nuage.facil.services/s/ntXfzgfBEFDS7M2 Simply unzip in the
-   * tests/connection_scan_algorithm/cache directory. It corresponds to the
+   * tests/benchmark_csa/cache directory. It corresponds to the
    * STM's fall 2018 18S_S service.
    * */
   std::vector<std::string> createCalculationQuery()
