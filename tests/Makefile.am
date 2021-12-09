@@ -5,5 +5,6 @@ libgtest_la_LDFLAGS = -pthread
 
 SUBDIRS = . \
           cache_fetch \
-          benchmark_csa
+          benchmark_csa \
+          connection_scan_algorithm
 

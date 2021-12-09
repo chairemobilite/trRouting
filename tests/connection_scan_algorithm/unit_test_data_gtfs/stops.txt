@@ -1,0 +1,11 @@
+stop_id,stop_code,stop_name,stop_desc,stop_lat,stop_lon,zone_id,stop_url,location_type,parent_station,stop_timezone,wheelchair_boarding,level_id,platform_code
+5feed91e-f98f-46d6-972d-5f008b95c7b8,009,South2,,45.5269,-73.58912,,,0,,,,,
+35bad963-c585-42a1-80d5-5422d6a36f46,008,South1,,45.53258,-73.60196,,,0,,,,,
+9049d802-0428-46c2-9613-75862135edb0,001,MidPoint,,45.53827,-73.614436,,,0,,,,,
+ef75bf69-7eb4-4511-8cbc-104359d00b6f,006,North1,,45.54165,-73.62603,,,0,,,,,
+abf94539-008b-4f15-b34c-f3b0f6b6d770,007,North2,,45.54634,-73.64266,,,0,,,,,
+384988e7-83b9-4074-bc41-44e754419d62,003,East2,,45.55027,-73.60496,,,0,,,,,
+d67940e7-05a5-44c9-bfa1-710ac031bfb9,002,East1,,45.54249,-73.61199,,,0,,,,,
+185abf2e-484f-426b-b4b2-eaab15d82bd1,004,West1,,45.53473,-73.61825,,,0,,,,,
+44def3b3-bfa0-4c0c-8304-8b0059e3361f,005,West2,,45.52962,-73.62265,,,0,,,,,
+88774418-34cc-4761-8195-bc6e3b48b2e0,010,Extra1,,45.55316,-73.61894,,,0,,,,,
