@@ -1,0 +1,4 @@
+route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,route_url,route_color,route_text_color,route_sort_order,continuous_pickup,continuous_drop_off
+7b3ef82b-8630-45f1-aba9-a79687150d02,UT,01,North/South,,3,,#fff600,#000000,,,
+9d707cab-1ba3-4311-a6ed-64f893281097,UT,02,East/West,,3,,#0086FF,#000000,,,
+dcf8991c-ccbb-4903-9ce5-fde5f4d449a1,UT,03,Extra,,3,,#ff00c3,#000000,,,

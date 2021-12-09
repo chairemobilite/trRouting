@@ -52,6 +52,7 @@ AC_CONFIG_FILES([
  tests/Makefile
  tests/cache_fetch/Makefile
  tests/benchmark_csa/Makefile
+ tests/connection_scan_algorithm/Makefile
  include/Makefile
  include/capnp/Makefile
  connection_scan_algorithm/Makefile
