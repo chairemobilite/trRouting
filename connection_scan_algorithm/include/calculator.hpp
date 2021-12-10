@@ -68,7 +68,9 @@ extern std::string consoleResetColor;
 
 namespace TrRouting
 {
-  
+  // tuple representing a connection: departureNodeIndex, arrivalNodeIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequence in trip, lineIndex, blockIndex, canTransferSameLine, minWaitingTimeSeconds (-1 to inherit from parameters)
+  using ConnectionTuple = std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>;
+
   class Calculator {
   
   public:
@@ -121,7 +123,7 @@ namespace TrRouting
     int                    updateNetworksFromCache   (Parameters&  params, std::string customPath = "");
     int                    updateSchedulesFromCache  (Parameters&  params, std::string customPath = "");
 
-    int                    setConnections(std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>>> connections);
+    int                    setConnections(std::vector<std::shared_ptr<ConnectionTuple>> connections);
     
     int               countStations();
     int               countAgencies();
@@ -238,8 +240,8 @@ namespace TrRouting
     std::vector<int> tripsUsable; // after forward calculation, keep a list of usable trips in time range for reverse calculation
     std::vector<std::tuple<int,int,int>> accessFootpaths; // pair: accessNodeIndex, walkingTravelTimeSeconds, walkingDistanceMeters
     std::vector<std::tuple<int,int,int>> egressFootpaths; // pair: egressNodeIndex, walkingTravelTimeSeconds, walkingDistanceMeters
-    std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>>> forwardConnections; // tuple: departureNodeIndex, arrivalNodeIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequence in trip, lineIndex, blockIndex, canTransferSameLine, minWaitingTimeSeconds
-    std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>>> reverseConnections; // tuple: departureNodeIndex, arrivalNodeIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequence in trip, lineIndex, blockIndex, canTransferSameLine, minWaitingTimeSeconds
+    std::vector<std::shared_ptr<ConnectionTuple>> forwardConnections; // Forward connections, sorted by departure time ascending
+    std::vector<std::shared_ptr<ConnectionTuple>> reverseConnections; // Reverse connections, sorted by arrival time descending
     std::vector<std::tuple<int,int,int,int,int,short,int>> forwardJourneysSteps; // index = node index, tuple: final enter connection, final exit connection, final transferring node index, final trip index, transfer travel time, is same node transfer (first, second, third and fourth values = -1 for access and egress journeys)
     std::vector<std::tuple<int,int,int,int,int,short,int>> forwardEgressJourneysSteps; // index = node index, tuple: final enter connection, final exit connection, final transferring node index, final trip index, transfer travel time, is same node transfer (first, second, third and fourth values = -1 for access and egress journeys)
     std::vector<std::tuple<int,int,int,int,int,short,int>> reverseJourneysSteps; // index = node index, tuple: final enter connection, final exit connection, final transferring node index, final trip index, transfer travel time, is same node transfer (first, second, third and fourth values = -1 for access and egress journeys)
