@@ -75,7 +75,7 @@ namespace TrRouting
 
   int Calculator::updateSchedulesFromCache(Parameters& params, std::string customPath)
   {
-    std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>>> connections;
+    std::vector<std::shared_ptr<ConnectionTuple>> connections;
     int ret =  params.cacheFetcher->getSchedules(
       trips,
       lines,

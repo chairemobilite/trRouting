@@ -36,7 +36,7 @@ namespace TrRouting
     std::string customPath
   )
   {
-
+    // FIXME ConnectionTuple is defined in calculator.hpp. Should it be elsewhere? Cache fetcher should work for any algorithm, is this tuple csa-specific or should it go somewhere common.
     using ConnectionTuple = std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>;
 
     trips.clear();

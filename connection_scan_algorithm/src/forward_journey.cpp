@@ -39,8 +39,8 @@ namespace TrRouting
       std::deque<std::tuple<int,int,int,int,int,short,int>> journey;
       std::tuple<int,int,int,int,int,short,int>         resultingNodeJourneyStep;
       std::tuple<int,int,int,int,int,short,int>         emptyJourneyStep {-1,-1,-1,-1,-1,-1,-1};
-      std::tuple<int,int,int,int,int,short,short,int,int,int,short,short> * journeyStepEnterConnection; // connection tuple: departureNodeIndex, arrivalNodeIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequenceinTrip
-      std::tuple<int,int,int,int,int,short,short,int,int,int,short,short> * journeyStepExitConnection;
+      ConnectionTuple * journeyStepEnterConnection; // connection tuple: departureNodeIndex, arrivalNodeIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequenceinTrip
+      ConnectionTuple * journeyStepExitConnection;
       std::vector<boost::uuids::uuid>                   lineUuids;
       std::vector<int>                                  linesIdx;
       std::vector<std::string>                          modeShortnames;

@@ -107,10 +107,9 @@ namespace TrRouting
 
   }
 
-  int Calculator::setConnections(std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>>> connections)
+  int Calculator::setConnections(std::vector<std::shared_ptr<ConnectionTuple>> connections)
   {
-    using ConnectionTuple = std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>;
-
+  
     // Copy the connections to both forward and reverse vectors
     forwardConnections.clear();
     reverseConnections.clear();
