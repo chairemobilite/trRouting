@@ -106,6 +106,119 @@ namespace TrRouting
     }
 
   }
+
+  int Calculator::setConnections(std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>>> connections)
+  {
+    using ConnectionTuple = std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>;
+
+    // Copy the connections to both forward and reverse vectors
+    forwardConnections.clear();
+    reverseConnections.clear();
+    for (int i=0; i<connections.size(); i++)
+    {
+      std::shared_ptr<ConnectionTuple> reverseConnection = connections[i];
+      forwardConnections.push_back(std::move(connections[i]));
+      reverseConnections.push_back(std::move(reverseConnection));
+    }
+    forwardConnections.shrink_to_fit();
+    reverseConnections.shrink_to_fit();
+      
+    int tripIdx {-1};
+    try
+    {
+      std::cout << "Sorting connections..." << std::endl;
+      // Sort forward connections by departure time, trip id, sequence
+      std::stable_sort(forwardConnections.begin(), forwardConnections.end(), [](const std::shared_ptr<ConnectionTuple>& connectionA, const std::shared_ptr<ConnectionTuple>& connectionB)
+      {
+        // { NODE_DEP = 0, NODE_ARR = 1, TIME_DEP = 2, TIME_ARR = 3, TRIP = 4, CAN_BOARD = 5, CAN_UNBOARD = 6, SEQUENCE = 7, LINE = 8, BLOCK = 9, CAN_TRANSFER_SAME_LINE = 10, MIN_WAITING_TIME_SECONDS = 11 };
+        if (std::get<connectionIndexes::TIME_DEP>(*connectionA) < std::get<connectionIndexes::TIME_DEP>(*connectionB))
+        {
+          return true;
+        }
+        else if (std::get<connectionIndexes::TIME_DEP>(*connectionA) > std::get<connectionIndexes::TIME_DEP>(*connectionB))
+        {
+          return false;
+        }
+        if (std::get<connectionIndexes::TRIP>(*connectionA) < std::get<connectionIndexes::TRIP>(*connectionB))
+        {
+          return true;
+        }
+        else if (std::get<connectionIndexes::TRIP>(*connectionA) > std::get<connectionIndexes::TRIP>(*connectionB))
+        {
+          return false;
+        }
+        if (std::get<connectionIndexes::SEQUENCE>(*connectionA) < std::get<connectionIndexes::SEQUENCE>(*connectionB))
+        {
+          return true;
+        }
+        else if (std::get<connectionIndexes::SEQUENCE>(*connectionA) > std::get<connectionIndexes::SEQUENCE>(*connectionB))
+        {
+          return false;
+        }
+        return false;
+      });
+      // Sort reverse connection by arrival time, trip and sequence
+      std::stable_sort(reverseConnections.begin(), reverseConnections.end(), [](const std::shared_ptr<ConnectionTuple>& connectionA, const std::shared_ptr<ConnectionTuple>& connectionB)
+      {
+        // { NODE_DEP = 0, NODE_ARR = 1, TIME_DEP = 2, TIME_ARR = 3, TRIP = 4, CAN_BOARD = 5, CAN_UNBOARD = 6, SEQUENCE = 7, LINE = 8, BLOCK = 9, CAN_TRANSFER_SAME_LINE = 10, MIN_WAITING_TIME_SECONDS = 11 };
+        if (std::get<connectionIndexes::TIME_ARR>(*connectionA) > std::get<connectionIndexes::TIME_ARR>(*connectionB))
+        {
+          return true;
+        }
+        else if (std::get<connectionIndexes::TIME_ARR>(*connectionA) < std::get<connectionIndexes::TIME_ARR>(*connectionB))
+        {
+          return false;
+        }
+        if (std::get<connectionIndexes::TRIP>(*connectionA) > std::get<connectionIndexes::TRIP>(*connectionB)) // here we need to reverse sequence!
+        {
+          return true;
+        }
+        else if (std::get<connectionIndexes::TRIP>(*connectionA) < std::get<connectionIndexes::TRIP>(*connectionB))
+        {
+          return false;
+        }
+        if (std::get<connectionIndexes::SEQUENCE>(*connectionA) > std::get<connectionIndexes::SEQUENCE>(*connectionB)) // here we need to reverse sequence!
+        {
+          return true;
+        }
+        else if (std::get<connectionIndexes::SEQUENCE>(*connectionA) < std::get<connectionIndexes::SEQUENCE>(*connectionB))
+        {
+          return false;
+        }
+        return false;
+      });
+
+      CalculationTime algorithmCalculationTime = CalculationTime();
+      algorithmCalculationTime.start();
+      long long       calculationTime;
+      calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
+
+      // assign connections to trips:
+      int i {0};
+      for(auto & connection : forwardConnections)
+      {
+        tripIdx = std::get<connectionIndexes::TRIP>(*connection);
+        trips[tripIdx]->forwardConnectionsIdx.push_back(i);
+        i++;
+      }
+
+      i = 0;
+      for(auto & connection : reverseConnections)
+      {
+        tripIdx = std::get<connectionIndexes::TRIP>(*connection);
+        trips[tripIdx]->reverseConnectionsIdx.push_back(i);
+        i++;
+      }
+
+      std::cerr << "-- assign connections to trips -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
+      return 0;
+    }
+    catch (const std::exception& ex)
+    {
+      std::cerr << "-- Error assigning connections to trips -- " << ex.what() << std::endl;
+      return -EINVAL;
+    }
+  }
   
 
 }
