@@ -31,8 +31,7 @@ namespace TrRouting
     std::map<std::string, int>& modeIndexesByShortname,
     std::vector<std::vector<std::unique_ptr<int>>>&   tripConnectionDepartureTimes,
     std::vector<std::vector<std::unique_ptr<float>>>& tripConnectionDemands,
-    std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>>>& forwardConnections, 
-    std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>>>& reverseConnections,
+    std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>>>& connections, 
     Parameters& params,
     std::string customPath
   )
@@ -47,10 +46,8 @@ namespace TrRouting
     tripConnectionDepartureTimes.shrink_to_fit();
     tripConnectionDemands.clear();
     tripConnectionDemands.shrink_to_fit();
-    forwardConnections.clear();
-    forwardConnections.shrink_to_fit();
-    reverseConnections.clear();
-    reverseConnections.shrink_to_fit();
+    connections.clear();
+    connections.shrink_to_fit();
 
     int transferableModeIdx {modeIndexesByShortname.find("transferable") != modeIndexesByShortname.end() ? modeIndexesByShortname["transferable"] : -1};
 
@@ -175,10 +172,8 @@ namespace TrRouting
                     trip->allowSameLineTransfers,
                     transferableModeIdx == line->modeIdx ? 0 : -1
                   )));
-                  std::shared_ptr<ConnectionTuple> reverseConnection = forwardConnection;
 
-                  forwardConnections.push_back(std::move(forwardConnection));
-                  reverseConnections.push_back(std::move(reverseConnection));
+                  connections.push_back(std::move(forwardConnection));
 
                   connectionDepartureTimes[nodeTimeI] = std::make_unique<int>(departureTimesSeconds[nodeTimeI]);
                   connectionDemands[nodeTimeI]        = std::make_unique<float>(0.0);
@@ -206,98 +201,7 @@ namespace TrRouting
     }
     std::cout << "100%" << std::endl;
 
-    try
-    {
-      std::cout << "Sorting connections..." << std::endl;
-      std::stable_sort(forwardConnections.begin(), forwardConnections.end(), [](const std::shared_ptr<ConnectionTuple>& connectionA, const std::shared_ptr<ConnectionTuple>& connectionB)
-      {
-        // { NODE_DEP = 0, NODE_ARR = 1, TIME_DEP = 2, TIME_ARR = 3, TRIP = 4, CAN_BOARD = 5, CAN_UNBOARD = 6, SEQUENCE = 7, LINE = 8, BLOCK = 9, CAN_TRANSFER_SAME_LINE = 10, MIN_WAITING_TIME_SECONDS = 11 };
-        if (std::get<2>(*connectionA) < std::get<2>(*connectionB))
-        {
-          return true;
-        }
-        else if (std::get<2>(*connectionA) > std::get<2>(*connectionB))
-        {
-          return false;
-        }
-        if (std::get<4>(*connectionA) < std::get<4>(*connectionB))
-        {
-          return true;
-        }
-        else if (std::get<4>(*connectionA) > std::get<4>(*connectionB))
-        {
-          return false;
-        }
-        if (std::get<7>(*connectionA) < std::get<7>(*connectionB))
-        {
-          return true;
-        }
-        else if (std::get<7>(*connectionA) > std::get<7>(*connectionB))
-        {
-          return false;
-        }
-        return false;
-      });
-      std::stable_sort(reverseConnections.begin(), reverseConnections.end(), [](const std::shared_ptr<ConnectionTuple>& connectionA, const std::shared_ptr<ConnectionTuple>& connectionB)
-      {
-        // { NODE_DEP = 0, NODE_ARR = 1, TIME_DEP = 2, TIME_ARR = 3, TRIP = 4, CAN_BOARD = 5, CAN_UNBOARD = 6, SEQUENCE = 7, LINE = 8, BLOCK = 9, CAN_TRANSFER_SAME_LINE = 10, MIN_WAITING_TIME_SECONDS = 11 };
-        if (std::get<3>(*connectionA) > std::get<3>(*connectionB))
-        {
-          return true;
-        }
-        else if (std::get<3>(*connectionA) < std::get<3>(*connectionB))
-        {
-          return false;
-        }
-        if (std::get<4>(*connectionA) > std::get<4>(*connectionB)) // here we need to reverse sequence!
-        {
-          return true;
-        }
-        else if (std::get<4>(*connectionA) < std::get<4>(*connectionB))
-        {
-          return false;
-        }
-        if (std::get<7>(*connectionA) > std::get<7>(*connectionB)) // here we need to reverse sequence!
-        {
-          return true;
-        }
-        else if (std::get<7>(*connectionA) < std::get<7>(*connectionB))
-        {
-          return false;
-        }
-        return false;
-      });
-
-      CalculationTime algorithmCalculationTime = CalculationTime();
-      algorithmCalculationTime.start();
-      long long       calculationTime;
-      calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
-
-      // assign connections to trips:
-      int i {0};
-      for(auto & connection : forwardConnections)
-      {
-        tripIdx = std::get<4>(*connection);
-        trips[tripIdx]->forwardConnectionsIdx.push_back(i);
-        i++;
-      }
-
-      i = 0;
-      for(auto & connection : reverseConnections)
-      {
-        tripIdx = std::get<4>(*connection);
-        trips[tripIdx]->reverseConnectionsIdx.push_back(i);
-        i++;
-      }
-      
-      std::cerr << "-- assign connections to trips -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
-      return 0;
-    }
-    catch (const std::exception& ex)
-    {
-      std::cerr << "-- Error assigning connections to trips -- " << ex.what() << std::endl;
-      return -EINVAL;
-    }
+    return 0;
 
   }
 

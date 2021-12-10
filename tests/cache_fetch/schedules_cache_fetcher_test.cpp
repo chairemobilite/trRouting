@@ -30,8 +30,7 @@ protected:
     std::map<std::string, int> modeIndexesByShortname;
     std::vector<std::vector<std::unique_ptr<int>>> tripConnectionDepartureTimes;
     std::vector<std::vector<std::unique_ptr<float>>> tripConnectionDemands;
-    std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>>> forwardConnections;
-    std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>>> reverseConnections;
+    std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>>> connections;
 
 public:
     void SetUp( ) override
@@ -71,8 +70,7 @@ TEST_F(ScheduleCacheFetcherFixtureTests, TestGetSchedulesInvalidLineFile)
       modeIndexesByShortname,
       tripConnectionDepartureTimes,
       tripConnectionDemands,
-      forwardConnections,
-      reverseConnections,
+      connections,
       params,
       INVALID_CUSTOM_PATH
     );
@@ -96,8 +94,7 @@ TEST_F(ScheduleCacheFetcherFixtureTests, TestGetUnexistingLineFiles)
       modeIndexesByShortname,
       tripConnectionDepartureTimes,
       tripConnectionDemands,
-      forwardConnections,
-      reverseConnections,
+      connections,
       params,
       INVALID_CUSTOM_PATH
     );
@@ -120,8 +117,7 @@ TEST_F(ScheduleCacheFetcherFixtureTests, TestGetSchedulesValid)
       modeIndexesByShortname,
       tripConnectionDepartureTimes,
       tripConnectionDemands,
-      forwardConnections,
-      reverseConnections,
+      connections,
       params,
       VALID_CUSTOM_PATH
     );

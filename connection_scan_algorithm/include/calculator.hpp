@@ -120,6 +120,8 @@ namespace TrRouting
     int                    updateScenariosFromCache  (Parameters&  params, std::string customPath = "");
     int                    updateNetworksFromCache   (Parameters&  params, std::string customPath = "");
     int                    updateSchedulesFromCache  (Parameters&  params, std::string customPath = "");
+
+    int                    setConnections(std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>>> connections);
     
     int               countStations();
     int               countAgencies();
@@ -194,7 +196,7 @@ namespace TrRouting
     std::vector<std::vector<std::unique_ptr<int>>>   tripConnectionDepartureTimes; // tripIndex: [connectionIndex (sequence in trip): departureTimeSeconds]
     std::vector<std::vector<std::unique_ptr<float>>> tripConnectionDemands;        // tripIndex: [connectionIndex (sequence in trip): sum of od trips weights using this connection (demand)]
     //std::vector<std::unique_ptr<std::vector<std::unique_ptr<int>>>>   tripIndexesByPathIndex;
-  
+
     Parameters& params;
     CalculationTime algorithmCalculationTime;
     
