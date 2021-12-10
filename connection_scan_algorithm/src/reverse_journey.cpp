@@ -15,7 +15,7 @@ namespace TrRouting
     int              reachableNodesCount  {0};
     bool             foundRoute           {false};
 
-    int transferableModeIdx {modeIndexesByShortname["transferable"]};
+    int transferableModeIdx {modeIndexesByShortname.find("transferable") != modeIndexesByShortname.end() ? modeIndexesByShortname["transferable"] : -1};
 
     std::vector<int> resultingNodes;
     if (params.returnAllNodesResult)

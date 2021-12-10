@@ -52,7 +52,7 @@ namespace TrRouting
     reverseConnections.clear();
     reverseConnections.shrink_to_fit();
 
-    int transferableModeIdx {modeIndexesByShortname["transferable"]};
+    int transferableModeIdx {modeIndexesByShortname.find("transferable") != modeIndexesByShortname.end() ? modeIndexesByShortname["transferable"] : -1};
 
     //std::vector<Block> blocks;
     //std::map<boost::uuids::uuid, int> blockIndexesByUuid;
