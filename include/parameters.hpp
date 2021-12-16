@@ -143,7 +143,11 @@ namespace TrRouting
 
       void setDefaultValues();
       bool isCompleteForCalculation();
-      void update(std::vector<std::string> &parameters, std::map<boost::uuids::uuid, int> &scenarioIndexesByUuid, std::vector<std::unique_ptr<Scenario>> &scenarios, std::map<boost::uuids::uuid, int> &nodeIndexesByUuid, std::map<boost::uuids::uuid, int> &agencyIndexesByUuid, std::map<boost::uuids::uuid, int> &lineIndexesByUuid, std::map<boost::uuids::uuid, int> &serviceIndexesByUuid, std::map<std::string, int> &modeIndexesByShortname, std::map<boost::uuids::uuid, int> &dataSourceIndexesByUuid);
+      void update(std::vector<std::string> &parameters,
+        std::map<boost::uuids::uuid, int> &scenarioIndexesByUuid,
+        std::vector<std::unique_ptr<Scenario>> &scenarios,
+        std::map<boost::uuids::uuid, int> &nodeIndexesByUuid,
+        std::map<boost::uuids::uuid, int> &dataSourceIndexesByUuid);
     
   };
   

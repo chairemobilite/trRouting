@@ -143,7 +143,11 @@ TEST_F(TAndACalculationFixtureTests, TripWithAlternatives)
 nlohmann::json TAndACalculationFixtureTests::calculateWithAlternatives(std::vector<std::string> parameters)
 {
     calculator.params.setDefaultValues();
-    calculator.params.update(parameters, calculator.scenarioIndexesByUuid, calculator.scenarios, calculator.nodeIndexesByUuid, calculator.agencyIndexesByUuid, calculator.lineIndexesByUuid, calculator.serviceIndexesByUuid, calculator.modeIndexesByShortname, calculator.dataSourceIndexesByUuid);
+    calculator.params.update(parameters,
+        calculator.scenarioIndexesByUuid,
+        calculator.scenarios,
+        calculator.nodeIndexesByUuid,
+        calculator.dataSourceIndexesByUuid);
     calculator.params.birdDistanceAccessibilityEnabled = true;
 
     // TODO Shouldn't need to do this, but we do for now, benchmark needs to be started

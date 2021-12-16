@@ -149,15 +149,6 @@ paths:
       # - seed, random_seed
       # - max_number_of_transfers, max_transfers
       # - calculate_by_number_of_transfers, by_num_transfers
-      # - only_service_uuids,
-      # - only_node_uuids
-      # - except_node_uuids
-      # - only_line_uuids
-      # - except_line_uuids
-      # - only_modes
-      # - except_modes
-      # - only_agency_uuids
-      # - except_agency_uuids
       # - date
       # - calculation_name, name
       # - file_format, format, response_format, response

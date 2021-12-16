@@ -347,7 +347,11 @@ int main(int argc, char** argv) {
 
       // update params:
       calculator.params.setDefaultValues();
-      calculator.params.update(parametersWithValues, calculator.scenarioIndexesByUuid, calculator.scenarios, calculator.nodeIndexesByUuid, calculator.agencyIndexesByUuid, calculator.lineIndexesByUuid, calculator.serviceIndexesByUuid, calculator.modeIndexesByShortname, calculator.dataSourceIndexesByUuid);
+      calculator.params.update(parametersWithValues,
+        calculator.scenarioIndexesByUuid,
+        calculator.scenarios,
+        calculator.nodeIndexesByUuid,
+        calculator.dataSourceIndexesByUuid);
 
       if (calculator.params.isCompleteForCalculation())
       {
