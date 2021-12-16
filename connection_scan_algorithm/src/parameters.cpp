@@ -2,7 +2,7 @@
 
 namespace TrRouting
 {
-  
+
   bool Parameters::isCompleteForCalculation()
   {
     if (debugDisplay)
@@ -128,12 +128,16 @@ namespace TrRouting
     calculateProfiles                      = true;
     walkingSpeedFactor                     = 1.0; // all walking segments are weighted with this value. > 1.0 means faster walking, < 1.0 means slower walking
     seed                                   = std::chrono::system_clock::now().time_since_epoch().count();
-    
+
   }
 
-  void Parameters::update(std::vector<std::string> &parameters, std::map<boost::uuids::uuid, int> &scenarioIndexesByUuid, std::vector<std::unique_ptr<Scenario>> &scenarios, std::map<boost::uuids::uuid, int> &nodeIndexesByUuid, std::map<boost::uuids::uuid, int> &agencyIndexesByUuid, std::map<boost::uuids::uuid, int> &lineIndexesByUuid, std::map<boost::uuids::uuid, int> &serviceIndexesByUuid, std::map<std::string, int> &modeIndexesByShortname, std::map<boost::uuids::uuid, int> &dataSourceIndexesByUuid)
+  void Parameters::update(std::vector<std::string> &parameters,
+    std::map<boost::uuids::uuid, int> &scenarioIndexesByUuid,
+    std::vector<std::unique_ptr<Scenario>> &scenarios,
+    std::map<boost::uuids::uuid, int> &nodeIndexesByUuid,
+    std::map<boost::uuids::uuid, int> &dataSourceIndexesByUuid)
   {
-    
+
     setDefaultValues();
 
     boost::uuids::string_generator uuidGenerator;
@@ -143,7 +147,7 @@ namespace TrRouting
     dataSourceUuid = boost::none;
     boost::uuids::uuid originNodeUuid;
     boost::uuids::uuid destinationNodeUuid;
-    
+
     int periodIndex {0};
     int periodStartAtSeconds;
     int periodEndAtSeconds;
@@ -560,7 +564,7 @@ namespace TrRouting
         minAlternativeMaxTravelTimeSeconds = std::stoi(parameterWithValueVector[1]);
         continue;
       }
-      
+
       // other:
       else if (parameterWithValueVector[0] == "transfer_penalty" || parameterWithValueVector[0] == "transfer_penalty_minutes")
       {
@@ -620,7 +624,7 @@ namespace TrRouting
       else if (parameterWithValueVector[0] == "calculate_by_number_of_transfers" || parameterWithValueVector[0] == "by_num_transfers")
       {
         if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1")
-        { 
+        {
           calculateByNumberOfTransfers = true;
         }
         continue;
@@ -677,167 +681,6 @@ namespace TrRouting
         continue;
       }
       */
-      
-      // those are optional and are replaced by scenario uuid for standard queries:
-      else if (parameterWithValueVector[0] == "only_service_uuids")
-      {
-        // these service uuids must be in the provided scenario, otherwise they will be ignored and the onlyServiceIds may be emptied
-        boost::split(onlyServiceUuidsVector, parameterWithValueVector[1], boost::is_any_of(","));
-        boost::uuids::uuid onlyServiceUuid;
-        std::vector<int> onlyServicesIdx;
-        onlyServicesIdx = onlyServicesIdx;
-        onlyServicesIdx.clear();
-        for(std::string onlyServiceUuidStr : onlyServiceUuidsVector)
-        {
-          onlyServiceUuid = uuidGenerator(onlyServiceUuidStr);
-          if (serviceIndexesByUuid.count(onlyServiceUuid) == 1 && std::find(onlyServicesIdx.begin(), onlyServicesIdx.end(), serviceIndexesByUuid[onlyServiceUuid]) != onlyServicesIdx.end())
-          {
-            onlyServicesIdx.push_back(serviceIndexesByUuid[onlyServiceUuid]);
-          }
-        }
-        continue;
-      }
-      else if (parameterWithValueVector[0] == "except_service_uuids")
-      {
-        boost::split(exceptServiceUuidsVector, parameterWithValueVector[1], boost::is_any_of(","));
-        boost::uuids::uuid exceptServiceUuid;
-        exceptServicesIdx.clear();
-        for(std::string exceptServiceUuidStr : exceptServiceUuidsVector)
-        {
-          exceptServiceUuid = uuidGenerator(exceptServiceUuidStr);
-          if (serviceIndexesByUuid.count(exceptServiceUuid) == 1)
-          {
-            exceptServicesIdx.push_back(serviceIndexesByUuid[exceptServiceUuid]);
-          }
-        }
-        continue;
-      }
-      else if (parameterWithValueVector[0] == "only_node_uuids")
-      {        
-        // will replace scenario only line uuids
-        boost::split(onlyNodeUuidsVector, parameterWithValueVector[1], boost::is_any_of(","));
-        boost::uuids::uuid onlyNodeUuid;
-        onlyNodesIdx.clear();
-        for(std::string onlyNodeUuidStr : onlyNodeUuidsVector)
-        {
-          onlyNodeUuid = uuidGenerator(onlyNodeUuidStr);
-          if (nodeIndexesByUuid.count(onlyNodeUuid) == 1)
-          {
-            onlyNodesIdx.push_back(nodeIndexesByUuid[onlyNodeUuid]);
-          }
-        }
-        continue;
-      }
-      else if (parameterWithValueVector[0] == "except_node_uuids")
-      {
-        // will replace scenario except node uuids
-        boost::split(exceptNodeUuidsVector, parameterWithValueVector[1], boost::is_any_of(","));
-        boost::uuids::uuid exceptNodeUuid;
-        exceptNodesIdx.clear();
-        for(std::string exceptNodeUuidStr : exceptNodeUuidsVector)
-        {
-          exceptNodeUuid = uuidGenerator(exceptNodeUuidStr);
-          if (nodeIndexesByUuid.count(exceptNodeUuid) == 1)
-          {
-            exceptNodesIdx.push_back(nodeIndexesByUuid[exceptNodeUuid]);
-          }
-        }
-        continue;
-      }
-      else if (parameterWithValueVector[0] == "only_line_uuids")
-      {
-        // will replace scenario only line uuids
-        std::cerr << " only line uuids: " << std::endl;
-        boost::split(onlyLineUuidsVector, parameterWithValueVector[1], boost::is_any_of(","));
-        boost::uuids::uuid onlyLineUuid;
-        onlyLinesIdx.clear();
-        for(std::string onlyLineUuidStr : onlyLineUuidsVector)
-        {
-          std::cerr << "  " << onlyLineUuidStr << std::endl;
-          onlyLineUuid = uuidGenerator(onlyLineUuidStr);
-          if (lineIndexesByUuid.count(onlyLineUuid) == 1)
-          {
-            onlyLinesIdx.push_back(lineIndexesByUuid[onlyLineUuid]);
-          }
-        }
-        continue;
-      }
-      else if (parameterWithValueVector[0] == "except_line_uuids")
-      {
-        // will replace scenario except line uuids
-        boost::split(exceptLineUuidsVector, parameterWithValueVector[1], boost::is_any_of(","));
-        boost::uuids::uuid exceptLineUuid;
-        exceptLinesIdx.clear();
-        for(std::string exceptLineUuidStr : exceptLineUuidsVector)
-        {
-          exceptLineUuid = uuidGenerator(exceptLineUuidStr);
-          if (lineIndexesByUuid.count(exceptLineUuid) == 1)
-          {
-            exceptLinesIdx.push_back(lineIndexesByUuid[exceptLineUuid]);
-          }
-        }
-        continue;
-      }
-      else if (parameterWithValueVector[0] == "only_modes")
-      {
-        // will replace scenario only modes
-        onlyModesIdx.clear();
-        boost::split(onlyModeShortnamesVector, parameterWithValueVector[1], boost::is_any_of(","));
-        for(std::string onlyModeShortname : onlyModeShortnamesVector)
-        {
-          if (modeIndexesByShortname.count(onlyModeShortname) == 1)
-          {
-            onlyModesIdx.push_back(modeIndexesByShortname[onlyModeShortname]);
-          }
-        }
-        continue;
-      }
-      else if (parameterWithValueVector[0] == "except_modes")
-      {
-        // will replace scenario except modes
-        exceptModesIdx.clear();
-        boost::split(exceptModeShortnamesVector, parameterWithValueVector[1], boost::is_any_of(","));
-        for(std::string exceptModeShortname : exceptModeShortnamesVector)
-        {
-          if (modeIndexesByShortname.count(exceptModeShortname) == 1)
-          {
-            exceptModesIdx.push_back(modeIndexesByShortname[exceptModeShortname]);
-          }
-        }
-        continue;
-      }
-      else if (parameterWithValueVector[0] == "only_agency_uuids")
-      {
-        // will replace scenario only agency uuids
-        boost::split(onlyAgencyUuidsVector, parameterWithValueVector[1], boost::is_any_of(","));
-        boost::uuids::uuid onlyAgencyUuid;
-        onlyAgenciesIdx.clear();
-        for(std::string onlyAgencyUuidStr : onlyAgencyUuidsVector)
-        {
-          onlyAgencyUuid = uuidGenerator(onlyAgencyUuidStr);
-          if (agencyIndexesByUuid.count(onlyAgencyUuid) == 1)
-          {
-            onlyAgenciesIdx.push_back(agencyIndexesByUuid[onlyAgencyUuid]);
-          }
-        }
-        continue;
-      }
-      else if (parameterWithValueVector[0] == "except_agency_uuids")
-      {
-        // will replace scenario except agency uuids
-        boost::split(exceptAgencyUuidsVector, parameterWithValueVector[1], boost::is_any_of(","));
-        boost::uuids::uuid exceptAgencyUuid;
-        exceptAgenciesIdx.clear();
-        for(std::string exceptAgencyUuidStr : exceptAgencyUuidsVector)
-        {
-          exceptAgencyUuid = uuidGenerator(exceptAgencyUuidStr);
-          if (agencyIndexesByUuid.count(exceptAgencyUuid) == 1)
-          {
-            exceptAgenciesIdx.push_back(agencyIndexesByUuid[exceptAgencyUuid]);
-          }
-        }
-        continue;
-      }
 
       else if (parameterWithValueVector[0] == "date")
       {
