@@ -3,24 +3,24 @@
 
 namespace TrRouting
 {
-  std::vector<std::tuple<int, int, int>> OsrmFetcher::getAccessibleNodesFootpathsFromPoint(const Point point, const std::vector<std::unique_ptr<Node>> &nodes, std::string mode, Parameters &params, bool reversed)
+  std::vector<std::tuple<int, int, int>> OsrmFetcher::getAccessibleNodesFootpathsFromPoint(const Point &point, const std::vector<std::unique_ptr<Node>> &nodes, std::string mode, Parameters &params, int maxWalkingTravelTime, float walkingSpeedMetersPerSecond, bool reversed)
   {
     if (params.birdDistanceAccessibilityEnabled)
     {
-      return getNodesFromBirdDistance(point, nodes, params);
+      return getNodesFromBirdDistance(point, nodes, params, maxWalkingTravelTime, walkingSpeedMetersPerSecond);
     }
     else
     {
-      return getNodesFromOsrm(point, nodes, mode, params, reversed);
+      return getNodesFromOsrm(point, nodes, mode, params, maxWalkingTravelTime, walkingSpeedMetersPerSecond, reversed);
     }
   }
 
-  std::vector<std::tuple<int, int, int>> OsrmFetcher::getNodesFromBirdDistance(const Point &point, const std::vector<std::unique_ptr<Node>> &nodes, Parameters &params)
+  std::vector<std::tuple<int, int, int>> OsrmFetcher::getNodesFromBirdDistance(const Point &point, const std::vector<std::unique_ptr<Node>> &nodes, Parameters &params, int maxWalkingTravelTime, float walkingSpeedMetersPerSecond)
   {
     std::vector<std::tuple<int, int, int>> accessibleNodesFootpaths;
 
     auto lengthOfOneDegree = calculateLengthOfOneDegree(point);
-    float maxDistanceMetersSquared = calculateMaxDistanceSquared(params);
+    float maxDistanceMetersSquared = calculateMaxDistanceSquared(maxWalkingTravelTime, walkingSpeedMetersPerSecond);
     float distanceMetersSquared;
 
     if (params.debugDisplay)
@@ -34,7 +34,7 @@ namespace TrRouting
       if (distanceMetersSquared <= maxDistanceMetersSquared)
       {
         int distanceMeters = sqrt(distanceMetersSquared);
-        int travelTimeSeconds = distanceMeters / params.walkingSpeedMetersPerSecond;
+        int travelTimeSeconds = distanceMeters / walkingSpeedMetersPerSecond;
         accessibleNodesFootpaths.push_back(std::make_tuple(i, travelTimeSeconds, distanceMeters));
       }
       i++;
@@ -46,13 +46,13 @@ namespace TrRouting
     return accessibleNodesFootpaths;
   }
 
-  std::vector<std::tuple<int, int, int>> OsrmFetcher::getNodesFromOsrm(const Point &point, const std::vector<std::unique_ptr<Node>> &nodes, std::string mode, Parameters &params, bool reversed)
+  std::vector<std::tuple<int, int, int>> OsrmFetcher::getNodesFromOsrm(const Point &point, const std::vector<std::unique_ptr<Node>> &nodes, std::string mode, Parameters &params, int maxWalkingTravelTime, float walkingSpeedMetersPerSecond, bool reversed)
   {
     std::vector<int> birdDistanceAccessibleNodeIndexes;
     std::vector<std::tuple<int, int, int>> accessibleNodesFootpaths;
 
     auto lengthOfOneDegree = calculateLengthOfOneDegree(point);
-    float maxDistanceMetersSquared = calculateMaxDistanceSquared(params);
+    float maxDistanceMetersSquared = calculateMaxDistanceSquared(maxWalkingTravelTime, walkingSpeedMetersPerSecond);
     float distanceMetersSquared;
 
     if (params.debugDisplay)
@@ -106,7 +106,7 @@ namespace TrRouting
         for (int i = 1; i < numberOfDurations; i++) // ignore first (duration with itself)
         {
           travelTimeSeconds = (int)ceil((float)responseJson["durations"][0][i]);
-          if (travelTimeSeconds <= params.maxAccessWalkingTravelTimeSeconds)
+          if (travelTimeSeconds <= maxWalkingTravelTime)
           {
             distanceMeters = (int)ceil((float)responseJson["distances"][0][i]);
             accessibleNodesFootpaths.push_back(std::make_tuple(birdDistanceAccessibleNodeIndexes[i - 1], travelTimeSeconds, distanceMeters));
@@ -130,9 +130,9 @@ namespace TrRouting
     return std::make_tuple(lengthOfOneDegreeOfLongitude, lengthOfOneDegreeOflatitude);
   }
 
-  float OsrmFetcher::calculateMaxDistanceSquared(Parameters &params)
+  float OsrmFetcher::calculateMaxDistanceSquared(int maxWalkingTravelTime, float walkingSpeedMetersPerSecond)
   {
-    return (params.maxAccessWalkingTravelTimeSeconds * params.walkingSpeedMetersPerSecond) * (params.maxAccessWalkingTravelTimeSeconds * params.walkingSpeedMetersPerSecond);
+    return (maxWalkingTravelTime * walkingSpeedMetersPerSecond) * (maxWalkingTravelTime * walkingSpeedMetersPerSecond);
   }
 
   float OsrmFetcher::calculateNodeDistanceSquared(const Point *node, const Point &point, const std::tuple<float, float> &lengthOfOneDegree)
