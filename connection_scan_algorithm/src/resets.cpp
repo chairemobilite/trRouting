@@ -110,7 +110,7 @@ namespace TrRouting
             std::cout << "  fetching nodes with osrm with mode " << params.accessMode << std::endl;
 
           if (params.hasOrigin)
-            accessFootpaths = std::move(OsrmFetcher::getAccessibleNodesFootpathsFromPoint(params.origin, nodes, params.accessMode, params));
+            accessFootpaths = std::move(OsrmFetcher::getAccessibleNodesFootpathsFromPoint(params.origin, nodes, params.accessMode, params, params.maxAccessWalkingTravelTimeSeconds, params.walkingSpeedMetersPerSecond));
         }
       }
 
@@ -178,7 +178,7 @@ namespace TrRouting
         else
         {
           if (params.hasDestination)
-            egressFootpaths = std::move(OsrmFetcher::getAccessibleNodesFootpathsFromPoint(params.destination, nodes, params.accessMode, params));
+            egressFootpaths = std::move(OsrmFetcher::getAccessibleNodesFootpathsFromPoint(params.destination, nodes, params.accessMode, params, params.maxEgressWalkingTravelTimeSeconds, params.walkingSpeedMetersPerSecond));
         }
       }
       

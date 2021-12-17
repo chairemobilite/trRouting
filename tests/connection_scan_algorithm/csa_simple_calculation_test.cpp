@@ -175,8 +175,7 @@ TEST_F(RouteCalculationFixtureTests, NoRoutingAccessTimeLimit)
 // Same as SimpleODCalculation, but with max_egress_travel_time_seconds lower than egress time
 TEST_F(RouteCalculationFixtureTests, NoRoutingEgressTimeLimit)
 {
-    // This test does not work, see issue https://github.com/chairemobilite/trRouting/issues/97
-    /* int departureTime = getTimeInSeconds(9, 45);
+    int departureTime = getTimeInSeconds(9, 45);
     // This is where mocking would be interesting. Those were taken from the first run of the test
     int egressTime = 138;
 
@@ -187,7 +186,7 @@ TEST_F(RouteCalculationFixtureTests, NoRoutingEgressTimeLimit)
     parametersWithValues.push_back("max_egress_travel_time_seconds=" + std::to_string(egressTime - 5));
 
     TrRouting::RoutingResult result = calculateOd(parametersWithValues);
-    assertNoRouting(result); */
+    assertNoRouting(result);
 }
 
 // Same as SimpleODCalculation, but with max_first_waiting_time_seconds lower than should be
