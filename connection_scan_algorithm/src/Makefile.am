@@ -1,4 +1,4 @@
-AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/connection_scan_algorithm/include 
+AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/connection_scan_algorithm/include
 
 noinst_LTLIBRARIES = libcsa.la
 
@@ -10,9 +10,10 @@ libcsa_la_SOURCES = alternatives_routing.cpp \
 		   od_trips_routing.cpp \
 		   optimize_journey.cpp \
 		   parameters.cpp \
-	           preparations.cpp \
+		   preparations.cpp \
 		   program_options.cpp \
 		   resets.cpp \
 		   reverse_calculation.cpp \
 		   reverse_journey.cpp \
-	           transit_routing_http_server.cpp
+		   route_parameters.cpp \
+		   transit_routing_http_server.cpp
