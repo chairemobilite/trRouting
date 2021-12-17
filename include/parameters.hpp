@@ -24,11 +24,116 @@
 
 namespace TrRouting
 {
-  
+
   class DatabaseFetcher;
   class CacheFetcher;
   class GtfsFetcher;
   class CsvFetcher;
+
+  class ParameterException : public std::exception
+  {
+    public:
+      enum class Type
+      {
+        // No scenario was specified
+        MISSING_SCENARIO = 0,
+        // Origin was not specified, but is mandatory
+        MISSING_ORIGIN,
+        // Destination was not specified, but is mandatory
+        MISSING_DESTINATION,
+        // time_of_trip should be specified
+        MISSING_TIME_OF_TRIP,
+        // The selected scenario does not contain any trips
+        EMPTY_SCENARIO,
+        // Origin data received is invalid. Expected comma-separate lat/lon
+        INVALID_ORIGIN,
+        // Destination data received is invalid. Expected comma-separate lat/lon
+        INVALID_DESTINATION,
+        // Some parameter value is invalid. Expected an integer
+        INVALID_NUMERICAL_DATA
+      };
+      ParameterException(Type type_) : std::exception(), type(type_) {};
+      Type getType() const { return type; };
+
+    private:
+      Type type;
+  };
+
+  class RouteParameters {
+    private:
+      boost::uuids::uuid scenarioUuid;
+      // FIXME The scenario pointer is required for now, even if we extract its
+      // data, because alternatives calculations will need to create new objects
+      // from this RouteParameters object, but changing one field (the max travel
+      // time). When calculation specific parameters are implemented, this field
+      // will not be required in this class anymore.
+      Scenario& scenario;
+      std::unique_ptr<Point> origin;
+      std::unique_ptr<Point> destination;
+
+      int timeOfTrip;
+      int minWaitingTimeSeconds;
+      int maxTotalTravelTimeSeconds;
+      int maxAccessWalkingTravelTimeSeconds;
+      int maxEgressWalkingTravelTimeSeconds;
+      int maxTransferWalkingTravelTimeSeconds;
+      int maxFirstWaitingTimeSeconds;
+
+      std::vector<int> onlyServicesIdx;
+      std::vector<int> exceptServicesIdx;
+      std::vector<int> onlyLinesIdx;
+      std::vector<int> exceptLinesIdx;
+      std::vector<int> onlyModesIdx;
+      std::vector<int> exceptModesIdx;
+      std::vector<int> onlyAgenciesIdx;
+      std::vector<int> exceptAgenciesIdx;
+      std::vector<int> onlyNodesIdx;
+      std::vector<int> exceptNodesIdx;
+      bool withAlternatives; // calculate alternatives or not
+      bool forwardCalculation; // forward calculation: default true. if false: reverse calculation, will ride connections backward (useful when setting the arrival time)
+
+    public:
+      RouteParameters(std::unique_ptr<Point> orig,
+        std::unique_ptr<Point> dest,
+        Scenario& scenario,
+        int timeOfTrip,
+        int minWaitingTime,
+        int maxTotalTime,
+        int maxAccessTime,
+        int maxEgressTime,
+        int maxTransferTime,
+        int maxFirstWaitingTime,
+        bool alt,
+        bool forward
+      );
+      RouteParameters(const RouteParameters& routeParams);
+      Point* getOrigin() { return origin.get(); }
+      Point* getDestination() { return destination.get(); }
+      // FIXME Temporary method, will be removed once calculation specific parameters are implemented. Try not to use.
+      Scenario& getScenario() { return scenario; }
+      int getTimeOfTrip() const { return timeOfTrip; }
+      int getMinWaitingTimeSeconds() const { return minWaitingTimeSeconds; }
+      int getMaxTotalTravelTimeSeconds() const { return maxTotalTravelTimeSeconds; }
+      int getMaxAccessWalkingTravelTimeSeconds() const { return maxAccessWalkingTravelTimeSeconds; }
+      int getMaxEgressWalkingTravelTimeSeconds() const { return maxEgressWalkingTravelTimeSeconds; }
+      int getMaxTransferWalkingTravelTimeSeconds() const { return maxTransferWalkingTravelTimeSeconds; }
+      int getMaxFirstWaitingTimeSeconds() const { return maxFirstWaitingTimeSeconds; }
+      bool isWithAlternatives() { return withAlternatives; }
+      bool isForwardCalculation() { return forwardCalculation; }
+
+      /**
+       * Factory function to create a routeParameters object from  a map of
+       * parameters coming from the origin/destination route. It returns a new
+       * immutable routeParameters object with complete parameter initialization.
+       *
+       * If there are missing parameters, this function will throw a
+       * ParameterException error
+       **/
+      static RouteParameters createRouteODParameter(std::vector<std::pair<std::string, std::string>> &parameters,
+        std::map<boost::uuids::uuid, int> &scenarioIndexesByUuid,
+        std::vector<std::unique_ptr<Scenario>> &scenarios
+      );
+  };
 
   class Parameters {
 
@@ -39,11 +144,11 @@ namespace TrRouting
       std::string cacheDirectoryPath;
       std::string calculationName;
       std::string responseFormat;
-      
+
       CacheFetcher* cacheFetcher;
       GtfsFetcher*  gtfsFetcher;
       CsvFetcher*   csvFetcher;
-      
+
       int batchNumber;
       int batchesCount;
       int odTripsSampleSize;
@@ -69,14 +174,14 @@ namespace TrRouting
       std::vector<int> egressNodesIdx;
       std::vector<int> egressNodeTravelTimesSeconds;
       std::vector<int> egressNodeDistancesMeters;
-      
+
       std::vector<std::pair<int,int>> odTripsPeriods; // pair: start_at_seconds, end_at_seconds
       std::vector<std::string>        odTripsGenders;
       std::vector<std::string>        odTripsAgeGroups;
       std::vector<std::string>        odTripsOccupations;
       std::vector<std::string>        odTripsActivities;
       std::vector<std::string>        odTripsModes;
-  
+
       int departureTimeSeconds;
       int arrivalTimeSeconds;
       int maxTotalTravelTimeSeconds;
@@ -109,14 +214,14 @@ namespace TrRouting
       boost::optional<boost::uuids::uuid> odTripUuid;
       boost::optional<boost::uuids::uuid> startingNodeUuid;
       boost::optional<boost::uuids::uuid> endingNodeUuid;
-  
+
       std::string osrmWalkingPort;
       std::string osrmCyclingPort;
       std::string osrmDrivingPort;
       std::string osrmWalkingHost;
       std::string osrmCyclingHost;
       std::string osrmDrivingHost;
-      
+
       bool birdDistanceAccessibilityEnabled = false; // true if the accessibility information is obtained using bird distances instead of osrm
       std::string accessMode;
       std::string egressMode;
@@ -148,9 +253,9 @@ namespace TrRouting
         std::vector<std::unique_ptr<Scenario>> &scenarios,
         std::map<boost::uuids::uuid, int> &nodeIndexesByUuid,
         std::map<boost::uuids::uuid, int> &dataSourceIndexesByUuid);
-    
+
   };
-  
+
 }
 
 
