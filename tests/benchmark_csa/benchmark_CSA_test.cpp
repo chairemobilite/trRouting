@@ -65,59 +65,14 @@ protected:
   bool updateCalculatorFromCache(Calculator *calculator)
   {
     std::cout << "Preparing calculator..." << std::endl;
-    int dataStatus = calculator->prepare();
+    Calculator::DataStatus dataStatus = calculator->prepare();
 
-    if (dataStatus < 0)
+    if (dataStatus != Calculator::DataStatus::READY)
     {
-      std::cout << "Something is wrong with the calculator. Data status: " << dataStatus << std::endl;
-      return false;
-    }
-    if (assertCacheOk(calculator) != 0)
-    {
-      std::cout << "Invalid cache" << std::endl;
+      std::cout << "Something is wrong with the calculator. Data status: " << (int) dataStatus << std::endl;
       return false;
     }
     return true;
-  }
-
-  int assertCacheOk(Calculator *calculator)
-  {
-    if (calculator->countAgencies() == 0)
-    {
-      std::cout << "no agencies";
-      return -1;
-    }
-    else if (calculator->countServices() == 0)
-    {
-      std::cout << "no services";
-      return -1;
-    }
-    else if (calculator->countNodes() == 0)
-    {
-      std::cout << "no nodes";
-      return -1;
-    }
-    else if (calculator->countLines() == 0)
-    {
-      std::cout << "no lines";
-      return -1;
-    }
-    else if (calculator->countPaths() == 0)
-    {
-      std::cout << "no paths";
-      return -1;
-    }
-    else if (calculator->countScenarios() == 0)
-    {
-      std::cout << "no scenarios";
-      return -1;
-    }
-    else if (calculator->countConnections() == 0 || calculator->countTrips() == 0)
-    {
-      std::cout << "no schedules";
-      return -1;
-    }
-    return 0;
   }
 
   /**

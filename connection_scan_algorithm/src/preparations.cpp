@@ -100,7 +100,39 @@ namespace TrRouting
     return setConnections(connections);
   }
 
-  int Calculator::prepare()
+  Calculator::DataStatus validateData(Calculator* calculator) {
+    if (calculator->countAgencies() == 0)
+    {
+      return Calculator::DataStatus::NO_AGENCIES;
+    }
+    else if (calculator->countServices() == 0)
+    {
+      return Calculator::DataStatus::NO_SERVICES;
+    }
+    else if (calculator->countNodes() == 0)
+    {
+      return Calculator::DataStatus::NO_NODES;
+    }
+    else if (calculator->countLines() == 0)
+    {
+      return Calculator::DataStatus::NO_LINES;
+    }
+    else if (calculator->countPaths() == 0)
+    {
+      return Calculator::DataStatus::NO_PATHS;
+    }
+    else if (calculator->countScenarios() == 0)
+    {
+      return Calculator::DataStatus::NO_SCENARIOS;
+    }
+    else if (calculator->countConnections() == 0  || calculator->countTrips() == 0)
+    {
+      return Calculator::DataStatus::NO_SCHEDULES;
+    }
+    return Calculator::DataStatus::READY;
+  }
+
+  Calculator::DataStatus Calculator::prepare()
   {
     int ret = 0;
     if (params.debugDisplay)
@@ -115,78 +147,78 @@ namespace TrRouting
       // Ignore missing nodes file
       if (ret < 0 && ret != -ENOENT)
       {
-        return -1;
+        return Calculator::DataStatus::DATA_READ_ERROR;
       }
 
       ret = updateDataSourcesFromCache(params);
       // Ignore missing data sources file
       if (ret < 0 && ret != -ENOENT)
       {
-        return -1;
+        return Calculator::DataStatus::DATA_READ_ERROR;
       }
       ret = updateHouseholdsFromCache(params);
       if (ret < 0)
       {
-        return -1;
+        return Calculator::DataStatus::DATA_READ_ERROR;
       }
       ret = updatePersonsFromCache(params);
       if (ret < 0)
       {
-        return -1;
+        return Calculator::DataStatus::DATA_READ_ERROR;
       }
       ret = updateOdTripsFromCache(params);
       if (ret < 0)
       {
-        return -1;
+        return Calculator::DataStatus::DATA_READ_ERROR;
       }
       ret = updatePlacesFromCache(params);
       if (ret < 0)
       {
-        return -1;
+        return Calculator::DataStatus::DATA_READ_ERROR;
       }
 
       ret = updateAgenciesFromCache(params);
       // Ignore missing file
       if (ret < 0 && ret != -ENOENT)
       {
-        return -1;
+        return Calculator::DataStatus::DATA_READ_ERROR;
       }
       ret = updateServicesFromCache(params);
       // Ignore missing file
       if (ret < 0 && ret != -ENOENT)
       {
-        return -1;
+        return Calculator::DataStatus::DATA_READ_ERROR;
       }
       
       ret = updateLinesFromCache(params);
       // Ignore missing file
       if (ret < 0 && ret != -ENOENT)
       {
-        return -1;
+        return Calculator::DataStatus::DATA_READ_ERROR;
       }
       ret = updatePathsFromCache(params);
       // Ignore missing file
       if (ret < 0 && ret != -ENOENT)
       {
-        return -1;
+        return Calculator::DataStatus::DATA_READ_ERROR;
       }
       ret = updateScenariosFromCache(params);
       // Ignore missing file
       if (ret < 0 && ret != -ENOENT)
       {
-        return -1;
+        return Calculator::DataStatus::DATA_READ_ERROR;
       }
       ret = updateNetworksFromCache(params);
       // Ignore missing file
       if (ret < 0 && ret != -ENOENT)
       {
-        return -1;
+        return Calculator::DataStatus::DATA_READ_ERROR;
       }
       ret = updateSchedulesFromCache(params);
       // Ignore missing file
       if (ret < 0 && ret != -ENOENT)
       {
-        return -1;
+        return Calculator::DataStatus::DATA_READ_ERROR;
       }
       
     }
@@ -201,7 +233,7 @@ namespace TrRouting
     
     initializeCalculationData();
     std::cout << "preparing nodes tentative times, trips enter connections and journeys..." << std::endl;
-    return ret;
+    return validateData(this);
   }
   
 }
