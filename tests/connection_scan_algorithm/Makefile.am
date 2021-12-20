@@ -6,7 +6,9 @@ csa_test_SOURCES = gtest.cpp \
     ../../src/osrm_fetcher.cpp \
     csa_test_base.cpp \
     csa_simple_calculation_test.cpp \
-    csa_transfer_and_alternatives_test.cpp
+    csa_transfer_and_alternatives_test.cpp \
+    csa_access_map_test.cpp \
+    csa_odtrips_calculation_test.cpp
 
 
 csa_test_LDADD = $(top_srcdir)/tests/libgtest.la ../../connection_scan_algorithm/src/libcsa.la
