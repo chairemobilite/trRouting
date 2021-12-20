@@ -74,6 +74,28 @@ namespace TrRouting
   class Calculator {
   
   public:
+
+    enum class DataStatus 
+    {
+      // Data is ready for query
+      READY = 0,
+      // Error reading the data source, no data available
+      DATA_READ_ERROR,
+      // There are no agencies in the data
+      NO_AGENCIES,
+      // There are no lines in the data
+      NO_LINES,
+      // There are no paths in the data
+      NO_PATHS,
+      // There are no services in the data
+      NO_SERVICES,
+      // There are no scenarios in the data
+      NO_SCENARIOS,
+      // There are no schedules in the data
+      NO_SCHEDULES,
+      // There are no nodes in the data
+      NO_NODES
+    };
     
     std::map<std::string, int> benchmarking;
     std::string projectShortname;
@@ -81,11 +103,13 @@ namespace TrRouting
     Calculator(Parameters& theParams);
 
     /**
-     * Prepare the data for the calculator
+     * Prepare the data for the calculator and validate that there are at least
+     * some data to do calculations on
      *
-     * @return 0 in case of success -1 in case of error
+     * @return A DataStatus corresponding to the data readiness. Only if the
+     * status is READY will queries be served on this data
      */
-    int                     prepare();
+    DataStatus              prepare();
     void                    reset(bool resetAccessPaths = true, bool resetFilters = true);
     RoutingResult           calculate(bool resetAccessPaths = true, bool resetFilters = true);
     std::tuple<int,int,int,int> forwardCalculation(); // best arrival time,   best egress node index, best egress travel time: MAX_INT,-1,-1 if non routable, too long or all nodes result

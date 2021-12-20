@@ -40,42 +40,30 @@ std::string consoleCyan       = "";
 std::string consoleMagenta    = "";
 std::string consoleResetColor = "";
 
-std::string intializeResponse(int dataStatus, Calculator& calculator)
+std::string intializeResponse(Calculator::DataStatus status) 
 {
-  std::string response {""};
-  if (dataStatus < 0) {
-    response = "{\"status\": \"data_error\"}";
-  }
-  else if (calculator.countAgencies() == 0)
+  switch(status) 
   {
-    response = "{\"status\": \"error\", \"error\": {\"error\": \"No agencies found\", \"code\": \"MISSING_DATA_AGENCIES\"}}";
+    case Calculator::DataStatus::READY: return "";
+    case Calculator::DataStatus::DATA_READ_ERROR: return "{\"status\": \"data_error\"}";
+    case Calculator::DataStatus::NO_AGENCIES:
+      return "{\"status\": \"error\", \"error\": {\"error\": \"No agencies found\", \"code\": \"MISSING_DATA_AGENCIES\"}}";
+    case Calculator::DataStatus::NO_LINES:
+      return "{\"status\": \"error\", \"error\": {\"error\": \"No lines found\", \"code\": \"MISSING_DATA_LINES\"}}";
+    case Calculator::DataStatus::NO_NODES:
+      return "{\"status\": \"error\", \"error\": {\"error\": \"No nodes found\", \"code\": \"MISSING_DATA_NODES\"}}";
+    case Calculator::DataStatus::NO_PATHS:
+      return "{\"status\": \"error\", \"error\": {\"error\": \"No paths found\", \"code\": \"MISSING_DATA_PATHS\"}}";
+    case Calculator::DataStatus::NO_SCENARIOS:
+      return "{\"status\": \"error\", \"error\": {\"error\": \"No scenarios found\", \"code\": \"MISSING_DATA_SCENARIOS\"}}";
+    case Calculator::DataStatus::NO_SCHEDULES:
+      return "{\"status\": \"error\", \"error\": {\"error\": \"No schedules found\", \"code\": \"MISSING_DATA_SCHEDULES\"}}";
+    case Calculator::DataStatus::NO_SERVICES:
+      return "{\"status\": \"error\", \"error\": {\"error\": \"No services found\", \"code\": \"MISSING_DATA_SERVICES\"}}";
+    default: return "PARAM_ERROR_UNKNOWN";
   }
-  else if (calculator.countServices() == 0)
-  {
-    response = "{\"status\": \"error\", \"error\": {\"error\": \"No services found\", \"code\": \"MISSING_DATA_SERVICES\"}}";
-  }
-  else if (calculator.countNodes() == 0)
-  {
-    response = "{\"status\": \"error\", \"error\": {\"error\": \"No nodes found\", \"code\": \"MISSING_DATA_NODES\"}}";
-  }
-  else if (calculator.countLines() == 0)
-  {
-    response = "{\"status\": \"error\", \"error\": {\"error\": \"No lines found\", \"code\": \"MISSING_DATA_LINES\"}}";
-  }
-  else if (calculator.countPaths() == 0)
-  {
-    response = "{\"status\": \"error\", \"error\": {\"error\": \"No paths found\", \"code\": \"MISSING_DATA_PATHS\"}}";
-  }
-  else if (calculator.countScenarios() == 0)
-  {
-    response = "{\"status\": \"error\", \"error\": {\"error\": \"No scenarios found\", \"code\": \"MISSING_DATA_SCENARIOS\"}}";
-  }
-  else if (calculator.countConnections() == 0  || calculator.countTrips() == 0)
-  {
-    response = "{\"status\": \"error\", \"error\": {\"error\": \"No schedules found\", \"code\": \"MISSING_DATA_SCHEDULES\"}}";
-  }
-  return response;
-};
+}
+
 
 int main(int argc, char** argv) {
   
@@ -134,7 +122,7 @@ int main(int argc, char** argv) {
   
   Calculator calculator(algorithmParams);
   std::cout << "preparing calculator..." << std::endl;
-  int dataStatus = calculator.prepare();
+  Calculator::DataStatus dataStatus = calculator.prepare();
 
   int i = 0;
   
@@ -325,7 +313,7 @@ int main(int argc, char** argv) {
   // routing request
   server.resource["^/route/v1/transit[/]?$"]["GET"]=[&server, &calculator, &dataStatus](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
     
-    std::string response = intializeResponse(dataStatus, calculator);
+    std::string response = intializeResponse(dataStatus);
 
     if (response.empty())
     {
