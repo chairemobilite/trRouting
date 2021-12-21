@@ -46,6 +46,17 @@ LDFLAGS+=" $BOOST_LDFLAGS $BOOST_REGEX_LIB $BOOST_FILESYSTEM_LIB $BOOST_IOSTREAM
 LDFLAGS+=" $CURSES_LIBS"
 LDFLAGS+=" $CAPNP_LIBS"
 
+# Do not enable benchmark in the make check by default
+AC_ARG_ENABLE([benchmark],
+    [  --enable-benchmark      Benchmarks will be run when running make check],
+    [case "${enableval}" in
+        yes) benchmark=true ;;
+        no)  benchmark=false ;;
+        *) AC_MSG_ERROR([bad value ${enableval} for --enable-benchmark]) ;;
+    esac],[benchmark=false])
+AS_IF([test x"$benchmark" = xfalse], [AC_MSG_NOTICE([Benchmarks are disabled. Enable them by adding the --enable-benchmark flag to configure.])])
+AM_CONDITIONAL([RUN_BENCHMARK], [test x$benchmark = xtrue])
+
 AC_CONFIG_FILES([
  Makefile
  src/Makefile
