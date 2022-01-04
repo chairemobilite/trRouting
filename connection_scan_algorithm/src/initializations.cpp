@@ -2,11 +2,28 @@
 
 namespace TrRouting
 {
-  
-  Calculator::Calculator(Parameters& theParams) : params(theParams)
+
+  Calculator::Calculator(Parameters& theParams) :
+    projectShortname(""),
+    params(theParams),
+    odTrip(nullptr),
+    origin(nullptr),
+    destination(nullptr),
+    algorithmCalculationTime(CalculationTime()),
+    departureTimeSeconds(0),
+    initialDepartureTimeSeconds(0),
+    arrivalTimeSeconds(-1),
+    maxTimeValue(0),
+    minAccessTravelTime(0),
+    maxEgressTravelTime(0),
+    maxAccessTravelTime(0),
+    minEgressTravelTime(0),
+    maxAccessWalkingTravelTimeFromOriginToFirstNodeSeconds(0),
+    maxAccessWalkingTravelTimeFromLastNodeToDestinationSeconds(0),
+    calculationTime(0),
+    accessMode("walking"),
+    egressMode("walking")
   {
-    
-    algorithmCalculationTime = CalculationTime();
 
   }
 
@@ -61,7 +78,7 @@ namespace TrRouting
     tripsExitConnectionTransferTravelTime.shrink_to_fit();
     tripsExitConnectionTransferTravelTime.resize(trips.size());
 
-    std::cout << forwardConnections.size() << " connections" << std::endl; 
+    std::cout << forwardConnections.size() << " connections" << std::endl;
 
     //int benchmarkingStart = algorithmCalculationTime.getEpoch();
 
@@ -69,7 +86,7 @@ namespace TrRouting
 
     forwardConnectionsIndexPerDepartureTimeHour = std::vector<int>(32, -1);
     reverseConnectionsIndexPerArrivalTimeHour   = std::vector<int>(32, lastConnectionIndex);
-    
+
     int hour {0};
     int i = 0;
     for (auto & connection : forwardConnections)
@@ -109,7 +126,7 @@ namespace TrRouting
 
   int Calculator::setConnections(std::vector<std::shared_ptr<ConnectionTuple>> connections)
   {
-  
+
     // Copy the connections to both forward and reverse vectors
     forwardConnections.clear();
     reverseConnections.clear();
@@ -121,7 +138,7 @@ namespace TrRouting
     }
     forwardConnections.shrink_to_fit();
     reverseConnections.shrink_to_fit();
-      
+
     int tripIdx {-1};
     try
     {
@@ -218,6 +235,6 @@ namespace TrRouting
       return -EINVAL;
     }
   }
-  
+
 
 }
