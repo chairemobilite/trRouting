@@ -6,19 +6,15 @@
 #include "calculator.hpp"
 
 using namespace TrRouting;
+using BenchmarkDataTuple = std::tuple<std::string, double, double, double, double, int, bool>;
 
-class ConstantBenchmarkCSATests : public ::testing::Test
+class ConstantBenchmarkCSATests : public ::testing::TestWithParam<BenchmarkDataTuple>
 {
 protected:
-    TrRouting::Parameters setupAlgorithmParams();
-    bool updateCalculatorFromCache(TrRouting::Calculator *calculator);
-    int assertCacheOk(TrRouting::Calculator *calculator);
-    
-    std::vector<std::string> createCalculationQuery();
-    
-    bool updateCalculatorParams(Calculator *calculator, std::vector<std::string> *parametersWithValues);
-    
-    void benchmarkCurrentParams(Calculator *calculator);
+    enum parameterIndexes : short { TEST_DESCRIPTION = 0, LON_ORIG, LAT_ORIG, LON_DEST, LAT_DEST, TIME, EXPECT_RESULTS };
+
+public:
+
 };
 
 #endif
