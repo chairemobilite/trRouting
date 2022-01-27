@@ -105,7 +105,11 @@ paths:
             default: 0
           required: false
           # TODO: This will become 2 different endpoints since the return values are so much different.
-          description: If set to 0, the query returns the routes between origin and destination. If set to 1, the query will return all the nodes accessible with the given parameter. Only the origin is required for this query.
+          description: |
+            If set to 0, the query returns the routes between origin and destination.
+            If set to 1, the query will return all the nodes accessible with the given parameter.
+            Only the origin is required for this query that will calculate all nodes accessible
+            from this point. There can also be only the destination for all nodes to this point.
       # The parameters above are those used in the Transition queries, already ported to typescript
       # Still undocumented parameters. See if they are all required and remove any reference to them if they are not. Parameters on the same line are in the same if condition in the code, so identical
       # Some parameters differ only with the unit, consider using a single parameter, and if really required, add a parameter that contains the units. Otherwise, one can specify 2 such parameters, which one to take?
