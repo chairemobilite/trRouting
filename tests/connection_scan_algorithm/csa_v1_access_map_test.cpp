@@ -5,7 +5,7 @@
 #include "gtest/gtest.h"
 #include "calculator.hpp"
 #include "csa_test_base.hpp"
-#include "csa_simple_calculation_test.hpp"
+#include "csa_v1_simple_calculation_test.hpp"
 #include "constants.hpp"
 
 /**
@@ -53,7 +53,7 @@ void RouteAccessMapFixtureTests::assertResults(TrRouting::RoutingResult result,
     ASSERT_EQ(nbReachableNodes, result.json["numberOfReachableNodes"]);
 }
 
-std::vector<std::string> RouteAccessMapFixtureTests::initializeParameters() 
+std::vector<std::string> RouteAccessMapFixtureTests::initializeParameters()
 {
     std::vector<std::string> parametersWithValues = RouteCalculationFixtureTests::initializeParameters();
     parametersWithValues.push_back("all_nodes=1");
