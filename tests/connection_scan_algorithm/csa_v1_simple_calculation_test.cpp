@@ -5,7 +5,7 @@
 #include "gtest/gtest.h"
 #include "calculator.hpp"
 #include "csa_test_base.hpp"
-#include "csa_simple_calculation_test.hpp"
+#include "csa_v1_simple_calculation_test.hpp"
 #include "constants.hpp"
 
 // TODO:

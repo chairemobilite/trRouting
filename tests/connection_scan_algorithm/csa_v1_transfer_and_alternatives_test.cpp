@@ -5,7 +5,7 @@
 #include "gtest/gtest.h"
 #include "calculator.hpp"
 #include "csa_test_base.hpp"
-#include "csa_simple_calculation_test.hpp"
+#include "csa_v1_simple_calculation_test.hpp"
 #include "constants.hpp"
 
 /**
@@ -21,7 +21,7 @@ public:
 };
 
 // Test from OD which includes a transfer to the same node, origin is further
-// south of South2, in the line axis, destination is very close to west2 
+// south of South2, in the line axis, destination is very close to west2
 // Use default parameters for non-mandatory ones
 TEST_F(TAndACalculationFixtureTests, TripWithTransfer)
 {
