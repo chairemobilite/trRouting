@@ -5,7 +5,7 @@
 #include "gtest/gtest.h"
 #include "calculator.hpp"
 #include "csa_test_base.hpp"
-#include "csa_simple_calculation_test.hpp"
+#include "csa_v1_simple_calculation_test.hpp"
 #include "constants.hpp"
 #include "od_trip.hpp"
 #include "data_source.hpp"
@@ -85,7 +85,7 @@ void RouteOdTripsFixtureTests::SetUp() {
     setupOdTrips();
 }
 
-std::vector<std::string> RouteOdTripsFixtureTests::initializeParameters() 
+std::vector<std::string> RouteOdTripsFixtureTests::initializeParameters()
 {
     std::vector<std::string> parametersWithValues = RouteCalculationFixtureTests::initializeParameters();
     parametersWithValues.push_back("od_trips=1");
