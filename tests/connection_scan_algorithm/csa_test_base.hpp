@@ -66,10 +66,10 @@ protected:
 public:
     BaseCsaFixtureTests() : params(TrRouting::Parameters()), calculator(TrRouting::Calculator(params)) {}
     void SetUp();
-    // Asserts the result status is no routing. If we add reasons, this method can eventually be updated and all test cases will need to be updated.
-    void assertNoRouting(TrRouting::RoutingResult result);
+    // Assert the result returned an exception and that the reason matches the expected reason
+    void assertNoRouting(const TrRouting::NoRoutingFoundException& exception, TrRouting::NoRoutingFoundException::NoRoutingReason expectedReason);
     // Asserts the successful result fields, given some easy to provide expected test data
-    void assertSuccessResults(TrRouting::RoutingResult result,
+    void assertSuccessResults(TrRouting::RoutingResultNew& result,
         int origDepartureTime,
         int expTransitDepartureTime,
         int expInVehicleTravelTime,

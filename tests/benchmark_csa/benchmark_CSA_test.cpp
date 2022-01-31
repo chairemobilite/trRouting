@@ -143,13 +143,19 @@ public:
       auto start = std::chrono::high_resolution_clock::now();
 
       if (routeParams.isWithAlternatives()) {
-        std::string result = calculator->alternativesRouting(routeParams);
-        nlohmann::json json;
-        nlohmann::json jsonResult = json.parse(result);
-        ASSERT_EQ(expectResult ? STATUS_SUCCESS : STATUS_NO_ROUTING_FOUND, jsonResult["status"]);
+        try {
+          calculator->alternativesRouting(routeParams);
+          ASSERT_TRUE(expectResult);
+        } catch (TrRouting::NoRoutingFoundException& e) {
+          ASSERT_FALSE(expectResult);
+        }
       } else {
-        TrRouting::RoutingResult result = calculator->calculate(routeParams);
-        ASSERT_EQ(expectResult ? STATUS_SUCCESS : STATUS_NO_ROUTING_FOUND, result.status);
+        try {
+          calculator->calculate(routeParams);
+          ASSERT_TRUE(expectResult);
+        } catch (TrRouting::NoRoutingFoundException& e) {
+          ASSERT_FALSE(expectResult);
+        }
       }
       auto end = std::chrono::high_resolution_clock::now();
       results[i] = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count() * 1e-9;
