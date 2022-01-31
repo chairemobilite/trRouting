@@ -348,10 +348,10 @@ components:
               type: number
               description: Distance traveled in this step, in meters
             departureTime:
-              type: string
+              type: number
               description: Time of the beginning of this step, in seconds since midnight
             arrivalTime:
-              type: string
+              type: number
               description: Time of arrival to destination for this step, in seconds since midnight
 
     tripStepWalkingWithBoarding:
@@ -360,7 +360,7 @@ components:
       - type: object
         properties:
           readyToBoardAt:
-            type: string
+            type: number
             description: Time at which boarding is possible, this includes a waiting time buffer at the stop, so is usually arrival_time + minimum waiting time. Time format is seconds since midnight.
 
     tripStepTripEnterOrExit:
@@ -427,7 +427,7 @@ components:
         - type: object
           properties:
             departureTime:
-              type: string
+              type: number
               description: Departure time of the vehicle, in seconds since midnight
             waitingTime:
               type: number
@@ -439,7 +439,7 @@ components:
         - type: object
           properties:
             arrivalTime:
-              type: string
+              type: number
               description: Arrival time of the vehicle, in seconds since midnight
             inVehicleTime:
               type: number
