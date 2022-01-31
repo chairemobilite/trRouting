@@ -449,12 +449,12 @@ void BaseCsaFixtureTests::setUpModes()
     calculator.modes.push_back(mode);
 }
 
-void BaseCsaFixtureTests::assertNoRouting(TrRouting::RoutingResult result)
+void BaseCsaFixtureTests::assertNoRouting(const TrRouting::NoRoutingFoundException& exception, TrRouting::NoRoutingFoundException::NoRoutingReason expectedReason)
 {
-    ASSERT_EQ(STATUS_NO_ROUTING_FOUND, result.status);
+    ASSERT_EQ(expectedReason, exception.getReason());
 }
 
-void BaseCsaFixtureTests::assertSuccessResults(TrRouting::RoutingResult result,
+void BaseCsaFixtureTests::assertSuccessResults(TrRouting::RoutingResultNew& result,
     int origDepartureTime,
     int expTransitDepartureTime,
     int expInVehicleTravelTime,
@@ -466,19 +466,18 @@ void BaseCsaFixtureTests::assertSuccessResults(TrRouting::RoutingResult result,
     int expTransferWaitingTime,
     int expTransferTravelTime)
 {
-    ASSERT_EQ(STATUS_SUCCESS, result.status);
-    ASSERT_EQ(expInVehicleTravelTime + expAccessTime + expEgressTime + expTotalWaitingTime + expTransferTravelTime, result.travelTimeSeconds);
-    ASSERT_EQ(expTransitDepartureTime + expInVehicleTravelTime + expEgressTime + (expTotalWaitingTime - minWaitingTime) + expTransferTravelTime, result.arrivalTimeSeconds);
-    ASSERT_EQ(expTransitDepartureTime - expAccessTime - minWaitingTime, result.departureTimeSeconds);
-    ASSERT_EQ(origDepartureTime, result.initialDepartureTimeSeconds);
-    ASSERT_EQ(origDepartureTime == -1 ? -1 : expTransitDepartureTime - expAccessTime - minWaitingTime - origDepartureTime, result.initialLostTimeAtDepartureSeconds);
-    ASSERT_EQ(expNbTransfers, result.numberOfTransfers);
-    ASSERT_EQ(expInVehicleTravelTime, result.inVehicleTravelTimeSeconds);
-    ASSERT_EQ(expTransferTravelTime, result.transferTravelTimeSeconds);
-    ASSERT_EQ(expTotalWaitingTime, result.waitingTimeSeconds);
-    ASSERT_EQ(expAccessTime, result.accessTravelTimeSeconds);
-    ASSERT_EQ(expEgressTime, result.egressTravelTimeSeconds);
-    ASSERT_EQ(expTransferWaitingTime, result.transferWaitingTimeSeconds);
-    ASSERT_EQ(minWaitingTime, result.firstWaitingTimeSeconds);
-    ASSERT_EQ(expAccessTime + expEgressTime + expTransferTravelTime, result.nonTransitTravelTimeSeconds);
+    ASSERT_EQ(TrRouting::result_type::SINGLE_CALCULATION, result.resType);
+    TrRouting::SingleCalculationResult& routingResult = dynamic_cast<TrRouting::SingleCalculationResult&>(result);
+    ASSERT_EQ(expInVehicleTravelTime + expAccessTime + expEgressTime + expTotalWaitingTime + expTransferTravelTime, routingResult.totalTravelTime);
+    ASSERT_EQ(expTransitDepartureTime + expInVehicleTravelTime + expEgressTime + (expTotalWaitingTime - minWaitingTime) + expTransferTravelTime, routingResult.arrivalTime);
+    ASSERT_EQ(expTransitDepartureTime - expAccessTime - minWaitingTime, routingResult.departureTime);
+    ASSERT_EQ(expNbTransfers, routingResult.numberOfTransfers);
+    ASSERT_EQ(expInVehicleTravelTime, routingResult.totalInVehicleTime);
+    ASSERT_EQ(expTransferTravelTime, routingResult.transferWalkingTime);
+    ASSERT_EQ(expTotalWaitingTime, routingResult.totalWaitingTime);
+    ASSERT_EQ(expAccessTime, routingResult.accessTravelTime);
+    ASSERT_EQ(expEgressTime, routingResult.egressTravelTime);
+    ASSERT_EQ(expTransferWaitingTime, routingResult.transferWaitingTime);
+    ASSERT_EQ(minWaitingTime, routingResult.firstWaitingTime);
+    ASSERT_EQ(expAccessTime + expEgressTime + expTransferTravelTime, routingResult.totalNonTransitTravelTime);
 }

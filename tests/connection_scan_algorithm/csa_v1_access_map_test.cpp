@@ -21,7 +21,7 @@ class RouteAccessMapFixtureTests : public RouteCalculationFixtureTests
 
 public:
     // Asserts the successful result fields, given some easy to provide expected test data
-    void assertResults(TrRouting::RoutingResult result,
+    void assertResults(TrRouting::RoutingResultNew& result,
         int nbReachableNodes);
     // Return a parameters vector with the scenario and minimum waiting time, which is repetitive and mandatory
     std::vector<std::string> initializeParameters();
@@ -41,16 +41,17 @@ TEST_F(RouteAccessMapFixtureTests, SimpleAllNodesQuery)
     parametersWithValues.push_back("origin=45.5242,-73.5817");
     parametersWithValues.push_back("departure_time_seconds=" + std::to_string(departureTime));
 
-    TrRouting::RoutingResult result = calculateOd(parametersWithValues);
-    assertResults(result, 5);
+    std::unique_ptr<TrRouting::RoutingResultNew> result = calculateOd(parametersWithValues);
+    assertResults(*result.get(), 5);
 
 }
 
-void RouteAccessMapFixtureTests::assertResults(TrRouting::RoutingResult result,
+void RouteAccessMapFixtureTests::assertResults(TrRouting::RoutingResultNew& result,
     int nbReachableNodes)
 {
-    ASSERT_EQ(STATUS_SUCCESS, result.json["status"]);
-    ASSERT_EQ(nbReachableNodes, result.json["numberOfReachableNodes"]);
+    ASSERT_EQ(TrRouting::result_type::ALL_NODES, result.resType);
+    TrRouting::AllNodesResult& routingResult = dynamic_cast<TrRouting::AllNodesResult&>(result);
+    ASSERT_EQ(nbReachableNodes, routingResult.numberOfReachableNodes);
 }
 
 std::vector<std::string> RouteAccessMapFixtureTests::initializeParameters()

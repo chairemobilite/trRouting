@@ -43,13 +43,11 @@ namespace TrRouting
     return forwardConnections.size();
   }
 
-  RoutingResult Calculator::calculate(RouteParameters &parameters, bool resetAccessPaths, bool resetFilters) {
+  std::unique_ptr<RoutingResultNew> Calculator::calculate(RouteParameters &parameters, bool resetAccessPaths, bool resetFilters) {
 
     reset(parameters, resetAccessPaths, resetFilters);
 
-    RoutingResult result;
-    
-    result.json = {};
+    std::unique_ptr<RoutingResultNew> result;
     
     std::tuple<int,int,int> forwardResult;
     std::tuple<int,int,int> reverseResult;
@@ -140,7 +138,7 @@ namespace TrRouting
 
     }
 
-    return result;
+    return std::move(result);
     
   }
   

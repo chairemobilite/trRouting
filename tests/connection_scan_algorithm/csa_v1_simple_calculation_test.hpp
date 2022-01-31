@@ -13,7 +13,7 @@ class RouteCalculationFixtureTests : public BaseCsaFixtureTests
 
 public:
     // Helper method to set parameters and calculate OD trip result. Test cases need only provide parameters and validate the result
-    TrRouting::RoutingResult calculateOd(std::vector<std::string> parameters);
+    std::unique_ptr<TrRouting::RoutingResultNew> calculateOd(std::vector<std::string> parameters);
     // Return a parameters vector with the scenario and minimum waiting time, which is repetitive and mandatory
     std::vector<std::string> initializeParameters();
 };

@@ -17,7 +17,7 @@ class SingleTAndACalculationFixtureTests : public SingleRouteCalculationFixtureT
 
 public:
     // Helper method to set parameters and calculate OD with alternatives. Test cases need only provide parameters and validate the result
-    nlohmann::json calculateWithAlternatives(TrRouting::RouteParameters& parameters);
+    TrRouting::AlternativesResult calculateWithAlternatives(TrRouting::RouteParameters& parameters);
 };
 
 // Test from OD which includes a transfer to the same node, origin is further
@@ -49,8 +49,8 @@ TEST_F(SingleTAndACalculationFixtureTests, TripWithTransfer)
         true
     );
 
-    TrRouting::RoutingResult result = calculateOd(testParameters);
-    assertSuccessResults(result,
+    std::unique_ptr<TrRouting::RoutingResultNew> result = calculateOd(testParameters);
+    assertSuccessResults(*result.get(),
         departureTime,
         expectedTransitDepartureTime,
         travelTimeInVehicle,
@@ -89,8 +89,8 @@ TEST_F(SingleTAndACalculationFixtureTests, NoTransferMinTransferTime)
         true
     );
 
-    TrRouting::RoutingResult result = calculateOd(testParameters);
-    assertSuccessResults(result,
+    std::unique_ptr<TrRouting::RoutingResultNew> result = calculateOd(testParameters);
+    assertSuccessResults(*result.get(),
         departureTime,
         expectedTransitDepartureTime,
         travelTimeInVehicle,
@@ -130,8 +130,8 @@ TEST_F(SingleTAndACalculationFixtureTests, TripWithWalkingTransfer)
         true
     );
 
-    TrRouting::RoutingResult result = calculateOd(testParameters);
-    assertSuccessResults(result,
+    std::unique_ptr<TrRouting::RoutingResultNew> result = calculateOd(testParameters);
+    assertSuccessResults(*result.get(),
         departureTime,
         expectedTransitDepartureTime,
         travelTimeInVehicle,
@@ -150,12 +150,9 @@ TEST_F(SingleTAndACalculationFixtureTests, TripWithWalkingTransfer)
 TEST_F(SingleTAndACalculationFixtureTests, TripWithAlternatives)
 {
     int departureTime = getTimeInSeconds(9, 45);
-    int travelTimeInVehicle = 720;
     // This is where mocking would be interesting. Those were taken from the first run of the test
     int accessTime = 469;
-    int egressTime = 166;
     int expectedTransitDepartureTime = getTimeInSeconds(10);
-    int expectedTransferWaitingTime = 300;
 
     TrRouting::RouteParameters testParameters = TrRouting::RouteParameters(
         std::make_unique<TrRouting::Point>(45.5242, -73.5817),
@@ -172,12 +169,46 @@ TEST_F(SingleTAndACalculationFixtureTests, TripWithAlternatives)
         true
     );
 
-    nlohmann::json result = calculateWithAlternatives(testParameters);
-    ASSERT_EQ(STATUS_SUCCESS, result["status"]);
-    ASSERT_EQ(2, result["alternatives"].size());
+    TrRouting::AlternativesResult routingResult = calculateWithAlternatives(testParameters);
+    ASSERT_EQ(2, routingResult.alternatives.size());
+    // TODO: Why is it 5? Would it be a sign of an error? To investigate
+    ASSERT_EQ(5, routingResult.totalAlternativesCalculated);
+
+    // First trip gets off at midpoint, walks to east 1 and takes extra line and walks from extra node to destination
+    int egressTimeAlt1 = 77;
+    int expTransferWaitingTime1 = 300;
+    int expTransferWalkingTime = 480;
+    TrRouting::SingleCalculationResult& alternativeResult1 = dynamic_cast<TrRouting::SingleCalculationResult&>(*routingResult.alternatives[0].get());
+    assertSuccessResults(alternativeResult1,
+        departureTime,
+        expectedTransitDepartureTime,
+        12 * 60,
+        accessTime,
+        egressTimeAlt1,
+        1,
+        MIN_WAITING_TIME,
+        MIN_WAITING_TIME + expTransferWaitingTime1,
+        expTransferWaitingTime1,
+        expTransferWalkingTime
+    );
+
+    // Second trip takes SN line to North1 and walks to destination
+    int egressTimeAlt2 = 1080;
+    assertSuccessResults(*routingResult.alternatives[1].get(),
+        departureTime,
+        expectedTransitDepartureTime,
+        13 * 60,
+        accessTime,
+        egressTimeAlt2,
+        0,
+        MIN_WAITING_TIME,
+        MIN_WAITING_TIME,
+        0,
+        0
+    );
 }
 
-nlohmann::json SingleTAndACalculationFixtureTests::calculateWithAlternatives(TrRouting::RouteParameters& parameters)
+TrRouting::AlternativesResult SingleTAndACalculationFixtureTests::calculateWithAlternatives(TrRouting::RouteParameters& parameters)
 {
     // TODO: This needs to be called to set some default values that are still part of the global parameters
     calculator.params.setDefaultValues();
@@ -187,9 +218,6 @@ nlohmann::json SingleTAndACalculationFixtureTests::calculateWithAlternatives(TrR
     calculator.algorithmCalculationTime.start();
     calculator.benchmarking.clear();
 
-    std::string result = calculator.alternativesRouting(parameters);
-    nlohmann::json json;
-    nlohmann::json jsonResult = json.parse(result);
-    return jsonResult;
+    return calculator.alternativesRouting(parameters);
 
 }

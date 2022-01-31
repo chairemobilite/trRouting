@@ -70,10 +70,10 @@ namespace TrRouting
   using ConnectionTuple = std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>;
 
   class Calculator {
-  
+
   public:
 
-    enum class DataStatus 
+    enum class DataStatus
     {
       // Data is ready for query
       READY = 0,
@@ -94,10 +94,10 @@ namespace TrRouting
       // There are no nodes in the data
       NO_NODES
     };
-    
+
     std::map<std::string, int> benchmarking;
     std::string projectShortname;
-    
+
     Calculator(Parameters& theParams);
 
     /**
@@ -109,19 +109,25 @@ namespace TrRouting
      */
     DataStatus              prepare();
     void                    reset(RouteParameters &parameters, bool resetAccessPaths = true, bool resetFilters = true);
-    RoutingResult           calculate(RouteParameters &parameters, bool resetAccessPaths = true, bool resetFilters = true);
+    // TODO This function supports both allNodes and simple calculation, which
+    // are 2 very different return values. They should be split so it can return
+    // a concrete result object instead of pointer (that alternatives could use directly), but still
+    // use common calculation functions
+    std::unique_ptr<RoutingResultNew> calculate(RouteParameters &parameters, bool resetAccessPaths = true, bool resetFilters = true);
     std::tuple<int,int,int,int> forwardCalculation(RouteParameters &parameters); // best arrival time,   best egress node index, best egress travel time: MAX_INT,-1,-1 if non routable, too long or all nodes result
     std::tuple<int,int,int,int> reverseCalculation(RouteParameters &parameters); // best departure time, best access node index, best access travel time: -1,-1,-1 if non routable, too long or all nodes result
-    RoutingResult           forwardJourneyStep(RouteParameters &parameters, int bestArrivalTime, int bestEgressNodeIndex, int bestEgressTravelTime, int bestEgressDistance);
-    RoutingResult           reverseJourneyStep(RouteParameters &parameters, int bestDepartureTime, int bestAccessNodeIndex, int bestAccessTravelTime, int bestAccessDistance);
-    std::string             alternativesRouting(RouteParameters &parameters);
+    // TODO See calculate
+    std::unique_ptr<RoutingResultNew> forwardJourneyStep(RouteParameters &parameters, int bestArrivalTime, int bestEgressNodeIndex, int bestEgressTravelTime, int bestEgressDistance);
+    // TODO See calculate
+    std::unique_ptr<RoutingResultNew> reverseJourneyStep(RouteParameters &parameters, int bestDepartureTime, int bestAccessNodeIndex, int bestAccessTravelTime, int bestAccessDistance);
+    AlternativesResult alternativesRouting(RouteParameters &parameters);
     std::string             odTripsRouting(RouteParameters &parameters);
-    
+
     std::vector<int>        optimizeJourney(std::deque<std::tuple<int,int,int,int,int,short,int>> &journey);
 
     /**
      * The update*FromCache methods get the data from the cache
-     * 
+     *
      * @return 0 in case of success, values below 0 when errors occurred:
      * -EBADMSG if deserialization did not work
      * -ENOENT if the file does not exist
@@ -145,7 +151,7 @@ namespace TrRouting
     int                    updateSchedulesFromCache  (Parameters&  params, std::string customPath = "");
 
     int                    setConnections(std::vector<std::shared_ptr<ConnectionTuple>> connections);
-    
+
     int               countStations();
     int               countAgencies();
     int               countServices();
@@ -172,10 +178,10 @@ namespace TrRouting
 
     std::vector<std::unique_ptr<Household>>  households;
     std::map<boost::uuids::uuid, int>        householdIndexesByUuid;
-  
+
     std::vector<std::unique_ptr<Person>>     persons;
     std::map<boost::uuids::uuid, int>        personIndexesByUuid;
-  
+
     std::vector<std::unique_ptr<OdTrip>>     odTrips;
     std::map<boost::uuids::uuid, int>        odTripIndexesByUuid;
 
@@ -219,14 +225,14 @@ namespace TrRouting
 
     Parameters& params;
     CalculationTime algorithmCalculationTime;
-    
+
     OdTrip * odTrip;
 
   private:
-    
+
     enum connectionIndexes : short { NODE_DEP = 0, NODE_ARR = 1, TIME_DEP = 2, TIME_ARR = 3, TRIP = 4, CAN_BOARD = 5, CAN_UNBOARD = 6, SEQUENCE = 7, LINE = 8, BLOCK = 9, CAN_TRANSFER_SAME_LINE = 10, MIN_WAITING_TIME_SECONDS = 11 };
     enum journeyStepIndexes: short { FINAL_ENTER_CONNECTION = 0, FINAL_EXIT_CONNECTION = 1, FINAL_TRANSFERRING_NODE = 2, FINAL_TRIP = 3, TRANSFER_TRAVEL_TIME = 4, IS_SAME_NODE_TRANSFER = 5, TRANSFER_DISTANCE = 6 };
-    
+
     int              departureTimeSeconds;
     int              initialDepartureTimeSeconds;
     int              arrivalTimeSeconds;
@@ -248,10 +254,10 @@ namespace TrRouting
     std::vector<int> nodesEgressTravelTime; // travel time to reach destination (-1 if unreachable by egress mode)
     std::vector<int> nodesAccessDistance; // distance from origin to accessible nodes (-1 if unreachable by access mode)
     std::vector<int> nodesEgressDistance; // distance to reach destination (-1 if unreachable by egress mode)
-    std::vector<int> tripsEnterConnection; // index of the entering connection for each trip index 
-    std::vector<int> tripsEnterConnectionTransferTravelTime; // index of the entering connection for each trip index 
-    std::vector<int> tripsExitConnection; // index of the exiting connection for each trip index 
-    std::vector<int> tripsExitConnectionTransferTravelTime; // index of the exiting connection for each trip index 
+    std::vector<int> tripsEnterConnection; // index of the entering connection for each trip index
+    std::vector<int> tripsEnterConnectionTransferTravelTime; // index of the entering connection for each trip index
+    std::vector<int> tripsExitConnection; // index of the exiting connection for each trip index
+    std::vector<int> tripsExitConnectionTransferTravelTime; // index of the exiting connection for each trip index
     std::vector<int> tripsEnabled; // allow/disallow use of this trip during calculation
     std::vector<int> tripsUsable; // after forward calculation, keep a list of usable trips in time range for reverse calculation
     std::vector<std::tuple<int,int,int>> accessFootpaths; // pair: accessNodeIndex, walkingTravelTimeSeconds, walkingDistanceMeters
@@ -264,7 +270,7 @@ namespace TrRouting
     std::vector<std::tuple<int,int,int,int,int,short,int>> reverseAccessJourneysSteps; // index = node index, tuple: final enter connection, final exit connection, final transferring node index, final trip index, transfer travel time, is same node transfer (first, second, third and fourth values = -1 for access and egress journeys)
 
   };
-  
+
 }
 
 #endif // TR_CALCULATOR

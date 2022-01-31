@@ -17,7 +17,7 @@ class TAndACalculationFixtureTests : public RouteCalculationFixtureTests
 
 public:
     // Helper method to set parameters and calculate OD with alternatives. Test cases need only provide parameters and validate the result
-    nlohmann::json calculateWithAlternatives(std::vector<std::string> parameters);
+    TrRouting::AlternativesResult calculateWithAlternatives(std::vector<std::string> parameters);
 };
 
 // Test from OD which includes a transfer to the same node, origin is further
@@ -40,8 +40,8 @@ TEST_F(TAndACalculationFixtureTests, TripWithTransfer)
     parametersWithValues.push_back("departure_time_seconds=" + std::to_string(departureTime));
     parametersWithValues.push_back("min_waiting_time_seconds=" + std::to_string(minWaitingTime));
 
-    TrRouting::RoutingResult result = calculateOd(parametersWithValues);
-    assertSuccessResults(result,
+    std::unique_ptr<TrRouting::RoutingResultNew> result = calculateOd(parametersWithValues);
+    assertSuccessResults(*result.get(),
         departureTime,
         expectedTransitDepartureTime,
         travelTimeInVehicle,
@@ -71,8 +71,8 @@ TEST_F(TAndACalculationFixtureTests, NoTransferMinTransferTime)
     parametersWithValues.push_back("departure_time_seconds=" + std::to_string(departureTime));
     parametersWithValues.push_back("min_waiting_time_seconds=" + std::to_string(minWaitingTime));
 
-    TrRouting::RoutingResult result = calculateOd(parametersWithValues);
-    assertSuccessResults(result,
+    std::unique_ptr<TrRouting::RoutingResultNew> result = calculateOd(parametersWithValues);
+    assertSuccessResults(*result.get(),
         departureTime,
         expectedTransitDepartureTime,
         travelTimeInVehicle,
@@ -102,8 +102,8 @@ TEST_F(TAndACalculationFixtureTests, TripWithWalkingTransfer)
     parametersWithValues.push_back("destination=45.5549,-73.6173");
     parametersWithValues.push_back("departure_time_seconds=" + std::to_string(departureTime));
 
-    TrRouting::RoutingResult result = calculateOd(parametersWithValues);
-    assertSuccessResults(result,
+    std::unique_ptr<TrRouting::RoutingResultNew> result = calculateOd(parametersWithValues);
+    assertSuccessResults(*result.get(),
         departureTime,
         expectedTransitDepartureTime,
         travelTimeInVehicle,
@@ -135,12 +135,38 @@ TEST_F(TAndACalculationFixtureTests, TripWithAlternatives)
     parametersWithValues.push_back("departure_time_seconds=" + std::to_string(departureTime));
     parametersWithValues.push_back("alternatives=1");
 
-    nlohmann::json result = calculateWithAlternatives(parametersWithValues);
-    ASSERT_EQ(STATUS_SUCCESS, result["status"]);
-    ASSERT_EQ(2, result["alternatives"].size());
+    TrRouting::AlternativesResult result = calculateWithAlternatives(parametersWithValues);
+    ASSERT_EQ(2, result.alternatives.size());
 }
 
-nlohmann::json TAndACalculationFixtureTests::calculateWithAlternatives(std::vector<std::string> parameters)
+// Test a query with alternatives, for a trip with no routing found
+TEST_F(TAndACalculationFixtureTests, TripWithNoRoutingAlternatives)
+{
+    int departureTime = getTimeInSeconds(9, 45);
+    int travelTimeInVehicle = 720;
+    // This is where mocking would be interesting. Those were taken from the first run of the test
+    int accessTime = 469;
+    int egressTime = 166;
+    int expectedTransitDepartureTime = getTimeInSeconds(10);
+    int expectedTransferWaitingTime = 300;
+
+    std::vector<std::string> parametersWithValues = initializeParameters();
+    parametersWithValues.push_back("origin=45.7242,-73.7817");
+    parametersWithValues.push_back("destination=45.7541,-73.8186");
+    parametersWithValues.push_back("departure_time_seconds=" + std::to_string(departureTime));
+    parametersWithValues.push_back("alternatives=1");
+
+    try {
+        calculateWithAlternatives(parametersWithValues);
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
+    } catch (TrRouting::NoRoutingFoundException const & e) {
+        assertNoRouting(e, TrRouting::NoRoutingFoundException::NoRoutingReason::NO_ROUTING_FOUND);
+    } catch(...) {
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
+    }
+}
+
+TrRouting::AlternativesResult TAndACalculationFixtureTests::calculateWithAlternatives(std::vector<std::string> parameters)
 {
     calculator.params.setDefaultValues();
     TrRouting::RouteParameters routeParams = calculator.params.update(parameters,
@@ -157,8 +183,5 @@ nlohmann::json TAndACalculationFixtureTests::calculateWithAlternatives(std::vect
     calculator.algorithmCalculationTime.start();
     calculator.benchmarking.clear();
 
-    std::string result =  calculator.alternativesRouting(routeParams);
-    nlohmann::json json;
-    nlohmann::json jsonResult = json.parse(result);
-    return jsonResult;
+    return calculator.alternativesRouting(routeParams);
 }

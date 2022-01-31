@@ -42,8 +42,14 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingBecauseNoPath)
         true
     );
 
-    TrRouting::RoutingResult result = calculateOd(testParameters);
-    assertNoRouting(result);
+    try {
+        calculateOd(testParameters);
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
+    } catch (TrRouting::NoRoutingFoundException const & e) {
+        assertNoRouting(e, TrRouting::NoRoutingFoundException::NoRoutingReason::NO_ROUTING_FOUND);
+    } catch(...) {
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
+    }
 }
 
 // Test origin and destination far from network
@@ -64,8 +70,14 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingBecauseNoNode)
         true
     );
 
-    TrRouting::RoutingResult result = calculateOd(testParameters);
-    assertNoRouting(result);
+    try {
+        calculateOd(testParameters);
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
+    } catch (TrRouting::NoRoutingFoundException const & e) {
+        assertNoRouting(e, TrRouting::NoRoutingFoundException::NoRoutingReason::NO_ROUTING_FOUND);
+    } catch(...) {
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
+    }
 }
 
 // Test from first to second node of SN path, but before the time of the trip (6:50)
@@ -86,8 +98,15 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingBecauseTooEarly)
         true
     );
 
-    TrRouting::RoutingResult result = calculateOd(testParameters);
-    assertNoRouting(result);
+    try {
+        calculateOd(testParameters);
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
+    } catch (TrRouting::NoRoutingFoundException const & e) {
+        assertNoRouting(e, TrRouting::NoRoutingFoundException::NoRoutingReason::NO_ROUTING_FOUND);
+    } catch(...) {
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
+    }
+    
 }
 
 // Test from first to second node of SN path
@@ -112,8 +131,8 @@ TEST_F(SingleRouteCalculationFixtureTests, NodeToNodeCalculation)
         true
     );
 
-    TrRouting::RoutingResult result = calculateOd(testParameters);
-    assertSuccessResults(result,
+    std::unique_ptr<TrRouting::RoutingResultNew> result = calculateOd(testParameters);
+    assertSuccessResults(*result.get(),
         departureTime,
         expectedTransitDepartureTime,
         travelTimeInVehicle);
@@ -145,8 +164,8 @@ TEST_F(SingleRouteCalculationFixtureTests, SimpleODCalculationDepartureTime)
         true
     );
 
-    TrRouting::RoutingResult result = calculateOd(testParameters);
-    assertSuccessResults(result,
+    std::unique_ptr<TrRouting::RoutingResultNew> result = calculateOd(testParameters);
+    assertSuccessResults(*result.get(),
         departureTime,
         expectedTransitDepartureTime,
         travelTimeInVehicle,
@@ -179,8 +198,8 @@ TEST_F(SingleRouteCalculationFixtureTests, SimpleODCalculationArrivalTime)
         false
     );
 
-    TrRouting::RoutingResult result = calculateOd(testParameters);
-    assertSuccessResults(result,
+    std::unique_ptr<TrRouting::RoutingResultNew> result = calculateOd(testParameters);
+    assertSuccessResults(*result.get(),
         -1,
         expectedTransitDepartureTime,
         travelTimeInVehicle,
@@ -215,8 +234,8 @@ TEST_F(SingleRouteCalculationFixtureTests, SimpleODCalculationWithAllParams)
         true
     );
 
-    TrRouting::RoutingResult result = calculateOd(testParameters);
-    assertSuccessResults(result,
+    std::unique_ptr<TrRouting::RoutingResultNew> result = calculateOd(testParameters);
+    assertSuccessResults(*result.get(),
         departureTime,
         expectedTransitDepartureTime,
         travelTimeInVehicle,
@@ -249,8 +268,14 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingAccessTimeLimit)
         true
     );
 
-    TrRouting::RoutingResult result = calculateOd(testParameters);
-    assertNoRouting(result);
+    try {
+        calculateOd(testParameters);
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
+    } catch (TrRouting::NoRoutingFoundException const & e) {
+        assertNoRouting(e, TrRouting::NoRoutingFoundException::NoRoutingReason::NO_ROUTING_FOUND);
+    } catch(...) {
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
+    }
 }
 
 // Same as SimpleODCalculation, but with max_egress_travel_time lower than egress time
@@ -275,8 +300,14 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingEgressTimeLimit)
         true
     );
 
-    TrRouting::RoutingResult result = calculateOd(testParameters);
-    assertNoRouting(result);
+    try {
+        calculateOd(testParameters);
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
+    } catch (TrRouting::NoRoutingFoundException const & e) {
+        assertNoRouting(e, TrRouting::NoRoutingFoundException::NoRoutingReason::NO_ROUTING_FOUND);
+    } catch(...) {
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
+    }
 }
 
 // Same as SimpleODCalculation, but with max_first_waiting_time lower than should be
@@ -304,8 +335,14 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingMaxFirstWaitingTime)
         true
     );
 
-    TrRouting::RoutingResult result = calculateOd(testParameters);
-    assertNoRouting(result);
+    try {
+        calculateOd(testParameters);
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
+    } catch (TrRouting::NoRoutingFoundException const & e) {
+        assertNoRouting(e, TrRouting::NoRoutingFoundException::NoRoutingReason::NO_ROUTING_FOUND);
+    } catch(...) {
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
+    }
 }
 
 // Same as SimpleODCalculation, but with min_waiting_time higher than available
@@ -333,8 +370,14 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingMinWaitingTime)
         true
     );
 
-    TrRouting::RoutingResult result = calculateOd(testParameters);
-    assertNoRouting(result);
+    try {
+        calculateOd(testParameters);
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
+    } catch (TrRouting::NoRoutingFoundException const & e) {
+        assertNoRouting(e, TrRouting::NoRoutingFoundException::NoRoutingReason::NO_ROUTING_FOUND);
+    } catch(...) {
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
+    }
 }
 
 // Same as SimpleODCalculation, but with max_travel_time lower than should be
@@ -362,11 +405,17 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingTravelTime)
         true
     );
 
-    TrRouting::RoutingResult result = calculateOd(testParameters);
-    assertNoRouting(result);
+    try {
+        calculateOd(testParameters);
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
+    } catch (TrRouting::NoRoutingFoundException const & e) {
+        assertNoRouting(e, TrRouting::NoRoutingFoundException::NoRoutingReason::NO_ROUTING_FOUND);
+    } catch(...) {
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
+    }
 }
 
-TrRouting::RoutingResult SingleRouteCalculationFixtureTests::calculateOd(TrRouting::RouteParameters& parameters)
+std::unique_ptr<TrRouting::RoutingResultNew> SingleRouteCalculationFixtureTests::calculateOd(TrRouting::RouteParameters& parameters)
 {
     // TODO: This needs to be called to set some default values that are still part of the global parameters
     calculator.params.setDefaultValues();

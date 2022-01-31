@@ -23,7 +23,7 @@ protected:
 
 public:
     // Helper method to set parameters and calculate OD trip result. Test cases need only provide parameters and validate the result
-    TrRouting::RoutingResult calculateOd(TrRouting::RouteParameters& parameters);
+    std::unique_ptr<TrRouting::RoutingResultNew> calculateOd(TrRouting::RouteParameters& parameters);
     void SetUp();
 };
 

@@ -1,23 +1,70 @@
 #include "calculator.hpp"
 #include "constants.hpp"
+#include "routing_result.hpp"
 
 namespace TrRouting
 {
-
-  std::string Calculator::alternativesRouting(RouteParameters &parameters)
-  {
-
-    RoutingResult  routingResult;
-    std::string    response;
-    nlohmann::json json;
-    nlohmann::json alternativeJson;
-    
-    if (odTrip != nullptr) // if odTrip is provided
-    {
-      json["odTripUuid"] = boost::uuids::to_string(odTrip->uuid);
+  /**
+   * @brief Visitor class to get the line ids used by a step
+   * 
+   * TODO See TODO of LineIdxVisitor, when concrete classes are returned, the visitor approach for line id should be re...visited!
+   */
+  class LineIdxStepVisitor : public StepVisitor<int> {
+  private:
+    int lineIdx;
+    std::map<boost::uuids::uuid, int>& lineIndexesByUuid;
+  public:
+    LineIdxStepVisitor(std::map<boost::uuids::uuid, int>& _lineIndexesByUuid):
+      lineIdx(-1),
+      lineIndexesByUuid(_lineIndexesByUuid) {}
+    void visitBoardingStep(const BoardingStep& step) override {
+      lineIdx = lineIndexesByUuid[step.lineUuid];
     }
+    void visitUnboardingStep(const UnboardingStep& step) override {
+      lineIdx = -1;
+    }
+    void visitWalkingStep(const WalkingStep& step) override {
+      lineIdx = -1;
+    }
+    int getResult() override {
+      return lineIdx;
+    }
+  };
 
-    json["alternatives"] = nlohmann::json::array();
+  /** 
+   * @brief Visitor class to get the line ids used by a result object
+   * 
+   * TODO when allNodes and single calculation are split in the calculation method, we can use concrete 
+   * return types instead. When that is possible, consider adding a method in SingleCalculationResult 
+   * instead of this visitor.
+   * */
+  class LineIdxVisitor : public ResultVisitor<std::vector<int>> {
+  private:
+    std::vector<int> linesIdx;
+    LineIdxStepVisitor stepVisitor;
+  public:
+    LineIdxVisitor(std::map<boost::uuids::uuid, int>& _lineIndexesByUuid): stepVisitor(LineIdxStepVisitor(_lineIndexesByUuid)) {}
+    std::vector<int> getResult() override {
+      return linesIdx;
+    }
+    void visitSingleCalculationResult(const SingleCalculationResult& result) override {
+      for (auto const& step : result.steps) {
+        int stepLineIdx = step.get()->accept(stepVisitor);
+        if (stepLineIdx >= 0) {
+          linesIdx.push_back(stepLineIdx);
+        }
+      }
+    };
+    void visitAlternativesResult(const AlternativesResult& result) override {
+      // Nothing to do for this result
+    }
+    void visitAllNodesResult(const AllNodesResult& result) override {
+      // Nothing to do for this result
+    }
+  };
+
+  AlternativesResult Calculator::alternativesRouting(RouteParameters &parameters)
+  {
 
     std::vector<int>                 foundLinesIdx;
     std::vector<int>                 exceptLinesIdxFromParameters = *parameters.getExceptLinesIdx(); // make a copy of lines that are already disabled in parameters
@@ -36,7 +83,7 @@ namespace TrRouting
     int lastFoundedAtNum = 0;
     //int departureTimeSeconds = -1;
     std::vector<std::string> lineShortnames;
-    
+
     if (params.debugDisplay)
     {
       std::cout << "alternatives parameters:" << std::endl;
@@ -47,60 +94,31 @@ namespace TrRouting
       std::cout << "calculating fastest alternative..." << std::endl;
     }
 
-    routingResult = calculate(parameters);
+    std::unique_ptr<RoutingResultNew> result = calculate(parameters);
 
-
-
-    if (routingResult.status == STATUS_SUCCESS)
+    // Can technically be allNodes or SingleCalculation, so we check the type
+    if (result.get()->resType == result_type::SINGLE_CALCULATION)
     {
-      /*lineShortnames.clear();
-      for(auto lineIdx : routingResult.linesIdx)
-      {
-        lineShortnames.push_back(lines[lineIdx].get()->shortname);
-      }*/
-      
-      alternativeJson = routingResult.json;
-      /*alternativeJson["status"]                        = routingResult.status;
-      alternativeJson["travelTimeSeconds"]             = routingResult.travelTimeSeconds;
-      alternativeJson["minimizedTravelTimeSeconds"]    = routingResult.travelTimeSeconds - routingResult.firstWaitingTimeSeconds + params.minWaitingTimeSeconds;
-      alternativeJson["departureTimeSeconds"]          = routingResult.departureTimeSeconds;
-      alternativeJson["minimizedDepartureTimeSeconds"] = routingResult.minimizedDepartureTimeSeconds;
-      alternativeJson["arrivalTimeSeconds"]            = routingResult.arrivalTimeSeconds;
-      alternativeJson["numberOfTransfers"]             = routingResult.numberOfTransfers;
-      alternativeJson["inVehicleTravelTimeSeconds"]    = routingResult.inVehicleTravelTimeSeconds;
-      alternativeJson["transferTravelTimeSeconds"]     = routingResult.transferTravelTimeSeconds;
-      alternativeJson["waitingTimeSeconds"]            = routingResult.waitingTimeSeconds;
-      alternativeJson["accessTravelTimeSeconds"]       = routingResult.accessTravelTimeSeconds;
-      alternativeJson["egressTravelTimeSeconds"]       = routingResult.egressTravelTimeSeconds;
-      alternativeJson["transferWaitingTimeSeconds"]    = routingResult.transferWaitingTimeSeconds;
-      alternativeJson["firstWaitingTimeSeconds"]       = routingResult.firstWaitingTimeSeconds;
-      alternativeJson["nonTransitTravelTimeSeconds"]   = routingResult.nonTransitTravelTimeSeconds;
-      alternativeJson["inVehicleTravelTimesSeconds"]   = routingResult.inVehicleTravelTimesSeconds;
-      alternativeJson["lineUuids"]                     = routingResult.lineUuids;
-      alternativeJson["lineShortnames"]                = lineShortnames;
-      alternativeJson["modeShortnames"]                = routingResult.modeShortnames;
-      alternativeJson["agencyUuids"]                   = routingResult.agencyUuids;
-      alternativeJson["boardingNodeUuids"]             = routingResult.boardingNodeUuids;
-      alternativeJson["unboardingNodeUuids"]           = routingResult.unboardingNodeUuids;
-      alternativeJson["tripUuids"]                     = routingResult.tripUuids;*/
-      alternativeJson["alternativeSequence"]           = alternativeSequence;
-      alternativeJson["alternativeTotalSequence"]      = alternativesCalculatedCount + 1;
+      SingleCalculationResult& routingResult = dynamic_cast<SingleCalculationResult&>(*result.get());
+      AlternativesResult alternatives = AlternativesResult();
+
+      alternatives.alternatives.push_back(std::move(result));
 
       alternativeSequence++;
       alternativesCalculatedCount++;
 
-      json["alternatives"].push_back(alternativeJson);
-      json["status"] = STATUS_SUCCESS;
+      LineIdxVisitor visitor = LineIdxVisitor(lineIndexesByUuid);
+
       //departureTimeSeconds = routingResult.departureTimeSeconds + routingResult.firstWaitingTimeSeconds - params.minWaitingTimeSeconds;
-            
-      maxTravelTime = params.alternativesMaxTravelTimeRatio * routingResult.travelTimeSeconds + (routingResult.initialDepartureTimeSeconds ? routingResult.departureTimeSeconds - routingResult.initialDepartureTimeSeconds : 0);
+
+      maxTravelTime = params.alternativesMaxTravelTimeRatio * routingResult.totalTravelTime + (parameters.isForwardCalculation() ? routingResult.departureTime - parameters.getTimeOfTrip() : 0);
       if (maxTravelTime < params.minAlternativeMaxTravelTimeSeconds)
       {
         maxTravelTime = params.minAlternativeMaxTravelTimeSeconds;
       }
-      else if (maxTravelTime > routingResult.travelTimeSeconds + params.alternativesMaxAddedTravelTimeSeconds)
+      else if (maxTravelTime > routingResult.totalTravelTime + params.alternativesMaxAddedTravelTimeSeconds)
       {
-        maxTravelTime = routingResult.travelTimeSeconds + params.alternativesMaxAddedTravelTimeSeconds;
+        maxTravelTime = routingResult.totalTravelTime + params.alternativesMaxAddedTravelTimeSeconds;
       }
       // TODO: We should not create a whole new object just to update maxTravelTime. This parameter should be in the calculation specific parameters, which do not exist yet
       Point* origin = parameters.getOrigin();
@@ -119,14 +137,14 @@ namespace TrRouting
         parameters.isForwardCalculation());
 
       //params.departureTimeSeconds = departureTimeSeconds;
-      
+
       if (params.debugDisplay)
-        std::cout << "  fastestTravelTimeSeconds: " << routingResult.travelTimeSeconds << std::endl;
-      
-      foundLinesIdx = routingResult.linesIdx;
+        std::cout << "  fastestTravelTimeSeconds: " << routingResult.totalTravelTime << std::endl;
+
+      foundLinesIdx = routingResult.accept(visitor);
       std::stable_sort(foundLinesIdx.begin(),foundLinesIdx.end());
       alreadyFoundLinesIdx[foundLinesIdx]           = true;
-      foundLinesIdxTravelTimeSeconds[foundLinesIdx] = routingResult.travelTimeSeconds;
+      foundLinesIdxTravelTimeSeconds[foundLinesIdx] = routingResult.totalTravelTime;
       lastFoundedAtNum = 1;
 
       if (params.debugDisplay)
@@ -153,7 +171,7 @@ namespace TrRouting
           alreadyCalculatedCombinations[newCombination] = true;
         }
       }
-      
+
       std::vector<int> combination;
       for (int i = 0; i < allCombinations.size(); i++)
       {
@@ -183,119 +201,94 @@ namespace TrRouting
             }
             std::cout << std::endl;
           }
-          
 
-          
+
+
           //std::cout << std::endl;
 
 
 
-          routingResult = calculate(alternativeParameters, false, true);
+          try {
+            result = calculate(alternativeParameters, false, true);
 
-          if (routingResult.status == STATUS_SUCCESS)
-          {
-          
-            foundLinesIdx = routingResult.linesIdx;
-            std::stable_sort(foundLinesIdx.begin(), foundLinesIdx.end());
-            
-            if (foundLinesIdx.size() > 0 && alreadyFoundLinesIdx.count(foundLinesIdx) == 0)
+            if (result.get()->resType == result_type::SINGLE_CALCULATION)
             {
-              lineShortnames.clear();
-              for(auto lineIdx : routingResult.linesIdx)
-              {
-                lineShortnames.push_back(lines[lineIdx].get()->shortname);
-              }
-              
-              alternativeJson = routingResult.json;
-              /*alternativeJson["status"]                        = routingResult.status;
-              alternativeJson["travelTimeSeconds"]             = routingResult.travelTimeSeconds;
-              alternativeJson["minimizedTravelTimeSeconds"]    = routingResult.travelTimeSeconds - routingResult.firstWaitingTimeSeconds + params.minWaitingTimeSeconds;
-              alternativeJson["departureTimeSeconds"]          = routingResult.departureTimeSeconds;
-              alternativeJson["minimizedDepartureTimeSeconds"] = routingResult.minimizedDepartureTimeSeconds;
-              alternativeJson["arrivalTimeSeconds"]            = routingResult.arrivalTimeSeconds;
-              alternativeJson["numberOfTransfers"]             = routingResult.numberOfTransfers;
-              alternativeJson["inVehicleTravelTimeSeconds"]    = routingResult.inVehicleTravelTimeSeconds;
-              alternativeJson["transferTravelTimeSeconds"]     = routingResult.transferTravelTimeSeconds;
-              alternativeJson["waitingTimeSeconds"]            = routingResult.waitingTimeSeconds;
-              alternativeJson["accessTravelTimeSeconds"]       = routingResult.accessTravelTimeSeconds;
-              alternativeJson["egressTravelTimeSeconds"]       = routingResult.egressTravelTimeSeconds;
-              alternativeJson["transferWaitingTimeSeconds"]    = routingResult.transferWaitingTimeSeconds;
-              alternativeJson["firstWaitingTimeSeconds"]       = routingResult.firstWaitingTimeSeconds;
-              alternativeJson["nonTransitTravelTimeSeconds"]   = routingResult.nonTransitTravelTimeSeconds;
-              alternativeJson["inVehicleTravelTimesSeconds"]   = routingResult.inVehicleTravelTimesSeconds;
-              alternativeJson["lineUuids"]                     = routingResult.lineUuids;
-              alternativeJson["lineShortnames"]                = lineShortnames;
-              alternativeJson["modeShortnames"]                = routingResult.modeShortnames;
-              alternativeJson["agencyUuids"]                   = routingResult.agencyUuids;
-              alternativeJson["boardingNodeUuids"]             = routingResult.boardingNodeUuids;
-              alternativeJson["unboardingNodeUuids"]           = routingResult.unboardingNodeUuids;
-              alternativeJson["tripUuids"]                     = routingResult.tripUuids;*/
-              alternativeJson["alternativeSequence"]           = alternativeSequence;
-              alternativeJson["alternativeTotalSequence"]      = alternativesCalculatedCount;
-              json["alternatives"].push_back(alternativeJson);
+              SingleCalculationResult& alternativeCalcResult = dynamic_cast<SingleCalculationResult&>(*result.get());
+              LineIdxVisitor alternativeVisitor = LineIdxVisitor(lineIndexesByUuid);
+              foundLinesIdx = alternativeCalcResult.accept(alternativeVisitor);
+              std::stable_sort(foundLinesIdx.begin(), foundLinesIdx.end());
 
-              if (params.debugDisplay)
+              if (foundLinesIdx.size() > 0 && alreadyFoundLinesIdx.count(foundLinesIdx) == 0)
               {
-                std::cout << "travelTimeSeconds: " << routingResult.travelTimeSeconds << " line Uuids: ";
-                for (auto lineIdx : foundLinesIdx)
+                lineShortnames.clear();
+                for(auto lineIdx : foundLinesIdx)
                 {
-                  std::cout << lines[lineIdx].get()->shortname << " ";
+                  lineShortnames.push_back(lines[lineIdx].get()->shortname);
                 }
-                std::cout << std::endl;
-              }
-              
-              combinationsKs.clear();
-              
-              lastFoundedAtNum = alternativesCalculatedCount;
-              alreadyFoundLinesIdx[foundLinesIdx] = true;
-              foundLinesIdxTravelTimeSeconds[foundLinesIdx] = routingResult.travelTimeSeconds;
-              for (int i = 1; i <= foundLinesIdx.size(); i++) { combinationsKs.push_back(i); }
-              for (auto k : combinationsKs)
-              {
-                Combinations<int> combinations(foundLinesIdx, k);
-                //std::cout << "\nk = " << k << std::endl;
-                for (auto newCombination : combinations)
+
+                alternatives.alternatives.push_back(std::move(result));
+
+                if (params.debugDisplay)
                 {
-                  
-                  newCombination.insert( newCombination.end(), combination.begin(), combination.end() );
-                  std::stable_sort(newCombination.begin(), newCombination.end());
-                  if (alreadyCalculatedCombinations.count(newCombination) == 0)
+                  std::cout << "travelTimeSeconds: " << alternativeCalcResult.totalTravelTime << " line Uuids: ";
+                  for (auto lineIdx : foundLinesIdx)
                   {
-                    combinationMatchesWithAtLeastOneFailed = false;
-                    for (auto failedCombination : failedCombinations)
+                    std::cout << lines[lineIdx].get()->shortname << " ";
+                  }
+                  std::cout << std::endl;
+                }
+
+                combinationsKs.clear();
+
+                lastFoundedAtNum = alternativesCalculatedCount;
+                alreadyFoundLinesIdx[foundLinesIdx] = true;
+                foundLinesIdxTravelTimeSeconds[foundLinesIdx] = alternativeCalcResult.totalTravelTime;
+                for (int i = 1; i <= foundLinesIdx.size(); i++) { combinationsKs.push_back(i); }
+                for (auto k : combinationsKs)
+                {
+                  Combinations<int> combinations(foundLinesIdx, k);
+                  //std::cout << "\nk = " << k << std::endl;
+                  for (auto newCombination : combinations)
+                  {
+
+                    newCombination.insert( newCombination.end(), combination.begin(), combination.end() );
+                    std::stable_sort(newCombination.begin(), newCombination.end());
+                    if (alreadyCalculatedCombinations.count(newCombination) == 0)
                     {
-                      combinationMatchesWithFailed = true;
-                      for (int failedLineIdx : failedCombination)
+                      combinationMatchesWithAtLeastOneFailed = false;
+                      for (auto failedCombination : failedCombinations)
                       {
-                        if (std::find(newCombination.begin(), newCombination.end(), failedLineIdx) == newCombination.end())
+                        combinationMatchesWithFailed = true;
+                        for (int failedLineIdx : failedCombination)
                         {
-                          combinationMatchesWithFailed = false;
+                          if (std::find(newCombination.begin(), newCombination.end(), failedLineIdx) == newCombination.end())
+                          {
+                            combinationMatchesWithFailed = false;
+                            break;
+                          }
+                        }
+                        if (combinationMatchesWithFailed)
+                        {
+                          combinationMatchesWithAtLeastOneFailed = true;
                           break;
                         }
                       }
-                      if (combinationMatchesWithFailed)
+                      if (!combinationMatchesWithAtLeastOneFailed)
                       {
-                        combinationMatchesWithAtLeastOneFailed = true;
-                        break;
+                        allCombinations.push_back(newCombination);
                       }
+                      alreadyCalculatedCombinations[newCombination] = true;
                     }
-                    if (!combinationMatchesWithAtLeastOneFailed)
-                    {
-                      allCombinations.push_back(newCombination);
-                    }
-                    alreadyCalculatedCombinations[newCombination] = true;
                   }
                 }
+
+                combination.clear();
+
+                alternativeSequence++;
+
               }
-              
-              combination.clear();
-
-              alternativeSequence++;
-
             }
-          }
-          else // failed
-          {
+          } catch (NoRoutingFoundException& e) {
             //std::cout << "failed" << std::endl;
             failedCombinations.push_back(combination);
           }
@@ -340,23 +333,18 @@ namespace TrRouting
           i++;
           std::cout << std::endl;
         }
-        
+
         std::cout << "last alternative found at: " << lastFoundedAtNum << " on a total of " << maxAlternatives << " calculations" << std::endl;
-      
+
       }
-      
-    }
-    else
-    {
-      json["status"] = STATUS_NO_ROUTING_FOUND;
-    }
+      alternatives.totalAlternativesCalculated = alternativesCalculatedCount;
+      return alternatives;
 
-    response = json.dump(2);
-
-    return response;
+    }
+    throw NoRoutingFoundException(NoRoutingFoundException::NO_ROUTING_FOUND);
 
   }
 
-  
+
 
 }

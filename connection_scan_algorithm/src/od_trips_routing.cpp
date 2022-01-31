@@ -1,14 +1,141 @@
 #include "calculator.hpp"
+#include "toolbox.hpp"
+#include "constants.hpp"
 
 namespace TrRouting
 {
+  class StepToOdTripJsonVisitor: public StepVisitor<int> {
+  private:
+    std::vector<std::string> lineShortnames;
+    std::vector<std::string> agencyAcronyms;
+    std::vector<std::string> modeShortnames;
+    std::vector<boost::uuids::uuid> agencyUuids;
+    std::vector<boost::uuids::uuid> lineUuids;
+    std::vector<boost::uuids::uuid> boardingNodesUuids;
+    std::vector<boost::uuids::uuid> unboardingNodesUuids;
+  public:
+    int getResult() { return 1; }
+    std::vector<std::string> getLineShortnames() { return lineShortnames; }
+    std::vector<std::string> getAgencyAcronyms() { return agencyAcronyms; }
+    std::vector<std::string> getModeShortnames() { return modeShortnames; }
+    std::vector<boost::uuids::uuid> getAgencyUuids() { return agencyUuids; }
+    std::vector<boost::uuids::uuid> getLineUuids() { return lineUuids; }
+    std::vector<boost::uuids::uuid> getBoardingNodesUuids() { return boardingNodesUuids; }
+    std::vector<boost::uuids::uuid> getUnboardingNodesUuids() { return unboardingNodesUuids; }
+    void visitBoardingStep(const BoardingStep& step) override;
+    void visitUnboardingStep(const UnboardingStep& step) override;
+    void visitWalkingStep(const WalkingStep& step) override;
+  };
+
+  void StepToOdTripJsonVisitor::visitBoardingStep(const BoardingStep& step)
+  {
+    lineShortnames.push_back(step.lineShortname);
+    agencyAcronyms.push_back(step.agencyAcronym);
+    modeShortnames.push_back(step.mode);
+    agencyUuids.push_back(step.agencyUuid);
+    lineUuids.push_back(step.lineUuid);
+    boardingNodesUuids.push_back(step.nodeUuid);
+  }
+
+  void StepToOdTripJsonVisitor::visitUnboardingStep(const UnboardingStep& step)
+  {
+    unboardingNodesUuids.push_back(step.nodeUuid);
+  }
+
+  void StepToOdTripJsonVisitor::visitWalkingStep(const WalkingStep& step)
+  {
+    // Nothing to do for walking steps
+  }
+
+  class ResultToOdTripJsonVisitor: public ResultVisitor<nlohmann::json> {
+  private:
+    nlohmann::json response;
+    // TODO Instead of returning total travel time and legs, this visitor should do what needs to be done
+    std::vector<std::tuple<int, int, int, int, int>> legs;
+    int totalTravelTime;
+    RouteParameters& params;
+  public:
+    ResultToOdTripJsonVisitor(RouteParameters& _params): params(_params) {
+      // Nothing to initialize
+    }
+    nlohmann::json getResult() { return response; }
+    std::vector<std::tuple<int, int, int, int, int>> getLegs() { return legs; }
+    int getTotalTravelTime() { return totalTravelTime; }
+    void visitSingleCalculationResult(const SingleCalculationResult& result) override;
+    void visitAlternativesResult(const AlternativesResult& result) override;
+    void visitAllNodesResult(const AllNodesResult& result) override;
+  };
+
+  void ResultToOdTripJsonVisitor::visitSingleCalculationResult(const SingleCalculationResult& result)
+  {
+    nlohmann::json odTripJson;
+    odTripJson["status"]                        = STATUS_SUCCESS;
+    odTripJson["originLat"]                     = params.getOrigin()->latitude;
+    odTripJson["originLon"]                     = params.getOrigin()->longitude;
+    odTripJson["destinationLat"]                = params.getDestination()->latitude;
+    odTripJson["destinationLon"]                = params.getDestination()->longitude;
+    odTripJson["travelTimeSeconds"]             = result.totalTravelTime;
+    odTripJson["initialLostTimeAtDepartureSeconds"] = result.departureTime - params.getTimeOfTrip();
+    odTripJson["departureTimeSeconds"]          = result.departureTime;
+    odTripJson["arrivalTimeSeconds"]            = result.arrivalTime;
+    odTripJson["numberOfTransfers"]             = result.numberOfTransfers;
+    odTripJson["inVehicleTravelTimeSeconds"]    = result.totalInVehicleTime;
+    odTripJson["transferTravelTimeSeconds"]     = result.transferWalkingTime;
+    odTripJson["waitingTimeSeconds"]            = result.totalWaitingTime;
+    odTripJson["accessTravelTimeSeconds"]       = result.accessTravelTime;
+    odTripJson["egressTravelTimeSeconds"]       = result.egressTravelTime;
+    odTripJson["transferWaitingTimeSeconds"]    = result.transferWaitingTime;
+    odTripJson["firstWaitingTimeSeconds"]       = result.firstWaitingTime;
+    odTripJson["nonTransitTravelTimeSeconds"]   = result.totalNonTransitTravelTime;
+
+    // convert the steps
+    StepToOdTripJsonVisitor stepVisitor = StepToOdTripJsonVisitor();
+    for (auto &step : result.steps) {
+      step.get()->accept(stepVisitor);
+    }
+    odTripJson["linesShortnames"]               = stepVisitor.getLineShortnames();
+    odTripJson["agenciesAcronyms"]              = stepVisitor.getAgencyAcronyms();
+    odTripJson["modesShortnames"]               = stepVisitor.getModeShortnames();
+    odTripJson["agencyUuids"]                   = Toolbox::uuidsToStrings(stepVisitor.getAgencyUuids());
+    odTripJson["lineUuids"]                     = Toolbox::uuidsToStrings(stepVisitor.getLineUuids());
+    odTripJson["boardingNodeUuids"]             = Toolbox::uuidsToStrings(stepVisitor.getBoardingNodesUuids());
+    odTripJson["unboardingNodeUuids"]           = Toolbox::uuidsToStrings(stepVisitor.getUnboardingNodesUuids());
+    response = odTripJson;
+    legs = result.legs;
+    totalTravelTime = result.totalTravelTime;
+  }
+
+  void ResultToOdTripJsonVisitor::visitAlternativesResult(const AlternativesResult& result)
+  {
+    nlohmann::json json;
+    // This type of result should not be visited here
+    response = json;
+  }
+
+  void ResultToOdTripJsonVisitor::visitAllNodesResult(const AllNodesResult& result)
+  {
+    nlohmann::json json;
+    // This type of result should not be visited here
+    response = json;
+  }
+
+  nlohmann::json noRoutingFoundResultToJson(RouteParameters& params)
+  {
+    nlohmann::json json;
+    json["status"]                     = STATUS_NO_ROUTING_FOUND;
+    json["origin"]                     = { params.getOrigin()->latitude, params.getOrigin()->longitude };
+    json["destination"]                = { params.getDestination()->latitude, params.getDestination()->longitude };
+    json["departureTime"]              = Toolbox::convertSecondsToFormattedTime(params.getTimeOfTrip());
+    json["departureTimeSeconds"]       = params.getTimeOfTrip();
+    return json;
+  }
 
   std::string Calculator::odTripsRouting(RouteParameters &parameters)
   {
     if (params.debugDisplay)
       std::cout << "  preparing odTripsRouting" << std::endl;
 
-    RoutingResult  routingResult;
+    std::unique_ptr<RoutingResultNew>  routingResult;
     nlohmann::json json;
     nlohmann::json odTripJson;
     nlohmann::json lineProfilesJson;
@@ -157,104 +284,71 @@ namespace TrRouting
           parameters.getMaxFirstWaitingTimeSeconds(),
           parameters.isWithAlternatives(),
           parameters.isForwardCalculation());
-        routingResult = calculate(odTripParameters, true, resetFilters); // reset filters only on first calculation
-        resetFilters  = false;
-        countOdTripsCalculated++;
 
         float correctedExpansionFactor = odTrip->expansionFactor / params.odTripsSampleRatio;
-        atLeastOneOdTrip = true;
-        if (routingResult.legs.size() > 0)
-        {
-          totalTravelTimeSeconds += correctedExpansionFactor * routingResult.travelTimeSeconds;
-          for (auto & leg : routingResult.legs)
-          {
-            legTripIdx            = std::get<0>(leg);
-            legLineIdx            = std::get<1>(leg);
-            legPathIdx            = std::get<2>(leg);
-            legPath               = paths[legPathIdx].get();
-            legConnectionStartIdx = std::get<3>(leg);
-            legConnectionEndIdx   = std::get<4>(leg);
-            lineProfiles[lines[legLineIdx].get()->uuid] += correctedExpansionFactor;
 
-            if (pathProfiles.find(legPath->uuid) == pathProfiles.end())
+        try {
+          routingResult = calculate(odTripParameters, true, resetFilters); // reset filters only on first calculation
+          resetFilters  = false;
+          countOdTripsCalculated++;
+          ResultToOdTripJsonVisitor visitor = ResultToOdTripJsonVisitor(odTripParameters);
+          odTripJson = routingResult.get()->accept(visitor);
+          
+          atLeastOneOdTrip = true;
+          if (visitor.getLegs().size() > 0)
+          {
+            totalTravelTimeSeconds += correctedExpansionFactor * visitor.getTotalTravelTime();
+            for (auto & leg : visitor.getLegs())
             {
-              pathProfiles[legPath->uuid] = std::vector<std::vector<float>>(legPath->nodesIdx.size() - 1, demandByHourOfDay);
-              pathTotalProfiles[legPath->uuid] = std::vector<float>(legPath->nodesIdx.size() - 1, 0.0);
-            }
-            for (int connectionIndex = legConnectionStartIdx; connectionIndex <= legConnectionEndIdx; connectionIndex++)
-            {
-              connectionDepartureTimeSeconds = *tripConnectionDepartureTimes[legTripIdx][connectionIndex];
-              *tripConnectionDemands[legTripIdx][connectionIndex] += correctedExpansionFactor;
-              connectionDepartureTimeHour    = connectionDepartureTimeSeconds / 3600;
-              //std::cout << "pUuid:" << legPath->uuid << " dth:" << connectionDepartureTimeHour << " cI:" << connectionIndex << " oldD:" << pathProfiles[legPath.uuid][connectionIndex][connectionDepartureTimeHour] << std::endl;
-              pathProfiles[legPath->uuid][connectionIndex][connectionDepartureTimeHour] += correctedExpansionFactor;
-              pathTotalProfiles[legPath->uuid][connectionIndex] += correctedExpansionFactor;
-              if (maximumSegmentHourlyDemand < pathProfiles[legPath->uuid][connectionIndex][connectionDepartureTimeHour])
+              legTripIdx            = std::get<0>(leg);
+              legLineIdx            = std::get<1>(leg);
+              legPathIdx            = std::get<2>(leg);
+              legPath               = paths[legPathIdx].get();
+              legConnectionStartIdx = std::get<3>(leg);
+              legConnectionEndIdx   = std::get<4>(leg);
+              lineProfiles[lines[legLineIdx].get()->uuid] += correctedExpansionFactor;
+
+              if (pathProfiles.find(legPath->uuid) == pathProfiles.end())
               {
-                maximumSegmentHourlyDemand = pathProfiles[legPath->uuid][connectionIndex][connectionDepartureTimeHour];
+                pathProfiles[legPath->uuid] = std::vector<std::vector<float>>(legPath->nodesIdx.size() - 1, demandByHourOfDay);
+                pathTotalProfiles[legPath->uuid] = std::vector<float>(legPath->nodesIdx.size() - 1, 0.0);
               }
-              if (maximumSegmentTotalDemand < pathTotalProfiles[legPath->uuid][connectionIndex])
+              for (int connectionIndex = legConnectionStartIdx; connectionIndex <= legConnectionEndIdx; connectionIndex++)
               {
-                maximumSegmentTotalDemand = pathTotalProfiles[legPath->uuid][connectionIndex];
+                connectionDepartureTimeSeconds = *tripConnectionDepartureTimes[legTripIdx][connectionIndex];
+                *tripConnectionDemands[legTripIdx][connectionIndex] += correctedExpansionFactor;
+                connectionDepartureTimeHour    = connectionDepartureTimeSeconds / 3600;
+                //std::cout << "pUuid:" << legPath->uuid << " dth:" << connectionDepartureTimeHour << " cI:" << connectionIndex << " oldD:" << pathProfiles[legPath.uuid][connectionIndex][connectionDepartureTimeHour] << std::endl;
+                pathProfiles[legPath->uuid][connectionIndex][connectionDepartureTimeHour] += correctedExpansionFactor;
+                pathTotalProfiles[legPath->uuid][connectionIndex] += correctedExpansionFactor;
+                if (maximumSegmentHourlyDemand < pathProfiles[legPath->uuid][connectionIndex][connectionDepartureTimeHour])
+                {
+                  maximumSegmentHourlyDemand = pathProfiles[legPath->uuid][connectionIndex][connectionDepartureTimeHour];
+                }
+                if (maximumSegmentTotalDemand < pathTotalProfiles[legPath->uuid][connectionIndex])
+                {
+                  maximumSegmentTotalDemand = pathTotalProfiles[legPath->uuid][connectionIndex];
+                }
               }
             }
           }
+
+        } catch (NoRoutingFoundException& e) {
+          odTripJson = noRoutingFoundResultToJson(odTripParameters);
         }
 
-        std::vector<std::string> lineShortnames;
-        //std::vector<std::string> lineLongnames;
-        std::vector<std::string> agencyAcronyms;
-        for (auto & lineIdx : routingResult.linesIdx)
-        {
-          lineShortnames.push_back(lines[lineIdx].get()->shortname);
-          //lineLongnames.push_back(lines[lineIdx].get()->longname);
-          agencyAcronyms.push_back(agencies[lines[lineIdx].get()->agencyIdx].get()->acronym);
-        }
-
-
-        odTripJson = {};
-        odTripJson["uuid"]                          = boost::uuids::to_string(odTrip->uuid);
-        odTripJson["status"]                        = routingResult.status;
-        /*odTripJson["ageGroup"]                    = persons[odTrip->personIdx].ageGroup; // this fails (segmentation fault)...
-        odTripJson["gender"]                        = persons[odTrip->personIdx].gender;
-        odTripJson["occupation"]                    = persons[odTrip->personIdx].occupation;*/
-        odTripJson["originLat"]                     = odTrip->origin->latitude;
-        odTripJson["originLon"]                     = odTrip->origin->longitude;
-        odTripJson["destinationLat"]                = odTrip->destination->latitude;
-        odTripJson["destinationLon"]                = odTrip->destination->longitude;
+        // Add additional fields to response
+        odTripJson["uuid"] = boost::uuids::to_string(odTrip->uuid);
         odTripJson["internalId"]                    = odTrip->internalId;
         odTripJson["originActivity"]                = odTrip->originActivity;
         odTripJson["destinationActivity"]           = odTrip->destinationActivity;
         odTripJson["declaredMode"]                  = odTrip->mode;
         odTripJson["expansionFactor"]               = correctedExpansionFactor;
-        odTripJson["travelTimeSeconds"]             = routingResult.travelTimeSeconds;
-        odTripJson["initialLostTimeAtDepartureSeconds"] = routingResult.initialLostTimeAtDepartureSeconds;
         odTripJson["onlyWalkingTravelTimeSeconds"]  = odTrip->walkingTravelTimeSeconds;
         odTripJson["onlyCyclingTravelTimeSeconds"]  = odTrip->cyclingTravelTimeSeconds;
         odTripJson["onlyDrivingTravelTimeSeconds"]  = odTrip->drivingTravelTimeSeconds;
         odTripJson["declaredDepartureTimeSeconds"]  = odTrip->departureTimeSeconds;
         odTripJson["declaredArrivalTimeSeconds"]    = odTrip->arrivalTimeSeconds;
-        odTripJson["departureTimeSeconds"]          = routingResult.departureTimeSeconds;
-        odTripJson["arrivalTimeSeconds"]            = routingResult.arrivalTimeSeconds;
-        odTripJson["numberOfTransfers"]             = routingResult.numberOfTransfers;
-        odTripJson["inVehicleTravelTimeSeconds"]    = routingResult.inVehicleTravelTimeSeconds;
-        odTripJson["transferTravelTimeSeconds"]     = routingResult.transferTravelTimeSeconds;
-        odTripJson["waitingTimeSeconds"]            = routingResult.waitingTimeSeconds;
-        odTripJson["accessTravelTimeSeconds"]       = routingResult.accessTravelTimeSeconds;
-        odTripJson["egressTravelTimeSeconds"]       = routingResult.egressTravelTimeSeconds;
-        odTripJson["transferWaitingTimeSeconds"]    = routingResult.transferWaitingTimeSeconds;
-        odTripJson["firstWaitingTimeSeconds"]       = routingResult.firstWaitingTimeSeconds;
-        odTripJson["nonTransitTravelTimeSeconds"]   = routingResult.nonTransitTravelTimeSeconds;
-
-        odTripJson["linesShortnames"]               = lineShortnames;
-        //odTripJson["linesLongname"]                 = lineLongnames;
-        odTripJson["agenciesAcronyms"]              = agencyAcronyms;
-        odTripJson["modesShortnames"]               = routingResult.modeShortnames;
-        odTripJson["agencyUuids"]                   = Toolbox::uuidsToStrings(routingResult.agencyUuids);
-        odTripJson["lineUuids"]                     = Toolbox::uuidsToStrings(routingResult.lineUuids);
-        odTripJson["boardingNodeUuids"]             = Toolbox::uuidsToStrings(routingResult.boardingNodeUuids);
-        odTripJson["unboardingNodeUuids"]           = Toolbox::uuidsToStrings(routingResult.unboardingNodeUuids);
-        //odTripJson["tripUuids"]                     = Toolbox::uuidsToStrings(routingResult.tripUuids);
         json["odTrips"].push_back(odTripJson);
       }
 
