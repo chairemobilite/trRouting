@@ -5,7 +5,7 @@
 namespace TrRouting
 {
 
-  RoutingResult Calculator::reverseJourneyStep(int bestDepartureTime, int bestAccessNodeIndex, int bestAccessTravelTime, int bestAccessDistance)
+  RoutingResult Calculator::reverseJourneyStep(RouteParameters &parameters, int bestDepartureTime, int bestAccessNodeIndex, int bestAccessTravelTime, int bestAccessDistance)
   {
   
     RoutingResult    result;
@@ -200,7 +200,7 @@ namespace TrRouting
 
             if (journey.size() > i + 1 && std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journey[i+1]) != -1)
             {
-              transferReadyTime += (std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journey[i+1])].get()) >= 0 ? std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journey[i+1])].get()) : params.minWaitingTimeSeconds);
+              transferReadyTime += (std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journey[i+1])].get()) >= 0 ? std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journey[i+1])].get()) : parameters.getMinWaitingTimeSeconds());
             }
 
             totalInVehicleTime         += inVehicleTime;
@@ -362,7 +362,7 @@ namespace TrRouting
 
               if (journey.size() > i + 1 && std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journey[i+1]) != -1)
               {
-                transferReadyTime += (std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journey[i+1])].get()) >= 0 ? std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journey[i+1])].get()) : params.minWaitingTimeSeconds);
+                transferReadyTime += (std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journey[i+1])].get()) >= 0 ? std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journey[i+1])].get()) : parameters.getMinWaitingTimeSeconds());
               }
 
               totalWalkingTime    += transferTime;
@@ -419,7 +419,7 @@ namespace TrRouting
           if (std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(reverseAccessJourneysSteps[resultingNodeIndex]) != -1)
           {
             departureTime = std::get<connectionIndexes::TIME_DEP>(*reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(reverseAccessJourneysSteps[resultingNodeIndex])].get()) - std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(reverseAccessJourneysSteps[resultingNodeIndex])].get());
-            if (arrivalTimeSeconds - departureTime <= params.maxTotalTravelTimeSeconds)
+            if (arrivalTimeSeconds - departureTime <=  parameters.getMaxTotalTravelTimeSeconds())
             {
               reachableNodesCount++;
               json["status"]                     = STATUS_SUCCESS;
@@ -470,8 +470,8 @@ namespace TrRouting
             }
 
             json["status"]                                         = STATUS_SUCCESS;
-            json["origin"]                                         = { origin->longitude,      origin->latitude      };
-            json["destination"]                                    = { destination->longitude, destination->latitude };
+            json["origin"]                                         = { parameters.getOrigin()->longitude,      parameters.getOrigin()->latitude      };
+            json["destination"]                                    = { parameters.getDestination()->longitude, parameters.getDestination()->latitude };
             json["departureTime"]                                  = Toolbox::convertSecondsToFormattedTime(bestDepartureTime);
             json["departureTimeSeconds"]                           = bestDepartureTime;
             if (initialDepartureTimeSeconds != -1)
@@ -552,8 +552,8 @@ namespace TrRouting
     else // no route found
     {
       json["status"]                     = STATUS_NO_ROUTING_FOUND;
-      json["origin"]                     = { origin->longitude,      origin->latitude      };
-      json["destination"]                = { destination->longitude, destination->latitude };
+      json["origin"]                     = { parameters.getOrigin()->longitude,      parameters.getOrigin()->latitude      };
+      json["destination"]                = { parameters.getDestination()->longitude, parameters.getDestination()->latitude };
       json["arrivalTime"]                = Toolbox::convertSecondsToFormattedTime(arrivalTimeSeconds);
       json["arrivalTimeSeconds"]         = arrivalTimeSeconds;
       result.status                      = STATUS_NO_ROUTING_FOUND;

@@ -6,7 +6,6 @@
 #include "calculator.hpp"
 #include "csa_test_base.hpp"
 #include "csa_v1_simple_calculation_test.hpp"
-#include "constants.hpp"
 
 // TODO:
 // Test transferable mode, it has separate code path
@@ -249,40 +248,6 @@ TEST_F(RouteCalculationFixtureTests, NoRoutingTravelTime)
     assertNoRouting(result);
 }
 
-void RouteCalculationFixtureTests::assertNoRouting(TrRouting::RoutingResult result)
-{
-    ASSERT_EQ(STATUS_NO_ROUTING_FOUND, result.status);
-}
-
-void RouteCalculationFixtureTests::assertSuccessResults(TrRouting::RoutingResult result,
-    int origDepartureTime,
-    int expTransitDepartureTime,
-    int expInVehicleTravelTime,
-    int expAccessTime,
-    int expEgressTime,
-    int expNbTransfers,
-    int minWaitingTime,
-    int expTotalWaitingTime,
-    int expTransferWaitingTime,
-    int expTransferTravelTime)
-{
-    ASSERT_EQ(STATUS_SUCCESS, result.status);
-    ASSERT_EQ(expInVehicleTravelTime + expAccessTime + expEgressTime + expTotalWaitingTime + expTransferTravelTime, result.travelTimeSeconds);
-    ASSERT_EQ(expTransitDepartureTime + expInVehicleTravelTime + expEgressTime + (expTotalWaitingTime - minWaitingTime) + expTransferTravelTime, result.arrivalTimeSeconds);
-    ASSERT_EQ(expTransitDepartureTime - expAccessTime - minWaitingTime, result.departureTimeSeconds);
-    ASSERT_EQ(origDepartureTime, result.initialDepartureTimeSeconds);
-    ASSERT_EQ(origDepartureTime == -1 ? -1 : expTransitDepartureTime - expAccessTime - minWaitingTime - origDepartureTime, result.initialLostTimeAtDepartureSeconds);
-    ASSERT_EQ(expNbTransfers, result.numberOfTransfers);
-    ASSERT_EQ(expInVehicleTravelTime, result.inVehicleTravelTimeSeconds);
-    ASSERT_EQ(expTransferTravelTime, result.transferTravelTimeSeconds);
-    ASSERT_EQ(expTotalWaitingTime, result.waitingTimeSeconds);
-    ASSERT_EQ(expAccessTime, result.accessTravelTimeSeconds);
-    ASSERT_EQ(expEgressTime, result.egressTravelTimeSeconds);
-    ASSERT_EQ(expTransferWaitingTime, result.transferWaitingTimeSeconds);
-    ASSERT_EQ(minWaitingTime, result.firstWaitingTimeSeconds);
-    ASSERT_EQ(expAccessTime + expEgressTime + expTransferTravelTime, result.nonTransitTravelTimeSeconds);
-}
-
 std::vector<std::string> RouteCalculationFixtureTests::initializeParameters()
 {
     std::vector<std::string> parametersWithValues;
@@ -294,10 +259,13 @@ std::vector<std::string> RouteCalculationFixtureTests::initializeParameters()
 TrRouting::RoutingResult RouteCalculationFixtureTests::calculateOd(std::vector<std::string> parameters)
 {
     calculator.params.setDefaultValues();
-    calculator.params.update(parameters,
+    TrRouting::RouteParameters routeParams = calculator.params.update(parameters,
         calculator.scenarioIndexesByUuid,
         calculator.scenarios,
+        calculator.odTripIndexesByUuid,
+        calculator.odTrips,
         calculator.nodeIndexesByUuid,
+        calculator.nodes,
         calculator.dataSourceIndexesByUuid);
     calculator.params.birdDistanceAccessibilityEnabled = true;
 
@@ -305,8 +273,5 @@ TrRouting::RoutingResult RouteCalculationFixtureTests::calculateOd(std::vector<s
     calculator.algorithmCalculationTime.start();
     calculator.benchmarking.clear();
 
-    // TODO shouldn't have to do this...
-    calculator.origin = &calculator.params.origin;
-    calculator.destination = &calculator.params.destination;
-    return calculator.calculate();
+    return calculator.calculate(routeParams);
 }

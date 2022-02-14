@@ -47,9 +47,9 @@ namespace TrRouting
     return networks.size();
   }
 
-  RoutingResult Calculator::calculate(bool resetAccessPaths, bool resetFilters) {
-    
-    reset(resetAccessPaths, resetFilters);
+  RoutingResult Calculator::calculate(RouteParameters &parameters, bool resetAccessPaths, bool resetFilters) {
+
+    reset(parameters, resetAccessPaths, resetFilters);
 
     RoutingResult result;
     
@@ -67,13 +67,13 @@ namespace TrRouting
     int bestAccessTravelTime {-1};
     int bestAccessDistance {-1};
     int bestDepartureTime {-1};
-    
-    if (departureTimeSeconds > -1 && params.forwardCalculation == true)
+
+    if (departureTimeSeconds > -1 && parameters.isForwardCalculation())
     {
       
       initialDepartureTimeSeconds = departureTimeSeconds; // set initial departure time so we can find the latest possible departure time with reverse calculation later and still know the initial waiting time
-      
-      std::tie(bestArrivalTime, bestEgressNodeIndex, bestEgressTravelTime, bestEgressDistance) = forwardCalculation();
+
+      std::tie(bestArrivalTime, bestEgressNodeIndex, bestEgressTravelTime, bestEgressDistance) = forwardCalculation(parameters);
 
       if (params.debugDisplay)
         std::cerr << "-- forward calculation -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
@@ -81,7 +81,7 @@ namespace TrRouting
       
       if (params.returnAllNodesResult)
       {
-        result = forwardJourneyStep(bestArrivalTime, bestEgressNodeIndex, bestEgressTravelTime, bestEgressDistance);
+        result = forwardJourneyStep(parameters, bestArrivalTime, bestEgressNodeIndex, bestEgressTravelTime, bestEgressDistance);
         if (params.debugDisplay)
           std::cerr << "-- forward journey -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
         calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
@@ -100,13 +100,13 @@ namespace TrRouting
           {
             nodesReverseTentativeTime[std::get<0>(egressFootpath)] = arrivalTimeSeconds - std::get<1>(egressFootpath);
           }
-          
-          std::tie(bestDepartureTime, bestAccessNodeIndex, bestAccessTravelTime, bestAccessDistance) = reverseCalculation();
+
+          std::tie(bestDepartureTime, bestAccessNodeIndex, bestAccessTravelTime, bestAccessDistance) = reverseCalculation(parameters);
           if (params.debugDisplay)
             std::cerr << "-- reverse calculation -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
           calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
-          
-          result = reverseJourneyStep(bestDepartureTime, bestAccessNodeIndex, bestAccessTravelTime, bestAccessDistance);
+
+          result = reverseJourneyStep(parameters, bestDepartureTime, bestAccessNodeIndex, bestAccessTravelTime, bestAccessDistance);
           if (params.debugDisplay)
             std::cerr << "-- reverse journey -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
           calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
@@ -114,8 +114,8 @@ namespace TrRouting
         }
         else
         {
-          
-          result = forwardJourneyStep(bestArrivalTime, bestEgressNodeIndex, bestEgressTravelTime, bestEgressDistance);
+
+          result = forwardJourneyStep(parameters, bestArrivalTime, bestEgressNodeIndex, bestEgressTravelTime, bestEgressDistance);
           if (params.debugDisplay)
             std::cerr << "-- forward journey -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
           calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
@@ -131,13 +131,13 @@ namespace TrRouting
       std::fill(tripsUsable.begin(), tripsUsable.end(), 1);
       //tripsUsable = std::vector<std::unique_ptr<int>>(trips.size(), std::make_unique<int>(1));
       //std::fill(tripsUsable.begin(), tripsUsable.end(), std::make_unique<int>(1)); // we need to make all trips usable when not coming from forward result because reverse calculation, by default, checks for usableTrips == 1
-      
-      std::tie(bestDepartureTime, bestAccessNodeIndex, bestAccessTravelTime, bestAccessDistance) = reverseCalculation();
+
+      std::tie(bestDepartureTime, bestAccessNodeIndex, bestAccessTravelTime, bestAccessDistance) = reverseCalculation(parameters);
       if (params.debugDisplay)
         std::cerr << "-- reverse calculation -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
       calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
 
-      result = reverseJourneyStep(bestDepartureTime, bestAccessNodeIndex, bestAccessTravelTime, bestAccessDistance);
+      result = reverseJourneyStep(parameters, bestDepartureTime, bestAccessNodeIndex, bestAccessTravelTime, bestAccessDistance);
       if (params.debugDisplay)
         std::cerr << "-- reverse journey -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
       calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();

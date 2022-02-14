@@ -109,14 +109,14 @@ namespace TrRouting
      * status is READY will queries be served on this data
      */
     DataStatus              prepare();
-    void                    reset(bool resetAccessPaths = true, bool resetFilters = true);
-    RoutingResult           calculate(bool resetAccessPaths = true, bool resetFilters = true);
-    std::tuple<int,int,int,int> forwardCalculation(); // best arrival time,   best egress node index, best egress travel time: MAX_INT,-1,-1 if non routable, too long or all nodes result
-    std::tuple<int,int,int,int> reverseCalculation(); // best departure time, best access node index, best access travel time: -1,-1,-1 if non routable, too long or all nodes result
-    RoutingResult           forwardJourneyStep(int bestArrivalTime, int bestEgressNodeIndex, int bestEgressTravelTime, int bestEgressDistance);
-    RoutingResult           reverseJourneyStep(int bestDepartureTime, int bestAccessNodeIndex, int bestAccessTravelTime, int bestAccessDistance);
-    std::string             alternativesRouting();
-    std::string             odTripsRouting();
+    void                    reset(RouteParameters &parameters, bool resetAccessPaths = true, bool resetFilters = true);
+    RoutingResult           calculate(RouteParameters &parameters, bool resetAccessPaths = true, bool resetFilters = true);
+    std::tuple<int,int,int,int> forwardCalculation(RouteParameters &parameters); // best arrival time,   best egress node index, best egress travel time: MAX_INT,-1,-1 if non routable, too long or all nodes result
+    std::tuple<int,int,int,int> reverseCalculation(RouteParameters &parameters); // best departure time, best access node index, best access travel time: -1,-1,-1 if non routable, too long or all nodes result
+    RoutingResult           forwardJourneyStep(RouteParameters &parameters, int bestArrivalTime, int bestEgressNodeIndex, int bestEgressTravelTime, int bestEgressDistance);
+    RoutingResult           reverseJourneyStep(RouteParameters &parameters, int bestDepartureTime, int bestAccessNodeIndex, int bestAccessTravelTime, int bestAccessDistance);
+    std::string             alternativesRouting(RouteParameters &parameters);
+    std::string             odTripsRouting(RouteParameters &parameters);
     
     std::vector<int>        optimizeJourney(std::deque<std::tuple<int,int,int,int,int,short,int>> &journey);
 
@@ -225,8 +225,6 @@ namespace TrRouting
     Parameters& params;
     CalculationTime algorithmCalculationTime;
     
-    Point  * origin;
-    Point  * destination;
     OdTrip * odTrip;
 
   private:

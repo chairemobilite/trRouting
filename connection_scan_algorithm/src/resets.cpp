@@ -2,8 +2,8 @@
 
 namespace TrRouting
 {
-  
-  void Calculator::reset(bool resetAccessPaths, bool resetFilters)
+
+  void Calculator::reset(RouteParameters &parameters, bool resetAccessPaths, bool resetFilters)
   {
     
     using JourneyTuple = std::tuple<int,int,int,int,int,short,int>;
@@ -46,13 +46,13 @@ namespace TrRouting
     {
       departureTimeSeconds = odTrip->departureTimeSeconds;
     }
-    else if (params.departureTimeSeconds >= 0)
+    else if (parameters.isForwardCalculation())
     {
-      departureTimeSeconds = params.departureTimeSeconds;
+      departureTimeSeconds = parameters.getTimeOfTrip();
     }
-    if (params.arrivalTimeSeconds >= 0)
+    if (!parameters.isForwardCalculation())
     {
-      arrivalTimeSeconds = params.arrivalTimeSeconds;
+      arrivalTimeSeconds = parameters.getTimeOfTrip();
     }
 
     if (params.debugDisplay)
@@ -109,8 +109,7 @@ namespace TrRouting
           if (params.debugDisplay)
             std::cout << "  fetching nodes with osrm with mode " << params.accessMode << std::endl;
 
-          if (params.hasOrigin)
-            accessFootpaths = std::move(OsrmFetcher::getAccessibleNodesFootpathsFromPoint(params.origin, nodes, params.accessMode, params, params.maxAccessWalkingTravelTimeSeconds, params.walkingSpeedMetersPerSecond));
+          accessFootpaths = std::move(OsrmFetcher::getAccessibleNodesFootpathsFromPoint(*parameters.getOrigin(), nodes, params.accessMode, params, parameters.getMaxAccessWalkingTravelTimeSeconds(), params.walkingSpeedMetersPerSecond));
         }
       }
 
@@ -177,8 +176,7 @@ namespace TrRouting
         }
         else
         {
-          if (params.hasDestination)
-            egressFootpaths = std::move(OsrmFetcher::getAccessibleNodesFootpathsFromPoint(params.destination, nodes, params.accessMode, params, params.maxEgressWalkingTravelTimeSeconds, params.walkingSpeedMetersPerSecond));
+          egressFootpaths = std::move(OsrmFetcher::getAccessibleNodesFootpathsFromPoint(*parameters.getDestination(), nodes, params.accessMode, params, parameters.getMaxEgressWalkingTravelTimeSeconds(), params.walkingSpeedMetersPerSecond));
         }
       }
       
@@ -233,85 +231,87 @@ namespace TrRouting
           std::generate(tripConnectionDemand.begin(), tripConnectionDemand.end(), []() { return std::make_unique<float>(0.0); });
         }
       }
-      
+
       int i {0};
       for (auto & trip : trips)
       {
-        if (tripsEnabled[i] == 1 && params.onlyServicesIdx.size() > 0)
+        if (tripsEnabled[i] == 1 && parameters.getOnlyServicesIdx()->size() > 0)
         {
-          if (std::find(params.onlyServicesIdx.begin(), params.onlyServicesIdx.end(), trip->serviceIdx) == params.onlyServicesIdx.end())
+          if (std::find(parameters.getOnlyServicesIdx()->begin(), parameters.getOnlyServicesIdx()->end(), trip->serviceIdx) == parameters.getOnlyServicesIdx()->end())
           {
             tripsEnabled[i] = -1;
           }
         }
 
-        if (tripsEnabled[i] == 1 && params.onlyLinesIdx.size() > 0)
+        if (tripsEnabled[i] == 1 && parameters.getOnlyLinesIdx()->size() > 0)
         {
-          if (std::find(params.onlyLinesIdx.begin(), params.onlyLinesIdx.end(), trip->lineIdx) == params.onlyLinesIdx.end())
+          if (std::find(parameters.getOnlyLinesIdx()->begin(), parameters.getOnlyLinesIdx()->end(), trip->lineIdx) == parameters.getOnlyLinesIdx()->end())
           {
             tripsEnabled[i] = -1;
           }
         }
 
-        if (tripsEnabled[i] == 1 && params.onlyModesIdx.size() > 0)
+        if (tripsEnabled[i] == 1 && parameters.getOnlyModesIdx()->size() > 0)
         {
-          if (std::find(params.onlyModesIdx.begin(), params.onlyModesIdx.end(), trip->modeIdx) == params.onlyModesIdx.end())
+          if (std::find(parameters.getOnlyModesIdx()->begin(), parameters.getOnlyModesIdx()->end(), trip->modeIdx) == parameters.getOnlyModesIdx()->end())
           {
             tripsEnabled[i] = -1;
           }
         }
 
-        if (tripsEnabled[i] == 1 && params.onlyNodesIdx.size() > 0)
+        if (tripsEnabled[i] == 1 && parameters.getOnlyNodesIdx()->size() > 0)
         {
-          if (std::find(params.onlyNodesIdx.begin(), params.onlyNodesIdx.end(), trip->modeIdx) == params.onlyNodesIdx.end())
+          // FIXME: This is not right, it should look for a node, not the mode
+          if (std::find(parameters.getOnlyNodesIdx()->begin(), parameters.getOnlyNodesIdx()->end(), trip->modeIdx) == parameters.getOnlyNodesIdx()->end())
           {
             tripsEnabled[i] = -1;
           }
         }
 
-        if (tripsEnabled[i] == 1 && params.onlyAgenciesIdx.size() > 0)
+        if (tripsEnabled[i] == 1 && parameters.getOnlyAgenciesIdx()->size() > 0)
         {
-          if (std::find(params.onlyAgenciesIdx.begin(), params.onlyAgenciesIdx.end(), trip->agencyIdx) == params.onlyAgenciesIdx.end())
+          if (std::find(parameters.getOnlyAgenciesIdx()->begin(), parameters.getOnlyAgenciesIdx()->end(), trip->agencyIdx) == parameters.getOnlyAgenciesIdx()->end())
           {
             tripsEnabled[i] = -1;
           }
         }
 
-        if (tripsEnabled[i] == 1 && params.exceptServicesIdx.size() > 0)
+        if (tripsEnabled[i] == 1 && parameters.getExceptServicesIdx()->size() > 0)
         {
-          if (std::find(params.exceptServicesIdx.begin(), params.exceptServicesIdx.end(), trip->serviceIdx) != params.exceptServicesIdx.end())
+          if (std::find(parameters.getExceptServicesIdx()->begin(), parameters.getExceptServicesIdx()->end(), trip->serviceIdx) != parameters.getExceptServicesIdx()->end())
           {
             tripsEnabled[i] = -1;
           }
         }
 
-        if (tripsEnabled[i] == 1 && params.exceptLinesIdx.size() > 0)
+        if (tripsEnabled[i] == 1 && parameters.getExceptLinesIdx()->size() > 0)
         {
-          if (std::find(params.exceptLinesIdx.begin(), params.exceptLinesIdx.end(), trip->lineIdx) != params.exceptLinesIdx.end())
+          if (std::find(parameters.getExceptLinesIdx()->begin(), parameters.getExceptLinesIdx()->end(), trip->lineIdx) != parameters.getExceptLinesIdx()->end())
           {
             tripsEnabled[i] = -1;
           }
         }
 
-        if (tripsEnabled[i] == 1 && params.exceptNodesIdx.size() > 0)
+        if (tripsEnabled[i] == 1 && parameters.getExceptNodesIdx()->size() > 0)
         {
-          if (std::find(params.exceptNodesIdx.begin(), params.exceptNodesIdx.end(), trip->modeIdx) != params.exceptNodesIdx.end())
+          // FIXME: This is not right, it should look for a node, not the mode
+          if (std::find(parameters.getExceptNodesIdx()->begin(), parameters.getExceptNodesIdx()->end(), trip->modeIdx) != parameters.getExceptNodesIdx()->end())
           {
             tripsEnabled[i] = -1;
           }
         }
 
-        if (tripsEnabled[i] == 1 && params.exceptModesIdx.size() > 0)
+        if (tripsEnabled[i] == 1 && parameters.getExceptModesIdx()->size() > 0)
         {
-          if (std::find(params.exceptModesIdx.begin(), params.exceptModesIdx.end(), trip->modeIdx) != params.exceptModesIdx.end())
+          if (std::find(parameters.getExceptModesIdx()->begin(), parameters.getExceptModesIdx()->end(), trip->modeIdx) != parameters.getExceptModesIdx()->end())
           {
             tripsEnabled[i] = -1;
           }
         }
 
-        if (tripsEnabled[i] == 1 && params.exceptAgenciesIdx.size() > 0)
+        if (tripsEnabled[i] == 1 && parameters.getExceptAgenciesIdx()->size() > 0)
         {
-          if (std::find(params.exceptAgenciesIdx.begin(), params.exceptAgenciesIdx.end(), trip->agencyIdx) != params.exceptAgenciesIdx.end())
+          if (std::find(parameters.getExceptAgenciesIdx()->begin(), parameters.getExceptAgenciesIdx()->end(), trip->agencyIdx) != parameters.getExceptAgenciesIdx()->end())
           {
             tripsEnabled[i] = -1;
           }
