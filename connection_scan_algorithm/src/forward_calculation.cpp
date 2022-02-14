@@ -3,7 +3,7 @@
 namespace TrRouting
 {
     
-  std::tuple<int,int,int,int> Calculator::forwardCalculation()
+  std::tuple<int,int,int,int> Calculator::forwardCalculation(RouteParameters &parameters)
   {
 
     int benchmarkingStart  = algorithmCalculationTime.getEpoch();
@@ -55,7 +55,7 @@ namespace TrRouting
         if (tripsEnabled[tripIndex] != -1)
         {
           connectionDepartureTime         = std::get<connectionIndexes::TIME_DEP>(**connection);
-          connectionMinWaitingTimeSeconds = std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(**connection) >= 0 ? std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(**connection) : params.minWaitingTimeSeconds;
+          connectionMinWaitingTimeSeconds = std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(**connection) >= 0 ? std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(**connection) : parameters.getMinWaitingTimeSeconds();
 
           // no need to parse next connections if already reached destination from all egress nodes:
           // yes, we mean connectionDepartureTime and not connectionArrivalTime because travel time for each connections, otherwise you can catch a very short/long connection
@@ -64,7 +64,7 @@ namespace TrRouting
               && maxEgressTravelTime >= 0
               && tentativeEgressNodeArrivalTime < MAX_INT
               && connectionDepartureTime /* ! not connectionArrivalTime */ > tentativeEgressNodeArrivalTime + maxEgressTravelTime
-            ) || (connectionDepartureTime - departureTimeSeconds > params.maxTotalTravelTimeSeconds))
+            ) || (connectionDepartureTime - departureTimeSeconds > parameters.getMaxTotalTravelTimeSeconds()))
           {
             break;
           }
@@ -72,7 +72,7 @@ namespace TrRouting
           tripEnterConnectionIndex   = tripsEnterConnection[tripIndex]; // -1 if trip has not yet been used
           nodeDepartureIndex         = std::get<connectionIndexes::NODE_DEP>(**connection);
           nodeDepartureTentativeTime = nodesTentativeTime[nodeDepartureIndex];
-          nodeWasAccessedFromOrigin  = params.maxFirstWaitingTimeSeconds > 0 && nodesAccessTravelTime[nodeDepartureIndex] >= 0 && std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(forwardJourneysSteps[nodeDepartureIndex]) == -1;
+          nodeWasAccessedFromOrigin  = parameters.getMaxFirstWaitingTimeSeconds() > 0 && nodesAccessTravelTime[nodeDepartureIndex] >= 0 && std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(forwardJourneysSteps[nodeDepartureIndex]) == -1;
 
           // reachable connections only here:
           if (
@@ -85,7 +85,7 @@ namespace TrRouting
             (
               !nodeWasAccessedFromOrigin
               ||
-              connectionDepartureTime - nodeDepartureTentativeTime <= params.maxFirstWaitingTimeSeconds
+              connectionDepartureTime - nodeDepartureTentativeTime <= parameters.getMaxFirstWaitingTimeSeconds()
             )
           )
           {
@@ -141,7 +141,7 @@ namespace TrRouting
   
                 footpathTravelTime = params.walkingSpeedFactor == 1.0 ? nodes[nodeArrivalIndex].get()->transferableTravelTimesSeconds[footpathIndex] : (int)ceil((float)nodes[nodeArrivalIndex].get()->transferableTravelTimesSeconds[footpathIndex] / params.walkingSpeedFactor);
 
-                if (footpathTravelTime <= params.maxTransferWalkingTravelTimeSeconds)
+                if (footpathTravelTime <= parameters.getMaxTransferWalkingTravelTimeSeconds())
                 {
                   if (footpathTravelTime + connectionArrivalTime < nodesTentativeTime[transferableNodeIndex])
                   {
@@ -194,7 +194,7 @@ namespace TrRouting
           egressDistance        = nodesEgressDistance[std::get<0>(egressFootpath)];
           egressNodeArrivalTime = std::get<connectionIndexes::TIME_ARR>(*forwardConnections[egressExitConnection]) + egressTravelTime;
           //std::cerr << nodes[std::get<0>(egressFootpath)].get()->name << ": " << egressTravelTime << " - " << Toolbox::convertSecondsToFormattedTime(egressNodeArrivalTime) << std::endl;
-          if (egressNodeArrivalTime >= 0 && egressNodeArrivalTime - departureTimeSeconds <= params.maxTotalTravelTimeSeconds && egressNodeArrivalTime < bestArrivalTime && egressNodeArrivalTime < MAX_INT)
+          if (egressNodeArrivalTime >= 0 && egressNodeArrivalTime - departureTimeSeconds <= parameters.getMaxTotalTravelTimeSeconds() && egressNodeArrivalTime < bestArrivalTime && egressNodeArrivalTime < MAX_INT)
           {
             bestArrivalTime      = egressNodeArrivalTime;
             bestEgressNodeIndex  = std::get<0>(egressFootpath);

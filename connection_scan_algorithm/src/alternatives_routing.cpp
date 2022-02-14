@@ -3,8 +3,8 @@
 
 namespace TrRouting
 {
-    
-  std::string Calculator::alternativesRouting()
+
+  std::string Calculator::alternativesRouting(RouteParameters &parameters)
   {
 
     RoutingResult  routingResult;
@@ -20,7 +20,7 @@ namespace TrRouting
     json["alternatives"] = nlohmann::json::array();
 
     std::vector<int>                 foundLinesIdx;
-    std::vector<int>                 exceptLinesIdxFromParameters = params.exceptLinesIdx; // make a copy of lines that are already disabled in parameters
+    std::vector<int>                 exceptLinesIdxFromParameters = *parameters.getExceptLinesIdx(); // make a copy of lines that are already disabled in parameters
     std::vector< std::vector<int> >  allCombinations;
     std::vector< std::vector<int> >  failedCombinations;
     bool                             combinationMatchesWithFailed {false};
@@ -40,15 +40,14 @@ namespace TrRouting
     if (params.debugDisplay)
     {
       std::cout << "alternatives parameters:" << std::endl;
-      std::cout << "  maxTotalTravelTimeSeconds: " << params.maxTotalTravelTimeSeconds << std::endl;
+      std::cout << "  maxTotalTravelTimeSeconds: " << parameters.getMaxTotalTravelTimeSeconds() << std::endl;
       std::cout << "  minAlternativeMaxTravelTimeSeconds: " << params.minAlternativeMaxTravelTimeSeconds << std::endl;
       std::cout << "  alternativesMaxAddedTravelTimeSeconds: " << params.alternativesMaxAddedTravelTimeSeconds << std::endl;
       std::cout << "  alternativesMaxTravelTimeRatio: " << params.alternativesMaxTravelTimeRatio << std::endl;
-      std::cout << "  maxTotalTravelTimeSeconds: " << params.maxTotalTravelTimeSeconds << std::endl;
       std::cout << "calculating fastest alternative..." << std::endl;
     }
-    
-    routingResult = calculate();
+
+    routingResult = calculate(parameters);
 
 
 
@@ -97,17 +96,28 @@ namespace TrRouting
       maxTravelTime = params.alternativesMaxTravelTimeRatio * routingResult.travelTimeSeconds + (routingResult.initialDepartureTimeSeconds ? routingResult.departureTimeSeconds - routingResult.initialDepartureTimeSeconds : 0);
       if (maxTravelTime < params.minAlternativeMaxTravelTimeSeconds)
       {
-        params.maxTotalTravelTimeSeconds = params.minAlternativeMaxTravelTimeSeconds;
+        maxTravelTime = params.minAlternativeMaxTravelTimeSeconds;
       }
       else if (maxTravelTime > routingResult.travelTimeSeconds + params.alternativesMaxAddedTravelTimeSeconds)
       {
-        params.maxTotalTravelTimeSeconds = routingResult.travelTimeSeconds + params.alternativesMaxAddedTravelTimeSeconds;
+        maxTravelTime = routingResult.travelTimeSeconds + params.alternativesMaxAddedTravelTimeSeconds;
       }
-      else
-      {
-        params.maxTotalTravelTimeSeconds = maxTravelTime;
-      }
-      
+      // TODO: We should not create a whole new object just to update maxTravelTime. This parameter should be in the calculation specific parameters, which do not exist yet
+      Point* origin = parameters.getOrigin();
+      Point* dest = parameters.getDestination();
+      RouteParameters alternativeParameters = RouteParameters(std::make_unique<Point>(origin->latitude, origin->longitude),
+        std::make_unique<Point>(dest->latitude, dest->longitude),
+        parameters.getScenario(),
+        parameters.getTimeOfTrip(),
+        parameters.getMinWaitingTimeSeconds(),
+        maxTravelTime,
+        parameters.getMaxAccessWalkingTravelTimeSeconds(),
+        parameters.getMaxEgressWalkingTravelTimeSeconds(),
+        parameters.getMaxTransferWalkingTravelTimeSeconds(),
+        parameters.getMaxFirstWaitingTimeSeconds(),
+        parameters.isWithAlternatives(),
+        parameters.isForwardCalculation());
+
       //params.departureTimeSeconds = departureTimeSeconds;
       
       if (params.debugDisplay)
@@ -151,10 +161,11 @@ namespace TrRouting
         {
 
           combination = allCombinations.at(i);
-          params.exceptLinesIdx = exceptLinesIdxFromParameters; // reset except lines using parameters
+          // TODO: The exception should be part of the calculation specific parameters, which do not exist yet
+          alternativeParameters.exceptLinesIdx = exceptLinesIdxFromParameters; // reset except lines using parameters
           for (auto lineIdx : combination)
           {
-            params.exceptLinesIdx.push_back(lineIdx);
+            alternativeParameters.exceptLinesIdx.push_back(lineIdx);
           }
 
           //if (params.debugDisplay)
@@ -179,8 +190,8 @@ namespace TrRouting
 
 
 
-          routingResult = calculate(false, true);
-          
+          routingResult = calculate(alternativeParameters, false, true);
+
           if (routingResult.status == STATUS_SUCCESS)
           {
           

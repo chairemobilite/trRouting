@@ -2,8 +2,8 @@
 
 namespace TrRouting
 {
-    
-  std::string Calculator::odTripsRouting()
+
+  std::string Calculator::odTripsRouting(RouteParameters &parameters)
   {
     if (params.debugDisplay)
       std::cout << "  preparing odTripsRouting" << std::endl;
@@ -116,7 +116,7 @@ namespace TrRouting
       atLeastOneCompatiblePeriod = false;
       
       // verify that od trip matches selected attributes:
-      if ( (params.odTripsAgeGroups.size()   > 0 && std::find(params.odTripsAgeGroups.begin(),   params.odTripsAgeGroups.end(),   persons[odTrip->personIdx]->ageGroup)   == params.odTripsAgeGroups.end()) 
+      if ( (params.odTripsAgeGroups.size()   > 0 && std::find(params.odTripsAgeGroups.begin(),   params.odTripsAgeGroups.end(),   persons[odTrip->personIdx]->ageGroup)   == params.odTripsAgeGroups.end())
         || (params.odTripsGenders.size()     > 0 && std::find(params.odTripsGenders.begin(),     params.odTripsGenders.end(),     persons[odTrip->personIdx]->gender)     == params.odTripsGenders.end())
         || (params.odTripsOccupations.size() > 0 && std::find(params.odTripsOccupations.begin(), params.odTripsOccupations.end(), persons[odTrip->personIdx]->occupation) == params.odTripsOccupations.end())
         || (params.odTripsActivities.size()  > 0 && std::find(params.odTripsActivities.begin(),  params.odTripsActivities.end(),  odTrip->destinationActivity)            == params.odTripsActivities.end())
@@ -159,9 +159,19 @@ namespace TrRouting
             std::cout << (i+1) << "/" << odTripsCount << std::endl;
           }
         }
-        origin        = odTrip->origin.get();
-        destination   = odTrip->destination.get();
-        routingResult = calculate(true, resetFilters); // reset filters only on first calculation
+        RouteParameters odTripParameters = RouteParameters(std::make_unique<Point>(odTrip->origin.get()->latitude, odTrip->origin.get()->longitude),
+          std::make_unique<Point>(odTrip->destination.get()->latitude, odTrip->destination.get()->longitude),
+          parameters.getScenario(),
+          parameters.getTimeOfTrip(),
+          parameters.getMinWaitingTimeSeconds(),
+          parameters.getMaxTotalTravelTimeSeconds(),
+          parameters.getMaxAccessWalkingTravelTimeSeconds(),
+          parameters.getMaxEgressWalkingTravelTimeSeconds(),
+          parameters.getMaxTransferWalkingTravelTimeSeconds(),
+          parameters.getMaxFirstWaitingTimeSeconds(),
+          parameters.isWithAlternatives(),
+          parameters.isForwardCalculation());
+        routingResult = calculate(odTripParameters, true, resetFilters); // reset filters only on first calculation
         resetFilters  = false;
         countOdTripsCalculated++;
 

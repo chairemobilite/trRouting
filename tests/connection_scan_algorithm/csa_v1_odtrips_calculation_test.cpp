@@ -95,10 +95,13 @@ std::vector<std::string> RouteOdTripsFixtureTests::initializeParameters()
 nlohmann::json RouteOdTripsFixtureTests::calculateOdTrips(std::vector<std::string> parameters)
 {
     calculator.params.setDefaultValues();
-    calculator.params.update(parameters,
+    TrRouting::RouteParameters routeParams = calculator.params.update(parameters,
         calculator.scenarioIndexesByUuid,
         calculator.scenarios,
+        calculator.odTripIndexesByUuid,
+        calculator.odTrips,
         calculator.nodeIndexesByUuid,
+        calculator.nodes,
         calculator.dataSourceIndexesByUuid);
     calculator.params.birdDistanceAccessibilityEnabled = true;
 
@@ -106,10 +109,7 @@ nlohmann::json RouteOdTripsFixtureTests::calculateOdTrips(std::vector<std::strin
     calculator.algorithmCalculationTime.start();
     calculator.benchmarking.clear();
 
-    // TODO shouldn't have to do this...
-    calculator.origin = &calculator.params.origin;
-    calculator.destination = &calculator.params.destination;
-    std::string result =  calculator.odTripsRouting();
+    std::string result =  calculator.odTripsRouting(routeParams);
     nlohmann::json json;
     nlohmann::json jsonResult = json.parse(result);
     return jsonResult;

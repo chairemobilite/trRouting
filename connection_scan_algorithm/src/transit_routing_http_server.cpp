@@ -39,9 +39,9 @@ std::string consoleCyan       = "";
 std::string consoleMagenta    = "";
 std::string consoleResetColor = "";
 
-std::string intializeResponse(Calculator::DataStatus status) 
+std::string intializeResponse(Calculator::DataStatus status)
 {
-  switch(status) 
+  switch(status)
   {
     case Calculator::DataStatus::READY: return "";
     case Calculator::DataStatus::DATA_READ_ERROR: return "{\"status\": \"data_error\"}";
@@ -65,14 +65,14 @@ std::string intializeResponse(Calculator::DataStatus status)
 
 
 int main(int argc, char** argv) {
-  
+
   // Set params:
   ProgramOptions programOptions;
   programOptions.parseOptions(argc, argv);
   Parameters algorithmParams;
-  
+
   // setup program options:
-  
+
   // setup console colors:
   // (this will create a new terminal window, check if the terminal is color-capable and then it will close the terminal window with endwin()):
   initscr();
@@ -96,11 +96,11 @@ int main(int argc, char** argv) {
     consoleResetColor = "";
   }
   endwin();
-    
-  std::cout << "Starting transit routing on port " << consoleGreen << programOptions.port << consoleResetColor 
-            << " for the project: " << consoleGreen << programOptions.projectShortname << consoleResetColor 
+
+  std::cout << "Starting transit routing on port " << consoleGreen << programOptions.port << consoleResetColor
+            << " for the project: " << consoleGreen << programOptions.projectShortname << consoleResetColor
             << std::endl << std::endl;
-  
+
   algorithmParams.projectShortname       = programOptions.projectShortname;
   algorithmParams.cacheDirectoryPath     = programOptions.cachePath;
   algorithmParams.dataFetcherShortname   = programOptions.dataFetcherShortname;
@@ -118,15 +118,15 @@ int main(int argc, char** argv) {
   algorithmParams.csvFetcher   = &csvFetcher;
   CacheFetcher cacheFetcher    = CacheFetcher();
   algorithmParams.cacheFetcher = &cacheFetcher;
-  
+
   Calculator calculator(algorithmParams);
   std::cout << "preparing calculator..." << std::endl;
   Calculator::DataStatus dataStatus = calculator.prepare();
 
   int i = 0;
-  
+
   std::cout << "preparing server..." << std::endl;
-  
+
   //HTTP-server using 1 thread
   //Unless you do more heavy non-threaded processing in the resources,
   //1 thread is usually faster than several threads
@@ -136,7 +136,7 @@ int main(int argc, char** argv) {
 
 
   server.resource["^/saveCache[/]?$"]["POST"] = [&server, &calculator](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
-    
+
     std::string response {""};
 
 
@@ -163,7 +163,7 @@ int main(int argc, char** argv) {
 
   // updateCache:
   server.resource["^/updateCache[/]?$"]["GET"]=[&server, &calculator](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
-    
+
     std::string              response {""};
     std::vector<std::string> parametersWithValues;
     std::vector<std::string> parameterWithValueVector;
@@ -200,7 +200,7 @@ int main(int argc, char** argv) {
         continue;
       }
     }
-  
+
     int i {0};
     bool correctCacheName {false};
     for(std::string cacheName : cacheNames)
@@ -296,7 +296,7 @@ int main(int argc, char** argv) {
 
   // closeServer and exit app:
   server.resource["^/exit[/]?\\?([0-9a-zA-Z&=_,:/.-]+)$"]["GET"]=[&server, &calculator](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
-    
+
     std::string response {""};
     *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
 
@@ -311,11 +311,16 @@ int main(int argc, char** argv) {
 
   // routing request
   server.resource["^/route/v1/transit[/]?$"]["GET"]=[&server, &calculator, &dataStatus](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
-    
+
     std::string response = intializeResponse(dataStatus);
 
-    if (response.empty())
+    if (!response.empty())
     {
+      *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/" << calculator.params.responseFormat << "; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
+      return;
+    }
+
+    try {
       // prepare benchmarking and timer:
       calculator.algorithmCalculationTime.start();
       calculator.benchmarking.clear();
@@ -342,70 +347,60 @@ int main(int argc, char** argv) {
       std::cout << "calculating request: " << request->path << std::endl;
 
       int countOdTripsCalculated {0};
-      
+
 
       // update params:
       calculator.params.setDefaultValues();
-      calculator.params.update(parametersWithValues,
+      RouteParameters routeParams = calculator.params.update(parametersWithValues,
         calculator.scenarioIndexesByUuid,
         calculator.scenarios,
+        calculator.odTripIndexesByUuid,
+        calculator.odTrips,
         calculator.nodeIndexesByUuid,
+        calculator.nodes,
         calculator.dataSourceIndexesByUuid);
 
-      if (calculator.params.isCompleteForCalculation())
+      // find OdTrip if provided:
+      bool   foundOdTrip{false};
+
+      calculator.odTrip      = nullptr;
+
+      if (calculator.params.odTripUuid.has_value() && calculator.odTripIndexesByUuid.count(calculator.params.odTripUuid.value()))
       {
-
-        // find OdTrip if provided:
-        bool   foundOdTrip{false};
-
-        calculator.origin      = &calculator.params.origin;
-        calculator.destination = &calculator.params.destination;
-        calculator.odTrip      = nullptr;
-
-        if (calculator.params.odTripUuid.has_value() && calculator.odTripIndexesByUuid.count(calculator.params.odTripUuid.value()))
+        calculator.odTrip = calculator.odTrips[calculator.odTripIndexesByUuid[calculator.params.odTripUuid.value()]].get();
+        foundOdTrip = true;
+        std::cout << "od trip uuid " << calculator.odTrip->uuid << std::endl;
+        std::cout << "dts " << calculator.odTrip->departureTimeSeconds << std::endl;
+        if (routeParams.isWithAlternatives())
         {
-          calculator.odTrip = calculator.odTrips[calculator.odTripIndexesByUuid[calculator.params.odTripUuid.value()]].get();
-          foundOdTrip = true;
-          std::cout << "od trip uuid " << calculator.odTrip->uuid << std::endl;
-          std::cout << "dts " << calculator.odTrip->departureTimeSeconds << std::endl;
-          calculator.origin      = calculator.odTrip->origin.get();
-          calculator.destination = calculator.odTrip->destination.get();
-          if (calculator.params.alternatives)
-          {
-            response = calculator.alternativesRouting();
-          }
-          else
-          {
-            response = calculator.calculate().json.dump(2);
-          }
-        }
-        else if (calculator.params.alternatives)
-        {
-          response = calculator.alternativesRouting();
-        }
-        else if (!calculator.params.alternatives && (calculator.params.calculateAllOdTrips || foundOdTrip ))
-        {
-          response = calculator.odTripsRouting();
+          response = calculator.alternativesRouting(routeParams);
         }
         else
         {
-          response = calculator.calculate().json.dump(2);
+          response = calculator.calculate(routeParams).json.dump(2);
         }
-
-        if (calculator.params.saveResultToFile)
-        {
-          std::cerr << "writing file" << std::endl;
-          std::ofstream file;
-          //file.imbue(std::locale("en_US.UTF8"));
-          file.open(calculator.params.calculationName + "." + calculator.params.responseFormat, std::ios_base::trunc);
-          file << response;
-          file.close();
-        }
-
+      }
+      else if (routeParams.isWithAlternatives())
+      {
+        response = calculator.alternativesRouting(routeParams);
+      }
+      else if (!routeParams.isWithAlternatives() && (calculator.params.calculateAllOdTrips || foundOdTrip ))
+      {
+        response = calculator.odTripsRouting(routeParams);
       }
       else
       {
-        response = "{\"status\": \"error\", \"error\": \"Wrong or malformed query\"}";
+        response = calculator.calculate(routeParams).json.dump(2);
+      }
+
+      if (calculator.params.saveResultToFile)
+      {
+        std::cerr << "writing file" << std::endl;
+        std::ofstream file;
+        //file.imbue(std::locale("en_US.UTF8"));
+        file.open(calculator.params.calculationName + "." + calculator.params.responseFormat, std::ios_base::trunc);
+        file << response;
+        file.close();
       }
 
       std::cerr << "-- total -- " << calculator.algorithmCalculationTime.getDurationMicrosecondsNoStop() << " microseconds\n";
@@ -426,17 +421,20 @@ int main(int argc, char** argv) {
           std::cerr << "  -- number of od trips calculated -- " << countOdTripsCalculated << "\n";
         }
       }
+
+    }
+    catch (...)
+    {
+      response = "{\"status\": \"error\", \"error\": \"Wrong or malformed query\"}";
     }
 
     *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/" << calculator.params.responseFormat << "; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
-    
-  };
-  
 
+  };
 
   server.default_resource["GET"] = [](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
     std::cout << "calculating request: " << request->content.string() << std::endl;
-    
+
     std::string response = "{\"status\": \"error\", \"error\": \"missing params\"}";
 
     *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
@@ -454,11 +452,11 @@ int main(int argc, char** argv) {
 
   // Wait for server to start so that the client can connect:
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
-  
+
   std::cout << "ready." << std::endl;
-  
+
   server_thread.join();
-    
+
   return 0;
 }
 

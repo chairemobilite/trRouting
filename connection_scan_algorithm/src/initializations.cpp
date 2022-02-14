@@ -7,8 +7,6 @@ namespace TrRouting
     projectShortname(""),
     params(theParams),
     odTrip(nullptr),
-    origin(nullptr),
-    destination(nullptr),
     algorithmCalculationTime(CalculationTime()),
     departureTimeSeconds(0),
     initialDepartureTimeSeconds(0),

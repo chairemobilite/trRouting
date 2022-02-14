@@ -129,51 +129,26 @@ public:
     delete calculator;
   }
 
-  bool updateCalculatorParams(Calculator &calculator, std::vector<std::string> &parametersWithValues)
+  void benchmarkCurrentParams(TrRouting::RouteParameters &routeParams, bool expectResult, int nbIter)
   {
-    calculator.params.setDefaultValues();
-    calculator.params.update(parametersWithValues,
-      calculator.scenarioIndexesByUuid,
-      calculator.scenarios,
-      calculator.nodeIndexesByUuid,
-      calculator.dataSourceIndexesByUuid);
-    calculator.params.birdDistanceAccessibilityEnabled = true;
+    // TODO Shouldn't have to do this, a query is not a benchmark
+    algorithmParams.setDefaultValues();
+    calculator->algorithmCalculationTime.start();
+    calculator->benchmarking.clear();
 
-    if (calculator.params.isCompleteForCalculation())
-    {
-      calculator.origin = &calculator.params.origin;
-      calculator.destination = &calculator.params.destination;
-      calculator.odTrip = nullptr;
-
-      return true;
-    }
-    return false;
-  }
-
-  void benchmarkCurrentParams(std::vector<std::string> &parametersWithValues, bool expectResult, int nbIter)
-  {
-    if (calculator == nullptr) {
-      throw "Calculator is null";
-    }
     double results[nbIter];
     for (int i = 0; i < nbIter; i++)
     {
-      if (!updateCalculatorParams(*calculator, parametersWithValues))
-      {
-        ASSERT_EQ(true, false);
-      }
 
-      calculator->algorithmCalculationTime.start();
-      calculator->benchmarking.clear();
       auto start = std::chrono::high_resolution_clock::now();
 
-      if (algorithmParams.alternatives) {
-        std::string result = calculator->alternativesRouting();
+      if (routeParams.isWithAlternatives()) {
+        std::string result = calculator->alternativesRouting(routeParams);
         nlohmann::json json;
         nlohmann::json jsonResult = json.parse(result);
         ASSERT_EQ(expectResult ? STATUS_SUCCESS : STATUS_NO_ROUTING_FOUND, jsonResult["status"]);
       } else {
-        TrRouting::RoutingResult result = calculator->calculate();
+        TrRouting::RoutingResult result = calculator->calculate(routeParams);
         ASSERT_EQ(expectResult ? STATUS_SUCCESS : STATUS_NO_ROUTING_FOUND, result.status);
       }
       auto end = std::chrono::high_resolution_clock::now();
@@ -191,28 +166,28 @@ public:
 
   void benchmarkCurrentData(std::string testType, BenchmarkDataTuple paramTuple, bool alternatives, bool forward, int nbIter)
   {
-    std::vector<std::string> parametersWithValues;
-    std::pair<std::string, std::string> queryFields[] = {
-        std::make_pair("destination", std::to_string(std::get<parameterIndexes::LAT_DEST>(paramTuple)) + "," + std::to_string(std::get<parameterIndexes::LON_DEST>(paramTuple))),
-        std::make_pair("alternatives", alternatives ? "1" : "0"),
-        std::make_pair("scenario_uuid", "ed42d920-0349-4f64-8590-4698056c2734"),
-        std::make_pair("origin", std::to_string(std::get<parameterIndexes::LAT_ORIG>(paramTuple)) + "," + std::to_string(std::get<parameterIndexes::LON_ORIG>(paramTuple))),
-        std::make_pair("max_transfer_travel_time_seconds", "600"),
-        std::make_pair("max_egress_travel_time_seconds", "900"),
-        std::make_pair("max_access_travel_time_seconds", "900"),
-        std::make_pair(forward ? "departure_time_seconds" : "arrival_time_seconds", std::to_string(std::get<parameterIndexes::TIME>(paramTuple))),
-        std::make_pair("min_waiting_time_seconds", "180")};
+    Scenario* scenario = calculator->scenarios[calculator->scenarioIndexesByUuid[scenarioUuid]].get();
 
-    for (auto &field : queryFields)
-    {
-      parametersWithValues.push_back(field.first + "=" + field.second);
-    }
+    TrRouting::RouteParameters routeParams = TrRouting::RouteParameters(
+      std::make_unique<TrRouting::Point>(std::get<parameterIndexes::LAT_ORIG>(paramTuple), std::get<parameterIndexes::LON_ORIG>(paramTuple)),
+      std::make_unique<TrRouting::Point>(std::get<parameterIndexes::LAT_DEST>(paramTuple), std::get<parameterIndexes::LON_DEST>(paramTuple)),
+      *scenario,
+      std::get<parameterIndexes::TIME>(paramTuple),
+      3 * 60,
+      180 * 60,
+      20 * 60,
+      20 * 60,
+      20 * 60,
+      15 * 60,
+      alternatives,
+      forward
+    );
 
     try
     {
       // One line in the detailed results per calculation type
       benchmarkDetailedResultsFile << std::get<parameterIndexes::TEST_DESCRIPTION>(paramTuple) << "," << testType;
-      benchmarkCurrentParams(parametersWithValues, std::get<parameterIndexes::EXPECT_RESULTS>(paramTuple), nbIter);
+      benchmarkCurrentParams(routeParams, std::get<parameterIndexes::EXPECT_RESULTS>(paramTuple), nbIter);
       benchmarkDetailedResultsFile << std::endl;
       ASSERT_EQ(true, true);
     }

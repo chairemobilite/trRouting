@@ -21,6 +21,7 @@
 #include "toolbox.hpp"
 #include "od_trip.hpp"
 #include "scenario.hpp"
+#include "node.hpp"
 
 namespace TrRouting
 {
@@ -82,7 +83,9 @@ namespace TrRouting
       std::vector<int> onlyServicesIdx;
       std::vector<int> exceptServicesIdx;
       std::vector<int> onlyLinesIdx;
-      std::vector<int> exceptLinesIdx;
+      // FIXME: Temporarily moved to public until calculation specific parameters exist. This is used directly by alternatives routing.
+      // see https://github.com/chairemobilite/trRouting/issues/95
+      // std::vector<int> exceptLinesIdx;
       std::vector<int> onlyModesIdx;
       std::vector<int> exceptModesIdx;
       std::vector<int> onlyAgenciesIdx;
@@ -133,6 +136,20 @@ namespace TrRouting
         std::map<boost::uuids::uuid, int> &scenarioIndexesByUuid,
         std::vector<std::unique_ptr<Scenario>> &scenarios
       );
+      std::vector<int>* getOnlyServicesIdx() { return &onlyServicesIdx; }
+      std::vector<int>* getExceptServicesIdx() { return &exceptServicesIdx; }
+      std::vector<int>* getOnlyLinesIdx() { return &onlyLinesIdx; }
+      std::vector<int>* getExceptLinesIdx() { return &exceptLinesIdx; }
+      std::vector<int>* getOnlyModesIdx() { return &onlyModesIdx; }
+      std::vector<int>* getExceptModesIdx() { return &exceptModesIdx; }
+      std::vector<int>* getOnlyAgenciesIdx() { return &onlyAgenciesIdx; }
+      std::vector<int>* getExceptAgenciesIdx() { return &exceptAgenciesIdx; }
+      std::vector<int>* getOnlyNodesIdx() { return &onlyNodesIdx; }
+      std::vector<int>* getExceptNodesIdx() { return &exceptNodesIdx; }
+
+      // FIXME: Temporarily moved to public until calculation specific parameters exist. This is used directly by alternatives routing.
+      // see https://github.com/chairemobilite/trRouting/issues/95
+      std::vector<int> exceptLinesIdx;
   };
 
   class Parameters {
@@ -158,16 +175,6 @@ namespace TrRouting
       int routingDateMonth;  // not implemented, use onlyServicesIdx or exceptServicesIdx for now
       int routingDateDay;    // not implemented, use onlyServicesIdx or exceptServicesIdx for now
       int onlyDataSourceIdx;
-      std::vector<int> onlyServicesIdx;
-      std::vector<int> exceptServicesIdx;
-      std::vector<int> onlyLinesIdx;
-      std::vector<int> exceptLinesIdx;
-      std::vector<int> onlyModesIdx;
-      std::vector<int> exceptModesIdx;
-      std::vector<int> onlyAgenciesIdx;
-      std::vector<int> exceptAgenciesIdx;
-      std::vector<int> onlyNodesIdx;
-      std::vector<int> exceptNodesIdx;
       std::vector<int> accessNodesIdx;
       std::vector<int> accessNodeTravelTimesSeconds;
       std::vector<int> accessNodeDistancesMeters;
@@ -182,18 +189,10 @@ namespace TrRouting
       std::vector<std::string>        odTripsActivities;
       std::vector<std::string>        odTripsModes;
 
-      int departureTimeSeconds;
-      int arrivalTimeSeconds;
-      int maxTotalTravelTimeSeconds;
       int maxNumberOfTransfers;
-      int minWaitingTimeSeconds;
       int transferPenaltySeconds;
       int maxAccessWalkingDistanceMeters;
-      int maxAccessWalkingTravelTimeSeconds;
-      int maxEgressWalkingTravelTimeSeconds;
-      int maxTransferWalkingTravelTimeSeconds;
       int maxTotalWalkingTravelTimeSeconds;
-      int maxFirstWaitingTimeSeconds;
       float odTripsSampleRatio;
       float maxOnlyWalkingAccessTravelTimeRatio;
       float walkingSpeedFactor;
@@ -201,15 +200,10 @@ namespace TrRouting
       float drivingSpeedMetersPerSecond;
       float cyclingSpeedMetersPerSecond;
 
-      Point origin;
-      Point destination;
-      bool hasOrigin;
-      bool hasDestination;
       int originNodeIdx;
       int destinationNodeIdx;
       bool calculateAllOdTrips;
       bool saveResultToFile;
-      std::optional<boost::uuids::uuid> scenarioUuid;
       std::optional<boost::uuids::uuid> dataSourceUuid;
       std::optional<boost::uuids::uuid> odTripUuid;
       std::optional<boost::uuids::uuid> startingNodeUuid;
@@ -243,15 +237,19 @@ namespace TrRouting
       bool transferOnlyAtSameStation;    // will transfer only between nodes/stops having the same station_id (better performance, but make sure your stations are well designed and specified)
       bool transferBetweenSameLine;      // allow transfers between the same line
       bool calculateByNumberOfTransfers; // calculate first the fastest route, then calculate with decreasing number of transfers until no route is found, return results for each number of transfers.
-      bool alternatives;                 // calculate alternatives or not
       bool calculateProfiles;            // calculate profiles for lines, paths and trips (od trips only)
 
       void setDefaultValues();
-      bool isCompleteForCalculation();
-      void update(std::vector<std::string> &parameters,
+      /**
+       * @deprecated ServerParameters should not be updated this way, directly create a RouteParameters, but legacy endpoints still use this method.
+       * */
+      RouteParameters update(std::vector<std::string> &parameters,
         std::map<boost::uuids::uuid, int> &scenarioIndexesByUuid,
         std::vector<std::unique_ptr<Scenario>> &scenarios,
+        std::map<boost::uuids::uuid, int> &odTripIndexesByUuid,
+        std::vector<std::unique_ptr<OdTrip>> &odTrips,
         std::map<boost::uuids::uuid, int> &nodeIndexesByUuid,
+        std::vector<std::unique_ptr<Node>> &nodes,
         std::map<boost::uuids::uuid, int> &dataSourceIndexesByUuid);
 
   };
