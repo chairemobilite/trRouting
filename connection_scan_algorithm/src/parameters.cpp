@@ -1,52 +1,8 @@
 #include "parameters.hpp"
+#include "node.hpp"
 
 namespace TrRouting
 {
-
-  bool Parameters::isCompleteForCalculation()
-  {
-    if (debugDisplay)
-    {
-      std::cout << "parameters: "            << std::endl;
-      std::cout << " hasScenarioUuid: "      << (scenarioUuid.has_value()   ? "true" : "false") << std::endl;
-      std::cout << " hasServices: "          << (onlyServicesIdx.size() >  0     ? "true" : "false") << std::endl;
-      std::cout << " hasDataSourceUuid: "    << (dataSourceUuid.has_value() ? "true" : "false") << std::endl;
-      std::cout << " hasOdTripUuid: "        << (odTripUuid.has_value()     ? "true" : "false") << std::endl;
-      std::cout << " calculateAllOdTrips: "  << calculateAllOdTrips  << std::endl;
-      std::cout << " calculateProfiles: "    << calculateProfiles    << std::endl;
-      std::cout << " hasOrigin: "            << hasOrigin            << std::endl;
-      std::cout << " hasDestination: "       << hasDestination       << std::endl;
-      std::cout << " forwardCalculation: "   << forwardCalculation   << std::endl;
-      std::cout << " departureTimeSeconds: " << departureTimeSeconds << std::endl;
-      std::cout << " arrivalTimeSeconds: "   << arrivalTimeSeconds   << std::endl;
-      std::cout << " returnAllNodesResult: " << returnAllNodesResult << std::endl;
-    }
-    if (!scenarioUuid.has_value() || onlyServicesIdx.size() == 0) // scenario and only services is mandatory
-    {
-      return false;
-    }
-    if (calculateAllOdTrips || odTripUuid.has_value())
-    {
-      return true;
-    }
-    else if (hasOrigin && returnAllNodesResult && departureTimeSeconds >= 0 && forwardCalculation)
-    {
-      return true;
-    }
-    else if (hasDestination && returnAllNodesResult && arrivalTimeSeconds >= 0 && !forwardCalculation)
-    {
-      return true;
-    }
-    else if (hasOrigin && hasDestination && departureTimeSeconds >= 0 && forwardCalculation)
-    {
-      return true;
-    }
-    else if (hasOrigin && hasDestination && arrivalTimeSeconds >= 0 && !forwardCalculation)
-    {
-      return true;
-    }
-    return false;
-  }
 
   void Parameters::setDefaultValues()
   {
@@ -58,51 +14,27 @@ namespace TrRouting
     odTripsModes.clear();
 
     onlyDataSourceIdx = -1;
-    onlyServicesIdx.clear();
-    exceptServicesIdx.clear();
-    onlyLinesIdx.clear();
-    exceptLinesIdx.clear();
-    onlyModesIdx.clear();
-    exceptModesIdx.clear();
-    onlyAgenciesIdx.clear();
-    exceptAgenciesIdx.clear();
-    onlyNodesIdx.clear();
-    exceptNodesIdx.clear();
 
     calculationName                        = "trRouting";
     batchNumber                            = 1;
     batchesCount                           = 1;
-    alternatives                           = false;
     responseFormat                         = "json";
     saveResultToFile                       = false;
     odTripsSampleRatio                     = 1.0;
-    scenarioUuid.reset();
     dataSourceUuid.reset();
     odTripUuid.reset();
     startingNodeUuid.reset();
     endingNodeUuid.reset();
-    origin                                 = Point();
-    destination                            = Point();
-    hasOrigin                              = false;
-    hasDestination                         = false;
     routingDateYear                        = 0;
     routingDateMonth                       = 0;
     routingDateDay                         = 0;
     originNodeIdx                          = -1;
     destinationNodeIdx                     = -1;
-    departureTimeSeconds                   = -1;
-    arrivalTimeSeconds                     = -1;
     calculateAllOdTrips                    = false;
     walkingSpeedMetersPerSecond            = 5/3.6; // 5 km/h
     drivingSpeedMetersPerSecond            = 90/3.6; // 90 km/h
     cyclingSpeedMetersPerSecond            = 25/3.6; // 25 km/h
-    maxTotalTravelTimeSeconds              = MAX_INT;
     maxNumberOfTransfers                   = -1; // -1 means no limit
-    minWaitingTimeSeconds                  = 3*60;
-    maxFirstWaitingTimeSeconds             = 30*60; // Ignore all connections at access nodes if waiting time would be more than this value.
-    maxAccessWalkingTravelTimeSeconds      = 20*60;
-    maxEgressWalkingTravelTimeSeconds      = 20*60;
-    maxTransferWalkingTravelTimeSeconds    = 20*60; // depends of transfer data provided
     maxTotalWalkingTravelTimeSeconds       = 60*60; // not used right now
     maxOnlyWalkingAccessTravelTimeRatio    = 1.5; // prefer walking only if it is faster than transit and total only walking travel time <= maxAccessWalkingTravelTimeSeconds * this ratio
     transferPenaltySeconds                 = 0; // not used right now
@@ -131,19 +63,23 @@ namespace TrRouting
 
   }
 
-  void Parameters::update(std::vector<std::string> &parameters,
+  RouteParameters Parameters::update(std::vector<std::string> &parameters,
     std::map<boost::uuids::uuid, int> &scenarioIndexesByUuid,
     std::vector<std::unique_ptr<Scenario>> &scenarios,
+    std::map<boost::uuids::uuid, int> &odTripIndexesByUuid,
+    std::vector<std::unique_ptr<OdTrip>> &odTrips,
     std::map<boost::uuids::uuid, int> &nodeIndexesByUuid,
+    std::vector<std::unique_ptr<Node>> &nodes,
     std::map<boost::uuids::uuid, int> &dataSourceIndexesByUuid)
   {
 
     setDefaultValues();
 
     boost::uuids::string_generator uuidGenerator;
+    // Vector to contain parameters required for creating the RouteParameters object
+    std::vector<std::pair<std::string, std::string>> newParametersWithValues;
 
     Scenario *         scenario;
-    scenarioUuid.reset();
     dataSourceUuid.reset();
     boost::uuids::uuid originNodeUuid;
     boost::uuids::uuid destinationNodeUuid;
@@ -188,15 +124,19 @@ namespace TrRouting
       if (parameterWithValueVector[0] == "origin")
       {
         boost::split(latitudeLongitudeVector, parameterWithValueVector[1], boost::is_any_of(","));
-        origin    = Point(std::stof(latitudeLongitudeVector[0]), std::stof(latitudeLongitudeVector[1]));
-        hasOrigin = true;
+        if (latitudeLongitudeVector.size() == 2)
+        {
+          newParametersWithValues.push_back(std::make_pair("origin", latitudeLongitudeVector[1] + "," + latitudeLongitudeVector[0]));
+        }
         continue;
       }
       else if (parameterWithValueVector[0] == "destination")
       {
         boost::split(latitudeLongitudeVector, parameterWithValueVector[1], boost::is_any_of(","));
-        destination    = Point(std::stof(latitudeLongitudeVector[0]), std::stof(latitudeLongitudeVector[1]));
-        hasDestination = true;
+        if (latitudeLongitudeVector.size() == 2)
+        {
+          newParametersWithValues.push_back(std::make_pair("destination", latitudeLongitudeVector[1] + "," + latitudeLongitudeVector[0]));
+        }
         continue;
       }
       else if (parameterWithValueVector[0] == "starting_node_uuid"
@@ -207,7 +147,8 @@ namespace TrRouting
         originNodeUuid = uuidGenerator(parameterWithValueVector[1]);
         if (nodeIndexesByUuid.count(originNodeUuid) == 1)
         {
-          originNodeIdx = nodeIndexesByUuid[originNodeUuid];
+          Node *originNode = nodes[nodeIndexesByUuid[originNodeUuid]].get();
+          newParametersWithValues.push_back(std::make_pair("origin", std::to_string(originNode->point.get()->longitude) + ',' + std::to_string(originNode->point.get()->latitude)));
         }
         continue;
       }
@@ -219,7 +160,8 @@ namespace TrRouting
         destinationNodeUuid = uuidGenerator(parameterWithValueVector[1]);
         if (nodeIndexesByUuid.count(destinationNodeUuid) == 1)
         {
-          destinationNodeIdx = nodeIndexesByUuid[destinationNodeUuid];
+          Node *destinationNode = nodes[nodeIndexesByUuid[destinationNodeUuid]].get();
+          newParametersWithValues.push_back(std::make_pair("destination", std::to_string(destinationNode->point.get()->longitude) + ',' + std::to_string(destinationNode->point.get()->latitude)));
         }
         continue;
       }
@@ -228,7 +170,14 @@ namespace TrRouting
                || parameterWithValueVector[0] == "all_nodes"
               )
       {
-        if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1") { returnAllNodesResult = true; }
+        if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1")
+        {
+          returnAllNodesResult = true;
+          // This parameter requires only origin or destination, but the routeParameters class requires both,so we fake one so the parameter creation will work
+          // TODO Eventually move this parameter to its own endpoint
+          newParametersWithValues.insert(newParametersWithValues.begin(), std::make_pair("origin", "0,0"));
+          newParametersWithValues.insert(newParametersWithValues.begin(), std::make_pair("destination", "1,1"));
+        }
       }
 
       // times and date:
@@ -239,7 +188,7 @@ namespace TrRouting
               )
       {
         boost::split(timeVector, parameterWithValueVector[1], boost::is_any_of(":"));
-        departureTimeSeconds = std::stoi(timeVector[0]) * 3600 + std::stoi(timeVector[1]) * 60;
+        newParametersWithValues.push_back(std::make_pair("time_of_trip", std::to_string(std::stoi(timeVector[0]) * 3600 + std::stoi(timeVector[1]) * 60)));
         continue;
       }
       else if (parameterWithValueVector[0] == "arrival_time"
@@ -248,7 +197,8 @@ namespace TrRouting
               )
       {
         boost::split(timeVector, parameterWithValueVector[1], boost::is_any_of(":"));
-        arrivalTimeSeconds = std::stoi(timeVector[0]) * 3600 + std::stoi(timeVector[1]) * 60;
+        newParametersWithValues.push_back(std::make_pair("time_of_trip", std::to_string(std::stoi(timeVector[0]) * 3600 + std::stoi(timeVector[1]) * 60)));
+        newParametersWithValues.push_back(std::make_pair("time_type", "1"));
         continue;
       }
       else if (parameterWithValueVector[0] == "departure_seconds"
@@ -256,11 +206,7 @@ namespace TrRouting
                || parameterWithValueVector[0] == "start_time_seconds"
               )
       {
-        departureTimeSeconds = std::stoi(parameterWithValueVector[1]);
-        if (departureTimeSeconds < 0)
-        {
-          departureTimeSeconds = -1;
-        }
+        newParametersWithValues.push_back(std::make_pair("time_of_trip", parameterWithValueVector[1]));
         continue;
       }
       else if (parameterWithValueVector[0] == "arrival_seconds"
@@ -268,58 +214,15 @@ namespace TrRouting
                || parameterWithValueVector[0] == "end_time_seconds"
               )
       {
-        arrivalTimeSeconds = std::stoi(parameterWithValueVector[1]);
-        if (arrivalTimeSeconds < 0)
-        {
-          arrivalTimeSeconds = -1;
-        }
+        newParametersWithValues.push_back(std::make_pair("time_of_trip", parameterWithValueVector[1]));
+        newParametersWithValues.push_back(std::make_pair("time_type", "1"));
         continue;
       }
 
       // scenario:
       else if (parameterWithValueVector[0] == "scenario_uuid")
       {
-        scenarioUuid = uuidGenerator(parameterWithValueVector[1]);
-        if (scenarioIndexesByUuid.count(*scenarioUuid) == 1)
-        {
-          scenario = scenarios[scenarioIndexesByUuid[*scenarioUuid]].get();
-          if (onlyServicesIdx.size() == 0) // these can be already set by another parameter which has priority
-          {
-            onlyServicesIdx = scenario->servicesIdx;
-          }
-          if (onlyLinesIdx.size() == 0)
-          {
-            onlyLinesIdx = scenario->onlyLinesIdx;
-          }
-          if (onlyAgenciesIdx.size() == 0)
-          {
-            onlyAgenciesIdx = scenario->onlyAgenciesIdx;
-          }
-          if (onlyNodesIdx.size() == 0)
-          {
-            onlyNodesIdx = scenario->onlyNodesIdx;
-          }
-          if (onlyModesIdx.size() == 0)
-          {
-            onlyModesIdx = scenario->onlyModesIdx;
-          }
-          if (exceptLinesIdx.size() == 0)
-          {
-            exceptLinesIdx = scenario->exceptLinesIdx;
-          }
-          if (exceptAgenciesIdx.size() == 0)
-          {
-            exceptAgenciesIdx = scenario->exceptAgenciesIdx;
-          }
-          if (exceptNodesIdx.size() == 0)
-          {
-            exceptNodesIdx = scenario->exceptNodesIdx;
-          }
-          if (exceptModesIdx.size() == 0)
-          {
-            exceptModesIdx = scenario->exceptModesIdx;
-          }
-        }
+        newParametersWithValues.push_back(std::make_pair("scenario_id", parameterWithValueVector[1]));
         continue;
       }
 
@@ -340,101 +243,57 @@ namespace TrRouting
       // min and max parameters:
       else if (parameterWithValueVector[0] == "min_waiting_time" || parameterWithValueVector[0] == "min_waiting_time_minutes")
       {
-        minWaitingTimeSeconds = std::stoi(parameterWithValueVector[1]) * 60;
-        if (minWaitingTimeSeconds < 0)
-        {
-          minWaitingTimeSeconds = 0;
-        }
+        newParametersWithValues.push_back(std::make_pair("min_waiting_time", std::to_string(std::stoi(parameterWithValueVector[1]) * 60)));
         continue;
       }
       else if (parameterWithValueVector[0] == "min_waiting_time_seconds")
       {
-        minWaitingTimeSeconds = std::stoi(parameterWithValueVector[1]);
-        if (minWaitingTimeSeconds < 0)
-        {
-          minWaitingTimeSeconds = 0;
-        }
+        newParametersWithValues.push_back(std::make_pair("min_waiting_time", parameterWithValueVector[1]));
         continue;
       }
       else if (parameterWithValueVector[0] == "max_travel_time" || parameterWithValueVector[0] == "max_travel_time_minutes")
       {
-        maxTotalTravelTimeSeconds = std::stoi(parameterWithValueVector[1]) * 60;
-        if (maxTotalTravelTimeSeconds <= 0)
-        {
-          maxTotalTravelTimeSeconds = MAX_INT;
-        }
+        newParametersWithValues.push_back(std::make_pair("max_travel_time", std::to_string(std::stoi(parameterWithValueVector[1]) * 60)));
         continue;
       }
       else if (parameterWithValueVector[0] == "max_travel_time_seconds")
       {
-        maxTotalTravelTimeSeconds = std::stoi(parameterWithValueVector[1]);
-        if (maxTotalTravelTimeSeconds <= 0)
-        {
-          maxTotalTravelTimeSeconds = MAX_INT;
-        }
+        newParametersWithValues.push_back(std::make_pair("max_travel_time", parameterWithValueVector[1]));
         continue;
       }
       else if (parameterWithValueVector[0] == "max_access_travel_time" || parameterWithValueVector[0] == "max_access_travel_time_minutes")
       {
-        maxAccessWalkingTravelTimeSeconds = std::stoi(parameterWithValueVector[1]) * 60;
-        if (maxAccessWalkingTravelTimeSeconds <= 0)
-        {
-          maxAccessWalkingTravelTimeSeconds = MAX_INT;
-        }
+        newParametersWithValues.push_back(std::make_pair("max_access_travel_time", std::to_string(std::stoi(parameterWithValueVector[1]) * 60)));
         continue;
       }
       else if (parameterWithValueVector[0] == "max_access_travel_time_seconds")
       {
-        maxAccessWalkingTravelTimeSeconds = std::stoi(parameterWithValueVector[1]);
-        if (maxAccessWalkingTravelTimeSeconds <= 0)
-        {
-          maxAccessWalkingTravelTimeSeconds = MAX_INT;
-        }
+        newParametersWithValues.push_back(std::make_pair("max_access_travel_time", parameterWithValueVector[1]));
         continue;
       }
       else if (parameterWithValueVector[0] == "max_egress_travel_time" || parameterWithValueVector[0] == "max_egress_travel_time_minutes")
       {
-        maxEgressWalkingTravelTimeSeconds = std::stoi(parameterWithValueVector[1]) * 60;
-        if (maxEgressWalkingTravelTimeSeconds <= 0)
-        {
-          maxEgressWalkingTravelTimeSeconds = MAX_INT;
-        }
+        newParametersWithValues.push_back(std::make_pair("max_egress_travel_time", std::to_string(std::stoi(parameterWithValueVector[1]) * 60)));
         continue;
       }
       else if (parameterWithValueVector[0] == "max_egress_travel_time_seconds")
       {
-        maxEgressWalkingTravelTimeSeconds = std::stoi(parameterWithValueVector[1]);
-        if (maxEgressWalkingTravelTimeSeconds <= 0)
-        {
-          maxEgressWalkingTravelTimeSeconds = MAX_INT;
-        }
+        newParametersWithValues.push_back(std::make_pair("max_egress_travel_time", parameterWithValueVector[1]));
         continue;
       }
       else if (parameterWithValueVector[0] == "max_transfer_travel_time" || parameterWithValueVector[0] == "max_transfer_travel_time_minutes")
       {
-        maxTransferWalkingTravelTimeSeconds = std::stoi(parameterWithValueVector[1]) * 60;
-        if (maxTransferWalkingTravelTimeSeconds <= 0)
-        {
-          maxTransferWalkingTravelTimeSeconds = MAX_INT;
-        }
+        newParametersWithValues.push_back(std::make_pair("max_transfer_travel_time", std::to_string(std::stoi(parameterWithValueVector[1]) * 60)));
         continue;
       }
       else if (parameterWithValueVector[0] == "max_transfer_travel_time_seconds")
       {
-        maxTransferWalkingTravelTimeSeconds = std::stoi(parameterWithValueVector[1]);
-        if (maxTransferWalkingTravelTimeSeconds <= 0)
-        {
-          maxTransferWalkingTravelTimeSeconds = MAX_INT;
-        }
+        newParametersWithValues.push_back(std::make_pair("max_transfer_travel_time", parameterWithValueVector[1]));
         continue;
       }
       else if (parameterWithValueVector[0] == "max_first_waiting_time_seconds")
       {
-        maxFirstWaitingTimeSeconds = std::stoi(parameterWithValueVector[1]);
-        if (maxFirstWaitingTimeSeconds <= 0)
-        {
-          maxFirstWaitingTimeSeconds = -1;
-        }
+        newParametersWithValues.push_back(std::make_pair("max_first_waiting_time", parameterWithValueVector[1]));
         continue;
       }
       else if (parameterWithValueVector[0] == "max_only_walking_access_travel_time_ratio")
@@ -446,12 +305,31 @@ namespace TrRouting
       // od trips:
       else if (parameterWithValueVector[0] == "od_trip_uuid")
       {
-        odTripUuid = uuidGenerator(parameterWithValueVector[1]);
+        // TODO: Use a new endpoint for od trip uuid. Now we get its od and add them to parameters
+        boost::uuids::uuid odTripUuid = uuidGenerator(parameterWithValueVector[1]);
+
+        if (odTripIndexesByUuid.count(odTripUuid) == 1)
+        {
+          OdTrip *odTrip = odTrips[odTripIndexesByUuid[odTripUuid]].get();
+          std::cout << "od trip uuid " << odTrip->uuid << std::endl;
+          std::cout << "dts " << odTrip->departureTimeSeconds << std::endl;
+          newParametersWithValues.push_back(std::make_pair("origin", std::to_string(odTrip->origin.get()->latitude) + ',' + std::to_string(odTrip->origin.get()->longitude)));
+          newParametersWithValues.push_back(std::make_pair("destination", std::to_string(odTrip->destination.get()->latitude) + ',' + std::to_string(odTrip->destination.get()->longitude)));
+          // TODO Add parameter for the departure_time? It was not in the original code path
+        }
         continue;
       }
       else if (parameterWithValueVector[0] == "od_trips")
       {
-        if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1") { calculateAllOdTrips = true; }
+        if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1")
+        {
+          calculateAllOdTrips = true;
+          // This parameter does not require origin/destination/departure_time parameters, so we fake one so the parameter creation will work
+          // TODO Eventually move this parameter to its own endpoint
+          newParametersWithValues.push_back(std::make_pair("origin", "0,0"));
+          newParametersWithValues.push_back(std::make_pair("destination", "1,1"));
+          newParametersWithValues.push_back(std::make_pair("time_of_trip", "0"));
+        }
         continue;
       }
       else if (parameterWithValueVector[0] == "od_trips_sample_size" || parameterWithValueVector[0] == "sample_size" || parameterWithValueVector[0] == "sample")
@@ -531,7 +409,7 @@ namespace TrRouting
       // alternatives:
       else if (parameterWithValueVector[0] == "alternatives" || parameterWithValueVector[0] == "alt")
       {
-        if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1") { alternatives = true; }
+        newParametersWithValues.push_back(std::make_pair("alternatives", parameterWithValueVector[1]));
         continue;
       }
        else if (parameterWithValueVector[0] == "max_alternatives" || parameterWithValueVector[0] == "max_alt")
@@ -724,14 +602,7 @@ namespace TrRouting
 
     }
 
-    if (departureTimeSeconds >= 0)
-    {
-      forwardCalculation = true;
-    }
-    else if (arrivalTimeSeconds >= 0 && departureTimeSeconds < 0)
-    {
-      forwardCalculation = false;
-    }
+    return RouteParameters::createRouteODParameter(newParametersWithValues, scenarioIndexesByUuid, scenarios);
 
   }
 

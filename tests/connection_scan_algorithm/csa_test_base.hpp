@@ -6,8 +6,9 @@
 #include "parameters.hpp"
 
 inline int getTimeInSeconds(int hour, int minutes = 0, int seconds = 0) { return hour * 3600 + minutes * 60 + seconds; }
+const int MIN_WAITING_TIME{180};
 
-class BaseCsaFixtureTests : public ::testing::Test 
+class BaseCsaFixtureTests : public ::testing::Test
 {
 
 protected:
@@ -65,6 +66,20 @@ protected:
 public:
     BaseCsaFixtureTests() : params(TrRouting::Parameters()), calculator(TrRouting::Calculator(params)) {}
     void SetUp();
+    // Asserts the result status is no routing. If we add reasons, this method can eventually be updated and all test cases will need to be updated.
+    void assertNoRouting(TrRouting::RoutingResult result);
+    // Asserts the successful result fields, given some easy to provide expected test data
+    void assertSuccessResults(TrRouting::RoutingResult result,
+        int origDepartureTime,
+        int expTransitDepartureTime,
+        int expInVehicleTravelTime,
+        int expAccessTime = 0,
+        int expEgressTime = 0,
+        int expNbTransfers = 0,
+        int minWaitingTime = MIN_WAITING_TIME,
+        int expTotalWaitingTime = MIN_WAITING_TIME,
+        int expTransferWaitingTime = 0,
+        int expTransferTravelTime = 0);
 
 };
 
