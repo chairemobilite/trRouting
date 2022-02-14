@@ -13,9 +13,10 @@
 #include "path.hpp"
 #include "point.hpp"
 #include "mode.hpp"
+#include "constants.hpp"
 
 /**
- *  Create a default data set: 
+ *  Create a default data set:
  * - one agency
  * - 2 orthogonal lines with a 5 stops each, joining in the their middle and 1
  *   extra line to test walking transfers
@@ -166,7 +167,7 @@ void BaseCsaFixtureTests::setUpNodes()
     addTransferableNode(extra1.get(), array.size(), 0, 0);
     arrayIndexesByUuid[extra1->uuid] = array.size();
     array.push_back(std::move(extra1));
-        
+
 }
 
 void BaseCsaFixtureTests::setUpAgencies()
@@ -339,7 +340,7 @@ void addTripData(TrRouting::Calculator& calculator, TrRouting::Trip *trip, std::
 // refactoring, let's add some tests! It's the chickend or the egg!
 void BaseCsaFixtureTests::setUpSchedules(std::vector<std::shared_ptr<TrRouting::ConnectionTuple>> &connections)
 {
-    
+
     int tripIdx;
     std::vector<std::unique_ptr<TrRouting::Trip>>& array = calculator.trips;
     std::map<boost::uuids::uuid, int>& arrayIndexesByUuid = calculator.tripIndexesByUuid;
@@ -438,7 +439,7 @@ void BaseCsaFixtureTests::setUpSchedules(std::vector<std::shared_ptr<TrRouting::
 
     addTripData(calculator, extraTrip1.get(), connections, arrivalTimesT5, departureTimesT5, 2, tripIdx);
     array.push_back(std::move(extraTrip1));
-    
+
 }
 
 void BaseCsaFixtureTests::setUpModes()
@@ -446,4 +447,38 @@ void BaseCsaFixtureTests::setUpModes()
     TrRouting::Mode mode = {"bus", "Bus", 3, 700};
     calculator.modeIndexesByShortname[mode.shortname] = 0;
     calculator.modes.push_back(mode);
+}
+
+void BaseCsaFixtureTests::assertNoRouting(TrRouting::RoutingResult result)
+{
+    ASSERT_EQ(STATUS_NO_ROUTING_FOUND, result.status);
+}
+
+void BaseCsaFixtureTests::assertSuccessResults(TrRouting::RoutingResult result,
+    int origDepartureTime,
+    int expTransitDepartureTime,
+    int expInVehicleTravelTime,
+    int expAccessTime,
+    int expEgressTime,
+    int expNbTransfers,
+    int minWaitingTime,
+    int expTotalWaitingTime,
+    int expTransferWaitingTime,
+    int expTransferTravelTime)
+{
+    ASSERT_EQ(STATUS_SUCCESS, result.status);
+    ASSERT_EQ(expInVehicleTravelTime + expAccessTime + expEgressTime + expTotalWaitingTime + expTransferTravelTime, result.travelTimeSeconds);
+    ASSERT_EQ(expTransitDepartureTime + expInVehicleTravelTime + expEgressTime + (expTotalWaitingTime - minWaitingTime) + expTransferTravelTime, result.arrivalTimeSeconds);
+    ASSERT_EQ(expTransitDepartureTime - expAccessTime - minWaitingTime, result.departureTimeSeconds);
+    ASSERT_EQ(origDepartureTime, result.initialDepartureTimeSeconds);
+    ASSERT_EQ(origDepartureTime == -1 ? -1 : expTransitDepartureTime - expAccessTime - minWaitingTime - origDepartureTime, result.initialLostTimeAtDepartureSeconds);
+    ASSERT_EQ(expNbTransfers, result.numberOfTransfers);
+    ASSERT_EQ(expInVehicleTravelTime, result.inVehicleTravelTimeSeconds);
+    ASSERT_EQ(expTransferTravelTime, result.transferTravelTimeSeconds);
+    ASSERT_EQ(expTotalWaitingTime, result.waitingTimeSeconds);
+    ASSERT_EQ(expAccessTime, result.accessTravelTimeSeconds);
+    ASSERT_EQ(expEgressTime, result.egressTravelTimeSeconds);
+    ASSERT_EQ(expTransferWaitingTime, result.transferWaitingTimeSeconds);
+    ASSERT_EQ(minWaitingTime, result.firstWaitingTimeSeconds);
+    ASSERT_EQ(expAccessTime + expEgressTime + expTransferTravelTime, result.nonTransitTravelTimeSeconds);
 }
