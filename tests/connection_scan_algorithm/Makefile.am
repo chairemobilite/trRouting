@@ -19,4 +19,5 @@ csa_test_LDFLAGS = -no-pie -pthread -std=c++17 -lstdc++fs
 
 csa_test_CPPFLAGS = -I$(top_srcdir)/googletest/googletest/include -I$(top_srcdir)/googletest/googletest -I$(top_srcdir)/include -I$(top_srcdir)/connection_scan_algorithm/include -pthread -std=c++17 -lstdc++fs
 
+
 TESTS = csa_test
