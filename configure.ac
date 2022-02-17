@@ -38,6 +38,7 @@ AC_CHECK_LIB(rt, shm_open)
 # TODO: Add link to doc of this override flag
 CPPFLAGS+=" -DBOOST_BIND_GLOBAL_PLACEHOLDERS"
 
+
 CPPFLAGS+=" $CURSES_CFLAGS $CAPNP_CFLAGS"
 
 # Add BOOST flags
