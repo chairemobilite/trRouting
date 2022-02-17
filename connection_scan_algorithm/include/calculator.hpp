@@ -23,7 +23,6 @@
 #include <boost/range/adaptor/reversed.hpp>
 //#include <boost/compute.hpp>
 #include <boost/tokenizer.hpp>
-#include <boost/optional.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/lexical_cast.hpp>

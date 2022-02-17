@@ -12,7 +12,7 @@ LT_INIT
 # AX_ macros copied from the autoconf-archive
 
 # TODO Do we need the strict mode or not here ?
-AX_CXX_COMPILE_STDCXX_14(noext)
+AX_CXX_COMPILE_STDCXX(17,noext)
 
 AX_BOOST_BASE
 AX_BOOST_FILESYSTEM
