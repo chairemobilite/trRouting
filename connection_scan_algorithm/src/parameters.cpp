@@ -18,7 +18,6 @@ namespace TrRouting
     calculationName                        = "trRouting";
     batchNumber                            = 1;
     batchesCount                           = 1;
-    responseFormat                         = "json";
     saveResultToFile                       = false;
     odTripsSampleRatio                     = 1.0;
     dataSourceUuid.reset();
@@ -572,11 +571,6 @@ namespace TrRouting
       else if (parameterWithValueVector[0] == "calculation_name" || parameterWithValueVector[0] == "name")
       {
         calculationName = parameterWithValueVector[1];
-        continue;
-      }
-      else if (parameterWithValueVector[0] == "file_format" || parameterWithValueVector[0] == "format" || parameterWithValueVector[0] == "response_format" || parameterWithValueVector[0] == "response")
-      {
-        responseFormat = parameterWithValueVector[1];
         continue;
       }
       else if (parameterWithValueVector[0] == "batch")

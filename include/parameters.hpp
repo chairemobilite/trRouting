@@ -160,7 +160,6 @@ namespace TrRouting
       std::string dataFetcherShortname; // cache, csv or gtfs, only cache is implemented for now
       std::string cacheDirectoryPath;
       std::string calculationName;
-      std::string responseFormat;
 
       CacheFetcher* cacheFetcher;
       GtfsFetcher*  gtfsFetcher;
