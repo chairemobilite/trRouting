@@ -90,7 +90,7 @@ namespace TrRouting
     boost::uuids::string_generator uuidGenerator;
 
     Scenario * scenario = nullptr;
-    boost::optional<boost::uuids::uuid> scenarioUuid = boost::none;
+    std::optional<boost::uuids::uuid> scenarioUuid;
     boost::uuids::uuid originNodeUuid;
     boost::uuids::uuid destinationNodeUuid;
 
@@ -102,8 +102,8 @@ namespace TrRouting
     int maxEgressWalkingTravelTimeSeconds = DEFAULT_MAX_EGRESS_TRAVEL_TIME;
     int maxTransferWalkingTravelTimeSeconds = DEFAULT_MAX_TRANSFER_TRAVEL_TIME;
     int maxFirstWaitingTimeSeconds = DEFAULT_FIRST_WAITING_TIME; // Ignore all connections at access nodes if waiting time would be more than this value.
-    boost::optional<Point> origin = boost::none;
-    boost::optional<Point> destination = boost::none;
+    std::optional<Point> origin;
+    std::optional<Point> destination;
     bool alternatives = false;
     bool forwardCalculation = true;
 
@@ -263,8 +263,8 @@ namespace TrRouting
       throw ParameterException(ParameterException::Type::MISSING_TIME_OF_TRIP);
     }
 
-    return RouteParameters(std::make_unique<TrRouting::Point>(origin.get().latitude, origin.get().longitude),
-      std::make_unique<TrRouting::Point>(destination.get().latitude, destination.get().longitude),
+    return RouteParameters(std::make_unique<TrRouting::Point>(origin->latitude, origin->longitude),
+      std::make_unique<TrRouting::Point>(destination->latitude, destination->longitude),
       *scenario,
       timeOfTrip,
       minWaitingTimeSeconds,

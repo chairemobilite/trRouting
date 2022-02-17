@@ -8,10 +8,10 @@ namespace TrRouting
     if (debugDisplay)
     {
       std::cout << "parameters: "            << std::endl;
-      std::cout << " hasScenarioUuid: "      << (scenarioUuid.is_initialized()   ? "true" : "false") << std::endl;
+      std::cout << " hasScenarioUuid: "      << (scenarioUuid.has_value()   ? "true" : "false") << std::endl;
       std::cout << " hasServices: "          << (onlyServicesIdx.size() >  0     ? "true" : "false") << std::endl;
-      std::cout << " hasDataSourceUuid: "    << (dataSourceUuid.is_initialized() ? "true" : "false") << std::endl;
-      std::cout << " hasOdTripUuid: "        << (odTripUuid.is_initialized()     ? "true" : "false") << std::endl;
+      std::cout << " hasDataSourceUuid: "    << (dataSourceUuid.has_value() ? "true" : "false") << std::endl;
+      std::cout << " hasOdTripUuid: "        << (odTripUuid.has_value()     ? "true" : "false") << std::endl;
       std::cout << " calculateAllOdTrips: "  << calculateAllOdTrips  << std::endl;
       std::cout << " calculateProfiles: "    << calculateProfiles    << std::endl;
       std::cout << " hasOrigin: "            << hasOrigin            << std::endl;
@@ -21,11 +21,11 @@ namespace TrRouting
       std::cout << " arrivalTimeSeconds: "   << arrivalTimeSeconds   << std::endl;
       std::cout << " returnAllNodesResult: " << returnAllNodesResult << std::endl;
     }
-    if (!scenarioUuid.is_initialized() || onlyServicesIdx.size() == 0) // scenario and only services is mandatory
+    if (!scenarioUuid.has_value() || onlyServicesIdx.size() == 0) // scenario and only services is mandatory
     {
       return false;
     }
-    if (calculateAllOdTrips || odTripUuid.is_initialized())
+    if (calculateAllOdTrips || odTripUuid.has_value())
     {
       return true;
     }
@@ -76,11 +76,11 @@ namespace TrRouting
     responseFormat                         = "json";
     saveResultToFile                       = false;
     odTripsSampleRatio                     = 1.0;
-    scenarioUuid                           = boost::none;
-    dataSourceUuid                         = boost::none;
-    odTripUuid                             = boost::none;
-    startingNodeUuid                       = boost::none;
-    endingNodeUuid                         = boost::none;
+    scenarioUuid.reset();
+    dataSourceUuid.reset();
+    odTripUuid.reset();
+    startingNodeUuid.reset();
+    endingNodeUuid.reset();
     origin                                 = Point();
     destination                            = Point();
     hasOrigin                              = false;
@@ -143,8 +143,8 @@ namespace TrRouting
     boost::uuids::string_generator uuidGenerator;
 
     Scenario *         scenario;
-    scenarioUuid   = boost::none;
-    dataSourceUuid = boost::none;
+    scenarioUuid.reset();
+    dataSourceUuid.reset();
     boost::uuids::uuid originNodeUuid;
     boost::uuids::uuid destinationNodeUuid;
 
