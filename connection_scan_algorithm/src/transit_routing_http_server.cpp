@@ -11,7 +11,6 @@
 #include <iterator>
 #include <curses.h>
 
-#include <boost/optional.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/program_options.hpp>
 #include <boost/property_tree/json_parser.hpp>
@@ -363,9 +362,9 @@ int main(int argc, char** argv) {
         calculator.destination = &calculator.params.destination;
         calculator.odTrip      = nullptr;
 
-        if (calculator.params.odTripUuid.is_initialized() && calculator.odTripIndexesByUuid.count(calculator.params.odTripUuid.get()))
+        if (calculator.params.odTripUuid.has_value() && calculator.odTripIndexesByUuid.count(calculator.params.odTripUuid.value()))
         {
-          calculator.odTrip = calculator.odTrips[calculator.odTripIndexesByUuid[calculator.params.odTripUuid.get()]].get();
+          calculator.odTrip = calculator.odTrips[calculator.odTripIndexesByUuid[calculator.params.odTripUuid.value()]].get();
           foundOdTrip = true;
           std::cout << "od trip uuid " << calculator.odTrip->uuid << std::endl;
           std::cout << "dts " << calculator.odTrip->departureTimeSeconds << std::endl;
