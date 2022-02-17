@@ -316,7 +316,7 @@ int main(int argc, char** argv) {
 
     if (!response.empty())
     {
-      *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/" << calculator.params.responseFormat << "; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
+      *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
       return;
     }
 
@@ -398,7 +398,7 @@ int main(int argc, char** argv) {
         std::cerr << "writing file" << std::endl;
         std::ofstream file;
         //file.imbue(std::locale("en_US.UTF8"));
-        file.open(calculator.params.calculationName + "." + calculator.params.responseFormat, std::ios_base::trunc);
+        file.open(calculator.params.calculationName + ".json", std::ios_base::trunc);
         file << response;
         file.close();
       }
@@ -428,7 +428,7 @@ int main(int argc, char** argv) {
       response = "{\"status\": \"error\", \"error\": \"Wrong or malformed query\"}";
     }
 
-    *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/" << calculator.params.responseFormat << "; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
+    *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
 
   };
 
