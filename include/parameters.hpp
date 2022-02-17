@@ -12,7 +12,7 @@
 #include <vector>
 #include <map>
 #include <math.h>
-#include <boost/optional.hpp>
+#include <optional>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/string_generator.hpp>
 #include <boost/algorithm/string.hpp>
@@ -209,11 +209,11 @@ namespace TrRouting
       int destinationNodeIdx;
       bool calculateAllOdTrips;
       bool saveResultToFile;
-      boost::optional<boost::uuids::uuid> scenarioUuid;
-      boost::optional<boost::uuids::uuid> dataSourceUuid;
-      boost::optional<boost::uuids::uuid> odTripUuid;
-      boost::optional<boost::uuids::uuid> startingNodeUuid;
-      boost::optional<boost::uuids::uuid> endingNodeUuid;
+      std::optional<boost::uuids::uuid> scenarioUuid;
+      std::optional<boost::uuids::uuid> dataSourceUuid;
+      std::optional<boost::uuids::uuid> odTripUuid;
+      std::optional<boost::uuids::uuid> startingNodeUuid;
+      std::optional<boost::uuids::uuid> endingNodeUuid;
 
       std::string osrmWalkingPort;
       std::string osrmCyclingPort;

@@ -4,7 +4,6 @@
 #include <vector>
 #include <string>
 #include <boost/uuid/uuid.hpp>
-#include <boost/optional.hpp>
 
 #include "point.hpp"
 
