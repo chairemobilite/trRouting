@@ -6,6 +6,7 @@
 #include <boost/uuid/uuid.hpp>
 #include <stdlib.h>
 #include "routing_result_visitor.hpp"
+#include "json.hpp"
 
 namespace TrRouting
 {
