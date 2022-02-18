@@ -16,4 +16,5 @@ libcsa_la_SOURCES = alternatives_routing.cpp \
 		   reverse_calculation.cpp \
 		   reverse_journey.cpp \
 		   route_parameters.cpp \
+		   result_to_v1.cpp \
 		   transit_routing_http_server.cpp
