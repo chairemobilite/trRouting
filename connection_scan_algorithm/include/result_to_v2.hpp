@@ -1,5 +1,5 @@
-#ifndef TR_RESULT_TO_V1_RESPONSE
-#define TR_RESULT_TO_V1_RESPONSE
+#ifndef TR_RESULT_TO_V2_RESPONSE
+#define TR_RESULT_TO_V2_RESPONSE
 
 #include "json.hpp"
 #include "routing_result.hpp"
@@ -10,9 +10,9 @@ namespace TrRouting
   class RouteParameters;
 
   /**
-   * @brief Convert a result object to a json object for the version 1 trRouting API, as described in docs/APIv1/API.yml
+   * @brief Convert a result object to a json object for the version 2 trRouting API, as described in docs/APIv2/API.yml
    */
-  class ResultToV1Response {
+  class ResultToV2Response {
   public:
     static nlohmann::json resultToJsonString(RoutingResult& result, RouteParameters& params);
     static nlohmann::json noRoutingFoundResponse(RouteParameters& params, NoRoutingReason noRoutingReason);
@@ -20,4 +20,5 @@ namespace TrRouting
 
 }
 
-#endif // TR_RESULT_TO_V1_RESPONSE
+
+#endif // TR_RESULT_TO_V2_RESPONSE

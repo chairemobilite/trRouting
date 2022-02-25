@@ -8,6 +8,21 @@ NoRoutingFound:
       status:
         type: string
         enum: [no_routing_found]
+      reason:
+        type: string
+        enum:
+          # Generic reason, when not possible to specify more
+          - NO_ROUTING_FOUND,
+          # No accessible node at origin
+          - NO_ACCESS_AT_ORIGIN,
+          # No accessible node at destination
+          - NO_ACCESS_AT_DESTINATION
+          # No accessible node at both origin and destination
+          - NO_ACCESS_AT_ORIGIN_AND_DESTINATION
+          # There is no service from origin with the query parameters
+          - NO_SERVICE_FROM_ORIGIN,
+          # There is no service to destination with the query parameters
+          - NO_SERVICE_TO_DESTINATION
 
 success: # TODO: There's a lot of data returned, document it all, but from the code, not from transition
   required:

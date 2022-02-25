@@ -2,6 +2,9 @@
 #include <boost/uuid/string_generator.hpp>
 
 #include "gtest/gtest.h" // we will add the path to C preprocessor later
+
+#include "gtest/gtest.h" // we will add the path to C preprocessor later
+#include "csa_result_to_response_test.hpp"
 #include "routing_result.hpp"
 #include "result_to_v1.hpp"
 #include "json.hpp"
@@ -11,60 +14,12 @@
 #include "parameters.hpp"
 #include "scenario.hpp"
 
-class ResultToV1FixtureTest : public ::testing::Test
+class ResultToV1FixtureTest : public ResultToResponseFixtureTest
 {
 protected:
-    inline static const boost::uuids::string_generator uuidGenerator;
-    // test parameters, actual values are not important, it's just for result generation
-    inline static const int DEFAULT_MIN_WAITING_TIME = 3 * 60;
-    inline static const int DEFAULT_MAX_TOTAL_TIME = TrRouting::MAX_INT;
-    inline static const int DEFAULT_MAX_ACCESS_TRAVEL_TIME = 20 * 60;
-    inline static const int DEFAULT_MAX_EGRESS_TRAVEL_TIME = 20 * 60;
-    inline static const int DEFAULT_MAX_TRANSFER_TRAVEL_TIME = 20 * 60;
-    inline static const int DEFAULT_FIRST_WAITING_TIME = 30 * 60;
-    inline static const int DEFAULT_TIME = 8 * 60 * 60;
-    inline static const std::string agencyUuid = "aaaaaaaa-1111-cccc-dddd-eeeeeeffffff";
-    inline static const std::string lineUuid = "aaaaaaaa-2222-cccc-dddd-eeeeeeffffff";
-    inline static const std::string pathUuid = "aaaaaaaa-3333-cccc-dddd-eeeeeeffffff";
-    inline static const std::string tripUuid = "aaaaaaaa-4444-cccc-dddd-eeeeeeffffff";
-    inline static const std::string boardingNodeUuid = "aaaaaaaa-5555-cccc-dddd-eeeeeeffffff";
-    inline static const std::string unboardingNodeUuid = "aaaaaaaa-6666-cccc-dddd-eeeeeeffffff";
-    inline static TrRouting::Point boardingNode = TrRouting::Point(45.526, -73.59);
-    inline static TrRouting::Point unboardingNode = TrRouting::Point(45.53, -73.61);
-
-    std::unique_ptr<TrRouting::Scenario> scenario;
-    std::unique_ptr<TrRouting::RouteParameters> testParameters;
-
-    std::unique_ptr<TrRouting::SingleCalculationResult> getSingleResult();
-    void assertResultConversion(nlohmann::json jsonResponse, TrRouting::SingleCalculationResult &result, TrRouting::RouteParameters &params);
+    void assertResultConversion(nlohmann::json jsonResponse, TrRouting::SingleCalculationResult &result, TrRouting::RouteParameters &params) override;
 
 public:
-    void SetUp( ) override
-    {
-        scenario = std::make_unique<TrRouting::Scenario>();
-        scenario->uuid = uuidGenerator("aaaaaaaa-bbbb-cccc-dddd-eeeeeeffffff");
-        scenario->name = "Test arbitrary scenario";
-
-        testParameters = std::make_unique<TrRouting::RouteParameters>(
-            std::make_unique<TrRouting::Point>(45.5269, -73.58912),
-            std::make_unique<TrRouting::Point>(45.52184, -73.57817),
-            *scenario,
-            DEFAULT_TIME,
-            DEFAULT_MIN_WAITING_TIME,
-            DEFAULT_MAX_TOTAL_TIME,
-            DEFAULT_MAX_ACCESS_TRAVEL_TIME,
-            DEFAULT_MAX_EGRESS_TRAVEL_TIME,
-            DEFAULT_MAX_TRANSFER_TRAVEL_TIME,
-            DEFAULT_FIRST_WAITING_TIME,
-            false,
-            true
-        );
-    }
-
-    void TearDown( ) override
-    {
-        // Nothing to tear down
-    }
 };
 
 TEST_F(ResultToV1FixtureTest, TestNoRoutingFoundResultDefaultReason)
@@ -216,83 +171,6 @@ TEST_F(ResultToV1FixtureTest, TestAllNodesResult)
     ASSERT_EQ(node2Result.arrivalTime, jsonResponse["nodes"][1]["arrivalTimeSeconds"]);
     ASSERT_EQ(node2Result.totalTravelTime, jsonResponse["nodes"][1]["totalTravelTimeSeconds"]);
     ASSERT_EQ(node2Result.numberOfTransfers, jsonResponse["nodes"][1]["numberOfTransfers"]);
-}
-
-std::unique_ptr<TrRouting::SingleCalculationResult> ResultToV1FixtureTest::getSingleResult() {
-    // Prepare the result, we test the conversion, the result doesn't have to make sense
-    std::unique_ptr<TrRouting::SingleCalculationResult> result = std::make_unique<TrRouting::SingleCalculationResult>();
-    result.get()->departureTime = 8 * 60 * 60 + 500;
-    result.get()->totalTravelTime = 2000;
-    result.get()->arrivalTime = result.get()->departureTime + result.get()->totalTravelTime;
-    result.get()->totalDistance = 3000;
-    result.get()->totalInVehicleTime = 1200;
-    result.get()->totalInVehicleDistance = 2000;
-    result.get()->totalNonTransitTravelTime = 800;
-    result.get()->totalNonTransitDistance = 1000;
-    result.get()->numberOfBoardings = 1;
-    result.get()->numberOfTransfers = 0;
-    result.get()->transferWalkingTime = 100;
-    result.get()->transferWalkingDistance = 50;
-    result.get()->accessTravelTime = 400;
-    result.get()->accessDistance = 700;
-    result.get()->egressTravelTime = 200;
-    result.get()->egressDistance = 250;
-    result.get()->transferWaitingTime = 60;
-    result.get()->firstWaitingTime = 40;
-    result.get()->totalWaitingTime = 100;
-
-    result.get()->steps.push_back(std::make_unique<TrRouting::WalkingStep>(
-        TrRouting::walking_step_type::ACCESS,
-        result.get()->accessTravelTime,
-        result.get()->accessDistance,
-        result.get()->departureTime,
-        result.get()->departureTime + result.get()->accessTravelTime,
-        result.get()->departureTime + result.get()->accessTravelTime + 180
-    ));
-
-    result.get()->steps.push_back(std::make_unique<TrRouting::BoardingStep>(
-        uuidGenerator(agencyUuid),
-        "AG",
-        "AgencyName",
-        uuidGenerator(lineUuid),
-        "LI",
-        "LineName",
-        uuidGenerator(pathUuid),
-        "bus",
-        "autobus",
-        uuidGenerator(tripUuid),
-        1,
-        1,
-        uuidGenerator(boardingNodeUuid),
-        "NC",
-        "NodeName",
-        boardingNode,
-        result.get()->departureTime + result.get()->accessTravelTime + 180,
-        100
-    ));
-
-    result.get()->steps.push_back(std::make_unique<TrRouting::UnboardingStep>(
-        uuidGenerator(agencyUuid),
-        "AG",
-        "AgencyName",
-        uuidGenerator(lineUuid),
-        "LI",
-        "LineName",
-        uuidGenerator(pathUuid),
-        "bus",
-        "autobus",
-        uuidGenerator(tripUuid),
-        3,
-        4,
-        uuidGenerator(unboardingNodeUuid),
-        "NC1",
-        "NodeName2",
-        unboardingNode,
-        result.get()->arrivalTime - result.get()->egressTravelTime,
-        result.get()->totalInVehicleTime,
-        result.get()->totalInVehicleDistance
-    ));
-    return std::move(result);
 }
 
 // Matches the single result returned by getSingleResult, with some hard-coded values. If necessary, it will need to be adapted to match any result
