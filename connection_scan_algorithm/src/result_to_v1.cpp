@@ -206,7 +206,7 @@ namespace TrRouting
     response = json;
   }
 
- nlohmann::json ResultToV1Response::noRoutingFoundResponse(RouteParameters& params, NoRoutingReason noRoutingReason)
+  nlohmann::json ResultToV1Response::noRoutingFoundResponse(RouteParameters& params, NoRoutingReason noRoutingReason)
   {
     nlohmann::json json;
     json["status"]                     = STATUS_NO_ROUTING_FOUND;
