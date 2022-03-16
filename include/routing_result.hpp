@@ -311,6 +311,26 @@ namespace TrRouting
     }
   };
 
+  /**
+   * @brief Exception class thrown when no routing is found
+   * 
+   */
+  class NoRoutingFoundException : public std::exception
+  {
+    public:
+      enum NoRoutingReason
+      {
+        // TODO As the calculator supports more reasons, add more elements to this enum
+        // Generic reason, when not possible to specify more
+        NO_ROUTING_FOUND
+      };
+      NoRoutingFoundException(NoRoutingReason reason_) : std::exception(), reason(reason_) {};
+      NoRoutingReason getReason() const { return reason; };
+
+    private:
+      NoRoutingReason reason;
+  };
+
   // TODO: This type will be removed in later commits
   struct RoutingResult {
 
