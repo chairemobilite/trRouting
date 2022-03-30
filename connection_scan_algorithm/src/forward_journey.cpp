@@ -108,13 +108,11 @@ namespace TrRouting
           continue;
         }
 
-        i = 0;
         while ((std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(resultingNodeJourneyStep) != -1 && std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION>(resultingNodeJourneyStep) != -1))
         {
           journey.push_front(resultingNodeJourneyStep);
           bestAccessNodeIndex = std::get<connectionIndexes::NODE_DEP>(*forwardConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(resultingNodeJourneyStep)].get());
           resultingNodeJourneyStep = forwardJourneysSteps[bestAccessNodeIndex];
-          i++;
         }
 
         if (!params.returnAllNodesResult)
