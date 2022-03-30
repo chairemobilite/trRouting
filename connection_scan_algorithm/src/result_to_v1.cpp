@@ -210,7 +210,7 @@ namespace TrRouting
     return json;
   }
 
-  nlohmann::json ResultToV1Response::resultToJsonString(RoutingResultNew& result, RouteParameters& params)
+  nlohmann::json ResultToV1Response::resultToJsonString(RoutingResult& result, RouteParameters& params)
   {
     ResultToV1Visitor visitor = ResultToV1Visitor(params);
     return result.accept(visitor);

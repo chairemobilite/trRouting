@@ -21,7 +21,7 @@ class RouteAccessMapFixtureTests : public RouteCalculationFixtureTests
 
 public:
     // Asserts the successful result fields, given some easy to provide expected test data
-    void assertResults(TrRouting::RoutingResultNew& result,
+    void assertResults(TrRouting::RoutingResult& result,
         int nbReachableNodes);
     // Return a parameters vector with the scenario and minimum waiting time, which is repetitive and mandatory
     std::vector<std::string> initializeParameters();
@@ -41,12 +41,12 @@ TEST_F(RouteAccessMapFixtureTests, SimpleAllNodesQuery)
     parametersWithValues.push_back("origin=45.5242,-73.5817");
     parametersWithValues.push_back("departure_time_seconds=" + std::to_string(departureTime));
 
-    std::unique_ptr<TrRouting::RoutingResultNew> result = calculateOd(parametersWithValues);
+    std::unique_ptr<TrRouting::RoutingResult> result = calculateOd(parametersWithValues);
     assertResults(*result.get(), 5);
 
 }
 
-void RouteAccessMapFixtureTests::assertResults(TrRouting::RoutingResultNew& result,
+void RouteAccessMapFixtureTests::assertResults(TrRouting::RoutingResult& result,
     int nbReachableNodes)
 {
     ASSERT_EQ(TrRouting::result_type::ALL_NODES, result.resType);

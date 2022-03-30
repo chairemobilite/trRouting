@@ -326,7 +326,7 @@ int main(int argc, char** argv) {
       calculator.algorithmCalculationTime.start();
       calculator.benchmarking.clear();
 
-      std::unique_ptr<TrRouting::RoutingResultNew> routingResult;
+      std::unique_ptr<TrRouting::RoutingResult> routingResult;
       TrRouting::AlternativesResult alternativeResult;
 
       // prepare parameters:

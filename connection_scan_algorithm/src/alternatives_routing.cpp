@@ -94,7 +94,7 @@ namespace TrRouting
       std::cout << "calculating fastest alternative..." << std::endl;
     }
 
-    std::unique_ptr<RoutingResultNew> result = calculate(parameters);
+    std::unique_ptr<RoutingResult> result = calculate(parameters);
 
     // Can technically be allNodes or SingleCalculation, so we check the type
     if (result.get()->resType == result_type::SINGLE_CALCULATION)

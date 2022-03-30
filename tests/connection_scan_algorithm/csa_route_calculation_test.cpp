@@ -131,7 +131,7 @@ TEST_F(SingleRouteCalculationFixtureTests, NodeToNodeCalculation)
         true
     );
 
-    std::unique_ptr<TrRouting::RoutingResultNew> result = calculateOd(testParameters);
+    std::unique_ptr<TrRouting::RoutingResult> result = calculateOd(testParameters);
     assertSuccessResults(*result.get(),
         departureTime,
         expectedTransitDepartureTime,
@@ -164,7 +164,7 @@ TEST_F(SingleRouteCalculationFixtureTests, SimpleODCalculationDepartureTime)
         true
     );
 
-    std::unique_ptr<TrRouting::RoutingResultNew> result = calculateOd(testParameters);
+    std::unique_ptr<TrRouting::RoutingResult> result = calculateOd(testParameters);
     assertSuccessResults(*result.get(),
         departureTime,
         expectedTransitDepartureTime,
@@ -198,7 +198,7 @@ TEST_F(SingleRouteCalculationFixtureTests, SimpleODCalculationArrivalTime)
         false
     );
 
-    std::unique_ptr<TrRouting::RoutingResultNew> result = calculateOd(testParameters);
+    std::unique_ptr<TrRouting::RoutingResult> result = calculateOd(testParameters);
     assertSuccessResults(*result.get(),
         -1,
         expectedTransitDepartureTime,
@@ -234,7 +234,7 @@ TEST_F(SingleRouteCalculationFixtureTests, SimpleODCalculationWithAllParams)
         true
     );
 
-    std::unique_ptr<TrRouting::RoutingResultNew> result = calculateOd(testParameters);
+    std::unique_ptr<TrRouting::RoutingResult> result = calculateOd(testParameters);
     assertSuccessResults(*result.get(),
         departureTime,
         expectedTransitDepartureTime,
@@ -415,7 +415,7 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingTravelTime)
     }
 }
 
-std::unique_ptr<TrRouting::RoutingResultNew> SingleRouteCalculationFixtureTests::calculateOd(TrRouting::RouteParameters& parameters)
+std::unique_ptr<TrRouting::RoutingResult> SingleRouteCalculationFixtureTests::calculateOd(TrRouting::RouteParameters& parameters)
 {
     // TODO: This needs to be called to set some default values that are still part of the global parameters
     calculator.params.setDefaultValues();
