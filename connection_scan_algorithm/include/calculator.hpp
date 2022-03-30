@@ -44,7 +44,6 @@
 #include "person.hpp"
 #include "od_trip.hpp"
 #include "place.hpp"
-#include "network.hpp"
 #include "scenario.hpp"
 #include "service.hpp"
 #include "station.hpp"
@@ -143,7 +142,6 @@ namespace TrRouting
     int                    updateLinesFromCache      (Parameters&  params, std::string customPath = "");
     int                    updatePathsFromCache      (Parameters&  params, std::string customPath = "");
     int                    updateScenariosFromCache  (Parameters&  params, std::string customPath = "");
-    int                    updateNetworksFromCache   (Parameters&  params, std::string customPath = "");
     int                    updateSchedulesFromCache  (Parameters&  params, std::string customPath = "");
 
     int                    setConnections(std::vector<std::shared_ptr<ConnectionTuple>> connections);
@@ -187,9 +185,6 @@ namespace TrRouting
 
     std::vector<std::unique_ptr<Agency>>     agencies;
     std::map<boost::uuids::uuid, int>        agencyIndexesByUuid;
-
-    std::vector<std::unique_ptr<Network>>    networks;
-    std::map<boost::uuids::uuid, int>        networkIndexesByUuid;
 
     std::vector<std::unique_ptr<Service>>    services;
     std::map<boost::uuids::uuid, int>        serviceIndexesByUuid;

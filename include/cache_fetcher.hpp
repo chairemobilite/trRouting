@@ -34,7 +34,6 @@
 #include "toolbox.hpp"
 #include "parameters.hpp"
 #include "agency.hpp"
-#include "network.hpp"
 #include "line.hpp"
 #include "node.hpp"
 #include "data_source.hpp"
@@ -299,25 +298,6 @@ namespace TrRouting
       std::map<boost::uuids::uuid, int>& agencyIndexesByUuid,
       std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
       std::map<std::string, int>& modeIndexesByShortname,
-      Parameters& params,
-      std::string customPath = ""
-    );
-
-    /**
-     * Read the networks cache file and fill the networks vector.
-     * 
-     * @return 0 in case of success, values below 0 when errors occurred:
-     * -EBADMSG if deserialization did not work
-     * -ENOENT if the file does not exist
-     * -EINVAL For any other data related error
-     * -(error codes from the open system call)
-     */
-    int getNetworks(
-      std::vector<std::unique_ptr<Network>>& ts,
-      std::map<boost::uuids::uuid, int>& tIndexesByUuid,
-      std::map<boost::uuids::uuid, int>& agencyIndexesByUuid,
-      std::map<boost::uuids::uuid, int>& serviceIndexesByUuid,
-      std::map<boost::uuids::uuid, int>& scenarioIndexesByUuid,
       Parameters& params,
       std::string customPath = ""
     );

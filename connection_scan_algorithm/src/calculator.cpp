@@ -43,10 +43,6 @@ namespace TrRouting
     return forwardConnections.size();
   }
 
-  int Calculator::countNetworks() {
-    return networks.size();
-  }
-
   RoutingResult Calculator::calculate(RouteParameters &parameters, bool resetAccessPaths, bool resetFilters) {
 
     reset(parameters, resetAccessPaths, resetFilters);
