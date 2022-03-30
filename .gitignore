@@ -92,3 +92,5 @@ tests/**/gtest.trs
 tests/**/test-suite.log
 tests/*/.dirstamp
 !tests/**/*.capnpbin
+tests/benchmark_csa/cache
+tests/connection_scan_algorithm/csa_test*
