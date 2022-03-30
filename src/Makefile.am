@@ -12,7 +12,6 @@ gtfs_fetcher.cpp \
 households_cache_fetcher.cpp \
 lines_cache_fetcher.cpp \
 modes_initialization.cpp \
-networks_cache_fetcher.cpp \
 nodes_cache_fetcher.cpp \
 od_trips_cache_fetcher.cpp \
 osrm_fetcher.cpp \

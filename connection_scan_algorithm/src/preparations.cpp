@@ -68,11 +68,6 @@ namespace TrRouting
     return params.cacheFetcher->getScenarios(scenarios, scenarioIndexesByUuid, serviceIndexesByUuid, lineIndexesByUuid, agencyIndexesByUuid, nodeIndexesByUuid, modeIndexesByShortname, params, customPath);
   }
 
-  int Calculator::updateNetworksFromCache(Parameters& params, std::string customPath)
-  {
-    return params.cacheFetcher->getNetworks(networks, networkIndexesByUuid, agencyIndexesByUuid, serviceIndexesByUuid, scenarioIndexesByUuid, params, customPath);
-  }
-
   int Calculator::updateSchedulesFromCache(Parameters& params, std::string customPath)
   {
     std::vector<std::shared_ptr<ConnectionTuple>> connections;
@@ -203,12 +198,6 @@ namespace TrRouting
         return Calculator::DataStatus::DATA_READ_ERROR;
       }
       ret = updateScenariosFromCache(params);
-      // Ignore missing file
-      if (ret < 0 && ret != -ENOENT)
-      {
-        return Calculator::DataStatus::DATA_READ_ERROR;
-      }
-      ret = updateNetworksFromCache(params);
       // Ignore missing file
       if (ret < 0 && ret != -ENOENT)
       {

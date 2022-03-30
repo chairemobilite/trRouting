@@ -14,7 +14,6 @@ household.capnp.h \
 householdCollection.capnp.h \
 line.capnp.h \
 lineCollection.capnp.h \
-networkCollection.capnp.h \
 node.capnp.h \
 nodeCollection.capnp.h \
 odTrip.capnp.h \
