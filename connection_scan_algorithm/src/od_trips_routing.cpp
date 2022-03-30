@@ -135,7 +135,7 @@ namespace TrRouting
     if (params.debugDisplay)
       std::cout << "  preparing odTripsRouting" << std::endl;
 
-    std::unique_ptr<RoutingResultNew>  routingResult;
+    std::unique_ptr<RoutingResult>  routingResult;
     nlohmann::json json;
     nlohmann::json odTripJson;
     nlohmann::json lineProfilesJson;

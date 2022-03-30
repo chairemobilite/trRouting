@@ -82,7 +82,7 @@ TEST_F(RouteCalculationFixtureTests, NodeToNodeCalculation)
     parametersWithValues.push_back("destination=45.53258,-73.60196");
     parametersWithValues.push_back("departure_time_seconds=" + std::to_string(departureTime));
 
-    std::unique_ptr<TrRouting::RoutingResultNew> result = calculateOd(parametersWithValues);
+    std::unique_ptr<TrRouting::RoutingResult> result = calculateOd(parametersWithValues);
     assertSuccessResults(*result.get(),
         departureTime,
         expectedTransitDepartureTime,
@@ -105,7 +105,7 @@ TEST_F(RouteCalculationFixtureTests, SimpleODCalculationDepartureTime)
     parametersWithValues.push_back("destination=45.54,-73.6146");
     parametersWithValues.push_back("departure_time_seconds=" + std::to_string(departureTime));
 
-    std::unique_ptr<TrRouting::RoutingResultNew> result = calculateOd(parametersWithValues);
+    std::unique_ptr<TrRouting::RoutingResult> result = calculateOd(parametersWithValues);
     assertSuccessResults(*result.get(),
         departureTime,
         expectedTransitDepartureTime,
@@ -129,7 +129,7 @@ TEST_F(RouteCalculationFixtureTests, SimpleODCalculationArrivalTime)
     parametersWithValues.push_back("destination=45.54,-73.6146");
     parametersWithValues.push_back("arrival_time_seconds=" + std::to_string(arrivalTime));
 
-    std::unique_ptr<TrRouting::RoutingResultNew> result = calculateOd(parametersWithValues);
+    std::unique_ptr<TrRouting::RoutingResult> result = calculateOd(parametersWithValues);
     assertSuccessResults(*result.get(),
         -1,
         expectedTransitDepartureTime,
@@ -160,7 +160,7 @@ TEST_F(RouteCalculationFixtureTests, SimpleODCalculationWithAllParams)
     parametersWithValues.push_back("max_travel_time_seconds=" + std::to_string(expectedTransitDepartureTime - departureTime + egressTime + travelTimeInVehicle + 5));
     parametersWithValues.push_back("max_first_waiting_time_seconds=" + std::to_string(expectedTransitDepartureTime - departureTime));
 
-    std::unique_ptr<TrRouting::RoutingResultNew> result = calculateOd(parametersWithValues);
+    std::unique_ptr<TrRouting::RoutingResult> result = calculateOd(parametersWithValues);
     assertSuccessResults(*result.get(),
         departureTime,
         expectedTransitDepartureTime,
@@ -304,7 +304,7 @@ std::vector<std::string> RouteCalculationFixtureTests::initializeParameters()
     return parametersWithValues;
 }
 
-std::unique_ptr<TrRouting::RoutingResultNew> RouteCalculationFixtureTests::calculateOd(std::vector<std::string> parameters)
+std::unique_ptr<TrRouting::RoutingResult> RouteCalculationFixtureTests::calculateOd(std::vector<std::string> parameters)
 {
     calculator.params.setDefaultValues();
     TrRouting::RouteParameters routeParams = calculator.params.update(parameters,

@@ -49,7 +49,7 @@ TEST_F(SingleTAndACalculationFixtureTests, TripWithTransfer)
         true
     );
 
-    std::unique_ptr<TrRouting::RoutingResultNew> result = calculateOd(testParameters);
+    std::unique_ptr<TrRouting::RoutingResult> result = calculateOd(testParameters);
     assertSuccessResults(*result.get(),
         departureTime,
         expectedTransitDepartureTime,
@@ -89,7 +89,7 @@ TEST_F(SingleTAndACalculationFixtureTests, NoTransferMinTransferTime)
         true
     );
 
-    std::unique_ptr<TrRouting::RoutingResultNew> result = calculateOd(testParameters);
+    std::unique_ptr<TrRouting::RoutingResult> result = calculateOd(testParameters);
     assertSuccessResults(*result.get(),
         departureTime,
         expectedTransitDepartureTime,
@@ -130,7 +130,7 @@ TEST_F(SingleTAndACalculationFixtureTests, TripWithWalkingTransfer)
         true
     );
 
-    std::unique_ptr<TrRouting::RoutingResultNew> result = calculateOd(testParameters);
+    std::unique_ptr<TrRouting::RoutingResult> result = calculateOd(testParameters);
     assertSuccessResults(*result.get(),
         departureTime,
         expectedTransitDepartureTime,

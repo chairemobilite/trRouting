@@ -5,7 +5,7 @@
 namespace TrRouting
 {
 
-  std::unique_ptr<RoutingResultNew> Calculator::forwardJourneyStep(RouteParameters &parameters, int bestArrivalTime, int bestEgressNodeIndex, int bestEgressTravelTime, int bestEgressDistance)
+  std::unique_ptr<RoutingResult> Calculator::forwardJourneyStep(RouteParameters &parameters, int bestArrivalTime, int bestEgressNodeIndex, int bestEgressTravelTime, int bestEgressDistance)
   {
 
     // FIXME: One code path supports both Single calculation and all nodes, we shouldn't have to deal with both of these types here

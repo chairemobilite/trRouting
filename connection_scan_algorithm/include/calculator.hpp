@@ -113,13 +113,13 @@ namespace TrRouting
     // are 2 very different return values. They should be split so it can return
     // a concrete result object instead of pointer (that alternatives could use directly), but still
     // use common calculation functions
-    std::unique_ptr<RoutingResultNew> calculate(RouteParameters &parameters, bool resetAccessPaths = true, bool resetFilters = true);
+    std::unique_ptr<RoutingResult> calculate(RouteParameters &parameters, bool resetAccessPaths = true, bool resetFilters = true);
     std::tuple<int,int,int,int> forwardCalculation(RouteParameters &parameters); // best arrival time,   best egress node index, best egress travel time: MAX_INT,-1,-1 if non routable, too long or all nodes result
     std::tuple<int,int,int,int> reverseCalculation(RouteParameters &parameters); // best departure time, best access node index, best access travel time: -1,-1,-1 if non routable, too long or all nodes result
     // TODO See calculate
-    std::unique_ptr<RoutingResultNew> forwardJourneyStep(RouteParameters &parameters, int bestArrivalTime, int bestEgressNodeIndex, int bestEgressTravelTime, int bestEgressDistance);
+    std::unique_ptr<RoutingResult> forwardJourneyStep(RouteParameters &parameters, int bestArrivalTime, int bestEgressNodeIndex, int bestEgressTravelTime, int bestEgressDistance);
     // TODO See calculate
-    std::unique_ptr<RoutingResultNew> reverseJourneyStep(RouteParameters &parameters, int bestDepartureTime, int bestAccessNodeIndex, int bestAccessTravelTime, int bestAccessDistance);
+    std::unique_ptr<RoutingResult> reverseJourneyStep(RouteParameters &parameters, int bestDepartureTime, int bestAccessNodeIndex, int bestAccessTravelTime, int bestAccessDistance);
     AlternativesResult alternativesRouting(RouteParameters &parameters);
     std::string             odTripsRouting(RouteParameters &parameters);
 

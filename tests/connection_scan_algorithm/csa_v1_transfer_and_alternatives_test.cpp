@@ -40,7 +40,7 @@ TEST_F(TAndACalculationFixtureTests, TripWithTransfer)
     parametersWithValues.push_back("departure_time_seconds=" + std::to_string(departureTime));
     parametersWithValues.push_back("min_waiting_time_seconds=" + std::to_string(minWaitingTime));
 
-    std::unique_ptr<TrRouting::RoutingResultNew> result = calculateOd(parametersWithValues);
+    std::unique_ptr<TrRouting::RoutingResult> result = calculateOd(parametersWithValues);
     assertSuccessResults(*result.get(),
         departureTime,
         expectedTransitDepartureTime,
@@ -71,7 +71,7 @@ TEST_F(TAndACalculationFixtureTests, NoTransferMinTransferTime)
     parametersWithValues.push_back("departure_time_seconds=" + std::to_string(departureTime));
     parametersWithValues.push_back("min_waiting_time_seconds=" + std::to_string(minWaitingTime));
 
-    std::unique_ptr<TrRouting::RoutingResultNew> result = calculateOd(parametersWithValues);
+    std::unique_ptr<TrRouting::RoutingResult> result = calculateOd(parametersWithValues);
     assertSuccessResults(*result.get(),
         departureTime,
         expectedTransitDepartureTime,
@@ -102,7 +102,7 @@ TEST_F(TAndACalculationFixtureTests, TripWithWalkingTransfer)
     parametersWithValues.push_back("destination=45.5549,-73.6173");
     parametersWithValues.push_back("departure_time_seconds=" + std::to_string(departureTime));
 
-    std::unique_ptr<TrRouting::RoutingResultNew> result = calculateOd(parametersWithValues);
+    std::unique_ptr<TrRouting::RoutingResult> result = calculateOd(parametersWithValues);
     assertSuccessResults(*result.get(),
         departureTime,
         expectedTransitDepartureTime,

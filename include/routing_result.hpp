@@ -22,14 +22,12 @@ namespace TrRouting
   /**
    * @brief Base class for routing results. It accepts a visitor for the class hierarchy
    * 
-   * TODO: Will be renamed to RoutingResult in later patch, when the struct is removed and this class is used instead
-   * 
    * TODO: Even later, when function calls are detricated and split, there will be no use for a class hierarchy. Concrete result types
    */
-  class RoutingResultNew {
+  class RoutingResult {
   public:
     enum result_type resType;
-    RoutingResultNew(result_type _resType): resType(_resType) {}
+    RoutingResult(result_type _resType): resType(_resType) {}
     template<class T>
     T accept(ResultVisitor<T> &visitor) {
         do_accept(visitor);
@@ -229,7 +227,7 @@ namespace TrRouting
    * @brief Class detailing a single trip detail. It describes a single alternative trip.
    * 
    */
-  class SingleCalculationResult : public RoutingResultNew {
+  class SingleCalculationResult : public RoutingResult {
   public:
     int departureTime;
     int arrivalTime;
@@ -254,7 +252,7 @@ namespace TrRouting
     // TODO Legs are used in the od_trip_routing function. They are kept here to avoid having to rewrite this code handling now, but eventually, it should the steps detail instead
     std::vector<std::tuple<int, int, int, int, int>> legs; // tuple: tripIdx, lineIdx, pathIdx, start connection index, end connection index
     SingleCalculationResult():
-      RoutingResultNew(result_type::SINGLE_CALCULATION)
+      RoutingResult(result_type::SINGLE_CALCULATION)
     {}
     void do_accept(ResultVisitorBase &visitor) const override {
       return visitor.visitSingleCalculationResult(*this);
@@ -264,12 +262,12 @@ namespace TrRouting
   /**
    * @brief Result class describing many alternative trips for the queried parameters
    */
-  class AlternativesResult : public RoutingResultNew {
+  class AlternativesResult : public RoutingResult {
   public:
     // Results should be of SingleCalculationResult, but it's not possible to cast a unique_ptr
     int totalAlternativesCalculated;
-    std::vector<std::unique_ptr<RoutingResultNew>> alternatives;
-    AlternativesResult(): RoutingResultNew(result_type::ALTERNATIVES) {}
+    std::vector<std::unique_ptr<RoutingResult>> alternatives;
+    AlternativesResult(): RoutingResult(result_type::ALTERNATIVES) {}
     void do_accept(ResultVisitorBase &visitor) const override {
       return visitor.visitAlternativesResult(*this);
     }
@@ -300,12 +298,12 @@ namespace TrRouting
    * @brief Result class describing all accessible nodes within the queried parameters. It contains a list
    * of all accessible nodes and the times it takes
    */
-  class AllNodesResult : public RoutingResultNew {
+  class AllNodesResult : public RoutingResult {
   public:
     std::vector<AccessibleNodes> nodes;
     int numberOfReachableNodes;
     float percentOfReachableNodes;
-    AllNodesResult(): RoutingResultNew(result_type::ALL_NODES) {}
+    AllNodesResult(): RoutingResult(result_type::ALL_NODES) {}
     void do_accept(ResultVisitorBase &visitor) const override {
       return visitor.visitAllNodesResult(*this);
     }
@@ -329,39 +327,6 @@ namespace TrRouting
 
     private:
       NoRoutingReason reason;
-  };
-
-  // TODO: This type will be removed in later commits
-  struct RoutingResult {
-
-    int travelTimeSeconds;
-    int arrivalTimeSeconds;
-    int departureTimeSeconds;
-    int initialDepartureTimeSeconds;
-    int initialLostTimeAtDepartureSeconds;
-    int numberOfTransfers;
-    int inVehicleTravelTimeSeconds;
-    int transferTravelTimeSeconds;
-    int waitingTimeSeconds;
-    int accessTravelTimeSeconds;
-    int egressTravelTimeSeconds;
-    int transferWaitingTimeSeconds;
-    int firstWaitingTimeSeconds;
-    int nonTransitTravelTimeSeconds;
-    int calculationTimeMilliseconds;
-    std::string status;
-    nlohmann::json json;
-    std::vector<boost::uuids::uuid> lineUuids;
-    std::vector<boost::uuids::uuid> tripUuids;
-    std::vector<boost::uuids::uuid> boardingNodeUuids;
-    std::vector<boost::uuids::uuid> unboardingNodeUuids;
-    std::vector<boost::uuids::uuid> agencyUuids;
-    std::vector<std::string>        modeShortnames;
-    std::vector<int>                tripsIdx;
-    std::vector<int>                linesIdx;
-    std::vector<int>                inVehicleTravelTimesSeconds;
-    std::vector<std::tuple<int, int, int, int, int>> legs; // tuple: tripIdx, lineIdx, pathIdx, start connection index, end connection index
-
   };
 
 }

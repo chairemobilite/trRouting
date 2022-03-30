@@ -454,7 +454,7 @@ void BaseCsaFixtureTests::assertNoRouting(const TrRouting::NoRoutingFoundExcepti
     ASSERT_EQ(expectedReason, exception.getReason());
 }
 
-void BaseCsaFixtureTests::assertSuccessResults(TrRouting::RoutingResultNew& result,
+void BaseCsaFixtureTests::assertSuccessResults(TrRouting::RoutingResult& result,
     int origDepartureTime,
     int expTransitDepartureTime,
     int expInVehicleTravelTime,

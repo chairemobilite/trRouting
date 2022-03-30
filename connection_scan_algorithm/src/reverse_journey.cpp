@@ -5,7 +5,7 @@
 namespace TrRouting
 {
 
-  std::unique_ptr<RoutingResultNew> Calculator::reverseJourneyStep(RouteParameters &parameters, int bestDepartureTime, int bestAccessNodeIndex, int bestAccessTravelTime, int bestAccessDistance)
+  std::unique_ptr<RoutingResult> Calculator::reverseJourneyStep(RouteParameters &parameters, int bestDepartureTime, int bestAccessNodeIndex, int bestAccessTravelTime, int bestAccessDistance)
   {
 
     // FIXME: One code path supports both Single calculation and all nodes, we shouldn't have to deal with both of these types here
