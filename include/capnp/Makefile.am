@@ -26,6 +26,4 @@ place.capnp.h \
 placeCollection.capnp.h \
 scenarioCollection.capnp.h \
 serviceCollection.capnp.h \
-simulation.capnp.h \
-simulationCollection.capnp.h \
 stationCollection.capnp.h
