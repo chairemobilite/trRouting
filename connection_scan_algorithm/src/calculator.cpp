@@ -52,7 +52,6 @@ namespace TrRouting
     std::tuple<int,int,int> forwardResult;
     std::tuple<int,int,int> reverseResult;
     
-    int i {0};
     int bestEgressNodeIndex {-1};
     int bestEgressTravelTime {-1};
     int bestEgressDistance {-1};

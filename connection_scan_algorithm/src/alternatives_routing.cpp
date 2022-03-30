@@ -318,10 +318,10 @@ namespace TrRouting
       {
         std::cout << std::endl;
       }
-      int i {0};
 
       if (params.debugDisplay)
       {
+        int i {0};
         for (auto foundLinesIdx : alreadyFoundLinesIdx)
         {
           std::cout << i << ". ";
