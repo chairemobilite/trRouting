@@ -60,6 +60,46 @@ TEST_F(RouteAccessMapFixtureTests, SimpleAllNodesQuery)
 
 }
 
+// Test all nodes query from an origin far from the network (origin offsetted)
+TEST_F(RouteAccessMapFixtureTests, SimpleAllNodesQueryNoNodeAtOrigin)
+{
+    int departureTime = getTimeInSeconds(9, 45);
+
+    std::vector<std::string> parametersWithValues = initializeParameters();
+    parametersWithValues.push_back("origin=44.5242,-73.5817");
+    parametersWithValues.push_back("departure_time_seconds=" + std::to_string(departureTime));
+
+    try {
+        calculateOd(parametersWithValues);
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
+    } catch (TrRouting::NoRoutingFoundException const & e) {
+        assertNoRouting(e, TrRouting::NoRoutingFoundException::NoRoutingReason::NO_ACCESS_AT_ORIGIN);
+    } catch(...) {
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
+    }
+
+}
+
+// Test all nodes query to a destination far from the network (destination offsetted)
+TEST_F(RouteAccessMapFixtureTests, SimpleAllNodesQueryNoNodeAtDestination)
+{
+    int arrivalTime = getTimeInSeconds(9, 45);
+
+    std::vector<std::string> parametersWithValues = initializeParameters();
+    parametersWithValues.push_back("destination=44.5242,-73.5817");
+    parametersWithValues.push_back("arrival_time_seconds=" + std::to_string(arrivalTime));
+
+    try {
+        calculateOd(parametersWithValues);
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
+    } catch (TrRouting::NoRoutingFoundException const & e) {
+        assertNoRouting(e, TrRouting::NoRoutingFoundException::NoRoutingReason::NO_ACCESS_AT_DESTINATION);
+    } catch(...) {
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
+    }
+
+}
+
 void RouteAccessMapFixtureTests::assertResults(TrRouting::RoutingResult& result,
     int nbReachableNodes)
 {

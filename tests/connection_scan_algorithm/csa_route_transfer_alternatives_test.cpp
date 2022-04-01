@@ -222,6 +222,42 @@ TEST_F(SingleTAndACalculationFixtureTests, TripWithAlternatives)
     );
 }
 
+// Test a query with alternatives, for a trip with no routing found because too far from network
+TEST_F(SingleTAndACalculationFixtureTests, TripWithNoRoutingAlternatives)
+{
+    int departureTime = getTimeInSeconds(9, 45);
+    int travelTimeInVehicle = 720;
+    // This is where mocking would be interesting. Those were taken from the first run of the test
+    int accessTime = 469;
+    int egressTime = 166;
+    int expectedTransitDepartureTime = getTimeInSeconds(10);
+    int expectedTransferWaitingTime = 300;
+
+    TrRouting::RouteParameters testParameters = TrRouting::RouteParameters(
+        std::make_unique<TrRouting::Point>(45.7242, -73.7817),
+        std::make_unique<TrRouting::Point>(45.7541,-73.8186),
+        *scenario,
+        departureTime,
+        DEFAULT_MIN_WAITING_TIME,
+        DEFAULT_MAX_TOTAL_TIME,
+        DEFAULT_MAX_ACCESS_TRAVEL_TIME,
+        DEFAULT_MAX_EGRESS_TRAVEL_TIME,
+        DEFAULT_MAX_TRANSFER_TRAVEL_TIME,
+        DEFAULT_FIRST_WAITING_TIME,
+        true,
+        true
+    );
+
+    try {
+        calculateWithAlternatives(testParameters);
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
+    } catch (TrRouting::NoRoutingFoundException const & e) {
+        assertNoRouting(e, TrRouting::NoRoutingFoundException::NoRoutingReason::NO_ACCESS_AT_ORIGIN);
+    } catch(...) {
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
+    }
+}
+
 TrRouting::AlternativesResult SingleTAndACalculationFixtureTests::calculateWithAlternatives(TrRouting::RouteParameters& parameters)
 {
     // TODO: This needs to be called to set some default values that are still part of the global parameters

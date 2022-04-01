@@ -4,6 +4,7 @@
 #include "osrm_fetcher.hpp"
 #include "toolbox.hpp" //MAX_INT
 #include "od_trip.hpp"
+#include "routing_result.hpp"
 
 namespace TrRouting
 {
@@ -73,7 +74,7 @@ namespace TrRouting
 
     int j {0};
 
-    if (!params.returnAllNodesResult || departureTimeSeconds >= -1)
+    if (!params.returnAllNodesResult || departureTimeSeconds > -1)
     {
       if (resetAccessPaths)
       {
@@ -115,6 +116,9 @@ namespace TrRouting
             std::cout << "  fetching nodes with osrm with mode " << params.accessMode << std::endl;
 
           accessFootpaths = std::move(OsrmFetcher::getAccessibleNodesFootpathsFromPoint(*parameters.getOrigin(), nodes, params.accessMode, params, parameters.getMaxAccessWalkingTravelTimeSeconds(), params.walkingSpeedMetersPerSecond));
+          if (accessFootpaths.size() == 0) {
+            throw NoRoutingFoundException(NoRoutingFoundException::NO_ACCESS_AT_ORIGIN); 
+          }
         }
       }
 
@@ -145,7 +149,7 @@ namespace TrRouting
       }
     }
   
-    if (!params.returnAllNodesResult || arrivalTimeSeconds >= -1)
+    if (!params.returnAllNodesResult || arrivalTimeSeconds > -1)
     {
       if (resetAccessPaths)
       {
@@ -182,6 +186,9 @@ namespace TrRouting
         else
         {
           egressFootpaths = std::move(OsrmFetcher::getAccessibleNodesFootpathsFromPoint(*parameters.getDestination(), nodes, params.accessMode, params, parameters.getMaxEgressWalkingTravelTimeSeconds(), params.walkingSpeedMetersPerSecond));
+          if (egressFootpaths.size() == 0) {
+            throw NoRoutingFoundException(NoRoutingFoundException::NO_ACCESS_AT_DESTINATION); 
+          }
         }
       }
       

@@ -319,7 +319,11 @@ namespace TrRouting
       {
         // TODO As the calculator supports more reasons, add more elements to this enum
         // Generic reason, when not possible to specify more
-        NO_ROUTING_FOUND
+        NO_ROUTING_FOUND,
+        // No accessible node at origin
+        NO_ACCESS_AT_ORIGIN,
+        // No accessible node at destination
+        NO_ACCESS_AT_DESTINATION
       };
       NoRoutingFoundException(NoRoutingReason reason_) : std::exception(), reason(reason_) {};
       NoRoutingReason getReason() const { return reason; };
