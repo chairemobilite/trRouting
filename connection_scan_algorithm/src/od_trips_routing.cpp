@@ -1,3 +1,5 @@
+#include <random>
+
 #include "calculator.hpp"
 #include "toolbox.hpp"
 #include "constants.hpp"

@@ -2,33 +2,13 @@
 #define TR_CALCULATOR
 
 #include <string>
-#include <ctime>
-#include <utility>
-#include <iostream>
-#include <iomanip>
-#include <fstream>
-#include <sstream>
-#include <iterator>
 #include <vector>
-#include <math.h>
-#include <algorithm>
-#include <random>
-#include <chrono>
-#include <boost/algorithm/string.hpp>
-#include <boost/format.hpp>
-#include <boost/filesystem.hpp>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/ptr_container/ptr_vector.hpp>
-#include <boost/range/adaptor/reversed.hpp>
-//#include <boost/compute.hpp>
-#include <boost/tokenizer.hpp>
-#include <boost/filesystem.hpp>
+#include <map>
+#include <memory>
+#include <deque>
+#include <tuple>
+
 #include <boost/uuid/uuid.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/asio/ip/tcp.hpp>
-#include <limits>
-#include <stdlib.h>
 
 #include "calculation_time.hpp"
 
