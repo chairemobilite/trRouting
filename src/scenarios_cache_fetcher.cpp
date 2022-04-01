@@ -5,12 +5,14 @@
 #include <string>
 #include <vector>
 #include <errno.h>
+#include <fcntl.h>
 #include <kj/exception.h>
-
+#include <boost/uuid/string_generator.hpp>
+#include <boost/uuid/nil_generator.hpp>
+#include <capnp/serialize-packed.h>
 #include "cache_fetcher.hpp"
 #include "scenario.hpp"
 #include "capnp/scenarioCollection.capnp.h"
-//#include "toolbox.hpp"
 
 namespace TrRouting
 {

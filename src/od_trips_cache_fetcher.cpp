@@ -4,13 +4,14 @@
 
 #include <string>
 #include <vector>
-
+#include <fcntl.h>
+#include <boost/uuid/string_generator.hpp>
+#include <capnp/serialize-packed.h>
 #include "cache_fetcher.hpp"
 #include "od_trip.hpp"
 #include "point.hpp"
 #include "capnp/odTripCollection.capnp.h"
 #include "capnp/odTrip.capnp.h"
-//#include "toolbox.hpp"
 
 namespace TrRouting
 {

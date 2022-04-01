@@ -5,7 +5,10 @@
 #include <string>
 #include <vector>
 #include <errno.h>
+#include <fcntl.h>
 #include <kj/exception.h>
+#include <boost/uuid/string_generator.hpp>
+#include <capnp/serialize-packed.h>
 
 #include "cache_fetcher.hpp"
 #include "trip.hpp"

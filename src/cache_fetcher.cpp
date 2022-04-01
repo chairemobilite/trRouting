@@ -1,4 +1,8 @@
+#include <fstream>
+#include <fcntl.h>
+#include <capnp/serialize-packed.h>
 #include "cache_fetcher.hpp"
+#include "parameters.hpp"
 
 namespace TrRouting
 {
