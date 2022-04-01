@@ -45,11 +45,6 @@ public:
 TEST_F(RouteAccessMapFixtureTests, SimpleAllNodesQuery)
 {
     int departureTime = getTimeInSeconds(9, 45);
-    int travelTimeInVehicle = 420;
-    // This is where mocking would be interesting. Those were taken from the first run of the test
-    int accessTime = 469;
-    int egressTime = 138;
-    int expectedTransitDepartureTime = getTimeInSeconds(10);
 
     std::vector<std::string> parametersWithValues = initializeParameters();
     parametersWithValues.push_back("origin=45.5242,-73.5817");
@@ -57,6 +52,20 @@ TEST_F(RouteAccessMapFixtureTests, SimpleAllNodesQuery)
 
     std::unique_ptr<TrRouting::RoutingResult> result = calculateOd(parametersWithValues);
     assertResults(*result.get(), 5);
+
+}
+
+// Test for an destination near the north2 node
+TEST_F(RouteAccessMapFixtureTests, SimpleAllNodesQueryBackward)
+{
+    int arrivalTime = getTimeInSeconds(11, 15);
+
+    std::vector<std::string> parametersWithValues = initializeParameters();
+    parametersWithValues.push_back("destination=45.54,-73.6146");
+    parametersWithValues.push_back("arrival_time_seconds=" + std::to_string(arrivalTime));
+
+    std::unique_ptr<TrRouting::RoutingResult> result = calculateOd(parametersWithValues);
+    assertResults(*result.get(), 6);
 
 }
 
