@@ -1,6 +1,13 @@
 #include "calculator.hpp"
 #include "constants.hpp"
-#include "json.hpp"
+#include "parameters.hpp"
+#include "node.hpp"
+#include "trip.hpp"
+#include "line.hpp"
+#include "mode.hpp"
+#include "path.hpp"
+#include "agency.hpp"
+#include "routing_result.hpp"
 
 namespace TrRouting
 {
@@ -52,8 +59,6 @@ namespace TrRouting
       std::vector<int>                                  tripsIdx;
       std::vector<int>                                  inVehicleTravelTimesSeconds; // the in vehicle travel time for each segment
       std::vector<std::tuple<int, int, int, int, int>>  legs; // tuple: tripIdx, lineIdx, pathIdx, start connection index, end connection index
-      nlohmann::json stepJson = {};
-      nlohmann::json nodeJson = {};
 
       Node *   journeyStepNodeDeparture;
       Node *   journeyStepNodeArrival;

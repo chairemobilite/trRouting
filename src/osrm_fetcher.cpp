@@ -1,5 +1,9 @@
 #include "osrm_fetcher.hpp"
 #include "json.hpp"
+#include "point.hpp"
+#include "node.hpp"
+#include "parameters.hpp"
+#include "client_http.hpp"
 
 namespace TrRouting
 {

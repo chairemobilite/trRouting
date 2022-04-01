@@ -5,6 +5,7 @@
 #include "gtest/gtest.h"
 #include "calculator.hpp"
 #include "csa_test_base.hpp"
+#include "constants.hpp"
 #include "node.hpp"
 #include "scenario.hpp"
 #include "agency.hpp"
@@ -13,7 +14,13 @@
 #include "path.hpp"
 #include "point.hpp"
 #include "mode.hpp"
-#include "constants.hpp"
+#include "trip.hpp"
+#include "data_source.hpp"
+#include "household.hpp"
+#include "person.hpp"
+#include "place.hpp"
+#include "station.hpp"
+#include "stop.hpp"
 
 /**
  *  Create a default data set:

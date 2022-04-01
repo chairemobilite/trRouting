@@ -30,32 +30,7 @@
 #include <limits>
 #include <stdlib.h>
 
-#include "json.hpp"
-#include "toolbox.hpp"
-#include "node.hpp"
-#include "line.hpp"
-#include "trip.hpp"
-#include "point.hpp"
-#include "mode.hpp"
-#include "path.hpp"
-#include "stop.hpp"
-#include "data_source.hpp"
-#include "household.hpp"
-#include "person.hpp"
-#include "od_trip.hpp"
-#include "place.hpp"
-#include "scenario.hpp"
-#include "service.hpp"
-#include "station.hpp"
-#include "block.hpp"
-#include "parameters.hpp"
-#include "routing_result.hpp"
-#include "osrm_fetcher.hpp"
 #include "calculation_time.hpp"
-#include "cache_fetcher.hpp"
-#include "gtfs_fetcher.hpp"
-#include "csv_fetcher.hpp"
-#include "combinations.hpp"
 
 extern std::string consoleRed;
 extern std::string consoleGreen;
@@ -66,6 +41,26 @@ extern std::string consoleResetColor;
 
 namespace TrRouting
 {
+  class Parameters;
+  class RouteParameters;
+  class Mode;
+  class DataSource;
+  class Household;
+  class Person;
+  class OdTrip;
+  class Place;
+  class Agency;
+  class Service;
+  class Station;
+  class Node;
+  class Stop;
+  class Line;
+  class Path;
+  class Scenario;
+  class Trip;
+  class RoutingResult;
+  class AlternativesResult;
+
   // tuple representing a connection: departureNodeIndex, arrivalNodeIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequence in trip, lineIndex, blockIndex, canTransferSameLine, minWaitingTimeSeconds (-1 to inherit from parameters)
   using ConnectionTuple = std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>;
 

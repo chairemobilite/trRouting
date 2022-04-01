@@ -7,6 +7,18 @@
 #include "csa_test_base.hpp"
 #include "csa_route_calculation_test.hpp"
 #include "constants.hpp"
+#include "mode.hpp"
+#include "data_source.hpp"
+#include "household.hpp"
+#include "person.hpp"
+#include "place.hpp"
+#include "agency.hpp"
+#include "service.hpp"
+#include "station.hpp"
+#include "stop.hpp"
+#include "line.hpp"
+#include "path.hpp"
+#include "trip.hpp"
 
 /**
  * This file covers tests with transfers and requests for alternatives

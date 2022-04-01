@@ -1,4 +1,22 @@
+#include <boost/uuid/uuid.hpp>
+
 #include "calculator.hpp"
+#include "trip.hpp"
+#include "mode.hpp"
+#include "agency.hpp"
+#include "data_source.hpp"
+#include "node.hpp"
+#include "line.hpp"
+#include "path.hpp"
+#include "scenario.hpp"
+#include "stop.hpp"
+#include "service.hpp"
+#include "station.hpp"
+#include "od_trip.hpp"
+#include "place.hpp"
+#include "household.hpp"
+#include "person.hpp"
+
 
 namespace TrRouting
 {
