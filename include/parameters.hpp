@@ -2,26 +2,10 @@
 #define TR_PARAMETERS
 
 #include <string>
-#include <iostream>
-#include <iomanip>
-#include <fstream>
-#include <sstream>
-#include <algorithm>
-#include <iterator>
-#include <chrono>
 #include <vector>
 #include <map>
-#include <math.h>
 #include <optional>
 #include <boost/uuid/uuid.hpp>
-#include <boost/uuid/string_generator.hpp>
-#include <boost/algorithm/string.hpp>
-
-#include "point.hpp"
-#include "toolbox.hpp"
-#include "od_trip.hpp"
-#include "scenario.hpp"
-#include "node.hpp"
 
 namespace TrRouting
 {
@@ -30,6 +14,10 @@ namespace TrRouting
   class CacheFetcher;
   class GtfsFetcher;
   class CsvFetcher;
+  class Point;
+  class OdTrip;
+  class Scenario;
+  class Node;
 
   class ParameterException : public std::exception
   {

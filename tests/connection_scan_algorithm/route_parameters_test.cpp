@@ -1,11 +1,14 @@
 #include <errno.h>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <boost/uuid/string_generator.hpp>
 
 #include "gtest/gtest.h" // we will add the path to C preprocessor later
 #include "parameters.hpp"
 #include "parameters_test.hpp"
 #include "scenario.hpp"
+#include "point.hpp"
+#include "toolbox.hpp" //MAX_INT
 
 const std::string EMPTY_SCENARIO_UUID = "acdcef12-1111-2222-3333-444455558888";
 

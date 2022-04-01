@@ -1,5 +1,6 @@
 #include <errno.h>
 #include <experimental/filesystem>
+#include <boost/uuid/string_generator.hpp>
 
 #include "gtest/gtest.h" // we will add the path to C preprocessor later
 #include "routing_result.hpp"
@@ -9,6 +10,7 @@
 #include "toolbox.hpp"
 #include "point.hpp"
 #include "parameters.hpp"
+#include "scenario.hpp"
 
 namespace fs = std::experimental::filesystem;
 

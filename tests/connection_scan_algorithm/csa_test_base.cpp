@@ -21,6 +21,7 @@
 #include "place.hpp"
 #include "station.hpp"
 #include "stop.hpp"
+#include "od_trip.hpp"
 
 /**
  *  Create a default data set:

@@ -6,6 +6,7 @@
 #include "parameters.hpp"
 #include "csa_test_base.hpp"
 #include "scenario.hpp"
+#include "toolbox.hpp" //MAX_INT
 
 // This fixture tests the parameters from the single route parameters values
 class SingleRouteCalculationFixtureTests : public BaseCsaFixtureTests

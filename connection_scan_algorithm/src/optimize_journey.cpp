@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "calculator.hpp"
 #include "trip.hpp"
 #include "parameters.hpp"

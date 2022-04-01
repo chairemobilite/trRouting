@@ -19,6 +19,8 @@
 #include "line.hpp"
 #include "path.hpp"
 #include "trip.hpp"
+#include "od_trip.hpp"
+#include "node.hpp"
 
 /**
  * This file covers tests with transfers and requests for alternatives
