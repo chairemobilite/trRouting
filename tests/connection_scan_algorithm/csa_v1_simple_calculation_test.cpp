@@ -50,11 +50,29 @@ TEST_F(RouteCalculationFixtureTests, NoRoutingBecauseNoPath)
     }
 }
 
-// Test origin and destination far from network
-TEST_F(RouteCalculationFixtureTests, NoRoutingBecauseNoNode)
+// Test origin far from network
+TEST_F(RouteCalculationFixtureTests, NoRoutingBecauseNoNodeAtOrigin)
 {
     std::vector<std::string> parametersWithValues = initializeParameters();
     parametersWithValues.push_back("origin=45.5349,-73.55478");
+    parametersWithValues.push_back("destination=45.54,-73.6146");
+    parametersWithValues.push_back("departure_time_seconds=" + std::to_string(getTimeInSeconds(9, 50)));
+
+    try {
+        calculateOd(parametersWithValues);
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
+    } catch (TrRouting::NoRoutingFoundException const & e) {
+        assertNoRouting(e, TrRouting::NoRoutingFoundException::NoRoutingReason::NO_ACCESS_AT_ORIGIN);
+    } catch(...) {
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
+    }
+}
+
+// Test destination far from network
+TEST_F(RouteCalculationFixtureTests, NoRoutingBecauseNoNodeAtDestination)
+{
+    std::vector<std::string> parametersWithValues = initializeParameters();
+    parametersWithValues.push_back("origin=45.5242,-73.5817");
     parametersWithValues.push_back("destination=45.5155,-73.56797");
     parametersWithValues.push_back("departure_time_seconds=" + std::to_string(getTimeInSeconds(9, 50)));
 
@@ -62,7 +80,7 @@ TEST_F(RouteCalculationFixtureTests, NoRoutingBecauseNoNode)
         calculateOd(parametersWithValues);
         FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
     } catch (TrRouting::NoRoutingFoundException const & e) {
-        assertNoRouting(e, TrRouting::NoRoutingFoundException::NoRoutingReason::NO_ROUTING_FOUND);
+        assertNoRouting(e, TrRouting::NoRoutingFoundException::NoRoutingReason::NO_ACCESS_AT_DESTINATION);
     } catch(...) {
         FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
     }
@@ -205,7 +223,7 @@ TEST_F(RouteCalculationFixtureTests, NoRoutingAccessTimeLimit)
         calculateOd(parametersWithValues);
         FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
     } catch (TrRouting::NoRoutingFoundException const & e) {
-        assertNoRouting(e, TrRouting::NoRoutingFoundException::NoRoutingReason::NO_ROUTING_FOUND);
+        assertNoRouting(e, TrRouting::NoRoutingFoundException::NoRoutingReason::NO_ACCESS_AT_ORIGIN);
     } catch(...) {
         FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
     }
@@ -228,7 +246,7 @@ TEST_F(RouteCalculationFixtureTests, NoRoutingEgressTimeLimit)
         calculateOd(parametersWithValues);
         FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
     } catch (TrRouting::NoRoutingFoundException const & e) {
-        assertNoRouting(e, TrRouting::NoRoutingFoundException::NoRoutingReason::NO_ROUTING_FOUND);
+        assertNoRouting(e, TrRouting::NoRoutingFoundException::NoRoutingReason::NO_ACCESS_AT_DESTINATION);
     } catch(...) {
         FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
     }
