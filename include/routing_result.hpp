@@ -308,6 +308,17 @@ namespace TrRouting
     }
   };
 
+  enum NoRoutingReason
+  {
+    // TODO As the calculator supports more reasons, add more elements to this enum
+    // Generic reason, when not possible to specify more
+    NO_ROUTING_FOUND,
+    // No accessible node at origin
+    NO_ACCESS_AT_ORIGIN,
+    // No accessible node at destination
+    NO_ACCESS_AT_DESTINATION
+  };
+
   /**
    * @brief Exception class thrown when no routing is found
    * 
@@ -315,16 +326,6 @@ namespace TrRouting
   class NoRoutingFoundException : public std::exception
   {
     public:
-      enum NoRoutingReason
-      {
-        // TODO As the calculator supports more reasons, add more elements to this enum
-        // Generic reason, when not possible to specify more
-        NO_ROUTING_FOUND,
-        // No accessible node at origin
-        NO_ACCESS_AT_ORIGIN,
-        // No accessible node at destination
-        NO_ACCESS_AT_DESTINATION
-      };
       NoRoutingFoundException(NoRoutingReason reason_) : std::exception(), reason(reason_) {};
       NoRoutingReason getReason() const { return reason; };
 

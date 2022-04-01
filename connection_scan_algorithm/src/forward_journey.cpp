@@ -40,7 +40,7 @@ namespace TrRouting
       foundLine = true;
       resultingNodes.push_back(bestEgressNodeIndex);
     } else {
-      throw NoRoutingFoundException(NoRoutingFoundException::NO_ROUTING_FOUND);
+      throw NoRoutingFoundException(NoRoutingReason::NO_ROUTING_FOUND);
     }
 
     if (foundLine || params.returnAllNodesResult)

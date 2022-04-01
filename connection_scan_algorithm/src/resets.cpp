@@ -117,7 +117,7 @@ namespace TrRouting
 
           accessFootpaths = std::move(OsrmFetcher::getAccessibleNodesFootpathsFromPoint(*parameters.getOrigin(), nodes, params.accessMode, params, parameters.getMaxAccessWalkingTravelTimeSeconds(), params.walkingSpeedMetersPerSecond));
           if (accessFootpaths.size() == 0) {
-            throw NoRoutingFoundException(NoRoutingFoundException::NO_ACCESS_AT_ORIGIN); 
+            throw NoRoutingFoundException(NoRoutingReason::NO_ACCESS_AT_ORIGIN); 
           }
         }
       }
@@ -187,7 +187,7 @@ namespace TrRouting
         {
           egressFootpaths = std::move(OsrmFetcher::getAccessibleNodesFootpathsFromPoint(*parameters.getDestination(), nodes, params.accessMode, params, parameters.getMaxEgressWalkingTravelTimeSeconds(), params.walkingSpeedMetersPerSecond));
           if (egressFootpaths.size() == 0) {
-            throw NoRoutingFoundException(NoRoutingFoundException::NO_ACCESS_AT_DESTINATION); 
+            throw NoRoutingFoundException(NoRoutingReason::NO_ACCESS_AT_DESTINATION); 
           }
         }
       }

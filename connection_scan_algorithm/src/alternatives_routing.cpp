@@ -348,7 +348,7 @@ namespace TrRouting
       return alternatives;
 
     }
-    throw NoRoutingFoundException(NoRoutingFoundException::NO_ROUTING_FOUND);
+    throw NoRoutingFoundException(NoRoutingReason::NO_ROUTING_FOUND);
 
   }
 

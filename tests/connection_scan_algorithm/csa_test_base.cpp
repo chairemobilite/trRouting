@@ -457,7 +457,7 @@ void BaseCsaFixtureTests::setUpModes()
     calculator.modes.push_back(mode);
 }
 
-void BaseCsaFixtureTests::assertNoRouting(const TrRouting::NoRoutingFoundException& exception, TrRouting::NoRoutingFoundException::NoRoutingReason expectedReason)
+void BaseCsaFixtureTests::assertNoRouting(const TrRouting::NoRoutingFoundException& exception, TrRouting::NoRoutingReason expectedReason)
 {
     ASSERT_EQ(expectedReason, exception.getReason());
 }

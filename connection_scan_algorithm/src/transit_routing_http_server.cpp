@@ -434,7 +434,7 @@ int main(int argc, char** argv) {
           }
         }
       } catch (NoRoutingFoundException e) {
-          response = ResultToV1Response::noRoutingFoundResponse(routeParams).dump(2);
+          response = ResultToV1Response::noRoutingFoundResponse(routeParams, e.getReason()).dump(2);
       }
 
     }
