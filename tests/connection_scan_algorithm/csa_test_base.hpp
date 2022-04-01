@@ -1,6 +1,8 @@
 #ifndef _CSA_TEST_H
 #define _CSA_TEST_H
 
+#include <boost/uuid/string_generator.hpp>
+
 #include "gtest/gtest.h"
 #include "calculator.hpp"
 #include "parameters.hpp"

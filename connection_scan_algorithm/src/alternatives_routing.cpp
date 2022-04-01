@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "calculator.hpp"
 #include "constants.hpp"
 #include "routing_result.hpp"
@@ -5,6 +7,7 @@
 #include "parameters.hpp"
 #include "combinations.hpp"
 #include "routing_result.hpp"
+#include "point.hpp"
 
 namespace TrRouting
 {

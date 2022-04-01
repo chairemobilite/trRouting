@@ -1,4 +1,10 @@
+#include <boost/uuid/string_generator.hpp>
+#include <boost/algorithm/string.hpp>
+
 #include "parameters.hpp"
+#include "toolbox.hpp" //MAX_INT
+#include "scenario.hpp"
+#include "point.hpp"
 
 namespace TrRouting
 {

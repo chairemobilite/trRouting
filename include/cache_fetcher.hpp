@@ -11,6 +11,7 @@
 #include <vector>
 #include <math.h>
 #include <fcntl.h>
+#include <memory>
 #include <boost/uuid/uuid.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/uuid/uuid_io.hpp>

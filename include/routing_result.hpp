@@ -7,11 +7,10 @@
 #include <stdlib.h>
 #include "routing_result_visitor.hpp"
 #include "json.hpp"
+#include "point.hpp" //Not using a forward declaration, as we use it more directly, see issue #129
 
 namespace TrRouting
 {
-  class Point;
-
   // TODO These enums are used temporarily, while we need the class hierarchy to be able to determine which type is returned when dynamic cast is necessary
   enum result_type { SINGLE_CALCULATION, ALTERNATIVES, ALL_NODES };
   enum result_step_type { WALKING, BOARDING, UNBOARDING };

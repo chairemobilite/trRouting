@@ -9,6 +9,7 @@
 #include "line.hpp"
 #include "trip.hpp"
 #include "routing_result.hpp"
+#include "od_trip.hpp"
 
 namespace TrRouting
 {

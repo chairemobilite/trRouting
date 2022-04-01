@@ -1,3 +1,4 @@
+
 #include "calculator.hpp"
 #include "constants.hpp"
 #include "parameters.hpp"
@@ -8,7 +9,7 @@
 #include "path.hpp"
 #include "agency.hpp"
 #include "routing_result.hpp"
-
+#include "toolbox.hpp" //MAX_INT
 
 namespace TrRouting
 {

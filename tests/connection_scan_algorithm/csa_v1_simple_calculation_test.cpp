@@ -21,6 +21,7 @@
 #include "place.hpp"
 #include "station.hpp"
 #include "stop.hpp"
+#include "od_trip.hpp"
 
 // TODO:
 // Test transferable mode, it has separate code path

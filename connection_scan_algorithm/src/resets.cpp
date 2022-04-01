@@ -2,6 +2,8 @@
 #include "parameters.hpp"
 #include "trip.hpp"
 #include "osrm_fetcher.hpp"
+#include "toolbox.hpp" //MAX_INT
+#include "od_trip.hpp"
 
 namespace TrRouting
 {

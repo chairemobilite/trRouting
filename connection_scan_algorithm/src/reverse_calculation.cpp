@@ -1,6 +1,9 @@
+#include <boost/uuid/string_generator.hpp>
+
 #include "calculator.hpp"
 #include "toolbox.hpp"
 #include "parameters.hpp"
+#include "node.hpp"
 
 namespace TrRouting
 {

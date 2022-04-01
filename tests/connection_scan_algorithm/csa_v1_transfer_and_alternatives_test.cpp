@@ -22,6 +22,7 @@
 #include "place.hpp"
 #include "station.hpp"
 #include "stop.hpp"
+#include "od_trip.hpp"
 
 /**
  * This file covers tests with transfers and requests for alternatives
