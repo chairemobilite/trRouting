@@ -385,6 +385,8 @@ namespace TrRouting
             departureTime = std::get<connectionIndexes::TIME_DEP>(*reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(reverseAccessJourneysSteps[resultingNodeIndex])].get()) - std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(reverseAccessJourneysSteps[resultingNodeIndex])].get());
             if (arrivalTimeSeconds - departureTime <=  parameters.getMaxTotalTravelTimeSeconds())
             {
+              reachableNodesCount++;
+
               AccessibleNodes node = AccessibleNodes(
                 nodes[resultingNodeIndex].get()->uuid,
                 arrivalTimeSeconds,
