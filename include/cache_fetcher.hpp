@@ -2,38 +2,11 @@
 #define TR_CACHE_FETCHER
 
 #include <string>
-#include <iostream>
-#include <iomanip>
-#include <fstream>
-#include <sstream>
-#include <algorithm>
-#include <iterator>
 #include <vector>
-#include <math.h>
-#include <fcntl.h>
+#include <map>
 #include <memory>
 #include <boost/uuid/uuid.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/uuid/uuid_io.hpp>
-#include <boost/uuid/nil_generator.hpp>
-#include <boost/uuid/string_generator.hpp>
-#include <boost/date_time/gregorian/gregorian.hpp>
-//#include <boost/algorithm/string.hpp>
-//#include <boost/property_tree/ptree.hpp>
-//#include <boost/property_tree/json_parser.hpp>
-//#include <boost/tokenizer.hpp>
-//#include <boost/filesystem.hpp>
-//#include <boost/lexical_cast.hpp>
-//#include <boost/asio/ip/tcp.hpp>
-//#include <stdlib.h>
-#include <capnp/message.h>
-#include <capnp/serialize-packed.h>
 
-#include "calculation_time.hpp"
-
-//#include "tuple_boost_serialize.hpp"
-#include "toolbox.hpp"
-#include "parameters.hpp"
 #include "agency.hpp"
 #include "line.hpp"
 #include "node.hpp"
@@ -53,6 +26,8 @@
 
 namespace TrRouting
 {
+
+  class Parameters;
   
   class CacheFetcher
   {
