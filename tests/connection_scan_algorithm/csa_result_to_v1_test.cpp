@@ -71,9 +71,9 @@ public:
     }
 };
 
-TEST_F(ResultToV1FixtureTest, TestNoRoutingFoundResult)
+TEST_F(ResultToV1FixtureTest, TestNoRoutingFoundResultDefaultReason)
 {
-    nlohmann::json jsonResponse = TrRouting::ResultToV1Response::noRoutingFoundResponse(*testParameters.get());
+    nlohmann::json jsonResponse = TrRouting::ResultToV1Response::noRoutingFoundResponse(*testParameters.get(), TrRouting::NoRoutingReason::NO_ROUTING_FOUND);
 
     TrRouting::Point* origin = testParameters.get()->getOrigin();
     TrRouting::Point* destination = testParameters.get()->getDestination();
@@ -83,6 +83,22 @@ TEST_F(ResultToV1FixtureTest, TestNoRoutingFoundResult)
     ASSERT_EQ(origin->longitude, jsonResponse["origin"][1]);
     ASSERT_EQ(destination->latitude, jsonResponse["destination"][0]);
     ASSERT_EQ(destination->longitude, jsonResponse["destination"][1]);
+    ASSERT_EQ("NO_ROUTING_FOUND", jsonResponse["reason"]);
+}
+
+TEST_F(ResultToV1FixtureTest, TestNoRoutingFoundResultWithReason)
+{
+    nlohmann::json jsonResponse = TrRouting::ResultToV1Response::noRoutingFoundResponse(*testParameters.get(), TrRouting::NoRoutingReason::NO_ACCESS_AT_ORIGIN);
+
+    TrRouting::Point* origin = testParameters.get()->getOrigin();
+    TrRouting::Point* destination = testParameters.get()->getDestination();
+
+    ASSERT_EQ(STATUS_NO_ROUTING_FOUND, jsonResponse["status"]);
+    ASSERT_EQ(origin->latitude, jsonResponse["origin"][0]);
+    ASSERT_EQ(origin->longitude, jsonResponse["origin"][1]);
+    ASSERT_EQ(destination->latitude, jsonResponse["destination"][0]);
+    ASSERT_EQ(destination->longitude, jsonResponse["destination"][1]);
+    ASSERT_EQ("NO_ACCESS_AT_ORIGIN", jsonResponse["reason"]);
 }
 
 TEST_F(ResultToV1FixtureTest, TestSingleCalculationResult)

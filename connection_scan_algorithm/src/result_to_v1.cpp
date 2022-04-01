@@ -8,6 +8,10 @@
 
 namespace TrRouting
 {
+  const std::string NO_ROUTING_REASON_DEFAULT = "NO_ROUTING_FOUND";
+  const std::string NO_ROUTING_REASON_NO_ACCESS_AT_ORIGIN = "NO_ACCESS_AT_ORIGIN";
+  const std::string NO_ROUTING_REASON_NO_ACCESS_AT_DESTINATION = "NO_ACCESS_AT_DESTINATION";
+
   /**
    * @brief Visitor for the result's steps
    */
@@ -199,7 +203,7 @@ namespace TrRouting
     response = json;
   }
 
- nlohmann::json ResultToV1Response::noRoutingFoundResponse(RouteParameters& params)
+ nlohmann::json ResultToV1Response::noRoutingFoundResponse(RouteParameters& params, NoRoutingReason noRoutingReason)
   {
     nlohmann::json json;
     json["status"]                     = STATUS_NO_ROUTING_FOUND;
@@ -207,6 +211,22 @@ namespace TrRouting
     json["destination"]                = { params.getDestination()->latitude, params.getDestination()->longitude };
     json["departureTime"]              = Toolbox::convertSecondsToFormattedTime(params.getTimeOfTrip());
     json["departureTimeSeconds"]       = params.getTimeOfTrip();
+    std::string reason;
+    switch(noRoutingReason) {
+      case NoRoutingReason::NO_ROUTING_FOUND:
+        reason = NO_ROUTING_REASON_DEFAULT;
+        break;
+      case NoRoutingReason::NO_ACCESS_AT_ORIGIN:
+        reason = NO_ROUTING_REASON_NO_ACCESS_AT_ORIGIN;
+        break;
+      case NoRoutingReason::NO_ACCESS_AT_DESTINATION:
+        reason = NO_ROUTING_REASON_NO_ACCESS_AT_DESTINATION;
+        break;
+      default:
+        reason = NO_ROUTING_REASON_DEFAULT;
+        break;
+    }
+    json["reason"] = reason;
     return json;
   }
 

@@ -71,7 +71,7 @@ public:
     BaseCsaFixtureTests() : params(TrRouting::Parameters()), calculator(TrRouting::Calculator(params)) {}
     void SetUp();
     // Assert the result returned an exception and that the reason matches the expected reason
-    void assertNoRouting(const TrRouting::NoRoutingFoundException& exception, TrRouting::NoRoutingFoundException::NoRoutingReason expectedReason);
+    void assertNoRouting(const TrRouting::NoRoutingFoundException& exception, TrRouting::NoRoutingReason expectedReason);
     // Asserts the successful result fields, given some easy to provide expected test data
     void assertSuccessResults(TrRouting::RoutingResult& result,
         int origDepartureTime,

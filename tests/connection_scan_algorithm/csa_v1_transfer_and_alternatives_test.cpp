@@ -176,7 +176,7 @@ TEST_F(TAndACalculationFixtureTests, TripWithNoRoutingAlternatives)
         calculateWithAlternatives(parametersWithValues);
         FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
     } catch (TrRouting::NoRoutingFoundException const & e) {
-        assertNoRouting(e, TrRouting::NoRoutingFoundException::NoRoutingReason::NO_ACCESS_AT_ORIGIN);
+        assertNoRouting(e, TrRouting::NoRoutingReason::NO_ACCESS_AT_ORIGIN);
     } catch(...) {
         FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
     }

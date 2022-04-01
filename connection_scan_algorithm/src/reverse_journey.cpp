@@ -38,7 +38,7 @@ namespace TrRouting
       foundRoute = true;
       resultingNodes.push_back(bestAccessNodeIndex);
     } else {
-      throw NoRoutingFoundException(NoRoutingFoundException::NO_ROUTING_FOUND);
+      throw NoRoutingFoundException(NoRoutingReason::NO_ROUTING_FOUND);
     }
 
     if (foundRoute || params.returnAllNodesResult)

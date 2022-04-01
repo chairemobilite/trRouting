@@ -44,7 +44,7 @@ TEST_F(RouteCalculationFixtureTests, NoRoutingBecauseNoPath)
         calculateOd(parametersWithValues);
         FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
     } catch (TrRouting::NoRoutingFoundException const & e) {
-        assertNoRouting(e, TrRouting::NoRoutingFoundException::NoRoutingReason::NO_ROUTING_FOUND);
+        assertNoRouting(e, TrRouting::NoRoutingReason::NO_ROUTING_FOUND);
     } catch(...) {
         FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
     }
@@ -62,7 +62,7 @@ TEST_F(RouteCalculationFixtureTests, NoRoutingBecauseNoNodeAtOrigin)
         calculateOd(parametersWithValues);
         FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
     } catch (TrRouting::NoRoutingFoundException const & e) {
-        assertNoRouting(e, TrRouting::NoRoutingFoundException::NoRoutingReason::NO_ACCESS_AT_ORIGIN);
+        assertNoRouting(e, TrRouting::NoRoutingReason::NO_ACCESS_AT_ORIGIN);
     } catch(...) {
         FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
     }
@@ -80,7 +80,7 @@ TEST_F(RouteCalculationFixtureTests, NoRoutingBecauseNoNodeAtDestination)
         calculateOd(parametersWithValues);
         FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
     } catch (TrRouting::NoRoutingFoundException const & e) {
-        assertNoRouting(e, TrRouting::NoRoutingFoundException::NoRoutingReason::NO_ACCESS_AT_DESTINATION);
+        assertNoRouting(e, TrRouting::NoRoutingReason::NO_ACCESS_AT_DESTINATION);
     } catch(...) {
         FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
     }
@@ -98,7 +98,7 @@ TEST_F(RouteCalculationFixtureTests, NoRoutingBecauseTooEarly)
         calculateOd(parametersWithValues);
         FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
     } catch (TrRouting::NoRoutingFoundException const & e) {
-        assertNoRouting(e, TrRouting::NoRoutingFoundException::NoRoutingReason::NO_ROUTING_FOUND);
+        assertNoRouting(e, TrRouting::NoRoutingReason::NO_ROUTING_FOUND);
     } catch(...) {
         FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
     }
@@ -223,7 +223,7 @@ TEST_F(RouteCalculationFixtureTests, NoRoutingAccessTimeLimit)
         calculateOd(parametersWithValues);
         FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
     } catch (TrRouting::NoRoutingFoundException const & e) {
-        assertNoRouting(e, TrRouting::NoRoutingFoundException::NoRoutingReason::NO_ACCESS_AT_ORIGIN);
+        assertNoRouting(e, TrRouting::NoRoutingReason::NO_ACCESS_AT_ORIGIN);
     } catch(...) {
         FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
     }
@@ -246,7 +246,7 @@ TEST_F(RouteCalculationFixtureTests, NoRoutingEgressTimeLimit)
         calculateOd(parametersWithValues);
         FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
     } catch (TrRouting::NoRoutingFoundException const & e) {
-        assertNoRouting(e, TrRouting::NoRoutingFoundException::NoRoutingReason::NO_ACCESS_AT_DESTINATION);
+        assertNoRouting(e, TrRouting::NoRoutingReason::NO_ACCESS_AT_DESTINATION);
     } catch(...) {
         FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
     }
@@ -272,7 +272,7 @@ TEST_F(RouteCalculationFixtureTests, NoRoutingMaxFirstWaitingTime)
         calculateOd(parametersWithValues);
         FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
     } catch (TrRouting::NoRoutingFoundException const & e) {
-        assertNoRouting(e, TrRouting::NoRoutingFoundException::NoRoutingReason::NO_ROUTING_FOUND);
+        assertNoRouting(e, TrRouting::NoRoutingReason::NO_ROUTING_FOUND);
     } catch(...) {
         FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
     }
@@ -298,7 +298,7 @@ TEST_F(RouteCalculationFixtureTests, NoRoutingMinWaitingTime)
         calculateOd(parametersWithValues);
         FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
     } catch (TrRouting::NoRoutingFoundException const & e) {
-        assertNoRouting(e, TrRouting::NoRoutingFoundException::NoRoutingReason::NO_ROUTING_FOUND);
+        assertNoRouting(e, TrRouting::NoRoutingReason::NO_ROUTING_FOUND);
     } catch(...) {
         FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
     }
@@ -324,7 +324,7 @@ TEST_F(RouteCalculationFixtureTests, NoRoutingTravelTime)
         calculateOd(parametersWithValues);
         FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
     } catch (TrRouting::NoRoutingFoundException const & e) {
-        assertNoRouting(e, TrRouting::NoRoutingFoundException::NoRoutingReason::NO_ROUTING_FOUND);
+        assertNoRouting(e, TrRouting::NoRoutingReason::NO_ROUTING_FOUND);
     } catch(...) {
         FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
     }
