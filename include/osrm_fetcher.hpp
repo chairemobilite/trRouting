@@ -15,13 +15,12 @@
 #include <utility>
 #include <cstdlib>
 
-#include "point.hpp"
-#include "node.hpp"
-#include "parameters.hpp"
-#include "client_http.hpp"
-
 namespace TrRouting
 {
+  class Point;
+  class Node;
+  class Parameters;
+
   class OsrmFetcher
   {
 

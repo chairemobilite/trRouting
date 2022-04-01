@@ -1,4 +1,6 @@
 #include "calculator.hpp"
+#include "parameters.hpp"
+#include "cache_fetcher.hpp"
 
 namespace TrRouting
 {

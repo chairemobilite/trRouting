@@ -1,4 +1,7 @@
 #include "calculator.hpp"
+#include "toolbox.hpp"
+#include "parameters.hpp"
+#include "routing_result.hpp"
 
 namespace TrRouting
 {

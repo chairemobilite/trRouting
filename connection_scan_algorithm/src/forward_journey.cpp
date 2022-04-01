@@ -1,6 +1,14 @@
 #include "calculator.hpp"
 #include "constants.hpp"
-#include "json.hpp"
+#include "parameters.hpp"
+#include "node.hpp"
+#include "trip.hpp"
+#include "line.hpp"
+#include "mode.hpp"
+#include "path.hpp"
+#include "agency.hpp"
+#include "routing_result.hpp"
+
 
 namespace TrRouting
 {

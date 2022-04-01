@@ -6,6 +6,21 @@
 #include "calculator.hpp"
 #include "csa_test_base.hpp"
 #include "csa_v1_simple_calculation_test.hpp"
+#include "node.hpp"
+#include "scenario.hpp"
+#include "agency.hpp"
+#include "line.hpp"
+#include "service.hpp"
+#include "path.hpp"
+#include "point.hpp"
+#include "mode.hpp"
+#include "trip.hpp"
+#include "data_source.hpp"
+#include "household.hpp"
+#include "person.hpp"
+#include "place.hpp"
+#include "station.hpp"
+#include "stop.hpp"
 
 // TODO:
 // Test transferable mode, it has separate code path

@@ -1,6 +1,12 @@
 #include "calculator.hpp"
 #include "toolbox.hpp"
 #include "constants.hpp"
+#include "parameters.hpp"
+#include "path.hpp"
+#include "person.hpp"
+#include "line.hpp"
+#include "trip.hpp"
+#include "routing_result.hpp"
 
 namespace TrRouting
 {

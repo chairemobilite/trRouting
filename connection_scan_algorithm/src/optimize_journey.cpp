@@ -1,4 +1,7 @@
 #include "calculator.hpp"
+#include "trip.hpp"
+#include "parameters.hpp"
+#include "node.hpp"
 
 namespace TrRouting
 {

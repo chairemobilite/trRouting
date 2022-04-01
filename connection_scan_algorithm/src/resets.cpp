@@ -1,4 +1,7 @@
 #include "calculator.hpp"
+#include "parameters.hpp"
+#include "trip.hpp"
+#include "osrm_fetcher.hpp"
 
 namespace TrRouting
 {

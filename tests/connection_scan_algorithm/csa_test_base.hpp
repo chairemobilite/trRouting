@@ -4,6 +4,8 @@
 #include "gtest/gtest.h"
 #include "calculator.hpp"
 #include "parameters.hpp"
+#include "routing_result.hpp"
+
 
 inline int getTimeInSeconds(int hour, int minutes = 0, int seconds = 0) { return hour * 3600 + minutes * 60 + seconds; }
 const int MIN_WAITING_TIME{180};

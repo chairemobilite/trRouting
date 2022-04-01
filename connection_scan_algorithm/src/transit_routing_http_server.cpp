@@ -27,6 +27,7 @@
 #include "calculator.hpp"
 #include "program_options.hpp"
 #include "result_to_v1.hpp"
+#include "routing_result.hpp"
 
 using namespace TrRouting;
 
