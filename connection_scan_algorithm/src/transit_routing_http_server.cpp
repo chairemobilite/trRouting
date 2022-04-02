@@ -16,10 +16,9 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include "toolbox.hpp"
-#include "gtfs_fetcher.hpp"
-#include "csv_fetcher.hpp"
 #include "cache_fetcher.hpp"
 #include "calculation_time.hpp"
 #include "parameters.hpp"
@@ -114,10 +113,6 @@ int main(int argc, char** argv) {
   algorithmParams.osrmDrivingHost        = programOptions.osrmDrivingHost;
   algorithmParams.serverDebugDisplay     = programOptions.debug;
 
-  GtfsFetcher  gtfsFetcher     = GtfsFetcher();
-  algorithmParams.gtfsFetcher  = &gtfsFetcher;
-  CsvFetcher   csvFetcher      = CsvFetcher();
-  algorithmParams.csvFetcher   = &csvFetcher;
   CacheFetcher cacheFetcher    = CacheFetcher();
   algorithmParams.cacheFetcher = &cacheFetcher;
 

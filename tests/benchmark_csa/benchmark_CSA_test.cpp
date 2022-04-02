@@ -3,13 +3,12 @@
 //Added for the json-example
 #define BOOST_SPIRIT_THREADSAFE
 
+#include <fstream>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/string_generator.hpp>
 
 #include "calculator.hpp"
 #include "cache_fetcher.hpp"
-#include "gtfs_fetcher.hpp" // To initialize calculator object
-#include "csv_fetcher.hpp" // To initialize calculator object
 #include "parameters.hpp"
 #include "routing_result.hpp"
 #include "scenario.hpp"
@@ -73,10 +72,6 @@ public:
     algorithmParams.osrmDrivingHost = "localhost";
     algorithmParams.serverDebugDisplay = false;
 
-    GtfsFetcher gtfsFetcher = GtfsFetcher();
-    algorithmParams.gtfsFetcher = &gtfsFetcher;
-    CsvFetcher csvFetcher = CsvFetcher();
-    algorithmParams.csvFetcher = &csvFetcher;
     CacheFetcher cacheFetcher = TrRouting::CacheFetcher();
     algorithmParams.cacheFetcher = &cacheFetcher;
     algorithmParams.birdDistanceAccessibilityEnabled = true;
