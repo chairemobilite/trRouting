@@ -12,8 +12,6 @@ namespace TrRouting
 
   class DatabaseFetcher;
   class CacheFetcher;
-  class GtfsFetcher;
-  class CsvFetcher;
   class Point;
   class OdTrip;
   class Scenario;
@@ -150,8 +148,6 @@ namespace TrRouting
       std::string calculationName;
 
       CacheFetcher* cacheFetcher;
-      GtfsFetcher*  gtfsFetcher;
-      CsvFetcher*   csvFetcher;
 
       int batchNumber;
       int batchesCount;

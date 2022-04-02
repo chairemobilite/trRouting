@@ -6,9 +6,7 @@ bin_PROGRAMS = trRouting
 trRouting_SOURCES = agencies_cache_fetcher.cpp \
 		    cache_fetcher.cpp \
 calculation_time.cpp \
-csv_fetcher.cpp \
 data_sources_cache_fetcher.cpp \
-gtfs_fetcher.cpp \
 households_cache_fetcher.cpp \
 lines_cache_fetcher.cpp \
 modes_initialization.cpp \
