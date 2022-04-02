@@ -8,7 +8,6 @@
 #include <sstream>
 #include <algorithm>
 #include <boost/format.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
