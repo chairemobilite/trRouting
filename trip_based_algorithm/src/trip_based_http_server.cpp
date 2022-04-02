@@ -8,7 +8,6 @@
 
 
 //Added for the default_resource example
-#include <boost/filesystem.hpp>
 #include <boost/tokenizer.hpp>
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string.hpp>
