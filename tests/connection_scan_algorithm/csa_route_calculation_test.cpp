@@ -144,7 +144,36 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingBecauseTooEarly)
         calculateOd(testParameters);
         FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
     } catch (TrRouting::NoRoutingFoundException const & e) {
-        assertNoRouting(e, TrRouting::NoRoutingReason::NO_ROUTING_FOUND);
+        assertNoRouting(e, TrRouting::NoRoutingReason::NO_SERVICE_FROM_ORIGIN);
+    } catch(...) {
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
+    }
+    
+}
+
+// Test from first to second node of SN path, but before the time of the trip (6:50), reverse journey
+TEST_F(SingleRouteCalculationFixtureTests, NoRoutingBecauseTooEarlyArrival)
+{
+    TrRouting::RouteParameters testParameters = TrRouting::RouteParameters(
+        std::make_unique<TrRouting::Point>(45.5269, -73.58912),
+        std::make_unique<TrRouting::Point>(45.53258, -73.60196),
+        *scenario,
+        getTimeInSeconds(6, 50),
+        DEFAULT_MIN_WAITING_TIME,
+        DEFAULT_MAX_TOTAL_TIME,
+        DEFAULT_MAX_ACCESS_TRAVEL_TIME,
+        DEFAULT_MAX_EGRESS_TRAVEL_TIME,
+        DEFAULT_MAX_TRANSFER_TRAVEL_TIME,
+        DEFAULT_FIRST_WAITING_TIME,
+        false,
+        false // reverse journey
+    );
+
+    try {
+        calculateOd(testParameters);
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
+    } catch (TrRouting::NoRoutingFoundException const & e) {
+        assertNoRouting(e, TrRouting::NoRoutingReason::NO_SERVICE_TO_DESTINATION);
     } catch(...) {
         FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
     }
@@ -381,7 +410,7 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingMaxFirstWaitingTime)
         calculateOd(testParameters);
         FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
     } catch (TrRouting::NoRoutingFoundException const & e) {
-        assertNoRouting(e, TrRouting::NoRoutingReason::NO_ROUTING_FOUND);
+        assertNoRouting(e, TrRouting::NoRoutingReason::NO_SERVICE_FROM_ORIGIN);
     } catch(...) {
         FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
     }
@@ -416,21 +445,17 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingMinWaitingTime)
         calculateOd(testParameters);
         FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
     } catch (TrRouting::NoRoutingFoundException const & e) {
-        assertNoRouting(e, TrRouting::NoRoutingReason::NO_ROUTING_FOUND);
+        assertNoRouting(e, TrRouting::NoRoutingReason::NO_SERVICE_FROM_ORIGIN);
     } catch(...) {
         FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
     }
 }
 
-// Same as SimpleODCalculation, but with max_travel_time lower than should be
+// Same as SimpleODCalculation, but with max_travel_time lower than should be, there is no time to reach anywhere with trip, so no service
 TEST_F(SingleRouteCalculationFixtureTests, NoRoutingTravelTime)
 {
     int departureTime = getTimeInSeconds(9, 45);
     int travelTimeInVehicle = 420;
-    // This is where mocking would be interesting. Those were taken from the first run of the test
-    int accessTime = 469;
-    int egressTime = 138;
-    int expectedTransitDepartureTime = getTimeInSeconds(10);
 
     TrRouting::RouteParameters testParameters = TrRouting::RouteParameters(
         std::make_unique<TrRouting::Point>(45.5242, -73.5817),
@@ -439,6 +464,39 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingTravelTime)
         departureTime,
         DEFAULT_MIN_WAITING_TIME,
         travelTimeInVehicle,
+        DEFAULT_MAX_ACCESS_TRAVEL_TIME,
+        DEFAULT_MAX_EGRESS_TRAVEL_TIME,
+        DEFAULT_MAX_TRANSFER_TRAVEL_TIME,
+        DEFAULT_FIRST_WAITING_TIME,
+        false,
+        true
+    );
+
+    try {
+        calculateOd(testParameters);
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
+    } catch (TrRouting::NoRoutingFoundException const & e) {
+        // Since the connection cannot reach any point within prescribed time, it is considered as no service
+        assertNoRouting(e, TrRouting::NoRoutingReason::NO_SERVICE_FROM_ORIGIN);
+    } catch(...) {
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
+    }
+}
+
+
+// origin is further south of South2, and destination near North2. max_travel_time is not sufficient to reach destination, but there are trips from origin
+TEST_F(SingleRouteCalculationFixtureTests, NoRoutingTravelTimeLongerTrip)
+{
+    int departureTime = getTimeInSeconds(9, 45);
+    int totalTravelTime = 1800;
+
+    TrRouting::RouteParameters testParameters = TrRouting::RouteParameters(
+        std::make_unique<TrRouting::Point>(45.5242, -73.5817),
+        std::make_unique<TrRouting::Point>(45.5466, -73.6405),
+        *scenario,
+        departureTime,
+        DEFAULT_MIN_WAITING_TIME,
+        totalTravelTime,
         DEFAULT_MAX_ACCESS_TRAVEL_TIME,
         DEFAULT_MAX_EGRESS_TRAVEL_TIME,
         DEFAULT_MAX_TRANSFER_TRAVEL_TIME,

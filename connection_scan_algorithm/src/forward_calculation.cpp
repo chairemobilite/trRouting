@@ -2,6 +2,7 @@
 #include "toolbox.hpp"
 #include "parameters.hpp"
 #include "node.hpp"
+#include "routing_result.hpp"
 
 namespace TrRouting
 {
@@ -178,7 +179,11 @@ namespace TrRouting
 
     if (params.debugDisplay)
       std::cerr << "-- " << reachableConnectionsCount << " forward connections parsed on " << connectionsCount << std::endl;
-    
+
+    if (!params.returnAllNodesResult && reachableConnectionsCount == 0) {
+      throw NoRoutingFoundException(NoRoutingReason::NO_SERVICE_FROM_ORIGIN);
+    }
+
     int egressNodeArrivalTime {-1};
     int egressExitConnection  {-1};
     int egressTravelTime      {-1};
