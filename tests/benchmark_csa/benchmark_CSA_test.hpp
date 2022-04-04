@@ -2,8 +2,6 @@
 #define _BENCHMARK_CSA_TEST_H
 
 #include "gtest/gtest.h"
-#include "parameters.hpp"
-#include "calculator.hpp"
 
 using namespace TrRouting;
 using BenchmarkDataTuple = std::tuple<std::string, double, double, double, double, int, bool>;
