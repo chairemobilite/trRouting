@@ -69,6 +69,11 @@ Makefile:443: ../googletest/googletest/src/.deps/libgtest_la-gtest-all.Plo: No s
 make[1]: *** No rule to make target '../googletest/googletest/src/.deps/libgtest_la-gtest-all.Plo'.  Stop.
 ```
 
+### Benchmarks
+
+This repo also contains benchmarks to run various calculations. The benchmarks are under the `tests/` along, with the unit tests. To automatically run them with the `make check` command, configure the repo by running `./configure --enable-benchmark`. Otherwise, benchmarks can be executed manually by running the executable in the benchmark directory.
+
+See the README in the benchmark's directory for additional instructions to run them.
 
 ## Docker
 A provided dockerfile allows to easily build an image
