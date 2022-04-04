@@ -98,7 +98,25 @@ TEST_F(RouteCalculationFixtureTests, NoRoutingBecauseTooEarly)
         calculateOd(parametersWithValues);
         FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
     } catch (TrRouting::NoRoutingFoundException const & e) {
-        assertNoRouting(e, TrRouting::NoRoutingReason::NO_ROUTING_FOUND);
+        assertNoRouting(e, TrRouting::NoRoutingReason::NO_SERVICE_FROM_ORIGIN);
+    } catch(...) {
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
+    }
+}
+
+// Test from first to second node of SN path, but before the time of the trip (6:50) with reverse journey
+TEST_F(RouteCalculationFixtureTests, NoRoutingBecauseTooEarlyArrival)
+{
+    std::vector<std::string> parametersWithValues = initializeParameters();
+    parametersWithValues.push_back("origin=45.5269,-73.58912");
+    parametersWithValues.push_back("destination=45.53258,-73.60196");
+    parametersWithValues.push_back("arrival_time_seconds=" + std::to_string(getTimeInSeconds(6, 50)));
+
+    try {
+        calculateOd(parametersWithValues);
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
+    } catch (TrRouting::NoRoutingFoundException const & e) {
+        assertNoRouting(e, TrRouting::NoRoutingReason::NO_SERVICE_TO_DESTINATION);
     } catch(...) {
         FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
     }
@@ -272,7 +290,7 @@ TEST_F(RouteCalculationFixtureTests, NoRoutingMaxFirstWaitingTime)
         calculateOd(parametersWithValues);
         FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
     } catch (TrRouting::NoRoutingFoundException const & e) {
-        assertNoRouting(e, TrRouting::NoRoutingReason::NO_ROUTING_FOUND);
+        assertNoRouting(e, TrRouting::NoRoutingReason::NO_SERVICE_FROM_ORIGIN);
     } catch(...) {
         FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
     }
@@ -298,27 +316,45 @@ TEST_F(RouteCalculationFixtureTests, NoRoutingMinWaitingTime)
         calculateOd(parametersWithValues);
         FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
     } catch (TrRouting::NoRoutingFoundException const & e) {
-        assertNoRouting(e, TrRouting::NoRoutingReason::NO_ROUTING_FOUND);
+        assertNoRouting(e, TrRouting::NoRoutingReason::NO_SERVICE_FROM_ORIGIN);
     } catch(...) {
         FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
     }
 }
 
-// Same as SimpleODCalculation, but with max_travel_time_seconds lower than should be
+// Same as SimpleODCalculation, but with max_travel_time lower than should be, there is no time to reach anywhere with trip, so no service
 TEST_F(RouteCalculationFixtureTests, NoRoutingTravelTime)
 {
     int departureTime = getTimeInSeconds(9, 45);
     int travelTimeInVehicle = 420;
-    // This is where mocking would be interesting. Those were taken from the first run of the test
-    int accessTime = 469;
-    int egressTime = 138;
-    int expectedTransitDepartureTime = getTimeInSeconds(10);
 
     std::vector<std::string> parametersWithValues = initializeParameters();
     parametersWithValues.push_back("origin=45.5242,-73.5817");
     parametersWithValues.push_back("destination=45.54,-73.6146");
     parametersWithValues.push_back("departure_time_seconds=" + std::to_string(departureTime));
     parametersWithValues.push_back("max_travel_time_seconds=" + std::to_string(travelTimeInVehicle));
+
+    try {
+        calculateOd(parametersWithValues);
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
+    } catch (TrRouting::NoRoutingFoundException const & e) {
+        assertNoRouting(e, TrRouting::NoRoutingReason::NO_SERVICE_FROM_ORIGIN);
+    } catch(...) {
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
+    }
+}
+
+// origin is further south of South2, and destination near North2. max_travel_time is not sufficient to reach destination, but there are trips from origin
+TEST_F(RouteCalculationFixtureTests, NoRoutingTravelTimeLongerTrip)
+{
+    int departureTime = getTimeInSeconds(9, 45);
+    int totalTravelTime = 1800;
+
+    std::vector<std::string> parametersWithValues = initializeParameters();
+    parametersWithValues.push_back("origin=45.5242,-73.5817");
+    parametersWithValues.push_back("destination=45.5466,-73.6405");
+    parametersWithValues.push_back("departure_time_seconds=" + std::to_string(departureTime));
+    parametersWithValues.push_back("max_travel_time_seconds=" + std::to_string(totalTravelTime));
 
     try {
         calculateOd(parametersWithValues);

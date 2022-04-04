@@ -316,7 +316,11 @@ namespace TrRouting
     // No accessible node at origin
     NO_ACCESS_AT_ORIGIN,
     // No accessible node at destination
-    NO_ACCESS_AT_DESTINATION
+    NO_ACCESS_AT_DESTINATION,
+    // There is no service from origin with the query parameters
+    NO_SERVICE_FROM_ORIGIN,
+    // There is no service to destination with the query parameters
+    NO_SERVICE_TO_DESTINATION
   };
 
   /**
