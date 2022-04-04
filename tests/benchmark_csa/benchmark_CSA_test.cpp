@@ -1,35 +1,20 @@
 #include "gtest/gtest.h" // we will add the path to C preprocessor later
-#include "parameters.hpp"
-
-#include "server_http.hpp"
-#include "client_http.hpp"
 
 //Added for the json-example
 #define BOOST_SPIRIT_THREADSAFE
 
-#include <vector>
-#include <algorithm>
-#include <string>
-#include <iostream>
-#include <iterator>
-#include <curses.h>
-#include <bits/stdc++.h>
-#include <chrono>
-#include <iostream>
-#include <fstream>
-#include <ctime>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/string_generator.hpp>
 
-#include "toolbox.hpp"
-#include "gtfs_fetcher.hpp"
-#include "csv_fetcher.hpp"
+#include "calculator.hpp"
 #include "cache_fetcher.hpp"
-#include "calculation_time.hpp"
+#include "gtfs_fetcher.hpp" // To initialize calculator object
+#include "csv_fetcher.hpp" // To initialize calculator object
 #include "parameters.hpp"
+#include "routing_result.hpp"
 #include "scenario.hpp"
 #include "calculator.hpp"
-#include "program_options.hpp"
 #include "benchmark_CSA_test.hpp"
-#include "constants.hpp"
 
 using namespace TrRouting;
 
