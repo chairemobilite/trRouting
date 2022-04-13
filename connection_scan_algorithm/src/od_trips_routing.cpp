@@ -406,6 +406,7 @@ namespace TrRouting
       json["pathProfiles"] = pathProfilesJson;
 
     }
+    json["status"] = STATUS_SUCCESS;
     return json.dump(2);
 
   }
