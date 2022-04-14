@@ -4,7 +4,7 @@ SUFFIXES = .capnp .capnp.h
 	$(CAPNP_BIN) compile -oc++ $<
 
 clean-local:
-	rm *.capnp.h *.capnp.c++
+	rm -f *.capnp.h *.capnp.c++
 
 # TODO we might need to distribute those headers and change the nodist here
 nodist_include_HEADERS = agencyCollection.capnp.h \
