@@ -3,13 +3,8 @@ libgtest_la_SOURCES = ../googletest/googletest/src/gtest-all.cc
 libgtest_la_CPPFLAGS = -I$(top_srcdir)/googletest/googletest/include -I$(top_srcdir)/googletest/googletest
 libgtest_la_LDFLAGS = -pthread
 
-if RUN_BENCHMARK
-MAYBE_BENCHMARK = benchmark_csa
-else
-MAYBE_BENCHMARK =
-endif
-
 SUBDIRS = . \
           cache_fetch \
-          connection_scan_algorithm $(MAYBE_BENCHMARK)
+          connection_scan_algorithm \
+          benchmark_csa
 
