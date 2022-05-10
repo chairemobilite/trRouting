@@ -8,6 +8,7 @@
 #include "path.hpp"
 #include "agency.hpp"
 #include "routing_result.hpp"
+#include <iostream>
 
 namespace TrRouting
 {
@@ -68,14 +69,14 @@ namespace TrRouting
       Path *   journeyStepPath;
       Agency * journeyStepAgency;
 
-      int totalInVehicleTime       { 0}; int transferArrivalTime    {-1}; int firstDepartureTime   {-1};
-      int totalWalkingTime         { 0}; int transferReadyTime      {-1}; int numberOfTransfers    {-1};
-      int totalWaitingTime         { 0}; int departureTime          {-1}; int boardingSequence     {-1};
-      int totalTransferWalkingTime { 0}; int arrivalTime            {-1}; int unboardingSequence   {-1};
-      int totalTransferWaitingTime { 0}; int inVehicleTime          {-1}; int bestEgressNodeIndex  {-1};
-      int totalDistance            { 0}; int distance               {-1};
-      int inVehicleDistance        {-1}; int totalInVehicleDistance { 0}; int totalWalkingDistance { 0};
-      int totalTransferDistance    {-1}; int accessDistance         { 0}; int egressDistance       { 0};
+      int totalInVehicleTime       { 0}; int transferArrivalTime    {-1}; int firstDepartureTime     {-1};
+      int totalWalkingTime         { 0}; int transferReadyTime      {-1}; int numberOfTransfers      {-1};
+      int totalWaitingTime         { 0}; int departureTime          {-1}; int boardingSequence       {-1};
+      int totalTransferWalkingTime { 0}; int arrivalTime            {-1}; int unboardingSequence     {-1};
+      int totalTransferWaitingTime { 0}; int inVehicleTime          {-1}; int bestEgressNodeIndex    {-1};
+      int totalDistance            { 0}; int distance               {-1}; int bestEgressNodePrevIndex{-1};
+      int inVehicleDistance        {-1}; int totalInVehicleDistance { 0}; int totalWalkingDistance   { 0};
+      int totalTransferDistance    {-1}; int accessDistance         { 0}; int egressDistance         { 0};
       int journeyStepTravelTime    {-1}; int accessWalkingTime      {-1};
       int transferTime             {-1}; int egressWalkingTime      {-1};
       int waitingTime              {-1}; int accessWaitingTime      {-1};
@@ -94,14 +95,14 @@ namespace TrRouting
         modeShortnames.clear();
         inVehicleTravelTimesSeconds.clear();
 
-        totalInVehicleTime          =  0; transferArrivalTime    = -1; firstDepartureTime   = -1;
-        totalWalkingTime            =  0; transferReadyTime      = -1; numberOfTransfers    = -1;
-        totalWaitingTime            =  0; departureTime          = -1; boardingSequence     = -1;
-        totalTransferWalkingTime    =  0; arrivalTime            = -1; unboardingSequence   = -1;
-        totalTransferWaitingTime    =  0; inVehicleTime          = -1; bestEgressNodeIndex  = -1;
-        totalDistance               =  0; distance               = -1;
-        inVehicleDistance           =  0; totalInVehicleDistance =  0; totalWalkingDistance =  0;
-        totalTransferDistance       =  0; accessDistance         =  0; egressDistance       =  0;
+        totalInVehicleTime          =  0; transferArrivalTime    = -1; firstDepartureTime      = -1;
+        totalWalkingTime            =  0; transferReadyTime      = -1; numberOfTransfers       = -1;
+        totalWaitingTime            =  0; departureTime          = -1; boardingSequence        = -1;
+        totalTransferWalkingTime    =  0; arrivalTime            = -1; unboardingSequence      = -1;
+        totalTransferWaitingTime    =  0; inVehicleTime          = -1; bestEgressNodeIndex     = -1;
+        totalDistance               =  0; distance               = -1; bestEgressNodePrevIndex = -1;
+        inVehicleDistance           =  0; totalInVehicleDistance =  0; totalWalkingDistance    =  0;
+        totalTransferDistance       =  0; accessDistance         =  0; egressDistance          =  0;
         journeyStepTravelTime       = -1; accessWalkingTime      = -1;
         transferTime                = -1; egressWalkingTime      = -1;
         waitingTime                 = -1; accessWaitingTime      = -1;
@@ -124,7 +125,14 @@ namespace TrRouting
           }
           journey.push_back(resultingNodeJourneyStep);
           bestEgressNodeIndex      = std::get<connectionIndexes::NODE_ARR>(*reverseConnections[std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION>(resultingNodeJourneyStep)].get());
+          if (bestEgressNodePrevIndex != -1 && bestEgressNodeIndex != -1 && bestEgressNodePrevIndex == bestEgressNodeIndex) {
+            // this should not happen, it means that there is an ambiguity in the data, which makes this loop runs forever and create a memory leak filling journey indefinitely.
+            // TODO: add tests
+            std::cerr << "Invalid data in path uuid: " << paths[trips[std::get<journeyStepIndexes::FINAL_TRIP>(resultingNodeJourneyStep)].get()->pathIdx].get()->uuid << std::endl;
+            throw InvalidDataException(NoRoutingReason::INVALID_DATA);
+          }
           resultingNodeJourneyStep = reverseJourneysSteps[bestEgressNodeIndex];
+          bestEgressNodePrevIndex = bestEgressNodeIndex;
         }
 
         if (!params.returnAllNodesResult)

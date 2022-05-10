@@ -10,6 +10,7 @@
 #include "agency.hpp"
 #include "routing_result.hpp"
 #include "toolbox.hpp" //MAX_INT
+#include <iostream>
 
 namespace TrRouting
 {
@@ -79,7 +80,7 @@ namespace TrRouting
       int inVehicleDistance        {-1}; int totalInVehicleDistance { 0}; int totalWalkingDistance   { 0};
       int totalTransferDistance    {-1}; int accessDistance         { 0}; int egressDistance         { 0};
       int journeyStepTravelTime    {-1}; int accessWalkingTime      {-1}; int bestAccessNodeIndex    {-1};
-      int transferTime             {-1}; int egressWalkingTime      {-1};
+      int transferTime             {-1}; int egressWalkingTime      {-1}; int bestAccessNodePrevIndex{-1};
       int waitingTime              {-1}; int accessWaitingTime      {-1};
 
       for (auto & resultingNodeIndex : resultingNodes)
@@ -96,16 +97,16 @@ namespace TrRouting
         modeShortnames.clear();
         inVehicleTravelTimesSeconds.clear();
 
-        totalInVehicleTime       =  0; transferArrivalTime    = -1; firstDepartureTime     = -1;
-        totalWalkingTime         =  0; transferReadyTime      = -1; minimizedDepartureTime = -1;
-        totalWaitingTime         =  0; departureTime          = -1; numberOfTransfers      = -1;
-        totalTransferWalkingTime =  0; arrivalTime            = -1; boardingSequence       = -1;
-        totalTransferWaitingTime =  0; inVehicleTime          = -1; unboardingSequence     = -1;
+        totalInVehicleTime       =  0; transferArrivalTime    = -1; firstDepartureTime      = -1;
+        totalWalkingTime         =  0; transferReadyTime      = -1; minimizedDepartureTime  = -1;
+        totalWaitingTime         =  0; departureTime          = -1; numberOfTransfers       = -1;
+        totalTransferWalkingTime =  0; arrivalTime            = -1; boardingSequence        = -1;
+        totalTransferWaitingTime =  0; inVehicleTime          = -1; unboardingSequence      = -1;
         totalDistance            =  0; distance               = -1;
-        inVehicleDistance        =  0; totalInVehicleDistance =  0; totalWalkingDistance   =  0;
-        totalTransferDistance    =  0; accessDistance         =  0; egressDistance         =  0;
-        journeyStepTravelTime    = -1; accessWalkingTime      = -1; bestAccessNodeIndex    = -1;
-        transferTime             = -1; egressWalkingTime      = -1;
+        inVehicleDistance        =  0; totalInVehicleDistance =  0; totalWalkingDistance    =  0;
+        totalTransferDistance    =  0; accessDistance         =  0; egressDistance          =  0;
+        journeyStepTravelTime    = -1; accessWalkingTime      = -1; bestAccessNodeIndex     = -1;
+        transferTime             = -1; egressWalkingTime      = -1; bestAccessNodePrevIndex = -1;
         waitingTime              = -1; accessWaitingTime      = -1;
 
         //std::cerr << nodes[resultingNodeIndex].get()->name << " : " << std::get<0>(forwardJourneysSteps[resultingNodeIndex]) << std::endl;
@@ -117,11 +118,19 @@ namespace TrRouting
           continue;
         }
 
+
         while ((std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(resultingNodeJourneyStep) != -1 && std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION>(resultingNodeJourneyStep) != -1))
         {
           journey.push_front(resultingNodeJourneyStep);
           bestAccessNodeIndex = std::get<connectionIndexes::NODE_DEP>(*forwardConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(resultingNodeJourneyStep)].get());
+          if (bestAccessNodePrevIndex != -1 && bestAccessNodeIndex != -1 && bestAccessNodePrevIndex == bestAccessNodeIndex) {
+            // this should not happen, it means that there is an ambiguity in the data, which makes this loop runs forever and create a memory leak filling journey indefinitely.
+            // TODO: add tests
+            std::cerr << "Invalid data in path uuid: " << paths[trips[std::get<journeyStepIndexes::FINAL_TRIP>(resultingNodeJourneyStep)].get()->pathIdx].get()->uuid << std::endl;
+            throw InvalidDataException(NoRoutingReason::INVALID_DATA);
+          }
           resultingNodeJourneyStep = forwardJourneysSteps[bestAccessNodeIndex];
+          bestAccessNodePrevIndex = bestAccessNodeIndex;
         }
 
         if (!params.returnAllNodesResult)
