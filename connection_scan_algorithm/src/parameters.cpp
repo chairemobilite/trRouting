@@ -19,6 +19,13 @@ namespace TrRouting
     odTripsActivities.clear();
     odTripsModes.clear();
 
+    accessNodesIdx.clear();
+    accessNodeTravelTimesSeconds.clear();
+    accessNodeDistancesMeters.clear();
+    egressNodesIdx.clear();
+    egressNodeTravelTimesSeconds.clear();
+    egressNodeDistancesMeters.clear();
+
     onlyDataSourceIdx = -1;
 
     calculationName                        = "trRouting";
@@ -513,7 +520,6 @@ namespace TrRouting
         continue;
       }
 
-      /*
       // not sure we want to keep this: or supply node indexes instead, to limit request size?
       else if (parameterWithValueVector[0] == "access_node_uuids")
       {
@@ -529,7 +535,7 @@ namespace TrRouting
         }
         continue;
       }
-      else if (parameterWithValueVector[0] == "transfer_node_uuids")
+      else if (parameterWithValueVector[0] == "egress_node_uuids")
       {
         boost::split(egressNodeUuidsVector, parameterWithValueVector[1], boost::is_any_of(","));
         boost::uuids::uuid egressNodeUuid;
@@ -563,7 +569,6 @@ namespace TrRouting
         egressNodeTravelTimesSeconds = egressNodeTravelTimesSeconds;
         continue;
       }
-      */
 
       else if (parameterWithValueVector[0] == "date")
       {
