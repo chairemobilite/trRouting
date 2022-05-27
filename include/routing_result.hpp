@@ -320,7 +320,9 @@ namespace TrRouting
     // There is no service from origin with the query parameters
     NO_SERVICE_FROM_ORIGIN,
     // There is no service to destination with the query parameters
-    NO_SERVICE_TO_DESTINATION
+    NO_SERVICE_TO_DESTINATION,
+    // Invalid data found, which could create memory leaks or incorrect results
+    INVALID_DATA
   };
 
   /**
@@ -331,6 +333,20 @@ namespace TrRouting
   {
     public:
       NoRoutingFoundException(NoRoutingReason reason_) : std::exception(), reason(reason_) {};
+      NoRoutingReason getReason() const { return reason; };
+
+    private:
+      NoRoutingReason reason;
+  };
+
+  /**
+   * @brief Exception class thrown when getting invalid data
+   *
+   */
+  class InvalidDataException : public std::exception
+  {
+    public:
+      InvalidDataException(NoRoutingReason reason_) : std::exception(), reason(reason_) {};
       NoRoutingReason getReason() const { return reason; };
 
     private:
