@@ -235,7 +235,7 @@ TEST_F(SingleTAndACalculationFixtureTests, TripWithNoRoutingAlternatives)
 
     TrRouting::RouteParameters testParameters = TrRouting::RouteParameters(
         std::make_unique<TrRouting::Point>(45.7242, -73.7817),
-        std::make_unique<TrRouting::Point>(45.7541,-73.8186),
+        std::make_unique<TrRouting::Point>(45.7541, -73.8186),
         *scenario,
         departureTime,
         DEFAULT_MIN_WAITING_TIME,
@@ -252,7 +252,7 @@ TEST_F(SingleTAndACalculationFixtureTests, TripWithNoRoutingAlternatives)
         calculateWithAlternatives(testParameters);
         FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
     } catch (TrRouting::NoRoutingFoundException const & e) {
-        assertNoRouting(e, TrRouting::NoRoutingReason::NO_ACCESS_AT_ORIGIN);
+        assertNoRouting(e, TrRouting::NoRoutingReason::NO_ACCESS_AT_ORIGIN_AND_DESTINATION);
     } catch(...) {
         FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
     }

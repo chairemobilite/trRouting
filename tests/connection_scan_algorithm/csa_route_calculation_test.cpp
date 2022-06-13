@@ -122,6 +122,34 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingBecauseNoNodeAtDestination)
     }
 }
 
+// Test destination far from network
+TEST_F(SingleRouteCalculationFixtureTests, NoRoutingBecauseNoNodeAtOriginAndDestination)
+{
+    TrRouting::RouteParameters testParameters = TrRouting::RouteParameters(
+        std::make_unique<TrRouting::Point>(45.5349, -73.55478),
+        std::make_unique<TrRouting::Point>(45.5155, -73.56797),
+        *scenario,
+        getTimeInSeconds(9, 50),
+        DEFAULT_MIN_WAITING_TIME,
+        DEFAULT_MAX_TOTAL_TIME,
+        DEFAULT_MAX_ACCESS_TRAVEL_TIME,
+        DEFAULT_MAX_EGRESS_TRAVEL_TIME,
+        DEFAULT_MAX_TRANSFER_TRAVEL_TIME,
+        DEFAULT_FIRST_WAITING_TIME,
+        false,
+        true
+    );
+
+    try {
+        calculateOd(testParameters);
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
+    } catch (TrRouting::NoRoutingFoundException const & e) {
+        assertNoRouting(e, TrRouting::NoRoutingReason::NO_ACCESS_AT_ORIGIN_AND_DESTINATION);
+    } catch(...) {
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
+    }
+}
+
 // Test from first to second node of SN path, but before the time of the trip (6:50)
 TEST_F(SingleRouteCalculationFixtureTests, NoRoutingBecauseTooEarly)
 {
