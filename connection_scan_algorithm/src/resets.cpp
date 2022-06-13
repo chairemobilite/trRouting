@@ -15,6 +15,8 @@ namespace TrRouting
     using JourneyTuple = std::tuple<int,int,int,int,int,short,int>;
 
     int benchmarkingStart = algorithmCalculationTime.getEpoch();
+    bool accessFootpathOk = true;
+    bool egressFootpathOk = true;
 
     calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
     
@@ -117,7 +119,7 @@ namespace TrRouting
 
           accessFootpaths = std::move(OsrmFetcher::getAccessibleNodesFootpathsFromPoint(*parameters.getOrigin(), nodes, params.accessMode, params, parameters.getMaxAccessWalkingTravelTimeSeconds(), params.walkingSpeedMetersPerSecond));
           if (accessFootpaths.size() == 0) {
-            throw NoRoutingFoundException(NoRoutingReason::NO_ACCESS_AT_ORIGIN); 
+            accessFootpathOk = false;
           }
         }
       }
@@ -187,7 +189,7 @@ namespace TrRouting
         {
           egressFootpaths = std::move(OsrmFetcher::getAccessibleNodesFootpathsFromPoint(*parameters.getDestination(), nodes, params.accessMode, params, parameters.getMaxEgressWalkingTravelTimeSeconds(), params.walkingSpeedMetersPerSecond));
           if (egressFootpaths.size() == 0) {
-            throw NoRoutingFoundException(NoRoutingReason::NO_ACCESS_AT_DESTINATION); 
+            egressFootpathOk = false;
           }
         }
       }
@@ -217,6 +219,15 @@ namespace TrRouting
         //result.json += "destination_node: " + nodes[std::get<0>(egressFootpath)].get()->name + " - " + Toolbox::convertSecondsToFormattedTime(nodesTentativeTime[std::get<0>(accessFootpath)]) + "\n";
         //result.json += std::to_string((int)(ceil(std::get<1>(egressFootpath)))) + ",";
       }
+    }
+
+    // Throw proper exceptions when no access at origin and/or destination
+    if (!egressFootpathOk && !accessFootpathOk) {
+      throw NoRoutingFoundException(NoRoutingReason::NO_ACCESS_AT_ORIGIN_AND_DESTINATION);
+    } else if (!accessFootpathOk) {
+      throw NoRoutingFoundException(NoRoutingReason::NO_ACCESS_AT_ORIGIN);
+    } else if (!egressFootpathOk) {
+      throw NoRoutingFoundException(NoRoutingReason::NO_ACCESS_AT_DESTINATION);
     }
     
     //std::cerr << "-- maxEgressTravelTime = " << maxEgressTravelTime << std::endl;
