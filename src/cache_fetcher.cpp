@@ -46,15 +46,17 @@ namespace TrRouting
     if (!params.cacheDirectoryPath.empty()) {
       filePath += params.cacheDirectoryPath + "/";
     }
-    if (!params.projectShortname.empty()) {
+    else if (!params.projectShortname.empty()) {
       filePath += params.projectShortname + "/";
     }
     if (customPath.empty())
     {
+      std::cout << "reading " << (filePath + cacheFilePath) << " cache file" << std::endl;
       return filePath + cacheFilePath;
     }
     else
     {
+      std::cout << "reading " << (filePath + customPath + "/" + cacheFilePath) << " cache file" << std::endl;
       return filePath + customPath + "/" + cacheFilePath;
     }
   }
