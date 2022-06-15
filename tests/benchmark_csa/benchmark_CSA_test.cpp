@@ -61,8 +61,7 @@ public:
   // Initialize calculator and parameters. Open the result files and add headers
   static void SetUpTestSuite()
   {
-    algorithmParams.projectShortname = "demo_transition";
-    algorithmParams.cacheDirectoryPath = "cache";
+    algorithmParams.cacheDirectoryPath = "cache/demo_transition";
     algorithmParams.dataFetcherShortname = "cache";
     algorithmParams.osrmWalkingPort = "5000";
     algorithmParams.osrmWalkingHost = "localhost"; //"http://localhost";
