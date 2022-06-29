@@ -1,5 +1,4 @@
 #include <errno.h>
-#include <experimental/filesystem>
 #include <boost/uuid/string_generator.hpp>
 
 #include "gtest/gtest.h" // we will add the path to C preprocessor later
@@ -11,8 +10,6 @@
 #include "point.hpp"
 #include "parameters.hpp"
 #include "scenario.hpp"
-
-namespace fs = std::experimental::filesystem;
 
 class ResultToV1FixtureTest : public ::testing::Test
 {
