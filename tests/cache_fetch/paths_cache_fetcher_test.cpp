@@ -1,5 +1,5 @@
 #include <errno.h>
-#include <experimental/filesystem>
+#include <filesystem>
 
 #include "gtest/gtest.h" // we will add the path to C preprocessor later
 #include "parameters.hpp"
@@ -8,7 +8,7 @@
 #include "path.hpp"
 #include "capnp/pathCollection.capnp.h"
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 class PathCacheFetcherFixtureTests : public BaseCacheFetcherFixtureTests
 {
