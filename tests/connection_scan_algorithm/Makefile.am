@@ -16,8 +16,8 @@ csa_test_SOURCES = gtest.cpp \
 
 csa_test_LDADD = $(top_srcdir)/tests/libgtest.la ../../connection_scan_algorithm/src/libcsa.la
 
-csa_test_LDFLAGS = -no-pie -pthread -std=c++17 -lstdc++fs
+csa_test_LDFLAGS = -no-pie -pthread
 
-csa_test_CPPFLAGS = -I$(top_srcdir)/googletest/googletest/include -I$(top_srcdir)/googletest/googletest -I$(top_srcdir)/include -I$(top_srcdir)/connection_scan_algorithm/include -pthread -std=c++17 -lstdc++fs
+csa_test_CPPFLAGS = -I$(top_srcdir)/googletest/googletest/include -I$(top_srcdir)/googletest/googletest -I$(top_srcdir)/include -I$(top_srcdir)/connection_scan_algorithm/include -pthread
 
 TESTS = csa_test
