@@ -1,3 +1,4 @@
+#include "spdlog/spdlog.h"
 #include "calculator.hpp"
 #include "parameters.hpp"
 #include "trip.hpp"
@@ -63,8 +64,7 @@ namespace TrRouting
       arrivalTimeSeconds = parameters.getTimeOfTrip();
     }
 
-    if (params.debugDisplay)
-      std::cerr << "-- reset and preparations -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
+    spdlog::debug("-- reset and preparations -- {} microseconds", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
 
     calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
 
@@ -81,13 +81,11 @@ namespace TrRouting
       if (resetAccessPaths)
       {
 
-        if (params.debugDisplay)
-          std::cerr << "  resetting access paths " << std::endl;
+        spdlog::debug("  resetting access paths ");
 
         if(odTrip != nullptr)
         {
-          if (params.debugDisplay)
-            std::cerr << "  using odTrip with " << odTrip->originNodesIdx.size() << " accessible nodes" << std::endl;
+          spdlog::debug("  using odTrip with {} accessible nodes", odTrip->originNodesIdx.size());
 
           accessFootpaths.clear();
           j = 0;
@@ -114,8 +112,7 @@ namespace TrRouting
         }
         else
         {
-          if (params.debugDisplay)
-            std::cout << "  fetching nodes with osrm with mode " << params.accessMode << std::endl;
+          spdlog::debug("  fetching nodes with osrm with mode {}", params.accessMode);
 
           accessFootpaths = std::move(OsrmFetcher::getAccessibleNodesFootpathsFromPoint(*parameters.getOrigin(), nodes, params.accessMode, params, parameters.getMaxAccessWalkingTravelTimeSeconds(), params.walkingSpeedMetersPerSecond));
           if (accessFootpaths.size() == 0) {
@@ -124,8 +121,7 @@ namespace TrRouting
         }
       }
 
-      if (params.debugDisplay)
-        std::cout << "  parsing access footpaths to find min/max access travel times" << std::endl;
+      spdlog::debug("  parsing access footpaths to find min/max access travel times");
 
       int footpathTravelTimeSeconds;
       int footpathDistanceMeters;
@@ -146,8 +142,6 @@ namespace TrRouting
         {
           maxAccessTravelTime = footpathTravelTimeSeconds;
         }
-        //std::cerr << "origin_node: " << nodes[std::get<0>(accessFootpath)].get()->name << " - " << Toolbox::convertSecondsToFormattedTime(nodesTentativeTime[std::get<0>(accessFootpath)]) << std::endl;
-        //std::cerr << std::to_string(nodes[std::get<0>(accessFootpath)].get()->id) + ",";
       }
     }
   
@@ -159,8 +153,7 @@ namespace TrRouting
         if(odTrip != nullptr)
         {
 
-          if (params.debugDisplay)
-            std::cerr << "  using odTrip with " << odTrip->destinationNodesIdx.size() << " egressible nodes" << std::endl;
+          spdlog::debug("  using odTrip with {} egressible nodes", odTrip->destinationNodesIdx.size());
 
           egressFootpaths.clear();
           j = 0;
@@ -194,8 +187,7 @@ namespace TrRouting
         }
       }
       
-      if (params.debugDisplay)
-        std::cout << "  parsing egress footpaths to find min/max egress travel times" << std::endl;
+      spdlog::debug("  parsing egress footpaths to find min/max egress travel times");
 
       int footpathTravelTimeSeconds;
       int footpathDistanceMeters;
@@ -230,10 +222,8 @@ namespace TrRouting
       throw NoRoutingFoundException(NoRoutingReason::NO_ACCESS_AT_DESTINATION);
     }
     
-    //std::cerr << "-- maxEgressTravelTime = " << maxEgressTravelTime << std::endl;
 
-    if (params.debugDisplay)
-      std::cerr << "-- access and egress footpaths -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
+    spdlog::debug("-- access and egress footpaths -- {} microseconds", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
     
     calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
 
@@ -243,8 +233,7 @@ namespace TrRouting
     if (resetFilters)
     {
 
-      if (params.debugDisplay)
-        std::cout << "  resetting filters" << std::endl;
+      spdlog::debug("  resetting filters");
 
       if (params.calculateAllOdTrips)
       {
@@ -344,12 +333,10 @@ namespace TrRouting
     }
 
     
-    if (params.debugDisplay)
-      benchmarking["reset"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
-
-
-    if (params.debugDisplay)
-      std::cerr << "-- filter trips -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
+    benchmarking["reset"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
+    
+    
+    spdlog::debug("-- filter trips -- {} microseconds ", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
 
     calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
 

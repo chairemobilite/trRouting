@@ -1,3 +1,4 @@
+#include "spdlog/spdlog.h"
 #include "calculator.hpp"
 #include "parameters.hpp"
 #include "cache_fetcher.hpp"
@@ -132,8 +133,9 @@ namespace TrRouting
   Calculator::DataStatus Calculator::prepare()
   {
     int ret = 0;
-    if (params.debugDisplay)
-      std::cerr << "preparing nodes, routes, trips, connections and footpaths..." << std::endl;
+
+    spdlog::debug("preparing nodes, routes, trips, connections and footpaths...");
+    
     if (params.dataFetcherShortname == "cache")
     {
       std::tie(modes, modeIndexesByShortname) = params.cacheFetcher->getModes();
@@ -223,7 +225,7 @@ namespace TrRouting
     }
     
     initializeCalculationData();
-    std::cout << "preparing nodes tentative times, trips enter connections and journeys..." << std::endl;
+    spdlog::info("preparing nodes tentative times, trips enter connections and journeys...");
     return validateData(this);
   }
   

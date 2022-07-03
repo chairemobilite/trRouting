@@ -1,4 +1,4 @@
-#include <iostream>
+#include "spdlog/spdlog.h"
 
 #include "calculator.hpp"
 #include "trip.hpp"
@@ -138,14 +138,11 @@ namespace TrRouting
             }
 
           }
-          //std::cerr << std::endl;
 
           if (optimizationCase >= 0) // no need to check further journey steps if we found an optimization node already
           {
-            if (params.debugDisplay)
-            {
-              std::cerr << " Found optimization case: " << optimizationCase << " @node: " << nodes[optimizationNodeIdx]->name << "[" << nodes[optimizationNodeIdx]->code << "]" << std::endl;
-            }
+            spdlog::debug(" Found optimization case: {} @node: {} [{}]", optimizationCase, nodes[optimizationNodeIdx]->name, nodes[optimizationNodeIdx]->code);
+            
             break;
           }
 
@@ -304,10 +301,7 @@ namespace TrRouting
     }
 
 
-    if (params.debugDisplay)
-    {
-      std::cerr << "-- remove superfluous segments -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
-    }
+    spdlog::debug("-- remove superfluous segments -- {} microseconds", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);    
 
     return usedOptimizationCases;
 

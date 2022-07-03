@@ -1,4 +1,5 @@
 #include <random>
+#include "spdlog/spdlog.h"
 
 #include "calculator.hpp"
 #include "toolbox.hpp"
@@ -141,8 +142,8 @@ namespace TrRouting
 
   std::string Calculator::odTripsRouting(RouteParameters &parameters)
   {
-    if (params.debugDisplay)
-      std::cout << "  preparing odTripsRouting" << std::endl;
+    
+    spdlog::debug("  preparing odTripsRouting");
 
     std::unique_ptr<RoutingResult>  routingResult;
     nlohmann::json json;
@@ -183,12 +184,10 @@ namespace TrRouting
       demandByHourOfDay.push_back(0.0);
     }
 
-    if (params.debugDisplay)
-      std::cout << "  starting odTripsRouting" << std::endl;
+    spdlog::debug("  starting odTripsRouting (count: {})", odTripsCount);
 
     int stopAtI {-1};
     std::vector<int> odTripIndexes(odTripsCount);
-    std::cerr << odTripsCount << std::endl;
     std::iota(odTripIndexes.begin(), odTripIndexes.end(), 0);
 
     if (odTripsCount == 0)
@@ -205,9 +204,9 @@ namespace TrRouting
       //engine.seed(params.seed);
       // sort by departure time seconds before shuffling so seeds are consistent:
 
-      std::cout << " first ODTrip uuid: " << odTripIndexes[0] << std::endl;
+      spdlog::debug(" first ODTrip uuid: {} ", odTripIndexes[0]);
       std::shuffle(odTripIndexes.begin(), odTripIndexes.end(), std::mt19937{params.seed});
-      std::cout << " first ODTrip uuid after shuffle: " << odTripIndexes[0] << std::endl;
+      spdlog::debug(" first ODTrip uuid after shuffle: {}", odTripIndexes[0]);
       //stopAtI = ceil((float)(odTrips.size()) * params.odTripsSampleRatio);
     }
 
@@ -221,7 +220,6 @@ namespace TrRouting
 
       odTripIndex = odTripIndexes[i];
       odTrip      = odTrips[odTripIndex].get();
-      //std::cout << odTrip->uuid << std::endl;
 
       if ( i % params.batchesCount != params.batchNumber - 1) // when using multiple parallel calculators
       {
@@ -266,19 +264,23 @@ namespace TrRouting
       if (attributesMatches && (atLeastOneCompatiblePeriod || params.odTripsPeriods.size() == 0))
       {
 
-        if (params.debugDisplay)
-        {
-          std::cout << "od trip uuid " << odTrip->uuid << " (" << (i+1) << "/" << odTripsCount << ")" << std::endl << " dts: " << odTrip->departureTimeSeconds << " atLeastOneCompatiblePeriod: " << (atLeastOneCompatiblePeriod ? "true " : "false ") << "attributesMatches: " << (attributesMatches ? "true " : "false ") << std::endl;
-        }
-        else if ((i + 1) % 1000 == 0)
+        spdlog::debug("od trip uuid {} ({}/{}) dts: {} atLeastOneCompatiblePeriod: {} attributesMatches: {}",
+                        to_string(odTrip->uuid),
+                        (i+1),
+                        odTripsCount,
+                        odTrip->departureTimeSeconds,
+                        (atLeastOneCompatiblePeriod ? "true" : "false"),
+                        (attributesMatches ? "true " : "false "));                       
+
+        if ((i + 1) % 1000 == 0)
         {
           if (stopAtI > 0)
           {
-            std::cout << (i+1) << "/" << (stopAtI + 1) << std::endl;
+            spdlog::info("{}/{}", (i+1), (stopAtI + 1));
           }
           else
           {
-            std::cout << (i+1) << "/" << odTripsCount << std::endl;
+            spdlog::info("{}/{}", (i+1), odTripsCount);
           }
         }
         RouteParameters odTripParameters = RouteParameters(std::make_unique<Point>(odTrip->origin.get()->latitude, odTrip->origin.get()->longitude),
@@ -327,7 +329,7 @@ namespace TrRouting
                 connectionDepartureTimeSeconds = *tripConnectionDepartureTimes[legTripIdx][connectionIndex];
                 *tripConnectionDemands[legTripIdx][connectionIndex] += correctedExpansionFactor;
                 connectionDepartureTimeHour    = connectionDepartureTimeSeconds / 3600;
-                //std::cout << "pUuid:" << legPath->uuid << " dth:" << connectionDepartureTimeHour << " cI:" << connectionIndex << " oldD:" << pathProfiles[legPath.uuid][connectionIndex][connectionDepartureTimeHour] << std::endl;
+
                 pathProfiles[legPath->uuid][connectionIndex][connectionDepartureTimeHour] += correctedExpansionFactor;
                 pathTotalProfiles[legPath->uuid][connectionIndex] += correctedExpansionFactor;
                 if (maximumSegmentHourlyDemand < pathProfiles[legPath->uuid][connectionIndex][connectionDepartureTimeHour])

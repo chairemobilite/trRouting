@@ -9,6 +9,7 @@
 #include <kj/exception.h>
 #include <boost/uuid/string_generator.hpp>
 #include <capnp/serialize-packed.h>
+#include "spdlog/spdlog.h"
 
 #include "cache_fetcher.hpp"
 #include "trip.hpp"
@@ -16,7 +17,6 @@
 #include "block.hpp"
 #include "capnp/line.capnp.h"
 #include "calculation_time.hpp"
-//#include "toolbox.hpp"
 
 namespace TrRouting
 {
@@ -66,10 +66,7 @@ namespace TrRouting
     unsigned long linesCount {lines.size()};
     int lineI {0};
     
-    std::cout << "Fetching trips and connections from cache..." << std::endl;
-
-    std::cout << std::fixed;
-    std::cout << std::setprecision(2);
+    spdlog::info("Fetching trips and connections from cache... ({} lines)", linesCount);
 
     for (auto & line : lines)
     {
@@ -79,7 +76,7 @@ namespace TrRouting
       if (fd < 0)
       {
         int err = errno;
-        std::cerr << "no schedules found for line " << boost::uuids::to_string(line->uuid) << " (" << line->shortname << " " << line->longname << ")" << std::endl;
+        spdlog::error("no schedules found for line {} ({} {})", boost::uuids::to_string(line->uuid), line->shortname, line->longname);
         continue;
       }
 
@@ -192,17 +189,19 @@ namespace TrRouting
           }
         }
         lineI++;
-        std::cout << ((((double) lineI) / linesCount) * 100) << "%      \r" << std::flush; // \r is used to stay on the same line
+        if (lineI % 100 == 0) {
+          spdlog::info("Fetching trips and connections from cache...({:.2}%)", ((((double) lineI) / linesCount) * 100));
+        }
       }
       catch (const kj::Exception& e)
       {
         // TODO Do something about faulty cache files?
-        std::cerr << "-- Error reading line cache file -- " <<  cacheFilePath << ": " << e.getDescription().cStr() << std::endl;
+        spdlog::error("-- Error reading line cache file -- {}: {}", cacheFilePath, e.getDescription().cStr());
       }
 
       close(fd);
     }
-    std::cout << "100%" << std::endl;
+    spdlog::info("Fetching trips and connections from cache DONE");
 
     return 0;
 

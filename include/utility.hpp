@@ -6,7 +6,6 @@
 #include <chrono>
 #include <cstdlib>
 #include <ctime>
-#include <iostream>
 #include <memory>
 #include <mutex>
 #include <string>

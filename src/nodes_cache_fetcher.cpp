@@ -16,6 +16,7 @@
 #include "capnp/nodeCollection.capnp.h"
 #include "capnp/node.capnp.h"
 #include "calculation_time.hpp"
+#include "spdlog/spdlog.h"
 
 namespace TrRouting
 {
@@ -45,8 +46,8 @@ namespace TrRouting
     std::string nodeCacheFileNamePath{""};
     boost::uuids::string_generator uuidGenerator;
 
-    std::cout << "Fetching " << tStr << " from cache..." << std::endl;
-    
+    spdlog::info("Fetching {} from cache... {}", tStr, customPath);
+
     std::string cacheFilePath = CacheFetcher::getFilePath(cacheFileName, params, customPath) + ".capnpbin";
 
     int fd = open(cacheFilePath.c_str(), O_RDWR);
@@ -55,11 +56,11 @@ namespace TrRouting
       int err = errno;
       if (err == ENOENT)
       {
-        std::cerr << "missing " << tStr << " cache file!" << std::endl;
+        spdlog::error("missing {} cache files!", tStr);
       }
       else
       {
-        std::cerr << "Error opening cache file " << tStr << ": " << err << std::endl;
+        spdlog::error("Error opening cache file {} : {} ", tStr, err);
       }
       return -err;
     }
@@ -95,8 +96,6 @@ namespace TrRouting
         point->longitude = ((double)capnpT.getLongitude()) / 1000000.0;
         t->point         = std::move(point);
 
-        //std::cout << TStr << ":\n" << t->toString() << std::endl;
-
         tIndexesByUuid[t->uuid] = ts.size();
         ts.push_back(std::move(t));
         
@@ -104,13 +103,13 @@ namespace TrRouting
     }
     catch (const kj::Exception& e)
     {
-      std::cerr << "Error opening cache file " << tStr << ": " << e.getDescription().cStr() << std::endl;
+      spdlog::error("Error opening cache file {}: {}", tStr, e.getDescription().cStr());
       close(fd);
       return -EBADMSG;
     }
     catch (...)
     {
-      std::cerr << "Unknown error occurred " << tStr << std::endl;
+      spdlog::error("Unknown error occurred {} ", tStr);
       close(fd);
       return -EINVAL;
     }
@@ -125,7 +124,6 @@ namespace TrRouting
     auto nodesCount {ts.size()};
     //std::vector<int>::iterator nodeIndex;
     // find reverse transferable nodes:
-    //std::cout << "-- start node with nodesCount -- " << nodesCount << "\n";
     for (int i = 0; i < nodesCount; i++)
     {
 
@@ -139,7 +137,7 @@ namespace TrRouting
       {
         int err = errno;
         // TODO Do something about missing or faulty cache files?
-        std::cerr << "Error opening cache file " << nodeCacheFileNamePath << ": " << err << std::endl;
+        spdlog::error("Error opening cache file {}: {}", nodeCacheFileNamePath, err);
         continue;
       }
 
@@ -175,7 +173,7 @@ namespace TrRouting
       }
       catch (const kj::Exception& e)
       {
-        std::cerr << "-- Error reading node cache file -- " <<  nodeCacheFileNamePath << ": " << e.getDescription().cStr() << std::endl;
+        spdlog::error("-- Error reading node cache file -- {}: {}", nodeCacheFileNamePath, e.getDescription().cStr());
         close(fd);
         return -EBADMSG;
       }
@@ -184,8 +182,6 @@ namespace TrRouting
 
     try
     {
-      //std::cout << "generate reverse transferable nodes " << std::endl;
-
       // generate reverse transferable nodes 
       // travel time is not the same in both direction so we need to reverse these, 
       // especially with modes like car and bicycle which must follow one way and restrictions
@@ -207,8 +203,6 @@ namespace TrRouting
           ts[transferableNodeIdx]->reverseTransferableDistancesMeters.push_back(ts[i]->transferableDistancesMeters[j]);
         }
       }
-
-      //std::cout << "sort by increasing travel times " << std::endl;
 
       // sort by increasing travel times so we don't get longer transfers when shorter exists:
       for (auto & node : ts)
@@ -258,15 +252,11 @@ namespace TrRouting
 
       }
   
-      //std::cerr << "-- node reverse transferable nodes preparation -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
-
-      //std::cout << TStr << ":\n" << Toolbox::prettyPrintStructVector(ts) << std::endl;
-      
       return 0;
     }
     catch (const std::exception& ex)
     {
-      std::cerr << "-- Error processing node data -- " << ex.what() << std::endl;
+      spdlog::error("-- Error processing node data -- {}", ex.what());
       return -EINVAL;
     }
     

@@ -4,6 +4,7 @@
 
 #include <string>
 #include <vector>
+#include "spdlog/spdlog.h"
 
 #include "cache_fetcher.hpp"
 #include "mode.hpp"
@@ -19,7 +20,7 @@ namespace TrRouting
     std::vector<T> ts;
     std::map<std::string, int> tIndexesByShortname;
 
-    std::cout << "Initializing modes..." << std::endl;
+    spdlog::info("Initializing modes...");
 
     T t1 = {"bus", "Bus", 3, 700};
     ts.push_back(t1);
@@ -81,8 +82,6 @@ namespace TrRouting
     ts.push_back(t15);
     tIndexesByShortname[t15.shortname] = ts.size() - 1;
     
-    //std::cout << "Modes: \n" << Toolbox::prettyPrintStructVector(ts) << std::endl;
-
     return std::make_pair(ts, tIndexesByShortname);
   }
 
