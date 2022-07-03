@@ -1,9 +1,13 @@
 #include "program_options.hpp"
+#include <iostream>
+#include <cstdlib>
 
 namespace TrRouting {
 
   ProgramOptions::ProgramOptions() : options(boost::program_options::options_description("Options")) {
 
+    options.add_options()
+      ("help",                                              "display options");
     options.add_options()
       ("port",                                              boost::program_options::value<int>()        ->default_value(4000), "http server port");
     options.add_options()
@@ -46,6 +50,10 @@ namespace TrRouting {
     osrmCyclingHost      = "localhost";
     osrmDrivingHost      = "localhost";
 
+    if(variablesMap.count("help")) {
+      std::cout << options << std::endl;
+      std::exit(0);
+    }
     if(variablesMap.count("port") == 1)
     {
       port = variablesMap["port"].as<int>();
