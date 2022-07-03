@@ -13,7 +13,7 @@
 #include "station.hpp"
 #include "point.hpp"
 #include "capnp/stationCollection.capnp.h"
-//#include "toolbox.hpp"
+#include "spdlog/spdlog.h"
 
 namespace TrRouting
 {
@@ -40,7 +40,7 @@ namespace TrRouting
     std::string cacheFileName{tStr};
     boost::uuids::string_generator uuidGenerator;
 
-    std::cout << "Fetching " << tStr << " from cache..." << std::endl;
+    spdlog::info("Fetching {} from cache... {}", tStr, customPath);
     
     std::string cacheFilePath = CacheFetcher::getFilePath(cacheFileName, params, customPath) + ".capnpbin";
     int fd = open(cacheFilePath.c_str(), O_RDWR);
@@ -49,11 +49,11 @@ namespace TrRouting
       int err = errno;
       if (err == ENOENT)
       {
-        std::cerr << "missing " << tStr << " cache file!" << std::endl;
+        spdlog::error("missing {} cache files!", tStr);
       }
       else
       {
-        std::cerr << "Error opening cache file " << tStr << ": " << err << std::endl;
+        spdlog::error("Error opening cache file {} : {} ", tStr, err);
       }
       return -err;
     }
@@ -82,12 +82,12 @@ namespace TrRouting
     }
     catch (const kj::Exception& e)
     {
-      std::cerr << "Error opening cache file " << tStr << ": " << e.getDescription().cStr() << std::endl;
+      spdlog::error("Error opening cache file {}: {}", tStr, e.getDescription().cStr());
       ret = -EBADMSG;
     }
     catch (...)
     {
-      std::cerr << "Unknown error occurred " << tStr << std::endl;
+      spdlog::error("Unknown error occurred {} ", tStr);
       ret = -EINVAL;
     }
 

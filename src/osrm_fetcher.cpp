@@ -4,6 +4,7 @@
 #include "node.hpp"
 #include "parameters.hpp"
 #include "client_http.hpp"
+#include "spdlog/spdlog.h"
 
 namespace TrRouting
 {
@@ -27,8 +28,7 @@ namespace TrRouting
     float maxDistanceMetersSquared = calculateMaxDistanceSquared(maxWalkingTravelTime, walkingSpeedMetersPerSecond);
     float distanceMetersSquared;
 
-    if (params.debugDisplay)
-      std::cout << "use of bird distance " << std::endl;
+    spdlog::debug("use of bird distance ");
 
     int i{0};
     for (auto &node : nodes)
@@ -44,8 +44,7 @@ namespace TrRouting
       i++;
     }
 
-    if (params.debugDisplay)
-      std::cout << "fetched footpaths using bird distance (" << accessibleNodesFootpaths.size() << " foopaths found)" << std::endl;
+    spdlog::debug("fetched footpaths using bird distance ({} footpaths found)", accessibleNodesFootpaths.size());
 
     return accessibleNodesFootpaths;
   }
@@ -59,8 +58,7 @@ namespace TrRouting
     float maxDistanceMetersSquared = calculateMaxDistanceSquared(maxWalkingTravelTime, walkingSpeedMetersPerSecond);
     float distanceMetersSquared;
 
-    if (params.debugDisplay)
-      std::cout << "osrm with host " << params.osrmWalkingHost << " and port " << params.osrmWalkingPort << std::endl;
+    spdlog::debug("osrm with host {} and port {}", params.osrmWalkingHost, params.osrmWalkingPort);
 
     std::string queryString = "/table/v1/" + mode + "/" + std::to_string(point.longitude) + "," + std::to_string(point.latitude);
 
@@ -99,9 +97,8 @@ namespace TrRouting
     if (responseJson["durations"] != nullptr && responseJson["distances"] != nullptr && responseJson["durations"][0] != nullptr && responseJson["distances"][0] != nullptr)
     {
       int numberOfDurations = responseJson["durations"][0].size();
-      //std::cout << "numberOfDurations: " << responseJson["durations"][0].dump(2) << std::endl;
       int numberOfDistances = responseJson["distances"][0].size();
-      //std::cout << "numberOfDistances: " << responseJson["distances"][0].dump(2) << std::endl;
+
       int j = 0;
       if (numberOfDurations > 0 && numberOfDistances > 0)
       {
@@ -119,8 +116,7 @@ namespace TrRouting
       }
     }
 
-    if (params.debugDisplay)
-      std::cout << "fetched osrm footpaths (" << accessibleNodesFootpaths.size() << " foopaths found)" << std::endl;
+    spdlog::debug("fetched osrm footpaths ({} footpaths found)",  accessibleNodesFootpaths.size());
 
     return accessibleNodesFootpaths;
   }

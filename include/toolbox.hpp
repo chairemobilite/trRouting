@@ -2,7 +2,6 @@
 #define TR_TOOLBOX
 
 #include <string>
-#include <iostream>
 #include <iomanip>
 #include <fstream>
 #include <sstream>

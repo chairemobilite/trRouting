@@ -1,7 +1,7 @@
-#include <iostream>
 #include <chrono>
 #include <boost/uuid/string_generator.hpp>
 #include <boost/algorithm/string.hpp>
+#include "spdlog/spdlog.h"
 
 #include "parameters.hpp"
 #include "node.hpp"
@@ -130,7 +130,7 @@ namespace TrRouting
     {
       boost::split(parameterWithValueVector, parameterWithValue, boost::is_any_of("="));
 
-      std::cout << " setting parameter " << parameterWithValueVector[0] << " with value " << parameterWithValueVector[1] << std::endl;
+      spdlog::info(" setting parameter {} with value {}", parameterWithValueVector[0], parameterWithValueVector[1]);
 
       // origin and destination:
       if (parameterWithValueVector[0] == "origin")
@@ -323,8 +323,8 @@ namespace TrRouting
         if (odTripIndexesByUuid.count(odTripUuid) == 1)
         {
           OdTrip *odTrip = odTrips[odTripIndexesByUuid[odTripUuid]].get();
-          std::cout << "od trip uuid " << odTrip->uuid << std::endl;
-          std::cout << "dts " << odTrip->departureTimeSeconds << std::endl;
+          spdlog::info("od trip uuid {} dts {}", to_string(odTrip->uuid), odTrip->departureTimeSeconds);
+
           newParametersWithValues.push_back(std::make_pair("origin", std::to_string(odTrip->origin.get()->latitude) + ',' + std::to_string(odTrip->origin.get()->longitude)));
           newParametersWithValues.push_back(std::make_pair("destination", std::to_string(odTrip->destination.get()->latitude) + ',' + std::to_string(odTrip->destination.get()->longitude)));
           // TODO Add parameter for the departure_time? It was not in the original code path

@@ -1,4 +1,5 @@
 #include <boost/uuid/uuid.hpp>
+#include "spdlog/spdlog.h"
 
 #include "calculator.hpp"
 #include "trip.hpp"
@@ -94,7 +95,7 @@ namespace TrRouting
     tripsExitConnectionTransferTravelTime.shrink_to_fit();
     tripsExitConnectionTransferTravelTime.resize(trips.size());
 
-    std::cout << forwardConnections.size() << " connections" << std::endl;
+    spdlog::info("{} connections", forwardConnections.size());;
 
     //int benchmarkingStart = algorithmCalculationTime.getEpoch();
 
@@ -110,7 +111,6 @@ namespace TrRouting
       while (std::get<connectionIndexes::TIME_DEP>(*connection) >= hour * 3600 && forwardConnectionsIndexPerDepartureTimeHour[hour] == -1 && hour < 32)
       {
         forwardConnectionsIndexPerDepartureTimeHour[hour] = i;
-        //std::cout << hour << ":" << i << ":" << std::get<connectionIndexes::TIME_DEP>(connection) << std::endl;
         hour++;
       }
       i++;
@@ -123,7 +123,6 @@ namespace TrRouting
       while (std::get<connectionIndexes::TIME_ARR>(*connection) <= hour * 3600 && reverseConnectionsIndexPerArrivalTimeHour[hour] == lastConnectionIndex && hour >= 0)
       {
         reverseConnectionsIndexPerArrivalTimeHour[hour] = i;
-        //std::cout << hour << ":" << i << ":" << std::get<connectionIndexes::TIME_ARR>(connection) << std::endl;
         hour--;
       }
       i++;
@@ -135,7 +134,6 @@ namespace TrRouting
       {
         forwardConnectionsIndexPerDepartureTimeHour[h] = lastConnectionIndex;
       }
-      //std::cout << h << ": " << forwardConnectionsIndexPerDepartureTimeHour[h] << std::endl;
     }
 
   }
@@ -158,7 +156,7 @@ namespace TrRouting
     int tripIdx {-1};
     try
     {
-      std::cout << "Sorting connections..." << std::endl;
+      spdlog::info("Sorting connections...");
       // Sort forward connections by departure time, trip id, sequence
       std::stable_sort(forwardConnections.begin(), forwardConnections.end(), [](const std::shared_ptr<ConnectionTuple>& connectionA, const std::shared_ptr<ConnectionTuple>& connectionB)
       {
@@ -242,12 +240,12 @@ namespace TrRouting
         i++;
       }
 
-      std::cerr << "-- assign connections to trips -- " << algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime << " microseconds\n";
+      spdlog::debug("-- assign connections to trips -- {} microseconds", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
       return 0;
     }
     catch (const std::exception& ex)
     {
-      std::cerr << "-- Error assigning connections to trips -- " << ex.what() << std::endl;
+      spdlog::error("-- Error assigning connections to trips -- {} ", ex.what());
       return -EINVAL;
     }
   }

@@ -1,4 +1,5 @@
 #include <boost/uuid/string_generator.hpp>
+#include "spdlog/spdlog.h"
 
 #include "calculator.hpp"
 #include "toolbox.hpp"
@@ -48,8 +49,6 @@ namespace TrRouting
 
     // reverse calculation:
 
-    //std::cout << reverseConnectionsIndexPerArrivalTimeHour[arrivalTimeHour] << ":" << arrivalTimeHour << std::endl;
-
     // main loop for reverse connections:
     i = (arrivalTimeHour + 1 >= reverseConnectionsIndexPerArrivalTimeHour.size()) ? 0 : reverseConnectionsIndexPerArrivalTimeHour[arrivalTimeHour + 1];
     
@@ -78,8 +77,6 @@ namespace TrRouting
           tripExitConnectionIndex   = tripsExitConnection[tripIndex];
           nodeArrivalIndex          = std::get<connectionIndexes::NODE_ARR>(**connection);
           nodeArrivalTentativeTime  = nodesReverseTentativeTime[nodeArrivalIndex];
-          
-          //std::cerr << "nodeArrivalTentativeTime: " << nodeArrivalTentativeTime << " connectionArrivalTime: " << connectionArrivalTime << " tripExitConnectionIndex: " << tripExitConnectionIndex << std::endl;
           
           // reachable connections only here:
           if (
@@ -199,8 +196,7 @@ namespace TrRouting
       i++;
     }
     
-    if (params.debugDisplay)
-      std::cerr << "-- " << reachableConnectionsCount << " reverse connections parsed on " << connectionsCount << std::endl;
+    spdlog::debug("-- {}  reverse connections parsed on {}", reachableConnectionsCount, connectionsCount);
 
     if (!params.returnAllNodesResult && reachableConnectionsCount == 0) {
       throw NoRoutingFoundException(NoRoutingReason::NO_SERVICE_TO_DESTINATION);

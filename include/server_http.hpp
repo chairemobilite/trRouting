@@ -5,7 +5,6 @@
 #include "mutex.hpp"
 #include "utility.hpp"
 #include <functional>
-#include <iostream>
 #include <limits>
 #include <list>
 #include <map>

@@ -1,6 +1,7 @@
 #include <fstream>
 #include <fcntl.h>
 #include <capnp/serialize-packed.h>
+#include "spdlog/spdlog.h"
 #include "cache_fetcher.hpp"
 #include "parameters.hpp"
 
@@ -22,7 +23,7 @@ namespace TrRouting
     bool notEmpty = false;
     iCacheFile.open(cacheFilePath);
     notEmpty = iCacheFile.is_open();
-    //std::cout << "capnpCacheFileExists: " << CacheFetcher::getFilePath(cacheFilePath, params, customPath) << " : " << (notEmpty ? "TRUE" : "FALSE") << std::endl;
+
     iCacheFile.close();
     return notEmpty;
   }
@@ -35,7 +36,7 @@ namespace TrRouting
     if (iCacheFile.is_open())
     {
       iCacheFile >> count;
-      std::cout << cacheFilePath << " has " << count << " cache files" << std::endl;
+      spdlog::info("{} has {} cache files", cacheFilePath, count);
     }
     iCacheFile.close();
     return count;
@@ -48,17 +49,17 @@ namespace TrRouting
     }
     else if (!params.projectShortname.empty()) {
       filePath += params.projectShortname + "/";
-    }
+    }    
     if (customPath.empty())
     {
-      std::cout << "reading " << (filePath + cacheFilePath) << " cache file" << std::endl;
-      return filePath + cacheFilePath;
+      filePath += cacheFilePath;
     }
     else
     {
-      std::cout << "reading " << (filePath + customPath + "/" + cacheFilePath) << " cache file" << std::endl;
-      return filePath + customPath + "/" + cacheFilePath;
+      filePath += customPath + "/" + cacheFilePath;
     }
+    spdlog::info("reading {} cache file", filePath);
+    return filePath;
   }
 
 }

@@ -1,4 +1,5 @@
-#include <iostream>
+#include <sstream>
+#include "spdlog/spdlog.h"
 
 #include "calculator.hpp"
 #include "constants.hpp"
@@ -11,6 +12,17 @@
 
 namespace TrRouting
 {
+
+
+  std::string LineIdxToString(const std::vector<int> & linesList, const std::vector<std::unique_ptr<Line>> &lines) {
+    std::stringstream formatter;
+
+    for(auto lineIdx: linesList) {
+      formatter << lines[lineIdx].get()->shortname << " ";
+    }
+    return formatter.str();
+  }
+  
   /**
    * @brief Visitor class to get the line ids used by a step
    * 
@@ -91,16 +103,13 @@ namespace TrRouting
     //int departureTimeSeconds = -1;
     std::vector<std::string> lineShortnames;
 
-    if (params.debugDisplay)
-    {
-      std::cout << "alternatives parameters:" << std::endl;
-      std::cout << "  maxTotalTravelTimeSeconds: " << parameters.getMaxTotalTravelTimeSeconds() << std::endl;
-      std::cout << "  minAlternativeMaxTravelTimeSeconds: " << params.minAlternativeMaxTravelTimeSeconds << std::endl;
-      std::cout << "  alternativesMaxAddedTravelTimeSeconds: " << params.alternativesMaxAddedTravelTimeSeconds << std::endl;
-      std::cout << "  alternativesMaxTravelTimeRatio: " << params.alternativesMaxTravelTimeRatio << std::endl;
-      std::cout << "calculating fastest alternative..." << std::endl;
-    }
-
+    spdlog::debug("alternatives parameters:");
+    spdlog::debug("  maxTotalTravelTimeSeconds: {}", parameters.getMaxTotalTravelTimeSeconds());
+    spdlog::debug("  minAlternativeMaxTravelTimeSeconds: ", params.minAlternativeMaxTravelTimeSeconds);
+    spdlog::debug("  alternativesMaxAddedTravelTimeSeconds: ", params.alternativesMaxAddedTravelTimeSeconds);
+    spdlog::debug("  alternativesMaxTravelTimeRatio: ", params.alternativesMaxTravelTimeRatio);
+    spdlog::debug("calculating fastest alternative...");
+  
     std::unique_ptr<RoutingResult> result = calculate(parameters);
 
     // Can technically be allNodes or SingleCalculation, so we check the type
@@ -145,8 +154,7 @@ namespace TrRouting
 
       //params.departureTimeSeconds = departureTimeSeconds;
 
-      if (params.debugDisplay)
-        std::cout << "  fastestTravelTimeSeconds: " << routingResult.totalTravelTime << std::endl;
+      spdlog::debug("  fastestTravelTimeSeconds: ", routingResult.totalTravelTime);
 
       foundLinesIdx = routingResult.accept(visitor);
       std::stable_sort(foundLinesIdx.begin(),foundLinesIdx.end());
@@ -154,15 +162,7 @@ namespace TrRouting
       foundLinesIdxTravelTimeSeconds[foundLinesIdx] = routingResult.totalTravelTime;
       lastFoundedAtNum = 1;
 
-      if (params.debugDisplay)
-      {
-        std::cout << "fastest line ids: ";
-        for (auto lineIdx : foundLinesIdx)
-        {
-          std::cout << lines[lineIdx].get()->shortname << " ";
-        }
-        std::cout << std::endl;
-      }
+      spdlog::debug("fastest line ids: {}", LineIdxToString(foundLinesIdx, lines));
 
 
       combinationsKs.clear();
@@ -170,7 +170,7 @@ namespace TrRouting
       for (auto k : combinationsKs)
       {
         Combinations<int> combinations(foundLinesIdx, k);
-        //std::cout << "\nk = " << k << std::endl;
+
         for (auto newCombination : combinations)
         {
           std::stable_sort(newCombination.begin(), newCombination.end());
@@ -193,27 +193,9 @@ namespace TrRouting
             alternativeParameters.exceptLinesIdx.push_back(lineIdx);
           }
 
-          //if (params.debugDisplay)
-          //{
-            std::cerr << "calculating alternative " << alternativeSequence << " from a total of " << alternativesCalculatedCount << "..." << std::endl;
-          //}
-
-
-          if (params.debugDisplay)
-          {
-            std::cout << "except lines: ";
-            for (auto lineIdx : combination)
-            {
-              std::cout << lines[lineIdx].get()->shortname << " ";
-            }
-            std::cout << std::endl;
-          }
-
-
-
-          //std::cout << std::endl;
-
-
+          spdlog::info("calculating alternative {} from a total of {} ...", alternativeSequence, alternativesCalculatedCount);
+          
+          spdlog::debug("except lines: {}", LineIdxToString(combination, lines));
 
           try {
             result = calculate(alternativeParameters, false, true);
@@ -235,16 +217,10 @@ namespace TrRouting
 
                 alternatives.alternatives.push_back(std::move(result));
 
-                if (params.debugDisplay)
-                {
-                  std::cout << "travelTimeSeconds: " << alternativeCalcResult.totalTravelTime << " line Uuids: ";
-                  for (auto lineIdx : foundLinesIdx)
-                  {
-                    std::cout << lines[lineIdx].get()->shortname << " ";
-                  }
-                  std::cout << std::endl;
-                }
-
+                spdlog::debug("travelTimeSeconds: {}  line Uuids: {}",
+                              alternativeCalcResult.totalTravelTime,
+                              LineIdxToString(foundLinesIdx, lines));
+                
                 combinationsKs.clear();
 
                 lastFoundedAtNum = alternativesCalculatedCount;
@@ -254,7 +230,7 @@ namespace TrRouting
                 for (auto k : combinationsKs)
                 {
                   Combinations<int> combinations(foundLinesIdx, k);
-                  //std::cout << "\nk = " << k << std::endl;
+
                   for (auto newCombination : combinations)
                   {
 
@@ -296,54 +272,32 @@ namespace TrRouting
               }
             }
           } catch (NoRoutingFoundException& e) {
-            //std::cout << "failed" << std::endl;
+
             failedCombinations.push_back(combination);
           }
 
           alternativesCalculatedCount++;
 
-          if (params.debugDisplay)
+          if (failedCombinations.size() > 0)
           {
-            if (failedCombinations.size() > 0)
+            for (auto failedCombination : failedCombinations)
             {
-              std::cout << "failed combinations: ";
-              for (auto failedCombination : failedCombinations)
-              {
-                for (auto lineIdx : failedCombination)
-                {
-                  std::cout << "  " << lines[lineIdx].get()->shortname << " ";
-                }
-                std::cout << std::endl;
-              }
+              spdlog::debug("failed combinations: {}", LineIdxToString(failedCombination, lines));
             }
           }
-
         }
       }
 
-      if (params.debugDisplay)
-      {
-        std::cout << std::endl;
+      int i {0};
+      for (auto foundLinesIdx : alreadyFoundLinesIdx)
+      {          
+        spdlog::debug("{}. {} tt: ", i, LineIdxToString(foundLinesIdx.first, lines),
+                      (foundLinesIdxTravelTimeSeconds[foundLinesIdx.first] / 60));
+        i++;          
       }
+      
+      spdlog::debug("last alternative found at: {} on a total of {} calculations", lastFoundedAtNum,  maxAlternatives);
 
-      if (params.debugDisplay)
-      {
-        int i {0};
-        for (auto foundLinesIdx : alreadyFoundLinesIdx)
-        {
-          std::cout << i << ". ";
-          for(auto lineIdx : foundLinesIdx.first)
-          {
-            std::cout << lines[lineIdx].get()->shortname << " ";
-          }
-          std::cout << " tt: " << (foundLinesIdxTravelTimeSeconds[foundLinesIdx.first] / 60);
-          i++;
-          std::cout << std::endl;
-        }
-
-        std::cout << "last alternative found at: " << lastFoundedAtNum << " on a total of " << maxAlternatives << " calculations" << std::endl;
-
-      }
       alternatives.totalAlternativesCalculated = alternativesCalculatedCount;
       return alternatives;
 

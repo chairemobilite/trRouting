@@ -1,4 +1,5 @@
 
+#include "spdlog/spdlog.h"
 #include "calculator.hpp"
 #include "constants.hpp"
 #include "parameters.hpp"
@@ -108,7 +109,6 @@ namespace TrRouting
         transferTime             = -1; egressWalkingTime      = -1;
         waitingTime              = -1; accessWaitingTime      = -1;
 
-        //std::cerr << nodes[resultingNodeIndex].get()->name << " : " << std::get<0>(forwardJourneysSteps[resultingNodeIndex]) << std::endl;
         // recreate journey:
         resultingNodeJourneyStep = forwardEgressJourneysSteps[resultingNodeIndex];
 
@@ -390,8 +390,7 @@ namespace TrRouting
       }
     }
 
-    if (params.debugDisplay)
-      std::cerr << "-- forward result: " << (params.returnAllNodesResult ? " allNodes " : "single calculation") << std::endl;
+    spdlog::debug("-- forward result: {}", (params.returnAllNodesResult ? " allNodes " : "single calculation"));
 
     if (params.returnAllNodesResult)
     {

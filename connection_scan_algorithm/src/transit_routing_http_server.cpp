@@ -7,9 +7,9 @@
 #include <vector>
 #include <algorithm>
 #include <string>
-#include <iostream>
 #include <iterator>
 #include <curses.h>
+#include "spdlog/spdlog.h"
 
 #include <boost/uuid/uuid.hpp>
 #include <boost/program_options.hpp>
@@ -97,10 +97,8 @@ int main(int argc, char** argv) {
   }
   endwin();
 
-  std::cout << "Starting transit routing on port " << consoleGreen << programOptions.port << consoleResetColor
-            << " for the project: " << consoleGreen << programOptions.projectShortname << consoleResetColor
-            << std::endl << std::endl;
-
+  spdlog::info("Starting transit routing on port {} for the project: {}", programOptions.port, programOptions.projectShortname);
+  
   algorithmParams.projectShortname       = programOptions.projectShortname;
   algorithmParams.cacheDirectoryPath     = programOptions.cachePath;
   algorithmParams.dataFetcherShortname   = programOptions.dataFetcherShortname;
@@ -110,18 +108,23 @@ int main(int argc, char** argv) {
   algorithmParams.osrmWalkingHost        = programOptions.osrmWalkingHost;
   algorithmParams.osrmCyclingHost        = programOptions.osrmCyclingHost;
   algorithmParams.osrmDrivingHost        = programOptions.osrmDrivingHost;
+
+  if (programOptions.debug) {
+    spdlog::set_level(spdlog::level::debug);
+  }
+  //TODO REMOVE
   algorithmParams.serverDebugDisplay     = programOptions.debug;
 
   CacheFetcher cacheFetcher    = CacheFetcher();
   algorithmParams.cacheFetcher = &cacheFetcher;
 
   Calculator calculator(algorithmParams);
-  std::cout << "preparing calculator..." << std::endl;
+  spdlog::info("preparing calculator...");
   Calculator::DataStatus dataStatus = calculator.prepare();
 
   int i = 0;
 
-  std::cout << "preparing server..." << std::endl;
+  spdlog::info("preparing server...");
 
   //HTTP-server using 1 thread
   //Unless you do more heavy non-threaded processing in the resources,
@@ -343,7 +346,7 @@ int main(int argc, char** argv) {
         //calculator.benchmarking["generating_results"]  = 0;
       }
 
-      std::cout << "calculating request: " << request->path << std::endl;
+      spdlog::info("calculating request: {}", request->path);
 
       int countOdTripsCalculated {0};
 
@@ -369,8 +372,8 @@ int main(int argc, char** argv) {
         {
           calculator.odTrip = calculator.odTrips[calculator.odTripIndexesByUuid[calculator.params.odTripUuid.value()]].get();
           foundOdTrip = true;
-          std::cout << "od trip uuid " << calculator.odTrip->uuid << std::endl;
-          std::cout << "dts " << calculator.odTrip->departureTimeSeconds << std::endl;
+          spdlog::info("od trip uuid {}", to_string(calculator.odTrip->uuid));
+          spdlog::info("dts {} ", calculator.odTrip->departureTimeSeconds);
           if (routeParams.isWithAlternatives())
           {
             alternativeResult = calculator.alternativesRouting(routeParams);
@@ -401,7 +404,7 @@ int main(int argc, char** argv) {
 
         if (calculator.params.saveResultToFile)
         {
-          std::cerr << "writing file" << std::endl;
+          spdlog::info("writing file");
           std::ofstream file;
           //file.imbue(std::locale("en_US.UTF8"));
           file.open(calculator.params.calculationName + ".json", std::ios_base::trunc);
@@ -409,24 +412,23 @@ int main(int argc, char** argv) {
           file.close();
         }
 
-        std::cerr << "-- total -- " << calculator.algorithmCalculationTime.getDurationMicrosecondsNoStop() << " microseconds\n";
+        spdlog::debug("-- total -- {} microseconds", calculator.algorithmCalculationTime.getDurationMicrosecondsNoStop());
 
-        if (calculator.params.debugDisplay)
+        for (auto & benchmark : calculator.benchmarking) 
         {
-          for (auto & benchmark : calculator.benchmarking)
-          {
-            std::cerr << "  -- " << benchmark.first << " -- " << benchmark.second / 1000 << " ms ";
-            if (countOdTripsCalculated > 0)
-            {
-              std::cerr << " (" << (benchmark.second / countOdTripsCalculated / 1000) << " per odTrip)";
-            }
-            std::cerr << "\n";
-          }
-          if (countOdTripsCalculated > 0)
-          {
-            std::cerr << "  -- number of od trips calculated -- " << countOdTripsCalculated << "\n";
+          if (countOdTripsCalculated > 0) {
+            //TODO Check units here, ms should me second * 1000 not second/1000
+            spdlog::debug("  -- {} -- {} ms ({} per odTrip) -- number od trips: {}",
+                          benchmark.first,
+                          benchmark.second / 1000,
+                          (benchmark.second / countOdTripsCalculated / 1000),
+                          countOdTripsCalculated);
+          } else {
+            //TODO Check units here, ms should me second * 1000 not second/1000
+            spdlog::debug("  -- {} -- {} ms", benchmark.first, benchmark.second / 1000);
           }
         }
+
       } catch (NoRoutingFoundException e) {
           response = ResultToV1Response::noRoutingFoundResponse(routeParams, e.getReason()).dump(2);
       }
@@ -442,7 +444,7 @@ int main(int argc, char** argv) {
   };
 
   server.default_resource["GET"] = [](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
-    std::cout << "calculating request: " << request->content.string() << std::endl;
+    spdlog::info("calculating request: {}", request->content.string());
 
     std::string response = "{\"status\": \"error\", \"error\": \"missing params\"}";
 
@@ -454,7 +456,7 @@ int main(int argc, char** argv) {
     // Note that connection timeouts will also call this handle with ec set to SimpleWeb::errc::operation_canceled
   };
 
-  std::cout << "starting server..." << std::endl;
+  spdlog::info("starting server...");
   std::thread server_thread([&server](){
     server.start();
   });
@@ -462,7 +464,7 @@ int main(int argc, char** argv) {
   // Wait for server to start so that the client can connect:
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-  std::cout << "ready." << std::endl;
+  spdlog::info("ready.");
 
   server_thread.join();
 

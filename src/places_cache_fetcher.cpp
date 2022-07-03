@@ -12,6 +12,7 @@
 #include "point.hpp"
 #include "capnp/placeCollection.capnp.h"
 #include "capnp/place.capnp.h"
+#include "spdlog/spdlog.h"
 
 namespace TrRouting
 {
@@ -36,7 +37,7 @@ namespace TrRouting
     std::string cacheFileName{tStr};
     boost::uuids::string_generator uuidGenerator;
 
-    std::cout << "Fetching " << tStr << " from cache..." << std::endl;
+    spdlog::info("Fetching {} from cache... {}", tStr, customPath);
 
     for(std::map<boost::uuids::uuid, int>::iterator iter = dataSourceIndexesByUuid.begin(); iter != dataSourceIndexesByUuid.end(); ++iter)
     {
@@ -46,7 +47,7 @@ namespace TrRouting
 
       int filesCount {CacheFetcher::getCacheFilesCount(CacheFetcher::getFilePath(cacheFilePath + ".capnpbin.count", params, customPath))};
 
-      std::cout << "files count places: " << filesCount << " path: " << cacheFilePath << std::endl;
+      spdlog::info("files count places: {} path: {}", filesCount, cacheFilePath);
 
       for (int i = 0; i < filesCount; i++)
       {
@@ -59,11 +60,11 @@ namespace TrRouting
           int err = errno;
           if (err == ENOENT)
           {
-            std::cerr << "missing " << filePath << " cache file!" << std::endl;
+            spdlog::error("missing {} cache files!", filePath);
           }
           else
           {
-            std::cerr << "Error opening cache file " << filePath << ": " << err << std::endl;
+            spdlog::error("Error opening cache file {} : {} ", filePath, err);
           }
           continue;
         }
@@ -112,11 +113,11 @@ namespace TrRouting
         }
         catch (const kj::Exception& e)
         {
-          std::cerr << "Error reading cache file " << filePath << ": " << e.getDescription().cStr() << std::endl;
+          spdlog::error("Error opening cache file {}: {}", filePath, e.getDescription().cStr());
         }
         catch (...)
         {
-          std::cerr << "Unknown error occurred " << filePath << std::endl;
+          spdlog::error("Unknown error occurred {} ", filePath);
         }
 
         close(fd);

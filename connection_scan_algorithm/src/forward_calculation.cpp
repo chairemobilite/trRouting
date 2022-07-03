@@ -1,3 +1,5 @@
+#include "spdlog/spdlog.h"
+
 #include "calculator.hpp"
 #include "toolbox.hpp"
 #include "parameters.hpp"
@@ -41,8 +43,6 @@ namespace TrRouting
     
     int  connectionsCount  = forwardConnections.size();
     int  departureTimeHour = departureTimeSeconds / 3600;
-
-    //std::cout << forwardConnectionsIndexPerDepartureTimeHour[departureTimeHour] << ":" << departureTimeHour << std::endl;
 
     // main loop:
     i = forwardConnectionsIndexPerDepartureTimeHour[departureTimeHour];
@@ -177,8 +177,7 @@ namespace TrRouting
       i++;
     }
 
-    if (params.debugDisplay)
-      std::cerr << "-- " << reachableConnectionsCount << " forward connections parsed on " << connectionsCount << std::endl;
+    spdlog::debug("-- {} forward connections parsed on {}", reachableConnectionsCount, connectionsCount);
 
     if (!params.returnAllNodesResult && reachableConnectionsCount == 0) {
       throw NoRoutingFoundException(NoRoutingReason::NO_SERVICE_FROM_ORIGIN);
@@ -194,14 +193,13 @@ namespace TrRouting
       i = 0;
       for (auto & egressFootpath : egressFootpaths)
       {
-        //std::cerr << nodes[std::get<0>(egressFootpath)].get()->name << std::endl;
         egressExitConnection  = std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION>(forwardEgressJourneysSteps[std::get<0>(egressFootpath)]);
         if (egressExitConnection != -1)
         {
           egressTravelTime      = nodesEgressTravelTime[std::get<0>(egressFootpath)];
           egressDistance        = nodesEgressDistance[std::get<0>(egressFootpath)];
           egressNodeArrivalTime = std::get<connectionIndexes::TIME_ARR>(*forwardConnections[egressExitConnection]) + egressTravelTime;
-          //std::cerr << nodes[std::get<0>(egressFootpath)].get()->name << ": " << egressTravelTime << " - " << Toolbox::convertSecondsToFormattedTime(egressNodeArrivalTime) << std::endl;
+
           if (egressNodeArrivalTime >= 0 && egressNodeArrivalTime - departureTimeSeconds <= parameters.getMaxTotalTravelTimeSeconds() && egressNodeArrivalTime < bestArrivalTime && egressNodeArrivalTime < MAX_INT)
           {
             bestArrivalTime      = egressNodeArrivalTime;

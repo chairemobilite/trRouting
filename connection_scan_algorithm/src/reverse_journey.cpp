@@ -113,7 +113,7 @@ namespace TrRouting
         {
           continue;
         }
-        //std::cerr << nodes[bestEgressNodeIndex].get()->name << std::endl;
+
         while ((std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(resultingNodeJourneyStep) != -1 && std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION>(resultingNodeJourneyStep) != -1))
         {
           // here we inverse the transfers (putting them after the exit connection, instead of before the enter connection):
