@@ -63,7 +63,6 @@ namespace TrRouting
     transferBetweenSameLine                = true;
     calculateByNumberOfTransfers           = false;
     maxAlternatives                        = 200;
-    debugDisplay                           = serverDebugDisplay;
     alternativesMaxTravelTimeRatio         = 1.75;
     minAlternativeMaxTravelTimeSeconds     = 30*60;
     alternativesMaxAddedTravelTimeSeconds  = 60*60;
@@ -599,12 +598,6 @@ namespace TrRouting
         if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1") { saveResultToFile = true; }
         continue;
       }
-      else if (parameterWithValueVector[0] == "debug")
-      {
-        if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1") { debugDisplay = true; }
-        continue;
-      }
-
     }
 
     return RouteParameters::createRouteODParameter(newParametersWithValues, scenarioIndexesByUuid, scenarios);

@@ -112,8 +112,6 @@ int main(int argc, char** argv) {
   if (programOptions.debug) {
     spdlog::set_level(spdlog::level::debug);
   }
-  //TODO REMOVE
-  algorithmParams.serverDebugDisplay     = programOptions.debug;
 
   CacheFetcher cacheFetcher    = CacheFetcher();
   algorithmParams.cacheFetcher = &cacheFetcher;
@@ -336,7 +334,7 @@ int main(int argc, char** argv) {
       }
 
       // clear and initialize benchmarking:
-      if (calculator.params.debugDisplay)
+      // TODO create flags to control benchmarking
       {
         calculator.benchmarking["reset"]               = 0;
         calculator.benchmarking["forward_calculation"] = 0;

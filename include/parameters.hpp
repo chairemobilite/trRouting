@@ -202,8 +202,6 @@ namespace TrRouting
       bool birdDistanceAccessibilityEnabled = false; // true if the accessibility information is obtained using bird distances instead of osrm
       std::string accessMode;
       std::string egressMode;
-      bool debugDisplay; // display performance and debug info when set to true
-      bool serverDebugDisplay; // same as debugDisplay, but set as override when starting the server
       bool tryNextModeIfRoutingFails;
       std::string noResultSecondMode;
       int noResultNextAccessTimeSecondsIncrement;

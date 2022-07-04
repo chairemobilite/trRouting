@@ -211,15 +211,13 @@ namespace TrRouting
         i++;
       }
 
-      if (params.debugDisplay)
-        benchmarking["forward_calculation"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
+      benchmarking["forward_calculation"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
 
       return std::make_tuple(bestArrivalTime, bestEgressNodeIndex, bestEgressTravelTime, bestEgressDistance);
     }
     else
     {
-      if (params.debugDisplay)
-        benchmarking["forward_calculation"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
+      benchmarking["forward_calculation"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
 
       return std::make_tuple(MAX_INT, -1, -1, -1);
     }
