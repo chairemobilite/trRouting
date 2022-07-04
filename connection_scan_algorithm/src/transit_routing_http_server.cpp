@@ -8,7 +8,6 @@
 #include <algorithm>
 #include <string>
 #include <iterator>
-#include <curses.h>
 #include "spdlog/spdlog.h"
 
 #include <boost/uuid/uuid.hpp>
@@ -31,13 +30,6 @@ using namespace TrRouting;
 
 typedef SimpleWeb::Server<SimpleWeb::HTTP> HttpServer;
 typedef SimpleWeb::Client<SimpleWeb::HTTP> HttpClient;
-
-std::string consoleRed        = "";
-std::string consoleGreen      = "";
-std::string consoleYellow     = "";
-std::string consoleCyan       = "";
-std::string consoleMagenta    = "";
-std::string consoleResetColor = "";
 
 std::string intializeResponse(Calculator::DataStatus status)
 {
@@ -72,31 +64,6 @@ int main(int argc, char** argv) {
   Parameters algorithmParams;
 
   // setup program options:
-
-  // setup console colors:
-  // (this will create a new terminal window, check if the terminal is color-capable and then it will close the terminal window with endwin()):
-  initscr();
-  start_color();
-  if (has_colors())
-  {
-    consoleRed        = "\033[0;31m";
-    consoleGreen      = "\033[1;32m";
-    consoleYellow     = "\033[1;33m";
-    consoleCyan       = "\033[0;36m";
-    consoleMagenta    = "\033[0;35m";
-    consoleResetColor = "\033[0m";
-  }
-  else
-  {
-    consoleRed        = "";
-    consoleGreen      = "";
-    consoleYellow     = "";
-    consoleCyan       = "";
-    consoleMagenta    = "";
-    consoleResetColor = "";
-  }
-  endwin();
-
   spdlog::info("Starting transit routing on port {} for the project: {}", programOptions.port, programOptions.projectShortname);
   
   algorithmParams.projectShortname       = programOptions.projectShortname;
