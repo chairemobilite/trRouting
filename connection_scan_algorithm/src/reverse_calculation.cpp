@@ -13,7 +13,7 @@ namespace TrRouting
   std::tuple<int,int,int,int> Calculator::reverseCalculation(RouteParameters &parameters)
   {
 
-    int benchmarkingStart = params.debugDisplay ? algorithmCalculationTime.getEpoch() : 0;
+    int benchmarkingStart = algorithmCalculationTime.getEpoch();
 
     int  i                                {0};
     int  reachableConnectionsCount        {0};
@@ -232,15 +232,13 @@ namespace TrRouting
         i++;
       }
 
-      if (params.debugDisplay)
-        benchmarking["reverse_calculation"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
+      benchmarking["reverse_calculation"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
 
       return std::make_tuple(bestDepartureTime, bestAccessNodeIndex, bestAccessTravelTime, bestAccessDistance);
     }
     else
     {
-      if (params.debugDisplay)
-        benchmarking["reverse_calculation"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
+      benchmarking["reverse_calculation"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
       
       return std::make_tuple(-1, -1, -1, -1);
     }

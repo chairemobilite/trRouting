@@ -69,7 +69,6 @@ public:
     algorithmParams.osrmCyclingHost = "localhost";
     algorithmParams.osrmDrivingPort = "7000";
     algorithmParams.osrmDrivingHost = "localhost";
-    algorithmParams.serverDebugDisplay = false;
 
     CacheFetcher cacheFetcher = TrRouting::CacheFetcher();
     algorithmParams.cacheFetcher = &cacheFetcher;
