@@ -28,7 +28,7 @@ brew install capnp
 
 [Install Cap'nProto](https://capnproto.org/install.html)
 ```
-sudo apt-get install clang libboost-all-dev libexpat1-dev libjsoncpp-dev libncurses5-dev
+sudo apt-get install clang libboost-all-dev libexpat1-dev libjsoncpp-dev libspdlog-dev
 ```
 
 ## Compilation
