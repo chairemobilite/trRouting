@@ -142,7 +142,6 @@ namespace TrRouting
 
     public:
 
-      std::string projectShortname;
       std::string dataFetcherShortname; // cache, csv or gtfs, only cache is implemented for now
       std::string cacheDirectoryPath;
       std::string calculationName;

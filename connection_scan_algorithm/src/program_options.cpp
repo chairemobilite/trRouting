@@ -17,8 +17,6 @@ namespace TrRouting {
     options.add_options()
       ("cachePath",                                         boost::program_options::value<std::string>()->default_value("cache"), "cache path");
     options.add_options()
-      ("project,projectShortname",                          boost::program_options::value<std::string>()->default_value("demo_transition"), "project shortname (shortname of the project to use or data to use)");
-    options.add_options()
       ("osrmPort,osrmWalkPort,osrmWalkingPort",             boost::program_options::value<std::string>()->default_value("5000"), "osrm walking port");
     options.add_options()
       ("osrmCyclingPort",                                   boost::program_options::value<std::string>()->default_value("8000"), "osrm cycling port");
@@ -42,7 +40,6 @@ namespace TrRouting {
     debug                = false;
     dataFetcherShortname = "cache";
     cachePath            = "cache";
-    projectShortname     = "demo_transition";
     osrmWalkingPort      = "5000";
     osrmCyclingPort      = "8000";
     osrmDrivingPort      = "7000";
@@ -69,14 +66,6 @@ namespace TrRouting {
     else if (variablesMap.count("data") == 1)
     {
       dataFetcherShortname = variablesMap["data"].as<std::string>();
-    }
-    if(variablesMap.count("projectShortname") == 1)
-    {
-      projectShortname = variablesMap["projectShortname"].as<std::string>();
-    }
-    else if(variablesMap.count("project") == 1)
-    {
-      projectShortname = variablesMap["project"].as<std::string>();
     }
     if(variablesMap.count("cachePath") == 1)
     {

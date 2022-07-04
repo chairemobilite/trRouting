@@ -47,9 +47,6 @@ namespace TrRouting
     if (!params.cacheDirectoryPath.empty()) {
       filePath += params.cacheDirectoryPath + "/";
     }
-    else if (!params.projectShortname.empty()) {
-      filePath += params.projectShortname + "/";
-    }    
     if (customPath.empty())
     {
       filePath += cacheFilePath;

@@ -35,9 +35,6 @@ namespace TrRouting
   public:
     
     CacheFetcher() {}
-    CacheFetcher(std::string projectShortname) {
-      
-    }
     
     template<class T>
 

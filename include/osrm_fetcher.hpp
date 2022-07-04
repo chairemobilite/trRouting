@@ -18,9 +18,6 @@ namespace TrRouting
 
   public:
     OsrmFetcher() {}
-    OsrmFetcher(std::string projectShortname)
-    {
-    }
 
     static std::vector<std::tuple<int, int, int>> getAccessibleNodesFootpathsFromPoint(const Point &point, const std::vector<std::unique_ptr<Node>> &nodes, std::string mode, Parameters &params, int maxWalkingTravelTime, float walkingSpeedMetersPerSecond, bool reversed = false);
 

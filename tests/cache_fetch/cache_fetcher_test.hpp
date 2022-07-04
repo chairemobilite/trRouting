@@ -24,7 +24,7 @@ protected:
 public:
     void SetUp() 
     {
-        params.projectShortname = PROJECT_NAME; 
+        params.cacheDirectoryPath = PROJECT_NAME;
     }
 };
 
