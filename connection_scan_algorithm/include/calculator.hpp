@@ -12,13 +12,6 @@
 
 #include "calculation_time.hpp"
 
-extern std::string consoleRed;
-extern std::string consoleGreen;
-extern std::string consoleYellow;
-extern std::string consoleCyan;
-extern std::string consoleMagenta;
-extern std::string consoleResetColor;
-
 namespace TrRouting
 {
   class Parameters;
