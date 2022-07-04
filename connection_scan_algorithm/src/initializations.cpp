@@ -23,7 +23,6 @@ namespace TrRouting
 {
 
   Calculator::Calculator(Parameters& theParams) :
-    projectShortname(""),
     params(theParams),
     odTrip(nullptr),
     algorithmCalculationTime(CalculationTime()),

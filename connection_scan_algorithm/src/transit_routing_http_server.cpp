@@ -64,9 +64,8 @@ int main(int argc, char** argv) {
   Parameters algorithmParams;
 
   // setup program options:
-  spdlog::info("Starting transit routing on port {} for the project: {}", programOptions.port, programOptions.projectShortname);
+  spdlog::info("Starting transit routing on port {} for the data: {}", programOptions.port, programOptions.cachePath);
   
-  algorithmParams.projectShortname       = programOptions.projectShortname;
   algorithmParams.cacheDirectoryPath     = programOptions.cachePath;
   algorithmParams.dataFetcherShortname   = programOptions.dataFetcherShortname;
   algorithmParams.osrmWalkingPort        = programOptions.osrmWalkingPort;

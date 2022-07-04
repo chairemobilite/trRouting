@@ -19,11 +19,6 @@ TEST_F(CacheFetcherFixtureTests, TestGetFilePath)
     filePath = TrRouting::CacheFetcher::getFilePath(CACHE_FILE, params, VALID_CUSTOM_PATH);
     EXPECT_STREQ(filePath.c_str(), (VALID_CUSTOM_PATH + '/' + CACHE_FILE).c_str());
 
-    // Put all parameters
-    params.projectShortname = PROJECT_NAME;
-    filePath = TrRouting::CacheFetcher::getFilePath(CACHE_FILE, params, "");
-    EXPECT_STREQ(filePath.c_str(), (PROJECT_NAME + '/' + CACHE_FILE).c_str());
-
     // Omit the project name in params
     params.cacheDirectoryPath = relativeCacheDir;
     filePath = TrRouting::CacheFetcher::getFilePath(CACHE_FILE, params, "");
@@ -32,7 +27,7 @@ TEST_F(CacheFetcherFixtureTests, TestGetFilePath)
     // Omit the cache directory path
     params.cacheDirectoryPath = "";
     filePath = TrRouting::CacheFetcher::getFilePath(CACHE_FILE, params, "");
-    EXPECT_STREQ(filePath.c_str(), (PROJECT_NAME + '/' + CACHE_FILE).c_str());
+    EXPECT_STREQ(filePath.c_str(), (CACHE_FILE).c_str());
 }
 
 TEST_F(CacheFetcherFixtureTests, TestFileExists)

@@ -64,7 +64,6 @@ namespace TrRouting
     };
 
     std::map<std::string, int> benchmarking;
-    std::string projectShortname;
 
     Calculator(Parameters& theParams);
 
