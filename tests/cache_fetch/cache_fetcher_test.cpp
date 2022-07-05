@@ -1,5 +1,4 @@
 #include "gtest/gtest.h" // we will add the path to C preprocessor later
-#include "parameters.hpp"
 #include "cache_fetcher.hpp"
 #include "cache_fetcher_test.hpp"
 
@@ -12,22 +11,19 @@ protected:
 TEST_F(CacheFetcherFixtureTests, TestGetFilePath)
 {
     // Test with default params values
-    std::string filePath = TrRouting::CacheFetcher::getFilePath(CACHE_FILE, params, "");
+    TrRouting::CacheFetcher aCacheFetcher("");
+    std::string filePath = aCacheFetcher.getFilePath(CACHE_FILE, "");
     EXPECT_STREQ(filePath.c_str(), CACHE_FILE.c_str());
 
     // Test with default params and custom path
-    filePath = TrRouting::CacheFetcher::getFilePath(CACHE_FILE, params, VALID_CUSTOM_PATH);
+    filePath = aCacheFetcher.getFilePath(CACHE_FILE, VALID_CUSTOM_PATH);
     EXPECT_STREQ(filePath.c_str(), (VALID_CUSTOM_PATH + '/' + CACHE_FILE).c_str());
 
     // Omit the project name in params
-    params.cacheDirectoryPath = relativeCacheDir;
-    filePath = TrRouting::CacheFetcher::getFilePath(CACHE_FILE, params, "");
+    TrRouting::CacheFetcher relCacheFetcher(relativeCacheDir);
+    filePath = relCacheFetcher.getFilePath(CACHE_FILE, "");
     EXPECT_STREQ(filePath.c_str(), (relativeCacheDir + '/' + CACHE_FILE).c_str());
 
-    // Omit the cache directory path
-    params.cacheDirectoryPath = "";
-    filePath = TrRouting::CacheFetcher::getFilePath(CACHE_FILE, params, "");
-    EXPECT_STREQ(filePath.c_str(), (CACHE_FILE).c_str());
 }
 
 TEST_F(CacheFetcherFixtureTests, TestFileExists)

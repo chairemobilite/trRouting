@@ -35,7 +35,6 @@ namespace TrRouting
     std::vector<std::vector<std::unique_ptr<int>>>&   tripConnectionDepartureTimes,
     std::vector<std::vector<std::unique_ptr<float>>>& tripConnectionDemands,
     std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>>>& connections, 
-    Parameters& params,
     std::string customPath
   )
   {
@@ -71,7 +70,7 @@ namespace TrRouting
     for (auto & line : lines)
     {
       cacheFileName = "lines/line_" + boost::uuids::to_string(line->uuid);
-      std::string cacheFilePath = CacheFetcher::getFilePath(cacheFileName, params, customPath) + ".capnpbin";
+      std::string cacheFilePath = getFilePath(cacheFileName, customPath) + ".capnpbin";
       int fd = open(cacheFilePath.c_str(), O_RDWR);
       if (fd < 0)
       {

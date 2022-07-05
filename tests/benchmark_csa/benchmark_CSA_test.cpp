@@ -62,7 +62,6 @@ public:
   // Initialize calculator and parameters. Open the result files and add headers
   static void SetUpTestSuite()
   {
-    algorithmParams.cacheDirectoryPath = "cache/demo_transition";
     algorithmParams.dataFetcherShortname = "cache";
     OsrmFetcher::osrmWalkingPort = "5000";
     OsrmFetcher::osrmWalkingHost = "localhost"; //"http://localhost";
@@ -71,7 +70,7 @@ public:
     OsrmFetcher::osrmDrivingPort = "7000";
     OsrmFetcher::osrmDrivingHost = "localhost";
 
-    CacheFetcher cacheFetcher = TrRouting::CacheFetcher();
+    CacheFetcher cacheFetcher = TrRouting::CacheFetcher("cache/demo_transition");
     algorithmParams.cacheFetcher = &cacheFetcher;
     OsrmFetcher::birdDistanceAccessibilityEnabled = true;
 

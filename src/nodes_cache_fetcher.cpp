@@ -25,7 +25,6 @@ namespace TrRouting
     std::vector<std::unique_ptr<Node>>& ts,
     std::map<boost::uuids::uuid, int>& tIndexesByUuid,
     std::map<boost::uuids::uuid, int>& stationIndexesByUuid,
-    Parameters& params,
     std::string customPath
   )
   {
@@ -48,7 +47,7 @@ namespace TrRouting
 
     spdlog::info("Fetching {} from cache... {}", tStr, customPath);
 
-    std::string cacheFilePath = CacheFetcher::getFilePath(cacheFileName, params, customPath) + ".capnpbin";
+    std::string cacheFilePath = getFilePath(cacheFileName, customPath) + ".capnpbin";
 
     int fd = open(cacheFilePath.c_str(), O_RDWR);
     if (fd < 0)
@@ -130,7 +129,7 @@ namespace TrRouting
       Node * t = ts[i].get();
 
       nodeCacheFileName = "nodes/node_" + boost::uuids::to_string(t->uuid);
-      nodeCacheFileNamePath = CacheFetcher::getFilePath(nodeCacheFileName, params, customPath) + ".capnpbin";
+      nodeCacheFileNamePath = getFilePath(nodeCacheFileName, customPath) + ".capnpbin";
 
       int fd = open(nodeCacheFileNamePath.c_str(), O_RDWR);
       if (fd < 0)

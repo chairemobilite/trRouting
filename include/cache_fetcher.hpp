@@ -27,14 +27,12 @@
 namespace TrRouting
 {
 
-  class Parameters;
-  
   class CacheFetcher
   {
   
   public:
     
-    CacheFetcher() {}
+    CacheFetcher(const std::string &cacheDir);
     
     template<class T>
 
@@ -58,7 +56,7 @@ namespace TrRouting
      * 
      * Returns the complete file path in the cache
      */
-    static std::string getFilePath  (         std::string cacheFilePath, Parameters& params, std::string customPath = "");
+    std::string getFilePath  (         std::string cacheFilePath, std::string customPath = "");
     
     const std::pair<std::vector<Mode>, std::map<std::string, int>> getModes();
     
@@ -74,7 +72,6 @@ namespace TrRouting
     int getDataSources(
       std::vector<std::unique_ptr<DataSource>>& ts, 
       std::map<boost::uuids::uuid, int>& tIndexesById, 
-      Parameters& params,
       std::string customPath = ""
     );
 
@@ -92,7 +89,6 @@ namespace TrRouting
       std::map<boost::uuids::uuid, int>& tIndexesById, 
       std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid, 
       std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
-      Parameters& params,
       std::string customPath = ""
     );
 
@@ -111,7 +107,6 @@ namespace TrRouting
       std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid,
       std::map<boost::uuids::uuid, int>& householdIndexesByUuid, 
       std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
-      Parameters& params,
       std::string customPath = ""
     );
 
@@ -131,7 +126,6 @@ namespace TrRouting
       std::map<boost::uuids::uuid, int>& householdIndexesByUuid, 
       std::map<boost::uuids::uuid, int>& personIndexesByUuid,
       std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
-      Parameters& params,
       std::string customPath = ""
     );
 
@@ -149,7 +143,6 @@ namespace TrRouting
       std::map<boost::uuids::uuid, int>& tIndexesById, 
       std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid,
       std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
-      Parameters& params,
       std::string customPath = ""
     );
 
@@ -165,7 +158,6 @@ namespace TrRouting
     int getAgencies(
       std::vector<std::unique_ptr<Agency>>& ts,
       std::map<boost::uuids::uuid, int>& tIndexesById,
-      Parameters& params,
       std::string customPath = ""
     );
 
@@ -181,7 +173,6 @@ namespace TrRouting
     int getServices(
       std::vector<std::unique_ptr<Service>>& ts,
       std::map<boost::uuids::uuid, int>& tIndexesById,
-      Parameters& params,
       std::string customPath = ""
     );
 
@@ -197,7 +188,6 @@ namespace TrRouting
     int getStations(
       std::vector<std::unique_ptr<Station>>& ts,
       std::map<boost::uuids::uuid, int>& tIndexesById,
-      Parameters& params,
       std::string customPath = ""
     );
 
@@ -214,7 +204,6 @@ namespace TrRouting
       std::vector<std::unique_ptr<Node>>& ts,
       std::map<boost::uuids::uuid, int>& tIndexesById,
       std::map<boost::uuids::uuid, int>& stationIndexesById,
-      Parameters& params,
       std::string customPath = ""
     );
 
@@ -232,7 +221,6 @@ namespace TrRouting
       std::map<boost::uuids::uuid, int>& tIndexesById,
       std::map<boost::uuids::uuid, int>& agencyIndexesByUuid,
       std::map<std::string, int>& modeIndexesByShortname,
-      Parameters& params,
       std::string customPath = ""
     );
 
@@ -250,7 +238,6 @@ namespace TrRouting
       std::map<boost::uuids::uuid, int>& tIndexesById,
       std::map<boost::uuids::uuid, int>& lineIndexesByUuid,
       std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
-      Parameters& params,
       std::string customPath = ""
     );
 
@@ -271,7 +258,6 @@ namespace TrRouting
       std::map<boost::uuids::uuid, int>& agencyIndexesByUuid,
       std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
       std::map<std::string, int>& modeIndexesByShortname,
-      Parameters& params,
       std::string customPath = ""
     );
 
@@ -298,12 +284,11 @@ namespace TrRouting
       std::vector<std::vector<std::unique_ptr<int>>>&   tripConnectionDepartureTimes,
       std::vector<std::vector<std::unique_ptr<float>>>& tripConnectionDemands,
       std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>>>& connections, 
-      Parameters& params,
       std::string customPath = ""
     );
         
   private:
-    
+    std::string cacheDirectoryPath;
   };
     
 }

@@ -24,7 +24,6 @@ namespace TrRouting
     std::map<boost::uuids::uuid, int>& tIndexesByUuid,
     std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid,
     std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
-    Parameters& params,
     std::string customPath
   )
   {
@@ -51,14 +50,14 @@ namespace TrRouting
 
       std::string cacheFilePath {"dataSources/" + boost::uuids::to_string(dataSourceUuid) + "/" + cacheFileName};
 
-      int filesCount {CacheFetcher::getCacheFilesCount(CacheFetcher::getFilePath(cacheFilePath + ".capnpbin.count", params, customPath))};
+      int filesCount {CacheFetcher::getCacheFilesCount(getFilePath(cacheFilePath + ".capnpbin.count", customPath))};
 
       spdlog::info("files count households: {} path: {}", filesCount, cacheFilePath);
 
       for (int i = 0; i < filesCount; i++)
       {
         std::string filePath {cacheFilePath + ".capnpbin" + (filesCount > 1 ? "." + std::to_string(i) : "")};
-        std::string cacheFilePath = CacheFetcher::getFilePath(filePath, params, customPath);
+        std::string cacheFilePath = getFilePath(filePath, customPath);
 
         int fd = open(cacheFilePath.c_str(), O_RDWR);
         if (fd < 0)

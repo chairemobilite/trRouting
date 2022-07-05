@@ -2,7 +2,6 @@
 #include <filesystem>
 
 #include "gtest/gtest.h" // we will add the path to C preprocessor later
-#include "parameters.hpp"
 #include "cache_fetcher.hpp"
 #include "cache_fetcher_test.hpp"
 #include "trip.hpp"
@@ -37,18 +36,18 @@ public:
     {
         BaseCacheFetcherFixtureTests::SetUp();
         // Read valid data for agencies, lines and paths
-        cacheFetcher.getNodes(nodes, nodeIndexesByUuid, stationIndexesByUuid, params, VALID_CUSTOM_PATH);
-        cacheFetcher.getLines(lines, lineIndexesByUuid, agencyIndexesByUuid, modeIndexesByShortname, params, VALID_CUSTOM_PATH);
-        cacheFetcher.getPaths(paths, pathIndexesByUuid, lineIndexesByUuid, nodeIndexesByUuid, params, VALID_CUSTOM_PATH);
+        cacheFetcher.getNodes(nodes, nodeIndexesByUuid, stationIndexesByUuid, VALID_CUSTOM_PATH);
+        cacheFetcher.getLines(lines, lineIndexesByUuid, agencyIndexesByUuid, modeIndexesByShortname, VALID_CUSTOM_PATH);
+        cacheFetcher.getPaths(paths, pathIndexesByUuid, lineIndexesByUuid, nodeIndexesByUuid, VALID_CUSTOM_PATH);
         // Create the invalid lines directory
-        fs::create_directory(PROJECT_NAME + "/" + INVALID_CUSTOM_PATH + "/lines");
+        fs::create_directory(BASE_CACHE_DIRECTORY_NAME + "/" + INVALID_CUSTOM_PATH + "/lines");
     }
 
     void TearDown( ) override
     {
         BaseCacheFetcherFixtureTests::TearDown();
         // Remove the invalid lines directory
-        fs::remove_all(PROJECT_NAME + "/" + INVALID_CUSTOM_PATH + "/lines");
+        fs::remove_all(BASE_CACHE_DIRECTORY_NAME + "/" + INVALID_CUSTOM_PATH + "/lines");
     }
 };
 
@@ -56,7 +55,7 @@ TEST_F(ScheduleCacheFetcherFixtureTests, TestGetSchedulesInvalidLineFile)
 {
     // Copy the invalid file for the first line 
     std::string node0Uuid = boost::uuids::to_string(lines[0].get()->uuid);
-    fs::copy_file(PROJECT_NAME + "/" + INVALID_CUSTOM_PATH + "/genericInvalid.capnpbin", PROJECT_NAME + "/" + INVALID_CUSTOM_PATH + "/lines/line_ " + node0Uuid.c_str() + ".capnpbin");
+    fs::copy_file(BASE_CACHE_DIRECTORY_NAME + "/" + INVALID_CUSTOM_PATH + "/genericInvalid.capnpbin", BASE_CACHE_DIRECTORY_NAME + "/" + INVALID_CUSTOM_PATH + "/lines/line_ " + node0Uuid.c_str() + ".capnpbin");
     int retVal = cacheFetcher.getSchedules(
       trips,
       lines,
@@ -71,7 +70,6 @@ TEST_F(ScheduleCacheFetcherFixtureTests, TestGetSchedulesInvalidLineFile)
       tripConnectionDepartureTimes,
       tripConnectionDemands,
       connections,
-      params,
       INVALID_CUSTOM_PATH
     );
     // TODO: Since a file was invalid, should this return -EBADMSG?
@@ -95,7 +93,6 @@ TEST_F(ScheduleCacheFetcherFixtureTests, TestGetUnexistingLineFiles)
       tripConnectionDepartureTimes,
       tripConnectionDemands,
       connections,
-      params,
       INVALID_CUSTOM_PATH
     );
     ASSERT_EQ(0, retVal);
@@ -118,7 +115,6 @@ TEST_F(ScheduleCacheFetcherFixtureTests, TestGetSchedulesValid)
       tripConnectionDepartureTimes,
       tripConnectionDemands,
       connections,
-      params,
       VALID_CUSTOM_PATH
     );
     ASSERT_EQ(0, retVal);

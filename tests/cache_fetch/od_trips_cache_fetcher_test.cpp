@@ -2,7 +2,6 @@
 #include <filesystem>
 
 #include "gtest/gtest.h" // we will add the path to C preprocessor later
-#include "parameters.hpp"
 #include "cache_fetcher.hpp"
 #include "cache_fetcher_test.hpp"
 #include "od_trip.hpp"
@@ -22,7 +21,7 @@ protected:
 
 TEST_F(OdTripCacheFetcherFixtureTests, TestGetOdTripsValid)
 {
-    int retVal = cacheFetcher.getOdTrips(objects, objectIndexesByUuid, dataSourceIndexesByUuid, householdIndexesByUuid, personIndexesByUuid, nodeIndexesByUuid, params, VALID_CUSTOM_PATH);
+    int retVal = cacheFetcher.getOdTrips(objects, objectIndexesByUuid, dataSourceIndexesByUuid, householdIndexesByUuid, personIndexesByUuid, nodeIndexesByUuid, VALID_CUSTOM_PATH);
     ASSERT_EQ(0, retVal);
     ASSERT_EQ(0, objects.size());
 }

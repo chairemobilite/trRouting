@@ -67,7 +67,6 @@ int main(int argc, char** argv) {
   // setup program options:
   spdlog::info("Starting transit routing on port {} for the data: {}", programOptions.port, programOptions.cachePath);
   
-  algorithmParams.cacheDirectoryPath     = programOptions.cachePath;
   algorithmParams.dataFetcherShortname   = programOptions.dataFetcherShortname;
   OsrmFetcher::osrmWalkingPort        = programOptions.osrmWalkingPort;
   OsrmFetcher::osrmCyclingPort        = programOptions.osrmCyclingPort;
@@ -80,7 +79,7 @@ int main(int argc, char** argv) {
     spdlog::set_level(spdlog::level::debug);
   }
 
-  CacheFetcher cacheFetcher    = CacheFetcher();
+  CacheFetcher cacheFetcher    = CacheFetcher(programOptions.cachePath);
   algorithmParams.cacheFetcher = &cacheFetcher;
 
   Calculator calculator(algorithmParams);
@@ -167,67 +166,68 @@ int main(int argc, char** argv) {
 
     int i {0};
     bool correctCacheName {false};
+    //TODO Merge this and the preparations.cpp code
     for(std::string cacheName : cacheNames)
     {
       if (cacheName == "data_sources" || cacheName == "all")
       {
         correctCacheName = true;
-        calculator.updateDataSourcesFromCache(calculator.params, customCacheDirectoryPath);
+        calculator.updateDataSourcesFromCache(customCacheDirectoryPath);
       }
       if (cacheName == "households" || cacheName == "all")
       {
         correctCacheName = true;
-        calculator.updateHouseholdsFromCache(calculator.params, customCacheDirectoryPath);
+        calculator.updateHouseholdsFromCache(customCacheDirectoryPath);
       }
       if (cacheName == "persons" || cacheName == "all")
       {
         correctCacheName = true;
-        calculator.updatePersonsFromCache(calculator.params, customCacheDirectoryPath);
+        calculator.updatePersonsFromCache(customCacheDirectoryPath);
       }
       if (cacheName == "od_trips" || cacheName == "all")
       {
         correctCacheName = true;
-        calculator.updateOdTripsFromCache(calculator.params, customCacheDirectoryPath);
+        calculator.updateOdTripsFromCache(customCacheDirectoryPath);
       }
       if (cacheName == "places" || cacheName == "all")
       {
         correctCacheName = true;
-        calculator.updatePlacesFromCache(calculator.params, customCacheDirectoryPath);
+        calculator.updatePlacesFromCache(customCacheDirectoryPath);
       }
       if (cacheName == "agencies" || cacheName == "all")
       {
         correctCacheName = true;
-        calculator.updateAgenciesFromCache(calculator.params, customCacheDirectoryPath);
+        calculator.updateAgenciesFromCache(customCacheDirectoryPath);
       }
       if (cacheName == "services" || cacheName == "all")
       {
         correctCacheName = true;
-        calculator.updateServicesFromCache(calculator.params, customCacheDirectoryPath);
+        calculator.updateServicesFromCache(customCacheDirectoryPath);
       }
       if (cacheName == "nodes" || cacheName == "all")
       {
         correctCacheName = true;
-        calculator.updateNodesFromCache(calculator.params, customCacheDirectoryPath);
+        calculator.updateNodesFromCache(customCacheDirectoryPath);
       }
       if (cacheName == "lines" || cacheName == "all")
       {
         correctCacheName = true;
-        calculator.updateLinesFromCache(calculator.params, customCacheDirectoryPath);
+        calculator.updateLinesFromCache(customCacheDirectoryPath);
       }
       if (cacheName == "paths" || cacheName == "all")
       {
         correctCacheName = true;
-        calculator.updatePathsFromCache(calculator.params, customCacheDirectoryPath);
+        calculator.updatePathsFromCache(customCacheDirectoryPath);
       }
       if (cacheName == "scenarios" || cacheName == "all")
       {
         correctCacheName = true;
-        calculator.updateScenariosFromCache(calculator.params, customCacheDirectoryPath);
+        calculator.updateScenariosFromCache(customCacheDirectoryPath);
       }
       if (cacheName == "schedules" || cacheName == "all")
       {
         correctCacheName = true;
-        calculator.updateSchedulesFromCache(calculator.params, customCacheDirectoryPath);
+        calculator.updateSchedulesFromCache(customCacheDirectoryPath);
       }
 
       if (correctCacheName)

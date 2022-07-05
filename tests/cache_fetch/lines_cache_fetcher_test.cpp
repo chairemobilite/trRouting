@@ -2,7 +2,6 @@
 #include <filesystem>
 
 #include "gtest/gtest.h" // we will add the path to C preprocessor later
-#include "parameters.hpp"
 #include "cache_fetcher.hpp"
 #include "cache_fetcher_test.hpp"
 #include "line.hpp"
@@ -23,34 +22,34 @@ public:
     {
         BaseCacheFetcherFixtureTests::SetUp();
         // Copy the invalid file
-        fs::copy_file(PROJECT_NAME + "/" + INVALID_CUSTOM_PATH + "/genericInvalid.capnpbin", PROJECT_NAME + "/" + INVALID_CUSTOM_PATH + "/lines.capnpbin");
+        fs::copy_file(BASE_CACHE_DIRECTORY_NAME + "/" + INVALID_CUSTOM_PATH + "/genericInvalid.capnpbin", BASE_CACHE_DIRECTORY_NAME + "/" + INVALID_CUSTOM_PATH + "/lines.capnpbin");
     }
 
     void TearDown( ) override
     {
         BaseCacheFetcherFixtureTests::TearDown();
         // Remove the invalid file
-        fs::remove(PROJECT_NAME + "/" + INVALID_CUSTOM_PATH + "/lines.capnpbin");
+        fs::remove(BASE_CACHE_DIRECTORY_NAME + "/" + INVALID_CUSTOM_PATH + "/lines.capnpbin");
     }
 };
 
 TEST_F(LineCacheFetcherFixtureTests, TestGetLinesInvalid)
 {
-    int retVal = cacheFetcher.getLines(objects, objectIndexesByUuid, agencyIndexesByUuid, modeIndexesByShortname, params, INVALID_CUSTOM_PATH);
+    int retVal = cacheFetcher.getLines(objects, objectIndexesByUuid, agencyIndexesByUuid, modeIndexesByShortname, INVALID_CUSTOM_PATH);
     ASSERT_EQ(-EBADMSG, retVal);
     ASSERT_EQ(0, objects.size());
 }
 
 TEST_F(LineCacheFetcherFixtureTests, TestGetLinesValid)
 {
-    int retVal = cacheFetcher.getLines(objects, objectIndexesByUuid, agencyIndexesByUuid, modeIndexesByShortname, params, VALID_CUSTOM_PATH);
+    int retVal = cacheFetcher.getLines(objects, objectIndexesByUuid, agencyIndexesByUuid, modeIndexesByShortname, VALID_CUSTOM_PATH);
     ASSERT_EQ(0, retVal);
     ASSERT_EQ(2, objects.size());
 }
 
 TEST_F(LineCacheFetcherFixtureTests, TestGetLinesFileNotExists)
 {
-    int retVal = cacheFetcher.getLines(objects, objectIndexesByUuid, agencyIndexesByUuid, modeIndexesByShortname, params, BASE_CUSTOM_PATH);
+    int retVal = cacheFetcher.getLines(objects, objectIndexesByUuid, agencyIndexesByUuid, modeIndexesByShortname, BASE_CUSTOM_PATH);
     ASSERT_EQ(-ENOENT, retVal);
     ASSERT_EQ(0, objects.size());
 }

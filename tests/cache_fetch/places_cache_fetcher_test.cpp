@@ -2,7 +2,6 @@
 #include <filesystem>
 
 #include "gtest/gtest.h" // we will add the path to C preprocessor later
-#include "parameters.hpp"
 #include "cache_fetcher.hpp"
 #include "cache_fetcher_test.hpp"
 #include "place.hpp"
@@ -20,7 +19,7 @@ protected:
 
 TEST_F(PlaceCacheFetcherFixtureTests, TestGetPlacesValid)
 {
-    int retVal = cacheFetcher.getPlaces(objects, objectIndexesByUuid, dataSourceIndexesByUuid, nodeIndexesByUuid, params, VALID_CUSTOM_PATH);
+    int retVal = cacheFetcher.getPlaces(objects, objectIndexesByUuid, dataSourceIndexesByUuid, nodeIndexesByUuid, VALID_CUSTOM_PATH);
     ASSERT_EQ(0, retVal);
     ASSERT_EQ(0, objects.size());
 }
