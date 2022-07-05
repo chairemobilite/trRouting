@@ -191,14 +191,6 @@ namespace TrRouting
       std::optional<boost::uuids::uuid> startingNodeUuid;
       std::optional<boost::uuids::uuid> endingNodeUuid;
 
-      std::string osrmWalkingPort;
-      std::string osrmCyclingPort;
-      std::string osrmDrivingPort;
-      std::string osrmWalkingHost;
-      std::string osrmCyclingHost;
-      std::string osrmDrivingHost;
-
-      bool birdDistanceAccessibilityEnabled = false; // true if the accessibility information is obtained using bird distances instead of osrm
       std::string accessMode;
       std::string egressMode;
       bool tryNextModeIfRoutingFails;

@@ -22,6 +22,7 @@
 #include "station.hpp"
 #include "stop.hpp"
 #include "od_trip.hpp"
+#include "osrm_fetcher.hpp"
 
 // TODO:
 // Test transferable mode, it has separate code path
@@ -385,7 +386,7 @@ std::unique_ptr<TrRouting::RoutingResult> RouteCalculationFixtureTests::calculat
         calculator.nodeIndexesByUuid,
         calculator.nodes,
         calculator.dataSourceIndexesByUuid);
-    calculator.params.birdDistanceAccessibilityEnabled = true;
+    TrRouting::OsrmFetcher::birdDistanceAccessibilityEnabled = true;
 
     // TODO Shouldn't need to do this, but we do for now, benchmark needs to be started
     calculator.algorithmCalculationTime.start();

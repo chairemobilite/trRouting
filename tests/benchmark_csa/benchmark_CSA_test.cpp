@@ -14,6 +14,7 @@
 #include "scenario.hpp"
 #include "calculator.hpp"
 #include "benchmark_CSA_test.hpp"
+#include "osrm_fetcher.hpp"
 
 using namespace TrRouting;
 
@@ -63,16 +64,16 @@ public:
   {
     algorithmParams.cacheDirectoryPath = "cache/demo_transition";
     algorithmParams.dataFetcherShortname = "cache";
-    algorithmParams.osrmWalkingPort = "5000";
-    algorithmParams.osrmWalkingHost = "localhost"; //"http://localhost";
-    algorithmParams.osrmCyclingPort = "8000";
-    algorithmParams.osrmCyclingHost = "localhost";
-    algorithmParams.osrmDrivingPort = "7000";
-    algorithmParams.osrmDrivingHost = "localhost";
+    OsrmFetcher::osrmWalkingPort = "5000";
+    OsrmFetcher::osrmWalkingHost = "localhost"; //"http://localhost";
+    OsrmFetcher::osrmCyclingPort = "8000";
+    OsrmFetcher::osrmCyclingHost = "localhost";
+    OsrmFetcher::osrmDrivingPort = "7000";
+    OsrmFetcher::osrmDrivingHost = "localhost";
 
     CacheFetcher cacheFetcher = TrRouting::CacheFetcher();
     algorithmParams.cacheFetcher = &cacheFetcher;
-    algorithmParams.birdDistanceAccessibilityEnabled = true;
+    OsrmFetcher::birdDistanceAccessibilityEnabled = true;
 
     calculator = new TrRouting::Calculator(algorithmParams);
 

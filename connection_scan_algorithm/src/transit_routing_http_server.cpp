@@ -25,6 +25,7 @@
 #include "program_options.hpp"
 #include "result_to_v1.hpp"
 #include "routing_result.hpp"
+#include "osrm_fetcher.hpp"
 
 using namespace TrRouting;
 
@@ -68,12 +69,12 @@ int main(int argc, char** argv) {
   
   algorithmParams.cacheDirectoryPath     = programOptions.cachePath;
   algorithmParams.dataFetcherShortname   = programOptions.dataFetcherShortname;
-  algorithmParams.osrmWalkingPort        = programOptions.osrmWalkingPort;
-  algorithmParams.osrmCyclingPort        = programOptions.osrmCyclingPort;
-  algorithmParams.osrmDrivingPort        = programOptions.osrmDrivingPort;
-  algorithmParams.osrmWalkingHost        = programOptions.osrmWalkingHost;
-  algorithmParams.osrmCyclingHost        = programOptions.osrmCyclingHost;
-  algorithmParams.osrmDrivingHost        = programOptions.osrmDrivingHost;
+  OsrmFetcher::osrmWalkingPort        = programOptions.osrmWalkingPort;
+  OsrmFetcher::osrmCyclingPort        = programOptions.osrmCyclingPort;
+  OsrmFetcher::osrmDrivingPort        = programOptions.osrmDrivingPort;
+  OsrmFetcher::osrmWalkingHost        = programOptions.osrmWalkingHost;
+  OsrmFetcher::osrmCyclingHost        = programOptions.osrmCyclingHost;
+  OsrmFetcher::osrmDrivingHost        = programOptions.osrmDrivingHost;
 
   if (programOptions.debug) {
     spdlog::set_level(spdlog::level::debug);
