@@ -21,6 +21,7 @@
 #include "trip.hpp"
 #include "od_trip.hpp"
 #include "node.hpp"
+#include "osrm_fetcher.hpp"
 
 // TODO:
 // Test transferable mode, it has separate code path
@@ -547,7 +548,7 @@ std::unique_ptr<TrRouting::RoutingResult> SingleRouteCalculationFixtureTests::ca
 {
     // TODO: This needs to be called to set some default values that are still part of the global parameters
     calculator.params.setDefaultValues();
-    calculator.params.birdDistanceAccessibilityEnabled = true;
+    TrRouting::OsrmFetcher::birdDistanceAccessibilityEnabled = true;
 
     // TODO Shouldn't need to do this, but we do for now, benchmark needs to be started
     calculator.algorithmCalculationTime.start();

@@ -2,25 +2,34 @@
 #include "json.hpp"
 #include "point.hpp"
 #include "node.hpp"
-#include "parameters.hpp"
 #include "client_http.hpp"
 #include "spdlog/spdlog.h"
 
 namespace TrRouting
 {
-  std::vector<std::tuple<int, int, int>> OsrmFetcher::getAccessibleNodesFootpathsFromPoint(const Point &point, const std::vector<std::unique_ptr<Node>> &nodes, std::string mode, Parameters &params, int maxWalkingTravelTime, float walkingSpeedMetersPerSecond, bool reversed)
+
+  //TODO Remove this initialization when this data is not static anymore
+  bool OsrmFetcher::birdDistanceAccessibilityEnabled = false;
+  std::string OsrmFetcher::osrmWalkingPort="";
+  std::string OsrmFetcher::osrmCyclingPort="";
+  std::string OsrmFetcher::osrmDrivingPort="";
+  std::string OsrmFetcher::osrmWalkingHost="";
+  std::string OsrmFetcher::osrmCyclingHost="";
+  std::string OsrmFetcher::osrmDrivingHost="";
+
+  std::vector<std::tuple<int, int, int>> OsrmFetcher::getAccessibleNodesFootpathsFromPoint(const Point &point, const std::vector<std::unique_ptr<Node>> &nodes, std::string mode, int maxWalkingTravelTime, float walkingSpeedMetersPerSecond, bool reversed)
   {
-    if (params.birdDistanceAccessibilityEnabled)
+    if (OsrmFetcher::birdDistanceAccessibilityEnabled)
     {
-      return getNodesFromBirdDistance(point, nodes, params, maxWalkingTravelTime, walkingSpeedMetersPerSecond);
+      return getNodesFromBirdDistance(point, nodes, maxWalkingTravelTime, walkingSpeedMetersPerSecond);
     }
     else
     {
-      return getNodesFromOsrm(point, nodes, mode, params, maxWalkingTravelTime, walkingSpeedMetersPerSecond, reversed);
+      return getNodesFromOsrm(point, nodes, mode, maxWalkingTravelTime, walkingSpeedMetersPerSecond, reversed);
     }
   }
 
-  std::vector<std::tuple<int, int, int>> OsrmFetcher::getNodesFromBirdDistance(const Point &point, const std::vector<std::unique_ptr<Node>> &nodes, Parameters &params, int maxWalkingTravelTime, float walkingSpeedMetersPerSecond)
+  std::vector<std::tuple<int, int, int>> OsrmFetcher::getNodesFromBirdDistance(const Point &point, const std::vector<std::unique_ptr<Node>> &nodes, int maxWalkingTravelTime, float walkingSpeedMetersPerSecond)
   {
     std::vector<std::tuple<int, int, int>> accessibleNodesFootpaths;
 
@@ -49,7 +58,7 @@ namespace TrRouting
     return accessibleNodesFootpaths;
   }
 
-  std::vector<std::tuple<int, int, int>> OsrmFetcher::getNodesFromOsrm(const Point &point, const std::vector<std::unique_ptr<Node>> &nodes, std::string mode, Parameters &params, int maxWalkingTravelTime, float walkingSpeedMetersPerSecond, bool reversed)
+  std::vector<std::tuple<int, int, int>> OsrmFetcher::getNodesFromOsrm(const Point &point, const std::vector<std::unique_ptr<Node>> &nodes, std::string mode, int maxWalkingTravelTime, float walkingSpeedMetersPerSecond, bool reversed)
   {
     std::vector<int> birdDistanceAccessibleNodeIndexes;
     std::vector<std::tuple<int, int, int>> accessibleNodesFootpaths;
@@ -58,7 +67,7 @@ namespace TrRouting
     float maxDistanceMetersSquared = calculateMaxDistanceSquared(maxWalkingTravelTime, walkingSpeedMetersPerSecond);
     float distanceMetersSquared;
 
-    spdlog::debug("osrm with host {} and port {}", params.osrmWalkingHost, params.osrmWalkingPort);
+    spdlog::debug("osrm with host {} and port {}", OsrmFetcher::osrmWalkingHost, OsrmFetcher::osrmWalkingPort);
 
     std::string queryString = "/table/v1/" + mode + "/" + std::to_string(point.longitude) + "," + std::to_string(point.latitude);
 
@@ -87,7 +96,7 @@ namespace TrRouting
     }
 
     using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
-    HttpClient client(params.osrmWalkingHost + ":" + params.osrmWalkingPort);
+    HttpClient client(OsrmFetcher::osrmWalkingHost + ":" + OsrmFetcher::osrmWalkingPort);
     auto s = client.request("GET", queryString);
 
     std::stringstream responseJsonSs;
