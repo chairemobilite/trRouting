@@ -2,7 +2,6 @@
 #include <filesystem>
 
 #include "gtest/gtest.h" // we will add the path to C preprocessor later
-#include "parameters.hpp"
 #include "cache_fetcher.hpp"
 #include "cache_fetcher_test.hpp"
 #include "scenario.hpp"
@@ -26,20 +25,20 @@ public:
     {
         BaseCacheFetcherFixtureTests::SetUp();
         // Copy the invalid file
-        fs::copy_file(PROJECT_NAME + "/" + INVALID_CUSTOM_PATH + "/genericInvalid.capnpbin", PROJECT_NAME + "/" + INVALID_CUSTOM_PATH + "/scenarios.capnpbin");
+        fs::copy_file(BASE_CACHE_DIRECTORY_NAME + "/" + INVALID_CUSTOM_PATH + "/genericInvalid.capnpbin", BASE_CACHE_DIRECTORY_NAME + "/" + INVALID_CUSTOM_PATH + "/scenarios.capnpbin");
     }
 
     void TearDown( ) override
     {
         BaseCacheFetcherFixtureTests::TearDown();
         // Remove the invalid file
-        fs::remove(PROJECT_NAME + "/" + INVALID_CUSTOM_PATH + "/scenarios.capnpbin");
+        fs::remove(BASE_CACHE_DIRECTORY_NAME + "/" + INVALID_CUSTOM_PATH + "/scenarios.capnpbin");
     }
 };
 
 TEST_F(ScenarioCacheFetcherFixtureTests, TestGetScenariosInvalid)
 {
-    int retVal = cacheFetcher.getScenarios(objects, objectIndexesByUuid, serviceIndexesByUuid, lineIndexesByUuid, agencyIndexesByUuid, nodeIndexesByUuid, modeIndexesByShortname, params, INVALID_CUSTOM_PATH);
+    int retVal = cacheFetcher.getScenarios(objects, objectIndexesByUuid, serviceIndexesByUuid, lineIndexesByUuid, agencyIndexesByUuid, nodeIndexesByUuid, modeIndexesByShortname, INVALID_CUSTOM_PATH);
     ASSERT_EQ(-EBADMSG, retVal);
     ASSERT_EQ(0, objects.size());
 }
@@ -47,14 +46,14 @@ TEST_F(ScenarioCacheFetcherFixtureTests, TestGetScenariosInvalid)
 // TODO Add tests for various services, lines, agencies that don't exist. But first, we should be able to create cache files with mock test data
 TEST_F(ScenarioCacheFetcherFixtureTests, TestGetScenariosValid)
 {
-    int retVal = cacheFetcher.getScenarios(objects, objectIndexesByUuid, serviceIndexesByUuid, lineIndexesByUuid, agencyIndexesByUuid, nodeIndexesByUuid, modeIndexesByShortname, params, VALID_CUSTOM_PATH);
+    int retVal = cacheFetcher.getScenarios(objects, objectIndexesByUuid, serviceIndexesByUuid, lineIndexesByUuid, agencyIndexesByUuid, nodeIndexesByUuid, modeIndexesByShortname, VALID_CUSTOM_PATH);
     ASSERT_EQ(0, retVal);
     ASSERT_EQ(2, objects.size());
 }
 
 TEST_F(ScenarioCacheFetcherFixtureTests, TestGetScenariosFileNotExists)
 {
-    int retVal = cacheFetcher.getScenarios(objects, objectIndexesByUuid, serviceIndexesByUuid, lineIndexesByUuid, agencyIndexesByUuid, nodeIndexesByUuid, modeIndexesByShortname, params, BASE_CUSTOM_PATH);
+    int retVal = cacheFetcher.getScenarios(objects, objectIndexesByUuid, serviceIndexesByUuid, lineIndexesByUuid, agencyIndexesByUuid, nodeIndexesByUuid, modeIndexesByShortname, BASE_CUSTOM_PATH);
     ASSERT_EQ(-ENOENT, retVal);
     ASSERT_EQ(0, objects.size());
 }

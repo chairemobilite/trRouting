@@ -101,21 +101,21 @@ namespace TrRouting
      * -EINVAL For any other data related error
      * -(error codes from the open system call)
      */
-    int                    updateDataSourcesFromCache(Parameters&  params, std::string customPath = "");
-    int                    updateHouseholdsFromCache (Parameters&  params, std::string customPath = "");
-    int                    updatePersonsFromCache    (Parameters&  params, std::string customPath = "");
-    int                    updateOdTripsFromCache    (Parameters&  params, std::string customPath = "");
-    int                    updatePlacesFromCache     (Parameters&  params, std::string customPath = "");
+    int                    updateDataSourcesFromCache(std::string customPath = "");
+    int                    updateHouseholdsFromCache (std::string customPath = "");
+    int                    updatePersonsFromCache    (std::string customPath = "");
+    int                    updateOdTripsFromCache    (std::string customPath = "");
+    int                    updatePlacesFromCache     (std::string customPath = "");
 
-    int                    updateStationsFromCache   (Parameters&  params, std::string customPath = "");
-    int                    updateAgenciesFromCache   (Parameters&  params, std::string customPath = "");
-    int                    updateServicesFromCache   (Parameters&  params, std::string customPath = "");
-    int                    updateNodesFromCache      (Parameters&  params, std::string customPath = "");
-    int                    updateStopsFromCache      (Parameters&  params, std::string customPath = "");
-    int                    updateLinesFromCache      (Parameters&  params, std::string customPath = "");
-    int                    updatePathsFromCache      (Parameters&  params, std::string customPath = "");
-    int                    updateScenariosFromCache  (Parameters&  params, std::string customPath = "");
-    int                    updateSchedulesFromCache  (Parameters&  params, std::string customPath = "");
+    int                    updateStationsFromCache   (std::string customPath = "");
+    int                    updateAgenciesFromCache   (std::string customPath = "");
+    int                    updateServicesFromCache   (std::string customPath = "");
+    int                    updateNodesFromCache      (std::string customPath = "");
+    int                    updateStopsFromCache      (std::string customPath = "");
+    int                    updateLinesFromCache      (std::string customPath = "");
+    int                    updatePathsFromCache      (std::string customPath = "");
+    int                    updateScenariosFromCache  (std::string customPath = "");
+    int                    updateSchedulesFromCache  (std::string customPath = "");
 
     int                    setConnections(std::vector<std::shared_ptr<ConnectionTuple>> connections);
 

@@ -21,7 +21,6 @@ namespace TrRouting
   int CacheFetcher::getServices(
     std::vector<std::unique_ptr<Service>>& ts,
     std::map<boost::uuids::uuid, int>& tIndexesByUuid,
-    Parameters& params,
     std::string customPath
   )
   {
@@ -43,7 +42,7 @@ namespace TrRouting
 
     spdlog::info("Fetching {} from cache... {}", tStr, customPath);
    
-    std::string cacheFilePath = CacheFetcher::getFilePath(cacheFileName, params, customPath) + ".capnpbin";
+    std::string cacheFilePath = getFilePath(cacheFileName, customPath) + ".capnpbin";
 
     int fd = open(cacheFilePath.c_str(), O_RDWR);
     if (fd < 0)

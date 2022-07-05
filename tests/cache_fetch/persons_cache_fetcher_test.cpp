@@ -2,7 +2,6 @@
 #include <filesystem>
 
 #include "gtest/gtest.h" // we will add the path to C preprocessor later
-#include "parameters.hpp"
 #include "cache_fetcher.hpp"
 #include "cache_fetcher_test.hpp"
 #include "person.hpp"
@@ -22,7 +21,7 @@ protected:
 
 TEST_F(PersonCacheFetcherFixtureTests, TestGetPersonsValid)
 {
-    int retVal = cacheFetcher.getPersons(objects, objectIndexesByUuid, dataSourceIndexesByUuid, householdIndexesByUuid, nodeIndexesByUuid, params, VALID_CUSTOM_PATH);
+    int retVal = cacheFetcher.getPersons(objects, objectIndexesByUuid, dataSourceIndexesByUuid, householdIndexesByUuid, nodeIndexesByUuid, VALID_CUSTOM_PATH);
     ASSERT_EQ(0, retVal);
     ASSERT_EQ(0, objects.size());
 }

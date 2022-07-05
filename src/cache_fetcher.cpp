@@ -7,7 +7,10 @@
 
 namespace TrRouting
 {
-  
+   CacheFetcher::CacheFetcher(const std::string &cacheDir)
+    : cacheDirectoryPath(cacheDir) {
+  }
+
   template<class T>
   void CacheFetcher::saveToCapnpCacheFile(T& data, std::string cacheFilePath) {
     std::ofstream oCacheFile;
@@ -42,10 +45,10 @@ namespace TrRouting
     return count;
   }
   
-  std::string CacheFetcher::getFilePath(std::string cacheFilePath, Parameters& params, std::string customPath) {
+  std::string CacheFetcher::getFilePath(std::string cacheFilePath, std::string customPath) {
     std::string filePath = "";
-    if (!params.cacheDirectoryPath.empty()) {
-      filePath += params.cacheDirectoryPath + "/";
+    if (!cacheDirectoryPath.empty()) {
+      filePath += cacheDirectoryPath + "/";
     }
     if (customPath.empty())
     {
