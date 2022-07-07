@@ -141,8 +141,6 @@ namespace TrRouting
 
     public:
 
-      std::string calculationName;
-
       int batchNumber;
       int batchesCount;
       int odTripsSampleSize;
@@ -180,7 +178,6 @@ namespace TrRouting
       int originNodeIdx;
       int destinationNodeIdx;
       bool calculateAllOdTrips;
-      bool saveResultToFile;
       std::optional<boost::uuids::uuid> dataSourceUuid;
       std::optional<boost::uuids::uuid> odTripUuid;
       std::optional<boost::uuids::uuid> startingNodeUuid;

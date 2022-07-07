@@ -28,10 +28,8 @@ namespace TrRouting
 
     onlyDataSourceIdx = -1;
 
-    calculationName                        = "trRouting";
     batchNumber                            = 1;
     batchesCount                           = 1;
-    saveResultToFile                       = false;
     odTripsSampleRatio                     = 1.0;
     dataSourceUuid.reset();
     odTripUuid.reset();
@@ -578,11 +576,6 @@ namespace TrRouting
         continue;
       }
 
-      else if (parameterWithValueVector[0] == "calculation_name" || parameterWithValueVector[0] == "name")
-      {
-        calculationName = parameterWithValueVector[1];
-        continue;
-      }
       else if (parameterWithValueVector[0] == "batch")
       {
         batchNumber = std::stoi(parameterWithValueVector[1]);
@@ -591,11 +584,6 @@ namespace TrRouting
       else if (parameterWithValueVector[0] == "num_batches")
       {
         batchesCount = std::stoi(parameterWithValueVector[1]);
-        continue;
-      }
-      else if (parameterWithValueVector[0] == "save_to_file" || parameterWithValueVector[0] == "save_file")
-      {
-        if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1") { saveResultToFile = true; }
         continue;
       }
     }
