@@ -10,8 +10,6 @@
 namespace TrRouting
 {
 
-  class DatabaseFetcher;
-  class CacheFetcher;
   class Point;
   class OdTrip;
   class Scenario;
@@ -142,10 +140,7 @@ namespace TrRouting
 
     public:
 
-      std::string dataFetcherShortname; // cache, csv or gtfs, only cache is implemented for now
       std::string calculationName;
-
-      CacheFetcher* cacheFetcher;
 
       int batchNumber;
       int batchesCount;

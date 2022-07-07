@@ -1,82 +1,55 @@
-#ifndef TR_CACHE_FETCHER
-#define TR_CACHE_FETCHER
+#ifndef TR_DUMMY_DATA_FETCHER
+#define TR_DUMMY_DATA_FETCHER
 
 #include <string>
 #include <vector>
 #include <map>
 #include <memory>
 #include <boost/uuid/uuid.hpp>
-
 #include "data_fetcher.hpp"
-
-#include "agency.hpp"
-#include "line.hpp"
-#include "node.hpp"
-#include "data_source.hpp"
-#include "household.hpp"
-#include "person.hpp"
-#include "od_trip.hpp"
-#include "place.hpp"
-#include "service.hpp"
-#include "scenario.hpp"
-#include "path.hpp"
-#include "block.hpp"
-#include "stop.hpp"
-#include "mode.hpp"
-#include "station.hpp"
-#include "trip.hpp"
 
 namespace TrRouting
 {
+  class DataSource;
+  class Household;
+  class Person;
+  class OdTrip;
+  class Place;
+  class Agency;
+  class Service;
+  class Station;
+  class Node;
+  class Stop;
+  class Line;
+  class Path;
+  class Scenario;
+  class Trip;
+  class Mode;
 
-  class CacheFetcher : public DataFetcher
+  /** Dummy class, which returns empty data. Useful for simple testing
+   */
+  class DummyDataFetcher : public DataFetcher
   {
-  
   public:
+    DummyDataFetcher() {}
+    virtual ~DummyDataFetcher() {}
+    virtual const std::pair<std::vector<Mode>, std::map<std::string, int>> getModes() {
+      std::vector<Mode> ts;
+      std::map<std::string, int> tIndexesByShortname;
+      return std::make_pair(ts, tIndexesByShortname);
+    };
     
-    CacheFetcher(const std::string &cacheDir);
-    virtual ~CacheFetcher();
-    
-    template<class T>
-
-    /**
-     * Save data to a cache file. The cache file path can be obtained using the
-     * getFilePath function
-     */
-    static void saveToCapnpCacheFile(T& data, std::string cacheFilePath);
-    /**
-     * Returns whether a cache file exists. The cache file path can be obtained
-     * using the getFilePath function
-     */
-    static bool capnpCacheFileExists(         std::string cacheFilePath);
-    /**
-     * Get the number of cache files in a directory. The cache file path can be
-     * obtained using the getFilePath function
-     */
-    static int  getCacheFilesCount  (         std::string cacheFilePath);
-    /**
-     * Get the complete file path from the parameters and configuration
-     * 
-     * Returns the complete file path in the cache
-     */
-    std::string getFilePath  (         std::string cacheFilePath, std::string customPath = "");
-    
-    virtual const std::pair<std::vector<Mode>, std::map<std::string, int>> getModes();
-
-    /** Refer to the base class for these functions documentations */
     virtual int getDataSources(
       std::vector<std::unique_ptr<DataSource>>& ts, 
       std::map<boost::uuids::uuid, int>& tIndexesById, 
-      std::string customPath = ""
-    );
+      std::string customPath = "") {return 0;}
 
-    virtual int getHouseholds(
+     virtual int getHouseholds(
       std::vector<std::unique_ptr<Household>>& ts,
       std::map<boost::uuids::uuid, int>& tIndexesById, 
       std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid, 
       std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
-      std::string customPath = ""
-    );
+      std::string customPath = "") {return 0;}
 
     virtual int getPersons(
       std::vector<std::unique_ptr<Person>>& ts,
@@ -85,7 +58,7 @@ namespace TrRouting
       std::map<boost::uuids::uuid, int>& householdIndexesByUuid, 
       std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
       std::string customPath = ""
-    );
+                           ) {return 0;}
 
     virtual int getOdTrips(
       std::vector<std::unique_ptr<OdTrip>>& ts,
@@ -95,7 +68,7 @@ namespace TrRouting
       std::map<boost::uuids::uuid, int>& personIndexesByUuid,
       std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
       std::string customPath = ""
-    );
+                           ) {return 0;}
 
     virtual int getPlaces(
       std::vector<std::unique_ptr<Place>>& ts,
@@ -103,32 +76,32 @@ namespace TrRouting
       std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid,
       std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
       std::string customPath = ""
-    );
+                          ) {return 0;}
 
     virtual int getAgencies(
       std::vector<std::unique_ptr<Agency>>& ts,
       std::map<boost::uuids::uuid, int>& tIndexesById,
       std::string customPath = ""
-    );
+                            ) {return 0;}
 
     virtual int getServices(
       std::vector<std::unique_ptr<Service>>& ts,
       std::map<boost::uuids::uuid, int>& tIndexesById,
       std::string customPath = ""
-    );
+                            ) {return 0;}
 
     virtual int getStations(
       std::vector<std::unique_ptr<Station>>& ts,
       std::map<boost::uuids::uuid, int>& tIndexesById,
       std::string customPath = ""
-    );
+                            ) {return 0;}
 
     virtual int getNodes(
       std::vector<std::unique_ptr<Node>>& ts,
       std::map<boost::uuids::uuid, int>& tIndexesById,
       std::map<boost::uuids::uuid, int>& stationIndexesById,
       std::string customPath = ""
-    );
+                         ) {return 0;}
 
     virtual int getLines(
       std::vector<std::unique_ptr<Line>>& ts,
@@ -136,7 +109,7 @@ namespace TrRouting
       std::map<boost::uuids::uuid, int>& agencyIndexesByUuid,
       std::map<std::string, int>& modeIndexesByShortname,
       std::string customPath = ""
-    );
+                         ) {return 0;}
 
     virtual int getPaths(
       std::vector<std::unique_ptr<Path>>& ts,
@@ -144,8 +117,17 @@ namespace TrRouting
       std::map<boost::uuids::uuid, int>& lineIndexesByUuid,
       std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
       std::string customPath = ""
-    );
+                         ) {return 0;}
 
+    /**
+     * Read the scenarios cache file and fill the scenarios vector.
+     * 
+     * @return 0 in case of success, values below 0 when errors occurred:
+     * -EBADMSG if deserialization did not work
+     * -ENOENT if the file does not exist
+     * -EINVAL For any other data related error
+     * -(error codes from the open system call)
+     */
     virtual int getScenarios(
       std::vector<std::unique_ptr<Scenario>>& ts,
       std::map<boost::uuids::uuid, int>& tIndexesById,
@@ -155,8 +137,17 @@ namespace TrRouting
       std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
       std::map<std::string, int>& modeIndexesByShortname,
       std::string customPath = ""
-    );
+                             ) {return 0;}
 
+    /**
+     * Read the lines with schedules cache file and fill the trips vector.
+     * 
+     * @return 0 in case of success, values below 0 when errors occurred:
+     * -EBADMSG if deserialization did not work
+     * -ENOENT if the file does not exist
+     * -EINVAL For any other data related error
+     * -(error codes from the open system call)
+     */
     virtual int getSchedules(
       std::vector<std::unique_ptr<Trip>>& trips,
       std::vector<std::unique_ptr<Line>>& lines,
@@ -171,13 +162,8 @@ namespace TrRouting
       std::vector<std::vector<std::unique_ptr<int>>>&   tripConnectionDepartureTimes,
       std::vector<std::vector<std::unique_ptr<float>>>& tripConnectionDemands,
       std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>>>& connections, 
-      std::string customPath = ""
-    );
-        
-  private:
-    std::string cacheDirectoryPath;
-  };
-    
-}
+      std::string customPath = "") {return 0;}
 
-#endif // TR_CACHE_FETCHER
+  };    
+}
+#endif

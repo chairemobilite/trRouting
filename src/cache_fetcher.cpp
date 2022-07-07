@@ -7,9 +7,10 @@
 
 namespace TrRouting
 {
-   CacheFetcher::CacheFetcher(const std::string &cacheDir)
+  CacheFetcher::CacheFetcher(const std::string &cacheDir)
     : cacheDirectoryPath(cacheDir) {
   }
+  CacheFetcher::~CacheFetcher() {}
 
   template<class T>
   void CacheFetcher::saveToCapnpCacheFile(T& data, std::string cacheFilePath) {
