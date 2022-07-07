@@ -21,7 +21,6 @@ using namespace TrRouting;
 const int NB_ITER = 30;
 
 // Global test suite variables, they should not be reset for each test
-Parameters algorithmParams;
 Calculator* calculator;
 std::ofstream benchmarkResultsFile;
 std::ofstream benchmarkDetailedResultsFile;
@@ -62,7 +61,6 @@ public:
   // Initialize calculator and parameters. Open the result files and add headers
   static void SetUpTestSuite()
   {
-    algorithmParams.dataFetcherShortname = "cache";
     OsrmFetcher::osrmWalkingPort = "5000";
     OsrmFetcher::osrmWalkingHost = "localhost"; //"http://localhost";
     OsrmFetcher::osrmCyclingPort = "8000";
@@ -71,10 +69,9 @@ public:
     OsrmFetcher::osrmDrivingHost = "localhost";
 
     CacheFetcher cacheFetcher = TrRouting::CacheFetcher("cache/demo_transition");
-    algorithmParams.cacheFetcher = &cacheFetcher;
     OsrmFetcher::birdDistanceAccessibilityEnabled = true;
 
-    calculator = new TrRouting::Calculator(algorithmParams);
+    calculator = new TrRouting::Calculator(cacheFetcher);
 
     if (!updateCalculatorFromCache(calculator)) {
       ASSERT_EQ(true, false);
@@ -110,7 +107,7 @@ public:
   void benchmarkCurrentParams(TrRouting::RouteParameters &routeParams, bool expectResult, int nbIter)
   {
     // TODO Shouldn't have to do this, a query is not a benchmark
-    algorithmParams.setDefaultValues();
+    calculator->params.setDefaultValues();
     calculator->algorithmCalculationTime.start();
     calculator->benchmarking.clear();
 

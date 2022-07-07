@@ -22,8 +22,8 @@
 namespace TrRouting
 {
 
-  Calculator::Calculator(Parameters& theParams) :
-    params(theParams),
+  Calculator::Calculator(DataFetcher& fetcher) :
+    dataFetcher(fetcher),
     odTrip(nullptr),
     algorithmCalculationTime(CalculationTime()),
     departureTimeSeconds(0),

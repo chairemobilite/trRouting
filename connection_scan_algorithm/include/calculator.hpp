@@ -11,10 +11,11 @@
 #include <boost/uuid/uuid.hpp>
 
 #include "calculation_time.hpp"
+#include "parameters.hpp"
 
 namespace TrRouting
 {
-  class Parameters;
+
   class RouteParameters;
   class Mode;
   class DataSource;
@@ -33,6 +34,7 @@ namespace TrRouting
   class Trip;
   class RoutingResult;
   class AlternativesResult;
+  class DataFetcher;
 
   // tuple representing a connection: departureNodeIndex, arrivalNodeIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequence in trip, lineIndex, blockIndex, canTransferSameLine, minWaitingTimeSeconds (-1 to inherit from parameters)
   using ConnectionTuple = std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>;
@@ -65,7 +67,7 @@ namespace TrRouting
 
     std::map<std::string, int> benchmarking;
 
-    Calculator(Parameters& theParams);
+    Calculator(DataFetcher& dataFetcher);
 
     /**
      * Prepare the data for the calculator and validate that there are at least
@@ -190,8 +192,9 @@ namespace TrRouting
     std::vector<std::vector<std::unique_ptr<float>>> tripConnectionDemands;        // tripIndex: [connectionIndex (sequence in trip): sum of od trips weights using this connection (demand)]
     //std::vector<std::unique_ptr<std::vector<std::unique_ptr<int>>>>   tripIndexesByPathIndex;
 
-    Parameters& params;
+    Parameters params;
     CalculationTime algorithmCalculationTime;
+    DataFetcher &dataFetcher;
 
     OdTrip * odTrip;
 

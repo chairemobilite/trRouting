@@ -62,12 +62,10 @@ int main(int argc, char** argv) {
   // Set params:
   ProgramOptions programOptions;
   programOptions.parseOptions(argc, argv);
-  Parameters algorithmParams;
 
   // setup program options:
   spdlog::info("Starting transit routing on port {} for the data: {}", programOptions.port, programOptions.cachePath);
   
-  algorithmParams.dataFetcherShortname   = programOptions.dataFetcherShortname;
   OsrmFetcher::osrmWalkingPort        = programOptions.osrmWalkingPort;
   OsrmFetcher::osrmCyclingPort        = programOptions.osrmCyclingPort;
   OsrmFetcher::osrmDrivingPort        = programOptions.osrmDrivingPort;
@@ -79,10 +77,15 @@ int main(int argc, char** argv) {
     spdlog::set_level(spdlog::level::debug);
   }
 
-  CacheFetcher cacheFetcher    = CacheFetcher(programOptions.cachePath);
-  algorithmParams.cacheFetcher = &cacheFetcher;
+  DataFetcher *fetcher = 0;
+  if (programOptions.dataFetcherShortname == "cache") {
+    fetcher = new CacheFetcher(programOptions.cachePath);
+  } else {
+    spdlog::error("Using invalid DataFetcher {}", programOptions.dataFetcherShortname);
+    exit(-2);
+  }
 
-  Calculator calculator(algorithmParams);
+  Calculator calculator(*fetcher);
   spdlog::info("preparing calculator...");
   Calculator::DataStatus dataStatus = calculator.prepare();
 
@@ -432,6 +435,9 @@ int main(int argc, char** argv) {
   spdlog::info("ready.");
 
   server_thread.join();
+
+  // Cleanup
+  delete fetcher;
 
   return 0;
 }
