@@ -16,7 +16,6 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/algorithm/string.hpp>
 
-#include "toolbox.hpp"
 #include "cache_fetcher.hpp"
 #include "calculation_time.hpp"
 #include "parameters.hpp"
@@ -368,16 +367,6 @@ int main(int argc, char** argv) {
 
         if (routingResult.get() != nullptr) {
           response = ResultToV1Response::resultToJsonString(*routingResult.get(), routeParams).dump(2);
-        }
-
-        if (calculator.params.saveResultToFile)
-        {
-          spdlog::info("writing file");
-          std::ofstream file;
-          //file.imbue(std::locale("en_US.UTF8"));
-          file.open(calculator.params.calculationName + ".json", std::ios_base::trunc);
-          file << response;
-          file.close();
         }
 
         spdlog::debug("-- total -- {} microseconds", calculator.algorithmCalculationTime.getDurationMicrosecondsNoStop());
