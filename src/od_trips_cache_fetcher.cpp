@@ -20,10 +20,10 @@ namespace TrRouting
   int CacheFetcher::getOdTrips(
     std::vector<std::unique_ptr<OdTrip>>& ts,
     std::map<boost::uuids::uuid, int>& tIndexesByUuid,
-    std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid,
-    std::map<boost::uuids::uuid, int>& householdIndexesByUuid,
-    std::map<boost::uuids::uuid, int>& personIndexesByUuid,
-    std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
+    const std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid,
+    const std::map<boost::uuids::uuid, int>& householdIndexesByUuid,
+    const std::map<boost::uuids::uuid, int>& personIndexesByUuid,
+    const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
     std::string customPath
   )
   {
@@ -40,7 +40,7 @@ namespace TrRouting
 
     spdlog::info("Fetching {} from cache... {}", tStr, customPath);
 
-    for(std::map<boost::uuids::uuid, int>::iterator iter = dataSourceIndexesByUuid.begin(); iter != dataSourceIndexesByUuid.end(); ++iter)
+    for(std::map<boost::uuids::uuid, int>::const_iterator iter = dataSourceIndexesByUuid.begin(); iter != dataSourceIndexesByUuid.end(); ++iter)
     {
       boost::uuids::uuid dataSourceUuid = iter->first;
 
@@ -105,9 +105,9 @@ namespace TrRouting
             t->origin                 = std::move(origin);
             t->destination            = std::move(destination);
 
-            t->dataSourceIdx   = dataSourceUuid.length() > 0 ? dataSourceIndexesByUuid[uuidGenerator(dataSourceUuid)] : -1;
-            t->householdIdx    = householdUuid.length()  > 0 ? householdIndexesByUuid[uuidGenerator(householdUuid)]   : -1;
-            t->personIdx       = personUuid.length()     > 0 ? personIndexesByUuid[uuidGenerator(personUuid)]         : -1;
+            t->dataSourceIdx   = dataSourceUuid.length() > 0 ? dataSourceIndexesByUuid.at(uuidGenerator(dataSourceUuid)) : -1;
+            t->householdIdx    = householdUuid.length()  > 0 ? householdIndexesByUuid.at(uuidGenerator(householdUuid))   : -1;
+            t->personIdx       = personUuid.length()     > 0 ? personIndexesByUuid.at(uuidGenerator(personUuid))         : -1;
 
             switch (capnpT.getMode()) {
               case odTrip::OdTrip::Mode::NONE             : t->mode = "none";            break;
@@ -184,7 +184,7 @@ namespace TrRouting
             for (int i = 0; i < originNodesCount; i++)
             {
               std::string nodeUuid {capnpT.getOriginNodesUuids()[i]};
-              originNodesIdx               [i] = nodeIndexesByUuid[uuidGenerator(nodeUuid)];
+              originNodesIdx               [i] = nodeIndexesByUuid.at(uuidGenerator(nodeUuid));
               originNodesTravelTimesSeconds[i] = capnpT.getOriginNodesTravelTimes()[i];
               originNodesDistancesMeters   [i] = capnpT.getOriginNodesDistances()[i];
             }
@@ -199,7 +199,7 @@ namespace TrRouting
             for (int i = 0; i < destinationNodesCount; i++)
             {
               std::string nodeUuid {capnpT.getDestinationNodesUuids()[i]};
-              destinationNodesIdx               [i] = nodeIndexesByUuid[uuidGenerator(nodeUuid)];
+              destinationNodesIdx               [i] = nodeIndexesByUuid.at(uuidGenerator(nodeUuid));
               destinationNodesTravelTimesSeconds[i] = capnpT.getDestinationNodesTravelTimes()[i];
               destinationNodesDistancesMeters   [i] = capnpT.getDestinationNodesDistances()[i];
             }

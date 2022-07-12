@@ -20,8 +20,8 @@ namespace TrRouting
   int CacheFetcher::getPlaces(
     std::vector<std::unique_ptr<Place>>& ts,
     std::map<boost::uuids::uuid, int>& tIndexesByUuid,
-    std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid,
-    std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
+    const std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid,
+    const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
     std::string customPath
   )
   {
@@ -38,7 +38,7 @@ namespace TrRouting
 
     spdlog::info("Fetching {} from cache... {}", tStr, customPath);
 
-    for(std::map<boost::uuids::uuid, int>::iterator iter = dataSourceIndexesByUuid.begin(); iter != dataSourceIndexesByUuid.end(); ++iter)
+    for(std::map<boost::uuids::uuid, int>::const_iterator iter = dataSourceIndexesByUuid.begin(); iter != dataSourceIndexesByUuid.end(); ++iter)
     {
       boost::uuids::uuid dataSourceUuid = iter->first;
 
@@ -85,7 +85,7 @@ namespace TrRouting
             t->shortname       = capnpT.getShortname();
             t->name            = capnpT.getName();
             t->internalId      = capnpT.getInternalId();
-            t->dataSourceIdx   = dataSourceUuid.length() > 0 ? dataSourceIndexesByUuid[uuidGenerator(dataSourceUuid)] : -1;
+            t->dataSourceIdx   = dataSourceUuid.length() > 0 ? dataSourceIndexesByUuid.at(uuidGenerator(dataSourceUuid)) : -1;
 
             point->latitude  = ((double)capnpT.getLatitude())  / 1000000.0;
             point->longitude = ((double)capnpT.getLongitude()) / 1000000.0;
@@ -98,7 +98,7 @@ namespace TrRouting
             for (int i = 0; i < nodesCount; i++)
             {
               std::string nodeUuid {capnpT.getNodesUuids()[i]};
-              nodesIdx               [i] = nodeIndexesByUuid[uuidGenerator(nodeUuid)];
+              nodesIdx               [i] = nodeIndexesByUuid.at(uuidGenerator(nodeUuid));
               nodesTravelTimesSeconds[i] = capnpT.getNodesTravelTimes()[i];
               nodesDistancesMeters   [i] = capnpT.getNodesDistances()[i];
             }

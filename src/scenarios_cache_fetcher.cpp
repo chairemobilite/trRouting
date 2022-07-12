@@ -21,11 +21,11 @@ namespace TrRouting
   int CacheFetcher::getScenarios(
     std::vector<std::unique_ptr<Scenario>>& ts,
     std::map<boost::uuids::uuid, int>& tIndexesByUuid,
-    std::map<boost::uuids::uuid, int>& serviceIndexesByUuid,
-    std::map<boost::uuids::uuid, int>& lineIndexesByUuid,
-    std::map<boost::uuids::uuid, int>& agencyIndexesByUuid,
-    std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
-    std::map<std::string, int>& modeIndexesByShortname,
+    const std::map<boost::uuids::uuid, int>& serviceIndexesByUuid,
+    const std::map<boost::uuids::uuid, int>& lineIndexesByUuid,
+    const std::map<boost::uuids::uuid, int>& agencyIndexesByUuid,
+    const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
+    const std::map<std::string, int>& modeIndexesByShortname,
     std::string customPath
   ) {
 
@@ -97,7 +97,7 @@ namespace TrRouting
           serviceUuid = uuidGenerator(serviceUuidStr);
           if (serviceIndexesByUuid.count(serviceUuid) != 0)
           {
-            servicesIdx.push_back(serviceIndexesByUuid[serviceUuid]);
+            servicesIdx.push_back(serviceIndexesByUuid.at(serviceUuid));
           }
         }
         t->servicesIdx = servicesIdx;
@@ -106,7 +106,7 @@ namespace TrRouting
           lineUuid = uuidGenerator(lineUuidStr);
           if (lineIndexesByUuid.count(lineUuid) != 0)
           {
-            onlyLinesIdx.push_back(lineIndexesByUuid[lineUuid]);
+            onlyLinesIdx.push_back(lineIndexesByUuid.at(lineUuid));
           }
         }
         t->onlyLinesIdx = onlyLinesIdx;
@@ -115,7 +115,7 @@ namespace TrRouting
           agencyUuid = uuidGenerator(agencyUuidStr);
           if (agencyIndexesByUuid.count(agencyUuid) != 0)
           {
-            onlyAgenciesIdx.push_back(agencyIndexesByUuid[agencyUuid]);
+            onlyAgenciesIdx.push_back(agencyIndexesByUuid.at(agencyUuid));
           }
         }
         t->onlyAgenciesIdx = onlyAgenciesIdx;
@@ -124,7 +124,7 @@ namespace TrRouting
           nodeUuid = uuidGenerator(nodeUuidStr);
           if (nodeIndexesByUuid.count(nodeUuid) != 0)
           {
-            onlyNodesIdx.push_back(nodeIndexesByUuid[nodeUuid]);
+            onlyNodesIdx.push_back(nodeIndexesByUuid.at(nodeUuid));
           }
         }
         t->onlyNodesIdx = onlyNodesIdx;
@@ -132,7 +132,7 @@ namespace TrRouting
         {
           if (modeIndexesByShortname.count(modeShortnameStr) != 0)
           {
-            onlyModesIdx.push_back(modeIndexesByShortname[modeShortnameStr]);
+            onlyModesIdx.push_back(modeIndexesByShortname.at(modeShortnameStr));
           }
         }
         t->onlyModesIdx = onlyModesIdx;
@@ -142,7 +142,7 @@ namespace TrRouting
           lineUuid = uuidGenerator(lineUuidStr);
           if (lineIndexesByUuid.count(lineUuid) != 0)
           {
-            exceptLinesIdx.push_back(lineIndexesByUuid[lineUuid]);
+            exceptLinesIdx.push_back(lineIndexesByUuid.at(lineUuid));
           }
         }
         t->exceptLinesIdx = exceptLinesIdx;
@@ -151,7 +151,7 @@ namespace TrRouting
           agencyUuid = uuidGenerator(agencyUuidStr);
           if (agencyIndexesByUuid.count(agencyUuid) != 0)
           {
-            exceptAgenciesIdx.push_back(agencyIndexesByUuid[agencyUuid]);
+            exceptAgenciesIdx.push_back(agencyIndexesByUuid.at(agencyUuid));
           }
         }
         t->exceptAgenciesIdx = exceptAgenciesIdx;
@@ -160,7 +160,7 @@ namespace TrRouting
           nodeUuid = uuidGenerator(nodeUuidStr);
           if (nodeIndexesByUuid.count(nodeUuid) != 0)
           {
-            exceptNodesIdx.push_back(nodeIndexesByUuid[nodeUuid]);
+            exceptNodesIdx.push_back(nodeIndexesByUuid.at(nodeUuid));
           }
         }
         t->exceptNodesIdx = exceptNodesIdx;
@@ -168,7 +168,7 @@ namespace TrRouting
         {
           if (modeIndexesByShortname.count(modeShortnameStr) != 0)
           {
-            exceptModesIdx.push_back(modeIndexesByShortname[modeShortnameStr]);
+            exceptModesIdx.push_back(modeIndexesByShortname.at(modeShortnameStr));
           }
         }
         t->exceptModesIdx = exceptModesIdx;

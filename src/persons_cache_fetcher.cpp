@@ -20,9 +20,9 @@ namespace TrRouting
   int CacheFetcher::getPersons(
     std::vector<std::unique_ptr<Person>>& ts,
     std::map<boost::uuids::uuid, int>& tIndexesByUuid,
-    std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid,
-    std::map<boost::uuids::uuid, int>& householdIndexesByUuid,
-    std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
+    const std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid,
+    const std::map<boost::uuids::uuid, int>& householdIndexesByUuid,
+    const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
     std::string customPath
   )
   { 
@@ -42,7 +42,7 @@ namespace TrRouting
 
     spdlog::info("Fetching {} from cache... {}", tStr, customPath);
 
-    for(std::map<boost::uuids::uuid, int>::iterator iter = dataSourceIndexesByUuid.begin(); iter != dataSourceIndexesByUuid.end(); ++iter)
+    for(std::map<boost::uuids::uuid, int>::const_iterator iter = dataSourceIndexesByUuid.begin(); iter != dataSourceIndexesByUuid.end(); ++iter)
     {
       boost::uuids::uuid dataSourceUuid = iter->first;
 
@@ -94,8 +94,8 @@ namespace TrRouting
             t->drivingLicenseOwner   = capnpT.getDrivingLicenseOwner();
             t->transitPassOwner      = capnpT.getTransitPassOwner();
 
-            t->dataSourceIdx   = dataSourceUuid.length() > 0 ? dataSourceIndexesByUuid[uuidGenerator(dataSourceUuid)] : -1;
-            t->householdIdx    = householdUuid.length()  > 0 ? householdIndexesByUuid[uuidGenerator(householdUuid)]   : -1;
+            t->dataSourceIdx   = dataSourceUuid.length() > 0 ? dataSourceIndexesByUuid.at(uuidGenerator(dataSourceUuid)) : -1;
+            t->householdIdx    = householdUuid.length()  > 0 ? householdIndexesByUuid.at(uuidGenerator(householdUuid))   : -1;
 
             switch (capnpT.getAgeGroup()) {
               case person::Person::AgeGroup::NONE     : t->ageGroup = "none";     break;
@@ -157,7 +157,7 @@ namespace TrRouting
             for (int i = 0; i < usualWorkPlaceNodesCount; i++)
             {
               std::string nodeUuid {capnpT.getUsualWorkPlaceNodesUuids()[i]};
-              usualWorkPlaceNodesIdx               [i] = nodeIndexesByUuid[uuidGenerator(nodeUuid)];
+              usualWorkPlaceNodesIdx               [i] = nodeIndexesByUuid.at(uuidGenerator(nodeUuid));
               usualWorkPlaceNodesTravelTimesSeconds[i] = capnpT.getUsualWorkPlaceNodesTravelTimes()[i];
               usualWorkPlaceNodesDistancesMeters   [i] = capnpT.getUsualWorkPlaceNodesDistances()[i];
             }
@@ -178,7 +178,7 @@ namespace TrRouting
             for (int i = 0; i < usualSchoolPlaceNodesCount; i++)
             {
               std::string nodeUuid {capnpT.getUsualSchoolPlaceNodesUuids()[i]};
-              usualSchoolPlaceNodesIdx               [i] = nodeIndexesByUuid[uuidGenerator(nodeUuid)];
+              usualSchoolPlaceNodesIdx               [i] = nodeIndexesByUuid.at(uuidGenerator(nodeUuid));
               usualSchoolPlaceNodesTravelTimesSeconds[i] = capnpT.getUsualSchoolPlaceNodesTravelTimes()[i];
               usualSchoolPlaceNodesDistancesMeters   [i] = capnpT.getUsualSchoolPlaceNodesDistances()[i];
             }

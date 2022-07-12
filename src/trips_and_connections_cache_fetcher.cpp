@@ -23,15 +23,15 @@ namespace TrRouting
   
   int CacheFetcher::getSchedules(
     std::vector<std::unique_ptr<Trip>>& trips,
-    std::vector<std::unique_ptr<Line>>& lines,
+    const std::vector<std::unique_ptr<Line>>& lines,
     std::vector<std::unique_ptr<Path>>& paths,
     std::map<boost::uuids::uuid, int>& tripIndexesByUuid,
-    std::map<boost::uuids::uuid, int>& serviceIndexesByUuid,
-    std::map<boost::uuids::uuid, int>& lineIndexesByUuid,
-    std::map<boost::uuids::uuid, int>& pathIndexesByUuid,
-    std::map<boost::uuids::uuid, int>& agencyIndexesByUuid,
-    std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
-    std::map<std::string, int>& modeIndexesByShortname,
+    const std::map<boost::uuids::uuid, int>& serviceIndexesByUuid,
+    const std::map<boost::uuids::uuid, int>& lineIndexesByUuid,
+    const std::map<boost::uuids::uuid, int>& pathIndexesByUuid,
+    const std::map<boost::uuids::uuid, int>& agencyIndexesByUuid,
+    const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
+    const std::map<std::string, int>& modeIndexesByShortname,
     std::vector<std::vector<std::unique_ptr<int>>>&   tripConnectionDepartureTimes,
     std::vector<std::vector<std::unique_ptr<float>>>& tripConnectionDemands,
     std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>>>& connections, 
@@ -51,7 +51,7 @@ namespace TrRouting
     connections.clear();
     connections.shrink_to_fit();
 
-    int transferableModeIdx {modeIndexesByShortname.find("transferable") != modeIndexesByShortname.end() ? modeIndexesByShortname["transferable"] : -1};
+    int transferableModeIdx {modeIndexesByShortname.find("transferable") != modeIndexesByShortname.end() ? modeIndexesByShortname.at("transferable") : -1};
 
     //std::vector<Block> blocks;
     //std::map<boost::uuids::uuid, int> blockIndexesByUuid;
@@ -89,7 +89,7 @@ namespace TrRouting
         {
           serviceUuidStr = schedule.getServiceUuid();
           serviceUuid    = uuidGenerator(serviceUuidStr);
-          serviceIdx     = serviceIndexesByUuid[serviceUuid];
+          serviceIdx     = serviceIndexesByUuid.at(serviceUuid);
 
           const auto periods {schedule.getPeriods()};
           for (const auto & period : periods)
@@ -101,15 +101,15 @@ namespace TrRouting
               pathUuidStr  = capnpTrip.getPathUuid();
               tripUuid     = uuidGenerator(tripUuidStr);
               pathUuid     = uuidGenerator(pathUuidStr);
-              path         = paths[pathIndexesByUuid[pathUuid]].get();
+              path         = paths[pathIndexesByUuid.at(pathUuid)].get();
               pathNodesIdx = path->nodesIdx;
               
               std::unique_ptr<Trip> trip = std::make_unique<Trip>();
 
               trip->uuid                   = tripUuid;
               trip->agencyIdx              = line->agencyIdx;
-              trip->lineIdx                = lineIndexesByUuid[line->uuid];
-              trip->pathIdx                = pathIndexesByUuid[pathUuid];
+              trip->lineIdx                = lineIndexesByUuid.at(line->uuid);
+              trip->pathIdx                = pathIndexesByUuid.at(pathUuid);
               trip->modeIdx                = line->modeIdx;
               trip->serviceIdx             = serviceIdx;
               trip->totalCapacity          = capnpTrip.getTotalCapacity();
