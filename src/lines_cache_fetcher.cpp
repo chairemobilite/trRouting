@@ -20,8 +20,8 @@ namespace TrRouting
   int CacheFetcher::getLines(
     std::vector<std::unique_ptr<Line>>& ts,
     std::map<boost::uuids::uuid, int>& tIndexesByUuid,
-    std::map<boost::uuids::uuid, int>& agencyIndexesByUuid,
-    std::map<std::string, int>& modeIndexesByShortname,
+    const std::map<boost::uuids::uuid, int>& agencyIndexesByUuid,
+    const std::map<std::string, int>& modeIndexesByShortname,
     std::string customPath
   )
   {
@@ -74,8 +74,8 @@ namespace TrRouting
         t->shortname              = capnpT.getShortname();
         t->longname               = capnpT.getLongname();
         t->internalId             = capnpT.getInternalId();
-        t->agencyIdx              = agencyIndexesByUuid[uuidGenerator(agencyUuid)];
-        t->modeIdx                = modeIndexesByShortname[capnpT.getMode()];
+        t->agencyIdx              = agencyIndexesByUuid.at(uuidGenerator(agencyUuid));
+        t->modeIdx                = modeIndexesByShortname.at(capnpT.getMode());
         t->allowSameLineTransfers = capnpT.getAllowSameLineTransfers();
         
         tIndexesByUuid[t->uuid] = ts.size();
@@ -86,6 +86,11 @@ namespace TrRouting
     {
       spdlog::error("Error opening cache file {}: {}", tStr, e.getDescription().cStr());
       ret = -EBADMSG;
+    }
+    catch (const std::exception& e)
+    {
+      spdlog::error("Unknown error occurred {} {}", tStr, e.what());
+      ret = -EINVAL;
     }
     catch (...)
     {

@@ -21,8 +21,8 @@ namespace TrRouting
   int CacheFetcher::getPaths(
     std::vector<std::unique_ptr<Path>>& ts,
     std::map<boost::uuids::uuid, int>& tIndexesByUuid,
-    std::map<boost::uuids::uuid, int>& lineIndexesByUuid,
-    std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
+    const std::map<boost::uuids::uuid, int>& lineIndexesByUuid,
+    const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
     std::string customPath
   )
   {
@@ -78,12 +78,12 @@ namespace TrRouting
         t->uuid                   = uuidGenerator(uuid);
         t->direction              = capnpT.getDirection();
         t->internalId             = capnpT.getInternalId();
-        t->lineIdx                = lineIndexesByUuid[uuidGenerator(lineUuid)];
+        t->lineIdx                = lineIndexesByUuid.at(uuidGenerator(lineUuid));
         t->tripsIdx               = tripsIdx;
         for (std::string nodeUuidStr : capnpT.getNodesUuids())
         {
           nodeUuid = uuidGenerator(nodeUuidStr);
-          nodesIdx.push_back(nodeIndexesByUuid[nodeUuid]);
+          nodesIdx.push_back(nodeIndexesByUuid.at(nodeUuid));
         }
         t->nodesIdx = nodesIdx;
 
@@ -112,6 +112,11 @@ namespace TrRouting
     {
       spdlog::error("Error opening cache file {}: {}", tStr, e.getDescription().cStr());
       ret = -EBADMSG;
+    }
+    catch (const std::exception& e)
+    {
+      spdlog::error("Unknown error occurred {} {}", tStr, e.what());
+      ret = -EINVAL;
     }
     catch (...)
     {

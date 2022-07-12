@@ -36,6 +36,13 @@ public:
     {
         BaseCacheFetcherFixtureTests::SetUp();
         // Read valid data for agencies, lines and paths
+        std::vector<std::unique_ptr<TrRouting::Agency>>     agencies;
+        cacheFetcher.getAgencies(agencies, agencyIndexesByUuid, VALID_CUSTOM_PATH);
+        std::vector<TrRouting::Mode>                        modes;
+        std::tie(modes, modeIndexesByShortname) = cacheFetcher.getModes();
+        std::vector<std::unique_ptr<TrRouting::Service>> services;
+        cacheFetcher.getServices(services, serviceIndexesByUuid, VALID_CUSTOM_PATH);
+
         cacheFetcher.getNodes(nodes, nodeIndexesByUuid, stationIndexesByUuid, VALID_CUSTOM_PATH);
         cacheFetcher.getLines(lines, lineIndexesByUuid, agencyIndexesByUuid, modeIndexesByShortname, VALID_CUSTOM_PATH);
         cacheFetcher.getPaths(paths, pathIndexesByUuid, lineIndexesByUuid, nodeIndexesByUuid, VALID_CUSTOM_PATH);

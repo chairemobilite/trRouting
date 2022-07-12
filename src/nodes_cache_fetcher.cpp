@@ -24,7 +24,7 @@ namespace TrRouting
   int CacheFetcher::getNodes(
     std::vector<std::unique_ptr<Node>>& ts,
     std::map<boost::uuids::uuid, int>& tIndexesByUuid,
-    std::map<boost::uuids::uuid, int>& stationIndexesByUuid,
+    const std::map<boost::uuids::uuid, int>& stationIndexesByUuid,
     std::string customPath
   )
   {
@@ -84,7 +84,7 @@ namespace TrRouting
 
         if (stationUuid.length() > 0 && stationIndexesByUuid.count(uuidGenerator(stationUuid)) != 0)
         {
-          t->stationIdx = stationIndexesByUuid[uuidGenerator(stationUuid)];
+          t->stationIdx = stationIndexesByUuid.at(uuidGenerator(stationUuid));
         }
         else
         {

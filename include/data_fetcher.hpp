@@ -59,8 +59,8 @@ namespace TrRouting
      virtual int getHouseholds(
       std::vector<std::unique_ptr<Household>>& ts,
       std::map<boost::uuids::uuid, int>& tIndexesById, 
-      std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid, 
-      std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
+      const std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid, 
+      const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
       std::string customPath = "") = 0;
 
     /**
@@ -75,9 +75,9 @@ namespace TrRouting
     virtual int getPersons(
       std::vector<std::unique_ptr<Person>>& ts,
       std::map<boost::uuids::uuid, int>& tIndexesById, 
-      std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid,
-      std::map<boost::uuids::uuid, int>& householdIndexesByUuid, 
-      std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
+      const std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid,
+      const std::map<boost::uuids::uuid, int>& householdIndexesByUuid, 
+      const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
       std::string customPath = ""
     ) = 0;
 
@@ -93,10 +93,10 @@ namespace TrRouting
     virtual int getOdTrips(
       std::vector<std::unique_ptr<OdTrip>>& ts,
       std::map<boost::uuids::uuid, int>& tIndexesById, 
-      std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid,
-      std::map<boost::uuids::uuid, int>& householdIndexesByUuid, 
-      std::map<boost::uuids::uuid, int>& personIndexesByUuid,
-      std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
+      const std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid,
+      const std::map<boost::uuids::uuid, int>& householdIndexesByUuid, 
+      const std::map<boost::uuids::uuid, int>& personIndexesByUuid,
+      const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
       std::string customPath = ""
     ) = 0;
 
@@ -112,8 +112,8 @@ namespace TrRouting
     virtual int getPlaces(
       std::vector<std::unique_ptr<Place>>& ts,
       std::map<boost::uuids::uuid, int>& tIndexesById, 
-      std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid,
-      std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
+      const std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid,
+      const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
       std::string customPath = ""
     ) = 0;
 
@@ -174,7 +174,7 @@ namespace TrRouting
     virtual int getNodes(
       std::vector<std::unique_ptr<Node>>& ts,
       std::map<boost::uuids::uuid, int>& tIndexesById,
-      std::map<boost::uuids::uuid, int>& stationIndexesById,
+      const std::map<boost::uuids::uuid, int>& stationIndexesById,
       std::string customPath = ""
     ) = 0;
 
@@ -190,8 +190,8 @@ namespace TrRouting
     virtual int getLines(
       std::vector<std::unique_ptr<Line>>& ts,
       std::map<boost::uuids::uuid, int>& tIndexesById,
-      std::map<boost::uuids::uuid, int>& agencyIndexesByUuid,
-      std::map<std::string, int>& modeIndexesByShortname,
+      const std::map<boost::uuids::uuid, int>& agencyIndexesByUuid,
+      const std::map<std::string, int>& modeIndexesByShortname,
       std::string customPath = ""
     ) = 0;
 
@@ -207,8 +207,8 @@ namespace TrRouting
     virtual int getPaths(
       std::vector<std::unique_ptr<Path>>& ts,
       std::map<boost::uuids::uuid, int>& tIndexesById,
-      std::map<boost::uuids::uuid, int>& lineIndexesByUuid,
-      std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
+      const std::map<boost::uuids::uuid, int>& lineIndexesByUuid,
+      const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
       std::string customPath = ""
     ) = 0;
 
@@ -224,11 +224,11 @@ namespace TrRouting
     virtual int getScenarios(
       std::vector<std::unique_ptr<Scenario>>& ts,
       std::map<boost::uuids::uuid, int>& tIndexesById,
-      std::map<boost::uuids::uuid, int>& serviceIndexesByUuid,
-      std::map<boost::uuids::uuid, int>& lineIndexesByUuid,
-      std::map<boost::uuids::uuid, int>& agencyIndexesByUuid,
-      std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
-      std::map<std::string, int>& modeIndexesByShortname,
+      const std::map<boost::uuids::uuid, int>& serviceIndexesByUuid,
+      const std::map<boost::uuids::uuid, int>& lineIndexesByUuid,
+      const std::map<boost::uuids::uuid, int>& agencyIndexesByUuid,
+      const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
+      const std::map<std::string, int>& modeIndexesByShortname,
       std::string customPath = ""
     ) = 0;
 
@@ -243,15 +243,15 @@ namespace TrRouting
      */
     virtual int getSchedules(
       std::vector<std::unique_ptr<Trip>>& trips,
-      std::vector<std::unique_ptr<Line>>& lines,
+      const std::vector<std::unique_ptr<Line>>& lines,
       std::vector<std::unique_ptr<Path>>& paths,
       std::map<boost::uuids::uuid, int>& tripIndexesByUuid,
-      std::map<boost::uuids::uuid, int>& serviceIndexesByUuid,
-      std::map<boost::uuids::uuid, int>& lineIndexesByUuid,
-      std::map<boost::uuids::uuid, int>& pathIndexesByUuid,
-      std::map<boost::uuids::uuid, int>& agencyIndexesByUuid,
-      std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
-      std::map<std::string, int>& modeIndexesByShortname,
+      const std::map<boost::uuids::uuid, int>& serviceIndexesByUuid,
+      const std::map<boost::uuids::uuid, int>& lineIndexesByUuid,
+      const std::map<boost::uuids::uuid, int>& pathIndexesByUuid,
+      const std::map<boost::uuids::uuid, int>& agencyIndexesByUuid,
+      const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
+      const std::map<std::string, int>& modeIndexesByShortname,
       std::vector<std::vector<std::unique_ptr<int>>>&   tripConnectionDepartureTimes,
       std::vector<std::vector<std::unique_ptr<float>>>& tripConnectionDemands,
       std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>>>& connections, 

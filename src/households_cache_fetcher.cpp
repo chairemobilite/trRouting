@@ -22,8 +22,8 @@ namespace TrRouting
   int CacheFetcher::getHouseholds(
     std::vector<std::unique_ptr<Household>>& ts,
     std::map<boost::uuids::uuid, int>& tIndexesByUuid,
-    std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid,
-    std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
+    const std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid,
+    const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
     std::string customPath
   )
   {
@@ -44,7 +44,7 @@ namespace TrRouting
 
     spdlog::info("Fetching {} from cache... {}", tStr, customPath);
 
-    for(std::map<boost::uuids::uuid, int>::iterator iter = dataSourceIndexesByUuid.begin(); iter != dataSourceIndexesByUuid.end(); ++iter)
+    for(std::map<boost::uuids::uuid, int>::const_iterator iter = dataSourceIndexesByUuid.begin(); iter != dataSourceIndexesByUuid.end(); ++iter)
     {
       boost::uuids::uuid dataSourceUuid = iter->first;
 
@@ -91,7 +91,7 @@ namespace TrRouting
             t->carNumber       = capnpT.getCarNumber();
             t->incomeLevel     = capnpT.getIncomeLevel();
             t->internalId      = capnpT.getInternalId();
-            t->dataSourceIdx   = dataSourceUuid.length() > 0 ? dataSourceIndexesByUuid[uuidGenerator(dataSourceUuid)] : -1;
+            t->dataSourceIdx   = dataSourceUuid.length() > 0 ? dataSourceIndexesByUuid.at(uuidGenerator(dataSourceUuid)) : -1;
 
             switch (capnpT.getIncomeLevelGroup()) {
               case household::Household::IncomeLevelGroup::NONE      : t->incomeLevelGroup = "none";     break;
@@ -124,7 +124,7 @@ namespace TrRouting
             for (int i = 0; i < homeNodesCount; i++)
             {
               std::string nodeUuid {capnpT.getHomeNodesUuids()[i]};
-              homeNodesIdx               [i] = nodeIndexesByUuid[uuidGenerator(nodeUuid)];
+              homeNodesIdx               [i] = nodeIndexesByUuid.at(uuidGenerator(nodeUuid));
               homeNodesTravelTimesSeconds[i] = capnpT.getHomeNodesTravelTimes()[i];
               homeNodesDistancesMeters   [i] = capnpT.getHomeNodesDistances()[i];
             }

@@ -26,6 +26,28 @@ public:
         BaseCacheFetcherFixtureTests::SetUp();
         // Copy the invalid file
         fs::copy_file(BASE_CACHE_DIRECTORY_NAME + "/" + INVALID_CUSTOM_PATH + "/genericInvalid.capnpbin", BASE_CACHE_DIRECTORY_NAME + "/" + INVALID_CUSTOM_PATH + "/scenarios.capnpbin");
+
+        // Load valid data 
+        std::vector<std::unique_ptr<TrRouting::Agency>>     agencies;
+        cacheFetcher.getAgencies(agencies, agencyIndexesByUuid, VALID_CUSTOM_PATH);
+
+        std::vector<std::unique_ptr<TrRouting::Line>> lines;
+
+        std::vector<TrRouting::Mode>                        modes;
+        std::tie(modes, modeIndexesByShortname) = cacheFetcher.getModes();
+        cacheFetcher.getLines(lines, lineIndexesByUuid, agencyIndexesByUuid, modeIndexesByShortname, VALID_CUSTOM_PATH);
+
+        std::vector<std::unique_ptr<TrRouting::Station>>     stations;
+        std::map<boost::uuids::uuid, int>        stationIndexesByUuid;
+
+        cacheFetcher.getStations(stations, agencyIndexesByUuid, VALID_CUSTOM_PATH);
+
+        std::vector<std::unique_ptr<TrRouting::Node>> nodes;
+        cacheFetcher.getNodes(nodes, nodeIndexesByUuid, stationIndexesByUuid, VALID_CUSTOM_PATH);
+
+        std::vector<std::unique_ptr<TrRouting::Service>> services;
+        cacheFetcher.getServices(services, serviceIndexesByUuid, VALID_CUSTOM_PATH);
+
     }
 
     void TearDown( ) override
