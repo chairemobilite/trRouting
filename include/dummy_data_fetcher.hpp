@@ -33,10 +33,9 @@ namespace TrRouting
   public:
     DummyDataFetcher() {}
     virtual ~DummyDataFetcher() {}
-    virtual const std::pair<std::vector<Mode>, std::map<std::string, int>> getModes() {
-      std::vector<Mode> ts;
-      std::map<std::string, int> tIndexesByShortname;
-      return std::make_pair(ts, tIndexesByShortname);
+    virtual const  std::map<std::string, Mode> getModes() {
+      std::map<std::string, Mode> modes;
+      return modes;
     };
     
     virtual int getDataSources(
@@ -107,7 +106,7 @@ namespace TrRouting
       std::vector<std::unique_ptr<Line>>& ts,
       std::map<boost::uuids::uuid, int>& tIndexesById,
       const std::map<boost::uuids::uuid, int>& agencyIndexesByUuid,
-      const std::map<std::string, int>& modeIndexesByShortname,
+      const std::map<std::string, Mode>& modes,
       std::string customPath = ""
                          ) {return 0;}
 
@@ -135,7 +134,7 @@ namespace TrRouting
       const std::map<boost::uuids::uuid, int>& lineIndexesByUuid,
       const std::map<boost::uuids::uuid, int>& agencyIndexesByUuid,
       const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
-      const std::map<std::string, int>& modeIndexesByShortname,
+      const std::map<std::string, Mode>& modes,
       std::string customPath = ""
                              ) {return 0;}
 
@@ -158,7 +157,6 @@ namespace TrRouting
       const std::map<boost::uuids::uuid, int>& pathIndexesByUuid,
       const std::map<boost::uuids::uuid, int>& agencyIndexesByUuid,
       const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
-      const std::map<std::string, int>& modeIndexesByShortname,
       std::vector<std::vector<std::unique_ptr<int>>>&   tripConnectionDepartureTimes,
       std::vector<std::vector<std::unique_ptr<float>>>& tripConnectionDemands,
       std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>>>& connections, 

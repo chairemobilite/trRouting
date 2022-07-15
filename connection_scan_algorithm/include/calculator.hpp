@@ -137,10 +137,10 @@ namespace TrRouting
     // TODO As part of issue https://github.com/chairemobilite/trRouting/issues/95, this will be removed
     void initializeCalculationData();
 
-
-    std::vector<Mode>                        modes;
-    std::map<std::string, int>               modeIndexesByShortname;
-
+    std::map<std::string, Mode>              modes;
+    // Prefer using getModes to access the mode object, so that we have read-only version
+    // TODO eventually, this will be moved to a const data container
+    const std::map<std::string, Mode> & getModes() {return modes;}
 
     std::vector<std::unique_ptr<DataSource>> dataSources;
     std::map<boost::uuids::uuid, int>        dataSourceIndexesByUuid;

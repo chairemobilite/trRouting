@@ -45,11 +45,11 @@ namespace TrRouting
     onlyLinesIdx = scenario.onlyLinesIdx;
     onlyAgenciesIdx = scenario.onlyAgenciesIdx;
     onlyNodesIdx = scenario.onlyNodesIdx;
-    onlyModesIdx = scenario.onlyModesIdx;
+    onlyModes = scenario.onlyModes;
     exceptLinesIdx = scenario.exceptLinesIdx;
     exceptAgenciesIdx = scenario.exceptAgenciesIdx;
     exceptNodesIdx = scenario.exceptNodesIdx;
-    exceptModesIdx = scenario.exceptModesIdx;
+    exceptModes = scenario.exceptModes;
   }
 
   RouteParameters::RouteParameters(const RouteParameters& routeParams):
@@ -70,11 +70,11 @@ namespace TrRouting
     onlyLinesIdx(routeParams.onlyLinesIdx),
     onlyAgenciesIdx(routeParams.onlyAgenciesIdx),
     onlyNodesIdx(routeParams.onlyNodesIdx),
-    onlyModesIdx(routeParams.onlyModesIdx),
+    onlyModes(routeParams.onlyModes),
     exceptLinesIdx(routeParams.exceptLinesIdx),
     exceptAgenciesIdx(routeParams.exceptAgenciesIdx),
     exceptNodesIdx(routeParams.exceptNodesIdx),
-    exceptModesIdx(routeParams.exceptModesIdx)
+    exceptModes(routeParams.exceptModes)
   {
   }
 

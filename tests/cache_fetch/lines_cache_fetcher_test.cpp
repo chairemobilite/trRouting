@@ -15,7 +15,7 @@ protected:
     std::vector<std::unique_ptr<TrRouting::Line>> objects;
     std::map<boost::uuids::uuid, int> objectIndexesByUuid;
     std::map<boost::uuids::uuid, int> agencyIndexesByUuid;
-    std::map<std::string, int> modeIndexesByShortname;
+    std::map<std::string, TrRouting::Mode> modes;
 
 public:
     void SetUp( ) override
@@ -30,8 +30,7 @@ public:
 
         std::vector<std::unique_ptr<TrRouting::Line>> lines;
 
-        std::vector<TrRouting::Mode>                        modes;
-        std::tie(modes, modeIndexesByShortname) = cacheFetcher.getModes();
+        modes = cacheFetcher.getModes();
         
     }
 
@@ -45,21 +44,21 @@ public:
 
 TEST_F(LineCacheFetcherFixtureTests, TestGetLinesInvalid)
 {
-    int retVal = cacheFetcher.getLines(objects, objectIndexesByUuid, agencyIndexesByUuid, modeIndexesByShortname, INVALID_CUSTOM_PATH);
+    int retVal = cacheFetcher.getLines(objects, objectIndexesByUuid, agencyIndexesByUuid, modes, INVALID_CUSTOM_PATH);
     ASSERT_EQ(-EBADMSG, retVal);
     ASSERT_EQ(0, objects.size());
 }
 
 TEST_F(LineCacheFetcherFixtureTests, TestGetLinesValid)
 {
-    int retVal = cacheFetcher.getLines(objects, objectIndexesByUuid, agencyIndexesByUuid, modeIndexesByShortname, VALID_CUSTOM_PATH);
+    int retVal = cacheFetcher.getLines(objects, objectIndexesByUuid, agencyIndexesByUuid, modes, VALID_CUSTOM_PATH);
     ASSERT_EQ(0, retVal);
     ASSERT_EQ(2, objects.size());
 }
 
 TEST_F(LineCacheFetcherFixtureTests, TestGetLinesFileNotExists)
 {
-    int retVal = cacheFetcher.getLines(objects, objectIndexesByUuid, agencyIndexesByUuid, modeIndexesByShortname, BASE_CUSTOM_PATH);
+    int retVal = cacheFetcher.getLines(objects, objectIndexesByUuid, agencyIndexesByUuid, modes, BASE_CUSTOM_PATH);
     ASSERT_EQ(-ENOENT, retVal);
     ASSERT_EQ(0, objects.size());
 }

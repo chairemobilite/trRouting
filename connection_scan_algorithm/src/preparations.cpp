@@ -59,7 +59,7 @@ namespace TrRouting
 
   int Calculator::updateLinesFromCache(std::string customPath)
   {
-    return dataFetcher.getLines(lines, lineIndexesByUuid, agencyIndexesByUuid, modeIndexesByShortname, customPath);
+    return dataFetcher.getLines(lines, lineIndexesByUuid, agencyIndexesByUuid, getModes(), customPath);
   }
 
   int Calculator::updatePathsFromCache(std::string customPath)
@@ -69,7 +69,7 @@ namespace TrRouting
 
   int Calculator::updateScenariosFromCache(std::string customPath)
   {
-    return dataFetcher.getScenarios(scenarios, scenarioIndexesByUuid, serviceIndexesByUuid, lineIndexesByUuid, agencyIndexesByUuid, nodeIndexesByUuid, modeIndexesByShortname, customPath);
+    return dataFetcher.getScenarios(scenarios, scenarioIndexesByUuid, serviceIndexesByUuid, lineIndexesByUuid, agencyIndexesByUuid, nodeIndexesByUuid, getModes(), customPath);
   }
 
   int Calculator::updateSchedulesFromCache(std::string customPath)
@@ -85,7 +85,6 @@ namespace TrRouting
       pathIndexesByUuid,
       agencyIndexesByUuid,
       nodeIndexesByUuid,
-      modeIndexesByShortname,
       tripConnectionDepartureTimes,
       tripConnectionDemands,
       connections,
@@ -136,7 +135,7 @@ namespace TrRouting
 
     spdlog::debug("preparing nodes, routes, trips, connections and footpaths...");
     
-    std::tie(modes, modeIndexesByShortname) = dataFetcher.getModes();
+    modes = dataFetcher.getModes();
 
     //updateStationsFromCache();
     //updateStopsFromCache();

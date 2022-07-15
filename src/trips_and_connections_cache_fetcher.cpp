@@ -31,7 +31,6 @@ namespace TrRouting
     const std::map<boost::uuids::uuid, int>& pathIndexesByUuid,
     const std::map<boost::uuids::uuid, int>& agencyIndexesByUuid,
     const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
-    const std::map<std::string, int>& modeIndexesByShortname,
     std::vector<std::vector<std::unique_ptr<int>>>&   tripConnectionDepartureTimes,
     std::vector<std::vector<std::unique_ptr<float>>>& tripConnectionDemands,
     std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>>>& connections, 
@@ -50,8 +49,6 @@ namespace TrRouting
     tripConnectionDemands.shrink_to_fit();
     connections.clear();
     connections.shrink_to_fit();
-
-    int transferableModeIdx {modeIndexesByShortname.find("transferable") != modeIndexesByShortname.end() ? modeIndexesByShortname.at("transferable") : -1};
 
     //std::vector<Block> blocks;
     //std::map<boost::uuids::uuid, int> blockIndexesByUuid;
@@ -104,18 +101,6 @@ namespace TrRouting
               path         = paths[pathIndexesByUuid.at(pathUuid)].get();
               pathNodesIdx = path->nodesIdx;
               
-              std::unique_ptr<Trip> trip = std::make_unique<Trip>();
-
-              trip->uuid                   = tripUuid;
-              trip->agencyIdx              = line->agencyIdx;
-              trip->lineIdx                = lineIndexesByUuid.at(line->uuid);
-              trip->pathIdx                = pathIndexesByUuid.at(pathUuid);
-              trip->modeIdx                = line->modeIdx;
-              trip->serviceIdx             = serviceIdx;
-              trip->totalCapacity          = capnpTrip.getTotalCapacity();
-              trip->seatedCapacity         = capnpTrip.getSeatedCapacity();
-              trip->allowSameLineTransfers = line->allowSameLineTransfers;
-
               /*blockUuidStr = capnpTrip.getBlockUuid();
               if (blockUuidStr.length() > 0) // if block does not exist yet
               {
@@ -135,10 +120,18 @@ namespace TrRouting
                 trip->blockIdx = -1;
               }*/
 
-              trip->blockIdx = -1;
+              std::unique_ptr<Trip> trip = std::make_unique<Trip>(tripUuid,
+                                                                  line->agencyIdx,
+                                                                  lineIndexesByUuid.at(line->uuid),
+                                                                  pathIndexesByUuid.at(pathUuid),
+                                                                  line->mode,
+                                                                  serviceIdx,
+                                                                  -1,
+                                                                  line->allowSameLineTransfers,
+                                                                  capnpTrip.getTotalCapacity(),
+                                                                  capnpTrip.getSeatedCapacity());
 
-              /**/
-
+              
               tripIdx = trips.size();
               paths[trip->pathIdx].get()->tripsIdx.push_back(tripIdx);
               tripIndexesByUuid[trip->uuid] = tripIdx;
@@ -169,7 +162,7 @@ namespace TrRouting
                     trip->lineIdx,
                     trip->blockIdx,
                     trip->allowSameLineTransfers,
-                    transferableModeIdx == line->modeIdx ? 0 : -1
+                    line->mode.shortname == Mode::TRANSFERABLE ? 0 : -1
                   )));
 
                   connections.push_back(std::move(forwardConnection));

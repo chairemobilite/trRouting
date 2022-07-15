@@ -24,8 +24,6 @@ namespace TrRouting
     int              reachableNodesCount  {0};
     bool             foundRoute           {false};
 
-    int transferableModeIdx {modeIndexesByShortname.find("transferable") != modeIndexesByShortname.end() ? modeIndexesByShortname["transferable"] : -1};
-
     std::vector<int> resultingNodes;
     if (params.returnAllNodesResult)
     {
@@ -51,7 +49,6 @@ namespace TrRouting
       ConnectionTuple * journeyStepExitConnection;
       std::vector<boost::uuids::uuid>                   lineUuids;
       std::vector<int>                                  linesIdx;
-      std::vector<std::string>                          modeShortnames;
       std::vector<boost::uuids::uuid>                   agencyUuids;
       std::vector<boost::uuids::uuid>                   unboardingNodeUuids;
       std::vector<boost::uuids::uuid>                   boardingNodeUuids;
@@ -64,7 +61,6 @@ namespace TrRouting
       Node *   journeyStepNodeArrival;
       Trip *   journeyStepTrip;
       Line *   journeyStepLine;
-      Mode     journeyStepMode;
       Path *   journeyStepPath;
       Agency * journeyStepAgency;
 
@@ -91,7 +87,6 @@ namespace TrRouting
         unboardingNodeUuids.clear();
         tripUuids.clear();
         tripsIdx.clear();
-        modeShortnames.clear();
         inVehicleTravelTimesSeconds.clear();
 
         totalInVehicleTime          =  0; transferArrivalTime    = -1; firstDepartureTime   = -1;
@@ -180,7 +175,6 @@ namespace TrRouting
             journeyStepAgency           = agencies[journeyStepTrip->agencyIdx].get();
             journeyStepLine             = lines[journeyStepTrip->lineIdx].get();
             journeyStepPath             = paths[journeyStepTrip->pathIdx].get();
-            journeyStepMode             = modes[journeyStepLine->modeIdx];
             transferTime                = std::get<journeyStepIndexes::TRANSFER_TRAVEL_TIME>(journeyStep);
             distance                    = std::get<journeyStepIndexes::TRANSFER_DISTANCE>(journeyStep);
             inVehicleDistance           = 0;
@@ -200,13 +194,12 @@ namespace TrRouting
 
             totalInVehicleTime         += inVehicleTime;
             totalWaitingTime           += waitingTime;
-            if (transferableModeIdx != journeyStepLine->modeIdx)
+            if (Mode::TRANSFERABLE != journeyStepLine->mode.shortname)
             {
               numberOfTransfers += 1;
             }
             lineUuids.push_back(journeyStepLine->uuid);
             linesIdx.push_back(journeyStepTrip->lineIdx);
-            modeShortnames.push_back(journeyStepMode.shortname);
             inVehicleTravelTimesSeconds.push_back(inVehicleTime);
             agencyUuids.push_back(journeyStepAgency->uuid);
             boardingNodeUuids.push_back(journeyStepNodeDeparture->uuid);
@@ -222,7 +215,7 @@ namespace TrRouting
                 inVehicleDistance += journeyStepPath->segmentsDistanceMeters[seqI];
               }
               totalDistance += inVehicleDistance;
-              if (transferableModeIdx == journeyStepLine->modeIdx)
+              if (Mode::TRANSFERABLE == journeyStepLine->mode.shortname)
               {
                 totalWalkingDistance     += inVehicleDistance;
                 totalWalkingTime         += inVehicleTime;
@@ -261,8 +254,8 @@ namespace TrRouting
                 journeyStepLine->shortname,
                 journeyStepLine->longname,
                 journeyStepPath->uuid,
-                journeyStepMode.name,
-                journeyStepMode.shortname,
+                journeyStepLine->mode.name,
+                journeyStepLine->mode.shortname,
                 journeyStepTrip->uuid,
                 boardingSequence,
                 boardingSequence,
@@ -282,8 +275,8 @@ namespace TrRouting
                 journeyStepLine->shortname,
                 journeyStepLine->longname,
                 journeyStepPath->uuid,
-                journeyStepMode.name,
-                journeyStepMode.shortname,
+                journeyStepLine->mode.name,
+                journeyStepLine->mode.shortname,
                 journeyStepTrip->uuid,
                 unboardingSequence,
                 unboardingSequence + 1,
