@@ -14,6 +14,7 @@ namespace TrRouting
   class OdTrip;
   class Scenario;
   class Node;
+  class Mode;
 
   class ParameterException : public std::exception
   {
@@ -70,8 +71,8 @@ namespace TrRouting
       // FIXME: Temporarily moved to public until calculation specific parameters exist. This is used directly by alternatives routing.
       // see https://github.com/chairemobilite/trRouting/issues/95
       // std::vector<int> exceptLinesIdx;
-      std::vector<int> onlyModesIdx;
-      std::vector<int> exceptModesIdx;
+      std::vector<std::reference_wrapper<const Mode>> onlyModes;
+      std::vector<std::reference_wrapper<const Mode>> exceptModes;
       std::vector<int> onlyAgenciesIdx;
       std::vector<int> exceptAgenciesIdx;
       std::vector<int> onlyNodesIdx;
@@ -124,8 +125,8 @@ namespace TrRouting
       std::vector<int>* getExceptServicesIdx() { return &exceptServicesIdx; }
       std::vector<int>* getOnlyLinesIdx() { return &onlyLinesIdx; }
       std::vector<int>* getExceptLinesIdx() { return &exceptLinesIdx; }
-      std::vector<int>* getOnlyModesIdx() { return &onlyModesIdx; }
-      std::vector<int>* getExceptModesIdx() { return &exceptModesIdx; }
+      const std::vector<std::reference_wrapper<const Mode>>& getOnlyModes() { return onlyModes; }
+      const std::vector<std::reference_wrapper<const Mode>>& getExceptModes() { return exceptModes; }
       std::vector<int>* getOnlyAgenciesIdx() { return &onlyAgenciesIdx; }
       std::vector<int>* getExceptAgenciesIdx() { return &exceptAgenciesIdx; }
       std::vector<int>* getOnlyNodesIdx() { return &onlyNodesIdx; }

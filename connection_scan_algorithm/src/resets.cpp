@@ -6,6 +6,7 @@
 #include "toolbox.hpp" //MAX_INT
 #include "od_trip.hpp"
 #include "routing_result.hpp"
+#include "mode.hpp"
 
 namespace TrRouting
 {
@@ -263,9 +264,9 @@ namespace TrRouting
           }
         }
 
-        if (tripsEnabled[i] == 1 && parameters.getOnlyModesIdx()->size() > 0)
+        if (tripsEnabled[i] == 1 && parameters.getOnlyModes().size() > 0)
         {
-          if (std::find(parameters.getOnlyModesIdx()->begin(), parameters.getOnlyModesIdx()->end(), trip->modeIdx) == parameters.getOnlyModesIdx()->end())
+          if (std::find(parameters.getOnlyModes().begin(), parameters.getOnlyModes().end(), trip->mode) == parameters.getOnlyModes().end())
           {
             tripsEnabled[i] = -1;
           }
@@ -274,10 +275,11 @@ namespace TrRouting
         if (tripsEnabled[i] == 1 && parameters.getOnlyNodesIdx()->size() > 0)
         {
           // FIXME: This is not right, it should look for a node, not the mode
-          if (std::find(parameters.getOnlyNodesIdx()->begin(), parameters.getOnlyNodesIdx()->end(), trip->modeIdx) == parameters.getOnlyNodesIdx()->end())
+          // FIXME2: Commented out, since mode is now typed, it won't match
+          /*if (std::find(parameters.getOnlyNodesIdx()->begin(), parameters.getOnlyNodesIdx()->end(), trip->modeIdx) == parameters.getOnlyNodesIdx()->end())
           {
             tripsEnabled[i] = -1;
-          }
+          }(*/
         }
 
         if (tripsEnabled[i] == 1 && parameters.getOnlyAgenciesIdx()->size() > 0)
@@ -307,15 +309,17 @@ namespace TrRouting
         if (tripsEnabled[i] == 1 && parameters.getExceptNodesIdx()->size() > 0)
         {
           // FIXME: This is not right, it should look for a node, not the mode
+          // FIXME2: Commented out, since mode is now typed, it won't match
+          /*
           if (std::find(parameters.getExceptNodesIdx()->begin(), parameters.getExceptNodesIdx()->end(), trip->modeIdx) != parameters.getExceptNodesIdx()->end())
           {
             tripsEnabled[i] = -1;
-          }
+            }*/
         }
 
-        if (tripsEnabled[i] == 1 && parameters.getExceptModesIdx()->size() > 0)
+        if (tripsEnabled[i] == 1 && parameters.getExceptModes().size() > 0)
         {
-          if (std::find(parameters.getExceptModesIdx()->begin(), parameters.getExceptModesIdx()->end(), trip->modeIdx) != parameters.getExceptModesIdx()->end())
+          if (std::find(parameters.getExceptModes().begin(), parameters.getExceptModes().end(), trip->mode) != parameters.getExceptModes().end())
           {
             tripsEnabled[i] = -1;
           }

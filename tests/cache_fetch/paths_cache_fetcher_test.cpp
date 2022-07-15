@@ -31,10 +31,8 @@ public:
 
         std::vector<std::unique_ptr<TrRouting::Line>> lines;
 
-        std::vector<TrRouting::Mode>                        modes;
-        std::map<std::string, int> modeIndexesByShortname;
-        std::tie(modes, modeIndexesByShortname) = cacheFetcher.getModes();
-        cacheFetcher.getLines(lines, lineIndexesByUuid, agencyIndexesByUuid, modeIndexesByShortname, VALID_CUSTOM_PATH);
+        auto modes = cacheFetcher.getModes();
+        cacheFetcher.getLines(lines, lineIndexesByUuid, agencyIndexesByUuid, modes, VALID_CUSTOM_PATH);
 
         // Empty Station
         std::map<boost::uuids::uuid, int>        stationIndexesByUuid;

@@ -25,7 +25,7 @@ namespace TrRouting
     const std::map<boost::uuids::uuid, int>& lineIndexesByUuid,
     const std::map<boost::uuids::uuid, int>& agencyIndexesByUuid,
     const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
-    const std::map<std::string, int>& modeIndexesByShortname,
+    const std::map<std::string, Mode>& modes,
     std::string customPath
   ) {
 
@@ -76,11 +76,11 @@ namespace TrRouting
         std::vector<int> onlyLinesIdx;
         std::vector<int> onlyAgenciesIdx;
         std::vector<int> onlyNodesIdx;
-        std::vector<int> onlyModesIdx;
+        std::vector<std::reference_wrapper<const Mode>> onlyModes;
         std::vector<int> exceptLinesIdx;
         std::vector<int> exceptAgenciesIdx;
         std::vector<int> exceptNodesIdx;
-        std::vector<int> exceptModesIdx;
+        std::vector<std::reference_wrapper<const Mode>> exceptModes;
         boost::uuids::uuid serviceUuid;
         boost::uuids::uuid lineUuid;
         boost::uuids::uuid agencyUuid;
@@ -130,12 +130,12 @@ namespace TrRouting
         t->onlyNodesIdx = onlyNodesIdx;
         for (std::string modeShortnameStr : capnpT.getOnlyModesShortnames())
         {
-          if (modeIndexesByShortname.count(modeShortnameStr) != 0)
+          if (modes.count(modeShortnameStr) != 0)
           {
-            onlyModesIdx.push_back(modeIndexesByShortname.at(modeShortnameStr));
+            onlyModes.push_back(modes.at(modeShortnameStr));
           }
         }
-        t->onlyModesIdx = onlyModesIdx;
+        t->onlyModes = onlyModes;
 
         for (std::string lineUuidStr : capnpT.getExceptLinesUuids())
         {
@@ -166,12 +166,12 @@ namespace TrRouting
         t->exceptNodesIdx = exceptNodesIdx;
         for (std::string modeShortnameStr : capnpT.getExceptModesShortnames())
         {
-          if (modeIndexesByShortname.count(modeShortnameStr) != 0)
+          if (modes.count(modeShortnameStr) != 0)
           {
-            exceptModesIdx.push_back(modeIndexesByShortname.at(modeShortnameStr));
+            exceptModes.push_back(modes.at(modeShortnameStr));
           }
         }
-        t->exceptModesIdx = exceptModesIdx;
+        t->exceptModes = exceptModes;
 
         tIndexesByUuid[t->uuid] = ts.size();
         ts.push_back(std::move(t));

@@ -21,7 +21,7 @@ namespace TrRouting
     std::vector<std::unique_ptr<Line>>& ts,
     std::map<boost::uuids::uuid, int>& tIndexesByUuid,
     const std::map<boost::uuids::uuid, int>& agencyIndexesByUuid,
-    const std::map<std::string, int>& modeIndexesByShortname,
+    const std::map<std::string, Mode>& modes, 
     std::string customPath
   )
   {
@@ -68,16 +68,15 @@ namespace TrRouting
         std::string uuid       {capnpT.getUuid()};
         std::string agencyUuid {capnpT.getAgencyUuid()};
         
-        std::unique_ptr<T> t = std::make_unique<T>();
+        std::unique_ptr<T> t = std::make_unique<T>(
+                                                   uuidGenerator(uuid),
+                                                   agencyIndexesByUuid.at(uuidGenerator(agencyUuid)),
+                                                   modes.at(capnpT.getMode()),
+                                                   capnpT.getShortname(),
+                                                   capnpT.getLongname(),
+                                                   capnpT.getInternalId(),
+                                                   capnpT.getAllowSameLineTransfers());
 
-        t->uuid                   = uuidGenerator(uuid);
-        t->shortname              = capnpT.getShortname();
-        t->longname               = capnpT.getLongname();
-        t->internalId             = capnpT.getInternalId();
-        t->agencyIdx              = agencyIndexesByUuid.at(uuidGenerator(agencyUuid));
-        t->modeIdx                = modeIndexesByShortname.at(capnpT.getMode());
-        t->allowSameLineTransfers = capnpT.getAllowSameLineTransfers();
-        
         tIndexesByUuid[t->uuid] = ts.size();
         ts.push_back(std::move(t));
       }

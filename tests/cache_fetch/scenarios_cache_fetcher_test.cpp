@@ -18,7 +18,7 @@ protected:
     std::map<boost::uuids::uuid, int> lineIndexesByUuid;
     std::map<boost::uuids::uuid, int> agencyIndexesByUuid;
     std::map<boost::uuids::uuid, int> nodeIndexesByUuid;
-    std::map<std::string, int> modeIndexesByShortname;
+    std::map<std::string, TrRouting::Mode> modes;
 
 public:
     void SetUp( ) override
@@ -33,9 +33,8 @@ public:
 
         std::vector<std::unique_ptr<TrRouting::Line>> lines;
 
-        std::vector<TrRouting::Mode>                        modes;
-        std::tie(modes, modeIndexesByShortname) = cacheFetcher.getModes();
-        cacheFetcher.getLines(lines, lineIndexesByUuid, agencyIndexesByUuid, modeIndexesByShortname, VALID_CUSTOM_PATH);
+        modes = cacheFetcher.getModes();
+        cacheFetcher.getLines(lines, lineIndexesByUuid, agencyIndexesByUuid, modes, VALID_CUSTOM_PATH);
 
         std::vector<std::unique_ptr<TrRouting::Station>>     stations;
         std::map<boost::uuids::uuid, int>        stationIndexesByUuid;
@@ -60,7 +59,7 @@ public:
 
 TEST_F(ScenarioCacheFetcherFixtureTests, TestGetScenariosInvalid)
 {
-    int retVal = cacheFetcher.getScenarios(objects, objectIndexesByUuid, serviceIndexesByUuid, lineIndexesByUuid, agencyIndexesByUuid, nodeIndexesByUuid, modeIndexesByShortname, INVALID_CUSTOM_PATH);
+    int retVal = cacheFetcher.getScenarios(objects, objectIndexesByUuid, serviceIndexesByUuid, lineIndexesByUuid, agencyIndexesByUuid, nodeIndexesByUuid, modes, INVALID_CUSTOM_PATH);
     ASSERT_EQ(-EBADMSG, retVal);
     ASSERT_EQ(0, objects.size());
 }
@@ -68,14 +67,14 @@ TEST_F(ScenarioCacheFetcherFixtureTests, TestGetScenariosInvalid)
 // TODO Add tests for various services, lines, agencies that don't exist. But first, we should be able to create cache files with mock test data
 TEST_F(ScenarioCacheFetcherFixtureTests, TestGetScenariosValid)
 {
-    int retVal = cacheFetcher.getScenarios(objects, objectIndexesByUuid, serviceIndexesByUuid, lineIndexesByUuid, agencyIndexesByUuid, nodeIndexesByUuid, modeIndexesByShortname, VALID_CUSTOM_PATH);
+    int retVal = cacheFetcher.getScenarios(objects, objectIndexesByUuid, serviceIndexesByUuid, lineIndexesByUuid, agencyIndexesByUuid, nodeIndexesByUuid, modes, VALID_CUSTOM_PATH);
     ASSERT_EQ(0, retVal);
     ASSERT_EQ(2, objects.size());
 }
 
 TEST_F(ScenarioCacheFetcherFixtureTests, TestGetScenariosFileNotExists)
 {
-    int retVal = cacheFetcher.getScenarios(objects, objectIndexesByUuid, serviceIndexesByUuid, lineIndexesByUuid, agencyIndexesByUuid, nodeIndexesByUuid, modeIndexesByShortname, BASE_CUSTOM_PATH);
+    int retVal = cacheFetcher.getScenarios(objects, objectIndexesByUuid, serviceIndexesByUuid, lineIndexesByUuid, agencyIndexesByUuid, nodeIndexesByUuid, modes, BASE_CUSTOM_PATH);
     ASSERT_EQ(-ENOENT, retVal);
     ASSERT_EQ(0, objects.size());
 }
