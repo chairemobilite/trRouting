@@ -26,12 +26,11 @@ namespace TrRouting
     egressNodeTravelTimesSeconds.clear();
     egressNodeDistancesMeters.clear();
 
-    onlyDataSourceIdx = -1;
+    onlyDataSource.reset();
 
     batchNumber                            = 1;
     batchesCount                           = 1;
     odTripsSampleRatio                     = 1.0;
-    dataSourceUuid.reset();
     odTripUuid.reset();
     startingNodeUuid.reset();
     endingNodeUuid.reset();
@@ -79,7 +78,7 @@ namespace TrRouting
     std::vector<std::unique_ptr<OdTrip>> &odTrips,
     std::map<boost::uuids::uuid, int> &nodeIndexesByUuid,
     std::vector<std::unique_ptr<Node>> &nodes,
-    std::map<boost::uuids::uuid, int> &dataSourceIndexesByUuid)
+    const std::map<boost::uuids::uuid, DataSource> &dataSources)
   {
 
     setDefaultValues();
@@ -89,7 +88,6 @@ namespace TrRouting
     std::vector<std::pair<std::string, std::string>> newParametersWithValues;
 
     Scenario *         scenario;
-    dataSourceUuid.reset();
     boost::uuids::uuid originNodeUuid;
     boost::uuids::uuid destinationNodeUuid;
 
@@ -237,8 +235,9 @@ namespace TrRouting
 
       else if (parameterWithValueVector[0] == "data_source_uuid")
       {
-        dataSourceUuid    = uuidGenerator(parameterWithValueVector[1]);
-        onlyDataSourceIdx = dataSourceIndexesByUuid[*dataSourceUuid];
+        boost::uuids::uuid dataSourceUuid    = uuidGenerator(parameterWithValueVector[1]);
+        // This will throw an exception if specified data_source_uuid is not valid
+        onlyDataSource = dataSources.at(dataSourceUuid);
         continue;
       }
 

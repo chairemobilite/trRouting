@@ -15,7 +15,6 @@ namespace TrRouting
   public:
    
     boost::uuids::uuid uuid;
-    int dataSourceIdx;
     unsigned long long id;
     float expansionFactor;
     int size;

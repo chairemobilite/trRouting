@@ -18,8 +18,7 @@ namespace TrRouting
 {
 
   int CacheFetcher::getDataSources(
-    std::vector<std::unique_ptr<DataSource>>& ts,
-    std::map<boost::uuids::uuid, int>& tIndexesByUuid,
+    std::map<boost::uuids::uuid, DataSource>& ts,
     std::string customPath
   )
   {
@@ -30,7 +29,6 @@ namespace TrRouting
     int ret = 0;
 
     ts.clear();
-    tIndexesByUuid.clear();
 
     std::string tStr  = "dataSources";
     std::string TStr  = "DataSources";
@@ -67,28 +65,28 @@ namespace TrRouting
         std::vector<int> servicesIdx;
         boost::uuids::uuid serviceUuid;
         
-        std::unique_ptr<T> t = std::make_unique<T>();
+        T t;
 
-        t->uuid = uuidGenerator(uuid);
-        t->name = capnpT.getName();
+        t.uuid = uuidGenerator(uuid);
+        t.name = capnpT.getName();
 
         switch (capnpT.getType()) {
-          case dataSource::DataSource::Type::NONE                     : t->type = "none";                    break;
-          case dataSource::DataSource::Type::OTHER                    : t->type = "other";                   break;
-          case dataSource::DataSource::Type::GTFS                     : t->type = "gtfs";                    break;
-          case dataSource::DataSource::Type::OD_TRIPS                 : t->type = "odTrips";                 break;
-          case dataSource::DataSource::Type::TRANSIT_SMART_CARD_DATA  : t->type = "transitSmartCardData";    break;
-          case dataSource::DataSource::Type::TRANSIT_OPERATIONAL_DATA : t->type = "transitOperationalData";  break;
-          case dataSource::DataSource::Type::TAXI_TRANSACTIONS        : t->type = "taxiTransactions";        break;
-          case dataSource::DataSource::Type::CAR_SHARING_TRANSACTIONS : t->type = "carSharingTransactions";  break;
-          case dataSource::DataSource::Type::BIKE_SHARING_TRANSACTIONS: t->type = "bikeSharingTransactions"; break;
-          case dataSource::DataSource::Type::GPS_TRACES               : t->type = "gpsTraces";               break;
-          case dataSource::DataSource::Type::STREET_SEGMENT_SPEEDS    : t->type = "streetSegmentSpeeds";     break;
-          case dataSource::DataSource::Type::UNKNOWN                  : t->type = "unknown";                 break;
+          case dataSource::DataSource::Type::NONE                     : t.type = "none";                    break;
+          case dataSource::DataSource::Type::OTHER                    : t.type = "other";                   break;
+          case dataSource::DataSource::Type::GTFS                     : t.type = "gtfs";                    break;
+          case dataSource::DataSource::Type::OD_TRIPS                 : t.type = "odTrips";                 break;
+          case dataSource::DataSource::Type::TRANSIT_SMART_CARD_DATA  : t.type = "transitSmartCardData";    break;
+          case dataSource::DataSource::Type::TRANSIT_OPERATIONAL_DATA : t.type = "transitOperationalData";  break;
+          case dataSource::DataSource::Type::TAXI_TRANSACTIONS        : t.type = "taxiTransactions";        break;
+          case dataSource::DataSource::Type::CAR_SHARING_TRANSACTIONS : t.type = "carSharingTransactions";  break;
+          case dataSource::DataSource::Type::BIKE_SHARING_TRANSACTIONS: t.type = "bikeSharingTransactions"; break;
+          case dataSource::DataSource::Type::GPS_TRACES               : t.type = "gpsTraces";               break;
+          case dataSource::DataSource::Type::STREET_SEGMENT_SPEEDS    : t.type = "streetSegmentSpeeds";     break;
+          case dataSource::DataSource::Type::UNKNOWN                  : t.type = "unknown";                 break;
         }
 
-        tIndexesByUuid[t->uuid] = ts.size();
-        ts.push_back(std::move(t));
+        //tIndexesByUuid[t.uuid] = ts.size();
+        ts[t.uuid] = t;
       }
     } 
     catch (const kj::Exception& e) 

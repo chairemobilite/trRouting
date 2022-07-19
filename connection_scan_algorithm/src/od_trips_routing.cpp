@@ -247,7 +247,7 @@ namespace TrRouting
       }
 
       // filter wrong data source if only data source is provided:
-      if (params.onlyDataSourceIdx != -1 && odTrip->dataSourceIdx != params.onlyDataSourceIdx)
+      if (params.onlyDataSource && odTrip->dataSource != params.onlyDataSource.value())
       {
         attributesMatches = false;
       }

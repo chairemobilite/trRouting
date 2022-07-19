@@ -385,7 +385,7 @@ std::unique_ptr<TrRouting::RoutingResult> RouteCalculationFixtureTests::calculat
         calculator.odTrips,
         calculator.nodeIndexesByUuid,
         calculator.nodes,
-        calculator.dataSourceIndexesByUuid);
+        calculator.dataSources);
     TrRouting::OsrmFetcher::birdDistanceAccessibilityEnabled = true;
 
     // TODO Shouldn't need to do this, but we do for now, benchmark needs to be started

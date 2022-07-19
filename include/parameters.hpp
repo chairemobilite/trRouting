@@ -6,6 +6,7 @@
 #include <map>
 #include <optional>
 #include <boost/uuid/uuid.hpp>
+#include "data_source.hpp"
 
 namespace TrRouting
 {
@@ -15,6 +16,7 @@ namespace TrRouting
   class Scenario;
   class Node;
   class Mode;
+  class DataSource;
 
   class ParameterException : public std::exception
   {
@@ -149,7 +151,8 @@ namespace TrRouting
       int routingDateYear;   // not implemented, use onlyServicesIdx or exceptServicesIdx for now
       int routingDateMonth;  // not implemented, use onlyServicesIdx or exceptServicesIdx for now
       int routingDateDay;    // not implemented, use onlyServicesIdx or exceptServicesIdx for now
-      int onlyDataSourceIdx;
+      //TODO Make it a reference or not??
+      std::optional<DataSource> onlyDataSource;
       std::vector<int> accessNodesIdx;
       std::vector<int> accessNodeTravelTimesSeconds;
       std::vector<int> accessNodeDistancesMeters;
@@ -178,7 +181,6 @@ namespace TrRouting
       int originNodeIdx;
       int destinationNodeIdx;
       bool calculateAllOdTrips;
-      std::optional<boost::uuids::uuid> dataSourceUuid;
       std::optional<boost::uuids::uuid> odTripUuid;
       std::optional<boost::uuids::uuid> startingNodeUuid;
       std::optional<boost::uuids::uuid> endingNodeUuid;
@@ -214,7 +216,7 @@ namespace TrRouting
         std::vector<std::unique_ptr<OdTrip>> &odTrips,
         std::map<boost::uuids::uuid, int> &nodeIndexesByUuid,
         std::vector<std::unique_ptr<Node>> &nodes,
-        std::map<boost::uuids::uuid, int> &dataSourceIndexesByUuid);
+                             const std::map<boost::uuids::uuid, DataSource> &dataSources);
 
   };
 

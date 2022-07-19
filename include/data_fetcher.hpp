@@ -10,10 +10,10 @@
 namespace TrRouting
 {
   class DataSource;
-  class Household;
+  //class Household;  //TODO #167
   class Person;
   class OdTrip;
-  class Place;
+  //class Place;  //TODO #167
   class Agency;
   class Service;
   class Station;
@@ -43,8 +43,7 @@ namespace TrRouting
      * -(error codes from the open system call)
      */
     virtual int getDataSources(
-      std::vector<std::unique_ptr<DataSource>>& ts, 
-      std::map<boost::uuids::uuid, int>& tIndexesById, 
+      std::map<boost::uuids::uuid, DataSource>& ts, 
       std::string customPath = "") = 0;
 
     /**
@@ -56,12 +55,12 @@ namespace TrRouting
      * -EINVAL For any other data related error
      * -(error codes from the open system call)
      */
-     virtual int getHouseholds(
-      std::vector<std::unique_ptr<Household>>& ts,
-      std::map<boost::uuids::uuid, int>& tIndexesById, 
-      const std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid, 
-      const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
-      std::string customPath = "") = 0;
+    //TODO #167 Place/Household removed while refactoring
+    // virtual int getHouseholds(
+    //  std::vector<std::unique_ptr<Household>>& ts,
+    //  std::map<boost::uuids::uuid, int>& tIndexesById,
+    //  const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
+    //  std::string customPath = "") = 0;
 
     /**
      * Read the persons cache file and fill the persons vector.
@@ -75,9 +74,7 @@ namespace TrRouting
     virtual int getPersons(
       std::vector<std::unique_ptr<Person>>& ts,
       std::map<boost::uuids::uuid, int>& tIndexesById, 
-      const std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid,
-      const std::map<boost::uuids::uuid, int>& householdIndexesByUuid, 
-      const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
+      const std::map<boost::uuids::uuid, DataSource>& dataSources,
       std::string customPath = ""
     ) = 0;
 
@@ -93,10 +90,9 @@ namespace TrRouting
     virtual int getOdTrips(
       std::vector<std::unique_ptr<OdTrip>>& ts,
       std::map<boost::uuids::uuid, int>& tIndexesById, 
-      const std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid,
-      const std::map<boost::uuids::uuid, int>& householdIndexesByUuid, 
-      const std::map<boost::uuids::uuid, int>& personIndexesByUuid,
+      const std::map<boost::uuids::uuid, DataSource>& dataSources,
       const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
+      const std::map<boost::uuids::uuid, int>& personIndexesByUuid,
       std::string customPath = ""
     ) = 0;
 
@@ -109,13 +105,14 @@ namespace TrRouting
      * -EINVAL For any other data related error
      * -(error codes from the open system call)
      */
-    virtual int getPlaces(
-      std::vector<std::unique_ptr<Place>>& ts,
-      std::map<boost::uuids::uuid, int>& tIndexesById, 
-      const std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid,
-      const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
-      std::string customPath = ""
-    ) = 0;
+    //TODO #167 Place/Household removed while refactoring
+    //virtual int getPlaces(
+    //  std::vector<std::unique_ptr<Place>>& ts,
+    //  std::map<boost::uuids::uuid, int>& tIndexesById,
+    //  const std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid,
+    //  const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
+    //  std::string customPath = ""
+    //) = 0;
 
     /**
      * Read the agencies cache file and fill the agencies vector.

@@ -14,14 +14,12 @@ class PersonCacheFetcherFixtureTests : public BaseCacheFetcherFixtureTests
 protected:
     std::vector<std::unique_ptr<TrRouting::Person>> objects;
     std::map<boost::uuids::uuid, int> objectIndexesByUuid;
-    std::map<boost::uuids::uuid, int> dataSourceIndexesByUuid;
-    std::map<boost::uuids::uuid, int> householdIndexesByUuid;
-    std::map<boost::uuids::uuid, int> nodeIndexesByUuid;
+    std::map<boost::uuids::uuid, TrRouting::DataSource> dataSources;
 };
 
 TEST_F(PersonCacheFetcherFixtureTests, TestGetPersonsValid)
 {
-    int retVal = cacheFetcher.getPersons(objects, objectIndexesByUuid, dataSourceIndexesByUuid, householdIndexesByUuid, nodeIndexesByUuid, VALID_CUSTOM_PATH);
+    int retVal = cacheFetcher.getPersons(objects, objectIndexesByUuid, dataSources, VALID_CUSTOM_PATH);
     ASSERT_EQ(0, retVal);
     ASSERT_EQ(0, objects.size());
 }

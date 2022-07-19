@@ -176,11 +176,13 @@ int main(int argc, char** argv) {
         correctCacheName = true;
         calculator.updateDataSourcesFromCache(customCacheDirectoryPath);
       }
+      /* TODO #167
       if (cacheName == "households" || cacheName == "all")
       {
         correctCacheName = true;
         calculator.updateHouseholdsFromCache(customCacheDirectoryPath);
       }
+      */
       if (cacheName == "persons" || cacheName == "all")
       {
         correctCacheName = true;
@@ -191,11 +193,13 @@ int main(int argc, char** argv) {
         correctCacheName = true;
         calculator.updateOdTripsFromCache(customCacheDirectoryPath);
       }
+      /* TODO #167
       if (cacheName == "places" || cacheName == "all")
       {
         correctCacheName = true;
         calculator.updatePlacesFromCache(customCacheDirectoryPath);
       }
+      */
       if (cacheName == "agencies" || cacheName == "all")
       {
         correctCacheName = true;
@@ -326,7 +330,7 @@ int main(int argc, char** argv) {
         calculator.odTrips,
         calculator.nodeIndexesByUuid,
         calculator.nodes,
-        calculator.dataSourceIndexesByUuid);
+        calculator.dataSources);
 
       // find OdTrip if provided:
       bool   foundOdTrip{false};

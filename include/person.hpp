@@ -10,14 +10,35 @@
 namespace TrRouting
 {
   
-  struct Person {
+  class Person {
   
   public:
+    Person( boost::uuids::uuid auuid,
+            unsigned long long aid,
+            const DataSource &adataSource,
+            float aexpansionFactor,
+            int aage,
+            short adrivingLicenseOwner,
+            short atransitPassOwner,
+            std::string aageGroup,
+            std::string agender,
+            std::string aoccupation,
+            std::string ainternalId) : uuid(auuid),
+                                       id(aid),
+                                       dataSource(adataSource),
+                                       expansionFactor(aexpansionFactor),
+                                       age(aage),
+                                       drivingLicenseOwner(adrivingLicenseOwner),
+                                       transitPassOwner(atransitPassOwner),
+                                       ageGroup(aageGroup),
+                                       gender(agender),
+                                       occupation(aoccupation),
+                                       internalId(ainternalId) {}
    
     boost::uuids::uuid uuid;
-    int dataSourceIdx;
-    int householdIdx;
+    //int householdIdx; //TODO #167
     unsigned long long id;
+    const DataSource &dataSource;
     float expansionFactor;
     int age;
     short drivingLicenseOwner;
@@ -26,6 +47,7 @@ namespace TrRouting
     std::string gender;
     std::string occupation;
     std::string internalId;
+    /*TODO #167 Restore those fields when necessary
     std::unique_ptr<Point> usualWorkPlace;
     std::unique_ptr<Point> usualSchoolPlace;
     std::vector<int> usualWorkPlaceNodesIdx;
@@ -40,7 +62,7 @@ namespace TrRouting
     int usualSchoolPlaceWalkingTravelTimeSeconds;
     int usualSchoolPlaceCyclingTravelTimeSeconds;
     int usualSchoolPlaceDrivingTravelTimeSeconds;
-
+    */
     const std::string toString() {
       return "Person " + boost::uuids::to_string(uuid) + " age " + std::to_string(age);
     }
