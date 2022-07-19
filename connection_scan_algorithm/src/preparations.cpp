@@ -24,29 +24,29 @@ namespace TrRouting
 
   int Calculator::updateDataSourcesFromCache(std::string customPath)
   {
-    return dataFetcher.getDataSources(dataSources, dataSourceIndexesByUuid, customPath);
+    return dataFetcher.getDataSources(dataSources, customPath);
   }
-
+  /* TODO #167
   int Calculator::updateHouseholdsFromCache(std::string customPath)
   {
     return dataFetcher.getHouseholds(households, householdIndexesByUuid, dataSourceIndexesByUuid, nodeIndexesByUuid, customPath);
   }
-
+  */
   int Calculator::updatePersonsFromCache(std::string customPath)
   {
-    return dataFetcher.getPersons(persons, personIndexesByUuid, dataSourceIndexesByUuid, householdIndexesByUuid, nodeIndexesByUuid, customPath);
+    return dataFetcher.getPersons(persons, personIndexesByUuid, getDataSources(), customPath);
   }
   
   int Calculator::updateOdTripsFromCache(std::string customPath)
   {
-    return dataFetcher.getOdTrips(odTrips, odTripIndexesByUuid, dataSourceIndexesByUuid, householdIndexesByUuid, personIndexesByUuid, nodeIndexesByUuid, customPath);
+    return dataFetcher.getOdTrips(odTrips, odTripIndexesByUuid, dataSources, personIndexesByUuid, nodeIndexesByUuid, customPath);
   }
-
+  /* TODO #167
   int Calculator::updatePlacesFromCache(std::string customPath)
   {
     return dataFetcher.getPlaces(places, placeIndexesByUuid, dataSourceIndexesByUuid, nodeIndexesByUuid, customPath);
   }
-
+  */ 
   int Calculator::updateAgenciesFromCache(std::string customPath)
   {
     return dataFetcher.getAgencies(agencies, agencyIndexesByUuid, customPath);
@@ -151,11 +151,13 @@ namespace TrRouting
     {
       return Calculator::DataStatus::DATA_READ_ERROR;
     }
+    /* TODO #167
     ret = updateHouseholdsFromCache();
     if (ret < 0)
     {
       return Calculator::DataStatus::DATA_READ_ERROR;
     }
+    */
     ret = updatePersonsFromCache();
     if (ret < 0)
     {
@@ -166,12 +168,13 @@ namespace TrRouting
     {
       return Calculator::DataStatus::DATA_READ_ERROR;
     }
+    /* TODO #167
     ret = updatePlacesFromCache();
     if (ret < 0)
     {
       return Calculator::DataStatus::DATA_READ_ERROR;
     }
-    
+    */
     ret = updateAgenciesFromCache();
     // Ignore missing file
     if (ret < 0 && ret != -ENOENT)

@@ -12,8 +12,7 @@ namespace fs = std::filesystem;
 class DataSourceCacheFetcherFixtureTests : public BaseCacheFetcherFixtureTests
 {
 protected:
-    std::vector<std::unique_ptr<TrRouting::DataSource>> objects;
-    std::map<boost::uuids::uuid, int> objectIndexesByUuid;
+    std::map<boost::uuids::uuid, TrRouting::DataSource> objects;
 
 public:
     void SetUp( ) override
@@ -33,14 +32,14 @@ public:
 
 TEST_F(DataSourceCacheFetcherFixtureTests, TestGetDataSourcesInvalid)
 {
-    int retVal = cacheFetcher.getDataSources(objects, objectIndexesByUuid, INVALID_CUSTOM_PATH);
+    int retVal = cacheFetcher.getDataSources(objects, INVALID_CUSTOM_PATH);
     ASSERT_EQ(-EBADMSG, retVal);
     ASSERT_EQ(0, objects.size());
 }
 
 TEST_F(DataSourceCacheFetcherFixtureTests, TestGetDataSourcesValid)
 {
-    int retVal = cacheFetcher.getDataSources(objects, objectIndexesByUuid, VALID_CUSTOM_PATH);
+    int retVal = cacheFetcher.getDataSources(objects, VALID_CUSTOM_PATH);
     ASSERT_EQ(0, retVal);
     // TODO Test with actual data
     ASSERT_EQ(0, objects.size());
@@ -48,7 +47,7 @@ TEST_F(DataSourceCacheFetcherFixtureTests, TestGetDataSourcesValid)
 
 TEST_F(DataSourceCacheFetcherFixtureTests, TestGetDataSourcesFileNotExists)
 {
-    int retVal = cacheFetcher.getDataSources(objects, objectIndexesByUuid, BASE_CUSTOM_PATH);
+    int retVal = cacheFetcher.getDataSources(objects, BASE_CUSTOM_PATH);
     ASSERT_EQ(-ENOENT, retVal);
     ASSERT_EQ(0, objects.size());
 }

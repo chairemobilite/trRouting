@@ -17,11 +17,66 @@
 namespace TrRouting
 {
 
+  std::string getOdTripModeStr(const odTrip::OdTrip::Mode &mode) {
+    std::string str;
+
+    switch (mode) {
+    case odTrip::OdTrip::Mode::NONE             : str = "none";            break;
+    case odTrip::OdTrip::Mode::WALKING          : str = "walking";         break;
+    case odTrip::OdTrip::Mode::CYCLING          : str = "cycling";         break;
+    case odTrip::OdTrip::Mode::CAR_DRIVER       : str = "carDriver";       break;
+    case odTrip::OdTrip::Mode::CAR_PASSENGER    : str = "carPassenger";    break;
+    case odTrip::OdTrip::Mode::MOTORCYCLE       : str = "motorcycle";      break;
+    case odTrip::OdTrip::Mode::TRANSIT          : str = "transit";         break;
+    case odTrip::OdTrip::Mode::PARATRANSIT      : str = "paratransit";     break;
+    case odTrip::OdTrip::Mode::TAXI             : str = "taxi";            break;
+    case odTrip::OdTrip::Mode::SCHOOL_BUS       : str = "schoolBus";       break;
+    case odTrip::OdTrip::Mode::OTHER_BUS        : str = "otherBus";        break;
+    case odTrip::OdTrip::Mode::INTERCITY_BUS    : str = "intercityBus";    break;
+    case odTrip::OdTrip::Mode::INTERCITY_TRAIN  : str = "intercityTrain";  break;
+    case odTrip::OdTrip::Mode::PLANE            : str = "plane";           break;
+    case odTrip::OdTrip::Mode::FERRY            : str = "ferry";           break;
+    case odTrip::OdTrip::Mode::PARK_AND_RIDE    : str = "parkAndRide";     break;
+    case odTrip::OdTrip::Mode::KISS_AND_RIDE    : str = "kissAndRide";     break;
+    case odTrip::OdTrip::Mode::BIKE_AND_RIDE    : str = "bikeAndRide";     break;
+    case odTrip::OdTrip::Mode::MULTIMODAL_OTHER : str = "multimodalOther"; break;
+    case odTrip::OdTrip::Mode::OTHER            : str = "other";           break;
+    case odTrip::OdTrip::Mode::UNKNOWN          : str = "unknown";         break;
+    }
+
+    return str;
+  }
+
+  std::string getOdTripActivityStr(const odTrip::OdTrip::Activity &activity) {
+    std::string str;
+    switch (activity) {
+    case odTrip::OdTrip::Activity::NONE             : str = "none";            break;
+    case odTrip::OdTrip::Activity::HOME             : str = "home";            break;
+    case odTrip::OdTrip::Activity::WORK_USUAL       : str = "workUsual";       break;
+    case odTrip::OdTrip::Activity::WORK_NON_USUAL   : str = "workNonUsual";    break;
+    case odTrip::OdTrip::Activity::SCHOOL_USUAL     : str = "schoolUsual";     break;
+    case odTrip::OdTrip::Activity::SCHOOL_NON_USUAL : str = "schoolNonUsual";  break;
+    case odTrip::OdTrip::Activity::SHOPPING         : str = "shopping";        break;
+    case odTrip::OdTrip::Activity::LEISURE          : str = "leisure";         break;
+    case odTrip::OdTrip::Activity::SERVICE          : str = "service";         break;
+    case odTrip::OdTrip::Activity::SECONDARY_HOME   : str = "secondaryHome";   break;
+    case odTrip::OdTrip::Activity::VISITING_FRIENDS : str = "visitingFriends"; break;
+    case odTrip::OdTrip::Activity::DROP_SOMEONE     : str = "dropSomeone";     break;
+    case odTrip::OdTrip::Activity::FETCH_SOMEONE    : str = "fetchSomeone";    break;
+    case odTrip::OdTrip::Activity::RESTAURANT       : str = "restaurant";      break;
+    case odTrip::OdTrip::Activity::MEDICAL          : str = "medical";         break;
+    case odTrip::OdTrip::Activity::WORSHIP          : str = "worship";         break;
+    case odTrip::OdTrip::Activity::ON_THE_ROAD      : str = "onTheRoad";       break;
+    case odTrip::OdTrip::Activity::OTHER            : str = "other";           break;
+    case odTrip::OdTrip::Activity::UNKNOWN          : str = "unknown";         break;
+    }
+    return str;
+  }
+
   int CacheFetcher::getOdTrips(
     std::vector<std::unique_ptr<OdTrip>>& ts,
     std::map<boost::uuids::uuid, int>& tIndexesByUuid,
-    const std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid,
-    const std::map<boost::uuids::uuid, int>& householdIndexesByUuid,
+    const std::map<boost::uuids::uuid, DataSource>& dataSources,
     const std::map<boost::uuids::uuid, int>& personIndexesByUuid,
     const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
     std::string customPath
@@ -40,7 +95,7 @@ namespace TrRouting
 
     spdlog::info("Fetching {} from cache... {}", tStr, customPath);
 
-    for(std::map<boost::uuids::uuid, int>::const_iterator iter = dataSourceIndexesByUuid.begin(); iter != dataSourceIndexesByUuid.end(); ++iter)
+    for(std::map<boost::uuids::uuid,  DataSource>::const_iterator iter = dataSources.begin(); iter != dataSources.end(); ++iter)
     {
       boost::uuids::uuid dataSourceUuid = iter->first;
 
@@ -78,104 +133,17 @@ namespace TrRouting
           {
             std::string uuid           {capnpT.getUuid()};
             std::string dataSourceUuid {capnpT.getDataSourceUuid()};
+            //TODO #167 Household are ignored for the moment
             std::string householdUuid  {capnpT.getHouseholdUuid()};
             std::string personUuid     {capnpT.getPersonUuid()};
 
-            std::unique_ptr<T> t               = std::make_unique<T>();
             std::unique_ptr<Point> origin      = std::make_unique<Point>();
             std::unique_ptr<Point> destination = std::make_unique<Point>();
-
-            t->uuid                     = uuidGenerator(uuid);
-            t->id                       = capnpT.getId();
-            t->expansionFactor          = capnpT.getExpansionFactor();
-            if (t->expansionFactor == -1.0) {
-              t->expansionFactor = 1.0;
-            }
-            t->internalId               = capnpT.getInternalId();
-            t->departureTimeSeconds     = capnpT.getDepartureTimeSeconds();
-            t->arrivalTimeSeconds       = capnpT.getArrivalTimeSeconds();
-            t->walkingTravelTimeSeconds = capnpT.getWalkingTravelTimeSeconds();
-            t->cyclingTravelTimeSeconds = capnpT.getCyclingTravelTimeSeconds();
-            t->drivingTravelTimeSeconds = capnpT.getDrivingTravelTimeSeconds();
 
             origin->latitude          = ((double)capnpT.getOriginLatitude())       / 1000000.0;
             origin->longitude         = ((double)capnpT.getOriginLongitude())      / 1000000.0;
             destination->latitude     = ((double)capnpT.getDestinationLatitude())  / 1000000.0;
             destination->longitude    = ((double)capnpT.getDestinationLongitude()) / 1000000.0;
-            t->origin                 = std::move(origin);
-            t->destination            = std::move(destination);
-
-            t->dataSourceIdx   = dataSourceUuid.length() > 0 ? dataSourceIndexesByUuid.at(uuidGenerator(dataSourceUuid)) : -1;
-            t->householdIdx    = householdUuid.length()  > 0 ? householdIndexesByUuid.at(uuidGenerator(householdUuid))   : -1;
-            t->personIdx       = personUuid.length()     > 0 ? personIndexesByUuid.at(uuidGenerator(personUuid))         : -1;
-
-            switch (capnpT.getMode()) {
-              case odTrip::OdTrip::Mode::NONE             : t->mode = "none";            break;
-              case odTrip::OdTrip::Mode::WALKING          : t->mode = "walking";         break;
-              case odTrip::OdTrip::Mode::CYCLING          : t->mode = "cycling";         break;
-              case odTrip::OdTrip::Mode::CAR_DRIVER       : t->mode = "carDriver";       break;
-              case odTrip::OdTrip::Mode::CAR_PASSENGER    : t->mode = "carPassenger";    break;
-              case odTrip::OdTrip::Mode::MOTORCYCLE       : t->mode = "motorcycle";      break;
-              case odTrip::OdTrip::Mode::TRANSIT          : t->mode = "transit";         break;
-              case odTrip::OdTrip::Mode::PARATRANSIT      : t->mode = "paratransit";     break;
-              case odTrip::OdTrip::Mode::TAXI             : t->mode = "taxi";            break;
-              case odTrip::OdTrip::Mode::SCHOOL_BUS       : t->mode = "schoolBus";       break;
-              case odTrip::OdTrip::Mode::OTHER_BUS        : t->mode = "otherBus";        break;
-              case odTrip::OdTrip::Mode::INTERCITY_BUS    : t->mode = "intercityBus";    break;
-              case odTrip::OdTrip::Mode::INTERCITY_TRAIN  : t->mode = "intercityTrain";  break;
-              case odTrip::OdTrip::Mode::PLANE            : t->mode = "plane";           break;
-              case odTrip::OdTrip::Mode::FERRY            : t->mode = "ferry";           break;
-              case odTrip::OdTrip::Mode::PARK_AND_RIDE    : t->mode = "parkAndRide";     break;
-              case odTrip::OdTrip::Mode::KISS_AND_RIDE    : t->mode = "kissAndRide";     break;
-              case odTrip::OdTrip::Mode::BIKE_AND_RIDE    : t->mode = "bikeAndRide";     break;
-              case odTrip::OdTrip::Mode::MULTIMODAL_OTHER : t->mode = "multimodalOther"; break;
-              case odTrip::OdTrip::Mode::OTHER            : t->mode = "other";           break;
-              case odTrip::OdTrip::Mode::UNKNOWN          : t->mode = "unknown";         break;
-            }
-
-            switch (capnpT.getOriginActivity()) {
-              case odTrip::OdTrip::Activity::NONE             : t->originActivity = "none";            break;
-              case odTrip::OdTrip::Activity::HOME             : t->originActivity = "home";            break;
-              case odTrip::OdTrip::Activity::WORK_USUAL       : t->originActivity = "workUsual";       break;
-              case odTrip::OdTrip::Activity::WORK_NON_USUAL   : t->originActivity = "workNonUsual";    break;
-              case odTrip::OdTrip::Activity::SCHOOL_USUAL     : t->originActivity = "schoolUsual";     break;
-              case odTrip::OdTrip::Activity::SCHOOL_NON_USUAL : t->originActivity = "schoolNonUsual";  break;
-              case odTrip::OdTrip::Activity::SHOPPING         : t->originActivity = "shopping";        break;
-              case odTrip::OdTrip::Activity::LEISURE          : t->originActivity = "leisure";         break;
-              case odTrip::OdTrip::Activity::SERVICE          : t->originActivity = "service";         break;
-              case odTrip::OdTrip::Activity::SECONDARY_HOME   : t->originActivity = "secondaryHome";   break;
-              case odTrip::OdTrip::Activity::VISITING_FRIENDS : t->originActivity = "visitingFriends"; break;
-              case odTrip::OdTrip::Activity::DROP_SOMEONE     : t->originActivity = "dropSomeone";     break;
-              case odTrip::OdTrip::Activity::FETCH_SOMEONE    : t->originActivity = "fetchSomeone";    break;
-              case odTrip::OdTrip::Activity::RESTAURANT       : t->originActivity = "restaurant";      break;
-              case odTrip::OdTrip::Activity::MEDICAL          : t->originActivity = "medical";         break;
-              case odTrip::OdTrip::Activity::WORSHIP          : t->originActivity = "worship";         break;
-              case odTrip::OdTrip::Activity::ON_THE_ROAD      : t->originActivity = "onTheRoad";       break;
-              case odTrip::OdTrip::Activity::OTHER            : t->originActivity = "other";           break;
-              case odTrip::OdTrip::Activity::UNKNOWN          : t->originActivity = "unknown";         break;
-            }
-
-            switch (capnpT.getDestinationActivity()) {
-              case odTrip::OdTrip::Activity::NONE             : t->destinationActivity = "none";            break;
-              case odTrip::OdTrip::Activity::HOME             : t->destinationActivity = "home";            break;
-              case odTrip::OdTrip::Activity::WORK_USUAL       : t->destinationActivity = "workUsual";       break;
-              case odTrip::OdTrip::Activity::WORK_NON_USUAL   : t->destinationActivity = "workNonUsual";    break;
-              case odTrip::OdTrip::Activity::SCHOOL_USUAL     : t->destinationActivity = "schoolUsual";     break;
-              case odTrip::OdTrip::Activity::SCHOOL_NON_USUAL : t->destinationActivity = "schoolNonUsual";  break;
-              case odTrip::OdTrip::Activity::SHOPPING         : t->destinationActivity = "shopping";        break;
-              case odTrip::OdTrip::Activity::LEISURE          : t->destinationActivity = "leisure";         break;
-              case odTrip::OdTrip::Activity::SERVICE          : t->destinationActivity = "service";         break;
-              case odTrip::OdTrip::Activity::SECONDARY_HOME   : t->destinationActivity = "secondaryHome";   break;
-              case odTrip::OdTrip::Activity::VISITING_FRIENDS : t->destinationActivity = "visitingFriends"; break;
-              case odTrip::OdTrip::Activity::DROP_SOMEONE     : t->destinationActivity = "dropSomeone";     break;
-              case odTrip::OdTrip::Activity::FETCH_SOMEONE    : t->destinationActivity = "fetchSomeone";    break;
-              case odTrip::OdTrip::Activity::RESTAURANT       : t->destinationActivity = "restaurant";      break;
-              case odTrip::OdTrip::Activity::MEDICAL          : t->destinationActivity = "medical";         break;
-              case odTrip::OdTrip::Activity::WORSHIP          : t->destinationActivity = "worship";         break;
-              case odTrip::OdTrip::Activity::ON_THE_ROAD      : t->destinationActivity = "onTheRoad";       break;
-              case odTrip::OdTrip::Activity::OTHER            : t->destinationActivity = "other";           break;
-              case odTrip::OdTrip::Activity::UNKNOWN          : t->destinationActivity = "unknown";         break;
-            }
 
             const unsigned int originNodesCount {capnpT.getOriginNodesUuids().size()};
             std::vector<int> originNodesIdx(originNodesCount);
@@ -188,9 +156,6 @@ namespace TrRouting
               originNodesTravelTimesSeconds[i] = capnpT.getOriginNodesTravelTimes()[i];
               originNodesDistancesMeters   [i] = capnpT.getOriginNodesDistances()[i];
             }
-            t->originNodesIdx                = originNodesIdx;
-            t->originNodesTravelTimesSeconds = originNodesTravelTimesSeconds;
-            t->originNodesDistancesMeters    = originNodesDistancesMeters;
 
             const unsigned int destinationNodesCount {capnpT.getDestinationNodesUuids().size()};
             std::vector<int> destinationNodesIdx(destinationNodesCount);
@@ -203,10 +168,32 @@ namespace TrRouting
               destinationNodesTravelTimesSeconds[i] = capnpT.getDestinationNodesTravelTimes()[i];
               destinationNodesDistancesMeters   [i] = capnpT.getDestinationNodesDistances()[i];
             }
-            t->destinationNodesIdx                = destinationNodesIdx;
-            t->destinationNodesTravelTimesSeconds = destinationNodesTravelTimesSeconds;
-            t->destinationNodesDistancesMeters    = destinationNodesDistancesMeters;
 
+            // Create new odTrip
+            std::unique_ptr<T> t = std::make_unique<T>(uuidGenerator(uuid),
+                                                       capnpT.getId(),
+                                                       capnpT.getInternalId(),
+                                                       dataSources.at(uuidGenerator(dataSourceUuid)),
+                                                       personUuid.length() > 0 ? personIndexesByUuid.at(uuidGenerator(personUuid)) : -1,
+                                                       capnpT.getDepartureTimeSeconds(),
+                                                       capnpT.getArrivalTimeSeconds(),
+                                                       capnpT.getWalkingTravelTimeSeconds(),
+                                                       capnpT.getCyclingTravelTimeSeconds(),
+                                                       capnpT.getDrivingTravelTimeSeconds(),
+                                                       //TODO comparison with float is fishy, confirm it's ok
+                                                       capnpT.getExpansionFactor() == -1.0 ? 1.0 : capnpT.getExpansionFactor(),
+                                                       getOdTripModeStr(capnpT.getMode()),
+                                                       getOdTripActivityStr(capnpT.getOriginActivity()),
+                                                       getOdTripActivityStr(capnpT.getDestinationActivity()),
+                                                       originNodesIdx,
+                                                       originNodesTravelTimesSeconds,
+                                                       originNodesDistancesMeters,
+                                                       destinationNodesIdx,
+                                                       destinationNodesTravelTimesSeconds,
+                                                       destinationNodesDistancesMeters,
+                                                       std::move(origin),
+                                                       std::move(destination)
+                                                       );
             tIndexesByUuid[t->uuid] = ts.size();
             ts.push_back(std::move(t));
 
@@ -217,6 +204,10 @@ namespace TrRouting
         catch (const kj::Exception& e)
         {
           spdlog::error("Error opening cache file {}: {}", filePath, e.getDescription().cStr());
+        }
+        catch (const std::exception& e)
+        {
+          spdlog::error("Unknown error occurred {} {}", tStr, e.what());
         }
         catch (...)
         {

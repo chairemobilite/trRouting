@@ -13,10 +13,11 @@ gtest_SOURCES = gtest.cpp \
     ../../src/paths_cache_fetcher.cpp paths_cache_fetcher_test.cpp \
     ../../src/calculation_time.cpp \
     ../../src/trips_and_connections_cache_fetcher.cpp schedules_cache_fetcher_test.cpp \
-    ../../src/households_cache_fetcher.cpp households_cache_fetcher_test.cpp \
     ../../src/persons_cache_fetcher.cpp persons_cache_fetcher_test.cpp \
-    ../../src/od_trips_cache_fetcher.cpp od_trips_cache_fetcher_test.cpp \
-    ../../src/places_cache_fetcher.cpp places_cache_fetcher_test.cpp
+    ../../src/od_trips_cache_fetcher.cpp od_trips_cache_fetcher_test.cpp
+#TODO #167 Place/Household removed while refactoring
+#../../src/places_cache_fetcher.cpp places_cache_fetcher_test.cpp
+#../../src/households_cache_fetcher.cpp households_cache_fetcher_test.cpp
 
 gtest_LDADD = $(top_srcdir)/tests/libgtest.la
 

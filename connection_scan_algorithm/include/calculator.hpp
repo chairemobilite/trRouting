@@ -104,10 +104,12 @@ namespace TrRouting
      * -(error codes from the open system call)
      */
     int                    updateDataSourcesFromCache(std::string customPath = "");
-    int                    updateHouseholdsFromCache (std::string customPath = "");
+    // TODO #167
+    //int                    updateHouseholdsFromCache (std::string customPath = "");
     int                    updatePersonsFromCache    (std::string customPath = "");
     int                    updateOdTripsFromCache    (std::string customPath = "");
-    int                    updatePlacesFromCache     (std::string customPath = "");
+    // TODO #167
+    //int                    updatePlacesFromCache     (std::string customPath = "");
 
     int                    updateStationsFromCache   (std::string customPath = "");
     int                    updateAgenciesFromCache   (std::string customPath = "");
@@ -142,21 +144,14 @@ namespace TrRouting
     // TODO eventually, this will be moved to a const data container
     const std::map<std::string, Mode> & getModes() {return modes;}
 
-    std::vector<std::unique_ptr<DataSource>> dataSources;
-    std::map<boost::uuids::uuid, int>        dataSourceIndexesByUuid;
-
-    std::vector<std::unique_ptr<Household>>  households;
-    std::map<boost::uuids::uuid, int>        householdIndexesByUuid;
+    std::map<boost::uuids::uuid, DataSource> dataSources;
+    const std::map<boost::uuids::uuid, DataSource> & getDataSources() {return dataSources;}
 
     std::vector<std::unique_ptr<Person>>     persons;
     std::map<boost::uuids::uuid, int>        personIndexesByUuid;
 
     std::vector<std::unique_ptr<OdTrip>>     odTrips;
     std::map<boost::uuids::uuid, int>        odTripIndexesByUuid;
-
-    std::vector<std::unique_ptr<Place>>      places;
-    std::map<boost::uuids::uuid, int>        placeIndexesByUuid;
-
 
     std::vector<std::unique_ptr<Agency>>     agencies;
     std::map<boost::uuids::uuid, int>        agencyIndexesByUuid;

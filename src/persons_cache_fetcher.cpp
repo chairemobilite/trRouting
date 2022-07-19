@@ -16,13 +16,73 @@
 
 namespace TrRouting
 {
+  class DataSource;
+
+  std::string getPersonAgeGroupStr(const person::Person::AgeGroup& group) {
+    std::string str;
+
+    switch (group) {
+      case person::Person::AgeGroup::NONE     : str = "none";     break;
+      case person::Person::AgeGroup::AG0004   : str = "ag0004";   break;
+      case person::Person::AgeGroup::AG0509   : str = "ag0509";   break;
+      case person::Person::AgeGroup::AG1014   : str = "ag1014";   break;
+      case person::Person::AgeGroup::AG1519   : str = "ag1519";   break;
+      case person::Person::AgeGroup::AG2024   : str = "ag2024";   break;
+      case person::Person::AgeGroup::AG2529   : str = "ag2529";   break;
+      case person::Person::AgeGroup::AG3034   : str = "ag3034";   break;
+      case person::Person::AgeGroup::AG3539   : str = "ag3539";   break;
+      case person::Person::AgeGroup::AG4044   : str = "ag4044";   break;
+      case person::Person::AgeGroup::AG4549   : str = "ag4549";   break;
+      case person::Person::AgeGroup::AG5054   : str = "ag5054";   break;
+      case person::Person::AgeGroup::AG5559   : str = "ag5559";   break;
+      case person::Person::AgeGroup::AG6064   : str = "ag6064";   break;
+      case person::Person::AgeGroup::AG6569   : str = "ag6569";   break;
+      case person::Person::AgeGroup::AG7074   : str = "ag7074";   break;
+      case person::Person::AgeGroup::AG7579   : str = "ag7579";   break;
+      case person::Person::AgeGroup::AG8084   : str = "ag8084";   break;
+      case person::Person::AgeGroup::AG8589   : str = "ag8589";   break;
+      case person::Person::AgeGroup::AG9094   : str = "ag9094";   break;
+      case person::Person::AgeGroup::AG95PLUS : str = "ag95plus"; break;
+      case person::Person::AgeGroup::UNKNOWN  : str = "unknown";  break;
+    }
+    return str;
+  }
+
+  std::string getPersonGenderStr(const person::Person::Gender &gender) {
+    std::string str;
+
+    switch (gender) {
+      case person::Person::Gender::NONE    : str = "none";    break;
+      case person::Person::Gender::FEMALE  : str = "female";  break;
+      case person::Person::Gender::MALE    : str = "male";    break;
+      case person::Person::Gender::CUSTOM  : str = "custom";  break;
+      case person::Person::Gender::UNKNOWN : str = "unknown"; break;
+    }
+    return str;
+  }
+
+  std::string getPersonOccupationStr(const person::Person::Occupation &occupation) {
+    std::string str;
+    switch (occupation) {
+      case person::Person::Occupation::NONE               : str = "none";             break;
+      case person::Person::Occupation::FULL_TIME_WORKER   : str = "fullTimeWorker";   break;
+      case person::Person::Occupation::PART_TIME_WORKER   : str = "partTimeWorker";   break;
+      case person::Person::Occupation::FULL_TIME_STUDENT  : str = "fullTimeStudent";  break;
+      case person::Person::Occupation::PART_TIME_STUDENT  : str = "partTimeStudent";  break;
+      case person::Person::Occupation::WORKER_AND_STUDENT : str = "workerAndStudent"; break;
+      case person::Person::Occupation::RETIRED            : str = "retired";          break;
+      case person::Person::Occupation::AT_HOME            : str = "atHome";           break;
+      case person::Person::Occupation::OTHER              : str = "other";            break;
+      case person::Person::Occupation::NON_APPLICABLE     : str = "nonApplicable";    break;
+      case person::Person::Occupation::UNKNOWN            : str = "unknown";          break;
+    }
+    return str;
+  }
 
   int CacheFetcher::getPersons(
     std::vector<std::unique_ptr<Person>>& ts,
     std::map<boost::uuids::uuid, int>& tIndexesByUuid,
-    const std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid,
-    const std::map<boost::uuids::uuid, int>& householdIndexesByUuid,
-    const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
+    const std::map<boost::uuids::uuid, DataSource>& dataSources,
     std::string customPath
   )
   { 
@@ -42,7 +102,7 @@ namespace TrRouting
 
     spdlog::info("Fetching {} from cache... {}", tStr, customPath);
 
-    for(std::map<boost::uuids::uuid, int>::const_iterator iter = dataSourceIndexesByUuid.begin(); iter != dataSourceIndexesByUuid.end(); ++iter)
+    for(std::map<boost::uuids::uuid, DataSource>::const_iterator iter = dataSources.begin(); iter != dataSources.end(); ++iter)
     {
       boost::uuids::uuid dataSourceUuid = iter->first;
 
@@ -80,72 +140,13 @@ namespace TrRouting
           {
             std::string uuid           {capnpT.getUuid()};
             std::string dataSourceUuid {capnpT.getDataSourceUuid()};
+            //TODO #167 Household are ignored for the moment
             std::string householdUuid  {capnpT.getHouseholdUuid()};
 
             std::unique_ptr<Point> usualWorkPlace   = std::make_unique<Point>();
             std::unique_ptr<Point> usualSchoolPlace = std::make_unique<Point>();
-            std::unique_ptr<T> t                    = std::make_unique<T>();
-            
-            t->uuid                  = uuidGenerator(uuid);
-            t->id                    = capnpT.getId();
-            t->expansionFactor       = capnpT.getExpansionFactor();
-            t->age                   = capnpT.getAge();
-            t->internalId            = capnpT.getInternalId();
-            t->drivingLicenseOwner   = capnpT.getDrivingLicenseOwner();
-            t->transitPassOwner      = capnpT.getTransitPassOwner();
 
-            t->dataSourceIdx   = dataSourceUuid.length() > 0 ? dataSourceIndexesByUuid.at(uuidGenerator(dataSourceUuid)) : -1;
-            t->householdIdx    = householdUuid.length()  > 0 ? householdIndexesByUuid.at(uuidGenerator(householdUuid))   : -1;
-
-            switch (capnpT.getAgeGroup()) {
-              case person::Person::AgeGroup::NONE     : t->ageGroup = "none";     break;
-              case person::Person::AgeGroup::AG0004   : t->ageGroup = "ag0004";   break;
-              case person::Person::AgeGroup::AG0509   : t->ageGroup = "ag0509";   break;
-              case person::Person::AgeGroup::AG1014   : t->ageGroup = "ag1014";   break;
-              case person::Person::AgeGroup::AG1519   : t->ageGroup = "ag1519";   break;
-              case person::Person::AgeGroup::AG2024   : t->ageGroup = "ag2024";   break;
-              case person::Person::AgeGroup::AG2529   : t->ageGroup = "ag2529";   break;
-              case person::Person::AgeGroup::AG3034   : t->ageGroup = "ag3034";   break;
-              case person::Person::AgeGroup::AG3539   : t->ageGroup = "ag3539";   break;
-              case person::Person::AgeGroup::AG4044   : t->ageGroup = "ag4044";   break;
-              case person::Person::AgeGroup::AG4549   : t->ageGroup = "ag4549";   break;
-              case person::Person::AgeGroup::AG5054   : t->ageGroup = "ag5054";   break;
-              case person::Person::AgeGroup::AG5559   : t->ageGroup = "ag5559";   break;
-              case person::Person::AgeGroup::AG6064   : t->ageGroup = "ag6064";   break;
-              case person::Person::AgeGroup::AG6569   : t->ageGroup = "ag6569";   break;
-              case person::Person::AgeGroup::AG7074   : t->ageGroup = "ag7074";   break;
-              case person::Person::AgeGroup::AG7579   : t->ageGroup = "ag7579";   break;
-              case person::Person::AgeGroup::AG8084   : t->ageGroup = "ag8084";   break;
-              case person::Person::AgeGroup::AG8589   : t->ageGroup = "ag8589";   break;
-              case person::Person::AgeGroup::AG9094   : t->ageGroup = "ag9094";   break;
-              case person::Person::AgeGroup::AG95PLUS : t->ageGroup = "ag95plus"; break;
-              case person::Person::AgeGroup::UNKNOWN  : t->ageGroup = "unknown";  break;
-            }
-
-            switch (capnpT.getGender()) {
-              case person::Person::Gender::NONE    : t->gender = "none";    break;
-              case person::Person::Gender::FEMALE  : t->gender = "female";  break;
-              case person::Person::Gender::MALE    : t->gender = "male";    break;
-              case person::Person::Gender::CUSTOM  : t->gender = "custom";  break;
-              case person::Person::Gender::UNKNOWN : t->gender = "unknown"; break;
-            }
-
-            switch (capnpT.getOccupation()) {
-              case person::Person::Occupation::NONE               : t->occupation = "none";             break;
-              case person::Person::Occupation::FULL_TIME_WORKER   : t->occupation = "fullTimeWorker";   break;
-              case person::Person::Occupation::PART_TIME_WORKER   : t->occupation = "partTimeWorker";   break;
-              case person::Person::Occupation::FULL_TIME_STUDENT  : t->occupation = "fullTimeStudent";  break;
-              case person::Person::Occupation::PART_TIME_STUDENT  : t->occupation = "partTimeStudent";  break;
-              case person::Person::Occupation::WORKER_AND_STUDENT : t->occupation = "workerAndStudent"; break;
-              case person::Person::Occupation::RETIRED            : t->occupation = "retired";          break;
-              case person::Person::Occupation::AT_HOME            : t->occupation = "atHome";           break;
-              case person::Person::Occupation::OTHER              : t->occupation = "other";            break;
-              case person::Person::Occupation::NON_APPLICABLE     : t->occupation = "nonApplicable";    break;
-              case person::Person::Occupation::UNKNOWN            : t->occupation = "unknown";          break;
-            }
-
-
-
+            /* TODO #167
             usualWorkPlace->latitude  = ((double)capnpT.getUsualWorkPlaceLatitude())  / 1000000.0;
             usualWorkPlace->longitude = ((double)capnpT.getUsualWorkPlaceLongitude()) / 1000000.0;
             t->usualWorkPlace         = std::move(usualWorkPlace);
@@ -186,7 +187,6 @@ namespace TrRouting
             t->usualSchoolPlaceNodesTravelTimesSeconds = usualSchoolPlaceNodesTravelTimesSeconds;
             t->usualSchoolPlaceNodesDistancesMeters    = usualSchoolPlaceNodesDistancesMeters;
 
-            t->internalId                               = capnpT.getInternalId();
             t->usualWorkPlaceWalkingTravelTimeSeconds   = capnpT.getUsualWorkPlaceWalkingTravelTimeSeconds();
             t->usualWorkPlaceCyclingTravelTimeSeconds   = capnpT.getUsualWorkPlaceCyclingTravelTimeSeconds();
             t->usualWorkPlaceDrivingTravelTimeSeconds   = capnpT.getUsualWorkPlaceDrivingTravelTimeSeconds();
@@ -194,6 +194,20 @@ namespace TrRouting
             t->usualSchoolPlaceCyclingTravelTimeSeconds = capnpT.getUsualSchoolPlaceCyclingTravelTimeSeconds();
             t->usualSchoolPlaceDrivingTravelTimeSeconds = capnpT.getUsualSchoolPlaceDrivingTravelTimeSeconds();
 
+            */
+
+            std::unique_ptr<T> t = std::make_unique<T>(uuidGenerator(uuid),
+                                                       capnpT.getId(),
+                                                       dataSources.at(uuidGenerator(dataSourceUuid)),
+                                                       capnpT.getExpansionFactor(),
+                                                       capnpT.getAge(),
+                                                       capnpT.getDrivingLicenseOwner(),
+                                                       capnpT.getTransitPassOwner(),
+                                                       getPersonAgeGroupStr(capnpT.getAgeGroup()),
+                                                       getPersonGenderStr(capnpT.getGender()),
+                                                       getPersonOccupationStr(capnpT.getOccupation()),
+                                                       capnpT.getInternalId()
+                                                       );
             tIndexesByUuid[t->uuid] = ts.size();
             ts.push_back(std::move(t));
           }

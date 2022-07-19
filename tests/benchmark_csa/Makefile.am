@@ -13,13 +13,14 @@ gtest_SOURCES = gtest.cpp \
     ../../src/paths_cache_fetcher.cpp \
     ../../src/calculation_time.cpp \
     ../../src/trips_and_connections_cache_fetcher.cpp \
-    ../../src/households_cache_fetcher.cpp \
     ../../src/persons_cache_fetcher.cpp \
     ../../src/modes_initialization.cpp \
     ../../src/od_trips_cache_fetcher.cpp \
-    ../../src/osrm_fetcher.cpp \
-    ../../src/places_cache_fetcher.cpp
+    ../../src/osrm_fetcher.cpp
 
+#TODO #167 Place/Household removed while refactoring
+#../../src/households_cache_fetcher.cpp \
+#../../src/places_cache_fetcher.cpp
 
 gtest_LDADD = $(top_srcdir)/tests/libgtest.la ../../connection_scan_algorithm/src/libcsa.la
 
