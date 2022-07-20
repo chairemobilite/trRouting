@@ -9,6 +9,7 @@ RUN apt-get update && \
 COPY . /source    
 RUN autoreconf -i && \
     ./configure && \
+    make clean && \
     make -j5 && \
     make install
 
