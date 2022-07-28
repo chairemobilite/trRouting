@@ -23,7 +23,7 @@ namespace TrRouting
     std::map<boost::uuids::uuid, int>& tIndexesByUuid,
     const std::map<boost::uuids::uuid, int>& serviceIndexesByUuid,
     const std::map<boost::uuids::uuid, int>& lineIndexesByUuid,
-    const std::map<boost::uuids::uuid, int>& agencyIndexesByUuid,
+    const std::map<boost::uuids::uuid, Agency>& agencies,
     const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
     const std::map<std::string, Mode>& modes,
     std::string customPath
@@ -74,11 +74,11 @@ namespace TrRouting
 
         std::vector<int> servicesIdx;
         std::vector<int> onlyLinesIdx;
-        std::vector<int> onlyAgenciesIdx;
+        std::vector<std::reference_wrapper<const Agency>> onlyAgencies;
         std::vector<int> onlyNodesIdx;
         std::vector<std::reference_wrapper<const Mode>> onlyModes;
         std::vector<int> exceptLinesIdx;
-        std::vector<int> exceptAgenciesIdx;
+        std::vector<std::reference_wrapper<const Agency>> exceptAgencies;
         std::vector<int> exceptNodesIdx;
         std::vector<std::reference_wrapper<const Mode>> exceptModes;
         boost::uuids::uuid serviceUuid;
@@ -113,12 +113,12 @@ namespace TrRouting
         for (std::string agencyUuidStr : capnpT.getOnlyAgenciesUuids())
         {
           agencyUuid = uuidGenerator(agencyUuidStr);
-          if (agencyIndexesByUuid.count(agencyUuid) != 0)
+          if (agencies.count(agencyUuid) != 0)
           {
-            onlyAgenciesIdx.push_back(agencyIndexesByUuid.at(agencyUuid));
+            onlyAgencies.push_back(agencies.at(agencyUuid));
           }
         }
-        t->onlyAgenciesIdx = onlyAgenciesIdx;
+        t->onlyAgencies = onlyAgencies;
         for (std::string nodeUuidStr : capnpT.getOnlyNodesUuids())
         {
           nodeUuid = uuidGenerator(nodeUuidStr);
@@ -149,12 +149,12 @@ namespace TrRouting
         for (std::string agencyUuidStr : capnpT.getExceptAgenciesUuids())
         {
           agencyUuid = uuidGenerator(agencyUuidStr);
-          if (agencyIndexesByUuid.count(agencyUuid) != 0)
+          if (agencies.count(agencyUuid) != 0)
           {
-            exceptAgenciesIdx.push_back(agencyIndexesByUuid.at(agencyUuid));
+            exceptAgencies.push_back(agencies.at(agencyUuid));
           }
         }
-        t->exceptAgenciesIdx = exceptAgenciesIdx;
+        t->exceptAgencies = exceptAgencies;
         for (std::string nodeUuidStr : capnpT.getExceptNodesUuids())
         {
           nodeUuid = uuidGenerator(nodeUuidStr);

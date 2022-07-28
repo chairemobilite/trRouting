@@ -49,7 +49,7 @@ namespace TrRouting
   */ 
   int Calculator::updateAgenciesFromCache(std::string customPath)
   {
-    return dataFetcher.getAgencies(agencies, agencyIndexesByUuid, customPath);
+    return dataFetcher.getAgencies(agencies, customPath);
   }
 
   int Calculator::updateServicesFromCache(std::string customPath)
@@ -59,7 +59,7 @@ namespace TrRouting
 
   int Calculator::updateLinesFromCache(std::string customPath)
   {
-    return dataFetcher.getLines(lines, lineIndexesByUuid, agencyIndexesByUuid, getModes(), customPath);
+    return dataFetcher.getLines(lines, lineIndexesByUuid, agencies, getModes(), customPath);
   }
 
   int Calculator::updatePathsFromCache(std::string customPath)
@@ -69,7 +69,7 @@ namespace TrRouting
 
   int Calculator::updateScenariosFromCache(std::string customPath)
   {
-    return dataFetcher.getScenarios(scenarios, scenarioIndexesByUuid, serviceIndexesByUuid, lineIndexesByUuid, agencyIndexesByUuid, nodeIndexesByUuid, getModes(), customPath);
+    return dataFetcher.getScenarios(scenarios, scenarioIndexesByUuid, serviceIndexesByUuid, lineIndexesByUuid, agencies, nodeIndexesByUuid, getModes(), customPath);
   }
 
   int Calculator::updateSchedulesFromCache(std::string customPath)
@@ -83,7 +83,6 @@ namespace TrRouting
       serviceIndexesByUuid,
       lineIndexesByUuid,
       pathIndexesByUuid,
-      agencyIndexesByUuid,
       nodeIndexesByUuid,
       tripConnectionDepartureTimes,
       tripConnectionDemands,

@@ -179,15 +179,11 @@ void BaseCsaFixtureTests::setUpNodes()
 
 void BaseCsaFixtureTests::setUpAgencies()
 {
-    std::vector<std::unique_ptr<TrRouting::Agency>>& array = calculator.agencies;
-    std::map<boost::uuids::uuid, int>& arrayIndexesByUuid = calculator.agencyIndexesByUuid;
-
-    std::unique_ptr<TrRouting::Agency> agency = std::make_unique<TrRouting::Agency>();
-    agency->uuid = agencyUuid;
-    agency->name = "Unit Test Agency";
-    agency->acronym = "UT";
-    arrayIndexesByUuid[agency->uuid] = array.size();
-    array.push_back(std::move(agency));
+    TrRouting::Agency agency;
+    agency.uuid = agencyUuid;
+    agency.name = "Unit Test Agency";
+    agency.acronym = "UT";
+    calculator.agencies[agencyUuid] = agency;
 }
 
 void BaseCsaFixtureTests::setUpLines()
@@ -195,18 +191,19 @@ void BaseCsaFixtureTests::setUpLines()
     std::vector<std::unique_ptr<TrRouting::Line>>& array = calculator.lines;
     std::map<boost::uuids::uuid, int>& arrayIndexesByUuid = calculator.lineIndexesByUuid;
     auto & busMode = calculator.getModes().at("bus");
+    const auto & defaultAgency = calculator.agencies.at(agencyUuid);
 
-    std::unique_ptr<TrRouting::Line> lineSN = std::make_unique<TrRouting::Line>(lineSNUuid, 0, busMode, "01", "South/North", "", 0);
+    std::unique_ptr<TrRouting::Line> lineSN = std::make_unique<TrRouting::Line>(lineSNUuid, defaultAgency, busMode, "01", "South/North", "", 0);
 
     arrayIndexesByUuid[lineSN->uuid] = array.size();
     array.push_back(std::move(lineSN));
 
-    std::unique_ptr<TrRouting::Line> lineEW = std::make_unique<TrRouting::Line>(lineEWUuid, 0, busMode, "02", "East/West", "", 0);
+    std::unique_ptr<TrRouting::Line> lineEW = std::make_unique<TrRouting::Line>(lineEWUuid, defaultAgency, busMode, "02", "East/West", "", 0);
 
     arrayIndexesByUuid[lineEW->uuid] = array.size();
     array.push_back(std::move(lineEW));
 
-    std::unique_ptr<TrRouting::Line> lineExtra = std::make_unique<TrRouting::Line>(lineExtraUuid, 0, busMode, "03", "Extra", "", 0);
+    std::unique_ptr<TrRouting::Line> lineExtra = std::make_unique<TrRouting::Line>(lineExtraUuid, defaultAgency, busMode, "03", "Extra", "", 0);
 
     arrayIndexesByUuid[lineExtra->uuid] = array.size();
     array.push_back(std::move(lineExtra));
@@ -341,7 +338,7 @@ void BaseCsaFixtureTests::setUpSchedules(std::vector<std::shared_ptr<TrRouting::
 
     // South/North trip 1 at 10
     std::unique_ptr<TrRouting::Trip> snTrip1 = std::make_unique<TrRouting::Trip>(trip1SNUuid,
-                                                                                 calculator.agencyIndexesByUuid[agencyUuid],
+                                                                                 calculator.agencies.at(agencyUuid),
                                                                                  calculator.lineIndexesByUuid[lineSNUuid],
                                                                                  calculator.pathIndexesByUuid[pathSNUuid],
                                                                                  busMode,
@@ -359,7 +356,7 @@ void BaseCsaFixtureTests::setUpSchedules(std::vector<std::shared_ptr<TrRouting::
 
     // South/North trip 2 at 11
     std::unique_ptr<TrRouting::Trip> snTrip2 = std::make_unique<TrRouting::Trip>(trip2SNUuid,
-                                                                                 calculator.agencyIndexesByUuid[agencyUuid],
+                                                                                 calculator.agencies.at(agencyUuid),
                                                                                  calculator.lineIndexesByUuid[lineSNUuid],
                                                                                  calculator.pathIndexesByUuid[pathSNUuid],
                                                                                  busMode,
@@ -377,7 +374,7 @@ void BaseCsaFixtureTests::setUpSchedules(std::vector<std::shared_ptr<TrRouting::
 
     // East/West trip 1 at 9
     std::unique_ptr<TrRouting::Trip> ewTrip1 = std::make_unique<TrRouting::Trip>(trip1EWUuid,
-                                                                                 calculator.agencyIndexesByUuid[agencyUuid],
+                                                                                 calculator.agencies.at(agencyUuid),
                                                                                  calculator.lineIndexesByUuid[lineEWUuid],
                                                                                  calculator.pathIndexesByUuid[pathEWUuid],
                                                                                  busMode,
@@ -395,7 +392,7 @@ void BaseCsaFixtureTests::setUpSchedules(std::vector<std::shared_ptr<TrRouting::
 
     // East/West trip 2 at 10:02
     std::unique_ptr<TrRouting::Trip> ewTrip2 = std::make_unique<TrRouting::Trip>(trip2EWUuid,
-                                                                                 calculator.agencyIndexesByUuid[agencyUuid],
+                                                                                 calculator.agencies.at(agencyUuid),
                                                                                  calculator.lineIndexesByUuid[lineEWUuid],
                                                                                  calculator.pathIndexesByUuid[pathEWUuid],
                                                                                  busMode,
@@ -413,7 +410,7 @@ void BaseCsaFixtureTests::setUpSchedules(std::vector<std::shared_ptr<TrRouting::
 
     // Extra trip at 10h20
     std::unique_ptr<TrRouting::Trip> extraTrip1 = std::make_unique<TrRouting::Trip>(trip1ExtraUuid,
-                                                                                 calculator.agencyIndexesByUuid[agencyUuid],
+                                                                                 calculator.agencies.at(agencyUuid),
                                                                                  calculator.lineIndexesByUuid[lineExtraUuid],
                                                                                  calculator.pathIndexesByUuid[pathExtraUuid],
                                                                                  busMode,

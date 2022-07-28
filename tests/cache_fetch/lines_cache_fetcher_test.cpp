@@ -14,7 +14,7 @@ class LineCacheFetcherFixtureTests : public BaseCacheFetcherFixtureTests
 protected:
     std::vector<std::unique_ptr<TrRouting::Line>> objects;
     std::map<boost::uuids::uuid, int> objectIndexesByUuid;
-    std::map<boost::uuids::uuid, int> agencyIndexesByUuid;
+    std::map<boost::uuids::uuid, TrRouting::Agency> agencies;
     std::map<std::string, TrRouting::Mode> modes;
 
 public:
@@ -25,8 +25,7 @@ public:
         fs::copy_file(BASE_CACHE_DIRECTORY_NAME + "/" + INVALID_CUSTOM_PATH + "/genericInvalid.capnpbin", BASE_CACHE_DIRECTORY_NAME + "/" + INVALID_CUSTOM_PATH + "/lines.capnpbin");
 
         // Load valid data 
-        std::vector<std::unique_ptr<TrRouting::Agency>>     agencies;
-        int retVal = cacheFetcher.getAgencies(agencies, agencyIndexesByUuid, VALID_CUSTOM_PATH);
+        int retVal = cacheFetcher.getAgencies(agencies, VALID_CUSTOM_PATH);
 
         std::vector<std::unique_ptr<TrRouting::Line>> lines;
 
@@ -44,21 +43,21 @@ public:
 
 TEST_F(LineCacheFetcherFixtureTests, TestGetLinesInvalid)
 {
-    int retVal = cacheFetcher.getLines(objects, objectIndexesByUuid, agencyIndexesByUuid, modes, INVALID_CUSTOM_PATH);
+    int retVal = cacheFetcher.getLines(objects, objectIndexesByUuid, agencies, modes, INVALID_CUSTOM_PATH);
     ASSERT_EQ(-EBADMSG, retVal);
     ASSERT_EQ(0, objects.size());
 }
 
 TEST_F(LineCacheFetcherFixtureTests, TestGetLinesValid)
 {
-    int retVal = cacheFetcher.getLines(objects, objectIndexesByUuid, agencyIndexesByUuid, modes, VALID_CUSTOM_PATH);
+    int retVal = cacheFetcher.getLines(objects, objectIndexesByUuid, agencies, modes, VALID_CUSTOM_PATH);
     ASSERT_EQ(0, retVal);
     ASSERT_EQ(2, objects.size());
 }
 
 TEST_F(LineCacheFetcherFixtureTests, TestGetLinesFileNotExists)
 {
-    int retVal = cacheFetcher.getLines(objects, objectIndexesByUuid, agencyIndexesByUuid, modes, BASE_CUSTOM_PATH);
+    int retVal = cacheFetcher.getLines(objects, objectIndexesByUuid, agencies, modes, BASE_CUSTOM_PATH);
     ASSERT_EQ(-ENOENT, retVal);
     ASSERT_EQ(0, objects.size());
 }
