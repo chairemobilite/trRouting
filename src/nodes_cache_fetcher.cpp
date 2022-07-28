@@ -24,7 +24,6 @@ namespace TrRouting
   int CacheFetcher::getNodes(
     std::vector<std::unique_ptr<Node>>& ts,
     std::map<boost::uuids::uuid, int>& tIndexesByUuid,
-    const std::map<boost::uuids::uuid, int>& stationIndexesByUuid,
     std::string customPath
   )
   {
@@ -71,7 +70,8 @@ namespace TrRouting
       for (cT::Reader capnpT : capnpTCollection.getNodes())
       {
         std::string uuid        {capnpT.getUuid()};
-        std::string stationUuid {capnpT.getStationUuid()};
+        //TODO Station related code was removed, keeping this to highlight the capnp data is ignored
+        //std::string stationUuid {capnpT.getStationUuid()};
 
         std::unique_ptr<Point> point = std::make_unique<Point>();
         std::unique_ptr<T> t         = std::make_unique<T>();
@@ -81,15 +81,6 @@ namespace TrRouting
         t->code       = capnpT.getCode();
         t->name       = capnpT.getName();
         t->internalId = capnpT.getInternalId();
-
-        if (stationUuid.length() > 0 && stationIndexesByUuid.count(uuidGenerator(stationUuid)) != 0)
-        {
-          t->stationIdx = stationIndexesByUuid.at(uuidGenerator(stationUuid));
-        }
-        else
-        {
-          t->stationIdx = -1;
-        }
 
         point->latitude  = ((double)capnpT.getLatitude())  / 1000000.0;
         point->longitude = ((double)capnpT.getLongitude()) / 1000000.0;

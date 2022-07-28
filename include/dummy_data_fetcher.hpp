@@ -17,7 +17,6 @@ namespace TrRouting
   class Place;
   class Agency;
   class Service;
-  class Station;
   class Node;
   class Stop;
   class Line;
@@ -69,16 +68,9 @@ namespace TrRouting
       std::string customPath = ""
                             ) {return 0;}
 
-    virtual int getStations(
-      std::vector<std::unique_ptr<Station>>& ts,
-      std::map<boost::uuids::uuid, int>& tIndexesById,
-      std::string customPath = ""
-                            ) {return 0;}
-
     virtual int getNodes(
       std::vector<std::unique_ptr<Node>>& ts,
       std::map<boost::uuids::uuid, int>& tIndexesById,
-      const std::map<boost::uuids::uuid, int>& stationIndexesById,
       std::string customPath = ""
                          ) {return 0;}
 

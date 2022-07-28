@@ -33,11 +33,8 @@ public:
         auto modes = cacheFetcher.getModes();
         cacheFetcher.getLines(lines, lineIndexesByUuid, agencies, modes, VALID_CUSTOM_PATH);
 
-        // Empty Station
-        std::map<boost::uuids::uuid, int>        stationIndexesByUuid;
-
         std::vector<std::unique_ptr<TrRouting::Node>> nodes;
-        cacheFetcher.getNodes(nodes, nodeIndexesByUuid, stationIndexesByUuid, VALID_CUSTOM_PATH);
+        cacheFetcher.getNodes(nodes, nodeIndexesByUuid, VALID_CUSTOM_PATH);
     }
 
     void TearDown( ) override
