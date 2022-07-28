@@ -9,7 +9,6 @@ gtest_SOURCES = gtest.cpp \
     ../../src/scenarios_cache_fetcher.cpp scenarios_cache_fetcher_test.cpp \
     ../../src/lines_cache_fetcher.cpp lines_cache_fetcher_test.cpp \
     ../../src/data_sources_cache_fetcher.cpp data_sources_cache_fetcher_test.cpp \
-    ../../src/stations_cache_fetcher.cpp stations_cache_fetcher_test.cpp \
     ../../src/paths_cache_fetcher.cpp paths_cache_fetcher_test.cpp \
     ../../src/calculation_time.cpp \
     ../../src/trips_and_connections_cache_fetcher.cpp schedules_cache_fetcher_test.cpp \

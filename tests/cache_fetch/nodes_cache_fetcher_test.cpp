@@ -15,7 +15,6 @@ class NodeCacheFetcherFixtureTests : public BaseCacheFetcherFixtureTests
 protected:
     std::vector<std::unique_ptr<TrRouting::Node>>     nodes;
     std::map<boost::uuids::uuid, int>        nodeIndexesByUuid;
-    std::map<boost::uuids::uuid, int>        stationIndexesByUuid;
 
 public:
     void SetUp( ) override
@@ -38,7 +37,7 @@ public:
 
 TEST_F(NodeCacheFetcherFixtureTests, TestGetNodesInvalidNodesFile)
 {
-    int retVal = cacheFetcher.getNodes(nodes, nodeIndexesByUuid, stationIndexesByUuid, INVALID_CUSTOM_PATH);
+    int retVal = cacheFetcher.getNodes(nodes, nodeIndexesByUuid, INVALID_CUSTOM_PATH);
     ASSERT_EQ(-EBADMSG, retVal);
     ASSERT_EQ(0, nodes.size());
 }
@@ -47,7 +46,7 @@ TEST_F(NodeCacheFetcherFixtureTests, TestGetUnexistingSingleNodeFile)
 {
     // Copy the file from the valid nodes, but have nodes be unexisting
     fs::copy_file(BASE_CACHE_DIRECTORY_NAME + "/" + VALID_CUSTOM_PATH + "/nodes.capnpbin", BASE_CACHE_DIRECTORY_NAME + "/" + INVALID_CUSTOM_PATH + "/nodes.capnpbin", fs::copy_options::overwrite_existing);
-    int retVal = cacheFetcher.getNodes(nodes, nodeIndexesByUuid, stationIndexesByUuid, INVALID_CUSTOM_PATH);
+    int retVal = cacheFetcher.getNodes(nodes, nodeIndexesByUuid, INVALID_CUSTOM_PATH);
     // TODO: Is this right?
     ASSERT_EQ(0, retVal);
     ASSERT_EQ(11, nodes.size());
@@ -62,20 +61,20 @@ TEST_F(NodeCacheFetcherFixtureTests, TestGetSingleInvalidNodeFile)
         // Copy the invalid file for each node name
         fs::copy_file(BASE_CACHE_DIRECTORY_NAME + "/" + INVALID_CUSTOM_PATH + "/genericInvalid.capnpbin", BASE_CACHE_DIRECTORY_NAME + "/" + INVALID_CUSTOM_PATH + "/nodes/" + p.path().filename().c_str());
     }
-    int retVal = cacheFetcher.getNodes(nodes, nodeIndexesByUuid, stationIndexesByUuid, INVALID_CUSTOM_PATH);
+    int retVal = cacheFetcher.getNodes(nodes, nodeIndexesByUuid, INVALID_CUSTOM_PATH);
     ASSERT_EQ(-EBADMSG, retVal);
 }
 
 TEST_F(NodeCacheFetcherFixtureTests, TestGetNodesValid)
 {
-    int retVal = cacheFetcher.getNodes(nodes, nodeIndexesByUuid, stationIndexesByUuid, VALID_CUSTOM_PATH);
+    int retVal = cacheFetcher.getNodes(nodes, nodeIndexesByUuid, VALID_CUSTOM_PATH);
     ASSERT_EQ(0, retVal);
     ASSERT_EQ(11, nodes.size());
 }
 
 TEST_F(NodeCacheFetcherFixtureTests, TestGetNodesFileNotExists)
 {
-    int retVal = cacheFetcher.getNodes(nodes, nodeIndexesByUuid, stationIndexesByUuid, BASE_CUSTOM_PATH);
+    int retVal = cacheFetcher.getNodes(nodes, nodeIndexesByUuid, BASE_CUSTOM_PATH);
     ASSERT_EQ(-ENOENT, retVal);
     ASSERT_EQ(0, nodes.size());
 }

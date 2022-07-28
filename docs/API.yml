@@ -146,7 +146,6 @@ paths:
       # - alternatives_min_max_travel_time_seconds, alt_min_max_travel_time_seconds
       # - transfer_penalty, transfer_penalty_minutes
       # - walking_speed_factor, walk_factor
-      # - transfer_only_at_same_station, transfer_only_at_station
       # - detailed, detailed_results, detailed_result
       # - profiles, calculate_profiles
       # - transfer_between_same_line, allow_same_line_transfer, transfers_between_same_line, allow_same_line_transfers

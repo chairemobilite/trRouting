@@ -16,7 +16,6 @@ namespace TrRouting
   //class Place;  //TODO #167
   class Agency;
   class Service;
-  class Station;
   class Node;
   class Stop;
   class Line;
@@ -144,21 +143,6 @@ namespace TrRouting
     ) = 0;
 
     /**
-     * Read the stations cache file and fill the stations vector.
-     * 
-     * @return 0 in case of success, values below 0 when errors occurred:
-     * -EBADMSG if deserialization did not work
-     * -ENOENT if the file does not exist
-     * -EINVAL For any other data related error
-     * -(error codes from the open system call)
-     */
-    virtual int getStations(
-      std::vector<std::unique_ptr<Station>>& ts,
-      std::map<boost::uuids::uuid, int>& tIndexesById,
-      std::string customPath = ""
-    ) = 0;
-
-    /**
      * Read the nodes cache file and fill the nodes and stations vector.
      * 
      * @return 0 in case of success, values below 0 when errors occurred:
@@ -170,7 +154,6 @@ namespace TrRouting
     virtual int getNodes(
       std::vector<std::unique_ptr<Node>>& ts,
       std::map<boost::uuids::uuid, int>& tIndexesById,
-      const std::map<boost::uuids::uuid, int>& stationIndexesById,
       std::string customPath = ""
     ) = 0;
 

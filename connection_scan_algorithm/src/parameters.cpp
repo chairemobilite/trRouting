@@ -56,7 +56,6 @@ namespace TrRouting
     returnAllNodesResult                   = false;
     forwardCalculation                     = true;
     detailedResults                        = false;
-    transferOnlyAtSameStation              = false;
     transferBetweenSameLine                = true;
     calculateByNumberOfTransfers           = false;
     maxAlternatives                        = 200;
@@ -461,13 +460,6 @@ namespace TrRouting
       else if (parameterWithValueVector[0] == "walking_speed_factor" || parameterWithValueVector[0] == "walk_factor") // > 1.0 means faster walking
       {
         walkingSpeedFactor = std::stof(parameterWithValueVector[1]);
-        continue;
-      }
-      else if (parameterWithValueVector[0] == "transfer_only_at_same_station"
-               || parameterWithValueVector[0] == "transfer_only_at_station"
-              )
-      {
-        if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1") { transferOnlyAtSameStation = true; }
         continue;
       }
       else if (parameterWithValueVector[0] == "detailed"

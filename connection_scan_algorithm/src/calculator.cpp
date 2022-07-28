@@ -8,10 +8,6 @@
 namespace TrRouting
 {
   
-  int Calculator::countStations() {
-    return stations.size();
-  }
-
   int Calculator::countAgencies() {
     return agencies.size();
   }

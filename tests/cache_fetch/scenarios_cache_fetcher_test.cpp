@@ -35,13 +35,8 @@ public:
         modes = cacheFetcher.getModes();
         cacheFetcher.getLines(lines, lineIndexesByUuid, agencies, modes, VALID_CUSTOM_PATH);
 
-        std::vector<std::unique_ptr<TrRouting::Station>>     stations;
-        std::map<boost::uuids::uuid, int>        stationIndexesByUuid;
-
-        cacheFetcher.getStations(stations, stationIndexesByUuid, VALID_CUSTOM_PATH);
-
         std::vector<std::unique_ptr<TrRouting::Node>> nodes;
-        cacheFetcher.getNodes(nodes, nodeIndexesByUuid, stationIndexesByUuid, VALID_CUSTOM_PATH);
+        cacheFetcher.getNodes(nodes, nodeIndexesByUuid, VALID_CUSTOM_PATH);
 
         std::vector<std::unique_ptr<TrRouting::Service>> services;
         cacheFetcher.getServices(services, serviceIndexesByUuid, VALID_CUSTOM_PATH);

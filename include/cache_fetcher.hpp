@@ -23,7 +23,6 @@
 #include "block.hpp"
 #include "stop.hpp"
 #include "mode.hpp"
-#include "station.hpp"
 #include "trip.hpp"
 
 namespace TrRouting
@@ -96,16 +95,9 @@ namespace TrRouting
       std::string customPath = ""
     );
 
-    virtual int getStations(
-      std::vector<std::unique_ptr<Station>>& ts,
-      std::map<boost::uuids::uuid, int>& tIndexesById,
-      std::string customPath = ""
-    );
-
     virtual int getNodes(
       std::vector<std::unique_ptr<Node>>& ts,
       std::map<boost::uuids::uuid, int>& tIndexesById,
-      const std::map<boost::uuids::uuid, int>& stationIndexesById,
       std::string customPath = ""
     );
 

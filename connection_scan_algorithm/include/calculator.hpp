@@ -123,7 +123,6 @@ namespace TrRouting
 
     int                    setConnections(std::vector<std::shared_ptr<ConnectionTuple>> connections);
 
-    int               countStations();
     int               countAgencies();
     int               countServices();
     int               countNodes();
@@ -157,9 +156,6 @@ namespace TrRouting
 
     std::vector<std::unique_ptr<Service>>    services;
     std::map<boost::uuids::uuid, int>        serviceIndexesByUuid;
-
-    std::vector<std::unique_ptr<Station>>    stations;
-    std::map<boost::uuids::uuid, int>        stationIndexesByUuid;
 
     std::vector<std::unique_ptr<Node>>       nodes;
     std::map<boost::uuids::uuid, int>        nodeIndexesByUuid;

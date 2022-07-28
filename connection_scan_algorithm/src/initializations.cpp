@@ -12,7 +12,6 @@
 #include "scenario.hpp"
 #include "stop.hpp"
 #include "service.hpp"
-#include "station.hpp"
 #include "od_trip.hpp"
 #include "place.hpp"
 #include "household.hpp"

@@ -201,7 +201,6 @@ namespace TrRouting
       bool returnAllNodesResult;         // keep results for all nodes (used in creating accessibility map)
       bool forwardCalculation;           // forward calculation: default. if false: reverse calculation, will ride connections backward (useful when setting the arrival time)
       bool detailedResults;              // return detailed results when using results for all nodes
-      bool transferOnlyAtSameStation;    // will transfer only between nodes/stops having the same station_id (better performance, but make sure your stations are well designed and specified)
       bool transferBetweenSameLine;      // allow transfers between the same line
       bool calculateByNumberOfTransfers; // calculate first the fastest route, then calculate with decreasing number of transfers until no route is found, return results for each number of transfers.
       bool calculateProfiles;            // calculate profiles for lines, paths and trips (od trips only)

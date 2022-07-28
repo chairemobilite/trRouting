@@ -20,7 +20,6 @@ namespace TrRouting
     std::string code;
     std::string name;
     std::string internalId;
-    int stationIdx;
     std::unique_ptr<Point> point;
     std::vector<int> transferableNodesIdx;
     std::vector<int> transferableTravelTimesSeconds;

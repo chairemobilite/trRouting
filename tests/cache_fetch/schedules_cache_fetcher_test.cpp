@@ -24,7 +24,6 @@ protected:
     std::map<boost::uuids::uuid, int> lineIndexesByUuid;
     std::map<boost::uuids::uuid, int> pathIndexesByUuid;
     std::map<boost::uuids::uuid, int> nodeIndexesByUuid;
-    std::map<boost::uuids::uuid, int> stationIndexesByUuid;
     std::vector<std::vector<std::unique_ptr<int>>> tripConnectionDepartureTimes;
     std::vector<std::vector<std::unique_ptr<float>>> tripConnectionDemands;
     std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>>> connections;
@@ -40,7 +39,7 @@ public:
         std::vector<std::unique_ptr<TrRouting::Service>> services;
         cacheFetcher.getServices(services, serviceIndexesByUuid, VALID_CUSTOM_PATH);
 
-        cacheFetcher.getNodes(nodes, nodeIndexesByUuid, stationIndexesByUuid, VALID_CUSTOM_PATH);
+        cacheFetcher.getNodes(nodes, nodeIndexesByUuid, VALID_CUSTOM_PATH);
         cacheFetcher.getLines(lines, lineIndexesByUuid, agencies, modes, VALID_CUSTOM_PATH);
         cacheFetcher.getPaths(paths, pathIndexesByUuid, lineIndexesByUuid, nodeIndexesByUuid, VALID_CUSTOM_PATH);
         // Create the invalid lines directory
