@@ -7,6 +7,7 @@
 #include "od_trip.hpp"
 #include "routing_result.hpp"
 #include "mode.hpp"
+#include "agency.hpp"
 
 namespace TrRouting
 {
@@ -282,9 +283,9 @@ namespace TrRouting
           }(*/
         }
 
-        if (tripsEnabled[i] == 1 && parameters.getOnlyAgenciesIdx()->size() > 0)
+        if (tripsEnabled[i] == 1 && parameters.getOnlyAgencies().size() > 0)
         {
-          if (std::find(parameters.getOnlyAgenciesIdx()->begin(), parameters.getOnlyAgenciesIdx()->end(), trip->agencyIdx) == parameters.getOnlyAgenciesIdx()->end())
+          if (std::find(parameters.getOnlyAgencies().begin(), parameters.getOnlyAgencies().end(), trip->agency) == parameters.getOnlyAgencies().end())
           {
             tripsEnabled[i] = -1;
           }
@@ -325,9 +326,9 @@ namespace TrRouting
           }
         }
 
-        if (tripsEnabled[i] == 1 && parameters.getExceptAgenciesIdx()->size() > 0)
+        if (tripsEnabled[i] == 1 && parameters.getExceptAgencies().size() > 0)
         {
-          if (std::find(parameters.getExceptAgenciesIdx()->begin(), parameters.getExceptAgenciesIdx()->end(), trip->agencyIdx) != parameters.getExceptAgenciesIdx()->end())
+          if (std::find(parameters.getExceptAgencies().begin(), parameters.getExceptAgencies().end(), trip->agency) != parameters.getExceptAgencies().end())
           {
             tripsEnabled[i] = -1;
           }

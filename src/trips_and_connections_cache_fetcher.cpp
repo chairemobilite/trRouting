@@ -29,7 +29,6 @@ namespace TrRouting
     const std::map<boost::uuids::uuid, int>& serviceIndexesByUuid,
     const std::map<boost::uuids::uuid, int>& lineIndexesByUuid,
     const std::map<boost::uuids::uuid, int>& pathIndexesByUuid,
-    const std::map<boost::uuids::uuid, int>& agencyIndexesByUuid,
     const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
     std::vector<std::vector<std::unique_ptr<int>>>&   tripConnectionDepartureTimes,
     std::vector<std::vector<std::unique_ptr<float>>>& tripConnectionDemands,
@@ -121,7 +120,7 @@ namespace TrRouting
               }*/
 
               std::unique_ptr<Trip> trip = std::make_unique<Trip>(tripUuid,
-                                                                  line->agencyIdx,
+                                                                  line->agency,
                                                                   lineIndexesByUuid.at(line->uuid),
                                                                   pathIndexesByUuid.at(pathUuid),
                                                                   line->mode,

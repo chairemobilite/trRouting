@@ -153,8 +153,8 @@ namespace TrRouting
     std::vector<std::unique_ptr<OdTrip>>     odTrips;
     std::map<boost::uuids::uuid, int>        odTripIndexesByUuid;
 
-    std::vector<std::unique_ptr<Agency>>     agencies;
-    std::map<boost::uuids::uuid, int>        agencyIndexesByUuid;
+    std::map<boost::uuids::uuid, Agency>     agencies;
+    const std::map<boost::uuids::uuid, Agency> & getAgencies() {return agencies;}
 
     std::vector<std::unique_ptr<Service>>    services;
     std::map<boost::uuids::uuid, int>        serviceIndexesByUuid;

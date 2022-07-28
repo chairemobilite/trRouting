@@ -9,19 +9,20 @@ namespace TrRouting
 {
 
   class Mode;
+  class Agency;
   
   struct Line {
   
   public:
     Line(const boost::uuids::uuid &auuid,
-         int aagencyIdx,
+         const Agency &aagency,
          const Mode &amode,
          const std::string &ashortname,
          const std::string &alongname,
          const std::string &ainternalId,
          short aallowSameLineTransfers):
       uuid(auuid),
-      agencyIdx(aagencyIdx),
+      agency(aagency),
       mode(amode),
       shortname(ashortname),
       longname(alongname),
@@ -29,7 +30,7 @@ namespace TrRouting
       allowSameLineTransfers(aallowSameLineTransfers) {}
 
     boost::uuids::uuid uuid;
-    int agencyIdx;
+    const Agency &agency;
     const Mode &mode;
     std::string shortname;
     std::string longname;

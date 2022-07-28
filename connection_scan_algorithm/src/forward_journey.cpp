@@ -52,7 +52,6 @@ namespace TrRouting
       ConnectionTuple * journeyStepExitConnection;
       std::vector<boost::uuids::uuid>                   lineUuids;
       std::vector<int>                                  linesIdx;
-      std::vector<boost::uuids::uuid>                   agencyUuids;
       std::vector<boost::uuids::uuid>                   unboardingNodeUuids;
       std::vector<boost::uuids::uuid>                   boardingNodeUuids;
       std::vector<boost::uuids::uuid>                   tripUuids;
@@ -65,7 +64,6 @@ namespace TrRouting
       Trip *   journeyStepTrip;
       Line *   journeyStepLine;
       Path *   journeyStepPath;
-      Agency * journeyStepAgency;
 
       int totalInVehicleTime       { 0}; int transferArrivalTime    {-1}; int firstDepartureTime     {-1};
       int totalWalkingTime         { 0}; int transferReadyTime      {-1}; int minimizedDepartureTime {-1};
@@ -140,7 +138,6 @@ namespace TrRouting
             journeyStepNodeDeparture   = nodes[std::get<connectionIndexes::NODE_DEP>(*journeyStepEnterConnection)].get();
             journeyStepNodeArrival     = nodes[std::get<connectionIndexes::NODE_ARR>(*journeyStepExitConnection)].get();
             journeyStepTrip            = trips[std::get<journeyStepIndexes::FINAL_TRIP>(journeyStep)].get();
-            journeyStepAgency          = agencies[journeyStepTrip->agencyIdx].get();
             journeyStepLine            = lines[journeyStepTrip->lineIdx].get();
             journeyStepPath            = paths[journeyStepTrip->pathIdx].get();
             transferTime               = std::get<journeyStepIndexes::TRANSFER_TRAVEL_TIME>(journeyStep);
@@ -169,7 +166,6 @@ namespace TrRouting
             lineUuids.push_back(journeyStepLine->uuid);
             linesIdx.push_back(journeyStepTrip->lineIdx);
             inVehicleTravelTimesSeconds.push_back(inVehicleTime);
-            agencyUuids.push_back(journeyStepAgency->uuid);
             boardingNodeUuids.push_back(journeyStepNodeDeparture->uuid);
             unboardingNodeUuids.push_back(journeyStepNodeArrival->uuid);
             tripUuids.push_back(journeyStepTrip->uuid);
@@ -216,9 +212,9 @@ namespace TrRouting
             if (!params.returnAllNodesResult)
             {
               singleResult.get()->steps.push_back(std::make_unique<BoardingStep>(
-                journeyStepAgency->uuid,
-                journeyStepAgency->acronym,
-                journeyStepAgency->name,
+                journeyStepTrip->agency.uuid, //TODO change boardingstep constructor to take the agency object directly
+                journeyStepTrip->agency.acronym,
+                journeyStepTrip->agency.name,
                 journeyStepLine->uuid,
                 journeyStepLine->shortname,
                 journeyStepLine->longname,
@@ -237,9 +233,9 @@ namespace TrRouting
               ));
 
               singleResult.get()->steps.push_back(std::make_unique<UnboardingStep>(
-                journeyStepAgency->uuid,
-                journeyStepAgency->acronym,
-                journeyStepAgency->name,
+                journeyStepTrip->agency.uuid, //TODO change boardingstep constructor to take the agency object directly
+                journeyStepTrip->agency.acronym,
+                journeyStepTrip->agency.name,
                 journeyStepLine->uuid,
                 journeyStepLine->shortname,
                 journeyStepLine->longname,

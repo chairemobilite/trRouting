@@ -25,14 +25,13 @@ public:
         fs::copy_file(BASE_CACHE_DIRECTORY_NAME + "/" + INVALID_CUSTOM_PATH + "/genericInvalid.capnpbin", BASE_CACHE_DIRECTORY_NAME + "/" + INVALID_CUSTOM_PATH + "/paths.capnpbin");
 
         // Load valid data 
-        std::vector<std::unique_ptr<TrRouting::Agency>>     agencies;
-        std::map<boost::uuids::uuid, int> agencyIndexesByUuid;
-        int retVal = cacheFetcher.getAgencies(agencies, agencyIndexesByUuid, VALID_CUSTOM_PATH);
+        std::map<boost::uuids::uuid, TrRouting::Agency> agencies;
+        int retVal = cacheFetcher.getAgencies(agencies, VALID_CUSTOM_PATH);
 
         std::vector<std::unique_ptr<TrRouting::Line>> lines;
 
         auto modes = cacheFetcher.getModes();
-        cacheFetcher.getLines(lines, lineIndexesByUuid, agencyIndexesByUuid, modes, VALID_CUSTOM_PATH);
+        cacheFetcher.getLines(lines, lineIndexesByUuid, agencies, modes, VALID_CUSTOM_PATH);
 
         // Empty Station
         std::map<boost::uuids::uuid, int>        stationIndexesByUuid;

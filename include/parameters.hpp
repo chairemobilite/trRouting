@@ -17,6 +17,7 @@ namespace TrRouting
   class Node;
   class Mode;
   class DataSource;
+  class Agency;
 
   class ParameterException : public std::exception
   {
@@ -75,8 +76,8 @@ namespace TrRouting
       // std::vector<int> exceptLinesIdx;
       std::vector<std::reference_wrapper<const Mode>> onlyModes;
       std::vector<std::reference_wrapper<const Mode>> exceptModes;
-      std::vector<int> onlyAgenciesIdx;
-      std::vector<int> exceptAgenciesIdx;
+      std::vector<std::reference_wrapper<const Agency>> onlyAgencies;
+      std::vector<std::reference_wrapper<const Agency>> exceptAgencies;
       std::vector<int> onlyNodesIdx;
       std::vector<int> exceptNodesIdx;
       bool withAlternatives; // calculate alternatives or not
@@ -129,8 +130,8 @@ namespace TrRouting
       std::vector<int>* getExceptLinesIdx() { return &exceptLinesIdx; }
       const std::vector<std::reference_wrapper<const Mode>>& getOnlyModes() { return onlyModes; }
       const std::vector<std::reference_wrapper<const Mode>>& getExceptModes() { return exceptModes; }
-      std::vector<int>* getOnlyAgenciesIdx() { return &onlyAgenciesIdx; }
-      std::vector<int>* getExceptAgenciesIdx() { return &exceptAgenciesIdx; }
+      const std::vector<std::reference_wrapper<const Agency>>& getOnlyAgencies() { return onlyAgencies; }
+      const std::vector<std::reference_wrapper<const Agency>>& getExceptAgencies() { return exceptAgencies; }
       std::vector<int>* getOnlyNodesIdx() { return &onlyNodesIdx; }
       std::vector<int>* getExceptNodesIdx() { return &exceptNodesIdx; }
 

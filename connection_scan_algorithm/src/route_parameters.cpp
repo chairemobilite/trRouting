@@ -43,11 +43,11 @@ namespace TrRouting
     scenarioUuid = scenario.uuid;
     onlyServicesIdx = scenario.servicesIdx;
     onlyLinesIdx = scenario.onlyLinesIdx;
-    onlyAgenciesIdx = scenario.onlyAgenciesIdx;
+    onlyAgencies = scenario.onlyAgencies;
     onlyNodesIdx = scenario.onlyNodesIdx;
     onlyModes = scenario.onlyModes;
     exceptLinesIdx = scenario.exceptLinesIdx;
-    exceptAgenciesIdx = scenario.exceptAgenciesIdx;
+    exceptAgencies = scenario.exceptAgencies;
     exceptNodesIdx = scenario.exceptNodesIdx;
     exceptModes = scenario.exceptModes;
   }
@@ -68,11 +68,11 @@ namespace TrRouting
     scenarioUuid(routeParams.scenarioUuid),
     onlyServicesIdx(routeParams.onlyServicesIdx),
     onlyLinesIdx(routeParams.onlyLinesIdx),
-    onlyAgenciesIdx(routeParams.onlyAgenciesIdx),
+    onlyAgencies(routeParams.onlyAgencies),
     onlyNodesIdx(routeParams.onlyNodesIdx),
     onlyModes(routeParams.onlyModes),
     exceptLinesIdx(routeParams.exceptLinesIdx),
-    exceptAgenciesIdx(routeParams.exceptAgenciesIdx),
+    exceptAgencies(routeParams.exceptAgencies),
     exceptNodesIdx(routeParams.exceptNodesIdx),
     exceptModes(routeParams.exceptModes)
   {

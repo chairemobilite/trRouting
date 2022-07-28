@@ -19,11 +19,11 @@ namespace TrRouting
     std::vector<int> servicesIdx;
     std::vector<std::reference_wrapper<const Mode>> onlyModes;
     std::vector<int> onlyLinesIdx;
-    std::vector<int> onlyAgenciesIdx;
+    std::vector<std::reference_wrapper<const Agency>> onlyAgencies;
     std::vector<int> onlyNodesIdx;
     std::vector<std::reference_wrapper<const Mode>> exceptModes;
     std::vector<int> exceptLinesIdx;
-    std::vector<int> exceptAgenciesIdx;
+    std::vector<std::reference_wrapper<const Agency>> exceptAgencies;
     std::vector<int> exceptNodesIdx;
 
     const std::string toString() {

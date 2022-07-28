@@ -22,8 +22,7 @@ namespace TrRouting
 {
 
   int CacheFetcher::getAgencies(
-    std::vector<std::unique_ptr<Agency>>& ts,
-    std::map<boost::uuids::uuid, int>& tIndexesByUuid,
+    std::map<boost::uuids::uuid,Agency>& ts,
     std::string customPath
   )
   {
@@ -34,7 +33,6 @@ namespace TrRouting
     int ret = 0;
 
     ts.clear();
-    tIndexesByUuid.clear();
 
     std::string tStr  = "agencies";
     std::string TStr  = "Agencies";
@@ -71,16 +69,14 @@ namespace TrRouting
         std::string uuid           {capnpT.getUuid()};
         std::string simulationUuid {capnpT.getSimulationUuid()};
 
-        std::unique_ptr<T> t = std::make_unique<T>();
+        T t;
 
-        t->uuid           = uuidGenerator(uuid);
-        t->acronym        = capnpT.getAcronym();
-        t->name           = capnpT.getName();
-        t->internalId     = capnpT.getInternalId();
-        t->simulationUuid = simulationUuid.empty() ? uuidNilGenerator() : uuidGenerator(simulationUuid);
-        
-        tIndexesByUuid[t->uuid] = ts.size();
-        ts.push_back(std::move(t));
+        t.uuid           = uuidGenerator(uuid);
+        t.acronym        = capnpT.getAcronym();
+        t.name           = capnpT.getName();
+        t.internalId     = capnpT.getInternalId();
+        t.simulationUuid = simulationUuid.empty() ? uuidNilGenerator() : uuidGenerator(simulationUuid);
+        ts[t.uuid] = t;
       }
     }
     catch (const kj::Exception& e)
