@@ -133,7 +133,6 @@ namespace TrRouting
     int               countScenarios();
     int               countTrips();
     long long         countConnections();
-    int               countNetworks();
 
     // Public for testing, this function initializes the calculation vectors and should be called whenever nodes and schedules are updated
     // TODO As part of issue https://github.com/chairemobilite/trRouting/issues/95, this will be removed
