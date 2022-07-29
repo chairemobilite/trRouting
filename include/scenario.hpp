@@ -8,6 +8,8 @@
 namespace TrRouting
 {
   class Mode;
+  class Agency;
+  class Service;
   
   struct Scenario {
   
@@ -16,7 +18,7 @@ namespace TrRouting
     boost::uuids::uuid uuid;
     std::string name;
     boost::uuids::uuid simulationUuid;
-    std::vector<int> servicesIdx;
+    std::vector<std::reference_wrapper<const Service>> servicesList;
     std::vector<std::reference_wrapper<const Mode>> onlyModes;
     std::vector<int> onlyLinesIdx;
     std::vector<std::reference_wrapper<const Agency>> onlyAgencies;

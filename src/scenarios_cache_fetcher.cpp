@@ -21,7 +21,7 @@ namespace TrRouting
   int CacheFetcher::getScenarios(
     std::vector<std::unique_ptr<Scenario>>& ts,
     std::map<boost::uuids::uuid, int>& tIndexesByUuid,
-    const std::map<boost::uuids::uuid, int>& serviceIndexesByUuid,
+    const std::map<boost::uuids::uuid, Service>& services,
     const std::map<boost::uuids::uuid, int>& lineIndexesByUuid,
     const std::map<boost::uuids::uuid, Agency>& agencies,
     const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
@@ -72,7 +72,7 @@ namespace TrRouting
         std::string uuid           {capnpT.getUuid()};
         std::string simulationUuid {capnpT.getSimulationUuid()};
 
-        std::vector<int> servicesIdx;
+        std::vector<std::reference_wrapper<const Service>> servicesList;
         std::vector<int> onlyLinesIdx;
         std::vector<std::reference_wrapper<const Agency>> onlyAgencies;
         std::vector<int> onlyNodesIdx;
@@ -95,12 +95,12 @@ namespace TrRouting
         for (std::string serviceUuidStr : capnpT.getServicesUuids())
         {
           serviceUuid = uuidGenerator(serviceUuidStr);
-          if (serviceIndexesByUuid.count(serviceUuid) != 0)
+          if (services.count(serviceUuid) != 0)
           {
-            servicesIdx.push_back(serviceIndexesByUuid.at(serviceUuid));
+            servicesList.push_back(services.at(serviceUuid));
           }
         }
-        t->servicesIdx = servicesIdx;
+        t->servicesList = servicesList;
         for (std::string lineUuidStr : capnpT.getOnlyLinesUuids())
         {
           lineUuid = uuidGenerator(lineUuidStr);

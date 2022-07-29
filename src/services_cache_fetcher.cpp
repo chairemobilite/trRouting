@@ -19,8 +19,7 @@ namespace TrRouting
 {
 
   int CacheFetcher::getServices(
-    std::vector<std::unique_ptr<Service>>& ts,
-    std::map<boost::uuids::uuid, int>& tIndexesByUuid,
+    std::map<boost::uuids::uuid, Service>& ts,
     std::string customPath
   )
   {
@@ -31,7 +30,6 @@ namespace TrRouting
     int ret = 0;
 
     ts.clear();
-    tIndexesByUuid.clear();
 
     std::string tStr  = "services";
     std::string TStr  = "Services";
@@ -71,28 +69,28 @@ namespace TrRouting
         std::vector<boost::gregorian::date> onlyDates;
         std::vector<boost::gregorian::date> exceptDates;
 
-        std::unique_ptr<T> t = std::make_unique<T>();
+        T t;
 
-        t->uuid           = uuidGenerator(uuid);
-        t->name           = capnpT.getName();
-        t->internalId     = capnpT.getInternalId();
-        t->simulationUuid = simulationUuid.empty() ? uuidNilGenerator() : uuidGenerator(simulationUuid);
-        t->monday         = capnpT.getMonday();
-        t->tuesday        = capnpT.getTuesday();
-        t->wednesday      = capnpT.getWednesday();
-        t->thursday       = capnpT.getThursday();
-        t->friday         = capnpT.getFriday();
-        t->saturday       = capnpT.getSaturday();
-        t->sunday         = capnpT.getSunday();
+        t.uuid           = uuidGenerator(uuid);
+        t.name           = capnpT.getName();
+        t.internalId     = capnpT.getInternalId();
+        t.simulationUuid = simulationUuid.empty() ? uuidNilGenerator() : uuidGenerator(simulationUuid);
+        t.monday         = capnpT.getMonday();
+        t.tuesday        = capnpT.getTuesday();
+        t.wednesday      = capnpT.getWednesday();
+        t.thursday       = capnpT.getThursday();
+        t.friday         = capnpT.getFriday();
+        t.saturday       = capnpT.getSaturday();
+        t.sunday         = capnpT.getSunday();
         std::string startDate {capnpT.getStartDate()};
         if (startDate.length() > 0)
         {
-          t->startDate = boost::gregorian::from_string(startDate);
+          t.startDate = boost::gregorian::from_string(startDate);
         }
         std::string endDate {capnpT.getEndDate()};
         if (endDate.length() > 0)
         {
-          t->endDate = boost::gregorian::from_string(endDate);
+          t.endDate = boost::gregorian::from_string(endDate);
         }
         for (const auto & onlyDate : capnpT.getOnlyDates())
         {
@@ -102,11 +100,10 @@ namespace TrRouting
         {
           exceptDates.push_back(boost::gregorian::from_string(exceptDate));
         }
-        t->onlyDates   = onlyDates;
-        t->exceptDates = exceptDates;
+        t.onlyDates   = onlyDates;
+        t.exceptDates = exceptDates;
         
-        tIndexesByUuid[t->uuid] = ts.size();
-        ts.push_back(std::move(t));
+        ts[t.uuid] = t;
       }
     }
     catch (const kj::Exception& e)

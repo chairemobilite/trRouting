@@ -20,7 +20,7 @@ protected:
     std::vector<std::unique_ptr<TrRouting::Path>> paths;
     std::vector<std::unique_ptr<TrRouting::Node>> nodes;
     std::map<boost::uuids::uuid, int> tripIndexesByUuid;
-    std::map<boost::uuids::uuid, int> serviceIndexesByUuid;
+    std::map<boost::uuids::uuid, TrRouting::Service> services;
     std::map<boost::uuids::uuid, int> lineIndexesByUuid;
     std::map<boost::uuids::uuid, int> pathIndexesByUuid;
     std::map<boost::uuids::uuid, int> nodeIndexesByUuid;
@@ -36,8 +36,7 @@ public:
         std::map<boost::uuids::uuid, TrRouting::Agency> agencies;
         cacheFetcher.getAgencies(agencies, VALID_CUSTOM_PATH);
         auto modes = cacheFetcher.getModes();
-        std::vector<std::unique_ptr<TrRouting::Service>> services;
-        cacheFetcher.getServices(services, serviceIndexesByUuid, VALID_CUSTOM_PATH);
+        cacheFetcher.getServices(services, VALID_CUSTOM_PATH);
 
         cacheFetcher.getNodes(nodes, nodeIndexesByUuid, VALID_CUSTOM_PATH);
         cacheFetcher.getLines(lines, lineIndexesByUuid, agencies, modes, VALID_CUSTOM_PATH);
@@ -64,7 +63,7 @@ TEST_F(ScheduleCacheFetcherFixtureTests, TestGetSchedulesInvalidLineFile)
       lines,
       paths,
       tripIndexesByUuid,
-      serviceIndexesByUuid,
+      services,
       lineIndexesByUuid,
       pathIndexesByUuid,
       nodeIndexesByUuid,
@@ -85,7 +84,7 @@ TEST_F(ScheduleCacheFetcherFixtureTests, TestGetUnexistingLineFiles)
       lines,
       paths,
       tripIndexesByUuid,
-      serviceIndexesByUuid,
+      services,
       lineIndexesByUuid,
       pathIndexesByUuid,
       nodeIndexesByUuid,
@@ -105,7 +104,7 @@ TEST_F(ScheduleCacheFetcherFixtureTests, TestGetSchedulesValid)
       lines,
       paths,
       tripIndexesByUuid,
-      serviceIndexesByUuid,
+      services,
       lineIndexesByUuid,
       pathIndexesByUuid,
       nodeIndexesByUuid,

@@ -33,8 +33,16 @@ namespace TrRouting
       return "Service " + boost::uuids::to_string(uuid) + "\n  name " + name;
     }
 
+    // Equal operator. We only compare the uuid, since they should be unique.
+    inline bool operator==(const Service& other ) const { return uuid == other.uuid; }
   };
 
+  // To use std::find with a vector<reference_wrapper<const Service>>
+  // TODO Could this be a template?
+  inline bool operator==(const std::reference_wrapper<const Service>& lhs, const Service& rhs)
+  {
+    return lhs.get() == rhs;
+  }
 }
 
 #endif // TR_SERVICE

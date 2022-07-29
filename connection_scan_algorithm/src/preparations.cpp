@@ -49,7 +49,7 @@ namespace TrRouting
 
   int Calculator::updateServicesFromCache(std::string customPath)
   {
-    return dataFetcher.getServices(services, serviceIndexesByUuid, customPath);
+    return dataFetcher.getServices(services, customPath);
   }
 
   int Calculator::updateLinesFromCache(std::string customPath)
@@ -64,7 +64,7 @@ namespace TrRouting
 
   int Calculator::updateScenariosFromCache(std::string customPath)
   {
-    return dataFetcher.getScenarios(scenarios, scenarioIndexesByUuid, serviceIndexesByUuid, lineIndexesByUuid, agencies, nodeIndexesByUuid, getModes(), customPath);
+    return dataFetcher.getScenarios(scenarios, scenarioIndexesByUuid, services, lineIndexesByUuid, agencies, nodeIndexesByUuid, getModes(), customPath);
   }
 
   int Calculator::updateSchedulesFromCache(std::string customPath)
@@ -75,7 +75,7 @@ namespace TrRouting
       lines,
       paths,
       tripIndexesByUuid,
-      serviceIndexesByUuid,
+      services,
       lineIndexesByUuid,
       pathIndexesByUuid,
       nodeIndexesByUuid,

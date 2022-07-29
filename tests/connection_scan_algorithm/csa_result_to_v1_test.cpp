@@ -44,7 +44,6 @@ public:
         scenario = std::make_unique<TrRouting::Scenario>();
         scenario->uuid = uuidGenerator("aaaaaaaa-bbbb-cccc-dddd-eeeeeeffffff");
         scenario->name = "Test arbitrary scenario";
-        scenario->servicesIdx.push_back(0);
 
         testParameters = std::make_unique<TrRouting::RouteParameters>(
             std::make_unique<TrRouting::Point>(45.5269, -73.58912),

@@ -210,14 +210,12 @@ void BaseCsaFixtureTests::setUpLines()
 
 void BaseCsaFixtureTests::setUpServices()
 {
-    std::vector<std::unique_ptr<TrRouting::Service>>& array = calculator.services;
-    std::map<boost::uuids::uuid, int>& arrayIndexesByUuid = calculator.serviceIndexesByUuid;
 
-    std::unique_ptr<TrRouting::Service> service = std::make_unique<TrRouting::Service>();
-    service->uuid = serviceUuid;
-    service->name = "Single Unit Test";
-    arrayIndexesByUuid[service->uuid] = array.size();
-    array.push_back(std::move(service));
+    TrRouting::Service service;
+    service.uuid = serviceUuid;
+    service.name = "Single Unit Test";
+
+    calculator.services[serviceUuid] = service;
 }
 
 void BaseCsaFixtureTests::setUpScenarios()
@@ -228,7 +226,7 @@ void BaseCsaFixtureTests::setUpScenarios()
     std::unique_ptr<TrRouting::Scenario> scenario = std::make_unique<TrRouting::Scenario>();
     scenario->uuid = scenarioUuid;
     scenario->name = "Test valid scenario";
-    scenario->servicesIdx.push_back(0);
+    scenario->servicesList.push_back(calculator.services.at(serviceUuid));
     arrayIndexesByUuid[scenario->uuid] = array.size();
     array.push_back(std::move(scenario));
 }
@@ -341,7 +339,7 @@ void BaseCsaFixtureTests::setUpSchedules(std::vector<std::shared_ptr<TrRouting::
                                                                                  calculator.lineIndexesByUuid[lineSNUuid],
                                                                                  calculator.pathIndexesByUuid[pathSNUuid],
                                                                                  busMode,
-                                                                                 calculator.serviceIndexesByUuid[serviceUuid],
+                                                                                 calculator.services.at(serviceUuid),
                                                                                  -1,
                                                                                  0);
     tripIdx = array.size();
@@ -359,7 +357,7 @@ void BaseCsaFixtureTests::setUpSchedules(std::vector<std::shared_ptr<TrRouting::
                                                                                  calculator.lineIndexesByUuid[lineSNUuid],
                                                                                  calculator.pathIndexesByUuid[pathSNUuid],
                                                                                  busMode,
-                                                                                 calculator.serviceIndexesByUuid[serviceUuid],
+                                                                                 calculator.services.at(serviceUuid),
                                                                                  -1,
                                                                                  0);
     tripIdx = array.size();
@@ -377,7 +375,7 @@ void BaseCsaFixtureTests::setUpSchedules(std::vector<std::shared_ptr<TrRouting::
                                                                                  calculator.lineIndexesByUuid[lineEWUuid],
                                                                                  calculator.pathIndexesByUuid[pathEWUuid],
                                                                                  busMode,
-                                                                                 calculator.serviceIndexesByUuid[serviceUuid],
+                                                                                 calculator.services.at(serviceUuid),
                                                                                  -1,
                                                                                  0);
     tripIdx = array.size();
@@ -395,7 +393,7 @@ void BaseCsaFixtureTests::setUpSchedules(std::vector<std::shared_ptr<TrRouting::
                                                                                  calculator.lineIndexesByUuid[lineEWUuid],
                                                                                  calculator.pathIndexesByUuid[pathEWUuid],
                                                                                  busMode,
-                                                                                 calculator.serviceIndexesByUuid[serviceUuid],
+                                                                                 calculator.services.at(serviceUuid),
                                                                                  -1,
                                                                                  0);
     tripIdx = array.size();
@@ -413,7 +411,7 @@ void BaseCsaFixtureTests::setUpSchedules(std::vector<std::shared_ptr<TrRouting::
                                                                                  calculator.lineIndexesByUuid[lineExtraUuid],
                                                                                  calculator.pathIndexesByUuid[pathExtraUuid],
                                                                                  busMode,
-                                                                                 calculator.serviceIndexesByUuid[serviceUuid],
+                                                                                 calculator.services.at(serviceUuid),
                                                                                  -1,
                                                                                  0);
     tripIdx = array.size();

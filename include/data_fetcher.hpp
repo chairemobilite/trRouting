@@ -137,8 +137,7 @@ namespace TrRouting
      * -(error codes from the open system call)
      */
     virtual int getServices(
-      std::vector<std::unique_ptr<Service>>& ts,
-      std::map<boost::uuids::uuid, int>& tIndexesById,
+      std::map<boost::uuids::uuid, Service>& ts,
       std::string customPath = ""
     ) = 0;
 
@@ -203,7 +202,7 @@ namespace TrRouting
     virtual int getScenarios(
       std::vector<std::unique_ptr<Scenario>>& ts,
       std::map<boost::uuids::uuid, int>& tIndexesById,
-      const std::map<boost::uuids::uuid, int>& serviceIndexesByUuid,
+      const std::map<boost::uuids::uuid, Service>& services,
       const std::map<boost::uuids::uuid, int>& lineIndexesByUuid,
       const std::map<boost::uuids::uuid, Agency>& agencies,
       const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
@@ -225,7 +224,7 @@ namespace TrRouting
       const std::vector<std::unique_ptr<Line>>& lines,
       std::vector<std::unique_ptr<Path>>& paths,
       std::map<boost::uuids::uuid, int>& tripIndexesByUuid,
-      const std::map<boost::uuids::uuid, int>& serviceIndexesByUuid,
+      const std::map<boost::uuids::uuid, Service>& services,
       const std::map<boost::uuids::uuid, int>& lineIndexesByUuid,
       const std::map<boost::uuids::uuid, int>& pathIndexesByUuid,
       const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
