@@ -18,6 +18,7 @@ namespace TrRouting
   class Mode;
   class DataSource;
   class Agency;
+  class Service;
 
   class ParameterException : public std::exception
   {
@@ -68,8 +69,9 @@ namespace TrRouting
       int maxTransferWalkingTravelTimeSeconds;
       int maxFirstWaitingTimeSeconds;
 
-      std::vector<int> onlyServicesIdx;
-      std::vector<int> exceptServicesIdx;
+      std::vector<std::reference_wrapper<const Service>> onlyServices;
+      //TODO exceptServices is never filled with anything
+      std::vector<std::reference_wrapper<const Service>> exceptServices;
       std::vector<int> onlyLinesIdx;
       // FIXME: Temporarily moved to public until calculation specific parameters exist. This is used directly by alternatives routing.
       // see https://github.com/chairemobilite/trRouting/issues/95
@@ -124,8 +126,8 @@ namespace TrRouting
         std::map<boost::uuids::uuid, int> &scenarioIndexesByUuid,
         std::vector<std::unique_ptr<Scenario>> &scenarios
       );
-      std::vector<int>* getOnlyServicesIdx() { return &onlyServicesIdx; }
-      std::vector<int>* getExceptServicesIdx() { return &exceptServicesIdx; }
+      const std::vector<std::reference_wrapper<const Service>>& getOnlyServices() { return onlyServices; }
+      const std::vector<std::reference_wrapper<const Service>>& getExceptServices() { return exceptServices; }
       std::vector<int>* getOnlyLinesIdx() { return &onlyLinesIdx; }
       std::vector<int>* getExceptLinesIdx() { return &exceptLinesIdx; }
       const std::vector<std::reference_wrapper<const Mode>>& getOnlyModes() { return onlyModes; }

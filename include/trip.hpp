@@ -7,6 +7,8 @@
 namespace TrRouting
 {
   class Mode;
+  class Agency;
+  class Service;
   
   struct Trip {
   
@@ -16,7 +18,7 @@ namespace TrRouting
           int alineIdx,
           int apathIdx,
           const Mode &amode,
-          int aserviceIdx,
+          const Service &aservice,
           int ablockIdx,
           short aallowSameLineTransfers,
           int atotalCapacity = -1,
@@ -25,7 +27,7 @@ namespace TrRouting
                                          lineIdx(alineIdx),
                                          pathIdx(apathIdx),
                                          mode(amode),
-                                         serviceIdx(aserviceIdx),
+                                         service(aservice),
                                          blockIdx(ablockIdx),
                                          totalCapacity(atotalCapacity),
                                          seatedCapacity(aseatedCapacity),
@@ -36,7 +38,7 @@ namespace TrRouting
     int lineIdx;
     int pathIdx;
     const Mode &mode;
-    int serviceIdx;
+    const Service &service;
     int blockIdx;
     short allowSameLineTransfers;
     int totalCapacity; //Unused

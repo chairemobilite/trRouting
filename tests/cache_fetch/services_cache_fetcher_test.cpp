@@ -12,8 +12,7 @@ namespace fs = std::filesystem;
 class ServiceCacheFetcherFixtureTests : public BaseCacheFetcherFixtureTests
 {
 protected:
-    std::vector<std::unique_ptr<TrRouting::Service>>     objects;
-    std::map<boost::uuids::uuid, int>        objectIndexesByUuid;
+    std::map<boost::uuids::uuid, TrRouting::Service> services;
 
 public:
     void SetUp( ) override
@@ -33,22 +32,22 @@ public:
 
 TEST_F(ServiceCacheFetcherFixtureTests, TestGetServicesInvalid)
 {
-    int retVal = cacheFetcher.getServices(objects, objectIndexesByUuid, INVALID_CUSTOM_PATH);
+    int retVal = cacheFetcher.getServices(services, INVALID_CUSTOM_PATH);
     ASSERT_EQ(-EBADMSG, retVal);
-    ASSERT_EQ(0, objects.size());
+    ASSERT_EQ(0, services.size());
 }
 
 TEST_F(ServiceCacheFetcherFixtureTests, TestGetServicesValid)
 {
-    int retVal = cacheFetcher.getServices(objects, objectIndexesByUuid, VALID_CUSTOM_PATH);
+    int retVal = cacheFetcher.getServices(services, VALID_CUSTOM_PATH);
     ASSERT_EQ(0, retVal);
-    ASSERT_EQ(2, objects.size());
+    ASSERT_EQ(2, services.size());
 }
 
 TEST_F(ServiceCacheFetcherFixtureTests, TestGetServicesFileNotExists)
 {
-    int retVal = cacheFetcher.getServices(objects, objectIndexesByUuid, BASE_CUSTOM_PATH);
+    int retVal = cacheFetcher.getServices(services, BASE_CUSTOM_PATH);
     ASSERT_EQ(-ENOENT, retVal);
-    ASSERT_EQ(0, objects.size());
+    ASSERT_EQ(0, services.size());
 }
 

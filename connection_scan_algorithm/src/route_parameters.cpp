@@ -41,7 +41,7 @@ namespace TrRouting
         forwardCalculation(forward)
   {
     scenarioUuid = scenario.uuid;
-    onlyServicesIdx = scenario.servicesIdx;
+    onlyServices = scenario.servicesList;
     onlyLinesIdx = scenario.onlyLinesIdx;
     onlyAgencies = scenario.onlyAgencies;
     onlyNodesIdx = scenario.onlyNodesIdx;
@@ -66,7 +66,7 @@ namespace TrRouting
     withAlternatives(routeParams.withAlternatives),
     forwardCalculation(routeParams.forwardCalculation),
     scenarioUuid(routeParams.scenarioUuid),
-    onlyServicesIdx(routeParams.onlyServicesIdx),
+    onlyServices(routeParams.onlyServices),
     onlyLinesIdx(routeParams.onlyLinesIdx),
     onlyAgencies(routeParams.onlyAgencies),
     onlyNodesIdx(routeParams.onlyNodesIdx),
@@ -252,7 +252,7 @@ namespace TrRouting
     {
       throw ParameterException(ParameterException::Type::MISSING_SCENARIO);
     }
-    else if (scenario->servicesIdx.size() <= 0)
+    else if (scenario->servicesList.size() <= 0)
     {
       throw ParameterException(ParameterException::Type::EMPTY_SCENARIO);
     }

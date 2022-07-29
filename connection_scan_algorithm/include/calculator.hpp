@@ -154,8 +154,8 @@ namespace TrRouting
     std::map<boost::uuids::uuid, Agency>     agencies;
     const std::map<boost::uuids::uuid, Agency> & getAgencies() {return agencies;}
 
-    std::vector<std::unique_ptr<Service>>    services;
-    std::map<boost::uuids::uuid, int>        serviceIndexesByUuid;
+    std::map<boost::uuids::uuid, Service>    services;
+    const std::map<boost::uuids::uuid, Service> & getServices() {return services;}
 
     std::vector<std::unique_ptr<Node>>       nodes;
     std::map<boost::uuids::uuid, int>        nodeIndexesByUuid;

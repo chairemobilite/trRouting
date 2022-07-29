@@ -8,6 +8,7 @@
 #include "parameters_test.hpp"
 #include "scenario.hpp"
 #include "point.hpp"
+#include "service.hpp"
 #include "toolbox.hpp" //MAX_INT
 
 const std::string EMPTY_SCENARIO_UUID = "acdcef12-1111-2222-3333-444455558888";
@@ -17,6 +18,7 @@ class RouteParametersFixtureTests : public BaseParametersFixtureTests
 protected:
     std::vector<std::unique_ptr<TrRouting::Scenario>> scenarios;
     std::map<boost::uuids::uuid, int> scenarioIndexesByUuid;
+    TrRouting::Service service; //Empty service, as the param parser expect at least one
 
 public:
     void SetUp( ) override
@@ -29,8 +31,7 @@ public:
         scenario->uuid = uuidGenerator("12345678-9999-0000-1111-ababbabaabab");
 
         scenario->name = "Test valid scenario";
-        scenario->servicesIdx.push_back(0);
-        scenario->servicesIdx.push_back(3);
+        scenario->servicesList.push_back(service);
 
         scenarioIndexesByUuid[scenario->uuid] = scenarios.size();
         scenarios.push_back(std::move(scenario));

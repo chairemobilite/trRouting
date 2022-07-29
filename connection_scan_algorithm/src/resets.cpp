@@ -8,6 +8,7 @@
 #include "routing_result.hpp"
 #include "mode.hpp"
 #include "agency.hpp"
+#include "service.hpp"
 
 namespace TrRouting
 {
@@ -249,9 +250,9 @@ namespace TrRouting
       int i {0};
       for (auto & trip : trips)
       {
-        if (tripsEnabled[i] == 1 && parameters.getOnlyServicesIdx()->size() > 0)
+        if (tripsEnabled[i] == 1 && parameters.getOnlyServices().size() > 0)
         {
-          if (std::find(parameters.getOnlyServicesIdx()->begin(), parameters.getOnlyServicesIdx()->end(), trip->serviceIdx) == parameters.getOnlyServicesIdx()->end())
+          if (std::find(parameters.getOnlyServices().begin(), parameters.getOnlyServices().end(), trip->service) == parameters.getOnlyServices().end())
           {
             tripsEnabled[i] = -1;
           }
@@ -291,9 +292,9 @@ namespace TrRouting
           }
         }
 
-        if (tripsEnabled[i] == 1 && parameters.getExceptServicesIdx()->size() > 0)
+        if (tripsEnabled[i] == 1 && parameters.getExceptServices().size() > 0)
         {
-          if (std::find(parameters.getExceptServicesIdx()->begin(), parameters.getExceptServicesIdx()->end(), trip->serviceIdx) != parameters.getExceptServicesIdx()->end())
+          if (std::find(parameters.getExceptServices().begin(), parameters.getExceptServices().end(), trip->service) != parameters.getExceptServices().end())
           {
             tripsEnabled[i] = -1;
           }

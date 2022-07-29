@@ -26,7 +26,7 @@ namespace TrRouting
     const std::vector<std::unique_ptr<Line>>& lines,
     std::vector<std::unique_ptr<Path>>& paths,
     std::map<boost::uuids::uuid, int>& tripIndexesByUuid,
-    const std::map<boost::uuids::uuid, int>& serviceIndexesByUuid,
+    const std::map<boost::uuids::uuid, Service>& services,
     const std::map<boost::uuids::uuid, int>& lineIndexesByUuid,
     const std::map<boost::uuids::uuid, int>& pathIndexesByUuid,
     const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
@@ -52,11 +52,11 @@ namespace TrRouting
     //std::vector<Block> blocks;
     //std::map<boost::uuids::uuid, int> blockIndexesByUuid;
     boost::uuids::string_generator uuidGenerator;
-    boost::uuids::uuid tripUuid, pathUuid, serviceUuid; //blockUuid;
+    boost::uuids::uuid tripUuid, pathUuid; //blockUuid;
     Path * path;
     std::vector<int> pathNodesIdx;
-    std::string tripUuidStr, pathUuidStr, serviceUuidStr, cacheFileName; // blockUuidStr
-    int serviceIdx, lineIdx, tripIdx;
+    std::string tripUuidStr, pathUuidStr, cacheFileName; // blockUuidStr
+    int lineIdx, tripIdx;
     unsigned long nodeTimesCount;
     unsigned long linesCount {lines.size()};
     int lineI {0};
@@ -83,9 +83,8 @@ namespace TrRouting
         const auto schedules {capnpLine.getSchedules()};
         for (const auto & schedule : schedules)
         {
-          serviceUuidStr = schedule.getServiceUuid();
-          serviceUuid    = uuidGenerator(serviceUuidStr);
-          serviceIdx     = serviceIndexesByUuid.at(serviceUuid);
+          std::string serviceUuidStr = schedule.getServiceUuid();
+          auto & service  = services.at(uuidGenerator(serviceUuidStr));
 
           const auto periods {schedule.getPeriods()};
           for (const auto & period : periods)
@@ -124,7 +123,7 @@ namespace TrRouting
                                                                   lineIndexesByUuid.at(line->uuid),
                                                                   pathIndexesByUuid.at(pathUuid),
                                                                   line->mode,
-                                                                  serviceIdx,
+                                                                  service,
                                                                   -1,
                                                                   line->allowSameLineTransfers,
                                                                   capnpTrip.getTotalCapacity(),
