@@ -18,7 +18,6 @@ namespace TrRouting
     int   reachableConnectionsCount       {0};
     int   tripIndex                       {-1};
     int   lineIndex                       {-1};
-    //int   blockIndex                      {-1};
     int   nodeDepartureIndex              {-1};
     int   nodeArrivalIndex                {-1};
     int   tripEnterConnectionIndex        {-1};
@@ -96,11 +95,6 @@ namespace TrRouting
 
             
             
-            /* Difficult to deal with blocks and no transfer between same line in CSA algorithm! */
-            /*lineIndex             = std::get<connectionIndexes::LINE>(**connection);
-            canTransferOnSameLine = std::get<connectionIndexes::CAN_TRANSFER_SAME_LINE>(**connection);
-            blockIndex            = std::get<connectionIndexes::BLOCK>(**connection);*/
-
             // TODO: add constrain for sameLineTransfer (check trip allowSameLineTransfers)
             if (
               std::get<connectionIndexes::CAN_BOARD>(**connection) == 1 

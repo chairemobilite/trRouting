@@ -19,7 +19,6 @@ namespace TrRouting
     int  reachableConnectionsCount        {0};
     int  tripIndex                        {-1};
     int  lineIndex                        {-1};
-    //int  blockIndex                       {-1};
     int  nodeDepartureIndex               {-1};
     int  nodeArrivalIndex                 {-1};
     int  tripExitConnectionIndex          {-1};
