@@ -19,7 +19,6 @@
 #include "household.hpp"
 #include "person.hpp"
 #include "place.hpp"
-#include "stop.hpp"
 #include "od_trip.hpp"
 /**
  *  Create a default data set:

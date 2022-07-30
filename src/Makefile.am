@@ -16,7 +16,6 @@ paths_cache_fetcher.cpp \
 persons_cache_fetcher.cpp \
 scenarios_cache_fetcher.cpp \
 services_cache_fetcher.cpp \
-stops_cache_fetcher.cpp \
 trips_and_connections_cache_fetcher.cpp
 #TODO #167 Place/Household removed while refactoring
 #places_cache_fetcher.cpp \

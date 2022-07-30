@@ -21,7 +21,6 @@
 #include "scenario.hpp"
 #include "path.hpp"
 #include "block.hpp"
-#include "stop.hpp"
 #include "mode.hpp"
 #include "trip.hpp"
 

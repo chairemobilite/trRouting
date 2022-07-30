@@ -20,10 +20,6 @@ namespace TrRouting
     return nodes.size();
   }
 
-  int Calculator::countStops() {
-    return stops.size();
-  }
-
   int Calculator::countLines() {
     return lines.size();
   }

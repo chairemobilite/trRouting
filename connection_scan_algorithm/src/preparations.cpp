@@ -7,10 +7,6 @@
 namespace TrRouting
 {
 
-  /*void Calculator::updateStopsFromCache(Parameters& params, std::string customPath)
-  {
-    params.cacheFetcher->getStops(stops, stopIndexesByUuid, nodeIndexesByUuid, params, customPath);
-  }*/
   // TODO now that we have a "generic" data fetcher interface, we should remove the FromCache from these function name
   int Calculator::updateNodesFromCache(std::string customPath)
   {
@@ -131,7 +127,6 @@ namespace TrRouting
     
     modes = dataFetcher.getModes();
 
-    //updateStopsFromCache();
     ret = updateNodesFromCache();
     // Ignore missing nodes file
     if (ret < 0 && ret != -ENOENT)
