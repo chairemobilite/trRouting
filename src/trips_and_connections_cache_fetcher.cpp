@@ -14,12 +14,13 @@
 #include "cache_fetcher.hpp"
 #include "trip.hpp"
 #include "line.hpp"
-#include "block.hpp"
 #include "capnp/line.capnp.h"
 #include "calculation_time.hpp"
 
 namespace TrRouting
 {
+  // FIXME ConnectionTuple is defined in calculator.hpp. Should it be elsewhere? Cache fetcher should work for any algorithm, is this tuple csa-specific or should it go somewhere common.
+  using ConnectionTuple = std::tuple<int,int,int,int,int,short,short,int,int,short,short>;
   
   int CacheFetcher::getSchedules(
     std::vector<std::unique_ptr<Trip>>& trips,
@@ -32,13 +33,10 @@ namespace TrRouting
     const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
     std::vector<std::vector<std::unique_ptr<int>>>&   tripConnectionDepartureTimes,
     std::vector<std::vector<std::unique_ptr<float>>>& tripConnectionDemands,
-    std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>>>& connections, 
+    std::vector<std::shared_ptr<ConnectionTuple>>& connections,
     std::string customPath
   )
   {
-    // FIXME ConnectionTuple is defined in calculator.hpp. Should it be elsewhere? Cache fetcher should work for any algorithm, is this tuple csa-specific or should it go somewhere common.
-    using ConnectionTuple = std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>;
-
     trips.clear();
     trips.shrink_to_fit();
     tripIndexesByUuid.clear();
@@ -49,13 +47,11 @@ namespace TrRouting
     connections.clear();
     connections.shrink_to_fit();
 
-    //std::vector<Block> blocks;
-    //std::map<boost::uuids::uuid, int> blockIndexesByUuid;
     boost::uuids::string_generator uuidGenerator;
-    boost::uuids::uuid tripUuid, pathUuid; //blockUuid;
+    boost::uuids::uuid tripUuid, pathUuid;
     Path * path;
     std::vector<int> pathNodesIdx;
-    std::string tripUuidStr, pathUuidStr, cacheFileName; // blockUuidStr
+    std::string tripUuidStr, pathUuidStr, cacheFileName;
     int lineIdx, tripIdx;
     unsigned long nodeTimesCount;
     unsigned long linesCount {lines.size()};
@@ -99,32 +95,12 @@ namespace TrRouting
               path         = paths[pathIndexesByUuid.at(pathUuid)].get();
               pathNodesIdx = path->nodesIdx;
               
-              /*blockUuidStr = capnpTrip.getBlockUuid();
-              if (blockUuidStr.length() > 0) // if block does not exist yet
-              {
-                blockUuid = uuidGenerator(blockUuidStr);
-                if (blockIndexesByUuid.count(blockUuid) != 1)
-                {
-                  // create new block:
-                  Block * block = new Block();
-                  block->uuid = blockUuid;
-                  blocks.push_back(*block);
-                  blockIndexesByUuid[block->uuid] = blocks.size() - 1;
-                }
-                trip->blockIdx = blockIndexesByUuid[blockUuid];
-              }
-              else
-              {
-                trip->blockIdx = -1;
-              }*/
-
               std::unique_ptr<Trip> trip = std::make_unique<Trip>(tripUuid,
                                                                   line->agency,
                                                                   lineIndexesByUuid.at(line->uuid),
                                                                   pathIndexesByUuid.at(pathUuid),
                                                                   line->mode,
                                                                   service,
-                                                                  -1,
                                                                   line->allowSameLineTransfers,
                                                                   capnpTrip.getTotalCapacity(),
                                                                   capnpTrip.getSeatedCapacity());
@@ -158,7 +134,6 @@ namespace TrRouting
                     canUnboards[nodeTimeI + 1],
                     nodeTimeI + 1,
                     trip->lineIdx,
-                    trip->blockIdx,
                     trip->allowSameLineTransfers,
                     line->mode.shortname == Mode::TRANSFERABLE ? 0 : -1
                   )));

@@ -19,7 +19,6 @@ namespace TrRouting
           int apathIdx,
           const Mode &amode,
           const Service &aservice,
-          int ablockIdx,
           short aallowSameLineTransfers,
           int atotalCapacity = -1,
           int aseatedCapacity = -1): uuid(auuid),
@@ -28,7 +27,6 @@ namespace TrRouting
                                          pathIdx(apathIdx),
                                          mode(amode),
                                          service(aservice),
-                                         blockIdx(ablockIdx),
                                          totalCapacity(atotalCapacity),
                                          seatedCapacity(aseatedCapacity),
                                          allowSameLineTransfers(aallowSameLineTransfers) {}
@@ -39,7 +37,6 @@ namespace TrRouting
     int pathIdx;
     const Mode &mode;
     const Service &service;
-    int blockIdx;
     short allowSameLineTransfers;
     int totalCapacity; //Unused
     int seatedCapacity; //Unused

@@ -302,7 +302,6 @@ void addTripData(TrRouting::Calculator& calculator, TrRouting::Trip *trip, std::
             1,
             nodeTimeI + 1,
             trip->lineIdx,
-            trip->blockIdx,
             trip->allowSameLineTransfers,
             -1
         )));

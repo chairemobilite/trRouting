@@ -7,7 +7,6 @@
 #include "trip.hpp"
 #include "line.hpp"
 #include "node.hpp"
-#include "block.hpp"
 #include "capnp/line.capnp.h"
 
 namespace fs = std::filesystem;
@@ -26,7 +25,7 @@ protected:
     std::map<boost::uuids::uuid, int> nodeIndexesByUuid;
     std::vector<std::vector<std::unique_ptr<int>>> tripConnectionDepartureTimes;
     std::vector<std::vector<std::unique_ptr<float>>> tripConnectionDemands;
-    std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,int,int,short,short>>> connections;
+    std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,int,short,short>>> connections;
 
 public:
     void SetUp( ) override
