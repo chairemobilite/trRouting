@@ -27,7 +27,6 @@ namespace TrRouting
   class Service;
   class Station;
   class Node;
-  class Stop;
   class Line;
   class Path;
   class Scenario;
@@ -115,7 +114,6 @@ namespace TrRouting
     int                    updateAgenciesFromCache   (std::string customPath = "");
     int                    updateServicesFromCache   (std::string customPath = "");
     int                    updateNodesFromCache      (std::string customPath = "");
-    int                    updateStopsFromCache      (std::string customPath = "");
     int                    updateLinesFromCache      (std::string customPath = "");
     int                    updatePathsFromCache      (std::string customPath = "");
     int                    updateScenariosFromCache  (std::string customPath = "");
@@ -126,7 +124,6 @@ namespace TrRouting
     int               countAgencies();
     int               countServices();
     int               countNodes();
-    int               countStops();
     int               countLines();
     int               countPaths();
     int               countScenarios();
@@ -159,9 +156,6 @@ namespace TrRouting
 
     std::vector<std::unique_ptr<Node>>       nodes;
     std::map<boost::uuids::uuid, int>        nodeIndexesByUuid;
-
-    std::vector<std::unique_ptr<Stop>>       stops;
-    std::map<boost::uuids::uuid, int>        stopIndexesByUuid;
 
     std::vector<std::unique_ptr<Line>>       lines;
     std::map<boost::uuids::uuid, int>        lineIndexesByUuid;

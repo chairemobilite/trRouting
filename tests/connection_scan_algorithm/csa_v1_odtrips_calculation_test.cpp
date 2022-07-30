@@ -14,7 +14,6 @@
 #include "place.hpp"
 #include "agency.hpp"
 #include "service.hpp"
-#include "stop.hpp"
 #include "line.hpp"
 #include "path.hpp"
 #include "trip.hpp"

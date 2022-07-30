@@ -18,7 +18,6 @@ namespace TrRouting
   class Agency;
   class Service;
   class Node;
-  class Stop;
   class Line;
   class Path;
   class Scenario;

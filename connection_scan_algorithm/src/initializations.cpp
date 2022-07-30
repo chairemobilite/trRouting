@@ -10,7 +10,6 @@
 #include "line.hpp"
 #include "path.hpp"
 #include "scenario.hpp"
-#include "stop.hpp"
 #include "service.hpp"
 #include "od_trip.hpp"
 #include "place.hpp"
