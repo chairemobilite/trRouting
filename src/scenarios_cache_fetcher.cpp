@@ -22,7 +22,7 @@ namespace TrRouting
     std::vector<std::unique_ptr<Scenario>>& ts,
     std::map<boost::uuids::uuid, int>& tIndexesByUuid,
     const std::map<boost::uuids::uuid, Service>& services,
-    const std::map<boost::uuids::uuid, int>& lineIndexesByUuid,
+    const std::map<boost::uuids::uuid, Line>& lines,
     const std::map<boost::uuids::uuid, Agency>& agencies,
     const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
     const std::map<std::string, Mode>& modes,
@@ -73,16 +73,15 @@ namespace TrRouting
         std::string simulationUuid {capnpT.getSimulationUuid()};
 
         std::vector<std::reference_wrapper<const Service>> servicesList;
-        std::vector<int> onlyLinesIdx;
+        std::vector<std::reference_wrapper<const Line>> onlyLines;
         std::vector<std::reference_wrapper<const Agency>> onlyAgencies;
         std::vector<int> onlyNodesIdx;
         std::vector<std::reference_wrapper<const Mode>> onlyModes;
-        std::vector<int> exceptLinesIdx;
+        std::vector<std::reference_wrapper<const Line>> exceptLines;
         std::vector<std::reference_wrapper<const Agency>> exceptAgencies;
         std::vector<int> exceptNodesIdx;
         std::vector<std::reference_wrapper<const Mode>> exceptModes;
         boost::uuids::uuid serviceUuid;
-        boost::uuids::uuid lineUuid;
         boost::uuids::uuid agencyUuid;
         boost::uuids::uuid nodeUuid;
 
@@ -103,13 +102,13 @@ namespace TrRouting
         t->servicesList = servicesList;
         for (std::string lineUuidStr : capnpT.getOnlyLinesUuids())
         {
-          lineUuid = uuidGenerator(lineUuidStr);
-          if (lineIndexesByUuid.count(lineUuid) != 0)
+          boost::uuids::uuid lineUuid = uuidGenerator(lineUuidStr);
+          if (lines.count(lineUuid) != 0)
           {
-            onlyLinesIdx.push_back(lineIndexesByUuid.at(lineUuid));
+            onlyLines.push_back(lines.at(lineUuid));
           }
         }
-        t->onlyLinesIdx = onlyLinesIdx;
+        t->onlyLines = onlyLines;
         for (std::string agencyUuidStr : capnpT.getOnlyAgenciesUuids())
         {
           agencyUuid = uuidGenerator(agencyUuidStr);
@@ -139,13 +138,13 @@ namespace TrRouting
 
         for (std::string lineUuidStr : capnpT.getExceptLinesUuids())
         {
-          lineUuid = uuidGenerator(lineUuidStr);
-          if (lineIndexesByUuid.count(lineUuid) != 0)
+          boost::uuids::uuid lineUuid = uuidGenerator(lineUuidStr);
+          if (lines.count(lineUuid) != 0)
           {
-            exceptLinesIdx.push_back(lineIndexesByUuid.at(lineUuid));
+            exceptLines.push_back(lines.at(lineUuid));
           }
         }
-        t->exceptLinesIdx = exceptLinesIdx;
+        t->exceptLines = exceptLines;
         for (std::string agencyUuidStr : capnpT.getExceptAgenciesUuids())
         {
           agencyUuid = uuidGenerator(agencyUuidStr);

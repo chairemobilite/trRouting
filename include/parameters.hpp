@@ -19,6 +19,7 @@ namespace TrRouting
   class DataSource;
   class Agency;
   class Service;
+  class Line;
 
   class ParameterException : public std::exception
   {
@@ -72,7 +73,7 @@ namespace TrRouting
       std::vector<std::reference_wrapper<const Service>> onlyServices;
       //TODO exceptServices is never filled with anything
       std::vector<std::reference_wrapper<const Service>> exceptServices;
-      std::vector<int> onlyLinesIdx;
+      std::vector<std::reference_wrapper<const Line>> onlyLines;
       // FIXME: Temporarily moved to public until calculation specific parameters exist. This is used directly by alternatives routing.
       // see https://github.com/chairemobilite/trRouting/issues/95
       // std::vector<int> exceptLinesIdx;
@@ -128,8 +129,8 @@ namespace TrRouting
       );
       const std::vector<std::reference_wrapper<const Service>>& getOnlyServices() { return onlyServices; }
       const std::vector<std::reference_wrapper<const Service>>& getExceptServices() { return exceptServices; }
-      std::vector<int>* getOnlyLinesIdx() { return &onlyLinesIdx; }
-      std::vector<int>* getExceptLinesIdx() { return &exceptLinesIdx; }
+      const std::vector<std::reference_wrapper<const Line>>& getOnlyLines() { return onlyLines; }
+      const std::vector<std::reference_wrapper<const Line>>& getExceptLines() { return exceptLines; }
       const std::vector<std::reference_wrapper<const Mode>>& getOnlyModes() { return onlyModes; }
       const std::vector<std::reference_wrapper<const Mode>>& getExceptModes() { return exceptModes; }
       const std::vector<std::reference_wrapper<const Agency>>& getOnlyAgencies() { return onlyAgencies; }
@@ -139,7 +140,7 @@ namespace TrRouting
 
       // FIXME: Temporarily moved to public until calculation specific parameters exist. This is used directly by alternatives routing.
       // see https://github.com/chairemobilite/trRouting/issues/95
-      std::vector<int> exceptLinesIdx;
+      std::vector<std::reference_wrapper<const Line>> exceptLines;
   };
 
   class Parameters {

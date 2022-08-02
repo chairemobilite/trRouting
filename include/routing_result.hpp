@@ -8,6 +8,7 @@
 #include "routing_result_visitor.hpp"
 #include "json.hpp"
 #include "point.hpp" //Not using a forward declaration, as we use it more directly, see issue #129
+#include "line.hpp" //For Leg
 
 namespace TrRouting
 {
@@ -226,6 +227,9 @@ namespace TrRouting
    * @brief Class detailing a single trip detail. It describes a single alternative trip.
    * 
    */
+   // tuple: tripIdx, line, pathIdx, start connection index, end connection index
+  typedef std::tuple<int, std::reference_wrapper<const Line>, int, int, int> Leg;
+
   class SingleCalculationResult : public RoutingResult {
   public:
     int departureTime;
@@ -249,7 +253,7 @@ namespace TrRouting
     int totalWaitingTime;
     std::vector<std::unique_ptr<RoutingStep>> steps;
     // TODO Legs are used in the od_trip_routing function. They are kept here to avoid having to rewrite this code handling now, but eventually, it should the steps detail instead
-    std::vector<std::tuple<int, int, int, int, int>> legs; // tuple: tripIdx, lineIdx, pathIdx, start connection index, end connection index
+    std::vector<Leg> legs;
     SingleCalculationResult():
       RoutingResult(result_type::SINGLE_CALCULATION)
     {}

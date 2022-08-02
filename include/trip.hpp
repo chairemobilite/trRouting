@@ -15,7 +15,7 @@ namespace TrRouting
   public:
     Trip( boost::uuids::uuid auuid,
           const Agency &aagency,
-          int alineIdx,
+          const Line &aline,
           int apathIdx,
           const Mode &amode,
           const Service &aservice,
@@ -23,7 +23,7 @@ namespace TrRouting
           int atotalCapacity = -1,
           int aseatedCapacity = -1): uuid(auuid),
                                          agency(aagency),
-                                         lineIdx(alineIdx),
+                                         line(aline),
                                          pathIdx(apathIdx),
                                          mode(amode),
                                          service(aservice),
@@ -32,10 +32,10 @@ namespace TrRouting
                                          allowSameLineTransfers(aallowSameLineTransfers) {}
    
     boost::uuids::uuid uuid;
-    const Agency &agency;
-    int lineIdx;
+    const Agency &agency; //TODO Agency is part of line, we could merge them
+    const Line &line;
     int pathIdx;
-    const Mode &mode;
+    const Mode &mode; //TODO Mode is part of Line, we could merge them
     const Service &service;
     short allowSameLineTransfers;
     int totalCapacity; //Unused

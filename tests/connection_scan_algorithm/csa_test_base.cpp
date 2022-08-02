@@ -20,6 +20,8 @@
 #include "person.hpp"
 #include "place.hpp"
 #include "od_trip.hpp"
+#include "spdlog/spdlog.h"
+
 /**
  *  Create a default data set:
  * - one agency
@@ -43,6 +45,9 @@
  * TODO: Mock the bird distance calculations to use completely arbitrary data?
  * */
 void BaseCsaFixtureTests::SetUp() {
+    // Enable full debug output in the test runs
+    spdlog::set_level(spdlog::level::debug);
+
     std::vector<std::shared_ptr<TrRouting::ConnectionTuple>> connections;
 
     setUpModes();
@@ -186,25 +191,14 @@ void BaseCsaFixtureTests::setUpAgencies()
 
 void BaseCsaFixtureTests::setUpLines()
 {
-    std::vector<std::unique_ptr<TrRouting::Line>>& array = calculator.lines;
-    std::map<boost::uuids::uuid, int>& arrayIndexesByUuid = calculator.lineIndexesByUuid;
     auto & busMode = calculator.getModes().at("bus");
     const auto & defaultAgency = calculator.agencies.at(agencyUuid);
 
-    std::unique_ptr<TrRouting::Line> lineSN = std::make_unique<TrRouting::Line>(lineSNUuid, defaultAgency, busMode, "01", "South/North", "", 0);
+    calculator.lines.emplace(lineSNUuid, TrRouting::Line(lineSNUuid, defaultAgency, busMode, "01", "South/North", "", 0));
 
-    arrayIndexesByUuid[lineSN->uuid] = array.size();
-    array.push_back(std::move(lineSN));
+    calculator.lines.emplace(lineEWUuid, TrRouting::Line(lineEWUuid, defaultAgency, busMode, "02", "East/West", "", 0));
 
-    std::unique_ptr<TrRouting::Line> lineEW = std::make_unique<TrRouting::Line>(lineEWUuid, defaultAgency, busMode, "02", "East/West", "", 0);
-
-    arrayIndexesByUuid[lineEW->uuid] = array.size();
-    array.push_back(std::move(lineEW));
-
-    std::unique_ptr<TrRouting::Line> lineExtra = std::make_unique<TrRouting::Line>(lineExtraUuid, defaultAgency, busMode, "03", "Extra", "", 0);
-
-    arrayIndexesByUuid[lineExtra->uuid] = array.size();
-    array.push_back(std::move(lineExtra));
+    calculator.lines.emplace(lineExtraUuid, TrRouting::Line(lineExtraUuid, defaultAgency, busMode, "03", "Extra", "", 0));
 }
 
 void BaseCsaFixtureTests::setUpServices()
@@ -245,10 +239,15 @@ void BaseCsaFixtureTests::setUpPaths()
     std::vector<std::unique_ptr<TrRouting::Path>>& array = calculator.paths;
     std::map<boost::uuids::uuid, int>& arrayIndexesByUuid = calculator.pathIndexesByUuid;
 
-    std::unique_ptr<TrRouting::Path> snPath = std::make_unique<TrRouting::Path>();
-    snPath->uuid = pathSNUuid;
-    snPath->lineIdx = calculator.lineIndexesByUuid[lineSNUuid];
-    snPath->direction = "outbound";
+    std::vector<int> emptyVector;
+    std::unique_ptr<TrRouting::Path> snPath = std::make_unique<TrRouting::Path>(pathSNUuid,
+                                                                                calculator.lines.at(lineSNUuid),
+                                                                                "outbound",
+                                                                                "",
+                                                                                emptyVector,
+                                                                                emptyVector,
+                                                                                emptyVector,
+                                                                                emptyVector);
     addNodeToPath(snPath.get(), calculator.nodeIndexesByUuid[nodeSouth2Uuid], 210, 1186);
     addNodeToPath(snPath.get(), calculator.nodeIndexesByUuid[nodeSouth1Uuid], 190, 1160);
     addNodeToPath(snPath.get(), calculator.nodeIndexesByUuid[nodeMidNodeUuid], 180, 980);
@@ -258,10 +257,14 @@ void BaseCsaFixtureTests::setUpPaths()
     arrayIndexesByUuid[snPath->uuid] = array.size();
     array.push_back(std::move(snPath));
 
-    std::unique_ptr<TrRouting::Path> ewPath = std::make_unique<TrRouting::Path>();
-    ewPath->uuid = pathEWUuid;
-    ewPath->lineIdx = calculator.lineIndexesByUuid[lineSNUuid];
-    ewPath->direction = "outbound";
+    std::unique_ptr<TrRouting::Path> ewPath = std::make_unique<TrRouting::Path>(pathEWUuid,
+                                                                                calculator.lines.at(lineEWUuid),
+                                                                                "outbound",
+                                                                                "",
+                                                                                emptyVector,
+                                                                                emptyVector,
+                                                                                emptyVector,
+                                                                                emptyVector);
     addNodeToPath(ewPath.get(), calculator.nodeIndexesByUuid[nodeEast2Uuid], 150, 1025);
     addNodeToPath(ewPath.get(), calculator.nodeIndexesByUuid[nodeEast1Uuid], 110, 510);
     addNodeToPath(ewPath.get(), calculator.nodeIndexesByUuid[nodeMidNodeUuid], 150, 498);
@@ -271,10 +274,14 @@ void BaseCsaFixtureTests::setUpPaths()
     arrayIndexesByUuid[ewPath->uuid] = array.size();
     array.push_back(std::move(ewPath));
 
-    std::unique_ptr<TrRouting::Path> extraPath = std::make_unique<TrRouting::Path>();
-    extraPath->uuid = pathExtraUuid;
-    extraPath->lineIdx = calculator.lineIndexesByUuid[lineExtraUuid];
-    extraPath->direction = "outbound";
+    std::unique_ptr<TrRouting::Path> extraPath = std::make_unique<TrRouting::Path>(pathExtraUuid,
+                                                                                   calculator.lines.at(lineExtraUuid),
+                                                                                   "outbound",
+                                                                                   "",
+                                                                                   emptyVector,
+                                                                                   emptyVector,
+                                                                                   emptyVector,
+                                                                                   emptyVector);
     addNodeToPath(extraPath.get(), calculator.nodeIndexesByUuid[nodeEast1Uuid], 300, 1760);
     addNodeToPath(extraPath.get(), calculator.nodeIndexesByUuid[nodeExtra1Uuid], -1, -1);
     // Path's trip data will be filled in the setUpSchedules
@@ -301,7 +308,6 @@ void addTripData(TrRouting::Calculator& calculator, TrRouting::Trip *trip, std::
             1,
             1,
             nodeTimeI + 1,
-            trip->lineIdx,
             trip->allowSameLineTransfers,
             -1
         )));
@@ -334,7 +340,7 @@ void BaseCsaFixtureTests::setUpSchedules(std::vector<std::shared_ptr<TrRouting::
     // South/North trip 1 at 10
     std::unique_ptr<TrRouting::Trip> snTrip1 = std::make_unique<TrRouting::Trip>(trip1SNUuid,
                                                                                  calculator.agencies.at(agencyUuid),
-                                                                                 calculator.lineIndexesByUuid[lineSNUuid],
+                                                                                 calculator.lines.at(lineSNUuid),
                                                                                  calculator.pathIndexesByUuid[pathSNUuid],
                                                                                  busMode,
                                                                                  calculator.services.at(serviceUuid),
@@ -352,7 +358,7 @@ void BaseCsaFixtureTests::setUpSchedules(std::vector<std::shared_ptr<TrRouting::
     // South/North trip 2 at 11
     std::unique_ptr<TrRouting::Trip> snTrip2 = std::make_unique<TrRouting::Trip>(trip2SNUuid,
                                                                                  calculator.agencies.at(agencyUuid),
-                                                                                 calculator.lineIndexesByUuid[lineSNUuid],
+                                                                                 calculator.lines.at(lineSNUuid),
                                                                                  calculator.pathIndexesByUuid[pathSNUuid],
                                                                                  busMode,
                                                                                  calculator.services.at(serviceUuid),
@@ -370,7 +376,7 @@ void BaseCsaFixtureTests::setUpSchedules(std::vector<std::shared_ptr<TrRouting::
     // East/West trip 1 at 9
     std::unique_ptr<TrRouting::Trip> ewTrip1 = std::make_unique<TrRouting::Trip>(trip1EWUuid,
                                                                                  calculator.agencies.at(agencyUuid),
-                                                                                 calculator.lineIndexesByUuid[lineEWUuid],
+                                                                                 calculator.lines.at(lineEWUuid),
                                                                                  calculator.pathIndexesByUuid[pathEWUuid],
                                                                                  busMode,
                                                                                  calculator.services.at(serviceUuid),
@@ -388,7 +394,7 @@ void BaseCsaFixtureTests::setUpSchedules(std::vector<std::shared_ptr<TrRouting::
     // East/West trip 2 at 10:02
     std::unique_ptr<TrRouting::Trip> ewTrip2 = std::make_unique<TrRouting::Trip>(trip2EWUuid,
                                                                                  calculator.agencies.at(agencyUuid),
-                                                                                 calculator.lineIndexesByUuid[lineEWUuid],
+                                                                                 calculator.lines.at(lineEWUuid),
                                                                                  calculator.pathIndexesByUuid[pathEWUuid],
                                                                                  busMode,
                                                                                  calculator.services.at(serviceUuid),
@@ -406,7 +412,7 @@ void BaseCsaFixtureTests::setUpSchedules(std::vector<std::shared_ptr<TrRouting::
     // Extra trip at 10h20
     std::unique_ptr<TrRouting::Trip> extraTrip1 = std::make_unique<TrRouting::Trip>(trip1ExtraUuid,
                                                                                  calculator.agencies.at(agencyUuid),
-                                                                                 calculator.lineIndexesByUuid[lineExtraUuid],
+                                                                                 calculator.lines.at(lineExtraUuid),
                                                                                  calculator.pathIndexesByUuid[pathExtraUuid],
                                                                                  busMode,
                                                                                  calculator.services.at(serviceUuid),

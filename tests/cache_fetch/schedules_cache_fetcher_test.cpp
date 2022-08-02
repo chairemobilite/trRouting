@@ -15,17 +15,16 @@ class ScheduleCacheFetcherFixtureTests : public BaseCacheFetcherFixtureTests
 {
 protected:
     std::vector<std::unique_ptr<TrRouting::Trip>> trips;
-    std::vector<std::unique_ptr<TrRouting::Line>> lines;
+    std::map<boost::uuids::uuid, TrRouting::Line> lines;
     std::vector<std::unique_ptr<TrRouting::Path>> paths;
     std::vector<std::unique_ptr<TrRouting::Node>> nodes;
     std::map<boost::uuids::uuid, int> tripIndexesByUuid;
     std::map<boost::uuids::uuid, TrRouting::Service> services;
-    std::map<boost::uuids::uuid, int> lineIndexesByUuid;
     std::map<boost::uuids::uuid, int> pathIndexesByUuid;
     std::map<boost::uuids::uuid, int> nodeIndexesByUuid;
     std::vector<std::vector<std::unique_ptr<int>>> tripConnectionDepartureTimes;
     std::vector<std::vector<std::unique_ptr<float>>> tripConnectionDemands;
-    std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,int,short,short>>> connections;
+    std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,short,short>>> connections;
 
 public:
     void SetUp( ) override
@@ -38,8 +37,8 @@ public:
         cacheFetcher.getServices(services, VALID_CUSTOM_PATH);
 
         cacheFetcher.getNodes(nodes, nodeIndexesByUuid, VALID_CUSTOM_PATH);
-        cacheFetcher.getLines(lines, lineIndexesByUuid, agencies, modes, VALID_CUSTOM_PATH);
-        cacheFetcher.getPaths(paths, pathIndexesByUuid, lineIndexesByUuid, nodeIndexesByUuid, VALID_CUSTOM_PATH);
+        cacheFetcher.getLines(lines, agencies, modes, VALID_CUSTOM_PATH);
+        cacheFetcher.getPaths(paths, pathIndexesByUuid, lines, nodeIndexesByUuid, VALID_CUSTOM_PATH);
         // Create the invalid lines directory
         fs::create_directory(BASE_CACHE_DIRECTORY_NAME + "/" + INVALID_CUSTOM_PATH + "/lines");
     }
@@ -55,7 +54,7 @@ public:
 TEST_F(ScheduleCacheFetcherFixtureTests, TestGetSchedulesInvalidLineFile)
 {
     // Copy the invalid file for the first line 
-    std::string node0Uuid = boost::uuids::to_string(lines[0].get()->uuid);
+    std::string node0Uuid = boost::uuids::to_string(lines.begin()->second.uuid);
     fs::copy_file(BASE_CACHE_DIRECTORY_NAME + "/" + INVALID_CUSTOM_PATH + "/genericInvalid.capnpbin", BASE_CACHE_DIRECTORY_NAME + "/" + INVALID_CUSTOM_PATH + "/lines/line_ " + node0Uuid.c_str() + ".capnpbin");
     int retVal = cacheFetcher.getSchedules(
       trips,
@@ -63,7 +62,6 @@ TEST_F(ScheduleCacheFetcherFixtureTests, TestGetSchedulesInvalidLineFile)
       paths,
       tripIndexesByUuid,
       services,
-      lineIndexesByUuid,
       pathIndexesByUuid,
       nodeIndexesByUuid,
       tripConnectionDepartureTimes,
@@ -84,7 +82,6 @@ TEST_F(ScheduleCacheFetcherFixtureTests, TestGetUnexistingLineFiles)
       paths,
       tripIndexesByUuid,
       services,
-      lineIndexesByUuid,
       pathIndexesByUuid,
       nodeIndexesByUuid,
       tripConnectionDepartureTimes,
@@ -104,7 +101,6 @@ TEST_F(ScheduleCacheFetcherFixtureTests, TestGetSchedulesValid)
       paths,
       tripIndexesByUuid,
       services,
-      lineIndexesByUuid,
       pathIndexesByUuid,
       nodeIndexesByUuid,
       tripConnectionDepartureTimes,

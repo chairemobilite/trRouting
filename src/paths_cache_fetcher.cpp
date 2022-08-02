@@ -21,7 +21,7 @@ namespace TrRouting
   int CacheFetcher::getPaths(
     std::vector<std::unique_ptr<Path>>& ts,
     std::map<boost::uuids::uuid, int>& tIndexesByUuid,
-    const std::map<boost::uuids::uuid, int>& lineIndexesByUuid,
+    const std::map<boost::uuids::uuid, Line>& lines,
     const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
     std::string customPath
   )
@@ -73,23 +73,15 @@ namespace TrRouting
         std::vector<int> travelTimesSeconds;
         boost::uuids::uuid nodeUuid;
         
-        std::unique_ptr<T> t = std::make_unique<T>();
-
-        t->uuid                   = uuidGenerator(uuid);
-        t->direction              = capnpT.getDirection();
-        t->internalId             = capnpT.getInternalId();
-        t->lineIdx                = lineIndexesByUuid.at(uuidGenerator(lineUuid));
-        t->tripsIdx               = tripsIdx;
         for (std::string nodeUuidStr : capnpT.getNodesUuids())
         {
           nodeUuid = uuidGenerator(nodeUuidStr);
           nodesIdx.push_back(nodeIndexesByUuid.at(nodeUuid));
         }
-        t->nodesIdx = nodesIdx;
 
         auto jsonData = nlohmann::json::parse(capnpT.getData());
 
-        for (int i=0; i < t->nodesIdx.size(); i++)
+        for (int i=0; i < nodesIdx.size(); i++)
         {
           if (jsonData["segments"][i]["distanceMeters"] != nullptr)
           {
@@ -101,9 +93,15 @@ namespace TrRouting
           }
         }
         
-        t->segmentsDistanceMeters    = distancesMeters;
-        t->segmentsTravelTimeSeconds = travelTimesSeconds;
-        
+        std::unique_ptr<T> t = std::make_unique<T>(uuidGenerator(uuid),
+                                                   lines.at(uuidGenerator(lineUuid)),
+                                                   capnpT.getDirection(),
+                                                   capnpT.getInternalId(),
+                                                   nodesIdx,
+                                                   tripsIdx, //TODO This is empty
+                                                   travelTimesSeconds,
+                                                   distancesMeters);
+
         tIndexesByUuid[t->uuid] = ts.size();
         ts.push_back(std::move(t));
       }

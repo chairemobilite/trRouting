@@ -20,15 +20,14 @@
 namespace TrRouting
 {
   // FIXME ConnectionTuple is defined in calculator.hpp. Should it be elsewhere? Cache fetcher should work for any algorithm, is this tuple csa-specific or should it go somewhere common.
-  using ConnectionTuple = std::tuple<int,int,int,int,int,short,short,int,int,short,short>;
+  using ConnectionTuple = std::tuple<int,int,int,int,int,short,short,int,short,short>;
   
   int CacheFetcher::getSchedules(
     std::vector<std::unique_ptr<Trip>>& trips,
-    const std::vector<std::unique_ptr<Line>>& lines,
+    const std::map<boost::uuids::uuid, Line>& lines,
     std::vector<std::unique_ptr<Path>>& paths,
     std::map<boost::uuids::uuid, int>& tripIndexesByUuid,
     const std::map<boost::uuids::uuid, Service>& services,
-    const std::map<boost::uuids::uuid, int>& lineIndexesByUuid,
     const std::map<boost::uuids::uuid, int>& pathIndexesByUuid,
     const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
     std::vector<std::vector<std::unique_ptr<int>>>&   tripConnectionDepartureTimes,
@@ -52,22 +51,23 @@ namespace TrRouting
     Path * path;
     std::vector<int> pathNodesIdx;
     std::string tripUuidStr, pathUuidStr, cacheFileName;
-    int lineIdx, tripIdx;
+    int tripIdx;
     unsigned long nodeTimesCount;
     unsigned long linesCount {lines.size()};
     int lineI {0};
     
     spdlog::info("Fetching trips and connections from cache... ({} lines)", linesCount);
 
-    for (auto & line : lines)
+    for (auto & lineIter : lines)
     {
-      cacheFileName = "lines/line_" + boost::uuids::to_string(line->uuid);
+      const Line &line = lineIter.second;
+      cacheFileName = "lines/line_" + boost::uuids::to_string(line.uuid);
       std::string cacheFilePath = getFilePath(cacheFileName, customPath) + ".capnpbin";
       int fd = open(cacheFilePath.c_str(), O_RDWR);
       if (fd < 0)
       {
         int err = errno;
-        spdlog::error("no schedules found for line {} ({} {})", boost::uuids::to_string(line->uuid), line->shortname, line->longname);
+        spdlog::error("no schedules found for line {} ({} {})", boost::uuids::to_string(line.uuid), line.shortname, line.longname);
         continue;
       }
 
@@ -96,12 +96,12 @@ namespace TrRouting
               pathNodesIdx = path->nodesIdx;
               
               std::unique_ptr<Trip> trip = std::make_unique<Trip>(tripUuid,
-                                                                  line->agency,
-                                                                  lineIndexesByUuid.at(line->uuid),
+                                                                  line.agency,
+                                                                  line,
                                                                   pathIndexesByUuid.at(pathUuid),
-                                                                  line->mode,
+                                                                  line.mode,
                                                                   service,
-                                                                  line->allowSameLineTransfers,
+                                                                  line.allowSameLineTransfers,
                                                                   capnpTrip.getTotalCapacity(),
                                                                   capnpTrip.getSeatedCapacity());
 
@@ -133,9 +133,8 @@ namespace TrRouting
                     canBoards[nodeTimeI],
                     canUnboards[nodeTimeI + 1],
                     nodeTimeI + 1,
-                    trip->lineIdx,
                     trip->allowSameLineTransfers,
-                    line->mode.shortname == Mode::TRANSFERABLE ? 0 : -1
+                    line.mode.shortname == Mode::TRANSFERABLE ? 0 : -1
                   )));
 
                   connections.push_back(std::move(forwardConnection));

@@ -61,7 +61,7 @@ namespace TrRouting
   private:
     nlohmann::json response;
     // TODO Instead of returning total travel time and legs, this visitor should do what needs to be done
-    std::vector<std::tuple<int, int, int, int, int>> legs;
+    std::vector<Leg> legs;
     int totalTravelTime;
     RouteParameters& params;
   public:
@@ -69,7 +69,7 @@ namespace TrRouting
       // Nothing to initialize
     }
     nlohmann::json getResult() { return response; }
-    std::vector<std::tuple<int, int, int, int, int>> getLegs() { return legs; }
+    std::vector<Leg> getLegs() { return legs; }
     int getTotalTravelTime() { return totalTravelTime; }
     void visitSingleCalculationResult(const SingleCalculationResult& result) override;
     void visitAlternativesResult(const AlternativesResult& result) override;
@@ -156,7 +156,6 @@ namespace TrRouting
     std::vector<float> demandByHourOfDay;
 
     int    legTripIdx;
-    int    legLineIdx;
     int    legPathIdx;
     Path * legPath;
     int    legConnectionStartIdx;
@@ -175,10 +174,12 @@ namespace TrRouting
 
     json["odTrips"] = nlohmann::json::array();
 
-    for (auto & line : lines)
+    // Initialize lineProfiles
+    for (auto & linePair : lines)
     {
-      lineProfiles[line->uuid] = 0.0;
+      lineProfiles[linePair.first] = 0.0;
     }
+    //TODO Why is it 28 ? That seems too many hours in a day
     for (int i = 0; i <= 28; i++)
     {
       demandByHourOfDay.push_back(0.0);
@@ -312,12 +313,12 @@ namespace TrRouting
             for (auto & leg : visitor.getLegs())
             {
               legTripIdx            = std::get<0>(leg);
-              legLineIdx            = std::get<1>(leg);
+              const Line &legLine   = std::get<1>(leg);
               legPathIdx            = std::get<2>(leg);
               legPath               = paths[legPathIdx].get();
               legConnectionStartIdx = std::get<3>(leg);
               legConnectionEndIdx   = std::get<4>(leg);
-              lineProfiles[lines[legLineIdx].get()->uuid] += correctedExpansionFactor;
+              lineProfiles.at(legLine.uuid) += correctedExpansionFactor;
 
               if (pathProfiles.find(legPath->uuid) == pathProfiles.end())
               {
