@@ -18,8 +18,7 @@ namespace TrRouting
 {
 
   int CacheFetcher::getLines(
-    std::vector<std::unique_ptr<Line>>& ts,
-    std::map<boost::uuids::uuid, int>& tIndexesByUuid,
+    std::map<boost::uuids::uuid, Line>& ts,
     const std::map<boost::uuids::uuid, Agency>& agencies,
     const std::map<std::string, Mode>& modes, 
     std::string customPath
@@ -32,7 +31,6 @@ namespace TrRouting
     int ret = 0;
 
     ts.clear();
-    tIndexesByUuid.clear();
 
     std::string tStr  = "lines";
     std::string TStr  = "Lines";
@@ -68,17 +66,13 @@ namespace TrRouting
         std::string uuid       {capnpT.getUuid()};
         std::string agencyUuid {capnpT.getAgencyUuid()};
         
-        std::unique_ptr<T> t = std::make_unique<T>(
-                                                   uuidGenerator(uuid),
-                                                   agencies.at(uuidGenerator(agencyUuid)),
-                                                   modes.at(capnpT.getMode()),
-                                                   capnpT.getShortname(),
-                                                   capnpT.getLongname(),
-                                                   capnpT.getInternalId(),
-                                                   capnpT.getAllowSameLineTransfers());
-
-        tIndexesByUuid[t->uuid] = ts.size();
-        ts.push_back(std::move(t));
+        ts.emplace(uuidGenerator(uuid), T(uuidGenerator(uuid),
+                                          agencies.at(uuidGenerator(agencyUuid)),
+                                          modes.at(capnpT.getMode()),
+                                          capnpT.getShortname(),
+                                          capnpT.getLongname(),
+                                          capnpT.getInternalId(),
+                                          capnpT.getAllowSameLineTransfers()));
       }
     }
     catch (const kj::Exception& e)

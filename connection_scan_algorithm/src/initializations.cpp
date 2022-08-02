@@ -158,7 +158,7 @@ namespace TrRouting
       std::stable_sort(forwardConnections.begin(), forwardConnections.end(), [](const std::shared_ptr<ConnectionTuple>& connectionA, const std::shared_ptr<ConnectionTuple>& connectionB)
       {
         // Copied from calculator.hpp
-        // { NODE_DEP = 0, NODE_ARR = 1, TIME_DEP = 2, TIME_ARR = 3, TRIP = 4, CAN_BOARD = 5, CAN_UNBOARD = 6, SEQUENCE = 7, LINE = 8, CAN_TRANSFER_SAME_LINE = 9, MIN_WAITING_TIME_SECONDS = 10 };
+        // { NODE_DEP = 0, NODE_ARR = 1, TIME_DEP = 2, TIME_ARR = 3, TRIP = 4, CAN_BOARD = 5, CAN_UNBOARD = 6, SEQUENCE = 7, CAN_TRANSFER_SAME_LINE = 8, MIN_WAITING_TIME_SECONDS = 8 };
         if (std::get<connectionIndexes::TIME_DEP>(*connectionA) < std::get<connectionIndexes::TIME_DEP>(*connectionB))
         {
           return true;

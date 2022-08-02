@@ -9,6 +9,7 @@
 #include "mode.hpp"
 #include "agency.hpp"
 #include "service.hpp"
+#include "line.hpp"
 
 namespace TrRouting
 {
@@ -258,9 +259,9 @@ namespace TrRouting
           }
         }
 
-        if (tripsEnabled[i] == 1 && parameters.getOnlyLinesIdx()->size() > 0)
+        if (tripsEnabled[i] == 1 && parameters.getOnlyLines().size() > 0)
         {
-          if (std::find(parameters.getOnlyLinesIdx()->begin(), parameters.getOnlyLinesIdx()->end(), trip->lineIdx) == parameters.getOnlyLinesIdx()->end())
+          if (std::find(parameters.getOnlyLines().begin(), parameters.getOnlyLines().end(), trip->line) == parameters.getOnlyLines().end())
           {
             tripsEnabled[i] = -1;
           }
@@ -300,9 +301,9 @@ namespace TrRouting
           }
         }
 
-        if (tripsEnabled[i] == 1 && parameters.getExceptLinesIdx()->size() > 0)
+        if (tripsEnabled[i] == 1 && parameters.getExceptLines().size() > 0)
         {
-          if (std::find(parameters.getExceptLinesIdx()->begin(), parameters.getExceptLinesIdx()->end(), trip->lineIdx) != parameters.getExceptLinesIdx()->end())
+          if (std::find(parameters.getExceptLines().begin(), parameters.getExceptLines().end(), trip->line) != parameters.getExceptLines().end())
           {
             tripsEnabled[i] = -1;
           }

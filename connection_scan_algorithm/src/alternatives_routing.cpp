@@ -14,11 +14,11 @@ namespace TrRouting
 {
 
 
-  std::string LineIdxToString(const std::vector<int> & linesList, const std::vector<std::unique_ptr<Line>> &lines) {
+  std::string LinesToString(const std::vector<std::reference_wrapper<const Line>> & linesList) {
     std::stringstream formatter;
 
-    for(auto lineIdx: linesList) {
-      formatter << lines[lineIdx].get()->shortname << " ";
+    for(auto line: linesList) {
+      formatter << line.get().shortname << " ";
     }
     return formatter.str();
   }
@@ -26,27 +26,29 @@ namespace TrRouting
   /**
    * @brief Visitor class to get the line ids used by a step
    * 
-   * TODO See TODO of LineIdxVisitor, when concrete classes are returned, the visitor approach for line id should be re...visited!
+   * TODO See TODO of LineVisitor, when concrete classes are returned, the visitor approach for line id should be re...visited!
    */
-  class LineIdxStepVisitor : public StepVisitor<int> {
+  class LineStepVisitor : public StepVisitor<std::optional<std::reference_wrapper<const Line>>> {
   private:
-    int lineIdx;
-    std::map<boost::uuids::uuid, int>& lineIndexesByUuid;
+    std::optional<std::reference_wrapper<const Line>> stepLine;
+    const std::map<boost::uuids::uuid, Line>& lines;
   public:
-    LineIdxStepVisitor(std::map<boost::uuids::uuid, int>& _lineIndexesByUuid):
-      lineIdx(-1),
-      lineIndexesByUuid(_lineIndexesByUuid) {}
+    LineStepVisitor(const std::map<boost::uuids::uuid, Line>& _lines):
+      lines(_lines) {}
     void visitBoardingStep(const BoardingStep& step) override {
-      lineIdx = lineIndexesByUuid[step.lineUuid];
+      spdlog::debug("Step Visitor line {}", boost::uuids::to_string(step.lineUuid));
+      stepLine = lines.at(step.lineUuid);
     }
     void visitUnboardingStep(const UnboardingStep& step) override {
-      lineIdx = -1;
+      //No line for this step type, don't set result
+      stepLine.reset();
     }
     void visitWalkingStep(const WalkingStep& step) override {
-      lineIdx = -1;
+      //No line for this step type, don't set result
+      stepLine.reset();
     }
-    int getResult() override {
-      return lineIdx;
+    std::optional<std::reference_wrapper<const Line>> getResult() override {
+      return stepLine;
     }
   };
 
@@ -57,20 +59,20 @@ namespace TrRouting
    * return types instead. When that is possible, consider adding a method in SingleCalculationResult 
    * instead of this visitor.
    * */
-  class LineIdxVisitor : public ResultVisitor<std::vector<int>> {
+  class LineVisitor : public ResultVisitor<std::vector<std::reference_wrapper<const Line>>> {
   private:
-    std::vector<int> linesIdx;
-    LineIdxStepVisitor stepVisitor;
+    std::vector<std::reference_wrapper<const Line>> linesList;
+    LineStepVisitor stepVisitor;
   public:
-    LineIdxVisitor(std::map<boost::uuids::uuid, int>& _lineIndexesByUuid): stepVisitor(LineIdxStepVisitor(_lineIndexesByUuid)) {}
-    std::vector<int> getResult() override {
-      return linesIdx;
+    LineVisitor(const std::map<boost::uuids::uuid, Line>& _lines): stepVisitor(LineStepVisitor(_lines)) {}
+    std::vector<std::reference_wrapper<const Line>> getResult() override {
+      return linesList;
     }
     void visitSingleCalculationResult(const SingleCalculationResult& result) override {
       for (auto const& step : result.steps) {
-        int stepLineIdx = step.get()->accept(stepVisitor);
-        if (stepLineIdx >= 0) {
-          linesIdx.push_back(stepLineIdx);
+        std::optional<std::reference_wrapper<const Line>> stepLine = step.get()->accept(stepVisitor);
+        if (stepLine.has_value()) {
+          linesList.push_back(stepLine.value());
         }
       }
     };
@@ -84,24 +86,21 @@ namespace TrRouting
 
   AlternativesResult Calculator::alternativesRouting(RouteParameters &parameters)
   {
-
-    std::vector<int>                 foundLinesIdx;
-    std::vector<int>                 exceptLinesIdxFromParameters = *parameters.getExceptLinesIdx(); // make a copy of lines that are already disabled in parameters
-    std::vector< std::vector<int> >  allCombinations;
-    std::vector< std::vector<int> >  failedCombinations;
+    using LineVector = std::vector<std::reference_wrapper<const Line>>;
+    LineVector exceptLinesFromParameters = parameters.getExceptLines(); // make a copy of lines that are already disabled in parameters
+    std::vector< LineVector >  allCombinations;
+    std::vector< LineVector >  failedCombinations;
     bool                             combinationMatchesWithFailed {false};
     bool                             combinationMatchesWithAtLeastOneFailed {false};
-    std::map<std::vector<int>, bool> alreadyCalculatedCombinations;
-    std::map<std::vector<int>, bool> alreadyFoundLinesIdx;
-    std::map<std::vector<int>, int>  foundLinesIdxTravelTimeSeconds;
-    std::vector<int>                 combinationsKs;
+    std::map<LineVector, bool> alreadyCalculatedCombinations;
+    std::map<LineVector, bool> alreadyFoundLines;
+    std::map<LineVector, int>  foundLinesTravelTimeSeconds;
     int maxTravelTime;
     int alternativeSequence = 1;
     int alternativesCalculatedCount = 1;
     int maxAlternatives = params.maxAlternatives;
     int lastFoundedAtNum = 0;
     //int departureTimeSeconds = -1;
-    std::vector<std::string> lineShortnames;
 
     spdlog::debug("alternatives parameters:");
     spdlog::debug("  maxTotalTravelTimeSeconds: {}", parameters.getMaxTotalTravelTimeSeconds());
@@ -123,7 +122,7 @@ namespace TrRouting
       alternativeSequence++;
       alternativesCalculatedCount++;
 
-      LineIdxVisitor visitor = LineIdxVisitor(lineIndexesByUuid);
+      LineVisitor visitor = LineVisitor(lines);
 
       //departureTimeSeconds = routingResult.departureTimeSeconds + routingResult.firstWaitingTimeSeconds - params.minWaitingTimeSeconds;
 
@@ -154,22 +153,23 @@ namespace TrRouting
 
       //params.departureTimeSeconds = departureTimeSeconds;
 
-      spdlog::debug("  fastestTravelTimeSeconds: ", routingResult.totalTravelTime);
+      spdlog::debug("  fastestTravelTimeSeconds: {}", routingResult.totalTravelTime);
 
-      foundLinesIdx = routingResult.accept(visitor);
-      std::stable_sort(foundLinesIdx.begin(),foundLinesIdx.end());
-      alreadyFoundLinesIdx[foundLinesIdx]           = true;
-      foundLinesIdxTravelTimeSeconds[foundLinesIdx] = routingResult.totalTravelTime;
+      // Get the best result and extract the lines from it
+      // We will generate all the combinations of those lines and redo the calculation
+      // with each of the combination of line excluded 
+      LineVector foundLines = routingResult.accept(visitor);
+      std::stable_sort(foundLines.begin(),foundLines.end());
+      alreadyFoundLines[foundLines]           = true;
+      foundLinesTravelTimeSeconds[foundLines] = routingResult.totalTravelTime;
       lastFoundedAtNum = 1;
 
-      spdlog::debug("fastest line ids: {}", LineIdxToString(foundLinesIdx, lines));
+      spdlog::debug("fastest line ids: {}", LinesToString(foundLines));
 
-
-      combinationsKs.clear();
-      for (int i = 1; i <= foundLinesIdx.size(); i++) { combinationsKs.push_back(i); }
-      for (auto k : combinationsKs)
+      // Generate combination of group of 1 line, then 2 lines up to the total amount of lines
+      for (int k = 1; k <= foundLines.size(); k++)
       {
-        Combinations<int> combinations(foundLinesIdx, k);
+        Combinations<std::reference_wrapper<const Line>> combinations(foundLines, k);
 
         for (auto newCombination : combinations)
         {
@@ -179,23 +179,23 @@ namespace TrRouting
         }
       }
 
-      std::vector<int> combination;
+      // Process all combinations and calculate new route with those excluded
       for (int i = 0; i < allCombinations.size(); i++)
       {
         if (alternativesCalculatedCount < maxAlternatives && alternativeSequence - 1 < params.maxValidAlternatives)
         {
-
-          combination = allCombinations.at(i);
+          // Generate parameters to send to calculate
+          const LineVector combination = allCombinations.at(i);
           // TODO: The exception should be part of the calculation specific parameters, which do not exist yet
-          alternativeParameters.exceptLinesIdx = exceptLinesIdxFromParameters; // reset except lines using parameters
-          for (auto lineIdx : combination)
+          alternativeParameters.exceptLines = exceptLinesFromParameters; // reset except lines using parameters
+          for (auto line : combination)
           {
-            alternativeParameters.exceptLinesIdx.push_back(lineIdx);
+            alternativeParameters.exceptLines.push_back(line);
           }
 
           spdlog::info("calculating alternative {} from a total of {} ...", alternativeSequence, alternativesCalculatedCount);
           
-          spdlog::debug("except lines: {}", LineIdxToString(combination, lines));
+          spdlog::debug("except lines: {}", LinesToString(combination));
 
           try {
             result = calculate(alternativeParameters, false, true);
@@ -203,38 +203,34 @@ namespace TrRouting
             if (result.get()->resType == result_type::SINGLE_CALCULATION)
             {
               SingleCalculationResult& alternativeCalcResult = dynamic_cast<SingleCalculationResult&>(*result.get());
-              LineIdxVisitor alternativeVisitor = LineIdxVisitor(lineIndexesByUuid);
-              foundLinesIdx = alternativeCalcResult.accept(alternativeVisitor);
-              std::stable_sort(foundLinesIdx.begin(), foundLinesIdx.end());
 
-              if (foundLinesIdx.size() > 0 && alreadyFoundLinesIdx.count(foundLinesIdx) == 0)
+              // Extract lines from new results. If the result is valid, add it to the alternative list
+              // and then generation new lines combinations to try other alternatives
+              LineVisitor alternativeVisitor = LineVisitor(lines);
+              foundLines = alternativeCalcResult.accept(alternativeVisitor);
+              std::stable_sort(foundLines.begin(), foundLines.end());
+
+              if (foundLines.size() > 0 && alreadyFoundLines.count(foundLines) == 0)
               {
-                lineShortnames.clear();
-                for(auto lineIdx : foundLinesIdx)
-                {
-                  lineShortnames.push_back(lines[lineIdx].get()->shortname);
-                }
-
                 alternatives.alternatives.push_back(std::move(result));
 
                 spdlog::debug("travelTimeSeconds: {}  line Uuids: {}",
                               alternativeCalcResult.totalTravelTime,
-                              LineIdxToString(foundLinesIdx, lines));
+                              LinesToString(foundLines));
                 
-                combinationsKs.clear();
 
                 lastFoundedAtNum = alternativesCalculatedCount;
-                alreadyFoundLinesIdx[foundLinesIdx] = true;
-                foundLinesIdxTravelTimeSeconds[foundLinesIdx] = alternativeCalcResult.totalTravelTime;
-                for (int i = 1; i <= foundLinesIdx.size(); i++) { combinationsKs.push_back(i); }
-                for (auto k : combinationsKs)
+                alreadyFoundLines[foundLines] = true;
+                foundLinesTravelTimeSeconds[foundLines] = alternativeCalcResult.totalTravelTime;
+                for (int k = 1; k <= foundLines.size(); k++)
                 {
-                  Combinations<int> combinations(foundLinesIdx, k);
-
+                  Combinations<std::reference_wrapper<const Line>> combinations(foundLines, k);
                   for (auto newCombination : combinations)
                   {
-
-                    newCombination.insert( newCombination.end(), combination.begin(), combination.end() );
+                    // Add the lines currently exclused (combination) to the newly generated combinations
+                    // from the line in the latest alternative
+                    std::copy(combination.begin(), combination.end(),
+                              std::back_inserter(newCombination));
                     std::stable_sort(newCombination.begin(), newCombination.end());
                     if (alreadyCalculatedCombinations.count(newCombination) == 0)
                     {
@@ -242,9 +238,9 @@ namespace TrRouting
                       for (auto failedCombination : failedCombinations)
                       {
                         combinationMatchesWithFailed = true;
-                        for (int failedLineIdx : failedCombination)
+                        for (auto failedLine : failedCombination)
                         {
-                          if (std::find(newCombination.begin(), newCombination.end(), failedLineIdx) == newCombination.end())
+                          if (std::find(newCombination.begin(), newCombination.end(), failedLine) == newCombination.end())
                           {
                             combinationMatchesWithFailed = false;
                             break;
@@ -265,8 +261,6 @@ namespace TrRouting
                   }
                 }
 
-                combination.clear();
-
                 alternativeSequence++;
 
               }
@@ -282,17 +276,17 @@ namespace TrRouting
           {
             for (auto failedCombination : failedCombinations)
             {
-              spdlog::debug("failed combinations: {}", LineIdxToString(failedCombination, lines));
+              spdlog::debug("failed combinations: {}", LinesToString(failedCombination));
             }
           }
         }
       }
 
       int i {0};
-      for (auto foundLinesIdx : alreadyFoundLinesIdx)
+      for (auto foundLines : alreadyFoundLines)
       {          
-        spdlog::debug("{}. {} tt: ", i, LineIdxToString(foundLinesIdx.first, lines),
-                      (foundLinesIdxTravelTimeSeconds[foundLinesIdx.first] / 60));
+        spdlog::debug("{}. {} tt: ", i, LinesToString(foundLines.first),
+                      (foundLinesTravelTimeSeconds[foundLines.first] / 60));
         i++;          
       }
       

@@ -47,19 +47,16 @@ namespace TrRouting
       std::tuple<int,int,int,int,int,short,int>         emptyJourneyStep {-1,-1,-1,-1,-1,-1,-1};
       ConnectionTuple * journeyStepEnterConnection; // connection tuple: departureNodeIndex, arrivalNodeIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequenceinTrip
       ConnectionTuple * journeyStepExitConnection;
-      std::vector<boost::uuids::uuid>                   lineUuids;
-      std::vector<int>                                  linesIdx;
       std::vector<boost::uuids::uuid>                   unboardingNodeUuids;
       std::vector<boost::uuids::uuid>                   boardingNodeUuids;
       std::vector<boost::uuids::uuid>                   tripUuids;
       std::vector<int>                                  tripsIdx;
       std::vector<int>                                  inVehicleTravelTimesSeconds; // the in vehicle travel time for each segment
-      std::vector<std::tuple<int, int, int, int, int>>  legs; // tuple: tripIdx, lineIdx, pathIdx, start connection index, end connection index
+      std::vector<Leg> legs;
 
       Node *   journeyStepNodeDeparture;
       Node *   journeyStepNodeArrival;
       Trip *   journeyStepTrip;
-      Line *   journeyStepLine;
       Path *   journeyStepPath;
 
       int totalInVehicleTime       { 0}; int transferArrivalTime    {-1}; int firstDepartureTime   {-1};
@@ -79,8 +76,6 @@ namespace TrRouting
 
         legs.clear();
         journey.clear();
-        lineUuids.clear();
-        linesIdx.clear();
         boardingNodeUuids.clear();
         unboardingNodeUuids.clear();
         tripUuids.clear();
@@ -170,7 +165,6 @@ namespace TrRouting
             journeyStepNodeDeparture    = nodes[std::get<connectionIndexes::NODE_DEP>(*journeyStepEnterConnection)].get();
             journeyStepNodeArrival      = nodes[std::get<connectionIndexes::NODE_ARR>(*journeyStepExitConnection)].get();
             journeyStepTrip             = trips[std::get<journeyStepIndexes::FINAL_TRIP>(journeyStep)].get();
-            journeyStepLine             = lines[journeyStepTrip->lineIdx].get();
             journeyStepPath             = paths[journeyStepTrip->pathIdx].get();
             transferTime                = std::get<journeyStepIndexes::TRANSFER_TRAVEL_TIME>(journeyStep);
             distance                    = std::get<journeyStepIndexes::TRANSFER_DISTANCE>(journeyStep);
@@ -191,18 +185,16 @@ namespace TrRouting
 
             totalInVehicleTime         += inVehicleTime;
             totalWaitingTime           += waitingTime;
-            if (Mode::TRANSFERABLE != journeyStepLine->mode.shortname)
+            if (Mode::TRANSFERABLE != journeyStepTrip->line.mode.shortname)
             {
               numberOfTransfers += 1;
             }
-            lineUuids.push_back(journeyStepLine->uuid);
-            linesIdx.push_back(journeyStepTrip->lineIdx);
             inVehicleTravelTimesSeconds.push_back(inVehicleTime);
             boardingNodeUuids.push_back(journeyStepNodeDeparture->uuid);
             unboardingNodeUuids.push_back(journeyStepNodeArrival->uuid);
             tripUuids.push_back(journeyStepTrip->uuid);
             tripsIdx.push_back(std::get<journeyStepIndexes::FINAL_TRIP>(journeyStep));
-            legs.push_back(std::make_tuple(std::get<journeyStepIndexes::FINAL_TRIP>(journeyStep), journeyStepTrip->lineIdx, journeyStepTrip->pathIdx, boardingSequence - 1, unboardingSequence - 1));
+            legs.push_back(std::make_tuple(std::get<journeyStepIndexes::FINAL_TRIP>(journeyStep), std::ref(journeyStepTrip->line), journeyStepTrip->pathIdx, boardingSequence - 1, unboardingSequence - 1));
 
             if (unboardingSequence - 1 < journeyStepPath->segmentsDistanceMeters.size()) // check if distances are available for this path
             {
@@ -211,7 +203,7 @@ namespace TrRouting
                 inVehicleDistance += journeyStepPath->segmentsDistanceMeters[seqI];
               }
               totalDistance += inVehicleDistance;
-              if (Mode::TRANSFERABLE == journeyStepLine->mode.shortname)
+              if (Mode::TRANSFERABLE == journeyStepTrip->line.mode.shortname)
               {
                 totalWalkingDistance     += inVehicleDistance;
                 totalWalkingTime         += inVehicleTime;
@@ -246,12 +238,12 @@ namespace TrRouting
                 journeyStepTrip->agency.uuid,
                 journeyStepTrip->agency.acronym,
                 journeyStepTrip->agency.name,
-                journeyStepLine->uuid,
-                journeyStepLine->shortname,
-                journeyStepLine->longname,
+                journeyStepTrip->line.uuid,
+                journeyStepTrip->line.shortname,
+                journeyStepTrip->line.longname,
                 journeyStepPath->uuid,
-                journeyStepLine->mode.name,
-                journeyStepLine->mode.shortname,
+                journeyStepTrip->line.mode.name,
+                journeyStepTrip->line.mode.shortname,
                 journeyStepTrip->uuid,
                 boardingSequence,
                 boardingSequence,
@@ -267,12 +259,12 @@ namespace TrRouting
                 journeyStepTrip->agency.uuid,
                 journeyStepTrip->agency.acronym,
                 journeyStepTrip->agency.name,
-                journeyStepLine->uuid,
-                journeyStepLine->shortname,
-                journeyStepLine->longname,
+                journeyStepTrip->line.uuid,
+                journeyStepTrip->line.shortname,
+                journeyStepTrip->line.longname,
                 journeyStepPath->uuid,
-                journeyStepLine->mode.name,
-                journeyStepLine->mode.shortname,
+                journeyStepTrip->line.mode.name,
+                journeyStepTrip->line.mode.shortname,
                 journeyStepTrip->uuid,
                 unboardingSequence,
                 unboardingSequence + 1,

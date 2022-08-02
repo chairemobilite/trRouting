@@ -20,11 +20,11 @@ namespace TrRouting
     boost::uuids::uuid simulationUuid;
     std::vector<std::reference_wrapper<const Service>> servicesList;
     std::vector<std::reference_wrapper<const Mode>> onlyModes;
-    std::vector<int> onlyLinesIdx;
+    std::vector<std::reference_wrapper<const Line>> onlyLines;
     std::vector<std::reference_wrapper<const Agency>> onlyAgencies;
     std::vector<int> onlyNodesIdx;
     std::vector<std::reference_wrapper<const Mode>> exceptModes;
-    std::vector<int> exceptLinesIdx;
+    std::vector<std::reference_wrapper<const Line>> exceptLines;
     std::vector<std::reference_wrapper<const Agency>> exceptAgencies;
     std::vector<int> exceptNodesIdx;
 
