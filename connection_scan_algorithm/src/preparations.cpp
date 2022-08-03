@@ -55,7 +55,7 @@ namespace TrRouting
 
   int Calculator::updatePathsFromCache(std::string customPath)
   {
-    return dataFetcher.getPaths(paths, pathIndexesByUuid, lines, nodeIndexesByUuid, customPath);
+    return dataFetcher.getPaths(paths, lines, nodeIndexesByUuid, customPath);
   }
 
   int Calculator::updateScenariosFromCache(std::string customPath)
@@ -72,7 +72,6 @@ namespace TrRouting
       paths,
       tripIndexesByUuid,
       services,
-      pathIndexesByUuid,
       nodeIndexesByUuid,
       tripConnectionDepartureTimes,
       tripConnectionDemands,

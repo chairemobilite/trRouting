@@ -160,8 +160,8 @@ namespace TrRouting
     std::map<boost::uuids::uuid, Line>       lines;
     const std::map<boost::uuids::uuid, Line> & getLines() {return lines;}
 
-    std::vector<std::unique_ptr<Path>>       paths;
-    std::map<boost::uuids::uuid, int>        pathIndexesByUuid;
+    std::map<boost::uuids::uuid, Path>       paths;
+    const std::map<boost::uuids::uuid, Path> & getPaths() {return paths;}
 
     std::vector<std::unique_ptr<Scenario>>   scenarios;
     std::map<boost::uuids::uuid, int>        scenarioIndexesByUuid;

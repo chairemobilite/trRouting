@@ -14,6 +14,7 @@
 #include "cache_fetcher.hpp"
 #include "trip.hpp"
 #include "line.hpp"
+#include "path.hpp"
 #include "capnp/line.capnp.h"
 #include "calculation_time.hpp"
 
@@ -25,10 +26,9 @@ namespace TrRouting
   int CacheFetcher::getSchedules(
     std::vector<std::unique_ptr<Trip>>& trips,
     const std::map<boost::uuids::uuid, Line>& lines,
-    std::vector<std::unique_ptr<Path>>& paths,
+    std::map<boost::uuids::uuid, Path>& paths,
     std::map<boost::uuids::uuid, int>& tripIndexesByUuid,
     const std::map<boost::uuids::uuid, Service>& services,
-    const std::map<boost::uuids::uuid, int>& pathIndexesByUuid,
     const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
     std::vector<std::vector<std::unique_ptr<int>>>&   tripConnectionDepartureTimes,
     std::vector<std::vector<std::unique_ptr<float>>>& tripConnectionDemands,
@@ -48,8 +48,6 @@ namespace TrRouting
 
     boost::uuids::string_generator uuidGenerator;
     boost::uuids::uuid tripUuid, pathUuid;
-    Path * path;
-    std::vector<int> pathNodesIdx;
     std::string tripUuidStr, pathUuidStr, cacheFileName;
     int tripIdx;
     unsigned long nodeTimesCount;
@@ -92,13 +90,12 @@ namespace TrRouting
               pathUuidStr  = capnpTrip.getPathUuid();
               tripUuid     = uuidGenerator(tripUuidStr);
               pathUuid     = uuidGenerator(pathUuidStr);
-              path         = paths[pathIndexesByUuid.at(pathUuid)].get();
-              pathNodesIdx = path->nodesIdx;
+              Path &path = paths.at(pathUuid);
               
               std::unique_ptr<Trip> trip = std::make_unique<Trip>(tripUuid,
                                                                   line.agency,
                                                                   line,
-                                                                  pathIndexesByUuid.at(pathUuid),
+                                                                  path,
                                                                   line.mode,
                                                                   service,
                                                                   line.allowSameLineTransfers,
@@ -107,7 +104,8 @@ namespace TrRouting
 
               
               tripIdx = trips.size();
-              paths[trip->pathIdx].get()->tripsIdx.push_back(tripIdx);
+              // TODO This should probably be done in the Trip constructor (setting the back reference)
+              path.tripsIdx.push_back(tripIdx);
               tripIndexesByUuid[trip->uuid] = tripIdx;
 
               nodeTimesCount             = capnpTrip.getNodeArrivalTimesSeconds().size();
@@ -125,8 +123,8 @@ namespace TrRouting
                 {
 
                   std::shared_ptr<ConnectionTuple> forwardConnection(std::make_shared<ConnectionTuple>(ConnectionTuple(
-                    pathNodesIdx[nodeTimeI],
-                    pathNodesIdx[nodeTimeI + 1],
+                    path.nodesIdx[nodeTimeI],
+                    path.nodesIdx[nodeTimeI + 1],
                     departureTimesSeconds[nodeTimeI],
                     arrivalTimesSeconds[nodeTimeI + 1],
                     tripIdx,
