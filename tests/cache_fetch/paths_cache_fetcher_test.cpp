@@ -12,8 +12,7 @@ namespace fs = std::filesystem;
 class PathCacheFetcherFixtureTests : public BaseCacheFetcherFixtureTests
 {
 protected:
-    std::vector<std::unique_ptr<TrRouting::Path>> objects;
-    std::map<boost::uuids::uuid, int> objectIndexesByUuid;
+    std::map<boost::uuids::uuid, TrRouting::Path> objects;
     std::map<boost::uuids::uuid, TrRouting::Line> lines;
     std::map<boost::uuids::uuid, int> nodeIndexesByUuid;
 
@@ -45,7 +44,7 @@ public:
 
 TEST_F(PathCacheFetcherFixtureTests, TestGetPathsInvalid)
 {
-    int retVal = cacheFetcher.getPaths(objects, objectIndexesByUuid, lines, nodeIndexesByUuid, INVALID_CUSTOM_PATH);
+    int retVal = cacheFetcher.getPaths(objects, lines, nodeIndexesByUuid, INVALID_CUSTOM_PATH);
     ASSERT_EQ(-EBADMSG, retVal);
     ASSERT_EQ(0, objects.size());
 }
@@ -53,14 +52,14 @@ TEST_F(PathCacheFetcherFixtureTests, TestGetPathsInvalid)
 // TODO Add tests for various services, lines, agencies that don't exist. But first, we should be able to create cache files with mock test data
 TEST_F(PathCacheFetcherFixtureTests, TestGetPathsValid)
 {
-    int retVal = cacheFetcher.getPaths(objects, objectIndexesByUuid, lines, nodeIndexesByUuid, VALID_CUSTOM_PATH);
+    int retVal = cacheFetcher.getPaths(objects, lines, nodeIndexesByUuid, VALID_CUSTOM_PATH);
     ASSERT_EQ(0, retVal);
     ASSERT_EQ(4, objects.size());
 }
 
 TEST_F(PathCacheFetcherFixtureTests, TestGetPathsFileNotExists)
 {
-    int retVal = cacheFetcher.getPaths(objects, objectIndexesByUuid, lines, nodeIndexesByUuid, BASE_CUSTOM_PATH);
+    int retVal = cacheFetcher.getPaths(objects, lines, nodeIndexesByUuid, BASE_CUSTOM_PATH);
     ASSERT_EQ(-ENOENT, retVal);
     ASSERT_EQ(0, objects.size());
 }

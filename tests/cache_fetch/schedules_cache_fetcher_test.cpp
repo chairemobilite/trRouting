@@ -16,11 +16,10 @@ class ScheduleCacheFetcherFixtureTests : public BaseCacheFetcherFixtureTests
 protected:
     std::vector<std::unique_ptr<TrRouting::Trip>> trips;
     std::map<boost::uuids::uuid, TrRouting::Line> lines;
-    std::vector<std::unique_ptr<TrRouting::Path>> paths;
+    std::map<boost::uuids::uuid, TrRouting::Path> paths;
     std::vector<std::unique_ptr<TrRouting::Node>> nodes;
     std::map<boost::uuids::uuid, int> tripIndexesByUuid;
     std::map<boost::uuids::uuid, TrRouting::Service> services;
-    std::map<boost::uuids::uuid, int> pathIndexesByUuid;
     std::map<boost::uuids::uuid, int> nodeIndexesByUuid;
     std::vector<std::vector<std::unique_ptr<int>>> tripConnectionDepartureTimes;
     std::vector<std::vector<std::unique_ptr<float>>> tripConnectionDemands;
@@ -38,7 +37,7 @@ public:
 
         cacheFetcher.getNodes(nodes, nodeIndexesByUuid, VALID_CUSTOM_PATH);
         cacheFetcher.getLines(lines, agencies, modes, VALID_CUSTOM_PATH);
-        cacheFetcher.getPaths(paths, pathIndexesByUuid, lines, nodeIndexesByUuid, VALID_CUSTOM_PATH);
+        cacheFetcher.getPaths(paths, lines, nodeIndexesByUuid, VALID_CUSTOM_PATH);
         // Create the invalid lines directory
         fs::create_directory(BASE_CACHE_DIRECTORY_NAME + "/" + INVALID_CUSTOM_PATH + "/lines");
     }
@@ -62,7 +61,6 @@ TEST_F(ScheduleCacheFetcherFixtureTests, TestGetSchedulesInvalidLineFile)
       paths,
       tripIndexesByUuid,
       services,
-      pathIndexesByUuid,
       nodeIndexesByUuid,
       tripConnectionDepartureTimes,
       tripConnectionDemands,
@@ -82,7 +80,6 @@ TEST_F(ScheduleCacheFetcherFixtureTests, TestGetUnexistingLineFiles)
       paths,
       tripIndexesByUuid,
       services,
-      pathIndexesByUuid,
       nodeIndexesByUuid,
       tripConnectionDepartureTimes,
       tripConnectionDemands,
@@ -101,7 +98,6 @@ TEST_F(ScheduleCacheFetcherFixtureTests, TestGetSchedulesValid)
       paths,
       tripIndexesByUuid,
       services,
-      pathIndexesByUuid,
       nodeIndexesByUuid,
       tripConnectionDepartureTimes,
       tripConnectionDemands,

@@ -19,8 +19,7 @@ namespace TrRouting
 {
 
   int CacheFetcher::getPaths(
-    std::vector<std::unique_ptr<Path>>& ts,
-    std::map<boost::uuids::uuid, int>& tIndexesByUuid,
+    std::map<boost::uuids::uuid, Path>& ts,
     const std::map<boost::uuids::uuid, Line>& lines,
     const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
     std::string customPath
@@ -33,7 +32,6 @@ namespace TrRouting
     int ret = 0;
 
     ts.clear();
-    tIndexesByUuid.clear();
 
     std::string tStr  = "paths";
     std::string TStr  = "Paths";
@@ -72,7 +70,7 @@ namespace TrRouting
         std::vector<int> distancesMeters;
         std::vector<int> travelTimesSeconds;
         boost::uuids::uuid nodeUuid;
-        
+        boost::uuids::uuid pathUuid = uuidGenerator(uuid);
         for (std::string nodeUuidStr : capnpT.getNodesUuids())
         {
           nodeUuid = uuidGenerator(nodeUuidStr);
@@ -93,17 +91,14 @@ namespace TrRouting
           }
         }
         
-        std::unique_ptr<T> t = std::make_unique<T>(uuidGenerator(uuid),
-                                                   lines.at(uuidGenerator(lineUuid)),
-                                                   capnpT.getDirection(),
-                                                   capnpT.getInternalId(),
-                                                   nodesIdx,
-                                                   tripsIdx, //TODO This is empty
-                                                   travelTimesSeconds,
-                                                   distancesMeters);
-
-        tIndexesByUuid[t->uuid] = ts.size();
-        ts.push_back(std::move(t));
+        ts.emplace(pathUuid, T(pathUuid,
+                               lines.at(uuidGenerator(lineUuid)),
+                               capnpT.getDirection(),
+                               capnpT.getInternalId(),
+                               nodesIdx,
+                               tripsIdx, //TODO This is empty
+                               travelTimesSeconds,
+                               distancesMeters));
       }
     }
     catch (const kj::Exception& e)

@@ -156,8 +156,6 @@ namespace TrRouting
     std::vector<float> demandByHourOfDay;
 
     int    legTripIdx;
-    int    legPathIdx;
-    Path * legPath;
     int    legConnectionStartIdx;
     int    legConnectionEndIdx;
     int    connectionDepartureTimeSeconds;
@@ -313,17 +311,20 @@ namespace TrRouting
             for (auto & leg : visitor.getLegs())
             {
               legTripIdx            = std::get<0>(leg);
-              const Line &legLine   = std::get<1>(leg);
-              legPathIdx            = std::get<2>(leg);
-              legPath               = paths[legPathIdx].get();
+              //std::reference_wrapper<const Line> lineref =  std::get<1>(leg);
+              const Line &legLine   = std::get<1>(leg).get();
+              //const Line &legLine = lineref.get();
+              //std::reference_wrapper<const Path> pathref =  std::get<2>(leg);
+              const Path &legPath   = std::get<2>(leg).get();
+              //const Path &legPath = pathref.get();
               legConnectionStartIdx = std::get<3>(leg);
               legConnectionEndIdx   = std::get<4>(leg);
               lineProfiles.at(legLine.uuid) += correctedExpansionFactor;
 
-              if (pathProfiles.find(legPath->uuid) == pathProfiles.end())
+              if (pathProfiles.find(legPath.uuid) == pathProfiles.end())
               {
-                pathProfiles[legPath->uuid] = std::vector<std::vector<float>>(legPath->nodesIdx.size() - 1, demandByHourOfDay);
-                pathTotalProfiles[legPath->uuid] = std::vector<float>(legPath->nodesIdx.size() - 1, 0.0);
+                pathProfiles[legPath.uuid] = std::vector<std::vector<float>>(legPath.nodesIdx.size() - 1, demandByHourOfDay);
+                pathTotalProfiles[legPath.uuid] = std::vector<float>(legPath.nodesIdx.size() - 1, 0.0);
               }
               for (int connectionIndex = legConnectionStartIdx; connectionIndex <= legConnectionEndIdx; connectionIndex++)
               {
@@ -331,15 +332,15 @@ namespace TrRouting
                 *tripConnectionDemands[legTripIdx][connectionIndex] += correctedExpansionFactor;
                 connectionDepartureTimeHour    = connectionDepartureTimeSeconds / 3600;
 
-                pathProfiles[legPath->uuid][connectionIndex][connectionDepartureTimeHour] += correctedExpansionFactor;
-                pathTotalProfiles[legPath->uuid][connectionIndex] += correctedExpansionFactor;
-                if (maximumSegmentHourlyDemand < pathProfiles[legPath->uuid][connectionIndex][connectionDepartureTimeHour])
+                pathProfiles[legPath.uuid][connectionIndex][connectionDepartureTimeHour] += correctedExpansionFactor;
+                pathTotalProfiles[legPath.uuid][connectionIndex] += correctedExpansionFactor;
+                if (maximumSegmentHourlyDemand < pathProfiles[legPath.uuid][connectionIndex][connectionDepartureTimeHour])
                 {
-                  maximumSegmentHourlyDemand = pathProfiles[legPath->uuid][connectionIndex][connectionDepartureTimeHour];
+                  maximumSegmentHourlyDemand = pathProfiles[legPath.uuid][connectionIndex][connectionDepartureTimeHour];
                 }
-                if (maximumSegmentTotalDemand < pathTotalProfiles[legPath->uuid][connectionIndex])
+                if (maximumSegmentTotalDemand < pathTotalProfiles[legPath.uuid][connectionIndex])
                 {
-                  maximumSegmentTotalDemand = pathTotalProfiles[legPath->uuid][connectionIndex];
+                  maximumSegmentTotalDemand = pathTotalProfiles[legPath.uuid][connectionIndex];
                 }
               }
             }

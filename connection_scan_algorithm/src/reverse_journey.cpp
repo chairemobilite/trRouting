@@ -57,7 +57,6 @@ namespace TrRouting
       Node *   journeyStepNodeDeparture;
       Node *   journeyStepNodeArrival;
       Trip *   journeyStepTrip;
-      Path *   journeyStepPath;
 
       int totalInVehicleTime       { 0}; int transferArrivalTime    {-1}; int firstDepartureTime   {-1};
       int totalWalkingTime         { 0}; int transferReadyTime      {-1}; int numberOfTransfers    {-1};
@@ -165,7 +164,6 @@ namespace TrRouting
             journeyStepNodeDeparture    = nodes[std::get<connectionIndexes::NODE_DEP>(*journeyStepEnterConnection)].get();
             journeyStepNodeArrival      = nodes[std::get<connectionIndexes::NODE_ARR>(*journeyStepExitConnection)].get();
             journeyStepTrip             = trips[std::get<journeyStepIndexes::FINAL_TRIP>(journeyStep)].get();
-            journeyStepPath             = paths[journeyStepTrip->pathIdx].get();
             transferTime                = std::get<journeyStepIndexes::TRANSFER_TRAVEL_TIME>(journeyStep);
             distance                    = std::get<journeyStepIndexes::TRANSFER_DISTANCE>(journeyStep);
             inVehicleDistance           = 0;
@@ -194,13 +192,14 @@ namespace TrRouting
             unboardingNodeUuids.push_back(journeyStepNodeArrival->uuid);
             tripUuids.push_back(journeyStepTrip->uuid);
             tripsIdx.push_back(std::get<journeyStepIndexes::FINAL_TRIP>(journeyStep));
-            legs.push_back(std::make_tuple(std::get<journeyStepIndexes::FINAL_TRIP>(journeyStep), std::ref(journeyStepTrip->line), journeyStepTrip->pathIdx, boardingSequence - 1, unboardingSequence - 1));
+            //TODO Seems like storing the Trip in the leg instead of Line and Path would be ok
+            legs.push_back(std::make_tuple(std::get<journeyStepIndexes::FINAL_TRIP>(journeyStep), std::ref(journeyStepTrip->line), std::ref(journeyStepTrip->path), boardingSequence - 1, unboardingSequence - 1));
 
-            if (unboardingSequence - 1 < journeyStepPath->segmentsDistanceMeters.size()) // check if distances are available for this path
+            if (unboardingSequence - 1 < journeyStepTrip->path.segmentsDistanceMeters.size()) // check if distances are available for this path
             {
               for (int seqI = boardingSequence - 1; seqI < unboardingSequence; seqI++)
               {
-                inVehicleDistance += journeyStepPath->segmentsDistanceMeters[seqI];
+                inVehicleDistance += journeyStepTrip->path.segmentsDistanceMeters[seqI];
               }
               totalDistance += inVehicleDistance;
               if (Mode::TRANSFERABLE == journeyStepTrip->line.mode.shortname)
@@ -241,7 +240,7 @@ namespace TrRouting
                 journeyStepTrip->line.uuid,
                 journeyStepTrip->line.shortname,
                 journeyStepTrip->line.longname,
-                journeyStepPath->uuid,
+                journeyStepTrip->path.uuid,
                 journeyStepTrip->line.mode.name,
                 journeyStepTrip->line.mode.shortname,
                 journeyStepTrip->uuid,
@@ -262,7 +261,7 @@ namespace TrRouting
                 journeyStepTrip->line.uuid,
                 journeyStepTrip->line.shortname,
                 journeyStepTrip->line.longname,
-                journeyStepPath->uuid,
+                journeyStepTrip->path.uuid,
                 journeyStepTrip->line.mode.name,
                 journeyStepTrip->line.mode.shortname,
                 journeyStepTrip->uuid,

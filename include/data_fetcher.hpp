@@ -181,8 +181,7 @@ namespace TrRouting
      * -(error codes from the open system call)
      */
     virtual int getPaths(
-      std::vector<std::unique_ptr<Path>>& ts,
-      std::map<boost::uuids::uuid, int>& tIndexesById,
+      std::map<boost::uuids::uuid, Path>& ts,
       const std::map<boost::uuids::uuid, Line>& lines,
       const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
       std::string customPath = ""
@@ -220,10 +219,9 @@ namespace TrRouting
     virtual int getSchedules(
       std::vector<std::unique_ptr<Trip>>& trips,
       const std::map<boost::uuids::uuid, Line>& lines,
-      std::vector<std::unique_ptr<Path>>& paths,
+      std::map<boost::uuids::uuid, Path>& paths,
       std::map<boost::uuids::uuid, int>& tripIndexesByUuid,
       const std::map<boost::uuids::uuid, Service>& services,
-      const std::map<boost::uuids::uuid, int>& pathIndexesByUuid,
       const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
       std::vector<std::vector<std::unique_ptr<int>>>&   tripConnectionDepartureTimes,
       std::vector<std::vector<std::unique_ptr<float>>>& tripConnectionDemands,
