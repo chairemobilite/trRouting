@@ -12,7 +12,8 @@ csa_test_SOURCES = gtest.cpp \
     csa_route_calculation_test.cpp \
     csa_route_transfer_alternatives_test.cpp \
     csa_result_to_v1_test.cpp \
-    route_parameters_test.cpp
+    route_parameters_test.cpp \
+    combinations_test.cpp
 
 csa_test_LDADD = $(top_srcdir)/tests/libgtest.la ../../connection_scan_algorithm/src/libcsa.la
 
