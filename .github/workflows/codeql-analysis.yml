@@ -59,7 +59,7 @@ jobs:
     - name: Install deps
       run: |
           sudo apt-get update
-          sudo apt-get install libboost-all-dev libexpat1-dev libjsoncpp-dev libncurses5-dev libcapnp-dev capnproto
+          sudo apt-get install libboost-all-dev libexpat1-dev libjsoncpp-dev libspdlog-dev libcapnp-dev capnproto
     - name: Gen configure
       run: autoreconf -i
     - name: configure
