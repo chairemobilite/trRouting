@@ -30,88 +30,18 @@ paths:
     get:
       description: Calculate transit route results for a given origin/destination pair
       parameters:
-        - in: query
-          name: origin
-          schema:
-            type: string
-            pattern: '^\-?\d{1,3}(\.\d+)?,\-?\d{1,3}(\.\d+)?$'
-          required: true
-          description: Comma-separated longitude/latitude coordinates of the origin, in the WSG84 coordinates system
-        - in: query
-          name: destination
-          schema:
-            type: string
-            pattern: '^\-?\d{1,3}(\.\d+)?,\-?\d{1,3}(\.\d+)?$'
-          required: true
-          description: Comma-separated longitude/latitude coordinates of the destination, in the WSG84 coordinates system
-        - in: query
-          name: scenario_id
-          schema:
-            type: string
-          required: true
-          # TODO: Scenario is very transition centric. Can't trRouting be used with a GTFS or some other type, without a scenario
-          description: ID of the scenario to query. A scenario defines the services, agencies and lines to use for this transit calculation
-        - in: query
-          name: time_of_trip
-          schema:
-            type: integer
-          required: true
-          description: |
-            time of the trip, in seconds since midnight.
-            The time_type field will determine if it represents a departure or arrival time.
-            There is no timezone associated with the time, trRouting is timezone agnostic as a scenario
-            typically covers a single timezone and the 0 is the midnight in the agency of that scenario.
-        - in: query
-          name: time_type
-          schema:
-            type: integer
-            enum:
-              - 0
-              - 1
-          required: false
-          description: The type of the time_of_trip. 0 means it is the departure time; 1 means arrival time. Defaults to 0.
-        - in: query
-          name: alternatives
-          schema:
-            type: boolean
-          required: false
-          description: Whether the results should return various alternatives if available or just a single result. Defaults to false, no alternatives
-        - in: query
-          name: min_waiting_time
-          schema:
-            type: integer
-          required: false
-          description: "The minimum time to wait at a stop/station, in seconds, to cope with uncertainties in the vehicle arrival times. Suggested value: 180"
-        - in: query
-          name: max_access_travel_time
-          schema:
-            type: integer
-          required: false
-          description: "Maximum time, in seconds, to reach the first stop/station in the trip"
-        - in: query
-          name: max_egress_travel_time
-          schema:
-            type: integer
-          required: false
-          description: "Maximum time, in seconds, from the last stop/station, to reach the destination"
-        - in: query
-          name: max_transfer_travel_time
-          schema:
-            type: integer
-          required: false
-          description: "Maximum time, in seconds, for each transfer between stop/station during the trip"
-        - in: query
-          name: max_travel_time
-          schema:
-            type: integer
-          required: false
-          description: The maximum total travel time between origin and destination, including access, transfer and egress times
-        - in: query
-          name: max_first_waiting_time
-          schema:
-            type: integer
-          required: false
-          description: The maximum time, in seconds, one can wait at first stop/station to consider this trip valid
+      - $ref: "parameters.yml#/originParam"
+      - $ref: "parameters.yml#/destinationParam"
+      - $ref: "parameters.yml#/scenarioParam"
+      - $ref: "parameters.yml#/timeOfTripParam"
+      - $ref: "parameters.yml#/timeTypeParam"
+      - $ref: "parameters.yml#/alternativesParam"
+      - $ref: "parameters.yml#/minWaitingTimeParam"
+      - $ref: "parameters.yml#/maxAccessTravelTimeParam"
+      - $ref: "parameters.yml#/maxEgressTravelTimeParam"
+      - $ref: "parameters.yml#/maxTransferTravelTimeParam"
+      - $ref: "parameters.yml#/maxTravelTimeParam"
+      - $ref: "parameters.yml#/maxFirstWaitingTime"
       responses:
         '200':
           description: Successful query, but may not have returned a routing result
