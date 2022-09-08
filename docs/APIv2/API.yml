@@ -8,7 +8,7 @@ servers:
 paths:
   /versions:
     get:
-      description: Get the versions of the API supported by this inVehicleDistanceMeters
+      description: Get the versions of the API supported by this instance
       responses:
         '200':
           description: Return the current and supported versions of the API
