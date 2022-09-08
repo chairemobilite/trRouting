@@ -49,7 +49,7 @@ paths:
             application/json:
               schema:
                 oneOf:
-                  - $ref: 'routeResponse.yml#/data_error'
+                  - $ref: 'commonResponse.yml#/data_error'
                   - $ref: 'routeResponse.yml#/NoRoutingFound'
                   - $ref: 'routeResponse.yml#/success'
                 discriminator:
@@ -57,11 +57,55 @@ paths:
                   mapping:
                     success: 'routeResponse.yml#/success'
                     no_routing_found: 'routeResponse.yml#/NoRoutingFound'
-                    data_error: 'routeResponse.yml#/data_error'
+                    data_error: 'commonResponse.yml#/data_error'
         '400':
           description: Query parameters are invalid
           content:
             application/json:
               schema:
-                $ref: 'routeResponse.yml#/query_error'
+                $ref: 'commonResponse.yml#/query_error'
+
+  /v2/summary:
+    get:
+      description: Return a summary of each transit object of a certain type used by the route calculation result 
+      parameters:
+      - $ref: "parameters.yml#/originParam"
+      - $ref: "parameters.yml#/destinationParam"
+      - $ref: "parameters.yml#/scenarioParam"
+      - $ref: "parameters.yml#/timeOfTripParam"
+      - $ref: "parameters.yml#/timeTypeParam"
+      - $ref: "parameters.yml#/alternativesParam"
+      - $ref: "parameters.yml#/minWaitingTimeParam"
+      - $ref: "parameters.yml#/maxAccessTravelTimeParam"
+      - $ref: "parameters.yml#/maxEgressTravelTimeParam"
+      - $ref: "parameters.yml#/maxTransferTravelTimeParam"
+      - $ref: "parameters.yml#/maxTravelTimeParam"
+      - $ref: "parameters.yml#/maxFirstWaitingTime"
+      - in: query
+        name: type
+        schema:
+          type: string
+          enum: [line]
+        required: true
+        description: The type of objects for which to get the summary
+      responses:
+        '200':
+          description: Successful query, but may not have returned a routing result
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: 'commonResponse.yml#/data_error'
+                  - $ref: 'summaryResponse.yml#/success'
+                discriminator:
+                  propertyName: status
+                  mapping:
+                    success: 'summaryResponse.yml#/success'
+                    data_error: 'commonResponse.yml#/data_error'
+        '400':
+          description: Query parameters are invalid
+          content:
+            application/json:
+              schema:
+                $ref: 'commonResponse.yml#/query_error'
     

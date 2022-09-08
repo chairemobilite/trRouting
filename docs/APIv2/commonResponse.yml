@@ -1,0 +1,40 @@
+data_error: # 'data_error' is a value for the status (discriminator)
+  required:
+    - status
+  type: object
+  properties:
+    status:
+      type: string
+      enum: [data_error]
+    errorCode:
+      type: string
+      enum:
+        - 'DATA_ERROR'
+        - 'MISSING_DATA_AGENCIES'
+        - 'MISSING_DATA_SERVICES'
+        - 'MISSING_DATA_NODES'
+        - 'MISSING_DATA_LINES'
+        - 'MISSING_DATA_PATHS'
+        - 'MISSING_DATA_SCENARIOS'
+        - 'MISSING_DATA_SCHEDULES'
+
+query_error: # 'query_error' is a value for the status (discriminator)
+  required:
+    - status
+  type: object
+  properties:
+    status:
+      type: string
+      enum: [query_error]
+    errorCode:
+      type: string
+      enum:
+        - 'EMPTY_SCENARIO'
+        - 'MISSING_PARAM_SCENARIO'
+        - 'MISSING_PARAM_ORIGIN'
+        - 'MISSING_PARAM_DESTINATION'
+        - 'MISSING_PARAM_TIME_OF_TRIP'
+        - 'INVALID_ORIGIN'
+        - 'INVALID_DESTINATION'
+        - 'INVALID_NUMERICAL_DATA'
+        - 'PARAM_ERROR_UNKNOWN'

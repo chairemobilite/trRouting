@@ -1,0 +1,74 @@
+success:
+  required:
+    - status
+  allOf:
+  - $ref: '#/summaryResponse'
+  - type: object
+    properties:
+      status:
+        type: string
+        enum: [success]
+
+summaryResponse:
+  type: object
+  properties:
+    origin:
+      type: array
+      items:
+        type: number
+      minItems: 2
+      maxItems: 2
+      description: Longitude and latitude of the origin, in the WSG84 coordiantes system
+    destination:
+      type: array
+      items:
+        type: number
+      minItems: 2
+      maxItems: 2
+      description: Longitude and latitude of the destination, in the WSG84 coordiantes system
+    timeOfTrip:
+      type: integer
+      description: |
+        The requested time of the trip, in seconds since midnight.
+        The time_type field will determine if it represents a departure or arrival time.
+    timeType:
+      type: integer
+      enum:
+        - 0
+        - 1
+      description: The type of the requestTime. 0 means it is the departure time; 1 means arrival time
+    nbAlternativesCalculated:
+      type: integer
+      description: Number of alternatives that were calculated in this route calculation
+    lines:
+      type: array
+      items:
+        $ref: '#/lineSummary'  
+    
+lineSummary:
+  type: object
+  properties:
+    lineUuid:
+      type: string
+      description: UUID of the line used
+    lineShortname:
+      type: string
+      description: Shortname of the line
+    lineLongname:
+      type: string
+      description: Long name of the line
+    agencyUuid:
+      type: string
+      description: UUID of the agency serving the line
+    agencyAcronym:
+      type: string
+      description: Acronym of the agency serving the line
+    agencyName:
+      type: string
+      description: Name of the agency serving the lineLongname
+    alternativeCount:
+      type: integer
+      description: Number of alternatives in which this line appears
+    
+    
+    
