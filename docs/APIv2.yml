@@ -54,6 +54,11 @@ paths:
                   - $ref: '#/components/schemas/success'
                 discriminator:
                   propertyName: status
+                  mapping:
+                    success: success
+                    no_routing_found: NoRoutingFound
+                    data_error: data_error
+                    query_error: query_error
         '400':
           description: Query parameters are invalid
           content:
@@ -63,67 +68,68 @@ paths:
 
 components:
   schemas:
-    statusResponse:
-      type: object
+    data_error: # 'data_error' is a value for the status (discriminator)
       required:
         - status
+      type: object
       properties:
         status:
           type: string
-          enum: [success, no_routing_found, data_error, query_error]
-      discriminator:
-        propertyName: status
-        mapping:
-          success: success
-          no_routing_found: NoRoutingFound
-          data_error: data_error
-          query_error: query_error
-
-    data_error: # 'data_error' is a value for the status (discriminator)
-      allOf:
-        - $ref: '#/components/schemas/statusResponse'
-        - type: object
-          properties:
-            errorCode:
-              type: string
-              enum:
-                - 'DATA_ERROR'
-                - 'MISSING_DATA_AGENCIES'
-                - 'MISSING_DATA_SERVICES'
-                - 'MISSING_DATA_NODES'
-                - 'MISSING_DATA_LINES'
-                - 'MISSING_DATA_PATHS'
-                - 'MISSING_DATA_SCENARIOS'
-                - 'MISSING_DATA_SCHEDULES'
+          enum: [data_error]
+        errorCode:
+          type: string
+          enum:
+            - 'DATA_ERROR'
+            - 'MISSING_DATA_AGENCIES'
+            - 'MISSING_DATA_SERVICES'
+            - 'MISSING_DATA_NODES'
+            - 'MISSING_DATA_LINES'
+            - 'MISSING_DATA_PATHS'
+            - 'MISSING_DATA_SCENARIOS'
+            - 'MISSING_DATA_SCHEDULES'
 
     query_error: # 'query_error' is a value for the status (discriminator)
-      allOf:
-        - $ref: '#/components/schemas/statusResponse'
-        - type: object
-          properties:
-            errorCode:
-              type: string
-              enum:
-                - 'EMPTY_SCENARIO'
-                - 'MISSING_PARAM_SCENARIO'
-                - 'MISSING_PARAM_ORIGIN'
-                - 'MISSING_PARAM_DESTINATION'
-                - 'MISSING_PARAM_TIME_OF_TRIP'
-                - 'INVALID_ORIGIN'
-                - 'INVALID_DESTINATION'
-                - 'INVALID_NUMERICAL_DATA'
-                - 'PARAM_ERROR_UNKNOWN'
+      required:
+        - status
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [query_error]
+        errorCode:
+          type: string
+          enum:
+            - 'EMPTY_SCENARIO'
+            - 'MISSING_PARAM_SCENARIO'
+            - 'MISSING_PARAM_ORIGIN'
+            - 'MISSING_PARAM_DESTINATION'
+            - 'MISSING_PARAM_TIME_OF_TRIP'
+            - 'INVALID_ORIGIN'
+            - 'INVALID_DESTINATION'
+            - 'INVALID_NUMERICAL_DATA'
+            - 'PARAM_ERROR_UNKNOWN'
 
     NoRoutingFound:
+      required:
+        - status
       allOf:
-      - $ref: '#/components/schemas/statusResponse'
       - $ref: '#/components/schemas/baseRouteResponse'
       - type: object
+        properties:
+          status:
+            type: string
+            enum: [no_routing_found]
 
     success: # TODO: There's a lot of data returned, document it all, but from the code, not from transition
+      required:
+        - status
       allOf:
-      - $ref: '#/components/schemas/statusResponse'
       - $ref: '#/components/schemas/routeOrAlternativesResponse'
+      - type: object
+        properties:
+          status:
+            type: string
+            enum: [success]
 
     routeOrAlternativesResponse:
       oneOf:
@@ -230,132 +236,143 @@ components:
 
     tripStep:
       type: object
+      oneOf:
+      - $ref: '#/components/schemas/tripStepWalking'
+      - $ref: '#/components/schemas/tripStepBoarding'
+      - $ref: '#/components/schemas/tripStepUnboarding'
+      discriminator:
+        propertyName: action
+        mapping:
+          walking: '#/components/schemas/tripStepWalking'
+          boarding: '#/components/schemas/tripStepBoarding'
+          unboarding: '#/components/schemas/tripStepUnboarding'
+
+    tripStepWalking:
       required:
         - action
       properties:
         action:
           type: string
-          enum: [walking, boarding, unboarding]
-      discriminator:
-        propertyName: action
-        mapping:
-          walking: tripStepWalking
-          boarding: tripStepBoarding
-          unboarding: tripStepUnboarding
-
-    tripStepWalking:
+          enum: [walking]
       oneOf:
       - $ref: '#/components/schemas/tripStepWalkingBaseEgress'
       - $ref: '#/components/schemas/tripStepWalkingWithBoarding'
       discriminator:
         propertyName: type
         mapping:
-          access: tripStepWalkingWithBoarding
-          egress: tripStepWalkingBaseEgress
-          transfer: tripStepWalkingWithBoarding
+          access: '#/components/schemas/tripStepWalkingWithBoarding'
+          egress: '#/components/schemas/tripStepWalkingBaseEgress'
+          transfer: '#/components/schemas/tripStepWalkingWithBoarding'
 
     tripStepWalkingBase:
-      type: object
       required:
         - type
+      type: object
       properties:
-        type:
-          type: string
-          enum: [access, egress, transfer]
-      discriminator:
-        propertyName: type
+        travelTime:
+          type: number
+          description: Time spent walking in this step, in seconds
+        distanceMeters:
+          type: number
+          description: Distance traveled in this step, in meters
+        departureTime:
+          type: number
+          description: Time of the beginning of this step, in seconds since midnight
+        arrivalTime:
+          type: number
+          description: Time of arrival to destination for this step, in seconds since midnight
 
     tripStepWalkingBaseEgress:
+      required:
+        - type
       allOf:
-        - $ref: '#/components/schemas/tripStep'
-        - $ref: '#/components/schemas/tripStepWalkingBase'
-        - type: object
-          properties:
-            travelTime:
-              type: number
-              description: Time spent walking in this step, in seconds
-            distanceMeters:
-              type: number
-              description: Distance traveled in this step, in meters
-            departureTime:
-              type: number
-              description: Time of the beginning of this step, in seconds since midnight
-            arrivalTime:
-              type: number
-              description: Time of arrival to destination for this step, in seconds since midnight
-
-    tripStepWalkingWithBoarding:
-      allOf:
-      - $ref: '#/components/schemas/tripStepWalkingBaseEgress'
+      - $ref: '#/components/schemas/tripStepWalkingBase'
       - type: object
         properties:
+          type:
+            type: string
+            enum: [egress]
+
+    tripStepWalkingWithBoarding:
+      required:
+        - type
+      allOf:
+      - $ref: '#/components/schemas/tripStepWalkingBase'
+      - type: object
+        properties:
+          type:
+            type: string
+            enum: [access, transfer]
           readyToBoardAt:
             type: number
             description: Time at which boarding is possible, this includes a waiting time buffer at the stop, so is usually arrival_time + minimum waiting time. Time format is seconds since midnight.
 
     tripStepTripEnterOrExit:
-      allOf:
-      - $ref: '#/components/schemas/tripStep'
-      - type: object
-        properties:
-          agencyAcronym:
-            type: string
-            description: Acronym of the agency serving the route being boarded/unboarded
-          agencyName:
-            type: string
-            description: Name of the agency serving the route being boarded/unboarded
-          agencyUuid:
-            type: string
-            description: UUID of the agency serving the route being boarded/unboarded
-          lineShortname:
-            type: string
-            description: Shortname of the route being boarded/unboarded
-          lineLongname:
-            type: string
-            description: Long name of the route being boarded/unboarded
-          lineUuid:
-            type: string
-            description: UUID of the line being boarded/unboarded
-          pathUuid:
-            type: string
-            description: UUID of the path being boarded/unboarded
-          modeName:
-            type: string
-            description: Full name of the route's mode
-          mode:
-            type: string
-            description: Code name of the route's mode
-          tripUuid:
-            type: string
-            description: UUID of the route's trip involved in this action
-          legSequenceInTrip:
+      type: object
+      properties:
+        agencyAcronym:
+          type: string
+          description: Acronym of the agency serving the route being boarded/unboarded
+        agencyName:
+          type: string
+          description: Name of the agency serving the route being boarded/unboarded
+        agencyUuid:
+          type: string
+          description: UUID of the agency serving the route being boarded/unboarded
+        lineShortname:
+          type: string
+          description: Shortname of the route being boarded/unboarded
+        lineLongname:
+          type: string
+          description: Long name of the route being boarded/unboarded
+        lineUuid:
+          type: string
+          description: UUID of the line being boarded/unboarded
+        pathUuid:
+          type: string
+          description: UUID of the path being boarded/unboarded
+        modeName:
+          type: string
+          description: Full name of the route's mode
+        mode:
+          type: string
+          description: Code name of the route's mode
+        tripUuid:
+          type: string
+          description: UUID of the route's trip involved in this action
+        legSequenceInTrip:
+          type: number
+          description: Sequence number, in the complete trip, of the sequence starting at the stop to be boarded/unboarded. 1 would mean the first sequence.
+        stopSequenceInTrip:
+          type: number
+          description: Sequence number, in the complete trip, of the stop boarded/unboarded at. 1 would mean the first stop
+        nodeName:
+          type: string
+          description: Name of the node where the action takes place
+        nodeCode:
+          type: string
+          description: Code of the node where the action takes place
+        nodeUuid:
+          type: string
+          description: UUID of the node where the action takes place
+        nodeCoordinates:
+          type: array
+          items:
             type: number
-            description: Sequence number, in the complete trip, of the sequence starting at the stop to be boarded/unboarded. 1 would mean the first sequence.
-          stopSequenceInTrip:
-            type: number
-            description: Sequence number, in the complete trip, of the stop boarded/unboarded at. 1 would mean the first stop
-          nodeName:
-            type: string
-            description: Name of the node where the action takes place
-          nodeCode:
-            type: string
-            description: Code of the node where the action takes place
-          nodeUuid:
-            type: string
-            description: UUID of the node where the action takes place
-          nodeCoordinates:
-            type: array
-            items:
-              type: number
-            minItems: 2
-            maxItems: 2
-            description: longitude and latitude of the node where the action takes place, in the WSG84 coordinates system
+          minItems: 2
+          maxItems: 2
+          description: longitude and latitude of the node where the action takes place, in the WSG84 coordinates system
 
     tripStepBoarding: # 'boarding' is a value for the action (discriminator)
+      required:
+        - action
       allOf:
         - $ref: '#/components/schemas/tripStepTripEnterOrExit'
         - type: object
           properties:
+            action:
+              type: string
+              enum: [boarding]
             departureTime:
               type: number
               description: Departure time of the vehicle, in seconds since midnight
@@ -364,10 +381,15 @@ components:
               description: Time spent waiting for the vehicle at the stops. Includes the minimal wait period specified in the query parameters. In seconds
 
     tripStepUnboarding: # 'unboarding' is a value for the action (discriminator)
+      required:
+        - action
       allOf:
-        - $ref: '#/components/schemas/tripStep'
+        - $ref: '#/components/schemas/tripStepTripEnterOrExit'
         - type: object
           properties:
+            action:
+              type: string
+              enum: [unboarding]
             arrivalTime:
               type: number
               description: Arrival time of the vehicle, in seconds since midnight
