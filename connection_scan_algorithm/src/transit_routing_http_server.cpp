@@ -24,6 +24,7 @@
 #include "program_options.hpp"
 #include "result_to_v1.hpp"
 #include "result_to_v2.hpp"
+#include "result_to_v2_summary.hpp"
 #include "routing_result.hpp"
 #include "osrm_fetcher.hpp"
 
@@ -495,6 +496,71 @@ int main(int argc, char** argv) {
 
       } catch (NoRoutingFoundException e) {
         response = ResultToV2Response::noRoutingFoundResponse(queryParams, e.getReason()).dump(2);
+      }
+
+      *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
+
+    } catch (ParameterException exp) {
+      response = "{\"status\": \"query_error\", \"errorCode\": \"" + getResponseCode(exp.getType()) + "\"}";
+      *serverResponse << "HTTP/1.1 400 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
+    } catch (...) {
+      response = "{\"status\": \"query_error\", \"errorCode\": \"PARAM_ERROR_UNKNOWN\"}";
+      *serverResponse << "HTTP/1.1 400 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
+    }
+
+  };
+
+  // Request a summary of lines data for a route
+  // TODO Copy pasted from v2/route. There's a lot in common, it should be extracted to common class, just the response parser is different
+  server.resource["^/v2/summary[/]?$"]["GET"]=[&server, &calculator, &dataStatus](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
+
+    std::string response = getFastErrorResponse(dataStatus);
+
+    if (!response.empty()) {
+      *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
+      return;
+    }
+
+    // prepare benchmarking and timer:
+    // TODO Shouldn't have to do this, a query is not a benchmark
+    calculator.algorithmCalculationTime.start();
+    calculator.benchmarking.clear();
+
+    // prepare parameters:
+    std::vector<std::pair<std::string, std::string>> parametersWithValues;
+    auto queryFields = request->parse_query_string();
+    for(auto &field : queryFields)
+    {
+      parametersWithValues.push_back(std::make_pair(field.first, field.second));
+    }
+
+    spdlog::debug("-- calculating request -- {}", request->path);
+
+    try
+    {
+      std::unique_ptr<TrRouting::RoutingResult> routingResult;
+      TrRouting::AlternativesResult alternativeResult;
+
+      RouteParameters queryParams = RouteParameters::createRouteODParameter(parametersWithValues, calculator.scenarioIndexesByUuid, calculator.scenarios);
+
+      try {
+        if (queryParams.isWithAlternatives())
+        {
+          alternativeResult = calculator.alternativesRouting(queryParams);
+          response = ResultToV2SummaryResponse::resultToJsonString(alternativeResult, queryParams).dump(2);
+        }
+        else
+        {
+          routingResult = calculator.calculate(queryParams);
+          if (routingResult.get() != nullptr) {
+            response = ResultToV2SummaryResponse::resultToJsonString(*routingResult.get(), queryParams).dump(2);
+          }
+        }
+
+        spdlog::debug("-- total -- {} microseconds", calculator.algorithmCalculationTime.getDurationMicrosecondsNoStop());
+
+      } catch (NoRoutingFoundException e) {
+        response = ResultToV2SummaryResponse::noRoutingFoundResponse(queryParams, e.getReason()).dump(2);
       }
 
       *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;

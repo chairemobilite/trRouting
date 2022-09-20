@@ -14,6 +14,7 @@ csa_test_SOURCES = gtest.cpp \
     csa_result_to_response_test.cpp \
     csa_result_to_v1_test.cpp \
     csa_result_to_v2_test.cpp \
+    csa_result_to_v2_summary_test.cpp \
     route_parameters_test.cpp \
     combinations_test.cpp
 
