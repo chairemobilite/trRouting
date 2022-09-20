@@ -18,4 +18,5 @@ libcsa_la_SOURCES = alternatives_routing.cpp \
 		   route_parameters.cpp \
 		   result_to_v1.cpp \
 		   result_to_v2.cpp \
+		   result_to_v2_summary.cpp \
 		   transit_routing_http_server.cpp
