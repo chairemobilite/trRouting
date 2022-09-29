@@ -139,6 +139,8 @@ int main(int argc, char** argv) {
   HttpServer server;
   server.config.port = programOptions.port;
 
+  // FIXME: Now, all endpoints, including v2 needs this param object to be initialized, so let's do it here, but it should not be necessary (see https://github.com/chairemobilite/trRouting/issues/58)
+  calculator.params.setDefaultValues();
 
 
   server.resource["^/saveCache[/]?$"]["POST"] = [&server, &calculator](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
