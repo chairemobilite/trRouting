@@ -360,6 +360,8 @@ TEST_F(RouteCalculationFixtureTests, NoRoutingTravelTimeLongerTrip)
         FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
     } catch (TrRouting::NoRoutingFoundException const & e) {
         assertNoRouting(e, TrRouting::NoRoutingReason::NO_ROUTING_FOUND);
+    } catch(const  std::exception &e) {
+      FAIL() << "Expected TrRouting::NoRoutingFoundException, std::exception was thrown " << e.what();
     } catch(...) {
         FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
     }
@@ -381,7 +383,6 @@ std::unique_ptr<TrRouting::RoutingResult> RouteCalculationFixtureTests::calculat
         calculator.scenarios,
         calculator.odTripIndexesByUuid,
         calculator.odTrips,
-        calculator.nodeIndexesByUuid,
         calculator.nodes,
         calculator.dataSources);
     TrRouting::OsrmFetcher::birdDistanceAccessibilityEnabled = true;

@@ -21,7 +21,7 @@ namespace TrRouting
   int CacheFetcher::getPaths(
     std::map<boost::uuids::uuid, Path>& ts,
     const std::map<boost::uuids::uuid, Line>& lines,
-    const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
+    const std::map<boost::uuids::uuid, Node>& nodes,
     std::string customPath
   )
   {
@@ -65,7 +65,7 @@ namespace TrRouting
       {
         std::string uuid     {capnpT.getUuid()};
         std::string lineUuid {capnpT.getLineUuid()};
-        std::vector<int> nodesIdx;
+        std::vector<std::reference_wrapper<const Node>> nodesRef;
         std::vector<int> tripsIdx;
         std::vector<int> distancesMeters;
         std::vector<int> travelTimesSeconds;
@@ -74,12 +74,12 @@ namespace TrRouting
         for (std::string nodeUuidStr : capnpT.getNodesUuids())
         {
           nodeUuid = uuidGenerator(nodeUuidStr);
-          nodesIdx.push_back(nodeIndexesByUuid.at(nodeUuid));
+          nodesRef.push_back(nodes.at(nodeUuid));
         }
 
         auto jsonData = nlohmann::json::parse(capnpT.getData());
 
-        for (int i=0; i < nodesIdx.size(); i++)
+        for (int i=0; i < nodesRef.size(); i++)
         {
           if (jsonData["segments"][i]["distanceMeters"] != nullptr)
           {
@@ -95,7 +95,7 @@ namespace TrRouting
                                lines.at(uuidGenerator(lineUuid)),
                                capnpT.getDirection(),
                                capnpT.getInternalId(),
-                               nodesIdx,
+                               nodesRef,
                                tripsIdx, //TODO This is empty
                                travelTimesSeconds,
                                distancesMeters));

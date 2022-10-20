@@ -81,8 +81,8 @@ namespace TrRouting
       std::vector<std::reference_wrapper<const Mode>> exceptModes;
       std::vector<std::reference_wrapper<const Agency>> onlyAgencies;
       std::vector<std::reference_wrapper<const Agency>> exceptAgencies;
-      std::vector<int> onlyNodesIdx;
-      std::vector<int> exceptNodesIdx;
+      std::vector<std::reference_wrapper<const Node>> onlyNodes;
+      std::vector<std::reference_wrapper<const Node>> exceptNodes;
       bool withAlternatives; // calculate alternatives or not
       bool forwardCalculation; // forward calculation: default true. if false: reverse calculation, will ride connections backward (useful when setting the arrival time)
 
@@ -135,8 +135,8 @@ namespace TrRouting
       const std::vector<std::reference_wrapper<const Mode>>& getExceptModes() { return exceptModes; }
       const std::vector<std::reference_wrapper<const Agency>>& getOnlyAgencies() { return onlyAgencies; }
       const std::vector<std::reference_wrapper<const Agency>>& getExceptAgencies() { return exceptAgencies; }
-      std::vector<int>* getOnlyNodesIdx() { return &onlyNodesIdx; }
-      std::vector<int>* getExceptNodesIdx() { return &exceptNodesIdx; }
+      const std::vector<std::reference_wrapper<const Node>>& getOnlyNodes() { return onlyNodes; }
+      const std::vector<std::reference_wrapper<const Node>>& getExceptNodes() { return exceptNodes; }
 
       // FIXME: Temporarily moved to public until calculation specific parameters exist. This is used directly by alternatives routing.
       // see https://github.com/chairemobilite/trRouting/issues/95
@@ -157,10 +157,11 @@ namespace TrRouting
       int routingDateDay;    // not implemented, use onlyServicesIdx or exceptServicesIdx for now
       //TODO Make it a reference or not??
       std::optional<DataSource> onlyDataSource;
-      std::vector<int> accessNodesIdx;
+      //TODO We could convert those to NodeTimeDistance object
+      std::vector<std::reference_wrapper<const Node>> accessNodesRef;
       std::vector<int> accessNodeTravelTimesSeconds;
       std::vector<int> accessNodeDistancesMeters;
-      std::vector<int> egressNodesIdx;
+      std::vector<std::reference_wrapper<const Node>> egressNodesRef;
       std::vector<int> egressNodeTravelTimesSeconds;
       std::vector<int> egressNodeDistancesMeters;
 
@@ -217,8 +218,7 @@ namespace TrRouting
         std::vector<std::unique_ptr<Scenario>> &scenarios,
         std::map<boost::uuids::uuid, int> &odTripIndexesByUuid,
         std::vector<std::unique_ptr<OdTrip>> &odTrips,
-        std::map<boost::uuids::uuid, int> &nodeIndexesByUuid,
-        std::vector<std::unique_ptr<Node>> &nodes,
+                             const std::map<boost::uuids::uuid,Node> &nodes,
                              const std::map<boost::uuids::uuid, DataSource> &dataSources);
 
   };

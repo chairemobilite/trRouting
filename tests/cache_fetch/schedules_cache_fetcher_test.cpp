@@ -17,13 +17,12 @@ protected:
     std::vector<std::unique_ptr<TrRouting::Trip>> trips;
     std::map<boost::uuids::uuid, TrRouting::Line> lines;
     std::map<boost::uuids::uuid, TrRouting::Path> paths;
-    std::vector<std::unique_ptr<TrRouting::Node>> nodes;
+    std::map<boost::uuids::uuid, TrRouting::Node> nodes;
     std::map<boost::uuids::uuid, int> tripIndexesByUuid;
     std::map<boost::uuids::uuid, TrRouting::Service> services;
-    std::map<boost::uuids::uuid, int> nodeIndexesByUuid;
     std::vector<std::vector<std::unique_ptr<int>>> tripConnectionDepartureTimes;
     std::vector<std::vector<std::unique_ptr<float>>> tripConnectionDemands;
-    std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,short,short>>> connections;
+    std::vector<std::shared_ptr<TrRouting::ConnectionTuple>> connections;
 
 public:
     void SetUp( ) override
@@ -35,9 +34,9 @@ public:
         auto modes = cacheFetcher.getModes();
         cacheFetcher.getServices(services, VALID_CUSTOM_PATH);
 
-        cacheFetcher.getNodes(nodes, nodeIndexesByUuid, VALID_CUSTOM_PATH);
+        cacheFetcher.getNodes(nodes, VALID_CUSTOM_PATH);
         cacheFetcher.getLines(lines, agencies, modes, VALID_CUSTOM_PATH);
-        cacheFetcher.getPaths(paths, lines, nodeIndexesByUuid, VALID_CUSTOM_PATH);
+        cacheFetcher.getPaths(paths, lines, nodes, VALID_CUSTOM_PATH);
         // Create the invalid lines directory
         fs::create_directory(BASE_CACHE_DIRECTORY_NAME + "/" + INVALID_CUSTOM_PATH + "/lines");
     }
@@ -61,7 +60,6 @@ TEST_F(ScheduleCacheFetcherFixtureTests, TestGetSchedulesInvalidLineFile)
       paths,
       tripIndexesByUuid,
       services,
-      nodeIndexesByUuid,
       tripConnectionDepartureTimes,
       tripConnectionDemands,
       connections,
@@ -80,7 +78,6 @@ TEST_F(ScheduleCacheFetcherFixtureTests, TestGetUnexistingLineFiles)
       paths,
       tripIndexesByUuid,
       services,
-      nodeIndexesByUuid,
       tripConnectionDepartureTimes,
       tripConnectionDemands,
       connections,
@@ -98,7 +95,6 @@ TEST_F(ScheduleCacheFetcherFixtureTests, TestGetSchedulesValid)
       paths,
       tripIndexesByUuid,
       services,
-      nodeIndexesByUuid,
       tripConnectionDepartureTimes,
       tripConnectionDemands,
       connections,

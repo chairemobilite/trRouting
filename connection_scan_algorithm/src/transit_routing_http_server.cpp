@@ -328,7 +328,6 @@ int main(int argc, char** argv) {
         calculator.scenarios,
         calculator.odTripIndexesByUuid,
         calculator.odTrips,
-        calculator.nodeIndexesByUuid,
         calculator.nodes,
         calculator.dataSources);
 

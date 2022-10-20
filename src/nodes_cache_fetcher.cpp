@@ -20,10 +20,8 @@
 
 namespace TrRouting
 {
-
   int CacheFetcher::getNodes(
-    std::vector<std::unique_ptr<Node>>& ts,
-    std::map<boost::uuids::uuid, int>& tIndexesByUuid,
+    std::map<boost::uuids::uuid, Node>& ts,
     std::string customPath
   )
   {
@@ -34,7 +32,6 @@ namespace TrRouting
     using cNode       = node::Node;
 
     ts.clear();
-    tIndexesByUuid.clear();
 
     std::string tStr  = "nodes";
     std::string TStr  = "Nodes";
@@ -74,21 +71,15 @@ namespace TrRouting
         //std::string stationUuid {capnpT.getStationUuid()};
 
         std::unique_ptr<Point> point = std::make_unique<Point>();
-        std::unique_ptr<T> t         = std::make_unique<T>();
-
-        t->uuid       = uuidGenerator(uuid);
-        t->id         = capnpT.getId();
-        t->code       = capnpT.getCode();
-        t->name       = capnpT.getName();
-        t->internalId = capnpT.getInternalId();
-
         point->latitude  = ((double)capnpT.getLatitude())  / 1000000.0;
         point->longitude = ((double)capnpT.getLongitude()) / 1000000.0;
-        t->point         = std::move(point);
 
-        tIndexesByUuid[t->uuid] = ts.size();
-        ts.push_back(std::move(t));
-        
+        ts.emplace(uuidGenerator(uuid), T(uuidGenerator(uuid),
+                             capnpT.getId(),
+                             capnpT.getCode(),
+                             capnpT.getName(),
+                             capnpT.getInternalId(),
+                             std::move(point)));
       }
     }
     catch (const kj::Exception& e)
@@ -114,12 +105,11 @@ namespace TrRouting
     auto nodesCount {ts.size()};
     //std::vector<int>::iterator nodeIndex;
     // find reverse transferable nodes:
-    for (int i = 0; i < nodesCount; i++)
+    for (auto nodeIter = ts.begin(); nodeIter != ts.end(); nodeIter++)
     {
+      Node & t = nodeIter->second;
 
-      Node * t = ts[i].get();
-
-      nodeCacheFileName = "nodes/node_" + boost::uuids::to_string(t->uuid);
+      nodeCacheFileName = "nodes/node_" + boost::uuids::to_string(t.uuid);
       nodeCacheFileNamePath = getFilePath(nodeCacheFileName, customPath) + ".capnpbin";
 
       int fd = open(nodeCacheFileNamePath.c_str(), O_RDWR);
@@ -138,28 +128,40 @@ namespace TrRouting
         cNode::Reader capnpT = capnpTMessage.getRoot<cNode>();
         const unsigned int transferableNodesCount {capnpT.getTransferableNodesUuids().size()};
 
-        std::vector<int> transferableNodesIdx(transferableNodesCount);
-        std::vector<int> transferableTravelTimesSeconds(transferableNodesCount);
-        std::vector<int> transferableDistancesMeters(transferableNodesCount);
-        std::vector<int> reverseTransferableNodesIdx(transferableNodesCount);
-        std::vector<int> reverseTransferableTravelTimesSeconds(transferableNodesCount);
-        std::vector<int> reverseTransferableDistancesMeters(transferableNodesCount);
+        std::vector<NodeTimeDistance> transferableNodes;
+        std::vector<NodeTimeDistance> reverseTransferableNodes;
 
         for (int j = 0; j < transferableNodesCount; j++)
         {
-          std::string nodeUuid {capnpT.getTransferableNodesUuids()[j]};
-          transferableNodesIdx          [j] = tIndexesByUuid[uuidGenerator(nodeUuid)];
-          transferableTravelTimesSeconds[j] = capnpT.getTransferableNodesTravelTimes()[j];
-          transferableDistancesMeters   [j] = capnpT.getTransferableNodesDistances()[j];
+          std::string nodeUuidStr {capnpT.getTransferableNodesUuids()[j]};
+          boost::uuids::uuid nodeUuid = uuidGenerator(nodeUuidStr);
+
+          if (ts.count(nodeUuid) == 0) {
+            spdlog::error("Invalid transferable node UUID ({}) in file {}", nodeUuidStr, nodeCacheFileNamePath);
+            //TODO We might want to do more than just print and continue
+            //close(fd);
+            //return -EINVAL;
+            continue;
+          }
+          
+          int travelTime = capnpT.getTransferableNodesTravelTimes()[j];
+          int distance = capnpT.getTransferableNodesDistances()[j];
+          transferableNodes.push_back(NodeTimeDistance(ts.at(nodeUuid),
+                                                       travelTime,
+                                                       distance));
+
+          // Fill in reverse transfer information
+          ts.at(nodeUuid).reverseTransferableNodes.push_back(NodeTimeDistance(t,
+                                                                              travelTime,
+                                                                              distance));
         }
-        t->transferableNodesIdx           = transferableNodesIdx;
-        t->transferableTravelTimesSeconds = transferableTravelTimesSeconds;
-        t->transferableDistancesMeters    = transferableDistancesMeters;
+        // Save transferable nodes in object
+        t.transferableNodes.clear();
+        std::copy(transferableNodes.begin(), transferableNodes.end(), std::back_inserter(t.transferableNodes));
 
         // put same node transfer at the beginning:
-        t->reverseTransferableNodesIdx.push_back(i);
-        t->reverseTransferableTravelTimesSeconds.push_back(0);
-        t->reverseTransferableDistancesMeters.push_back(0);
+        t.reverseTransferableNodes.push_back(NodeTimeDistance(t, 0, 0));
+
       }
       catch (const kj::Exception& e)
       {
@@ -172,73 +174,56 @@ namespace TrRouting
 
     try
     {
-      // generate reverse transferable nodes 
-      // travel time is not the same in both direction so we need to reverse these, 
-      // especially with modes like car and bicycle which must follow one way and restrictions
-      for (int i = 0; i < nodesCount; i++)
-      {
-        int transferableNodesCount = ts[i]->transferableNodesIdx.size();
-        for (int j = 0; j < transferableNodesCount; j++)
-        {
-
-          int transferableNodeIdx = ts[i]->transferableNodesIdx[j];
-
-          if (transferableNodeIdx == i) // we already put same node transfer at the beginning
-          {
-            continue;
-          }
-
-          ts[transferableNodeIdx]->reverseTransferableNodesIdx.push_back(i);
-          ts[transferableNodeIdx]->reverseTransferableTravelTimesSeconds.push_back(ts[i]->transferableTravelTimesSeconds[j]);
-          ts[transferableNodeIdx]->reverseTransferableDistancesMeters.push_back(ts[i]->transferableDistancesMeters[j]);
-        }
-      }
-
       // sort by increasing travel times so we don't get longer transfers when shorter exists:
-      for (auto & node : ts)
+      for(auto ite = ts.begin(); ite != ts.end(); ite++)
       {
-        
-        std::vector<size_t> sortedIdx(node->transferableNodesIdx.size());
+        auto & node = ite->second;
+        //TODO We can sort the vector<NodeTimeDistance> directly...
+        //TODO Could maybe make it a priority queue/sorted list which is always sorted????
+        std::vector<size_t> sortedIdx(node.transferableNodes.size());
+        // iota will fill array with a serie of int starting at 0 (0,1,2,3,4,...)
         std::iota(sortedIdx.begin(), sortedIdx.end(), 0);
         std::stable_sort(sortedIdx.begin(), sortedIdx.end(),
           [&](int i1, int i2) {
-            return node->transferableTravelTimesSeconds[i1] < node->transferableTravelTimesSeconds[i2];
+            return node.transferableNodes.at(i1).time < node.transferableNodes.at(i2).time;
         });
 
-        std::vector<int> transferableNodesIdx(node->transferableNodesIdx.size());
-        std::vector<int> transferableTravelTimesSeconds(node->transferableNodesIdx.size());
-        std::vector<int> transferableDistancesMeters(node->transferableNodesIdx.size());
-        transferableNodesIdx           = node->transferableNodesIdx;
-        transferableTravelTimesSeconds = node->transferableTravelTimesSeconds;
-        transferableDistancesMeters    = node->transferableDistancesMeters;
+        ////TODO This is what it would look like without the const Node & issues
+        ////std::stable_sort(node.transferableNodes.begin(), node.transferableNodes.end(),
+        ////[&](const NodeTimeDistance &i1, const NodeTimeDistance & i2) {
+        ////return i1.time < i2.time;
+        ////});
 
+        std::vector<NodeTimeDistance> transferableNodesSorted;
         for (int i = 0; i < sortedIdx.size(); i++)
         {
-          node->transferableNodesIdx[i]           = transferableNodesIdx[sortedIdx[i]];
-          node->transferableTravelTimesSeconds[i] = transferableTravelTimesSeconds[sortedIdx[i]];
-          node->transferableDistancesMeters[i]    = transferableDistancesMeters[sortedIdx[i]];
+          transferableNodesSorted.push_back( node.transferableNodes.at(i));
         }
+        node.transferableNodes.clear();
+        std::copy(transferableNodesSorted.begin(), transferableNodesSorted.end(), std::back_inserter(node.transferableNodes));
 
-        std::vector<size_t> sortedReverseIdx(node->reverseTransferableNodesIdx.size());
+        ////TODO This is what it would look like without the const Node & issues
+        ////std::stable_sort(node.reverseTransferableNodes.begin(), node.reverseTransferableNodes.end(),
+        ////[&](NodeTimeDistance &i1, NodeTimeDistance & i2) {
+        ////return i1.time < i2.time;
+        ////});
+
+        std::vector<size_t> sortedReverseIdx(node.reverseTransferableNodes.size());
         std::iota(sortedReverseIdx.begin(), sortedReverseIdx.end(), 0);
         std::stable_sort(sortedReverseIdx.begin(), sortedReverseIdx.end(),
           [&](int i1, int i2) {
-            return node->reverseTransferableTravelTimesSeconds[i1] < node->reverseTransferableTravelTimesSeconds[i2];
+            return node.reverseTransferableNodes.at(i1).time < node.reverseTransferableNodes.at(i2).time;
         });
 
-        std::vector<int> reverseTransferableNodesIdx(node->reverseTransferableNodesIdx.size());
-        std::vector<int> reverseTransferableTravelTimesSeconds(node->reverseTransferableNodesIdx.size());
-        std::vector<int> reverseTransferableDistancesMeters(node->reverseTransferableNodesIdx.size());
-        reverseTransferableNodesIdx           = node->reverseTransferableNodesIdx;
-        reverseTransferableTravelTimesSeconds = node->reverseTransferableTravelTimesSeconds;
-        reverseTransferableDistancesMeters    = node->reverseTransferableDistancesMeters;
+        std::vector<NodeTimeDistance> reverseTransferableNodesSorted;
 
         for (int i = 0; i < sortedReverseIdx.size(); i++)
         {
-          node->reverseTransferableNodesIdx[i]           = reverseTransferableNodesIdx[sortedReverseIdx[i]];
-          node->reverseTransferableTravelTimesSeconds[i] = reverseTransferableTravelTimesSeconds[sortedReverseIdx[i]];
-          node->reverseTransferableDistancesMeters[i]    = reverseTransferableDistancesMeters[sortedReverseIdx[i]];
+          reverseTransferableNodesSorted.push_back( node.reverseTransferableNodes.at(i));
+
         }
+        node.reverseTransferableNodes.clear();
+        std::copy(reverseTransferableNodesSorted.begin(), reverseTransferableNodesSorted.end(), std::back_inserter(node.reverseTransferableNodes));              
 
       }
   

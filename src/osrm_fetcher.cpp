@@ -17,7 +17,7 @@ namespace TrRouting
   std::string OsrmFetcher::osrmCyclingHost="";
   std::string OsrmFetcher::osrmDrivingHost="";
 
-  std::vector<std::tuple<int, int, int>> OsrmFetcher::getAccessibleNodesFootpathsFromPoint(const Point &point, const std::vector<std::unique_ptr<Node>> &nodes, std::string mode, int maxWalkingTravelTime, float walkingSpeedMetersPerSecond, bool reversed)
+  std::vector<NodeTimeDistance> OsrmFetcher::getAccessibleNodesFootpathsFromPoint(const Point &point, const std::map<boost::uuids::uuid, Node> &nodes, std::string mode, int maxWalkingTravelTime, float walkingSpeedMetersPerSecond, bool reversed)
   {
     if (OsrmFetcher::birdDistanceAccessibilityEnabled)
     {
@@ -29,9 +29,9 @@ namespace TrRouting
     }
   }
 
-  std::vector<std::tuple<int, int, int>> OsrmFetcher::getNodesFromBirdDistance(const Point &point, const std::vector<std::unique_ptr<Node>> &nodes, int maxWalkingTravelTime, float walkingSpeedMetersPerSecond)
+  std::vector<NodeTimeDistance> OsrmFetcher::getNodesFromBirdDistance(const Point &point, const std::map<boost::uuids::uuid, Node> &nodes, int maxWalkingTravelTime, float walkingSpeedMetersPerSecond)
   {
-    std::vector<std::tuple<int, int, int>> accessibleNodesFootpaths;
+    std::vector<NodeTimeDistance> accessibleNodesFootpaths;
 
     auto lengthOfOneDegree = calculateLengthOfOneDegree(point);
     float maxDistanceMetersSquared = calculateMaxDistanceSquared(maxWalkingTravelTime, walkingSpeedMetersPerSecond);
@@ -39,18 +39,16 @@ namespace TrRouting
 
     spdlog::debug("use of bird distance ");
 
-    int i{0};
-    for (auto &node : nodes)
+    for (auto &&[uuid,node] : nodes)
     {
-      distanceMetersSquared = calculateNodeDistanceSquared(node->point.get(), point, lengthOfOneDegree);
+      distanceMetersSquared = calculateNodeDistanceSquared(node.point.get(), point, lengthOfOneDegree);
 
       if (distanceMetersSquared <= maxDistanceMetersSquared)
       {
         int distanceMeters = sqrt(distanceMetersSquared);
         int travelTimeSeconds = distanceMeters / walkingSpeedMetersPerSecond;
-        accessibleNodesFootpaths.push_back(std::make_tuple(i, travelTimeSeconds, distanceMeters));
+        accessibleNodesFootpaths.push_back(NodeTimeDistance(node, travelTimeSeconds, distanceMeters));
       }
-      i++;
     }
 
     spdlog::debug("fetched footpaths using bird distance ({} footpaths found)", accessibleNodesFootpaths.size());
@@ -58,10 +56,10 @@ namespace TrRouting
     return accessibleNodesFootpaths;
   }
 
-  std::vector<std::tuple<int, int, int>> OsrmFetcher::getNodesFromOsrm(const Point &point, const std::vector<std::unique_ptr<Node>> &nodes, std::string mode, int maxWalkingTravelTime, float walkingSpeedMetersPerSecond, bool reversed)
+  std::vector<NodeTimeDistance> OsrmFetcher::getNodesFromOsrm(const Point &point, const std::map<boost::uuids::uuid, Node> &nodes, std::string mode, int maxWalkingTravelTime, float walkingSpeedMetersPerSecond, bool reversed)
   {
-    std::vector<int> birdDistanceAccessibleNodeIndexes;
-    std::vector<std::tuple<int, int, int>> accessibleNodesFootpaths;
+    std::vector<std::reference_wrapper<const Node>> birdDistanceAccessibleNodeIndexes;
+    std::vector<NodeTimeDistance> accessibleNodesFootpaths;
 
     auto lengthOfOneDegree = calculateLengthOfOneDegree(point);
     float maxDistanceMetersSquared = calculateMaxDistanceSquared(maxWalkingTravelTime, walkingSpeedMetersPerSecond);
@@ -71,17 +69,15 @@ namespace TrRouting
 
     std::string queryString = "/table/v1/" + mode + "/" + std::to_string(point.longitude) + "," + std::to_string(point.latitude);
 
-    int i{0};
-    for (auto &node : nodes)
+    for (auto &&[uuid,node] : nodes)
     {
-      distanceMetersSquared = calculateNodeDistanceSquared(node->point.get(), point, lengthOfOneDegree);
+      distanceMetersSquared = calculateNodeDistanceSquared(node.point.get(), point, lengthOfOneDegree);
 
       if (distanceMetersSquared <= maxDistanceMetersSquared)
       {
-        birdDistanceAccessibleNodeIndexes.push_back(i);
-        queryString += ";" + std::to_string(node->point.get()->longitude) + "," + std::to_string(node->point.get()->latitude);
+        birdDistanceAccessibleNodeIndexes.push_back(node);
+        queryString += ";" + std::to_string(node.point.get()->longitude) + "," + std::to_string(node.point.get()->latitude);
       }
-      i++;
     }
 
     queryString += "?annotations=duration,distance";
@@ -119,7 +115,9 @@ namespace TrRouting
           if (travelTimeSeconds <= maxWalkingTravelTime)
           {
             distanceMeters = (int)ceil((float)responseJson["distances"][0][i]);
-            accessibleNodesFootpaths.push_back(std::make_tuple(birdDistanceAccessibleNodeIndexes[i - 1], travelTimeSeconds, distanceMeters));
+            accessibleNodesFootpaths.push_back(NodeTimeDistance(birdDistanceAccessibleNodeIndexes[i - 1],
+                                                                travelTimeSeconds,
+                                                                distanceMeters));
           }
         }
       }

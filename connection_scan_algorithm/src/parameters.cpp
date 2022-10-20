@@ -19,10 +19,10 @@ namespace TrRouting
     odTripsActivities.clear();
     odTripsModes.clear();
 
-    accessNodesIdx.clear();
+    accessNodesRef.clear();
     accessNodeTravelTimesSeconds.clear();
     accessNodeDistancesMeters.clear();
-    egressNodesIdx.clear();
+    egressNodesRef.clear();
     egressNodeTravelTimesSeconds.clear();
     egressNodeDistancesMeters.clear();
 
@@ -75,8 +75,7 @@ namespace TrRouting
     std::vector<std::unique_ptr<Scenario>> &scenarios,
     std::map<boost::uuids::uuid, int> &odTripIndexesByUuid,
     std::vector<std::unique_ptr<OdTrip>> &odTrips,
-    std::map<boost::uuids::uuid, int> &nodeIndexesByUuid,
-    std::vector<std::unique_ptr<Node>> &nodes,
+    const std::map<boost::uuids::uuid, Node> &nodes,
     const std::map<boost::uuids::uuid, DataSource> &dataSources)
   {
 
@@ -106,8 +105,6 @@ namespace TrRouting
     std::vector<std::string> onlyAgencyUuidsVector;
     std::vector<std::string> exceptAgencyUuidsVector;
     std::vector<std::string> onlyNodeUuidsVector;
-    std::vector<std::string> exceptNodeUuidsVector;
-    std::vector<std::string> accessNodeUuidsVector;
     std::vector<std::string> accessNodeTravelTimesSecondsVector;
     std::vector<std::string> accessNodeDistancesMetersVector;
     std::vector<std::string> egressNodeUuidsVector;
@@ -151,10 +148,11 @@ namespace TrRouting
               )
       {
         originNodeUuid = uuidGenerator(parameterWithValueVector[1]);
-        if (nodeIndexesByUuid.count(originNodeUuid) == 1)
+        //TODO Replace map.count()/at() combos with map.find(). (Do this elsewhere)
+        if (nodes.count(originNodeUuid) == 1)
         {
-          Node *originNode = nodes[nodeIndexesByUuid[originNodeUuid]].get();
-          newParametersWithValues.push_back(std::make_pair("origin", std::to_string(originNode->point.get()->longitude) + ',' + std::to_string(originNode->point.get()->latitude)));
+          const Node &originNode = nodes.at(originNodeUuid);
+          newParametersWithValues.push_back(std::make_pair("origin", std::to_string(originNode.point.get()->longitude) + ',' + std::to_string(originNode.point.get()->latitude)));
         }
         continue;
       }
@@ -164,10 +162,10 @@ namespace TrRouting
               )
       {
         destinationNodeUuid = uuidGenerator(parameterWithValueVector[1]);
-        if (nodeIndexesByUuid.count(destinationNodeUuid) == 1)
+        if (nodes.count(destinationNodeUuid) == 1)
         {
-          Node *destinationNode = nodes[nodeIndexesByUuid[destinationNodeUuid]].get();
-          newParametersWithValues.push_back(std::make_pair("destination", std::to_string(destinationNode->point.get()->longitude) + ',' + std::to_string(destinationNode->point.get()->latitude)));
+          const Node & destinationNode = nodes.at(destinationNodeUuid);
+          newParametersWithValues.push_back(std::make_pair("destination", std::to_string(destinationNode.point.get()->longitude) + ',' + std::to_string(destinationNode.point.get()->latitude)));
         }
         continue;
       }
@@ -511,28 +509,30 @@ namespace TrRouting
       // not sure we want to keep this: or supply node indexes instead, to limit request size?
       else if (parameterWithValueVector[0] == "access_node_uuids")
       {
+        std::vector<std::string> accessNodeUuidsVector;
         boost::split(accessNodeUuidsVector, parameterWithValueVector[1], boost::is_any_of(","));
         boost::uuids::uuid accessNodeUuid;
         for(std::string accessNodeUuidStr : accessNodeUuidsVector)
         {
           accessNodeUuid = uuidGenerator(accessNodeUuidStr);
-          if (nodeIndexesByUuid.count(accessNodeUuid) == 1)
+          if (nodes.count(accessNodeUuid) == 1)
           {
-            accessNodesIdx.push_back(nodeIndexesByUuid[accessNodeUuid]);
+            accessNodesRef.push_back(nodes.at(accessNodeUuid));
           }
         }
         continue;
       }
       else if (parameterWithValueVector[0] == "egress_node_uuids")
       {
+        std::vector<std::string> exceptNodeUuidsVector;
         boost::split(egressNodeUuidsVector, parameterWithValueVector[1], boost::is_any_of(","));
         boost::uuids::uuid egressNodeUuid;
         for(std::string egressNodeUuidStr : egressNodeUuidsVector)
         {
           egressNodeUuid = uuidGenerator(egressNodeUuidStr);
-          if (nodeIndexesByUuid.count(egressNodeUuid) == 1)
+          if (nodes.count(egressNodeUuid) == 1)
           {
-            egressNodesIdx.push_back(nodeIndexesByUuid[egressNodeUuid]);
+            egressNodesRef.push_back(nodes.at(egressNodeUuid));
           }
         }
         continue;

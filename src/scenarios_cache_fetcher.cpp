@@ -24,7 +24,7 @@ namespace TrRouting
     const std::map<boost::uuids::uuid, Service>& services,
     const std::map<boost::uuids::uuid, Line>& lines,
     const std::map<boost::uuids::uuid, Agency>& agencies,
-    const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
+    const std::map<boost::uuids::uuid, Node>& nodes,
     const std::map<std::string, Mode>& modes,
     std::string customPath
   ) {
@@ -75,11 +75,11 @@ namespace TrRouting
         std::vector<std::reference_wrapper<const Service>> servicesList;
         std::vector<std::reference_wrapper<const Line>> onlyLines;
         std::vector<std::reference_wrapper<const Agency>> onlyAgencies;
-        std::vector<int> onlyNodesIdx;
+        std::vector<std::reference_wrapper<const Node>> onlyNodes;
         std::vector<std::reference_wrapper<const Mode>> onlyModes;
         std::vector<std::reference_wrapper<const Line>> exceptLines;
         std::vector<std::reference_wrapper<const Agency>> exceptAgencies;
-        std::vector<int> exceptNodesIdx;
+        std::vector<std::reference_wrapper<const Node>> exceptNodes;
         std::vector<std::reference_wrapper<const Mode>> exceptModes;
         boost::uuids::uuid serviceUuid;
         boost::uuids::uuid agencyUuid;
@@ -121,12 +121,12 @@ namespace TrRouting
         for (std::string nodeUuidStr : capnpT.getOnlyNodesUuids())
         {
           nodeUuid = uuidGenerator(nodeUuidStr);
-          if (nodeIndexesByUuid.count(nodeUuid) != 0)
+          if (nodes.count(nodeUuid) != 0)
           {
-            onlyNodesIdx.push_back(nodeIndexesByUuid.at(nodeUuid));
+            onlyNodes.push_back(nodes.at(nodeUuid));
           }
         }
-        t->onlyNodesIdx = onlyNodesIdx;
+        t->onlyNodes = onlyNodes;
         for (std::string modeShortnameStr : capnpT.getOnlyModesShortnames())
         {
           if (modes.count(modeShortnameStr) != 0)
@@ -157,12 +157,12 @@ namespace TrRouting
         for (std::string nodeUuidStr : capnpT.getExceptNodesUuids())
         {
           nodeUuid = uuidGenerator(nodeUuidStr);
-          if (nodeIndexesByUuid.count(nodeUuid) != 0)
+          if (nodes.count(nodeUuid) != 0)
           {
-            exceptNodesIdx.push_back(nodeIndexesByUuid.at(nodeUuid));
+            exceptNodes.push_back(nodes.at(nodeUuid));
           }
         }
-        t->exceptNodesIdx = exceptNodesIdx;
+        t->exceptNodes = exceptNodes;
         for (std::string modeShortnameStr : capnpT.getExceptModesShortnames())
         {
           if (modes.count(modeShortnameStr) != 0)

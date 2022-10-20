@@ -189,7 +189,6 @@ TrRouting::AlternativesResult TAndACalculationFixtureTests::calculateWithAlterna
         calculator.scenarios,
         calculator.odTripIndexesByUuid,
         calculator.odTrips,
-        calculator.nodeIndexesByUuid,
         calculator.nodes,
         calculator.dataSources);
     TrRouting::OsrmFetcher::birdDistanceAccessibilityEnabled = true;
