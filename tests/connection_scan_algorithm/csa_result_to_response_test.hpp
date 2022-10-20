@@ -16,13 +16,13 @@ class ResultToResponseFixtureTest : public ::testing::Test
 protected:
     inline static const boost::uuids::string_generator uuidGenerator;
     // test parameters, actual values are not important, it's just for result generation
-    static const int DEFAULT_MIN_WAITING_TIME = 3 * 60;
-    static const int DEFAULT_MAX_TOTAL_TIME = TrRouting::MAX_INT;
-    static const int DEFAULT_MAX_ACCESS_TRAVEL_TIME = 20 * 60;
-    static const int DEFAULT_MAX_EGRESS_TRAVEL_TIME = 20 * 60;
-    static const int DEFAULT_MAX_TRANSFER_TRAVEL_TIME = 20 * 60;
-    static const int DEFAULT_FIRST_WAITING_TIME = 30 * 60;
-    static const int DEFAULT_TIME = 8 * 60 * 60;
+    inline static const int DEFAULT_MIN_WAITING_TIME = 3 * 60;
+    inline static const int DEFAULT_MAX_TOTAL_TIME = TrRouting::MAX_INT;
+    inline static const int DEFAULT_MAX_ACCESS_TRAVEL_TIME = 20 * 60;
+    inline static const int DEFAULT_MAX_EGRESS_TRAVEL_TIME = 20 * 60;
+    inline static const int DEFAULT_MAX_TRANSFER_TRAVEL_TIME = 20 * 60;
+    inline static const int DEFAULT_FIRST_WAITING_TIME = 30 * 60;
+    inline static const int DEFAULT_TIME = 8 * 60 * 60;
     inline static const std::string agencyUuid = "aaaaaaaa-1111-cccc-dddd-eeeeeeffffff";
     inline static const std::string lineUuid = "aaaaaaaa-2222-cccc-dddd-eeeeeeffffff";
     inline static const std::string pathUuid = "aaaaaaaa-3333-cccc-dddd-eeeeeeffffff";
