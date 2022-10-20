@@ -59,18 +59,10 @@ void RouteOdTripsFixtureTests::setupOdTrips() {
     std::vector<std::unique_ptr<TrRouting::OdTrip>>& array = calculator.odTrips;
     std::map<boost::uuids::uuid, int>& arrayIndexesByUuid = calculator.odTripIndexesByUuid;
 
-    std::vector<int> originNodesIdx;
-    originNodesIdx.push_back(calculator.nodeIndexesByUuid[nodeSouth2Uuid]);
-    std::vector<int> originNodesTravelTimesSeconds;
-    originNodesTravelTimesSeconds.push_back(469);
-    std::vector<int> originNodesDistancesMeters;
-    originNodesDistancesMeters.push_back(500);        
-    std::vector<int> destinationNodesIdx;
-    destinationNodesIdx.push_back(calculator.nodeIndexesByUuid[nodeMidNodeUuid]);
-    std::vector<int> destinationNodesTravelTimesSeconds;
-    destinationNodesTravelTimesSeconds.push_back(138);
-    std::vector<int> destinationNodesDistancesMeters;
-    destinationNodesDistancesMeters.push_back(150);
+    std::vector<TrRouting::NodeTimeDistance> originNodes;
+    originNodes.push_back(TrRouting::NodeTimeDistance(calculator.nodes.at(nodeSouth2Uuid), 469, 500));
+    std::vector<TrRouting::NodeTimeDistance> destinationNodes;
+    destinationNodes.push_back(TrRouting::NodeTimeDistance(calculator.nodes.at(nodeMidNodeUuid), 138, 150));
 
     std::unique_ptr<TrRouting::OdTrip> odTrip = std::make_unique<TrRouting::OdTrip>(odTripUuid,
                                                                                     12345,
@@ -86,12 +78,8 @@ void RouteOdTripsFixtureTests::setupOdTrips() {
                                                                                     "",
                                                                                     "",
                                                                                     "",
-                                                                                    originNodesIdx,
-                                                                                    originNodesTravelTimesSeconds,
-                                                                                    originNodesDistancesMeters,
-                                                                                    destinationNodesIdx,
-                                                                                    destinationNodesTravelTimesSeconds,
-                                                                                    destinationNodesDistancesMeters,
+                                                                                    originNodes,
+                                                                                    destinationNodes,
                                                                                     std::make_unique<TrRouting::Point>(45.5242, -73.5817),
                                                                                     std::make_unique<TrRouting::Point>(45.54, -73.6146));
     arrayIndexesByUuid[odTrip->uuid] = array.size();
@@ -131,7 +119,6 @@ nlohmann::json RouteOdTripsFixtureTests::calculateOdTrips(std::vector<std::strin
         calculator.scenarios,
         calculator.odTripIndexesByUuid,
         calculator.odTrips,
-        calculator.nodeIndexesByUuid,
         calculator.nodes,
         calculator.dataSources);
     TrRouting::OsrmFetcher::birdDistanceAccessibilityEnabled = true;

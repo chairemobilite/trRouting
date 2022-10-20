@@ -6,6 +6,7 @@
 #include <fstream>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/string_generator.hpp>
+#include "spdlog/spdlog.h"
 
 #include "calculator.hpp"
 #include "cache_fetcher.hpp"
@@ -114,6 +115,7 @@ public:
     double results[nbIter];
     for (int i = 0; i < nbIter; i++)
     {
+      spdlog::info("Benchmark iteration {} of {} ...", i, nbIter);
 
       auto start = std::chrono::high_resolution_clock::now();
 

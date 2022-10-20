@@ -10,6 +10,7 @@
 #include "agency.hpp"
 #include "service.hpp"
 #include "line.hpp"
+#include "node.hpp"
 
 namespace TrRouting
 {
@@ -17,20 +18,13 @@ namespace TrRouting
   void Calculator::reset(RouteParameters &parameters, bool resetAccessPaths, bool resetFilters)
   {
     
-    using JourneyTuple = std::tuple<int,int,int,int,int,short,int>;
-
     int benchmarkingStart = algorithmCalculationTime.getEpoch();
+    //TODO Should we just check the size of accessFootpath and egressFootpath instead of adding a flag?
     bool accessFootpathOk = true;
     bool egressFootpathOk = true;
 
     calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
-    
-    std::fill(nodesTentativeTime.begin()       , nodesTentativeTime.end()       , MAX_INT);
-    std::fill(nodesReverseTentativeTime.begin(), nodesReverseTentativeTime.end(), -1);
-    std::fill(nodesAccessTravelTime.begin()    , nodesAccessTravelTime.end()    , -1);
-    std::fill(nodesAccessDistance.begin()      , nodesAccessDistance.end()      , -1);
-    std::fill(nodesEgressTravelTime.begin()    , nodesEgressTravelTime.end()    , -1);
-    std::fill(nodesEgressDistance.begin()      , nodesEgressDistance.end()      , -1);
+
     if (resetAccessPaths)
     {
       accessFootpaths.clear();
@@ -47,10 +41,11 @@ namespace TrRouting
       std::fill(tripsEnabled.begin(), tripsEnabled.end(), 1);
     }
     std::fill(tripsUsable.begin()               , tripsUsable.end()               , -1);
-    std::fill(forwardJourneysSteps.begin()      , forwardJourneysSteps.end()      , JourneyTuple(-1,-1,-1,-1,-1,-1,-1));
-    std::fill(forwardEgressJourneysSteps.begin(), forwardEgressJourneysSteps.end(), JourneyTuple(-1,-1,-1,-1,-1,-1,-1));
-    std::fill(reverseJourneysSteps.begin()      , reverseJourneysSteps.end()      , JourneyTuple(-1,-1,-1,-1,-1,-1,-1));
-    std::fill(reverseAccessJourneysSteps.begin(), reverseAccessJourneysSteps.end(), JourneyTuple(-1,-1,-1,-1,-1,-1,-1));
+    forwardJourneysSteps.clear();
+    forwardEgressJourneysSteps.clear();
+    reverseJourneysSteps.clear();
+    reverseAccessJourneysSteps.clear();
+
     
     departureTimeSeconds = -1;
     arrivalTimeSeconds   = -1;
@@ -78,8 +73,6 @@ namespace TrRouting
     minEgressTravelTime = MAX_INT;
     maxAccessTravelTime = -1;
 
-    int j {0};
-
     if (!params.returnAllNodesResult || departureTimeSeconds > -1)
     {
       if (resetAccessPaths)
@@ -89,28 +82,27 @@ namespace TrRouting
 
         if(odTrip != nullptr)
         {
-          spdlog::debug("  using odTrip with {} accessible nodes", odTrip->originNodesIdx.size());
+          spdlog::debug("  using odTrip with {} accessible nodes", odTrip->originNodes.size());
 
           accessFootpaths.clear();
-          j = 0;
-          for (auto & accessNodeIdx : odTrip->originNodesIdx)
+          //TODO This can be a std::copy
+          for (auto & accessNode : odTrip->originNodes)
           {
-            accessFootpaths.push_back(std::make_tuple(accessNodeIdx, odTrip->originNodesTravelTimesSeconds[j], odTrip->originNodesDistancesMeters[j]));
-            j++;
+            accessFootpaths.push_back(accessNode);
           }
         }
-        else if (params.accessNodesIdx.size() > 0 && params.accessNodeTravelTimesSeconds.size() == params.accessNodesIdx.size())
+        else if (params.accessNodesRef.size() > 0 && params.accessNodeTravelTimesSeconds.size() == params.accessNodesRef.size())
         {
           accessFootpaths.clear();
-          j = 0;
-          for (auto & accessNodeIdx : params.accessNodesIdx)
+          int j = 0;
+          for (auto & accessNode : params.accessNodesRef)
           {
             int distanceMeters{-1};
-            if (params.accessNodeDistancesMeters.size() == params.accessNodesIdx.size())
+            if (params.accessNodeDistancesMeters.size() == params.accessNodesRef.size())
             {
               distanceMeters = params.accessNodeDistancesMeters[j];
             }
-            accessFootpaths.push_back(std::make_tuple(accessNodeIdx, params.accessNodeTravelTimesSeconds[j], distanceMeters));
+            accessFootpaths.push_back(NodeTimeDistance(accessNode, params.accessNodeTravelTimesSeconds[j], distanceMeters));
             j++;
           }
         }
@@ -129,15 +121,19 @@ namespace TrRouting
 
       int footpathTravelTimeSeconds;
       int footpathDistanceMeters;
+      nodesAccess.clear();
+      forwardJourneysSteps.clear();
+      nodesTentativeTime.clear();
       for (auto & accessFootpath : accessFootpaths)
       {
-        footpathTravelTimeSeconds = (int)ceil((float)(std::get<1>(accessFootpath)) / params.walkingSpeedFactor);
-        footpathDistanceMeters    = std::get<2>(accessFootpath);
+        footpathTravelTimeSeconds = (int)ceil((float)(accessFootpath.time) / params.walkingSpeedFactor);
+        footpathDistanceMeters    = accessFootpath.distance;
 
-        nodesAccessTravelTime[std::get<0>(accessFootpath)] = footpathTravelTimeSeconds;
-        nodesAccessDistance[std::get<0>(accessFootpath)]   = footpathDistanceMeters;
-        forwardJourneysSteps[std::get<0>(accessFootpath)]  = std::make_tuple(-1, -1, -1, -1, footpathTravelTimeSeconds, -1, footpathDistanceMeters);
-        nodesTentativeTime[std::get<0>(accessFootpath)]    = departureTimeSeconds + footpathTravelTimeSeconds;
+        nodesAccess.emplace(accessFootpath.node.uid, NodeTimeDistance(accessFootpath.node,
+                                                                      footpathTravelTimeSeconds,
+                                                                      footpathDistanceMeters));
+        forwardJourneysSteps[accessFootpath.node.uid]  = std::make_tuple(-1, -1, -1, footpathTravelTimeSeconds, -1, footpathDistanceMeters);
+        nodesTentativeTime[accessFootpath.node.uid]    = departureTimeSeconds + footpathTravelTimeSeconds;
         if (footpathTravelTimeSeconds < minAccessTravelTime)
         {
           minAccessTravelTime = footpathTravelTimeSeconds;
@@ -157,28 +153,27 @@ namespace TrRouting
         if(odTrip != nullptr)
         {
 
-          spdlog::debug("  using odTrip with {} egressible nodes", odTrip->destinationNodesIdx.size());
+          spdlog::debug("  using odTrip with {} egressible nodes", odTrip->destinationNodes.size());
 
           egressFootpaths.clear();
-          j = 0;
-          for (auto & egressNodeIdx : odTrip->destinationNodesIdx)
+          //TODO This could be a std::copy
+          for (auto & egressNode : odTrip->destinationNodes)
           {
-            egressFootpaths.push_back(std::make_tuple(egressNodeIdx, odTrip->destinationNodesTravelTimesSeconds[j], odTrip->destinationNodesDistancesMeters[j]));
-            j++;
+            egressFootpaths.push_back(egressNode);
           }
         }
-        else if (params.egressNodesIdx.size() > 0 && params.egressNodeTravelTimesSeconds.size() == params.egressNodesIdx.size())
+        else if (params.egressNodesRef.size() > 0 && params.egressNodeTravelTimesSeconds.size() == params.egressNodesRef.size())
         {
           egressFootpaths.clear();
-          j = 0;
-          for (auto & egressNodeIdx : params.egressNodesIdx)
+          int j = 0;
+          for (auto & egressNode : params.egressNodesRef)
           {
             int distanceMeters{-1};
-            if (params.egressNodeDistancesMeters.size() == params.egressNodesIdx.size())
+            if (params.egressNodeDistancesMeters.size() == params.egressNodesRef.size())
             {
               distanceMeters = params.egressNodeDistancesMeters[j];
             }
-            egressFootpaths.push_back(std::make_tuple(egressNodeIdx, params.egressNodeTravelTimesSeconds[j], distanceMeters));
+            egressFootpaths.push_back(NodeTimeDistance(egressNode, params.egressNodeTravelTimesSeconds[j], distanceMeters));
             j++;
           }
         }
@@ -195,14 +190,20 @@ namespace TrRouting
 
       int footpathTravelTimeSeconds;
       int footpathDistanceMeters;
+      nodesEgress.clear();
+      reverseJourneysSteps.clear();
+      nodesReverseTentativeTime.clear();
       for (auto & egressFootpath : egressFootpaths)
       {
-        footpathTravelTimeSeconds  = (int)ceil((float)(std::get<1>(egressFootpath)) / params.walkingSpeedFactor);
-        footpathDistanceMeters     = std::get<2>(egressFootpath);
-        nodesEgressTravelTime[std::get<0>(egressFootpath)]     = footpathTravelTimeSeconds;
-        nodesEgressDistance[std::get<0>(egressFootpath)]       = footpathDistanceMeters;
-        reverseJourneysSteps[std::get<0>(egressFootpath)]      = std::make_tuple(-1, -1, -1, -1, footpathTravelTimeSeconds, -1, footpathDistanceMeters);
-        nodesReverseTentativeTime[std::get<0>(egressFootpath)] = arrivalTimeSeconds - footpathTravelTimeSeconds;
+        footpathTravelTimeSeconds  = (int)ceil((float)(egressFootpath.time) / params.walkingSpeedFactor);
+        footpathDistanceMeters     = egressFootpath.distance;
+
+        nodesEgress.emplace(egressFootpath.node.uid, NodeTimeDistance(egressFootpath.node,
+                                                                       footpathTravelTimeSeconds,
+                                                                       footpathDistanceMeters));
+
+        reverseJourneysSteps[egressFootpath.node.uid] = std::make_tuple(-1, -1, -1, footpathTravelTimeSeconds, -1, footpathDistanceMeters);
+        nodesReverseTentativeTime[egressFootpath.node.uid] = arrivalTimeSeconds - footpathTravelTimeSeconds;
         if (footpathTravelTimeSeconds > maxEgressTravelTime)
         {
           maxEgressTravelTime = footpathTravelTimeSeconds;
@@ -275,7 +276,7 @@ namespace TrRouting
           }
         }
 
-        if (tripsEnabled[i] == 1 && parameters.getOnlyNodesIdx()->size() > 0)
+        if (tripsEnabled[i] == 1 && parameters.getOnlyNodes().size() > 0)
         {
           // FIXME: This is not right, it should look for a node, not the mode
           // FIXME2: Commented out, since mode is now typed, it won't match
@@ -309,7 +310,7 @@ namespace TrRouting
           }
         }
 
-        if (tripsEnabled[i] == 1 && parameters.getExceptNodesIdx()->size() > 0)
+        if (tripsEnabled[i] == 1 && parameters.getExceptNodes().size() > 0)
         {
           // FIXME: This is not right, it should look for a node, not the mode
           // FIXME2: Commented out, since mode is now typed, it won't match

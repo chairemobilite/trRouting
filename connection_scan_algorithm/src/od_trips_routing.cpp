@@ -11,6 +11,7 @@
 #include "trip.hpp"
 #include "routing_result.hpp"
 #include "od_trip.hpp"
+#include "node.hpp"
 
 namespace TrRouting
 {
@@ -323,8 +324,8 @@ namespace TrRouting
 
               if (pathProfiles.find(legPath.uuid) == pathProfiles.end())
               {
-                pathProfiles[legPath.uuid] = std::vector<std::vector<float>>(legPath.nodesIdx.size() - 1, demandByHourOfDay);
-                pathTotalProfiles[legPath.uuid] = std::vector<float>(legPath.nodesIdx.size() - 1, 0.0);
+                pathProfiles[legPath.uuid] = std::vector<std::vector<float>>(legPath.nodesRef.size() - 1, demandByHourOfDay);
+                pathTotalProfiles[legPath.uuid] = std::vector<float>(legPath.nodesRef.size() - 1, 0.0);
               }
               for (int connectionIndex = legConnectionStartIdx; connectionIndex <= legConnectionEndIdx; connectionIndex++)
               {

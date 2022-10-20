@@ -20,16 +20,12 @@
 
 namespace TrRouting
 {
-  // FIXME ConnectionTuple is defined in calculator.hpp. Should it be elsewhere? Cache fetcher should work for any algorithm, is this tuple csa-specific or should it go somewhere common.
-  using ConnectionTuple = std::tuple<int,int,int,int,int,short,short,int,short,short>;
-  
   int CacheFetcher::getSchedules(
     std::vector<std::unique_ptr<Trip>>& trips,
     const std::map<boost::uuids::uuid, Line>& lines,
     std::map<boost::uuids::uuid, Path>& paths,
     std::map<boost::uuids::uuid, int>& tripIndexesByUuid,
     const std::map<boost::uuids::uuid, Service>& services,
-    const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
     std::vector<std::vector<std::unique_ptr<int>>>&   tripConnectionDepartureTimes,
     std::vector<std::vector<std::unique_ptr<float>>>& tripConnectionDemands,
     std::vector<std::shared_ptr<ConnectionTuple>>& connections,
@@ -117,14 +113,12 @@ namespace TrRouting
               std::vector<std::unique_ptr<int>>   connectionDepartureTimes = std::vector<std::unique_ptr<int>>(nodeTimesCount);
               std::vector<std::unique_ptr<float>> connectionDemands        = std::vector<std::unique_ptr<float>>(nodeTimesCount);
 
-              for (int nodeTimeI = 0; nodeTimeI < nodeTimesCount; nodeTimeI++)
+              // nodeTimesCount - 1, since we process node pairs, we have to stop and the second from last
+              for (int nodeTimeI = 0; nodeTimeI < nodeTimesCount - 1; nodeTimeI++)
               {
-                if (nodeTimeI < nodeTimesCount - 1)
-                {
-
                   std::shared_ptr<ConnectionTuple> forwardConnection(std::make_shared<ConnectionTuple>(ConnectionTuple(
-                    path.nodesIdx[nodeTimeI],
-                    path.nodesIdx[nodeTimeI + 1],
+                    path.nodesRef[nodeTimeI],
+                    path.nodesRef[nodeTimeI + 1],
                     departureTimesSeconds[nodeTimeI],
                     arrivalTimesSeconds[nodeTimeI + 1],
                     tripIdx,
@@ -140,7 +134,6 @@ namespace TrRouting
                   connectionDepartureTimes[nodeTimeI] = std::make_unique<int>(departureTimesSeconds[nodeTimeI]);
                   connectionDemands[nodeTimeI]        = std::make_unique<float>(0.0);
 
-                }
               }
               trips.push_back(std::move(trip));
 

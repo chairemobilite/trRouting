@@ -51,8 +51,8 @@ namespace TrRouting
       std::vector<std::unique_ptr<OdTrip>>& ts,
       std::map<boost::uuids::uuid, int>& tIndexesById, 
       const std::map<boost::uuids::uuid, DataSource>& dataSources,
-      const std::map<boost::uuids::uuid, int>& personIndexesByUuid,     
-      const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
+      const std::map<boost::uuids::uuid, int>& personIndexesByUuid,
+      const std::map<boost::uuids::uuid, Node>& nodes,
       std::string customPath = ""
                            ) {return 0;}
 
@@ -67,8 +67,7 @@ namespace TrRouting
                             ) {return 0;}
 
     virtual int getNodes(
-      std::vector<std::unique_ptr<Node>>& ts,
-      std::map<boost::uuids::uuid, int>& tIndexesById,
+      std::map<boost::uuids::uuid, Node>& ts,
       std::string customPath = ""
                          ) {return 0;}
 
@@ -82,7 +81,7 @@ namespace TrRouting
     virtual int getPaths(
       std::map<boost::uuids::uuid, Path>& ts,
       const std::map<boost::uuids::uuid, Line>& lines,
-      const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
+      const std::map<boost::uuids::uuid, Node>& nodes,
       std::string customPath = ""
                          ) {return 0;}
 
@@ -101,7 +100,7 @@ namespace TrRouting
       const std::map<boost::uuids::uuid, Service>& services,
       const std::map<boost::uuids::uuid, Line>& lines,
       const std::map<boost::uuids::uuid, Agency>& agencies,
-      const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
+      const std::map<boost::uuids::uuid, Node>& nodes,
       const std::map<std::string, Mode>& modes,
       std::string customPath = ""
                              ) {return 0;}
@@ -121,10 +120,9 @@ namespace TrRouting
       std::map<boost::uuids::uuid, Path>& paths,
       std::map<boost::uuids::uuid, int>& tripIndexesByUuid,
       const std::map<boost::uuids::uuid, Service>& services,
-      const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
       std::vector<std::vector<std::unique_ptr<int>>>&   tripConnectionDepartureTimes,
       std::vector<std::vector<std::unique_ptr<float>>>& tripConnectionDemands,
-      std::vector<std::shared_ptr<std::tuple<int,int,int,int,int,short,short,int,short,short>>>& connections,
+      std::vector<std::shared_ptr<ConnectionTuple>>& connections,
       std::string customPath = "") {return 0;}
 
   };    

@@ -10,7 +10,7 @@ namespace TrRouting
   // TODO now that we have a "generic" data fetcher interface, we should remove the FromCache from these function name
   int Calculator::updateNodesFromCache(std::string customPath)
   {
-    return dataFetcher.getNodes(nodes, nodeIndexesByUuid, customPath);
+    return dataFetcher.getNodes(nodes, customPath);
   }
 
   int Calculator::updateDataSourcesFromCache(std::string customPath)
@@ -30,7 +30,7 @@ namespace TrRouting
   
   int Calculator::updateOdTripsFromCache(std::string customPath)
   {
-    return dataFetcher.getOdTrips(odTrips, odTripIndexesByUuid, dataSources, personIndexesByUuid, nodeIndexesByUuid, customPath);
+    return dataFetcher.getOdTrips(odTrips, odTripIndexesByUuid, dataSources, personIndexesByUuid, getNodes(), customPath);
   }
   /* TODO #167
   int Calculator::updatePlacesFromCache(std::string customPath)
@@ -55,12 +55,12 @@ namespace TrRouting
 
   int Calculator::updatePathsFromCache(std::string customPath)
   {
-    return dataFetcher.getPaths(paths, lines, nodeIndexesByUuid, customPath);
+    return dataFetcher.getPaths(paths, lines, getNodes(), customPath);
   }
 
   int Calculator::updateScenariosFromCache(std::string customPath)
   {
-    return dataFetcher.getScenarios(scenarios, scenarioIndexesByUuid, services, lines, agencies, nodeIndexesByUuid, getModes(), customPath);
+    return dataFetcher.getScenarios(scenarios, scenarioIndexesByUuid, services, lines, agencies, getNodes(), getModes(), customPath);
   }
 
   int Calculator::updateSchedulesFromCache(std::string customPath)
@@ -72,7 +72,6 @@ namespace TrRouting
       paths,
       tripIndexesByUuid,
       services,
-      nodeIndexesByUuid,
       tripConnectionDepartureTimes,
       tripConnectionDemands,
       connections,

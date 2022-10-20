@@ -43,35 +43,13 @@ namespace TrRouting
 
   void Calculator::initializeCalculationData() {
     nodesTentativeTime.clear();
-    nodesTentativeTime.shrink_to_fit();
-    nodesTentativeTime.resize(nodes.size());
     nodesReverseTentativeTime.clear();
-    nodesReverseTentativeTime.shrink_to_fit();
-    nodesReverseTentativeTime.resize(nodes.size());
-    nodesAccessTravelTime.clear();
-    nodesAccessTravelTime.shrink_to_fit();
-    nodesAccessTravelTime.resize(nodes.size());
-    nodesAccessDistance.clear();
-    nodesAccessDistance.shrink_to_fit();
-    nodesAccessDistance.resize(nodes.size());
-    nodesEgressTravelTime.clear();
-    nodesEgressTravelTime.shrink_to_fit();
-    nodesEgressTravelTime.resize(nodes.size());
-    nodesEgressDistance.clear();
-    nodesEgressDistance.shrink_to_fit();
-    nodesEgressDistance.resize(nodes.size());
+    nodesAccess.clear();
+    nodesEgress.clear();
     forwardJourneysSteps.clear();
-    forwardJourneysSteps.shrink_to_fit();
-    forwardJourneysSteps.resize(nodes.size());
     forwardEgressJourneysSteps.clear();
-    forwardEgressJourneysSteps.shrink_to_fit();
-    forwardEgressJourneysSteps.resize(nodes.size());
     reverseJourneysSteps.clear();
-    reverseJourneysSteps.shrink_to_fit();
-    reverseJourneysSteps.resize(nodes.size());
     reverseAccessJourneysSteps.clear();
-    reverseAccessJourneysSteps.shrink_to_fit();
-    reverseAccessJourneysSteps.resize(nodes.size());
 
     tripsEnabled.clear();
     tripsEnabled.shrink_to_fit();
@@ -135,6 +113,7 @@ namespace TrRouting
 
   }
 
+  //TODO This should probably take a reference to the connections object and later not use the std::move semantic
   int Calculator::setConnections(std::vector<std::shared_ptr<ConnectionTuple>> connections)
   {
 

@@ -26,12 +26,8 @@ namespace TrRouting
            const std::string &amode,
            const std::string &aoriginActivity,
            const std::string &adestinationActivity,
-           const std::vector<int> &aoriginNodesIdx,
-           const std::vector<int> &aoriginNodesTravelTimesSeconds,
-           const std::vector<int> &aoriginNodesDistancesMeters,
-           const std::vector<int> &adestinationNodesIdx,
-           const std::vector<int> &adestinationNodesTravelTimesSeconds,
-           const std::vector<int> &adestinationNodesDistancesMeters,
+           const std::vector<NodeTimeDistance> &aoriginNodes,
+           const std::vector<NodeTimeDistance> &adestinationNodes,
            std::unique_ptr<Point> aorigin,
            std::unique_ptr<Point> adestination)
     : uuid(auuid),
@@ -48,12 +44,8 @@ namespace TrRouting
       mode(amode),
       originActivity(aoriginActivity),
       destinationActivity(adestinationActivity),
-      originNodesIdx(aoriginNodesIdx),
-      originNodesTravelTimesSeconds(aoriginNodesTravelTimesSeconds),
-      originNodesDistancesMeters(aoriginNodesDistancesMeters),
-      destinationNodesIdx(adestinationNodesIdx),
-      destinationNodesTravelTimesSeconds(adestinationNodesTravelTimesSeconds),
-      destinationNodesDistancesMeters(adestinationNodesDistancesMeters),
+      originNodes(aoriginNodes),
+      destinationNodes(adestinationNodes),
       origin(std::move(aorigin)),
       destination(std::move(adestination)) {}
 
@@ -73,13 +65,8 @@ namespace TrRouting
     std::string originActivity;
     std::string destinationActivity;
     std::string internalId;
-    //TODO Combine those 3 into an object
-    std::vector<int> originNodesIdx;
-    std::vector<int> originNodesTravelTimesSeconds;
-    std::vector<int> originNodesDistancesMeters;
-    std::vector<int> destinationNodesIdx;
-    std::vector<int> destinationNodesTravelTimesSeconds;
-    std::vector<int> destinationNodesDistancesMeters;
+    std::vector<NodeTimeDistance> originNodes;
+    std::vector<NodeTimeDistance> destinationNodes;
     std::unique_ptr<Point> origin;
     std::unique_ptr<Point> destination;
 

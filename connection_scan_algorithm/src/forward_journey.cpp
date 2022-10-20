@@ -15,7 +15,7 @@
 namespace TrRouting
 {
 
-  std::unique_ptr<RoutingResult> Calculator::forwardJourneyStep(RouteParameters &parameters, int bestArrivalTime, int bestEgressNodeIndex, int bestEgressTravelTime, int bestEgressDistance)
+  std::unique_ptr<RoutingResult> Calculator::forwardJourneyStep(RouteParameters &parameters, int bestArrivalTime, std::optional<std::reference_wrapper<const Node>> bestEgressNode)
   {
 
     // FIXME: One code path supports both Single calculation and all nodes, we shouldn't have to deal with both of these types here
@@ -27,27 +27,30 @@ namespace TrRouting
     int              reachableNodesCount  {0};
     bool             foundLine            {false};
 
-    std::vector<int> resultingNodes;
+    std::vector<std::reference_wrapper<const Node>> resultingNodes;
     if (params.returnAllNodesResult)
     {
       nodesCount     = nodes.size();
-      resultingNodes = std::vector<int>(nodesCount);
-      std::iota (std::begin(resultingNodes), std::end(resultingNodes), 0); // generate sequencial indexes of each nodes
+      // Add references to all nodes in the resultingNodes vector
+      // TODO this seems heavy. To reconsidered when we split function and consider the
+      // allNodes case separately 
+      for(auto nodeIte = nodes.begin(); nodeIte != nodes.end(); nodeIte++) {
+        resultingNodes.push_back(std::cref(nodeIte->second));
+      }
     }
     else if (bestArrivalTime < MAX_INT) // line found
     {
       foundLine = true;
-      resultingNodes.push_back(bestEgressNodeIndex);
+      resultingNodes.push_back(bestEgressNode.value());
     } else {
       throw NoRoutingFoundException(NoRoutingReason::NO_ROUTING_FOUND);
     }
 
+    //TODO This if seems unnecessary, we throw before if this condition would be false
     if (foundLine || params.returnAllNodesResult)
     {
+      std::deque<JourneyStep> journey;
 
-      std::deque<std::tuple<int,int,int,int,int,short,int>> journey;
-      std::tuple<int,int,int,int,int,short,int>         resultingNodeJourneyStep;
-      std::tuple<int,int,int,int,int,short,int>         emptyJourneyStep {-1,-1,-1,-1,-1,-1,-1};
       ConnectionTuple * journeyStepEnterConnection; // connection tuple: departureNodeIndex, arrivalNodeIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequenceinTrip
       ConnectionTuple * journeyStepExitConnection;
       std::vector<boost::uuids::uuid>                   unboardingNodeUuids;
@@ -57,8 +60,6 @@ namespace TrRouting
       std::vector<int>                                  inVehicleTravelTimesSeconds; // the in vehicle travel time for each segment
       std::vector<Leg>  legs;
 
-      Node *   journeyStepNodeDeparture;
-      Node *   journeyStepNodeArrival;
       Trip *   journeyStepTrip;
 
       int totalInVehicleTime       { 0}; int transferArrivalTime    {-1}; int firstDepartureTime     {-1};
@@ -69,11 +70,11 @@ namespace TrRouting
       int totalDistance            { 0}; int distance               {-1};
       int inVehicleDistance        {-1}; int totalInVehicleDistance { 0}; int totalWalkingDistance   { 0};
       int totalTransferDistance    {-1}; int accessDistance         { 0}; int egressDistance         { 0};
-      int journeyStepTravelTime    {-1}; int accessWalkingTime      {-1}; int bestAccessNodeIndex    {-1};
+      int journeyStepTravelTime    {-1}; int accessWalkingTime      {-1};
       int transferTime             {-1}; int egressWalkingTime      {-1};
       int waitingTime              {-1}; int accessWaitingTime      {-1};
 
-      for (auto & resultingNodeIndex : resultingNodes)
+      for (const Node & resultingNode : resultingNodes)
       {
 
         legs.clear();
@@ -93,30 +94,29 @@ namespace TrRouting
         totalDistance            =  0; distance               = -1;
         inVehicleDistance        =  0; totalInVehicleDistance =  0; totalWalkingDistance   =  0;
         totalTransferDistance    =  0; accessDistance         =  0; egressDistance         =  0;
-        journeyStepTravelTime    = -1; accessWalkingTime      = -1; bestAccessNodeIndex    = -1;
+        journeyStepTravelTime    = -1; accessWalkingTime      = -1;
         transferTime             = -1; egressWalkingTime      = -1;
         waitingTime              = -1; accessWaitingTime      = -1;
 
         // recreate journey:
-        resultingNodeJourneyStep = forwardEgressJourneysSteps[resultingNodeIndex];
-
-        if (resultingNodeJourneyStep == emptyJourneyStep) // ignore nodes with no line
-        {
+        if (forwardEgressJourneysSteps.count(resultingNode.uid) == 0) { // ignore nodes with no line
           continue;
         }
+        JourneyStep resultingNodeJourneyStep = forwardEgressJourneysSteps.at(resultingNode.uid);
 
+        std::optional<std::reference_wrapper<const Node>> bestAccessNode;
         while ((std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(resultingNodeJourneyStep) != -1 && std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION>(resultingNodeJourneyStep) != -1))
         {
           journey.push_front(resultingNodeJourneyStep);
-          bestAccessNodeIndex = std::get<connectionIndexes::NODE_DEP>(*forwardConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(resultingNodeJourneyStep)].get());
-          resultingNodeJourneyStep = forwardJourneysSteps[bestAccessNodeIndex];
+          bestAccessNode = std::get<connectionIndexes::NODE_DEP>(*forwardConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(resultingNodeJourneyStep)].get());
+          resultingNodeJourneyStep = forwardJourneysSteps.at(bestAccessNode.value().get().uid);
         }
 
         if (!params.returnAllNodesResult)
         {
-          journey.push_back(std::make_tuple(-1,-1,-1,-1,nodesEgressTravelTime[resultingNodeIndex],-1,nodesEgressDistance[resultingNodeIndex]));
+          journey.push_back(std::make_tuple(-1,-1,-1,nodesEgress.at(resultingNode.uid).distance,-1,nodesEgress.at(resultingNode.uid).distance));
         }
-        journey.push_front(std::make_tuple(-1,-1,-1,-1,nodesAccessTravelTime[bestAccessNodeIndex],-1,nodesAccessDistance[bestAccessNodeIndex]));
+        journey.push_front(std::make_tuple(-1,-1,-1,nodesAccess.at(bestAccessNode.value().get().uid).time,-1,nodesAccess.at(bestAccessNode.value().get().uid).distance));
 
         //std::string stepsJson = "  \"steps\":\n  [\n";
 
@@ -130,8 +130,8 @@ namespace TrRouting
             // journey tuple: final enter connection, final exit connection, final footpath
             journeyStepEnterConnection = forwardConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journeyStep)].get();
             journeyStepExitConnection  = forwardConnections[std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION>(journeyStep)].get();
-            journeyStepNodeDeparture   = nodes[std::get<connectionIndexes::NODE_DEP>(*journeyStepEnterConnection)].get();
-            journeyStepNodeArrival     = nodes[std::get<connectionIndexes::NODE_ARR>(*journeyStepExitConnection)].get();
+            const Node &journeyStepNodeDeparture   = std::get<connectionIndexes::NODE_DEP>(*journeyStepEnterConnection);
+            const Node &journeyStepNodeArrival     = std::get<connectionIndexes::NODE_ARR>(*journeyStepExitConnection);
             journeyStepTrip            = trips[std::get<journeyStepIndexes::FINAL_TRIP>(journeyStep)].get();
             transferTime               = std::get<journeyStepIndexes::TRANSFER_TRAVEL_TIME>(journeyStep);
             distance                   = std::get<journeyStepIndexes::TRANSFER_DISTANCE>(journeyStep);
@@ -157,8 +157,8 @@ namespace TrRouting
               numberOfTransfers += 1;
             }
             inVehicleTravelTimesSeconds.push_back(inVehicleTime);
-            boardingNodeUuids.push_back(journeyStepNodeDeparture->uuid);
-            unboardingNodeUuids.push_back(journeyStepNodeArrival->uuid);
+            boardingNodeUuids.push_back(journeyStepNodeDeparture.uuid);
+            unboardingNodeUuids.push_back(journeyStepNodeArrival.uuid);
             tripUuids.push_back(journeyStepTrip->uuid);
             tripsIdx.push_back(std::get<journeyStepIndexes::FINAL_TRIP>(journeyStep));
             legs.push_back(std::make_tuple(std::get<journeyStepIndexes::FINAL_TRIP>(journeyStep), std::ref(journeyStepTrip->line), std::ref(journeyStepTrip->path), boardingSequence - 1, unboardingSequence - 1));
@@ -215,10 +215,10 @@ namespace TrRouting
                 journeyStepTrip->uuid,
                 boardingSequence,
                 boardingSequence,
-                journeyStepNodeDeparture->uuid,
-                journeyStepNodeDeparture->code,
-                journeyStepNodeDeparture->name,
-                *journeyStepNodeDeparture->point.get(),
+                journeyStepNodeDeparture.uuid,
+                journeyStepNodeDeparture.code,
+                journeyStepNodeDeparture.name,
+                *journeyStepNodeDeparture.point.get(),
                 minimizedDepartureTime,
                 waitingTime
               ));
@@ -236,10 +236,10 @@ namespace TrRouting
                 journeyStepTrip->uuid,
                 unboardingSequence,
                 unboardingSequence + 1,
-                journeyStepNodeArrival->uuid,
-                journeyStepNodeArrival->code,
-                journeyStepNodeArrival->name,
-                *journeyStepNodeArrival->point.get(),
+                journeyStepNodeArrival.uuid,
+                journeyStepNodeArrival.code,
+                journeyStepNodeArrival.name,
+                *journeyStepNodeArrival.point.get(),
                 arrivalTime,
                 inVehicleTime,
                 inVehicleDistance
@@ -327,15 +327,15 @@ namespace TrRouting
 
         if (params.returnAllNodesResult)
         {
-          if (std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(forwardEgressJourneysSteps[resultingNodeIndex]) != -1)
+          if (std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(forwardEgressJourneysSteps.at(resultingNode.uid)) != -1)
           {
-            arrivalTime = std::get<connectionIndexes::TIME_ARR>(*forwardConnections[std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION>(forwardEgressJourneysSteps[resultingNodeIndex])].get());
+            arrivalTime = std::get<connectionIndexes::TIME_ARR>(*forwardConnections[std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION>(forwardEgressJourneysSteps.at(resultingNode.uid))].get());
             if (arrivalTime - departureTimeSeconds <= parameters.getMaxTotalTravelTimeSeconds())
             {
               reachableNodesCount++;
 
               AccessibleNodes node = AccessibleNodes(
-                nodes[resultingNodeIndex].get()->uuid,
+                resultingNode.uuid,
                 arrivalTime,
                 arrivalTime - departureTimeSeconds,
                 numberOfTransfers
@@ -344,7 +344,7 @@ namespace TrRouting
             }
           }
         }
-        else if (!params.returnAllNodesResult)
+        else
         {
           singleResult.get()->departureTime = minimizedDepartureTime;
           singleResult.get()->arrivalTime = arrivalTime;

@@ -22,11 +22,11 @@ namespace TrRouting
     std::vector<std::reference_wrapper<const Mode>> onlyModes;
     std::vector<std::reference_wrapper<const Line>> onlyLines;
     std::vector<std::reference_wrapper<const Agency>> onlyAgencies;
-    std::vector<int> onlyNodesIdx;
+    std::vector<std::reference_wrapper<const Node>> onlyNodes;
     std::vector<std::reference_wrapper<const Mode>> exceptModes;
     std::vector<std::reference_wrapper<const Line>> exceptLines;
     std::vector<std::reference_wrapper<const Agency>> exceptAgencies;
-    std::vector<int> exceptNodesIdx;
+    std::vector<std::reference_wrapper<const Node>> exceptNodes;
 
     const std::string toString() {
       return "Scenario " + boost::uuids::to_string(uuid) + "\n  name " + name;
