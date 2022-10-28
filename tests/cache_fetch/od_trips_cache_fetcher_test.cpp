@@ -14,13 +14,13 @@ protected:
     std::vector<std::unique_ptr<TrRouting::OdTrip>> objects;
     std::map<boost::uuids::uuid, int> objectIndexesByUuid;
     std::map<boost::uuids::uuid, TrRouting::DataSource> dataSources;
-    std::map<boost::uuids::uuid, int> personIndexesByUuid;
+    std::map<boost::uuids::uuid, TrRouting::Person> persons;
     std::map<boost::uuids::uuid, TrRouting::Node> nodes;
 };
 
 TEST_F(OdTripCacheFetcherFixtureTests, TestGetOdTripsValid)
 {
-    int retVal = cacheFetcher.getOdTrips(objects, objectIndexesByUuid, dataSources, personIndexesByUuid, nodes, VALID_CUSTOM_PATH);
+    int retVal = cacheFetcher.getOdTrips(objects, objectIndexesByUuid, dataSources, persons, nodes, VALID_CUSTOM_PATH);
     ASSERT_EQ(0, retVal);
     ASSERT_EQ(0, objects.size());
 }

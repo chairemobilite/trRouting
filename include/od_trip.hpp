@@ -8,6 +8,7 @@
 namespace TrRouting
 {
   class DataSource;
+  class Person;
   
   class OdTrip {
   
@@ -16,7 +17,7 @@ namespace TrRouting
            unsigned long long aid,
            const std::string &ainternalId,
            const DataSource &adataSource,
-           int apersonIdx,
+           std::optional<std::reference_wrapper<const Person>> _person,
            int adepartureTimeSeconds,
            int aarrivalTimeSeconds,
            int awalkingTravelTimeSeconds,
@@ -34,7 +35,7 @@ namespace TrRouting
       id(aid),
       internalId(ainternalId),
       dataSource(adataSource),
-      personIdx(apersonIdx),
+      person(_person),
       departureTimeSeconds(adepartureTimeSeconds),
       arrivalTimeSeconds(aarrivalTimeSeconds),
       walkingTravelTimeSeconds(awalkingTravelTimeSeconds),
@@ -53,7 +54,7 @@ namespace TrRouting
     unsigned long long id;
     const DataSource & dataSource;
     //int householdIdx; //TODO #167
-    int personIdx;
+    std::optional<std::reference_wrapper<const Person>> person;
     int departureTimeSeconds;
     int arrivalTimeSeconds;
     int walkingTravelTimeSeconds;

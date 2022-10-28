@@ -77,7 +77,7 @@ namespace TrRouting
     std::vector<std::unique_ptr<OdTrip>>& ts,
     std::map<boost::uuids::uuid, int>& tIndexesByUuid,
     const std::map<boost::uuids::uuid, DataSource>& dataSources,
-    const std::map<boost::uuids::uuid, int>& personIndexesByUuid,
+    const std::map<boost::uuids::uuid, Person>& persons,
     const std::map<boost::uuids::uuid, Node>& nodes,
     std::string customPath
   )
@@ -165,12 +165,18 @@ namespace TrRouting
                                                           capnpT.getDestinationNodesDistances()[i]));
             }
 
+            // Get person reference if we have one
+            std::optional<std::reference_wrapper<const Person>> person;
+            if (personUuid.length() > 0) {
+              person = persons.at(uuidGenerator(personUuid));
+            }
+
             // Create new odTrip
             std::unique_ptr<T> t = std::make_unique<T>(uuidGenerator(uuid),
                                                        capnpT.getId(),
                                                        capnpT.getInternalId(),
                                                        dataSources.at(uuidGenerator(dataSourceUuid)),
-                                                       personUuid.length() > 0 ? personIndexesByUuid.at(uuidGenerator(personUuid)) : -1,
+                                                       person,
                                                        capnpT.getDepartureTimeSeconds(),
                                                        capnpT.getArrivalTimeSeconds(),
                                                        capnpT.getWalkingTravelTimeSeconds(),

@@ -25,12 +25,12 @@ namespace TrRouting
   */
   int Calculator::updatePersonsFromCache(std::string customPath)
   {
-    return dataFetcher.getPersons(persons, personIndexesByUuid, getDataSources(), customPath);
+    return dataFetcher.getPersons(persons, getDataSources(), customPath);
   }
   
   int Calculator::updateOdTripsFromCache(std::string customPath)
   {
-    return dataFetcher.getOdTrips(odTrips, odTripIndexesByUuid, dataSources, personIndexesByUuid, getNodes(), customPath);
+    return dataFetcher.getOdTrips(odTrips, odTripIndexesByUuid, dataSources, getPersons(), getNodes(), customPath);
   }
   /* TODO #167
   int Calculator::updatePlacesFromCache(std::string customPath)

@@ -71,8 +71,7 @@ namespace TrRouting
      * -(error codes from the open system call)
      */
     virtual int getPersons(
-      std::vector<std::unique_ptr<Person>>& ts,
-      std::map<boost::uuids::uuid, int>& tIndexesById, 
+      std::map<boost::uuids::uuid, Person>& ts,
       const std::map<boost::uuids::uuid, DataSource>& dataSources,
       std::string customPath = ""
     ) = 0;
@@ -90,7 +89,7 @@ namespace TrRouting
       std::vector<std::unique_ptr<OdTrip>>& ts,
       std::map<boost::uuids::uuid, int>& tIndexesById, 
       const std::map<boost::uuids::uuid, DataSource>& dataSources,
-      const std::map<boost::uuids::uuid, int>& personIndexesByUuid,
+      const std::map<boost::uuids::uuid, Person>& persons,
       const std::map<boost::uuids::uuid, Node>& nodes,
       std::string customPath = ""
     ) = 0;
