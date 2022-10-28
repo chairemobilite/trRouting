@@ -12,8 +12,7 @@ namespace fs = std::filesystem;
 class ScenarioCacheFetcherFixtureTests : public BaseCacheFetcherFixtureTests
 {
 protected:
-    std::vector<std::unique_ptr<TrRouting::Scenario>> objects;
-    std::map<boost::uuids::uuid, int> objectIndexesByUuid;
+    std::map<boost::uuids::uuid, TrRouting::Scenario> objects;
     std::map<boost::uuids::uuid, TrRouting::Service> services;
     std::map<boost::uuids::uuid, TrRouting::Line> lines;
     std::map<boost::uuids::uuid, TrRouting::Agency> agencies;
@@ -49,7 +48,7 @@ public:
 
 TEST_F(ScenarioCacheFetcherFixtureTests, TestGetScenariosInvalid)
 {
-    int retVal = cacheFetcher.getScenarios(objects, objectIndexesByUuid, services, lines, agencies, nodes, modes, INVALID_CUSTOM_PATH);
+    int retVal = cacheFetcher.getScenarios(objects, services, lines, agencies, nodes, modes, INVALID_CUSTOM_PATH);
     ASSERT_EQ(-EBADMSG, retVal);
     ASSERT_EQ(0, objects.size());
 }
@@ -57,14 +56,14 @@ TEST_F(ScenarioCacheFetcherFixtureTests, TestGetScenariosInvalid)
 // TODO Add tests for various services, lines, agencies that don't exist. But first, we should be able to create cache files with mock test data
 TEST_F(ScenarioCacheFetcherFixtureTests, TestGetScenariosValid)
 {
-    int retVal = cacheFetcher.getScenarios(objects, objectIndexesByUuid, services, lines, agencies, nodes, modes, VALID_CUSTOM_PATH);
+    int retVal = cacheFetcher.getScenarios(objects, services, lines, agencies, nodes, modes, VALID_CUSTOM_PATH);
     ASSERT_EQ(0, retVal);
     ASSERT_EQ(2, objects.size());
 }
 
 TEST_F(ScenarioCacheFetcherFixtureTests, TestGetScenariosFileNotExists)
 {
-    int retVal = cacheFetcher.getScenarios(objects, objectIndexesByUuid, services, lines, agencies, nodes, modes, BASE_CUSTOM_PATH);
+    int retVal = cacheFetcher.getScenarios(objects, services, lines, agencies, nodes, modes, BASE_CUSTOM_PATH);
     ASSERT_EQ(-ENOENT, retVal);
     ASSERT_EQ(0, objects.size());
 }

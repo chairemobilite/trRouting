@@ -11,7 +11,7 @@ namespace TrRouting
   class Agency;
   class Service;
   
-  struct Scenario {
+  class Scenario {
   
   public:
    

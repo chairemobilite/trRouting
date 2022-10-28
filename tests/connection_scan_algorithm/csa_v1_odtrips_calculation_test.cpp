@@ -115,7 +115,6 @@ nlohmann::json RouteOdTripsFixtureTests::calculateOdTrips(std::vector<std::strin
 {
     calculator.params.setDefaultValues();
     TrRouting::RouteParameters routeParams = calculator.params.update(parameters,
-        calculator.scenarioIndexesByUuid,
         calculator.scenarios,
         calculator.odTripIndexesByUuid,
         calculator.odTrips,

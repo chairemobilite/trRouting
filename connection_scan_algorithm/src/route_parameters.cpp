@@ -17,7 +17,7 @@ namespace TrRouting
 
   RouteParameters::RouteParameters(std::unique_ptr<Point> orig_,
     std::unique_ptr<Point> dest_,
-    Scenario& scenario_,
+    const Scenario& scenario_,
     int _timeOfTrip,
     int minWaitingTime,
     int maxTotalTime,
@@ -90,13 +90,12 @@ namespace TrRouting
     }
   }
 
-  RouteParameters RouteParameters::createRouteODParameter(std::vector<std::pair<std::string, std::string>> &parameters, std::map<boost::uuids::uuid, int> &scenarioIndexesByUuid, std::vector<std::unique_ptr<Scenario>> &scenarios)
+  RouteParameters RouteParameters::createRouteODParameter(std::vector<std::pair<std::string, std::string>> &parameters, const std::map<boost::uuids::uuid, Scenario> &scenarios)
   {
 
     boost::uuids::string_generator uuidGenerator;
 
-    Scenario * scenario = nullptr;
-    std::optional<boost::uuids::uuid> scenarioUuid;
+    std::optional<std::reference_wrapper<const Scenario>> scenario;
     boost::uuids::uuid originNodeUuid;
     boost::uuids::uuid destinationNodeUuid;
 
@@ -173,10 +172,12 @@ namespace TrRouting
       // scenario:
       else if (parameterWithValue.first == "scenario_id")
       {
-        scenarioUuid = uuidGenerator(parameterWithValue.second);
-        if (scenarioIndexesByUuid.count(*scenarioUuid) == 1)
+        boost::uuids::uuid scenarioUuid  = uuidGenerator(parameterWithValue.second);
+
+        auto scenarioIte = scenarios.find(scenarioUuid);
+        if (scenarioIte != scenarios.end())
         {
-          scenario = scenarios[scenarioIndexesByUuid[*scenarioUuid]].get();
+          scenario = scenarioIte->second;
         }
         continue;
       }
@@ -248,11 +249,11 @@ namespace TrRouting
     }
 
     // Validate scenario parameters
-    if (scenario == nullptr)
+    if (!scenario.has_value())
     {
       throw ParameterException(ParameterException::Type::MISSING_SCENARIO);
     }
-    else if (scenario->servicesList.size() <= 0)
+    else if (scenario.value().get().servicesList.size() <= 0)
     {
       throw ParameterException(ParameterException::Type::EMPTY_SCENARIO);
     }
@@ -271,7 +272,7 @@ namespace TrRouting
 
     return RouteParameters(std::make_unique<TrRouting::Point>(origin->latitude, origin->longitude),
       std::make_unique<TrRouting::Point>(destination->latitude, destination->longitude),
-      *scenario,
+      scenario.value().get(),
       timeOfTrip,
       minWaitingTimeSeconds,
       maxTotalTravelTimeSeconds,

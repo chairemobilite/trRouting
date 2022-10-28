@@ -19,8 +19,7 @@ namespace TrRouting
 {
 
   int CacheFetcher::getScenarios(
-    std::vector<std::unique_ptr<Scenario>>& ts,
-    std::map<boost::uuids::uuid, int>& tIndexesByUuid,
+    std::map<boost::uuids::uuid, Scenario>& ts,
     const std::map<boost::uuids::uuid, Service>& services,
     const std::map<boost::uuids::uuid, Line>& lines,
     const std::map<boost::uuids::uuid, Agency>& agencies,
@@ -35,7 +34,6 @@ namespace TrRouting
     int ret = 0;
 
     ts.clear();
-    tIndexesByUuid.clear();
 
     std::string tStr  = "scenarios";
     std::string TStr  = "Scenarios";
@@ -85,11 +83,11 @@ namespace TrRouting
         boost::uuids::uuid agencyUuid;
         boost::uuids::uuid nodeUuid;
 
-        std::unique_ptr<T> t = std::make_unique<T>();
+        boost::uuids::uuid scenarioUuid = uuidGenerator(uuid);
+        ts[scenarioUuid].uuid = scenarioUuid;
 
-        t->uuid           = uuidGenerator(uuid);
-        t->name           = capnpT.getName();
-        t->simulationUuid = simulationUuid.empty() ? uuidNilGenerator() : uuidGenerator(simulationUuid);
+        ts[scenarioUuid].name           = capnpT.getName();
+        ts[scenarioUuid].simulationUuid = simulationUuid.empty() ? uuidNilGenerator() : uuidGenerator(simulationUuid);
         
         for (std::string serviceUuidStr : capnpT.getServicesUuids())
         {
@@ -99,7 +97,7 @@ namespace TrRouting
             servicesList.push_back(services.at(serviceUuid));
           }
         }
-        t->servicesList = servicesList;
+        ts[scenarioUuid].servicesList = servicesList;
         for (std::string lineUuidStr : capnpT.getOnlyLinesUuids())
         {
           boost::uuids::uuid lineUuid = uuidGenerator(lineUuidStr);
@@ -108,7 +106,7 @@ namespace TrRouting
             onlyLines.push_back(lines.at(lineUuid));
           }
         }
-        t->onlyLines = onlyLines;
+        ts[scenarioUuid].onlyLines = onlyLines;
         for (std::string agencyUuidStr : capnpT.getOnlyAgenciesUuids())
         {
           agencyUuid = uuidGenerator(agencyUuidStr);
@@ -117,7 +115,7 @@ namespace TrRouting
             onlyAgencies.push_back(agencies.at(agencyUuid));
           }
         }
-        t->onlyAgencies = onlyAgencies;
+        ts[scenarioUuid].onlyAgencies = onlyAgencies;
         for (std::string nodeUuidStr : capnpT.getOnlyNodesUuids())
         {
           nodeUuid = uuidGenerator(nodeUuidStr);
@@ -126,7 +124,7 @@ namespace TrRouting
             onlyNodes.push_back(nodes.at(nodeUuid));
           }
         }
-        t->onlyNodes = onlyNodes;
+        ts[scenarioUuid].onlyNodes = onlyNodes;
         for (std::string modeShortnameStr : capnpT.getOnlyModesShortnames())
         {
           if (modes.count(modeShortnameStr) != 0)
@@ -134,7 +132,7 @@ namespace TrRouting
             onlyModes.push_back(modes.at(modeShortnameStr));
           }
         }
-        t->onlyModes = onlyModes;
+        ts[scenarioUuid].onlyModes = onlyModes;
 
         for (std::string lineUuidStr : capnpT.getExceptLinesUuids())
         {
@@ -144,7 +142,7 @@ namespace TrRouting
             exceptLines.push_back(lines.at(lineUuid));
           }
         }
-        t->exceptLines = exceptLines;
+        ts[scenarioUuid].exceptLines = exceptLines;
         for (std::string agencyUuidStr : capnpT.getExceptAgenciesUuids())
         {
           agencyUuid = uuidGenerator(agencyUuidStr);
@@ -153,7 +151,7 @@ namespace TrRouting
             exceptAgencies.push_back(agencies.at(agencyUuid));
           }
         }
-        t->exceptAgencies = exceptAgencies;
+        ts[scenarioUuid].exceptAgencies = exceptAgencies;
         for (std::string nodeUuidStr : capnpT.getExceptNodesUuids())
         {
           nodeUuid = uuidGenerator(nodeUuidStr);
@@ -162,7 +160,7 @@ namespace TrRouting
             exceptNodes.push_back(nodes.at(nodeUuid));
           }
         }
-        t->exceptNodes = exceptNodes;
+        ts[scenarioUuid].exceptNodes = exceptNodes;
         for (std::string modeShortnameStr : capnpT.getExceptModesShortnames())
         {
           if (modes.count(modeShortnameStr) != 0)
@@ -170,10 +168,8 @@ namespace TrRouting
             exceptModes.push_back(modes.at(modeShortnameStr));
           }
         }
-        t->exceptModes = exceptModes;
+        ts[scenarioUuid].exceptModes = exceptModes;
 
-        tIndexesByUuid[t->uuid] = ts.size();
-        ts.push_back(std::move(t));
       }
     }
     catch (const kj::Exception& e)

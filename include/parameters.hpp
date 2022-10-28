@@ -58,7 +58,7 @@ namespace TrRouting
       // from this RouteParameters object, but changing one field (the max travel
       // time). When calculation specific parameters are implemented, this field
       // will not be required in this class anymore.
-      Scenario& scenario;
+      const Scenario& scenario;
       std::unique_ptr<Point> origin;
       std::unique_ptr<Point> destination;
 
@@ -89,7 +89,7 @@ namespace TrRouting
     public:
       RouteParameters(std::unique_ptr<Point> orig,
         std::unique_ptr<Point> dest,
-        Scenario& scenario,
+        const Scenario& scenario,
         int timeOfTrip,
         int minWaitingTime,
         int maxTotalTime,
@@ -104,7 +104,7 @@ namespace TrRouting
       Point* getOrigin() { return origin.get(); }
       Point* getDestination() { return destination.get(); }
       // FIXME Temporary method, will be removed once calculation specific parameters are implemented. Try not to use.
-      Scenario& getScenario() { return scenario; }
+      const Scenario& getScenario() { return scenario; }
       int getTimeOfTrip() const { return timeOfTrip; }
       int getMinWaitingTimeSeconds() const { return minWaitingTimeSeconds; }
       int getMaxTotalTravelTimeSeconds() const { return maxTotalTravelTimeSeconds; }
@@ -124,8 +124,7 @@ namespace TrRouting
        * ParameterException error
        **/
       static RouteParameters createRouteODParameter(std::vector<std::pair<std::string, std::string>> &parameters,
-        std::map<boost::uuids::uuid, int> &scenarioIndexesByUuid,
-        std::vector<std::unique_ptr<Scenario>> &scenarios
+                                                    const std::map<boost::uuids::uuid, Scenario> &scenarios
       );
       const std::vector<std::reference_wrapper<const Service>>& getOnlyServices() { return onlyServices; }
       const std::vector<std::reference_wrapper<const Service>>& getExceptServices() { return exceptServices; }
@@ -214,10 +213,9 @@ namespace TrRouting
        * @deprecated ServerParameters should not be updated this way, directly create a RouteParameters, but legacy endpoints still use this method.
        * */
       RouteParameters update(std::vector<std::string> &parameters,
-        std::map<boost::uuids::uuid, int> &scenarioIndexesByUuid,
-        std::vector<std::unique_ptr<Scenario>> &scenarios,
-        std::map<boost::uuids::uuid, int> &odTripIndexesByUuid,
-        std::vector<std::unique_ptr<OdTrip>> &odTrips,
+                             const std::map<boost::uuids::uuid, Scenario> &scenario,
+                             std::map<boost::uuids::uuid, int> &odTripIndexesByUuid,
+                             std::vector<std::unique_ptr<OdTrip>> &odTrips,
                              const std::map<boost::uuids::uuid,Node> &nodes,
                              const std::map<boost::uuids::uuid, DataSource> &dataSources);
 

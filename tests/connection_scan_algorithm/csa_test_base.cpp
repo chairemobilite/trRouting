@@ -219,15 +219,11 @@ void BaseCsaFixtureTests::setUpServices()
 
 void BaseCsaFixtureTests::setUpScenarios()
 {
-    std::vector<std::unique_ptr<TrRouting::Scenario>>& array = calculator.scenarios;
-    std::map<boost::uuids::uuid, int>& arrayIndexesByUuid = calculator.scenarioIndexesByUuid;
+    std::map<boost::uuids::uuid, TrRouting::Scenario>& array = calculator.scenarios;
 
-    std::unique_ptr<TrRouting::Scenario> scenario = std::make_unique<TrRouting::Scenario>();
-    scenario->uuid = scenarioUuid;
-    scenario->name = "Test valid scenario";
-    scenario->servicesList.push_back(calculator.services.at(serviceUuid));
-    arrayIndexesByUuid[scenario->uuid] = array.size();
-    array.push_back(std::move(scenario));
+    array[scenarioUuid].uuid = scenarioUuid;
+    array[scenarioUuid].name = "Test valid scenario";
+    array[scenarioUuid].servicesList.push_back(calculator.services.at(serviceUuid));
 }
 
 void addNodeToPath(std::vector<TrRouting::NodeTimeDistance>& nodesref, const TrRouting::Node &node, int timeTraveled, int distance) {

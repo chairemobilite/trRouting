@@ -60,7 +60,7 @@ namespace TrRouting
 
   int Calculator::updateScenariosFromCache(std::string customPath)
   {
-    return dataFetcher.getScenarios(scenarios, scenarioIndexesByUuid, services, lines, agencies, getNodes(), getModes(), customPath);
+    return dataFetcher.getScenarios(scenarios, services, lines, agencies, getNodes(), getModes(), customPath);
   }
 
   int Calculator::updateSchedulesFromCache(std::string customPath)

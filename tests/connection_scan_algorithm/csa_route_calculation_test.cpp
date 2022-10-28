@@ -34,7 +34,6 @@ void SingleRouteCalculationFixtureTests::SetUp()
 {
     BaseCsaFixtureTests::SetUp();
 
-    scenario = calculator.scenarios[calculator.scenarioIndexesByUuid[scenarioUuid]].get();
 }
 
 // Test from south node to the opposite direction
@@ -43,7 +42,7 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingBecauseNoPath)
     TrRouting::RouteParameters testParameters = TrRouting::RouteParameters(
         std::make_unique<TrRouting::Point>(45.5269, -73.58912),
         std::make_unique<TrRouting::Point>(45.52184, -73.57817),
-        *scenario,
+        calculator.scenarios.at(scenarioUuid),
         getTimeInSeconds(9, 50),
         DEFAULT_MIN_WAITING_TIME,
         DEFAULT_MAX_TOTAL_TIME,
@@ -71,7 +70,7 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingBecauseNoNodeAtOrigin)
     TrRouting::RouteParameters testParameters = TrRouting::RouteParameters(
         std::make_unique<TrRouting::Point>(45.5349, -73.55478),
         std::make_unique<TrRouting::Point>(45.54, -73.6146),
-        *scenario,
+        calculator.scenarios.at(scenarioUuid),
         getTimeInSeconds(9, 50),
         DEFAULT_MIN_WAITING_TIME,
         DEFAULT_MAX_TOTAL_TIME,
@@ -99,7 +98,7 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingBecauseNoNodeAtDestination)
     TrRouting::RouteParameters testParameters = TrRouting::RouteParameters(
         std::make_unique<TrRouting::Point>(45.5242, -73.5817),
         std::make_unique<TrRouting::Point>(45.5155, -73.56797),
-        *scenario,
+        calculator.scenarios.at(scenarioUuid),
         getTimeInSeconds(9, 50),
         DEFAULT_MIN_WAITING_TIME,
         DEFAULT_MAX_TOTAL_TIME,
@@ -127,7 +126,7 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingBecauseNoNodeAtOriginAndDest
     TrRouting::RouteParameters testParameters = TrRouting::RouteParameters(
         std::make_unique<TrRouting::Point>(45.5349, -73.55478),
         std::make_unique<TrRouting::Point>(45.5155, -73.56797),
-        *scenario,
+        calculator.scenarios.at(scenarioUuid),
         getTimeInSeconds(9, 50),
         DEFAULT_MIN_WAITING_TIME,
         DEFAULT_MAX_TOTAL_TIME,
@@ -155,7 +154,7 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingBecauseTooEarly)
     TrRouting::RouteParameters testParameters = TrRouting::RouteParameters(
         std::make_unique<TrRouting::Point>(45.5269, -73.58912),
         std::make_unique<TrRouting::Point>(45.53258, -73.60196),
-        *scenario,
+        calculator.scenarios.at(scenarioUuid),
         getTimeInSeconds(6, 50),
         DEFAULT_MIN_WAITING_TIME,
         DEFAULT_MAX_TOTAL_TIME,
@@ -184,7 +183,7 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingBecauseTooEarlyArrival)
     TrRouting::RouteParameters testParameters = TrRouting::RouteParameters(
         std::make_unique<TrRouting::Point>(45.5269, -73.58912),
         std::make_unique<TrRouting::Point>(45.53258, -73.60196),
-        *scenario,
+        calculator.scenarios.at(scenarioUuid),
         getTimeInSeconds(6, 50),
         DEFAULT_MIN_WAITING_TIME,
         DEFAULT_MAX_TOTAL_TIME,
@@ -217,7 +216,7 @@ TEST_F(SingleRouteCalculationFixtureTests, NodeToNodeCalculation)
     TrRouting::RouteParameters testParameters = TrRouting::RouteParameters(
         std::make_unique<TrRouting::Point>(45.5269, -73.58912),
         std::make_unique<TrRouting::Point>(45.53258, -73.60196),
-        *scenario,
+        calculator.scenarios.at(scenarioUuid),
         departureTime,
         DEFAULT_MIN_WAITING_TIME,
         DEFAULT_MAX_TOTAL_TIME,
@@ -250,7 +249,7 @@ TEST_F(SingleRouteCalculationFixtureTests, SimpleODCalculationDepartureTime)
     TrRouting::RouteParameters testParameters = TrRouting::RouteParameters(
         std::make_unique<TrRouting::Point>(45.5242, -73.5817),
         std::make_unique<TrRouting::Point>(45.54, -73.6146),
-        *scenario,
+        calculator.scenarios.at(scenarioUuid),
         departureTime,
         DEFAULT_MIN_WAITING_TIME,
         DEFAULT_MAX_TOTAL_TIME,
@@ -284,7 +283,7 @@ TEST_F(SingleRouteCalculationFixtureTests, SimpleODCalculationArrivalTime)
     TrRouting::RouteParameters testParameters = TrRouting::RouteParameters(
         std::make_unique<TrRouting::Point>(45.5242, -73.5817),
         std::make_unique<TrRouting::Point>(45.54, -73.6146),
-        *scenario,
+        calculator.scenarios.at(scenarioUuid),
         arrivalTime,
         DEFAULT_MIN_WAITING_TIME,
         DEFAULT_MAX_TOTAL_TIME,
@@ -320,7 +319,7 @@ TEST_F(SingleRouteCalculationFixtureTests, SimpleODCalculationWithAllParams)
     TrRouting::RouteParameters testParameters = TrRouting::RouteParameters(
         std::make_unique<TrRouting::Point>(45.5242, -73.5817),
         std::make_unique<TrRouting::Point>(45.54, -73.6146),
-        *scenario,
+        calculator.scenarios.at(scenarioUuid),
         departureTime,
         minWaitingTime,
         expectedTransitDepartureTime - departureTime + egressTime + travelTimeInVehicle + 5,
@@ -354,7 +353,7 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingAccessTimeLimit)
     TrRouting::RouteParameters testParameters = TrRouting::RouteParameters(
         std::make_unique<TrRouting::Point>(45.5242, -73.5817),
         std::make_unique<TrRouting::Point>(45.54, -73.6146),
-        *scenario,
+        calculator.scenarios.at(scenarioUuid),
         departureTime,
         DEFAULT_MIN_WAITING_TIME,
         DEFAULT_MAX_TOTAL_TIME,
@@ -386,7 +385,7 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingEgressTimeLimit)
     TrRouting::RouteParameters testParameters = TrRouting::RouteParameters(
         std::make_unique<TrRouting::Point>(45.5242, -73.5817),
         std::make_unique<TrRouting::Point>(45.54, -73.6146),
-        *scenario,
+        calculator.scenarios.at(scenarioUuid),
         departureTime,
         DEFAULT_MIN_WAITING_TIME,
         DEFAULT_MAX_TOTAL_TIME,
@@ -421,7 +420,7 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingMaxFirstWaitingTime)
     TrRouting::RouteParameters testParameters = TrRouting::RouteParameters(
         std::make_unique<TrRouting::Point>(45.5242, -73.5817),
         std::make_unique<TrRouting::Point>(45.54, -73.6146),
-        *scenario,
+        calculator.scenarios.at(scenarioUuid),
         departureTime,
         DEFAULT_MIN_WAITING_TIME,
         DEFAULT_MAX_TOTAL_TIME,
@@ -456,7 +455,7 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingMinWaitingTime)
     TrRouting::RouteParameters testParameters = TrRouting::RouteParameters(
         std::make_unique<TrRouting::Point>(45.5242, -73.5817),
         std::make_unique<TrRouting::Point>(45.54, -73.6146),
-        *scenario,
+        calculator.scenarios.at(scenarioUuid),
         departureTime,
         expectedTransitDepartureTime - departureTime,
         DEFAULT_MAX_TOTAL_TIME,
@@ -487,7 +486,7 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingTravelTime)
     TrRouting::RouteParameters testParameters = TrRouting::RouteParameters(
         std::make_unique<TrRouting::Point>(45.5242, -73.5817),
         std::make_unique<TrRouting::Point>(45.54, -73.6146),
-        *scenario,
+        calculator.scenarios.at(scenarioUuid),
         departureTime,
         DEFAULT_MIN_WAITING_TIME,
         travelTimeInVehicle,
@@ -520,7 +519,7 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingTravelTimeLongerTrip)
     TrRouting::RouteParameters testParameters = TrRouting::RouteParameters(
         std::make_unique<TrRouting::Point>(45.5242, -73.5817),
         std::make_unique<TrRouting::Point>(45.5466, -73.6405),
-        *scenario,
+        calculator.scenarios.at(scenarioUuid),
         departureTime,
         DEFAULT_MIN_WAITING_TIME,
         totalTravelTime,
