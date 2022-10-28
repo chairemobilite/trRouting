@@ -367,7 +367,6 @@ int main(int argc, char** argv) {
       // update params:
       calculator.params.setDefaultValues();
       RouteParameters routeParams = calculator.params.update(parametersWithValues,
-        calculator.scenarioIndexesByUuid,
         calculator.scenarios,
         calculator.odTripIndexesByUuid,
         calculator.odTrips,
@@ -477,7 +476,7 @@ int main(int argc, char** argv) {
       std::unique_ptr<TrRouting::RoutingResult> routingResult;
       TrRouting::AlternativesResult alternativeResult;
 
-      RouteParameters queryParams = RouteParameters::createRouteODParameter(parametersWithValues, calculator.scenarioIndexesByUuid, calculator.scenarios);
+      RouteParameters queryParams = RouteParameters::createRouteODParameter(parametersWithValues, calculator.scenarios);
 
       try {
         if (queryParams.isWithAlternatives())
@@ -542,7 +541,7 @@ int main(int argc, char** argv) {
       std::unique_ptr<TrRouting::RoutingResult> routingResult;
       TrRouting::AlternativesResult alternativeResult;
 
-      RouteParameters queryParams = RouteParameters::createRouteODParameter(parametersWithValues, calculator.scenarioIndexesByUuid, calculator.scenarios);
+      RouteParameters queryParams = RouteParameters::createRouteODParameter(parametersWithValues, calculator.scenarios);
 
       try {
         if (queryParams.isWithAlternatives())

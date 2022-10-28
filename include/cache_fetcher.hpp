@@ -112,8 +112,7 @@ namespace TrRouting
     );
 
     virtual int getScenarios(
-      std::vector<std::unique_ptr<Scenario>>& ts,
-      std::map<boost::uuids::uuid, int>& tIndexesById,
+      std::map<boost::uuids::uuid, Scenario>& ts,
       const std::map<boost::uuids::uuid, Service>& services,
       const std::map<boost::uuids::uuid, Line>& lines,
       const std::map<boost::uuids::uuid, Agency>& agencies,

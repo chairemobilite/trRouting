@@ -71,8 +71,7 @@ namespace TrRouting
   }
 
   RouteParameters Parameters::update(std::vector<std::string> &parameters,
-    std::map<boost::uuids::uuid, int> &scenarioIndexesByUuid,
-    std::vector<std::unique_ptr<Scenario>> &scenarios,
+    const std::map<boost::uuids::uuid, Scenario> &scenarios,
     std::map<boost::uuids::uuid, int> &odTripIndexesByUuid,
     std::vector<std::unique_ptr<OdTrip>> &odTrips,
     const std::map<boost::uuids::uuid, Node> &nodes,
@@ -85,7 +84,6 @@ namespace TrRouting
     // Vector to contain parameters required for creating the RouteParameters object
     std::vector<std::pair<std::string, std::string>> newParametersWithValues;
 
-    Scenario *         scenario;
     boost::uuids::uuid originNodeUuid;
     boost::uuids::uuid destinationNodeUuid;
 
@@ -579,7 +577,7 @@ namespace TrRouting
       }
     }
 
-    return RouteParameters::createRouteODParameter(newParametersWithValues, scenarioIndexesByUuid, scenarios);
+    return RouteParameters::createRouteODParameter(newParametersWithValues, scenarios);
 
   }
 

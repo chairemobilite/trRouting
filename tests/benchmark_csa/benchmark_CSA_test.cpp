@@ -149,12 +149,12 @@ public:
 
   void benchmarkCurrentData(std::string testType, BenchmarkDataTuple paramTuple, bool alternatives, bool forward, int nbIter)
   {
-    Scenario* scenario = calculator->scenarios[calculator->scenarioIndexesByUuid[scenarioUuid]].get();
+    const Scenario & scenario = calculator->scenarios.at(scenarioUuid);
 
     TrRouting::RouteParameters routeParams = TrRouting::RouteParameters(
       std::make_unique<TrRouting::Point>(std::get<parameterIndexes::LAT_ORIG>(paramTuple), std::get<parameterIndexes::LON_ORIG>(paramTuple)),
       std::make_unique<TrRouting::Point>(std::get<parameterIndexes::LAT_DEST>(paramTuple), std::get<parameterIndexes::LON_DEST>(paramTuple)),
-      *scenario,
+      scenario,
       std::get<parameterIndexes::TIME>(paramTuple),
       3 * 60,
       180 * 60,

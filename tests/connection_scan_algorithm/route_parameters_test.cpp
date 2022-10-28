@@ -12,14 +12,13 @@
 #include "toolbox.hpp" //MAX_INT
 
 const std::string EMPTY_SCENARIO_UUID = "acdcef12-1111-2222-3333-444455558888";
+const std::string TEST_SCENARIO_UUID = "12345678-9999-0000-1111-ababbabaabab";
 
 class RouteParametersFixtureTests : public BaseParametersFixtureTests
 {
 protected:
-    std::vector<std::unique_ptr<TrRouting::Scenario>> scenarios;
-    std::map<boost::uuids::uuid, int> scenarioIndexesByUuid;
+    std::map<boost::uuids::uuid, TrRouting::Scenario> scenarios;
     TrRouting::Service service; //Empty service, as the param parser expect at least one
-
 public:
     void SetUp( ) override
     {
@@ -27,29 +26,21 @@ public:
         const boost::uuids::string_generator uuidGenerator;
 
         // Create a valid scenario, services and other data don't have to exist, we are creating parameters, not using them
-        std::unique_ptr<TrRouting::Scenario> scenario = std::make_unique<TrRouting::Scenario>();
-        scenario->uuid = uuidGenerator("12345678-9999-0000-1111-ababbabaabab");
-
-        scenario->name = "Test valid scenario";
-        scenario->servicesList.push_back(service);
-
-        scenarioIndexesByUuid[scenario->uuid] = scenarios.size();
-        scenarios.push_back(std::move(scenario));
+        auto uuid = uuidGenerator(TEST_SCENARIO_UUID);
+        scenarios[uuid].uuid = uuid;
+        scenarios[uuid].name = "Test valid scenario";
+        scenarios[uuid].servicesList.push_back(service);
 
         // Create an empty scenario
-        scenario = std::make_unique<TrRouting::Scenario>();
-        scenario->uuid = uuidGenerator(EMPTY_SCENARIO_UUID);
-        scenario->name = "Test empty scenario";
-
-        scenarioIndexesByUuid[scenario->uuid] = scenarios.size();
-        scenarios.push_back(std::move(scenario));
+        uuid = uuidGenerator(EMPTY_SCENARIO_UUID);
+        scenarios[uuid].uuid = uuid;
+        scenarios[uuid].name = "Test empty scenario";
     }
 
     void TearDown( ) override
     {
         // Nothing to do? Shoud we delete the scenarios?
         scenarios.clear();
-        scenarioIndexesByUuid.clear();
     }
 };
 
@@ -101,7 +92,7 @@ TEST_P(InvalidParamTestSuite, TestParams)
     }
     if (paramName != "scenario_id")
     {
-        parametersWithValues.push_back(std::make_pair("scenario_id", boost::uuids::to_string(scenarios[0]->uuid)));
+        parametersWithValues.push_back(std::make_pair("scenario_id",  TEST_SCENARIO_UUID));
     }
     if (!paramValue.empty())
     {
@@ -109,7 +100,7 @@ TEST_P(InvalidParamTestSuite, TestParams)
     }
 
     try {
-        TrRouting::RouteParameters queryParams = TrRouting::RouteParameters::createRouteODParameter(parametersWithValues, scenarioIndexesByUuid, scenarios);
+        TrRouting::RouteParameters queryParams = TrRouting::RouteParameters::createRouteODParameter(parametersWithValues, scenarios);
         FAIL() << "Expected TrRouting::ParameterException, no exception was thrown";
     }
     catch(TrRouting::ParameterException const & err) {
@@ -123,12 +114,12 @@ TEST_P(InvalidParamTestSuite, TestParams)
 TEST_F(RouteParametersFixtureTests, DefaultParameters)
 {
     std::vector<std::pair<std::string, std::string>> parametersWithValues;
-    parametersWithValues.push_back(std::make_pair("scenario_id", boost::uuids::to_string(scenarios[0]->uuid)));
+    parametersWithValues.push_back(std::make_pair("scenario_id",  TEST_SCENARIO_UUID));
     parametersWithValues.push_back(std::make_pair("origin", "-73.5,45.5544"));
     parametersWithValues.push_back(std::make_pair("destination", "-73.57786713522127, 45.55239801892435"));
     parametersWithValues.push_back(std::make_pair("time_of_trip", "10800"));
 
-    TrRouting::RouteParameters queryParams = TrRouting::RouteParameters::createRouteODParameter(parametersWithValues, scenarioIndexesByUuid, scenarios);
+    TrRouting::RouteParameters queryParams = TrRouting::RouteParameters::createRouteODParameter(parametersWithValues, scenarios);
     EXPECT_DOUBLE_EQ(queryParams.getOrigin()->latitude, 45.5544);
     EXPECT_DOUBLE_EQ(queryParams.getOrigin()->longitude, -73.5);
     EXPECT_DOUBLE_EQ(queryParams.getDestination()->latitude, 45.55239801892435);
@@ -153,7 +144,7 @@ TEST_F(RouteParametersFixtureTests, SetAllParameters)
     int maxEgress = 900, maxTransfer = 750, maxFirst = 300;
 
     std::vector<std::pair<std::string, std::string>> parametersWithValues;
-    parametersWithValues.push_back(std::make_pair("scenario_id", boost::uuids::to_string(scenarios[0]->uuid)));
+    parametersWithValues.push_back(std::make_pair("scenario_id",  TEST_SCENARIO_UUID));
     parametersWithValues.push_back(std::make_pair("origin", "-73.5,45.5544"));
     parametersWithValues.push_back(std::make_pair("destination", "-73.57786713522127, 45.55239801892435"));
     parametersWithValues.push_back(std::make_pair("time_of_trip", "10800"));
@@ -166,7 +157,7 @@ TEST_F(RouteParametersFixtureTests, SetAllParameters)
     parametersWithValues.push_back(std::make_pair("max_travel_time", std::to_string(maxTotalTime)));
     parametersWithValues.push_back(std::make_pair("max_first_waiting_time", std::to_string(maxFirst)));
 
-    TrRouting::RouteParameters queryParams = TrRouting::RouteParameters::createRouteODParameter(parametersWithValues, scenarioIndexesByUuid, scenarios);
+    TrRouting::RouteParameters queryParams = TrRouting::RouteParameters::createRouteODParameter(parametersWithValues, scenarios);
     EXPECT_DOUBLE_EQ(queryParams.getOrigin()->latitude, 45.5544);
     EXPECT_DOUBLE_EQ(queryParams.getOrigin()->longitude, -73.5);
     EXPECT_DOUBLE_EQ(queryParams.getDestination()->latitude, 45.55239801892435);

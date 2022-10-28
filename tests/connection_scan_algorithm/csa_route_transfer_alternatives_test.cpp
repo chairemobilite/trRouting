@@ -50,7 +50,7 @@ TEST_F(SingleTAndACalculationFixtureTests, TripWithTransfer)
     TrRouting::RouteParameters testParameters = TrRouting::RouteParameters(
         std::make_unique<TrRouting::Point>(45.5242, -73.5817),
         std::make_unique<TrRouting::Point>(45.5295, -73.624),
-        *scenario,
+        calculator.scenarios.at(scenarioUuid),
         departureTime,
         minWaitingTime,
         DEFAULT_MAX_TOTAL_TIME,
@@ -90,7 +90,7 @@ TEST_F(SingleTAndACalculationFixtureTests, NoTransferMinTransferTime)
     TrRouting::RouteParameters testParameters = TrRouting::RouteParameters(
         std::make_unique<TrRouting::Point>(45.5242, -73.5817),
         std::make_unique<TrRouting::Point>(45.5295, -73.624),
-        *scenario,
+        calculator.scenarios.at(scenarioUuid),
         departureTime,
         minWaitingTime,
         DEFAULT_MAX_TOTAL_TIME,
@@ -131,7 +131,7 @@ TEST_F(SingleTAndACalculationFixtureTests, TripWithWalkingTransfer)
     TrRouting::RouteParameters testParameters = TrRouting::RouteParameters(
         std::make_unique<TrRouting::Point>(45.5242, -73.5817),
         std::make_unique<TrRouting::Point>(45.5549, -73.6173),
-        *scenario,
+        calculator.scenarios.at(scenarioUuid),
         departureTime,
         DEFAULT_MIN_WAITING_TIME,
         DEFAULT_MAX_TOTAL_TIME,
@@ -170,7 +170,7 @@ TEST_F(SingleTAndACalculationFixtureTests, TripWithAlternatives)
     TrRouting::RouteParameters testParameters = TrRouting::RouteParameters(
         std::make_unique<TrRouting::Point>(45.5242, -73.5817),
         std::make_unique<TrRouting::Point>(45.5541, -73.6186),
-        *scenario,
+        calculator.scenarios.at(scenarioUuid),
         departureTime,
         DEFAULT_MIN_WAITING_TIME,
         DEFAULT_MAX_TOTAL_TIME,
@@ -235,7 +235,7 @@ TEST_F(SingleTAndACalculationFixtureTests, TripWithNoRoutingAlternatives)
     TrRouting::RouteParameters testParameters = TrRouting::RouteParameters(
         std::make_unique<TrRouting::Point>(45.7242, -73.7817),
         std::make_unique<TrRouting::Point>(45.7541, -73.8186),
-        *scenario,
+        calculator.scenarios.at(scenarioUuid),
         departureTime,
         DEFAULT_MIN_WAITING_TIME,
         DEFAULT_MAX_TOTAL_TIME,

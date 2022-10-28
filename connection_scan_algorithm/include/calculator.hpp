@@ -164,8 +164,9 @@ namespace TrRouting
     std::map<boost::uuids::uuid, Path>       paths;
     const std::map<boost::uuids::uuid, Path> & getPaths() {return paths;}
 
-    std::vector<std::unique_ptr<Scenario>>   scenarios;
-    std::map<boost::uuids::uuid, int>        scenarioIndexesByUuid;
+    std::map<boost::uuids::uuid, Scenario>   scenarios;
+    const std::map<boost::uuids::uuid, Scenario> & getScenarios() {return scenarios;}
+
 
     std::vector<std::unique_ptr<Trip>>       trips;
     std::map<boost::uuids::uuid, int>        tripIndexesByUuid;

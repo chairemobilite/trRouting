@@ -379,7 +379,6 @@ std::unique_ptr<TrRouting::RoutingResult> RouteCalculationFixtureTests::calculat
 {
     calculator.params.setDefaultValues();
     TrRouting::RouteParameters routeParams = calculator.params.update(parameters,
-        calculator.scenarioIndexesByUuid,
         calculator.scenarios,
         calculator.odTripIndexesByUuid,
         calculator.odTrips,
