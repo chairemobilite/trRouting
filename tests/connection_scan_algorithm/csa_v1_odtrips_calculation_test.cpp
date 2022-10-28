@@ -68,7 +68,7 @@ void RouteOdTripsFixtureTests::setupOdTrips() {
                                                                                     12345,
                                                                                     "12345",
                                                                                     calculator.dataSources.at(dataSourceUuid),
-                                                                                    -1,
+                                                                                    std::nullopt,
                                                                                     getTimeInSeconds(9, 45),
                                                                                     -1,
                                                                                     0,

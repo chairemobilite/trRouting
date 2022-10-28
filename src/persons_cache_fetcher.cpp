@@ -80,8 +80,7 @@ namespace TrRouting
   }
 
   int CacheFetcher::getPersons(
-    std::vector<std::unique_ptr<Person>>& ts,
-    std::map<boost::uuids::uuid, int>& tIndexesByUuid,
+    std::map<boost::uuids::uuid, Person>& ts,
     const std::map<boost::uuids::uuid, DataSource>& dataSources,
     std::string customPath
   )
@@ -92,7 +91,6 @@ namespace TrRouting
     using cT          = person::Person;
 
     ts.clear();
-    tIndexesByUuid.clear();
 
     std::string tStr  = "persons";
     std::string TStr  = "Persons";
@@ -138,7 +136,7 @@ namespace TrRouting
           TCollection::Reader capnpTCollection = capnpTCollectionMessage.getRoot<TCollection>();
           for (cT::Reader capnpT : capnpTCollection.getPersons())
           {
-            std::string uuid           {capnpT.getUuid()};
+            std::string uuidStr           {capnpT.getUuid()};
             std::string dataSourceUuid {capnpT.getDataSourceUuid()};
             //TODO #167 Household are ignored for the moment
             std::string householdUuid  {capnpT.getHouseholdUuid()};
@@ -195,21 +193,20 @@ namespace TrRouting
             t->usualSchoolPlaceDrivingTravelTimeSeconds = capnpT.getUsualSchoolPlaceDrivingTravelTimeSeconds();
 
             */
-
-            std::unique_ptr<T> t = std::make_unique<T>(uuidGenerator(uuid),
-                                                       capnpT.getId(),
-                                                       dataSources.at(uuidGenerator(dataSourceUuid)),
-                                                       capnpT.getExpansionFactor(),
-                                                       capnpT.getAge(),
-                                                       capnpT.getDrivingLicenseOwner(),
-                                                       capnpT.getTransitPassOwner(),
-                                                       getPersonAgeGroupStr(capnpT.getAgeGroup()),
-                                                       getPersonGenderStr(capnpT.getGender()),
-                                                       getPersonOccupationStr(capnpT.getOccupation()),
-                                                       capnpT.getInternalId()
-                                                       );
-            tIndexesByUuid[t->uuid] = ts.size();
-            ts.push_back(std::move(t));
+            auto uuid = uuidGenerator(uuidStr);
+            ts.emplace(uuid, T(uuid,
+                               capnpT.getId(),
+                               dataSources.at(uuidGenerator(dataSourceUuid)),
+                               capnpT.getExpansionFactor(),
+                               capnpT.getAge(),
+                               capnpT.getDrivingLicenseOwner(),
+                               capnpT.getTransitPassOwner(),
+                               getPersonAgeGroupStr(capnpT.getAgeGroup()),
+                               getPersonGenderStr(capnpT.getGender()),
+                               getPersonOccupationStr(capnpT.getOccupation()),
+                               capnpT.getInternalId()
+                               )
+                       );
           }
         }
         catch (const kj::Exception& e)

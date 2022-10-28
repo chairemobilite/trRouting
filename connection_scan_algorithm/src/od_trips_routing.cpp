@@ -236,9 +236,10 @@ namespace TrRouting
       atLeastOneCompatiblePeriod = false;
 
       // verify that od trip matches selected attributes:
-      if ( (params.odTripsAgeGroups.size()   > 0 && std::find(params.odTripsAgeGroups.begin(),   params.odTripsAgeGroups.end(),   persons[odTrip->personIdx]->ageGroup)   == params.odTripsAgeGroups.end())
-        || (params.odTripsGenders.size()     > 0 && std::find(params.odTripsGenders.begin(),     params.odTripsGenders.end(),     persons[odTrip->personIdx]->gender)     == params.odTripsGenders.end())
-        || (params.odTripsOccupations.size() > 0 && std::find(params.odTripsOccupations.begin(), params.odTripsOccupations.end(), persons[odTrip->personIdx]->occupation) == params.odTripsOccupations.end())
+      // TODO Find a way to simplify this if
+      if ( (params.odTripsAgeGroups.size()   > 0 && (!odTrip->person.has_value() || (std::find(params.odTripsAgeGroups.begin(),   params.odTripsAgeGroups.end(), odTrip->person.value().get().ageGroup) == params.odTripsAgeGroups.end())))
+           || (params.odTripsGenders.size()  > 0 && (!odTrip->person.has_value() || (std::find(params.odTripsGenders.begin(),     params.odTripsGenders.end(), odTrip->person.value().get().gender) == params.odTripsGenders.end())))
+           || (params.odTripsOccupations.size() > 0 &&  (!odTrip->person.has_value() || (std::find(params.odTripsOccupations.begin(), params.odTripsOccupations.end(), odTrip->person.value().get().occupation) == params.odTripsOccupations.end())))
         || (params.odTripsActivities.size()  > 0 && std::find(params.odTripsActivities.begin(),  params.odTripsActivities.end(),  odTrip->destinationActivity)            == params.odTripsActivities.end())
         || (params.odTripsModes.size()       > 0 && std::find(params.odTripsModes.begin(),       params.odTripsModes.end(),       odTrip->mode)                           == params.odTripsModes.end())
       )

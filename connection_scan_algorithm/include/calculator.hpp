@@ -143,8 +143,8 @@ namespace TrRouting
     std::map<boost::uuids::uuid, DataSource> dataSources;
     const std::map<boost::uuids::uuid, DataSource> & getDataSources() {return dataSources;}
 
-    std::vector<std::unique_ptr<Person>>     persons;
-    std::map<boost::uuids::uuid, int>        personIndexesByUuid;
+    std::map<boost::uuids::uuid, Person>     persons;
+    const std::map<boost::uuids::uuid, Person> & getPersons() {return persons;}
 
     std::vector<std::unique_ptr<OdTrip>>     odTrips;
     std::map<boost::uuids::uuid, int>        odTripIndexesByUuid;
