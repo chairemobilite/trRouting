@@ -73,7 +73,6 @@ namespace TrRouting
       tripIndexesByUuid,
       services,
       tripConnectionDepartureTimes,
-      tripConnectionDemands,
       connections,
       customPath
     );

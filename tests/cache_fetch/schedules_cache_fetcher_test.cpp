@@ -21,7 +21,6 @@ protected:
     std::map<boost::uuids::uuid, int> tripIndexesByUuid;
     std::map<boost::uuids::uuid, TrRouting::Service> services;
     std::vector<std::vector<std::unique_ptr<int>>> tripConnectionDepartureTimes;
-    std::vector<std::vector<std::unique_ptr<float>>> tripConnectionDemands;
     std::vector<std::shared_ptr<TrRouting::ConnectionTuple>> connections;
 
 public:
@@ -61,7 +60,6 @@ TEST_F(ScheduleCacheFetcherFixtureTests, TestGetSchedulesInvalidLineFile)
       tripIndexesByUuid,
       services,
       tripConnectionDepartureTimes,
-      tripConnectionDemands,
       connections,
       INVALID_CUSTOM_PATH
     );
@@ -79,7 +77,6 @@ TEST_F(ScheduleCacheFetcherFixtureTests, TestGetUnexistingLineFiles)
       tripIndexesByUuid,
       services,
       tripConnectionDepartureTimes,
-      tripConnectionDemands,
       connections,
       INVALID_CUSTOM_PATH
     );
@@ -96,7 +93,6 @@ TEST_F(ScheduleCacheFetcherFixtureTests, TestGetSchedulesValid)
       tripIndexesByUuid,
       services,
       tripConnectionDepartureTimes,
-      tripConnectionDemands,
       connections,
       VALID_CUSTOM_PATH
     );

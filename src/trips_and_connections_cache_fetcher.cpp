@@ -27,7 +27,6 @@ namespace TrRouting
     std::map<boost::uuids::uuid, int>& tripIndexesByUuid,
     const std::map<boost::uuids::uuid, Service>& services,
     std::vector<std::vector<std::unique_ptr<int>>>&   tripConnectionDepartureTimes,
-    std::vector<std::vector<std::unique_ptr<float>>>& tripConnectionDemands,
     std::vector<std::shared_ptr<ConnectionTuple>>& connections,
     std::string customPath
   )
@@ -37,8 +36,6 @@ namespace TrRouting
     tripIndexesByUuid.clear();
     tripConnectionDepartureTimes.clear();
     tripConnectionDepartureTimes.shrink_to_fit();
-    tripConnectionDemands.clear();
-    tripConnectionDemands.shrink_to_fit();
     connections.clear();
     connections.shrink_to_fit();
 
@@ -111,7 +108,6 @@ namespace TrRouting
               auto canUnboards           = capnpTrip.getNodesCanUnboard();
               
               std::vector<std::unique_ptr<int>>   connectionDepartureTimes = std::vector<std::unique_ptr<int>>(nodeTimesCount);
-              std::vector<std::unique_ptr<float>> connectionDemands        = std::vector<std::unique_ptr<float>>(nodeTimesCount);
 
               // nodeTimesCount - 1, since we process node pairs, we have to stop and the second from last
               for (int nodeTimeI = 0; nodeTimeI < nodeTimesCount - 1; nodeTimeI++)
@@ -132,13 +128,11 @@ namespace TrRouting
                   connections.push_back(std::move(forwardConnection));
 
                   connectionDepartureTimes[nodeTimeI] = std::make_unique<int>(departureTimesSeconds[nodeTimeI]);
-                  connectionDemands[nodeTimeI]        = std::make_unique<float>(0.0);
 
               }
               trips.push_back(std::move(trip));
 
               tripConnectionDepartureTimes.push_back(std::move(connectionDepartureTimes));
-              tripConnectionDemands.push_back(std::move(connectionDemands));
 
             }
           }

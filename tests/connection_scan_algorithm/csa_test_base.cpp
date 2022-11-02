@@ -280,7 +280,6 @@ void addTripData(TrRouting::Calculator& calculator, TrRouting::Trip *trip, TrRou
     path.tripsIdx.push_back(tripIdx);
 
     std::vector<std::unique_ptr<int>> connectionDepartureTimes = std::vector<std::unique_ptr<int>>(arraySize);
-    std::vector<std::unique_ptr<float>> connectionDemands = std::vector<std::unique_ptr<float>>(arraySize);
 
     for (int nodeTimeI = 0; nodeTimeI < arraySize - 1; nodeTimeI++) {
         std::shared_ptr<TrRouting::ConnectionTuple> forwardConnection(std::make_shared<TrRouting::ConnectionTuple>(TrRouting::ConnectionTuple(
@@ -299,12 +298,10 @@ void addTripData(TrRouting::Calculator& calculator, TrRouting::Trip *trip, TrRou
         connections.push_back(std::move(forwardConnection));
 
         connectionDepartureTimes[nodeTimeI] = std::make_unique<int>(departureTimes[nodeTimeI]);
-        connectionDemands[nodeTimeI] = std::make_unique<float>(0.0);
 
     }
 
     calculator.tripConnectionDepartureTimes.push_back(std::move(connectionDepartureTimes));
-    calculator.tripConnectionDemands.push_back(std::move(connectionDemands));
 
 }
 

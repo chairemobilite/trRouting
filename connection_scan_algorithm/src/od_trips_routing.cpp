@@ -336,7 +336,6 @@ namespace TrRouting
               for (int connectionIndex = legConnectionStartIdx; connectionIndex <= legConnectionEndIdx; connectionIndex++)
               {
                 connectionDepartureTimeSeconds = *tripConnectionDepartureTimes[legTripIdx][connectionIndex];
-                *tripConnectionDemands[legTripIdx][connectionIndex] += correctedExpansionFactor;
                 connectionDepartureTimeHour    = connectionDepartureTimeSeconds / 3600;
 
                 pathProfiles[legPath.uuid][connectionIndex][connectionDepartureTimeHour] += correctedExpansionFactor;
