@@ -240,15 +240,6 @@ namespace TrRouting
 
       spdlog::debug("  resetting filters");
 
-      if (params.calculateAllOdTrips)
-      {
-        // reset connections demand:
-        for (auto & tripConnectionDemand : tripConnectionDemands)
-        {
-          std::generate(tripConnectionDemand.begin(), tripConnectionDemand.end(), []() { return std::make_unique<float>(0.0); });
-        }
-      }
-
       int i {0};
       for (auto & trip : trips)
       {

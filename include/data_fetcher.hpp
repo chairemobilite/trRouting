@@ -220,7 +220,6 @@ namespace TrRouting
       std::map<boost::uuids::uuid, int>& tripIndexesByUuid,
       const std::map<boost::uuids::uuid, Service>& services,
       std::vector<std::vector<std::unique_ptr<int>>>&   tripConnectionDepartureTimes,
-      std::vector<std::vector<std::unique_ptr<float>>>& tripConnectionDemands,
       std::vector<std::shared_ptr<ConnectionTuple>>& connections,
       std::string customPath = "") = 0;
 

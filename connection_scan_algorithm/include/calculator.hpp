@@ -172,8 +172,6 @@ namespace TrRouting
     std::map<boost::uuids::uuid, int>        tripIndexesByUuid;
 
     std::vector<std::vector<std::unique_ptr<int>>>   tripConnectionDepartureTimes; // tripIndex: [connectionIndex (sequence in trip): departureTimeSeconds]
-    std::vector<std::vector<std::unique_ptr<float>>> tripConnectionDemands;        // tripIndex: [connectionIndex (sequence in trip): sum of od trips weights using this connection (demand)]
-    //std::vector<std::unique_ptr<std::vector<std::unique_ptr<int>>>>   tripIndexesByPathIndex;
 
     Parameters params;
     CalculationTime algorithmCalculationTime;
