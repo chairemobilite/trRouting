@@ -72,8 +72,7 @@ namespace TrRouting
 
   RouteParameters Parameters::update(std::vector<std::string> &parameters,
     const std::map<boost::uuids::uuid, Scenario> &scenarios,
-    std::map<boost::uuids::uuid, int> &odTripIndexesByUuid,
-    std::vector<std::unique_ptr<OdTrip>> &odTrips,
+    const std::map<boost::uuids::uuid, OdTrip> &odTrips,
     const std::map<boost::uuids::uuid, Node> &nodes,
     const std::map<boost::uuids::uuid, DataSource> &dataSources)
   {
@@ -311,13 +310,13 @@ namespace TrRouting
         // TODO: Use a new endpoint for od trip uuid. Now we get its od and add them to parameters
         boost::uuids::uuid odTripUuid = uuidGenerator(parameterWithValueVector[1]);
 
-        if (odTripIndexesByUuid.count(odTripUuid) == 1)
+        if (odTrips.count(odTripUuid) == 1)
         {
-          OdTrip *odTrip = odTrips[odTripIndexesByUuid[odTripUuid]].get();
-          spdlog::info("od trip uuid {} dts {}", to_string(odTrip->uuid), odTrip->departureTimeSeconds);
+          const OdTrip & odTrip = odTrips.at(odTripUuid);
+          spdlog::info("od trip uuid {} dts {}", to_string(odTrip.uuid), odTrip.departureTimeSeconds);
 
-          newParametersWithValues.push_back(std::make_pair("origin", std::to_string(odTrip->origin.get()->latitude) + ',' + std::to_string(odTrip->origin.get()->longitude)));
-          newParametersWithValues.push_back(std::make_pair("destination", std::to_string(odTrip->destination.get()->latitude) + ',' + std::to_string(odTrip->destination.get()->longitude)));
+          newParametersWithValues.push_back(std::make_pair("origin", std::to_string(odTrip.origin.get()->latitude) + ',' + std::to_string(odTrip.origin.get()->longitude)));
+          newParametersWithValues.push_back(std::make_pair("destination", std::to_string(odTrip.destination.get()->latitude) + ',' + std::to_string(odTrip.destination.get()->longitude)));
           // TODO Add parameter for the departure_time? It was not in the original code path
         }
         continue;

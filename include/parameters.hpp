@@ -214,9 +214,8 @@ namespace TrRouting
        * */
       RouteParameters update(std::vector<std::string> &parameters,
                              const std::map<boost::uuids::uuid, Scenario> &scenario,
-                             std::map<boost::uuids::uuid, int> &odTripIndexesByUuid,
-                             std::vector<std::unique_ptr<OdTrip>> &odTrips,
-                             const std::map<boost::uuids::uuid,Node> &nodes,
+                             const std::map<boost::uuids::uuid, OdTrip> &odTrips,
+                             const std::map<boost::uuids::uuid, Node> &nodes,
                              const std::map<boost::uuids::uuid, DataSource> &dataSources);
 
   };

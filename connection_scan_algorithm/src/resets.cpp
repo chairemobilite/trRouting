@@ -50,9 +50,9 @@ namespace TrRouting
     departureTimeSeconds = -1;
     arrivalTimeSeconds   = -1;
     
-    if(odTrip != nullptr && params.forwardCalculation == true)
+    if(odTripGlob.has_value() && params.forwardCalculation == true)
     {
-      departureTimeSeconds = odTrip->departureTimeSeconds;
+      departureTimeSeconds = odTripGlob.value().get().departureTimeSeconds;
     }
     else if (parameters.isForwardCalculation())
     {
@@ -80,13 +80,13 @@ namespace TrRouting
 
         spdlog::debug("  resetting access paths ");
 
-        if(odTrip != nullptr)
+        if(odTripGlob.has_value())
         {
-          spdlog::debug("  using odTrip with {} accessible nodes", odTrip->originNodes.size());
+          spdlog::debug("  using odTrip with {} accessible nodes", odTripGlob.value().get().originNodes.size());
 
           accessFootpaths.clear();
           //TODO This can be a std::copy
-          for (auto & accessNode : odTrip->originNodes)
+          for (auto & accessNode : odTripGlob.value().get().originNodes)
           {
             accessFootpaths.push_back(accessNode);
           }
@@ -150,14 +150,14 @@ namespace TrRouting
       if (resetAccessPaths)
       {
         // fetch nodes footpaths accessible to destination using params or osrm fetcher if not provided:
-        if(odTrip != nullptr)
+        if(odTripGlob.has_value())
         {
 
-          spdlog::debug("  using odTrip with {} egressible nodes", odTrip->destinationNodes.size());
+          spdlog::debug("  using odTrip with {} egressible nodes", odTripGlob.value().get().destinationNodes.size());
 
           egressFootpaths.clear();
           //TODO This could be a std::copy
-          for (auto & egressNode : odTrip->destinationNodes)
+          for (auto & egressNode : odTripGlob.value().get().destinationNodes)
           {
             egressFootpaths.push_back(egressNode);
           }

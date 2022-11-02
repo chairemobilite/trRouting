@@ -56,34 +56,31 @@ void RouteOdTripsFixtureTests::setupDataSources() {
 }
 
 void RouteOdTripsFixtureTests::setupOdTrips() {
-    std::vector<std::unique_ptr<TrRouting::OdTrip>>& array = calculator.odTrips;
-    std::map<boost::uuids::uuid, int>& arrayIndexesByUuid = calculator.odTripIndexesByUuid;
+    std::map<boost::uuids::uuid, TrRouting::OdTrip>& array = calculator.odTrips;
 
     std::vector<TrRouting::NodeTimeDistance> originNodes;
     originNodes.push_back(TrRouting::NodeTimeDistance(calculator.nodes.at(nodeSouth2Uuid), 469, 500));
     std::vector<TrRouting::NodeTimeDistance> destinationNodes;
     destinationNodes.push_back(TrRouting::NodeTimeDistance(calculator.nodes.at(nodeMidNodeUuid), 138, 150));
 
-    std::unique_ptr<TrRouting::OdTrip> odTrip = std::make_unique<TrRouting::OdTrip>(odTripUuid,
-                                                                                    12345,
-                                                                                    "12345",
-                                                                                    calculator.dataSources.at(dataSourceUuid),
-                                                                                    std::nullopt,
-                                                                                    getTimeInSeconds(9, 45),
-                                                                                    -1,
-                                                                                    0,
-                                                                                    0,
-                                                                                    0,
-                                                                                    1.0,
-                                                                                    "",
-                                                                                    "",
-                                                                                    "",
-                                                                                    originNodes,
-                                                                                    destinationNodes,
-                                                                                    std::make_unique<TrRouting::Point>(45.5242, -73.5817),
-                                                                                    std::make_unique<TrRouting::Point>(45.54, -73.6146));
-    arrayIndexesByUuid[odTrip->uuid] = array.size();
-    array.push_back(std::move(odTrip));
+    array.emplace(odTripUuid, TrRouting::OdTrip(odTripUuid,
+                                                12345,
+                                                "12345",
+                                                calculator.dataSources.at(dataSourceUuid),
+                                                std::nullopt,
+                                                getTimeInSeconds(9, 45),
+                                                -1,
+                                                0,
+                                                0,
+                                                0,
+                                                1.0,
+                                                "",
+                                                "",
+                                                "",
+                                                originNodes,
+                                                destinationNodes,
+                                                std::make_unique<TrRouting::Point>(45.5242, -73.5817),
+                                                std::make_unique<TrRouting::Point>(45.54, -73.6146)));
 }
 
 // Simple test to make sure this code path still works
@@ -116,7 +113,6 @@ nlohmann::json RouteOdTripsFixtureTests::calculateOdTrips(std::vector<std::strin
     calculator.params.setDefaultValues();
     TrRouting::RouteParameters routeParams = calculator.params.update(parameters,
         calculator.scenarios,
-        calculator.odTripIndexesByUuid,
         calculator.odTrips,
         calculator.nodes,
         calculator.dataSources);
@@ -131,3 +127,5 @@ nlohmann::json RouteOdTripsFixtureTests::calculateOdTrips(std::vector<std::strin
     nlohmann::json jsonResult = json.parse(result);
     return jsonResult;
 }
+
+//TODO Add a test that validate the shuffle of the odTrips list
