@@ -186,9 +186,14 @@ namespace TrRouting
 
     spdlog::debug("  starting odTripsRouting (count: {})", odTripsCount);
 
-    int stopAtI {-1};
-    std::vector<int> odTripIndexes(odTripsCount);
-    std::iota(odTripIndexes.begin(), odTripIndexes.end(), 0);
+    // Vector with a copy of the odTrips, so we can shuffle them later
+    std::vector<std::reference_wrapper<const OdTrip>> odTripVector;
+
+    for (auto odTripIte = odTrips.begin(); odTripIte != odTrips.end(); odTripIte++) {
+      odTripVector.push_back(odTripIte->second);
+    }
+    
+    int stopAtI {-1}; //TODO Seem unused
 
     if (odTripsCount == 0)
     {
@@ -204,26 +209,26 @@ namespace TrRouting
       //engine.seed(params.seed);
       // sort by departure time seconds before shuffling so seeds are consistent:
 
-      spdlog::debug(" first ODTrip uuid: {} ", odTripIndexes[0]);
-      std::shuffle(odTripIndexes.begin(), odTripIndexes.end(), std::mt19937{params.seed});
-      spdlog::debug(" first ODTrip uuid after shuffle: {}", odTripIndexes[0]);
+      spdlog::debug(" first ODTrip uuid: {} ", boost::uuids::to_string(odTripVector[0].get().uuid));
+      std::shuffle(odTripVector.begin(), odTripVector.end(), std::mt19937{params.seed});
+      spdlog::debug(" first ODTrip uuid after shuffle: {}", boost::uuids::to_string(odTripVector[0].get().uuid));
       //stopAtI = ceil((float)(odTrips.size()) * params.odTripsSampleRatio);
     }
 
-    int i {0};
-    int j {0};
-    int odTripIndex {0}; // for shuffle
+
     int sampleSize {(int)(ceil((float)(odTripsCount) * params.odTripsSampleRatio))};
 
     for (int i = 0; i < sampleSize; i++)
     {
 
-      odTripIndex = odTripIndexes[i];
-      odTrip      = odTrips[odTripIndex].get();
+      const OdTrip & odTrip = odTripVector[i].get();
+      //TODO We need to initialise the global odTrip object. Downstream calculation needs it. (Mostly in reset() it seems).
+      // Should be changed to not have to rely on this global variable.
+      // (Code was changed to work with a local odTrip, but we still need to set the global one)
+      odTripGlob = odTrip;
 
       if ( i % params.batchesCount != params.batchNumber - 1) // when using multiple parallel calculators
       {
-        //i++;
         continue;
       }
 
@@ -237,18 +242,18 @@ namespace TrRouting
 
       // verify that od trip matches selected attributes:
       // TODO Find a way to simplify this if
-      if ( (params.odTripsAgeGroups.size()   > 0 && (!odTrip->person.has_value() || (std::find(params.odTripsAgeGroups.begin(),   params.odTripsAgeGroups.end(), odTrip->person.value().get().ageGroup) == params.odTripsAgeGroups.end())))
-           || (params.odTripsGenders.size()  > 0 && (!odTrip->person.has_value() || (std::find(params.odTripsGenders.begin(),     params.odTripsGenders.end(), odTrip->person.value().get().gender) == params.odTripsGenders.end())))
-           || (params.odTripsOccupations.size() > 0 &&  (!odTrip->person.has_value() || (std::find(params.odTripsOccupations.begin(), params.odTripsOccupations.end(), odTrip->person.value().get().occupation) == params.odTripsOccupations.end())))
-        || (params.odTripsActivities.size()  > 0 && std::find(params.odTripsActivities.begin(),  params.odTripsActivities.end(),  odTrip->destinationActivity)            == params.odTripsActivities.end())
-        || (params.odTripsModes.size()       > 0 && std::find(params.odTripsModes.begin(),       params.odTripsModes.end(),       odTrip->mode)                           == params.odTripsModes.end())
+      if ( (params.odTripsAgeGroups.size()   > 0 && (!odTrip.person.has_value() || (std::find(params.odTripsAgeGroups.begin(),   params.odTripsAgeGroups.end(), odTrip.person.value().get().ageGroup) == params.odTripsAgeGroups.end())))
+           || (params.odTripsGenders.size()  > 0 && (!odTrip.person.has_value() || (std::find(params.odTripsGenders.begin(),     params.odTripsGenders.end(), odTrip.person.value().get().gender) == params.odTripsGenders.end())))
+           || (params.odTripsOccupations.size() > 0 &&  (!odTrip.person.has_value() || (std::find(params.odTripsOccupations.begin(), params.odTripsOccupations.end(), odTrip.person.value().get().occupation) == params.odTripsOccupations.end())))
+        || (params.odTripsActivities.size()  > 0 && std::find(params.odTripsActivities.begin(),  params.odTripsActivities.end(),  odTrip.destinationActivity)            == params.odTripsActivities.end())
+        || (params.odTripsModes.size()       > 0 && std::find(params.odTripsModes.begin(),       params.odTripsModes.end(),       odTrip.mode)                           == params.odTripsModes.end())
       )
       {
         attributesMatches = false;
       }
 
       // filter wrong data source if only data source is provided:
-      if (params.onlyDataSource && odTrip->dataSource != params.onlyDataSource.value())
+      if (params.onlyDataSource && odTrip.dataSource != params.onlyDataSource.value())
       {
         attributesMatches = false;
       }
@@ -256,7 +261,7 @@ namespace TrRouting
       // verify that od trip matches at least one selected period:
       for (auto & period : params.odTripsPeriods)
       {
-        if (odTrip->departureTimeSeconds >= period.first && odTrip->departureTimeSeconds < period.second)
+        if (odTrip.departureTimeSeconds >= period.first && odTrip.departureTimeSeconds < period.second)
         {
           atLeastOneCompatiblePeriod = true;
         }
@@ -266,10 +271,10 @@ namespace TrRouting
       {
 
         spdlog::debug("od trip uuid {} ({}/{}) dts: {} atLeastOneCompatiblePeriod: {} attributesMatches: {}",
-                        to_string(odTrip->uuid),
+                        to_string(odTrip.uuid),
                         (i+1),
                         odTripsCount,
-                        odTrip->departureTimeSeconds,
+                        odTrip.departureTimeSeconds,
                         (atLeastOneCompatiblePeriod ? "true" : "false"),
                         (attributesMatches ? "true " : "false "));                       
 
@@ -284,8 +289,8 @@ namespace TrRouting
             spdlog::info("{}/{}", (i+1), odTripsCount);
           }
         }
-        RouteParameters odTripParameters = RouteParameters(std::make_unique<Point>(odTrip->origin.get()->latitude, odTrip->origin.get()->longitude),
-          std::make_unique<Point>(odTrip->destination.get()->latitude, odTrip->destination.get()->longitude),
+        RouteParameters odTripParameters = RouteParameters(std::make_unique<Point>(odTrip.origin.get()->latitude, odTrip.origin.get()->longitude),
+          std::make_unique<Point>(odTrip.destination.get()->latitude, odTrip.destination.get()->longitude),
           parameters.getScenario(),
           parameters.getTimeOfTrip(),
           parameters.getMinWaitingTimeSeconds(),
@@ -297,7 +302,7 @@ namespace TrRouting
           parameters.isWithAlternatives(),
           parameters.isForwardCalculation());
 
-        float correctedExpansionFactor = odTrip->expansionFactor / params.odTripsSampleRatio;
+        float correctedExpansionFactor = odTrip.expansionFactor / params.odTripsSampleRatio;
 
         try {
           routingResult = calculate(odTripParameters, true, resetFilters); // reset filters only on first calculation
@@ -353,21 +358,20 @@ namespace TrRouting
         }
 
         // Add additional fields to response
-        odTripJson["uuid"] = boost::uuids::to_string(odTrip->uuid);
-        odTripJson["internalId"]                    = odTrip->internalId;
-        odTripJson["originActivity"]                = odTrip->originActivity;
-        odTripJson["destinationActivity"]           = odTrip->destinationActivity;
-        odTripJson["declaredMode"]                  = odTrip->mode;
+        odTripJson["uuid"] = boost::uuids::to_string(odTrip.uuid);
+        odTripJson["internalId"]                    = odTrip.internalId;
+        odTripJson["originActivity"]                = odTrip.originActivity;
+        odTripJson["destinationActivity"]           = odTrip.destinationActivity;
+        odTripJson["declaredMode"]                  = odTrip.mode;
         odTripJson["expansionFactor"]               = correctedExpansionFactor;
-        odTripJson["onlyWalkingTravelTimeSeconds"]  = odTrip->walkingTravelTimeSeconds;
-        odTripJson["onlyCyclingTravelTimeSeconds"]  = odTrip->cyclingTravelTimeSeconds;
-        odTripJson["onlyDrivingTravelTimeSeconds"]  = odTrip->drivingTravelTimeSeconds;
-        odTripJson["declaredDepartureTimeSeconds"]  = odTrip->departureTimeSeconds;
-        odTripJson["declaredArrivalTimeSeconds"]    = odTrip->arrivalTimeSeconds;
+        odTripJson["onlyWalkingTravelTimeSeconds"]  = odTrip.walkingTravelTimeSeconds;
+        odTripJson["onlyCyclingTravelTimeSeconds"]  = odTrip.cyclingTravelTimeSeconds;
+        odTripJson["onlyDrivingTravelTimeSeconds"]  = odTrip.drivingTravelTimeSeconds;
+        odTripJson["declaredDepartureTimeSeconds"]  = odTrip.departureTimeSeconds;
+        odTripJson["declaredArrivalTimeSeconds"]    = odTrip.arrivalTimeSeconds;
         json["odTrips"].push_back(odTripJson);
       }
 
-      //i++;
       if (params.odTripsSampleSize > 0 && i + 1 >= params.odTripsSampleSize)
       {
         break;

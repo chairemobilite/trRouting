@@ -86,8 +86,7 @@ namespace TrRouting
      * -(error codes from the open system call)
      */
     virtual int getOdTrips(
-      std::vector<std::unique_ptr<OdTrip>>& ts,
-      std::map<boost::uuids::uuid, int>& tIndexesById, 
+      std::map<boost::uuids::uuid, OdTrip>& ts,
       const std::map<boost::uuids::uuid, DataSource>& dataSources,
       const std::map<boost::uuids::uuid, Person>& persons,
       const std::map<boost::uuids::uuid, Node>& nodes,

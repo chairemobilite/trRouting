@@ -30,7 +30,7 @@ namespace TrRouting
   
   int Calculator::updateOdTripsFromCache(std::string customPath)
   {
-    return dataFetcher.getOdTrips(odTrips, odTripIndexesByUuid, dataSources, getPersons(), getNodes(), customPath);
+    return dataFetcher.getOdTrips(odTrips, dataSources, getPersons(), getNodes(), customPath);
   }
   /* TODO #167
   int Calculator::updatePlacesFromCache(std::string customPath)

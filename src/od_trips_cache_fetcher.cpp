@@ -74,8 +74,7 @@ namespace TrRouting
   }
 
   int CacheFetcher::getOdTrips(
-    std::vector<std::unique_ptr<OdTrip>>& ts,
-    std::map<boost::uuids::uuid, int>& tIndexesByUuid,
+    std::map<boost::uuids::uuid, OdTrip>& ts,
     const std::map<boost::uuids::uuid, DataSource>& dataSources,
     const std::map<boost::uuids::uuid, Person>& persons,
     const std::map<boost::uuids::uuid, Node>& nodes,
@@ -172,29 +171,26 @@ namespace TrRouting
             }
 
             // Create new odTrip
-            std::unique_ptr<T> t = std::make_unique<T>(uuidGenerator(uuid),
-                                                       capnpT.getId(),
-                                                       capnpT.getInternalId(),
-                                                       dataSources.at(uuidGenerator(dataSourceUuid)),
-                                                       person,
-                                                       capnpT.getDepartureTimeSeconds(),
-                                                       capnpT.getArrivalTimeSeconds(),
-                                                       capnpT.getWalkingTravelTimeSeconds(),
-                                                       capnpT.getCyclingTravelTimeSeconds(),
-                                                       capnpT.getDrivingTravelTimeSeconds(),
-                                                       //TODO comparison with float is fishy, confirm it's ok
-                                                       capnpT.getExpansionFactor() == -1.0 ? 1.0 : capnpT.getExpansionFactor(),
-                                                       getOdTripModeStr(capnpT.getMode()),
-                                                       getOdTripActivityStr(capnpT.getOriginActivity()),
-                                                       getOdTripActivityStr(capnpT.getDestinationActivity()),
-                                                       originNodes,
-                                                       destinationNodes,
-                                                       std::move(origin),
-                                                       std::move(destination)
-                                                       );
-            tIndexesByUuid[t->uuid] = ts.size();
-            ts.push_back(std::move(t));
-
+            ts.emplace(uuidGenerator(uuid), T(uuidGenerator(uuid),
+                                              capnpT.getId(),
+                                              capnpT.getInternalId(),
+                                              dataSources.at(uuidGenerator(dataSourceUuid)),
+                                              person,
+                                              capnpT.getDepartureTimeSeconds(),
+                                              capnpT.getArrivalTimeSeconds(),
+                                              capnpT.getWalkingTravelTimeSeconds(),
+                                              capnpT.getCyclingTravelTimeSeconds(),
+                                              capnpT.getDrivingTravelTimeSeconds(),
+                                              //TODO comparison with float is fishy, confirm it's ok
+                                              capnpT.getExpansionFactor() == -1.0 ? 1.0 : capnpT.getExpansionFactor(),
+                                              getOdTripModeStr(capnpT.getMode()),
+                                              getOdTripActivityStr(capnpT.getOriginActivity()),
+                                              getOdTripActivityStr(capnpT.getDestinationActivity()),
+                                              originNodes,
+                                              destinationNodes,
+                                              std::move(origin),
+                                              std::move(destination)
+                                              ));
           }
 
           spdlog::info("parsed {} od trips", ts.size());

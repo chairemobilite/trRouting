@@ -146,8 +146,8 @@ namespace TrRouting
     std::map<boost::uuids::uuid, Person>     persons;
     const std::map<boost::uuids::uuid, Person> & getPersons() {return persons;}
 
-    std::vector<std::unique_ptr<OdTrip>>     odTrips;
-    std::map<boost::uuids::uuid, int>        odTripIndexesByUuid;
+    std::map<boost::uuids::uuid, OdTrip>     odTrips;
+    const std::map<boost::uuids::uuid, OdTrip> & getOdTrips() {return odTrips;}
 
     std::map<boost::uuids::uuid, Agency>     agencies;
     const std::map<boost::uuids::uuid, Agency> & getAgencies() {return agencies;}
@@ -179,7 +179,8 @@ namespace TrRouting
     CalculationTime algorithmCalculationTime;
     DataFetcher &dataFetcher;
 
-    OdTrip * odTrip;
+    // TODO Added Glob suffix to easily track which one was local and which was global
+    std::optional<std::reference_wrapper<const OdTrip>> odTripGlob;
 
   private:
 

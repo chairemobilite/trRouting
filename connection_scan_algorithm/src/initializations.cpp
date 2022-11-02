@@ -22,7 +22,7 @@ namespace TrRouting
 
   Calculator::Calculator(DataFetcher& fetcher) :
     dataFetcher(fetcher),
-    odTrip(nullptr),
+    odTripGlob(std::nullopt),
     algorithmCalculationTime(CalculationTime()),
     departureTimeSeconds(0),
     initialDepartureTimeSeconds(0),

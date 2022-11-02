@@ -368,7 +368,6 @@ int main(int argc, char** argv) {
       calculator.params.setDefaultValues();
       RouteParameters routeParams = calculator.params.update(parametersWithValues,
         calculator.scenarios,
-        calculator.odTripIndexesByUuid,
         calculator.odTrips,
         calculator.nodes,
         calculator.dataSources);
@@ -376,16 +375,16 @@ int main(int argc, char** argv) {
       // find OdTrip if provided:
       bool   foundOdTrip{false};
 
-      calculator.odTrip      = nullptr;
+      calculator.odTripGlob = std::nullopt;
 
       try {
 
-        if (calculator.params.odTripUuid.has_value() && calculator.odTripIndexesByUuid.count(calculator.params.odTripUuid.value()))
+        if (calculator.params.odTripUuid.has_value() && calculator.odTrips.count(calculator.params.odTripUuid.value()))
         {
-          calculator.odTrip = calculator.odTrips[calculator.odTripIndexesByUuid[calculator.params.odTripUuid.value()]].get();
+          calculator.odTripGlob = calculator.odTrips.at(calculator.params.odTripUuid.value());
           foundOdTrip = true;
-          spdlog::info("od trip uuid {}", to_string(calculator.odTrip->uuid));
-          spdlog::info("dts {} ", calculator.odTrip->departureTimeSeconds);
+          spdlog::info("od trip uuid {}", to_string(calculator.odTripGlob.value().get().uuid));
+          spdlog::info("dts {} ", calculator.odTripGlob.value().get().departureTimeSeconds);
           if (routeParams.isWithAlternatives())
           {
             alternativeResult = calculator.alternativesRouting(routeParams);
