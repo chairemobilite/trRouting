@@ -233,7 +233,7 @@ void addNodeToPath(std::vector<TrRouting::NodeTimeDistance>& nodesref, const TrR
 void BaseCsaFixtureTests::setUpPaths()
 {
 
-    std::vector<int> emptyVector;
+    std::vector<std::reference_wrapper<const TrRouting::Trip>> emptyVector;
     std::vector<TrRouting::NodeTimeDistance> nodesref;
     addNodeToPath(nodesref, calculator.nodes.at(nodeSouth2Uuid), 210, 1186);
     addNodeToPath(nodesref, calculator.nodes.at(nodeSouth1Uuid), 190, 1160);
@@ -275,33 +275,31 @@ void BaseCsaFixtureTests::setUpPaths()
 
 }
 
-void addTripData(TrRouting::Calculator& calculator, TrRouting::Trip *trip, TrRouting::Path & path, std::vector<std::shared_ptr<TrRouting::ConnectionTuple>>& connections, int arrivalTimes[], int departureTimes[], int arraySize, int tripIdx)
+void addTripData(TrRouting::Trip & trip, TrRouting::Path & path, std::vector<std::shared_ptr<TrRouting::ConnectionTuple>>& connections, int arrivalTimes[], int departureTimes[], int arraySize)
 {
-    path.tripsIdx.push_back(tripIdx);
+    path.tripsRef.push_back(trip);
 
-    std::vector<std::unique_ptr<int>> connectionDepartureTimes = std::vector<std::unique_ptr<int>>(arraySize);
+    trip.connectionDepartureTimes.resize(arraySize);
 
     for (int nodeTimeI = 0; nodeTimeI < arraySize - 1; nodeTimeI++) {
-        std::shared_ptr<TrRouting::ConnectionTuple> forwardConnection(std::make_shared<TrRouting::ConnectionTuple>(TrRouting::ConnectionTuple(
+      std::shared_ptr<TrRouting::ConnectionTuple> forwardConnection(std::make_shared<TrRouting::ConnectionTuple>(TrRouting::ConnectionTuple(
             path.nodesRef[nodeTimeI],
             path.nodesRef[nodeTimeI + 1],
             departureTimes[nodeTimeI],
             arrivalTimes[nodeTimeI + 1],
-            tripIdx,
+            trip,
             1,
             1,
             nodeTimeI + 1,
-            trip->allowSameLineTransfers,
+            trip.allowSameLineTransfers,
             -1
         )));
 
         connections.push_back(std::move(forwardConnection));
 
-        connectionDepartureTimes[nodeTimeI] = std::make_unique<int>(departureTimes[nodeTimeI]);
+        trip.connectionDepartureTimes[nodeTimeI] = departureTimes[nodeTimeI];
 
     }
-
-    calculator.tripConnectionDepartureTimes.push_back(std::move(connectionDepartureTimes));
 
 }
 
@@ -313,101 +311,83 @@ void addTripData(TrRouting::Calculator& calculator, TrRouting::Trip *trip, TrRou
 void BaseCsaFixtureTests::setUpSchedules(std::vector<std::shared_ptr<TrRouting::ConnectionTuple>> &connections)
 {
 
-    int tripIdx;
-    std::vector<std::unique_ptr<TrRouting::Trip>>& array = calculator.trips;
-    std::map<boost::uuids::uuid, int>& arrayIndexesByUuid = calculator.tripIndexesByUuid;
+    std::map<boost::uuids::uuid, TrRouting::Trip>& array = calculator.trips;
     auto & busMode = calculator.getModes().at("bus");
 
     // South/North trip 1 at 10
-    std::unique_ptr<TrRouting::Trip> snTrip1 = std::make_unique<TrRouting::Trip>(trip1SNUuid,
-                                                                                 calculator.agencies.at(agencyUuid),
-                                                                                 calculator.lines.at(lineSNUuid),
-                                                                                 calculator.paths.at(pathSNUuid),
-                                                                                 busMode,
-                                                                                 calculator.services.at(serviceUuid),
-                                                                                 -1,
-                                                                                 0);
-    tripIdx = array.size();
-    arrayIndexesByUuid[snTrip1->uuid] = tripIdx;
-
+    array.emplace(trip1SNUuid, TrRouting::Trip(trip1SNUuid,
+                                               calculator.agencies.at(agencyUuid),
+                                               calculator.lines.at(lineSNUuid),
+                                               calculator.paths.at(pathSNUuid),
+                                               busMode,
+                                               calculator.services.at(serviceUuid),
+                                               -1,
+                                               0));
     int arrivalTimesT1[5] = { getTimeInSeconds(10), getTimeInSeconds(10, 3, 30), getTimeInSeconds(10, 7), getTimeInSeconds(10, 13), getTimeInSeconds(10, 18) };
     int departureTimesT1[5] = { getTimeInSeconds(10), getTimeInSeconds(10, 3, 50), getTimeInSeconds(10, 10), getTimeInSeconds(10, 13, 30), getTimeInSeconds(10, 18) };
 
-    addTripData(calculator, snTrip1.get(), calculator.paths.at(pathSNUuid), connections, arrivalTimesT1, departureTimesT1, 5, tripIdx);
-    array.push_back(std::move(snTrip1));
+    addTripData(array.at(trip1SNUuid), calculator.paths.at(pathSNUuid), connections, arrivalTimesT1, departureTimesT1, 5);
 
     // South/North trip 2 at 11
-    std::unique_ptr<TrRouting::Trip> snTrip2 = std::make_unique<TrRouting::Trip>(trip2SNUuid,
-                                                                                 calculator.agencies.at(agencyUuid),
-                                                                                 calculator.lines.at(lineSNUuid),
-                                                                                 calculator.paths.at(pathSNUuid),
-                                                                                 busMode,
-                                                                                 calculator.services.at(serviceUuid),
-                                                                                 -1,
-                                                                                 0);
-    tripIdx = array.size();
-    arrayIndexesByUuid[snTrip2->uuid] = tripIdx;
-
+    array.emplace(trip2SNUuid,  TrRouting::Trip(trip2SNUuid,
+                                                calculator.agencies.at(agencyUuid),
+                                                calculator.lines.at(lineSNUuid),
+                                                calculator.paths.at(pathSNUuid),
+                                                busMode,
+                                                calculator.services.at(serviceUuid),
+                                                -1,
+                                                0));
     int arrivalTimesT2[5] = { getTimeInSeconds(11), getTimeInSeconds(11, 3, 30), getTimeInSeconds(11, 7), getTimeInSeconds(11, 11), getTimeInSeconds(11, 16) };
     int departureTimesT2[5] = { getTimeInSeconds(11), getTimeInSeconds(11, 3, 50), getTimeInSeconds(11, 8), getTimeInSeconds(11, 11, 30), getTimeInSeconds(11, 17) };
 
-    addTripData(calculator, snTrip2.get(), calculator.paths.at(pathSNUuid),  connections, arrivalTimesT2, departureTimesT2, 5, tripIdx);
-    array.push_back(std::move(snTrip2));
+    addTripData(array.at(trip2SNUuid), calculator.paths.at(pathSNUuid),  connections, arrivalTimesT2, departureTimesT2, 5);
 
     // East/West trip 1 at 9
-    std::unique_ptr<TrRouting::Trip> ewTrip1 = std::make_unique<TrRouting::Trip>(trip1EWUuid,
-                                                                                 calculator.agencies.at(agencyUuid),
-                                                                                 calculator.lines.at(lineEWUuid),
-                                                                                 calculator.paths.at(pathEWUuid),
-                                                                                 busMode,
-                                                                                 calculator.services.at(serviceUuid),
-                                                                                 -1,
-                                                                                 0);
-    tripIdx = array.size();
-    arrayIndexesByUuid[ewTrip1->uuid] = tripIdx;
+    array.emplace(trip1EWUuid,TrRouting::Trip(trip1EWUuid,
+                                              calculator.agencies.at(agencyUuid),
+                                              calculator.lines.at(lineEWUuid),
+                                              calculator.paths.at(pathEWUuid),
+                                              busMode,
+                                              calculator.services.at(serviceUuid),
+                                              -1,
+                                              0));
 
     int arrivalTimesT3[5] = { getTimeInSeconds(9), getTimeInSeconds(9, 2, 30), getTimeInSeconds(9, 4, 40), getTimeInSeconds(9, 7, 30), getTimeInSeconds(9, 10) };
     int departureTimesT3[5] = { getTimeInSeconds(9), getTimeInSeconds(9, 2, 50), getTimeInSeconds(9, 5), getTimeInSeconds(9, 8), getTimeInSeconds(9, 11) };
 
-    addTripData(calculator, ewTrip1.get(), calculator.paths.at(pathEWUuid), connections, arrivalTimesT3, departureTimesT3, 5, tripIdx);
-    array.push_back(std::move(ewTrip1));
+    addTripData(array.at(trip1EWUuid), calculator.paths.at(pathEWUuid), connections, arrivalTimesT3, departureTimesT3, 5);
+    //array.push_back(std::move(ewTrip1));
 
     // East/West trip 2 at 10:02
-    std::unique_ptr<TrRouting::Trip> ewTrip2 = std::make_unique<TrRouting::Trip>(trip2EWUuid,
-                                                                                 calculator.agencies.at(agencyUuid),
-                                                                                 calculator.lines.at(lineEWUuid),
-                                                                                 calculator.paths.at(pathEWUuid),
-                                                                                 busMode,
-                                                                                 calculator.services.at(serviceUuid),
-                                                                                 -1,
-                                                                                 0);
-    tripIdx = array.size();
-    arrayIndexesByUuid[ewTrip2->uuid] = tripIdx;
+    //std::unique_ptr<TrRouting::Trip> ewTrip2 = std::make_unique<TrRouting::Trip>(trip2EWUuid,
+    array.emplace(trip2EWUuid, TrRouting::Trip(trip2EWUuid,
+                    calculator.agencies.at(agencyUuid),
+                                               calculator.lines.at(lineEWUuid),
+                                               calculator.paths.at(pathEWUuid),
+                                               busMode,
+                                               calculator.services.at(serviceUuid),
+                                               -1,
+                                               0));
 
     int arrivalTimesT4[5] = { getTimeInSeconds(10, 2), getTimeInSeconds(10, 4, 30), getTimeInSeconds(10, 7), getTimeInSeconds(10, 11, 30), getTimeInSeconds(10, 14) };
     int departureTimesT4[5] = { getTimeInSeconds(10, 2), getTimeInSeconds(10, 5, 10), getTimeInSeconds(10, 9), getTimeInSeconds(10, 12), getTimeInSeconds(10, 15) };
 
-    addTripData(calculator, ewTrip2.get(), calculator.paths.at(pathEWUuid), connections, arrivalTimesT4, departureTimesT4, 5, tripIdx);
-    array.push_back(std::move(ewTrip2));
+    addTripData(array.at(trip2EWUuid), calculator.paths.at(pathEWUuid), connections, arrivalTimesT4, departureTimesT4, 5);
 
     // Extra trip at 10h20
-    std::unique_ptr<TrRouting::Trip> extraTrip1 = std::make_unique<TrRouting::Trip>(trip1ExtraUuid,
-                                                                                 calculator.agencies.at(agencyUuid),
-                                                                                 calculator.lines.at(lineExtraUuid),
-                                                                                 calculator.paths.at(pathExtraUuid),
-                                                                                 busMode,
-                                                                                 calculator.services.at(serviceUuid),
-                                                                                 -1,
-                                                                                 0);
-    tripIdx = array.size();
-    arrayIndexesByUuid[extraTrip1->uuid] = tripIdx;
+    array.emplace(trip1ExtraUuid, TrRouting::Trip(trip1ExtraUuid,
+                                                  calculator.agencies.at(agencyUuid),
+                                                  calculator.lines.at(lineExtraUuid),
+                                                  calculator.paths.at(pathExtraUuid),
+                                                  busMode,
+                                                  calculator.services.at(serviceUuid),
+                                                  -1,
+                                                  0));
 
     int arrivalTimesT5[2] = { getTimeInSeconds(10, 20), getTimeInSeconds(10, 25) };
     int departureTimesT5[2] = { getTimeInSeconds(10, 20), getTimeInSeconds(10,26) };
 
-    addTripData(calculator, extraTrip1.get(), calculator.paths.at(pathExtraUuid), connections, arrivalTimesT5, departureTimesT5, 2, tripIdx);
-    array.push_back(std::move(extraTrip1));
-
+    addTripData(array.at(trip1ExtraUuid), calculator.paths.at(pathExtraUuid), connections, arrivalTimesT5, departureTimesT5, 2);
 }
 
 void BaseCsaFixtureTests::setUpModes()

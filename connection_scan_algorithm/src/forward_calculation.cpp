@@ -15,7 +15,6 @@ namespace TrRouting
     int benchmarkingStart  = algorithmCalculationTime.getEpoch();
 
     int   reachableConnectionsCount       {0};
-    int   tripIndex                       {-1};
     int   tripEnterConnectionIndex        {-1};
     int   nodeDepartureTentativeTime      {MAX_INT};
     int   nodeArrivalTentativeTime        {MAX_INT};
@@ -46,10 +45,13 @@ namespace TrRouting
       // ignore connections before departure time + minimum access travel time:
       if (std::get<connectionIndexes::TIME_DEP>(**connection) >= departureTimeSeconds + minAccessTravelTime)
       {
-        tripIndex = std::get<connectionIndexes::TRIP>(**connection);
+        const Trip & trip = std::get<connectionIndexes::TRIP>(**connection);
+
+        // Cache the current query data overlay si we don't check the hashmap every time
+        auto & currentTripQueryOverlay = tripsQueryOverlay[trip.uid];
 
         // enabled trips only here:
-        if (tripsEnabled[tripIndex] != -1)
+        if (tripsEnabled[trip.uid])
         {
           connectionDepartureTime         = std::get<connectionIndexes::TIME_DEP>(**connection);
           connectionMinWaitingTimeSeconds = std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(**connection) >= 0 ? std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(**connection) : parameters.getMinWaitingTimeSeconds();
@@ -66,7 +68,7 @@ namespace TrRouting
             break;
           }
 
-          tripEnterConnectionIndex   = tripsEnterConnection[tripIndex]; // -1 if trip has not yet been used
+          tripEnterConnectionIndex   = currentTripQueryOverlay.enterConnection; // -1 if trip has not yet been used
           const Node &nodeDeparture = std::get<connectionIndexes::NODE_DEP>(**connection);
 
           // Extract node departure time if we have a result or set a default value
@@ -118,12 +120,12 @@ namespace TrRouting
               )
             )
             {
-              tripsUsable[tripIndex]                            = 1;
-              tripsEnterConnection[tripIndex]                   = i;
-              tripsEnterConnectionTransferTravelTime[tripIndex] = std::get<journeyStepIndexes::TRANSFER_TRAVEL_TIME>(forwardJourneysSteps.at(nodeDeparture.uid));
+              currentTripQueryOverlay.usable = true;
+              currentTripQueryOverlay.enterConnection = i;
+              currentTripQueryOverlay.enterConnectionTransferTravelTime = std::get<journeyStepIndexes::TRANSFER_TRAVEL_TIME>(forwardJourneysSteps.at(nodeDeparture.uid));
             }
             
-            if (std::get<connectionIndexes::CAN_UNBOARD>(**connection) == 1 && tripsEnterConnection[tripIndex] != -1)
+            if (std::get<connectionIndexes::CAN_UNBOARD>(**connection) == 1 && currentTripQueryOverlay.enterConnection != -1)
             {
               // get footpaths for the arrival node to get transferable nodes:
               const Node &nodeArrival = std::get<connectionIndexes::NODE_ARR>(**connection);
@@ -164,7 +166,7 @@ namespace TrRouting
                     footpathDistance = nodeArrival.transferableNodes[footpathIndex].distance;
                     nodesTentativeTime[transferableNode.node.uid] = footpathTravelTime + connectionArrivalTime;
 
-                    forwardJourneysSteps.insert({transferableNode.node.uid, std::make_tuple(tripsEnterConnection[tripIndex], i, tripIndex, footpathTravelTime, (nodeArrival.uuid == transferableNode.node.uuid ? 1 : -1), footpathDistance)});
+                    forwardJourneysSteps.insert({transferableNode.node.uid, std::make_tuple(currentTripQueryOverlay.enterConnection, i, std::cref(trip), footpathTravelTime, (nodeArrival.uuid == transferableNode.node.uuid ? 1 : -1), footpathDistance)});
                   }
 
                   if (
@@ -179,7 +181,7 @@ namespace TrRouting
                   )
                   {
                     footpathDistance = nodeArrival.transferableNodes[footpathIndex].distance;
-                    forwardEgressJourneysSteps.insert({transferableNode.node.uid, std::make_tuple(tripsEnterConnection[tripIndex], i, tripIndex, footpathTravelTime, 1, footpathDistance)});
+                    forwardEgressJourneysSteps.insert({transferableNode.node.uid, std::make_tuple(currentTripQueryOverlay.enterConnection, i, std::cref(trip), footpathTravelTime, 1, footpathDistance)});
                   }
                 }
                 footpathIndex++;

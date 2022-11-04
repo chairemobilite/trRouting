@@ -21,28 +21,21 @@
 namespace TrRouting
 {
   int CacheFetcher::getSchedules(
-    std::vector<std::unique_ptr<Trip>>& trips,
+    std::map<boost::uuids::uuid, Trip>& trips,
     const std::map<boost::uuids::uuid, Line>& lines,
     std::map<boost::uuids::uuid, Path>& paths,
-    std::map<boost::uuids::uuid, int>& tripIndexesByUuid,
     const std::map<boost::uuids::uuid, Service>& services,
-    std::vector<std::vector<std::unique_ptr<int>>>&   tripConnectionDepartureTimes,
     std::vector<std::shared_ptr<ConnectionTuple>>& connections,
     std::string customPath
   )
   {
     trips.clear();
-    trips.shrink_to_fit();
-    tripIndexesByUuid.clear();
-    tripConnectionDepartureTimes.clear();
-    tripConnectionDepartureTimes.shrink_to_fit();
     connections.clear();
     connections.shrink_to_fit();
 
     boost::uuids::string_generator uuidGenerator;
     boost::uuids::uuid tripUuid, pathUuid;
     std::string tripUuidStr, pathUuidStr, cacheFileName;
-    int tripIdx;
     unsigned long nodeTimesCount;
     unsigned long linesCount {lines.size()};
     int lineI {0};
@@ -85,30 +78,27 @@ namespace TrRouting
               pathUuid     = uuidGenerator(pathUuidStr);
               Path &path = paths.at(pathUuid);
               
-              std::unique_ptr<Trip> trip = std::make_unique<Trip>(tripUuid,
-                                                                  line.agency,
-                                                                  line,
-                                                                  path,
-                                                                  line.mode,
-                                                                  service,
-                                                                  line.allowSameLineTransfers,
-                                                                  capnpTrip.getTotalCapacity(),
-                                                                  capnpTrip.getSeatedCapacity());
-
+              trips.emplace(tripUuid, Trip(tripUuid,
+                                           line.agency,
+                                           line,
+                                           path,
+                                           line.mode,
+                                           service,
+                                           line.allowSameLineTransfers,
+                                           capnpTrip.getTotalCapacity(),
+                                           capnpTrip.getSeatedCapacity()));
+              //Current trip
+              Trip & trip = trips.at(tripUuid);
               
-              tripIdx = trips.size();
               // TODO This should probably be done in the Trip constructor (setting the back reference)
-              path.tripsIdx.push_back(tripIdx);
-              tripIndexesByUuid[trip->uuid] = tripIdx;
+              path.tripsRef.push_back(trip);
 
               nodeTimesCount             = capnpTrip.getNodeArrivalTimesSeconds().size();
               auto arrivalTimesSeconds   = capnpTrip.getNodeArrivalTimesSeconds();
               auto departureTimesSeconds = capnpTrip.getNodeDepartureTimesSeconds();
               auto canBoards             = capnpTrip.getNodesCanBoard();
               auto canUnboards           = capnpTrip.getNodesCanUnboard();
-              
-              std::vector<std::unique_ptr<int>>   connectionDepartureTimes = std::vector<std::unique_ptr<int>>(nodeTimesCount);
-
+              trip.connectionDepartureTimes.resize(nodeTimesCount);
               // nodeTimesCount - 1, since we process node pairs, we have to stop and the second from last
               for (int nodeTimeI = 0; nodeTimeI < nodeTimesCount - 1; nodeTimeI++)
               {
@@ -117,23 +107,19 @@ namespace TrRouting
                     path.nodesRef[nodeTimeI + 1],
                     departureTimesSeconds[nodeTimeI],
                     arrivalTimesSeconds[nodeTimeI + 1],
-                    tripIdx,
+                    trip,
                     canBoards[nodeTimeI],
                     canUnboards[nodeTimeI + 1],
                     nodeTimeI + 1,
-                    trip->allowSameLineTransfers,
+                    trip.allowSameLineTransfers,
                     line.mode.shortname == Mode::TRANSFERABLE ? 0 : -1
                   )));
 
                   connections.push_back(std::move(forwardConnection));
 
-                  connectionDepartureTimes[nodeTimeI] = std::make_unique<int>(departureTimesSeconds[nodeTimeI]);
+                  trip.connectionDepartureTimes[nodeTimeI] = departureTimesSeconds[nodeTimeI];
 
               }
-              trips.push_back(std::move(trip));
-
-              tripConnectionDepartureTimes.push_back(std::move(connectionDepartureTimes));
-
             }
           }
         }

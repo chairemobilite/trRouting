@@ -49,10 +49,11 @@ namespace TrRouting
       if (std::get<connectionIndexes::TIME_ARR>(**connection) <= arrivalTimeSeconds - (params.returnAllNodesResult ? 0 : minEgressTravelTime))
       {
         
-        tripIndex = std::get<connectionIndexes::TRIP>(**connection);
+        const Trip & trip = std::get<connectionIndexes::TRIP>(**connection);
         
         // enabled trips only here:
-        if (tripsUsable[tripIndex] == 1 && tripsEnabled[tripIndex] != -1)
+        auto & currentTripQueryOverlay = tripsQueryOverlay[trip.uid];
+        if (currentTripQueryOverlay.usable && tripsEnabled[trip.uid])
         {
 
           connectionArrivalTime           = std::get<connectionIndexes::TIME_ARR>(**connection);
@@ -64,7 +65,7 @@ namespace TrRouting
             break;
           }
 
-          tripExitConnectionIndex   = tripsExitConnection[tripIndex];
+          tripExitConnectionIndex   = currentTripQueryOverlay.exitConnection;
           const Node &nodeArrival = std::get<connectionIndexes::NODE_ARR>(**connection);
 
           // Extract node arrival time
@@ -89,8 +90,8 @@ namespace TrRouting
               // TODO probably extract the reverseJourneysSteps[nodeArrival.uuid] instead of doing lookup multiple the time
               if (tripExitConnectionIndex == -1) // <= to make sure we get the same result as forward calculation, which uses >
               {
-                tripsExitConnection[tripIndex]                   = i;
-                tripsExitConnectionTransferTravelTime[tripIndex] = std::get<journeyStepIndexes::TRANSFER_TRAVEL_TIME>(reverseJourneysSteps.at(nodeArrival.uid));
+                currentTripQueryOverlay.exitConnection = i;
+                currentTripQueryOverlay.exitConnectionTransferTravelTime = std::get<journeyStepIndexes::TRANSFER_TRAVEL_TIME>(reverseJourneysSteps.at(nodeArrival.uid));
               }
               else if (
                        //TODO This was commented out in forward_calculation
@@ -98,7 +99,7 @@ namespace TrRouting
                        &&
                        std::get<journeyStepIndexes::TRANSFER_TRAVEL_TIME>(reverseJourneysSteps.at(nodeArrival.uid)) >= 0
                        && 
-                       std::get<journeyStepIndexes::TRANSFER_TRAVEL_TIME>(reverseJourneysSteps.at(nodeArrival.uid)) < tripsExitConnectionTransferTravelTime[tripIndex]
+                       std::get<journeyStepIndexes::TRANSFER_TRAVEL_TIME>(reverseJourneysSteps.at(nodeArrival.uid)) < currentTripQueryOverlay.exitConnectionTransferTravelTime
                        )
               {
                 journeyConnectionMinWaitingTimeSeconds = parameters.getMinWaitingTimeSeconds();
@@ -109,14 +110,14 @@ namespace TrRouting
 
                 if (connectionArrivalTime + journeyConnectionMinWaitingTimeSeconds <= nodeArrivalTentativeTime)
                 {
-                  tripsExitConnection[tripIndex]                   = i;
-                  tripsExitConnectionTransferTravelTime[tripIndex] = std::get<journeyStepIndexes::TRANSFER_TRAVEL_TIME>(reverseJourneysSteps.at(nodeArrival.uid));
+                  currentTripQueryOverlay.exitConnection = i;
+                  currentTripQueryOverlay.exitConnectionTransferTravelTime = std::get<journeyStepIndexes::TRANSFER_TRAVEL_TIME>(reverseJourneysSteps.at(nodeArrival.uid));
                 }
               }
 
             }
             
-            if (std::get<connectionIndexes::CAN_BOARD>(**connection) == 1 && tripsExitConnection[tripIndex] != -1)
+            if (std::get<connectionIndexes::CAN_BOARD>(**connection) == 1 && currentTripQueryOverlay.exitConnection != -1)
             {
               // get footpaths for the arrival node to get transferable nodes:
               const Node &nodeDeparture = std::get<connectionIndexes::NODE_DEP>(**connection);
@@ -159,7 +160,7 @@ namespace TrRouting
                   {
                     footpathDistance = nodeDeparture.reverseTransferableNodes.at(footpathIndex).distance;
                     nodesReverseTentativeTime[transferableNode.node.uid] = connectionDepartureTime - footpathTravelTime - connectionMinWaitingTimeSeconds;
-                    reverseJourneysSteps[transferableNode.node.uid] = std::make_tuple(i, tripsExitConnection[tripIndex], tripIndex, footpathTravelTime, (nodeDeparture.uuid == transferableNode.node.uuid ? 1 : -1), footpathDistance);
+                    reverseJourneysSteps[transferableNode.node.uid] = std::make_tuple(i, currentTripQueryOverlay.exitConnection, std::cref(trip), footpathTravelTime, (nodeDeparture.uuid == transferableNode.node.uuid ? 1 : -1), footpathDistance);
                   }
                   if (
                     nodeDeparture.uuid == transferableNode.node.uuid
@@ -187,7 +188,7 @@ namespace TrRouting
                         connectionDepartureTime - initialDepartureTimeSeconds - nodeDepartureInNodesAccessIte->second.time <= parameters.getMaxFirstWaitingTimeSeconds()
                       )
                       {
-                        reverseAccessJourneysSteps[transferableNode.node.uid] = std::make_tuple(i, tripsExitConnection[tripIndex], tripIndex, 0, 1, 0);
+                        reverseAccessJourneysSteps[transferableNode.node.uid] = std::make_tuple(i, currentTripQueryOverlay.exitConnection, std::cref(trip), 0, 1, 0);
                       }
                     }
                   }

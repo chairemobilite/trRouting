@@ -66,7 +66,7 @@ namespace TrRouting
         std::string uuid     {capnpT.getUuid()};
         std::string lineUuid {capnpT.getLineUuid()};
         std::vector<std::reference_wrapper<const Node>> nodesRef;
-        std::vector<int> tripsIdx;
+        std::vector<std::reference_wrapper<const Trip>> tripsRef;
         std::vector<int> distancesMeters;
         std::vector<int> travelTimesSeconds;
         boost::uuids::uuid nodeUuid;
@@ -96,7 +96,7 @@ namespace TrRouting
                                capnpT.getDirection(),
                                capnpT.getInternalId(),
                                nodesRef,
-                               tripsIdx, //TODO This is empty
+                               tripsRef, //TODO This is empty
                                travelTimesSeconds,
                                distancesMeters));
       }

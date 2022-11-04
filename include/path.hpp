@@ -9,6 +9,7 @@
 namespace TrRouting
 {
   class Line;
+  class Trip;
   
   class Path {
   
@@ -18,7 +19,7 @@ namespace TrRouting
          const std::string &adirection,
          const std::string &ainternalId,
          const std::vector<std::reference_wrapper<const Node>> &anodesRef,
-         const std::vector<int> &atripsIdx,
+         const std::vector<std::reference_wrapper<const Trip>> &atripsRef,
          const std::vector<int> &asegmentsTravelTimeSeconds,
          const std::vector<int> &asegmentsDistanceMeters):
       uuid(auuid),
@@ -26,7 +27,7 @@ namespace TrRouting
       direction(adirection),
       internalId(ainternalId),
       nodesRef(anodesRef),
-      tripsIdx(atripsIdx),
+      tripsRef(atripsRef),
       segmentsTravelTimeSeconds(asegmentsTravelTimeSeconds),
       segmentsDistanceMeters(asegmentsDistanceMeters) {}
 
@@ -37,12 +38,12 @@ namespace TrRouting
          const std::string &adirection,
          const std::string &ainternalId,
          const std::vector<NodeTimeDistance> &anodesTimeDistance,
-         const std::vector<int> &atripsIdx):
+         const std::vector<std::reference_wrapper<const Trip>> &atripsRef):
       uuid(auuid),
       line(aline),
       direction(adirection),
       internalId(ainternalId),
-      tripsIdx(atripsIdx)
+      tripsRef(atripsRef)
       {
         for (const NodeTimeDistance & ntd: anodesTimeDistance) {
           nodesRef.push_back(ntd.node);
@@ -56,7 +57,7 @@ namespace TrRouting
     std::string direction;
     std::string internalId;
     std::vector<std::reference_wrapper<const Node>> nodesRef;
-    std::vector<int> tripsIdx;
+    std::vector<std::reference_wrapper<const Trip>> tripsRef;
     //TODO Should probably be integrated with nodes as a NodeTimeDistance object. Need
     // to validate their usage
     std::vector<int> segmentsTravelTimeSeconds;
