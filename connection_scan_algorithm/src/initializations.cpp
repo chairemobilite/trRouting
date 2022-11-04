@@ -52,23 +52,7 @@ namespace TrRouting
     reverseAccessJourneysSteps.clear();
 
     tripsEnabled.clear();
-    tripsEnabled.shrink_to_fit();
-    tripsEnabled.resize(trips.size());
-    tripsUsable.clear();
-    tripsUsable.shrink_to_fit();
-    tripsUsable.resize(trips.size());
-    tripsEnterConnection.clear();
-    tripsEnterConnection.shrink_to_fit();
-    tripsEnterConnection.resize(trips.size());
-    tripsExitConnection.clear();
-    tripsExitConnection.shrink_to_fit();
-    tripsExitConnection.resize(trips.size());
-    tripsEnterConnectionTransferTravelTime.clear();
-    tripsEnterConnectionTransferTravelTime.shrink_to_fit();
-    tripsEnterConnectionTransferTravelTime.resize(trips.size());
-    tripsExitConnectionTransferTravelTime.clear();
-    tripsExitConnectionTransferTravelTime.shrink_to_fit();
-    tripsExitConnectionTransferTravelTime.resize(trips.size());
+    tripsQueryOverlay.clear();
 
     spdlog::info("{} connections", forwardConnections.size());;
 
@@ -129,7 +113,6 @@ namespace TrRouting
     forwardConnections.shrink_to_fit();
     reverseConnections.shrink_to_fit();
 
-    int tripIdx {-1};
     try
     {
       spdlog::info("Sorting connections...");
@@ -146,11 +129,12 @@ namespace TrRouting
         {
           return false;
         }
-        if (std::get<connectionIndexes::TRIP>(*connectionA) < std::get<connectionIndexes::TRIP>(*connectionB))
+        //TODO We could do something  better than comparing uuud for trip. We just need something to have a stable sort
+        if (std::get<connectionIndexes::TRIP>(*connectionA).get().uuid < std::get<connectionIndexes::TRIP>(*connectionB).get().uuid)
         {
           return true;
         }
-        else if (std::get<connectionIndexes::TRIP>(*connectionA) > std::get<connectionIndexes::TRIP>(*connectionB))
+        else if (std::get<connectionIndexes::TRIP>(*connectionA).get().uuid > std::get<connectionIndexes::TRIP>(*connectionB).get().uuid)
         {
           return false;
         }
@@ -175,11 +159,11 @@ namespace TrRouting
         {
           return false;
         }
-        if (std::get<connectionIndexes::TRIP>(*connectionA) > std::get<connectionIndexes::TRIP>(*connectionB)) // here we need to reverse sequence!
+        if (std::get<connectionIndexes::TRIP>(*connectionA).get().uuid > std::get<connectionIndexes::TRIP>(*connectionB).get().uuid) // here we need to reverse sequence!
         {
           return true;
         }
-        else if (std::get<connectionIndexes::TRIP>(*connectionA) < std::get<connectionIndexes::TRIP>(*connectionB))
+        else if (std::get<connectionIndexes::TRIP>(*connectionA).get().uuid < std::get<connectionIndexes::TRIP>(*connectionB).get().uuid)
         {
           return false;
         }
@@ -203,16 +187,16 @@ namespace TrRouting
       int i {0};
       for(auto & connection : forwardConnections)
       {
-        tripIdx = std::get<connectionIndexes::TRIP>(*connection);
-        trips[tripIdx]->forwardConnectionsIdx.push_back(i);
+        Trip & trip = std::get<connectionIndexes::TRIP>(*connection);
+        trip.forwardConnectionsIdx.push_back(i);
         i++;
       }
 
       i = 0;
       for(auto & connection : reverseConnections)
       {
-        tripIdx = std::get<connectionIndexes::TRIP>(*connection);
-        trips[tripIdx]->reverseConnectionsIdx.push_back(i);
+        Trip & trip = std::get<connectionIndexes::TRIP>(*connection);
+        trip.reverseConnectionsIdx.push_back(i);
         i++;
       }
 

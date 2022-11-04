@@ -5,6 +5,7 @@
 #include "parameters.hpp"
 #include "routing_result.hpp"
 #include "node.hpp"
+#include "trip.hpp"
 
 
 namespace TrRouting
@@ -122,9 +123,12 @@ namespace TrRouting
     {
       departureTimeSeconds = -1;
       initialDepartureTimeSeconds = -1;
-      std::fill(tripsUsable.begin(), tripsUsable.end(), 1);
-      //tripsUsable = std::vector<std::unique_ptr<int>>(trips.size(), std::make_unique<int>(1));
-      //std::fill(tripsUsable.begin(), tripsUsable.end(), std::make_unique<int>(1)); // we need to make all trips usable when not coming from forward result because reverse calculation, by default, checks for usableTrips == 1
+      //TODO maybe we can do something different in that case, like a query flag
+      // we need to make all trips usable when not coming from forward result because reverse calculation, by default, checks for usableTrips
+      for (auto && tripIte : trips) {
+        const Trip & trip = tripIte.second;
+        tripsQueryOverlay[trip.uid].usable = true;
+      }
 
       auto resultCalculation = reverseCalculation(parameters);
       if (resultCalculation) {

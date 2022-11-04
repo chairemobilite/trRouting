@@ -15,6 +15,7 @@
 #include "parameters.hpp"
 #include "connection.hpp"
 #include "node.hpp"
+#include "trip.hpp"
 
 namespace TrRouting
 {
@@ -32,12 +33,11 @@ namespace TrRouting
   class Line;
   class Path;
   class Scenario;
-  class Trip;
   class RoutingResult;
   class AlternativesResult;
   class DataFetcher;
 
-  using JourneyStep = std::tuple<int,int,int,int,short,int>; //final enter connection, final exit connection, final trip index, transfer travel time, is same node transfer (first, second, third and fourth values = -1 for access and egress journeys)
+  using JourneyStep = std::tuple<int,int,std::optional<std::reference_wrapper<const Trip>>,int,short,int>; //final enter connection, final exit connection, final trip, transfer travel time, is same node transfer (first, second, third and fourth values = -1 for access and egress journeys)
 
   class Calculator {
 
@@ -168,10 +168,8 @@ namespace TrRouting
     const std::map<boost::uuids::uuid, Scenario> & getScenarios() {return scenarios;}
 
 
-    std::vector<std::unique_ptr<Trip>>       trips;
-    std::map<boost::uuids::uuid, int>        tripIndexesByUuid;
-
-    std::vector<std::vector<std::unique_ptr<int>>>   tripConnectionDepartureTimes; // tripIndex: [connectionIndex (sequence in trip): departureTimeSeconds]
+    std::map<boost::uuids::uuid, Trip>       trips;
+    const std::map<boost::uuids::uuid, Trip> & getTrips() {return trips;}
 
     Parameters params;
     CalculationTime algorithmCalculationTime;
@@ -205,12 +203,9 @@ namespace TrRouting
     std::unordered_map<Node::uid_t, NodeTimeDistance> nodesAccess; // travel time/distance from origin to accessible nodes
     std::unordered_map<Node::uid_t, NodeTimeDistance> nodesEgress; // travel time/distance to reach destination;
 
-    std::vector<int> tripsEnterConnection; // index of the entering connection for each trip index
-    std::vector<int> tripsEnterConnectionTransferTravelTime; // index of the entering connection for each trip index
-    std::vector<int> tripsExitConnection; // index of the exiting connection for each trip index
-    std::vector<int> tripsExitConnectionTransferTravelTime; // index of the exiting connection for each trip index
-    std::vector<int> tripsEnabled; // allow/disallow use of this trip during calculation
-    std::vector<int> tripsUsable; // after forward calculation, keep a list of usable trips in time range for reverse calculation
+    std::unordered_map<Trip::uid_t, bool> tripsEnabled;
+    std::unordered_map<Trip::uid_t, TripQueryData> tripsQueryOverlay; // Store addition trip info during a query processing
+
     std::vector<NodeTimeDistance> accessFootpaths; // pair: accessNodeIndex, walkingTravelTimeSeconds, walkingDistanceMeters
     std::vector<NodeTimeDistance> egressFootpaths; // pair: egressNodeIndex, walkingTravelTimeSeconds, walkingDistanceMeters
     std::vector<std::shared_ptr<ConnectionTuple>> forwardConnections; // Forward connections, sorted by departure time ascending

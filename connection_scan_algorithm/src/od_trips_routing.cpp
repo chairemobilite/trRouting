@@ -156,7 +156,6 @@ namespace TrRouting
     std::map<boost::uuids::uuid, std::vector<float>> pathTotalProfiles; // key: path uuid, value: [index: segment index, value: totalDemand]
     std::vector<float> demandByHourOfDay;
 
-    int    legTripIdx;
     int    legConnectionStartIdx;
     int    legConnectionEndIdx;
     int    connectionDepartureTimeSeconds;
@@ -317,7 +316,7 @@ namespace TrRouting
             totalTravelTimeSeconds += correctedExpansionFactor * visitor.getTotalTravelTime();
             for (auto & leg : visitor.getLegs())
             {
-              legTripIdx            = std::get<0>(leg);
+              const Trip &legTrip   = std::get<0>(leg);
               //std::reference_wrapper<const Line> lineref =  std::get<1>(leg);
               const Line &legLine   = std::get<1>(leg).get();
               //const Line &legLine = lineref.get();
@@ -335,7 +334,7 @@ namespace TrRouting
               }
               for (int connectionIndex = legConnectionStartIdx; connectionIndex <= legConnectionEndIdx; connectionIndex++)
               {
-                connectionDepartureTimeSeconds = *tripConnectionDepartureTimes[legTripIdx][connectionIndex];
+                connectionDepartureTimeSeconds = legTrip.connectionDepartureTimes[connectionIndex];
                 connectionDepartureTimeHour    = connectionDepartureTimeSeconds / 3600;
 
                 pathProfiles[legPath.uuid][connectionIndex][connectionDepartureTimeHour] += correctedExpansionFactor;

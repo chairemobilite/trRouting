@@ -14,13 +14,12 @@ namespace fs = std::filesystem;
 class ScheduleCacheFetcherFixtureTests : public BaseCacheFetcherFixtureTests
 {
 protected:
-    std::vector<std::unique_ptr<TrRouting::Trip>> trips;
+    std::map<boost::uuids::uuid, TrRouting::Trip> trips;
     std::map<boost::uuids::uuid, TrRouting::Line> lines;
     std::map<boost::uuids::uuid, TrRouting::Path> paths;
     std::map<boost::uuids::uuid, TrRouting::Node> nodes;
     std::map<boost::uuids::uuid, int> tripIndexesByUuid;
     std::map<boost::uuids::uuid, TrRouting::Service> services;
-    std::vector<std::vector<std::unique_ptr<int>>> tripConnectionDepartureTimes;
     std::vector<std::shared_ptr<TrRouting::ConnectionTuple>> connections;
 
 public:
@@ -57,9 +56,7 @@ TEST_F(ScheduleCacheFetcherFixtureTests, TestGetSchedulesInvalidLineFile)
       trips,
       lines,
       paths,
-      tripIndexesByUuid,
       services,
-      tripConnectionDepartureTimes,
       connections,
       INVALID_CUSTOM_PATH
     );
@@ -74,9 +71,7 @@ TEST_F(ScheduleCacheFetcherFixtureTests, TestGetUnexistingLineFiles)
       trips,
       lines,
       paths,
-      tripIndexesByUuid,
       services,
-      tripConnectionDepartureTimes,
       connections,
       INVALID_CUSTOM_PATH
     );
@@ -90,9 +85,7 @@ TEST_F(ScheduleCacheFetcherFixtureTests, TestGetSchedulesValid)
       trips,
       lines,
       paths,
-      tripIndexesByUuid,
       services,
-      tripConnectionDepartureTimes,
       connections,
       VALID_CUSTOM_PATH
     );

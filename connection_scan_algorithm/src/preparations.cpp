@@ -70,9 +70,7 @@ namespace TrRouting
       trips,
       lines,
       paths,
-      tripIndexesByUuid,
       services,
-      tripConnectionDepartureTimes,
       connections,
       customPath
     );

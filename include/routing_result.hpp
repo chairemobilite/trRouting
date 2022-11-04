@@ -13,6 +13,7 @@ namespace TrRouting
 {
   class Line;
   class Path;
+  class Trip;
 
   // TODO These enums are used temporarily, while we need the class hierarchy to be able to determine which type is returned when dynamic cast is necessary
   enum result_type { SINGLE_CALCULATION, ALTERNATIVES, ALL_NODES };
@@ -230,7 +231,7 @@ namespace TrRouting
    * 
    */
    // tuple: tripIdx, line, path, start connection index, end connection index
-  typedef std::tuple<int, std::reference_wrapper<const Line>, std::reference_wrapper<const Path>, int, int> Leg;
+  typedef std::tuple<std::reference_wrapper<const Trip>, std::reference_wrapper<const Line>, std::reference_wrapper<const Path>, int, int> Leg;
 
   class SingleCalculationResult : public RoutingResult {
   public:

@@ -47,19 +47,12 @@ namespace TrRouting
 
     if (foundRoute || params.returnAllNodesResult)
     {
-
-      std::deque<JourneyStep> journey;
-      JourneyStep         resultingNodeJourneyStep;
       ConnectionTuple * journeyStepEnterConnection; // connection tuple: departureNodeIndex, arrivalNodeIndex, departureTimeSeconds, arrivalTimeSeconds, tripIndex, canBoard, canUnboard, sequenceinTrip
       ConnectionTuple * journeyStepExitConnection;
       std::vector<boost::uuids::uuid>                   unboardingNodeUuids;
       std::vector<boost::uuids::uuid>                   boardingNodeUuids;
-      std::vector<boost::uuids::uuid>                   tripUuids;
-      std::vector<int>                                  tripsIdx;
       std::vector<int>                                  inVehicleTravelTimesSeconds; // the in vehicle travel time for each segment
       std::vector<Leg> legs;
-
-      Trip *   journeyStepTrip;
 
       int totalInVehicleTime       { 0}; int transferArrivalTime    {-1}; int firstDepartureTime   {-1};
       int totalWalkingTime         { 0}; int transferReadyTime      {-1}; int numberOfTransfers    {-1};
@@ -76,11 +69,9 @@ namespace TrRouting
       for (const Node & resultingNode : resultingNodes)
       {
         legs.clear();
-        journey.clear();
+        std::deque<JourneyStep> journey;
         boardingNodeUuids.clear();
         unboardingNodeUuids.clear();
-        tripUuids.clear();
-        tripsIdx.clear();
         inVehicleTravelTimesSeconds.clear();
 
         totalInVehicleTime          =  0; transferArrivalTime    = -1; firstDepartureTime   = -1;
@@ -117,9 +108,9 @@ namespace TrRouting
 
         if (!params.returnAllNodesResult)
         {
-          journey.push_front(std::make_tuple(-1,-1,-1,nodesAccess.at(resultingNode.uid).time,-1,nodesAccess.at(resultingNode.uid).distance));
+          journey.push_front(std::make_tuple(-1,-1,std::nullopt,nodesAccess.at(resultingNode.uid).time,-1,nodesAccess.at(resultingNode.uid).distance));
         }
-        journey.push_back(std::make_tuple(-1,-1,-1,nodesEgress.at(bestEgressNode.value().get().uid).time,-1,nodesEgress.at(bestEgressNode.value().get().uid).distance));
+        journey.push_back(std::make_tuple(-1,-1,std::nullopt,nodesEgress.at(bestEgressNode.value().get().uid).time,-1,nodesEgress.at(bestEgressNode.value().get().uid).distance));
 
 
         //TODO This optimizeCaseStr string does nothing, should be removed
@@ -164,7 +155,7 @@ namespace TrRouting
             journeyStepExitConnection   = reverseConnections[std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION>(journeyStep)].get();
             const Node &journeyStepNodeDeparture    = std::get<connectionIndexes::NODE_DEP>(*journeyStepEnterConnection);
             const Node &journeyStepNodeArrival      = std::get<connectionIndexes::NODE_ARR>(*journeyStepExitConnection);
-            journeyStepTrip             = trips[std::get<journeyStepIndexes::FINAL_TRIP>(journeyStep)].get();
+            const Trip &journeyStepTrip             = std::get<journeyStepIndexes::FINAL_TRIP>(journeyStep).value().get();
             transferTime                = std::get<journeyStepIndexes::TRANSFER_TRAVEL_TIME>(journeyStep);
             distance                    = std::get<journeyStepIndexes::TRANSFER_DISTANCE>(journeyStep);
             inVehicleDistance           = 0;
@@ -184,26 +175,24 @@ namespace TrRouting
 
             totalInVehicleTime         += inVehicleTime;
             totalWaitingTime           += waitingTime;
-            if (Mode::TRANSFERABLE != journeyStepTrip->line.mode.shortname)
+            if (Mode::TRANSFERABLE != journeyStepTrip.line.mode.shortname)
             {
               numberOfTransfers += 1;
             }
             inVehicleTravelTimesSeconds.push_back(inVehicleTime);
             boardingNodeUuids.push_back(journeyStepNodeDeparture.uuid);
             unboardingNodeUuids.push_back(journeyStepNodeArrival.uuid);
-            tripUuids.push_back(journeyStepTrip->uuid);
-            tripsIdx.push_back(std::get<journeyStepIndexes::FINAL_TRIP>(journeyStep));
             //TODO Seems like storing the Trip in the leg instead of Line and Path would be ok
-            legs.push_back(std::make_tuple(std::get<journeyStepIndexes::FINAL_TRIP>(journeyStep), std::ref(journeyStepTrip->line), std::ref(journeyStepTrip->path), boardingSequence - 1, unboardingSequence - 1));
+            legs.push_back(std::make_tuple(std::get<journeyStepIndexes::FINAL_TRIP>(journeyStep).value(), std::ref(journeyStepTrip.line), std::ref(journeyStepTrip.path), boardingSequence - 1, unboardingSequence - 1));
 
-            if (unboardingSequence - 1 < journeyStepTrip->path.segmentsDistanceMeters.size()) // check if distances are available for this path
+            if (unboardingSequence - 1 < journeyStepTrip.path.segmentsDistanceMeters.size()) // check if distances are available for this path
             {
               for (int seqI = boardingSequence - 1; seqI < unboardingSequence; seqI++)
               {
-                inVehicleDistance += journeyStepTrip->path.segmentsDistanceMeters[seqI];
+                inVehicleDistance += journeyStepTrip.path.segmentsDistanceMeters[seqI];
               }
               totalDistance += inVehicleDistance;
-              if (Mode::TRANSFERABLE == journeyStepTrip->line.mode.shortname)
+              if (Mode::TRANSFERABLE == journeyStepTrip.line.mode.shortname)
               {
                 totalWalkingDistance     += inVehicleDistance;
                 totalWalkingTime         += inVehicleTime;
@@ -235,16 +224,16 @@ namespace TrRouting
             if (!params.returnAllNodesResult)
             {
               singleResult.get()->steps.push_back(std::make_unique<BoardingStep>(
-                journeyStepTrip->agency.uuid,
-                journeyStepTrip->agency.acronym,
-                journeyStepTrip->agency.name,
-                journeyStepTrip->line.uuid,
-                journeyStepTrip->line.shortname,
-                journeyStepTrip->line.longname,
-                journeyStepTrip->path.uuid,
-                journeyStepTrip->line.mode.name,
-                journeyStepTrip->line.mode.shortname,
-                journeyStepTrip->uuid,
+                journeyStepTrip.agency.uuid,
+                journeyStepTrip.agency.acronym,
+                journeyStepTrip.agency.name,
+                journeyStepTrip.line.uuid,
+                journeyStepTrip.line.shortname,
+                journeyStepTrip.line.longname,
+                journeyStepTrip.path.uuid,
+                journeyStepTrip.line.mode.name,
+                journeyStepTrip.line.mode.shortname,
+                journeyStepTrip.uuid,
                 boardingSequence,
                 boardingSequence,
                 journeyStepNodeDeparture.uuid,
@@ -256,16 +245,16 @@ namespace TrRouting
               ));
 
               singleResult.get()->steps.push_back(std::make_unique<UnboardingStep>(
-                journeyStepTrip->agency.uuid,
-                journeyStepTrip->agency.acronym,
-                journeyStepTrip->agency.name,
-                journeyStepTrip->line.uuid,
-                journeyStepTrip->line.shortname,
-                journeyStepTrip->line.longname,
-                journeyStepTrip->path.uuid,
-                journeyStepTrip->line.mode.name,
-                journeyStepTrip->line.mode.shortname,
-                journeyStepTrip->uuid,
+                journeyStepTrip.agency.uuid,
+                journeyStepTrip.agency.acronym,
+                journeyStepTrip.agency.name,
+                journeyStepTrip.line.uuid,
+                journeyStepTrip.line.shortname,
+                journeyStepTrip.line.longname,
+                journeyStepTrip.path.uuid,
+                journeyStepTrip.line.mode.name,
+                journeyStepTrip.line.mode.shortname,
+                journeyStepTrip.uuid,
                 unboardingSequence,
                 unboardingSequence + 1,
                 journeyStepNodeArrival.uuid,
