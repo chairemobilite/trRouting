@@ -24,7 +24,7 @@ public:
         fs::copy_file(BASE_CACHE_DIRECTORY_NAME + "/" + INVALID_CUSTOM_PATH + "/genericInvalid.capnpbin", BASE_CACHE_DIRECTORY_NAME + "/" + INVALID_CUSTOM_PATH + "/lines.capnpbin");
 
         // Load valid data 
-        int retVal = cacheFetcher.getAgencies(agencies, VALID_CUSTOM_PATH);
+        cacheFetcher.getAgencies(agencies, VALID_CUSTOM_PATH);
 
         std::vector<std::unique_ptr<TrRouting::Line>> lines;
 

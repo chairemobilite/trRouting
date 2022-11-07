@@ -102,7 +102,6 @@ namespace TrRouting
     long long       calculationTime;
     calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();*/
 
-    auto nodesCount {ts.size()};
     //std::vector<int>::iterator nodeIndex;
     // find reverse transferable nodes:
     for (auto nodeIter = ts.begin(); nodeIter != ts.end(); nodeIter++)

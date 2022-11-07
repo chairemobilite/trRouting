@@ -104,7 +104,6 @@ namespace TrRouting
       int numberOfDurations = responseJson["durations"][0].size();
       int numberOfDistances = responseJson["distances"][0].size();
 
-      int j = 0;
       if (numberOfDurations > 0 && numberOfDistances > 0)
       {
         int travelTimeSeconds;

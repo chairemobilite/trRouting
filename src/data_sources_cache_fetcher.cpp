@@ -63,7 +63,6 @@ namespace TrRouting
       {
         std::string uuid {capnpT.getUuid()};
         std::vector<int> servicesIdx;
-        boost::uuids::uuid serviceUuid;
         
         T t;
 

@@ -160,7 +160,6 @@ namespace TrRouting
     int    legConnectionEndIdx;
     int    connectionDepartureTimeSeconds;
     int    connectionDepartureTimeHour;
-    bool   atLeastOneOdTrip           {false};
     bool   atLeastOneCompatiblePeriod {false};
     bool   attributesMatches          {true};
     bool   resetFilters               {true};
@@ -310,7 +309,6 @@ namespace TrRouting
           ResultToOdTripJsonVisitor visitor = ResultToOdTripJsonVisitor(odTripParameters);
           odTripJson = routingResult.get()->accept(visitor);
           
-          atLeastOneOdTrip = true;
           if (visitor.getLegs().size() > 0)
           {
             totalTravelTimeSeconds += correctedExpansionFactor * visitor.getTotalTravelTime();

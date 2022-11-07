@@ -66,7 +66,7 @@ namespace TrRouting
       int totalDistance            { 0}; int distance               {-1};
       int inVehicleDistance        {-1}; int totalInVehicleDistance { 0}; int totalWalkingDistance   { 0};
       int totalTransferDistance    {-1}; int accessDistance         { 0}; int egressDistance         { 0};
-      int journeyStepTravelTime    {-1}; int accessWalkingTime      {-1};
+      int accessWalkingTime      {-1};
       int transferTime             {-1}; int egressWalkingTime      {-1};
       int waitingTime              {-1}; int accessWaitingTime      {-1};
 
@@ -88,7 +88,7 @@ namespace TrRouting
         totalDistance            =  0; distance               = -1;
         inVehicleDistance        =  0; totalInVehicleDistance =  0; totalWalkingDistance   =  0;
         totalTransferDistance    =  0; accessDistance         =  0; egressDistance         =  0;
-        journeyStepTravelTime    = -1; accessWalkingTime      = -1;
+        accessWalkingTime      = -1;
         transferTime             = -1; egressWalkingTime      = -1;
         waitingTime              = -1; accessWaitingTime      = -1;
 

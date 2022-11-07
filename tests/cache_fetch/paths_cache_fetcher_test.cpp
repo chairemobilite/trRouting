@@ -25,7 +25,7 @@ public:
 
         // Load valid data 
         std::map<boost::uuids::uuid, TrRouting::Agency> agencies;
-        int retVal = cacheFetcher.getAgencies(agencies, VALID_CUSTOM_PATH);
+        cacheFetcher.getAgencies(agencies, VALID_CUSTOM_PATH);
 
         auto modes = cacheFetcher.getModes();
         cacheFetcher.getLines(lines, agencies, modes, VALID_CUSTOM_PATH);

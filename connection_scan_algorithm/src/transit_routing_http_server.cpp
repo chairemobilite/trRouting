@@ -129,8 +129,6 @@ int main(int argc, char** argv) {
   spdlog::info("preparing calculator...");
   Calculator::DataStatus dataStatus = calculator.prepare();
 
-  int i = 0;
-
   spdlog::info("preparing server...");
 
   //HTTP-server using 1 thread
@@ -209,7 +207,6 @@ int main(int argc, char** argv) {
       }
     }
 
-    int i {0};
     bool correctCacheName {false};
     //TODO Merge this and the preparations.cpp code
     for(std::string cacheName : cacheNames)
@@ -282,15 +279,13 @@ int main(int argc, char** argv) {
       if (correctCacheName)
       {
         cacheNamesStr += cacheName;
-        if (i < cacheNames.size() - 1)
-        {
-          cacheNamesStr += ",";
-        }
-        i++;
+        cacheNamesStr += ",";
       }
     }
     if (cacheNames.size() > 0)
     {
+      // Remove last ","
+      cacheNamesStr.pop_back();
       response = "{\"status\": \"success\", \"cache_names\": \"" + cacheNamesStr + "\", \"custom_cache_path\": \"" + customCacheDirectoryPath + "\"}";
     }
     else

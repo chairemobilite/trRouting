@@ -225,12 +225,6 @@ TEST_F(SingleTAndACalculationFixtureTests, TripWithAlternatives)
 TEST_F(SingleTAndACalculationFixtureTests, TripWithNoRoutingAlternatives)
 {
     int departureTime = getTimeInSeconds(9, 45);
-    int travelTimeInVehicle = 720;
-    // This is where mocking would be interesting. Those were taken from the first run of the test
-    int accessTime = 469;
-    int egressTime = 166;
-    int expectedTransitDepartureTime = getTimeInSeconds(10);
-    int expectedTransferWaitingTime = 300;
 
     TrRouting::RouteParameters testParameters = TrRouting::RouteParameters(
         std::make_unique<TrRouting::Point>(45.7242, -73.7817),

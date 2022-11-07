@@ -273,10 +273,8 @@ TEST_F(RouteCalculationFixtureTests, NoRoutingEgressTimeLimit)
 TEST_F(RouteCalculationFixtureTests, NoRoutingMaxFirstWaitingTime)
 {
     int departureTime = getTimeInSeconds(9, 45);
-    int travelTimeInVehicle = 420;
     // This is where mocking would be interesting. Those were taken from the first run of the test
     int accessTime = 469;
-    int egressTime = 138;
     int expectedTransitDepartureTime = getTimeInSeconds(10);
 
     std::vector<std::string> parametersWithValues = initializeParameters();
@@ -299,10 +297,7 @@ TEST_F(RouteCalculationFixtureTests, NoRoutingMaxFirstWaitingTime)
 TEST_F(RouteCalculationFixtureTests, NoRoutingMinWaitingTime)
 {
     int departureTime = getTimeInSeconds(9, 45);
-    int travelTimeInVehicle = 420;
     // This is where mocking would be interesting. Those were taken from the first run of the test
-    int accessTime = 469;
-    int egressTime = 138;
     int expectedTransitDepartureTime = getTimeInSeconds(10);
 
     std::vector<std::string> parametersWithValues = initializeParameters();
