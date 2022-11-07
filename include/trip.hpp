@@ -26,14 +26,14 @@ namespace TrRouting
           short aallowSameLineTransfers,
           int atotalCapacity = -1,
           int aseatedCapacity = -1): uuid(auuid),
-                                         agency(aagency),
-                                         line(aline),
-                                         path(apath),
-                                         mode(amode),
-                                         service(aservice),
-                                         totalCapacity(atotalCapacity),
-                                         seatedCapacity(aseatedCapacity),
+                                     agency(aagency),
+                                     line(aline),
+                                     path(apath),
+                                     mode(amode),
+                                     service(aservice),
                                      allowSameLineTransfers(aallowSameLineTransfers),
+                                     totalCapacity(atotalCapacity),
+                                     seatedCapacity(aseatedCapacity),
                                      uid(++global_uid) {}
    
     boost::uuids::uuid uuid;
