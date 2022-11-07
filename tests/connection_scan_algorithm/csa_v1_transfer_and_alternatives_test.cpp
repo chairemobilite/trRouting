@@ -137,12 +137,13 @@ TEST_F(TAndACalculationFixtureTests, TripWithWalkingTransfer)
 TEST_F(TAndACalculationFixtureTests, TripWithAlternatives)
 {
     int departureTime = getTimeInSeconds(9, 45);
-    int travelTimeInVehicle = 720;
+    // TODO check values?
+    // int travelTimeInVehicle = 720;
     // This is where mocking would be interesting. Those were taken from the first run of the test
-    int accessTime = 469;
-    int egressTime = 166;
-    int expectedTransitDepartureTime = getTimeInSeconds(10);
-    int expectedTransferWaitingTime = 300;
+    //int accessTime = 469;
+    //int egressTime = 166;
+    //int expectedTransitDepartureTime = getTimeInSeconds(10);
+    //int expectedTransferWaitingTime = 300;
 
     std::vector<std::string> parametersWithValues = initializeParameters();
     parametersWithValues.push_back("origin=45.5242,-73.5817");
@@ -158,12 +159,6 @@ TEST_F(TAndACalculationFixtureTests, TripWithAlternatives)
 TEST_F(TAndACalculationFixtureTests, TripWithNoRoutingAlternatives)
 {
     int departureTime = getTimeInSeconds(9, 45);
-    int travelTimeInVehicle = 720;
-    // This is where mocking would be interesting. Those were taken from the first run of the test
-    int accessTime = 469;
-    int egressTime = 166;
-    int expectedTransitDepartureTime = getTimeInSeconds(10);
-    int expectedTransferWaitingTime = 300;
 
     std::vector<std::string> parametersWithValues = initializeParameters();
     parametersWithValues.push_back("origin=45.7242,-73.7817");

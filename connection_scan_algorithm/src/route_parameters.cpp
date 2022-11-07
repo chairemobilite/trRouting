@@ -96,8 +96,6 @@ namespace TrRouting
     boost::uuids::string_generator uuidGenerator;
 
     std::optional<std::reference_wrapper<const Scenario>> scenario;
-    boost::uuids::uuid originNodeUuid;
-    boost::uuids::uuid destinationNodeUuid;
 
     // Initialize default values
     int timeOfTrip = -1;

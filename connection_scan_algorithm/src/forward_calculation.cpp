@@ -17,7 +17,6 @@ namespace TrRouting
     int   reachableConnectionsCount       {0};
     int   tripEnterConnectionIndex        {-1};
     int   nodeDepartureTentativeTime      {MAX_INT};
-    int   nodeArrivalTentativeTime        {MAX_INT};
     int   connectionDepartureTime         {-1};
     int   connectionArrivalTime           {-1};
     short connectionMinWaitingTimeSeconds {-1};
@@ -28,7 +27,6 @@ namespace TrRouting
     int   footpathDistance                {-1};
     int   tentativeEgressNodeArrivalTime  {MAX_INT};
     bool  reachedAtLeastOneEgressNode     {false};
-    bool  canTransferOnSameLine           {false};
     bool  nodeWasAccessedFromOrigin       {false};
     int   bestArrivalTime                 {MAX_INT};
     

@@ -191,7 +191,6 @@ namespace TrRouting
     nlohmann::json json;
     json["status"] = STATUS_SUCCESS;
     json["nodes"] = nlohmann::json::array();
-    int alternativeSequence = 0;
     for (auto &node : result.nodes) {
       nlohmann::json nodeJson;
       nodeJson["id"]                     = boost::uuids::to_string(node.nodeUuid);

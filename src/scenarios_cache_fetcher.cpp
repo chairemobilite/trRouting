@@ -28,7 +28,6 @@ namespace TrRouting
     std::string customPath
   ) {
 
-    using T           = Scenario;
     using TCollection = scenarioCollection::ScenarioCollection;
     using cT          = scenarioCollection::Scenario;
     int ret = 0;

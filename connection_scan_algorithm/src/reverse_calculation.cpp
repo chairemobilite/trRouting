@@ -17,8 +17,6 @@ namespace TrRouting
 
     int  i                                {0};
     int  reachableConnectionsCount        {0};
-    int  tripIndex                        {-1};
-    int  lineIndex                        {-1};
     int  tripExitConnectionIndex          {-1};
     int  connectionDepartureTime          {-1};
     int  connectionArrivalTime            {-1};
@@ -31,7 +29,6 @@ namespace TrRouting
     int  footpathDistance                 {-1};
     int  tentativeAccessNodeDepartureTime {-1};
     bool reachedAtLeastOneAccessNode      {false};
-    bool canTransferOnSameLine            {false};
     int  bestDepartureTime                {-1};
 
     int  connectionsCount = reverseConnections.size();

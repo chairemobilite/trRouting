@@ -50,7 +50,6 @@ namespace TrRouting
       int fd = open(cacheFilePath.c_str(), O_RDWR);
       if (fd < 0)
       {
-        int err = errno;
         spdlog::error("no schedules found for line {} ({} {})", boost::uuids::to_string(line.uuid), line.shortname, line.longname);
         continue;
       }

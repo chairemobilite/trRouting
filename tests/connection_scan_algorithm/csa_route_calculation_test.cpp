@@ -411,10 +411,8 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingEgressTimeLimit)
 TEST_F(SingleRouteCalculationFixtureTests, NoRoutingMaxFirstWaitingTime)
 {
     int departureTime = getTimeInSeconds(9, 45);
-    int travelTimeInVehicle = 420;
-    // This is where mocking would be interesting. Those were taken from the first run of the test
+        // This is where mocking would be interesting. Those were taken from the first run of the test
     int accessTime = 469;
-    int egressTime = 138;
     int expectedTransitDepartureTime = getTimeInSeconds(10);
 
     TrRouting::RouteParameters testParameters = TrRouting::RouteParameters(
@@ -446,10 +444,7 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingMaxFirstWaitingTime)
 TEST_F(SingleRouteCalculationFixtureTests, NoRoutingMinWaitingTime)
 {
     int departureTime = getTimeInSeconds(9, 45);
-    int travelTimeInVehicle = 420;
     // This is where mocking would be interesting. Those were taken from the first run of the test
-    int accessTime = 469;
-    int egressTime = 138;
     int expectedTransitDepartureTime = getTimeInSeconds(10);
 
     TrRouting::RouteParameters testParameters = TrRouting::RouteParameters(

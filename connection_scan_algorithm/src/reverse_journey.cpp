@@ -54,7 +54,7 @@ namespace TrRouting
       std::vector<int>                                  inVehicleTravelTimesSeconds; // the in vehicle travel time for each segment
       std::vector<Leg> legs;
 
-      int totalInVehicleTime       { 0}; int transferArrivalTime    {-1}; int firstDepartureTime   {-1};
+      int totalInVehicleTime       { 0}; int transferArrivalTime    {-1};
       int totalWalkingTime         { 0}; int transferReadyTime      {-1}; int numberOfTransfers    {-1};
       int totalWaitingTime         { 0}; int departureTime          {-1}; int boardingSequence     {-1};
       int totalTransferWalkingTime { 0}; int arrivalTime            {-1}; int unboardingSequence   {-1};
@@ -62,7 +62,7 @@ namespace TrRouting
       int totalDistance            { 0}; int distance               {-1};
       int inVehicleDistance        {-1}; int totalInVehicleDistance { 0}; int totalWalkingDistance { 0};
       int totalTransferDistance    {-1}; int accessDistance         { 0}; int egressDistance       { 0};
-      int journeyStepTravelTime    {-1}; int accessWalkingTime      {-1};
+      int accessWalkingTime      {-1};
       int transferTime             {-1}; int egressWalkingTime      {-1};
       int waitingTime              {-1}; int accessWaitingTime      {-1};
 
@@ -74,7 +74,7 @@ namespace TrRouting
         unboardingNodeUuids.clear();
         inVehicleTravelTimesSeconds.clear();
 
-        totalInVehicleTime          =  0; transferArrivalTime    = -1; firstDepartureTime   = -1;
+        totalInVehicleTime          =  0; transferArrivalTime    = -1;
         totalWalkingTime            =  0; transferReadyTime      = -1; numberOfTransfers    = -1;
         totalWaitingTime            =  0; departureTime          = -1; boardingSequence     = -1;
         totalTransferWalkingTime    =  0; arrivalTime            = -1; unboardingSequence   = -1;
@@ -82,7 +82,7 @@ namespace TrRouting
         totalDistance               =  0; distance               = -1;
         inVehicleDistance           =  0; totalInVehicleDistance =  0; totalWalkingDistance =  0;
         totalTransferDistance       =  0; accessDistance         =  0; egressDistance       =  0;
-        journeyStepTravelTime       = -1; accessWalkingTime      = -1;
+        accessWalkingTime      = -1;
         transferTime                = -1; egressWalkingTime      = -1;
         waitingTime                 = -1; accessWaitingTime      = -1;
 
@@ -213,7 +213,6 @@ namespace TrRouting
 
             if (i == 1) // first leg
             {
-              firstDepartureTime  = departureTime;
               accessWaitingTime   = waitingTime;
             }
             else
