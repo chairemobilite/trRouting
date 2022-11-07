@@ -63,18 +63,18 @@ namespace TrRouting
     maxEgressWalkingTravelTimeSeconds(routeParams.maxEgressWalkingTravelTimeSeconds),
     maxTransferWalkingTravelTimeSeconds(routeParams.maxTransferWalkingTravelTimeSeconds),
     maxFirstWaitingTimeSeconds(routeParams.maxFirstWaitingTimeSeconds),
-    withAlternatives(routeParams.withAlternatives),
-    forwardCalculation(routeParams.forwardCalculation),
     scenarioUuid(routeParams.scenarioUuid),
     onlyServices(routeParams.onlyServices),
     onlyLines(routeParams.onlyLines),
     onlyAgencies(routeParams.onlyAgencies),
-    onlyNodes(routeParams.onlyNodes),
     onlyModes(routeParams.onlyModes),
+    onlyNodes(routeParams.onlyNodes),
     exceptLines(routeParams.exceptLines),
     exceptAgencies(routeParams.exceptAgencies),
+    exceptModes(routeParams.exceptModes),
     exceptNodes(routeParams.exceptNodes),
-    exceptModes(routeParams.exceptModes)
+    withAlternatives(routeParams.withAlternatives),
+    forwardCalculation(routeParams.forwardCalculation)
   {
   }
 

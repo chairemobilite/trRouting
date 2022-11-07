@@ -35,11 +35,11 @@ namespace TrRouting
              }
    
     boost::uuids::uuid uuid;
-    uid_t uid; //Local, temporary unique id, used to speed up lookups
     unsigned long long id;
     std::string code;
     std::string name;
     std::string internalId;
+    uid_t uid; //Local, temporary unique id, used to speed up lookups
     std::unique_ptr<Point> point; //TODO Does this need to be a ptr or could be part of the object?
     std::vector<NodeTimeDistance> transferableNodes;
     std::vector<NodeTimeDistance> reverseTransferableNodes; //TODO Add comment on what this is

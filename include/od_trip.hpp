@@ -52,6 +52,7 @@ namespace TrRouting
 
     boost::uuids::uuid uuid;
     unsigned long long id;
+    std::string internalId;
     const DataSource & dataSource;
     //int householdIdx; //TODO #167
     std::optional<std::reference_wrapper<const Person>> person;
@@ -65,7 +66,6 @@ namespace TrRouting
     std::string mode;
     std::string originActivity;
     std::string destinationActivity;
-    std::string internalId;
     std::vector<NodeTimeDistance> originNodes;
     std::vector<NodeTimeDistance> destinationNodes;
     std::unique_ptr<Point> origin;

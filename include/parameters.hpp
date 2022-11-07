@@ -52,15 +52,15 @@ namespace TrRouting
 
   class RouteParameters {
     private:
-      boost::uuids::uuid scenarioUuid;
+      std::unique_ptr<Point> origin;
+      std::unique_ptr<Point> destination;
+
       // FIXME The scenario pointer is required for now, even if we extract its
       // data, because alternatives calculations will need to create new objects
       // from this RouteParameters object, but changing one field (the max travel
       // time). When calculation specific parameters are implemented, this field
       // will not be required in this class anymore.
       const Scenario& scenario;
-      std::unique_ptr<Point> origin;
-      std::unique_ptr<Point> destination;
 
       int timeOfTrip;
       int minWaitingTimeSeconds;
@@ -70,18 +70,21 @@ namespace TrRouting
       int maxTransferWalkingTravelTimeSeconds;
       int maxFirstWaitingTimeSeconds;
 
+      boost::uuids::uuid scenarioUuid;
       std::vector<std::reference_wrapper<const Service>> onlyServices;
+      std::vector<std::reference_wrapper<const Line>> onlyLines;
+      std::vector<std::reference_wrapper<const Agency>> onlyAgencies;
+      std::vector<std::reference_wrapper<const Mode>> onlyModes;
+      std::vector<std::reference_wrapper<const Node>> onlyNodes;
       //TODO exceptServices is never filled with anything
       std::vector<std::reference_wrapper<const Service>> exceptServices;
-      std::vector<std::reference_wrapper<const Line>> onlyLines;
       // FIXME: Temporarily moved to public until calculation specific parameters exist. This is used directly by alternatives routing.
       // see https://github.com/chairemobilite/trRouting/issues/95
-      // std::vector<int> exceptLinesIdx;
-      std::vector<std::reference_wrapper<const Mode>> onlyModes;
-      std::vector<std::reference_wrapper<const Mode>> exceptModes;
-      std::vector<std::reference_wrapper<const Agency>> onlyAgencies;
+  public:
+      std::vector<std::reference_wrapper<const Line>> exceptLines;
+  private:
       std::vector<std::reference_wrapper<const Agency>> exceptAgencies;
-      std::vector<std::reference_wrapper<const Node>> onlyNodes;
+      std::vector<std::reference_wrapper<const Mode>> exceptModes;
       std::vector<std::reference_wrapper<const Node>> exceptNodes;
       bool withAlternatives; // calculate alternatives or not
       bool forwardCalculation; // forward calculation: default true. if false: reverse calculation, will ride connections backward (useful when setting the arrival time)
@@ -136,10 +139,6 @@ namespace TrRouting
       const std::vector<std::reference_wrapper<const Agency>>& getExceptAgencies() { return exceptAgencies; }
       const std::vector<std::reference_wrapper<const Node>>& getOnlyNodes() { return onlyNodes; }
       const std::vector<std::reference_wrapper<const Node>>& getExceptNodes() { return exceptNodes; }
-
-      // FIXME: Temporarily moved to public until calculation specific parameters exist. This is used directly by alternatives routing.
-      // see https://github.com/chairemobilite/trRouting/issues/95
-      std::vector<std::reference_wrapper<const Line>> exceptLines;
   };
 
   class Parameters {

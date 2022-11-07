@@ -21,9 +21,9 @@ namespace TrRouting
 {
 
   Calculator::Calculator(DataFetcher& fetcher) :
+    algorithmCalculationTime(CalculationTime()),
     dataFetcher(fetcher),
     odTripGlob(std::nullopt),
-    algorithmCalculationTime(CalculationTime()),
     departureTimeSeconds(0),
     initialDepartureTimeSeconds(0),
     arrivalTimeSeconds(-1),

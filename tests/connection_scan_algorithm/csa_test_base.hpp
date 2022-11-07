@@ -50,10 +50,10 @@ protected:
     inline static const boost::uuids::uuid trip2EWUuid = uuidGenerator("ea8c90ba-7deb-46af-87c6-8af211e8fab7");
     inline static const boost::uuids::uuid trip1ExtraUuid = uuidGenerator("4aff9220-e72e-4b41-9cbf-0d86565d5128");
 
-    // Calculator is the entry point to run the algorithm, it is part of the test object since (for now) there is nothing specific for its initialization.
-    TrRouting::Calculator calculator;
     // A DataFetcher is required to initialize the calculator
     TrRouting::DummyDataFetcher dataFetcher;
+    // Calculator is the entry point to run the algorithm, it is part of the test object since (for now) there is nothing specific for its initialization.
+    TrRouting::Calculator calculator;
 
     // Setup functions. The base class will define a complete default data set,
     // but specific test cases can override these methods and add their own data
