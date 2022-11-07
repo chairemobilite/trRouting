@@ -101,5 +101,5 @@ std::unique_ptr<TrRouting::SingleCalculationResult> ResultToResponseFixtureTest:
         result.get()->totalInVehicleTime,
         result.get()->totalInVehicleDistance
     ));
-    return std::move(result);
+    return result;
 }

@@ -370,10 +370,10 @@ namespace TrRouting
       allNodesResult.get()->numberOfReachableNodes = reachableNodesCount;
       // Get a number with 2 decimals. FIXME: Let the formatting be done at another level?
       allNodesResult.get()->percentOfReachableNodes = round(10000 * (float)reachableNodesCount / (float)(nodesCount))/100.0;
-      return std::move(allNodesResult);
+      return allNodesResult;
     }
 
-    return std::move(singleResult);
+    return singleResult;
 
   }
 
