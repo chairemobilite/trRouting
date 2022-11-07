@@ -430,7 +430,7 @@ int main(int argc, char** argv) {
           }
         }
 
-      } catch (NoRoutingFoundException e) {
+      } catch (NoRoutingFoundException &e) {
           response = ResultToV1Response::noRoutingFoundResponse(routeParams, e.getReason()).dump(2);
       }
 
@@ -493,13 +493,13 @@ int main(int argc, char** argv) {
 
         spdlog::debug("-- total -- {} microseconds", calculator.algorithmCalculationTime.getDurationMicrosecondsNoStop());
 
-      } catch (NoRoutingFoundException e) {
+      } catch (NoRoutingFoundException &e) {
         response = ResultToV2Response::noRoutingFoundResponse(queryParams, e.getReason()).dump(2);
       }
 
       *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
 
-    } catch (ParameterException exp) {
+    } catch (ParameterException &exp) {
       response = "{\"status\": \"query_error\", \"errorCode\": \"" + getResponseCode(exp.getType()) + "\"}";
       *serverResponse << "HTTP/1.1 400 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
     } catch (...) {
@@ -558,13 +558,13 @@ int main(int argc, char** argv) {
 
         spdlog::debug("-- total -- {} microseconds", calculator.algorithmCalculationTime.getDurationMicrosecondsNoStop());
 
-      } catch (NoRoutingFoundException e) {
+      } catch (NoRoutingFoundException &e) {
         response = ResultToV2SummaryResponse::noRoutingFoundResponse(queryParams, e.getReason()).dump(2);
       }
 
       *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
 
-    } catch (ParameterException exp) {
+    } catch (ParameterException &exp) {
       response = "{\"status\": \"query_error\", \"errorCode\": \"" + getResponseCode(exp.getType()) + "\"}";
       *serverResponse << "HTTP/1.1 400 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
     } catch (...) {
