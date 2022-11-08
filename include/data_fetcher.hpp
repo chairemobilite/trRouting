@@ -29,6 +29,7 @@ namespace TrRouting
   class DataFetcher
   {
   public:
+      virtual ~DataFetcher() {}
       virtual const std::map<std::string, Mode> getModes() = 0;
 
       //TODO the customPath does not make much sense to a generic data access pattern (see issue #160)
