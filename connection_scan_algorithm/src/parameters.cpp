@@ -87,7 +87,7 @@ namespace TrRouting
     boost::uuids::uuid destinationNodeUuid;
 
     int periodIndex {0};
-    int periodStartAtSeconds;
+    int periodStartAtSeconds = 0;
     int periodEndAtSeconds;
     std::vector<std::string> parameterWithValueVector;
     std::vector<std::string> latitudeLongitudeVector;
