@@ -31,7 +31,7 @@ namespace TrRouting
       return formattedTime;
     }
     
-    static const int convertSecondsToMinutes(int timeInSeconds)
+    static int convertSecondsToMinutes(int timeInSeconds)
     {
       return (int)round((float)timeInSeconds / 60.0);
     }
