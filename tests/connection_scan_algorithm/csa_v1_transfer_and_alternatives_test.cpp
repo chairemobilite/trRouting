@@ -152,7 +152,7 @@ TEST_F(TAndACalculationFixtureTests, TripWithAlternatives)
     parametersWithValues.push_back("alternatives=1");
 
     TrRouting::AlternativesResult result = calculateWithAlternatives(parametersWithValues);
-    ASSERT_EQ(2, result.alternatives.size());
+    ASSERT_EQ(2u, result.alternatives.size());
 }
 
 // Test a query with alternatives, for a trip with no routing found

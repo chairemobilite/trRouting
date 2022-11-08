@@ -38,7 +38,7 @@ TEST_F(NodeCacheFetcherFixtureTests, TestGetNodesInvalidNodesFile)
 {
     int retVal = cacheFetcher.getNodes(nodes, INVALID_CUSTOM_PATH);
     ASSERT_EQ(-EBADMSG, retVal);
-    ASSERT_EQ(0, nodes.size());
+    ASSERT_EQ(0u, nodes.size());
 }
 
 TEST_F(NodeCacheFetcherFixtureTests, TestGetUnexistingSingleNodeFile)
@@ -48,7 +48,7 @@ TEST_F(NodeCacheFetcherFixtureTests, TestGetUnexistingSingleNodeFile)
     int retVal = cacheFetcher.getNodes(nodes, INVALID_CUSTOM_PATH);
     // TODO: Is this right?
     ASSERT_EQ(0, retVal);
-    ASSERT_EQ(11, nodes.size());
+    ASSERT_EQ(11u, nodes.size());
 }
 
 TEST_F(NodeCacheFetcherFixtureTests, TestGetSingleInvalidNodeFile)
@@ -68,13 +68,13 @@ TEST_F(NodeCacheFetcherFixtureTests, TestGetNodesValid)
 {
     int retVal = cacheFetcher.getNodes(nodes, VALID_CUSTOM_PATH);
     ASSERT_EQ(0, retVal);
-    ASSERT_EQ(11, nodes.size());
+    ASSERT_EQ(11u, nodes.size());
 }
 
 TEST_F(NodeCacheFetcherFixtureTests, TestGetNodesFileNotExists)
 {
     int retVal = cacheFetcher.getNodes(nodes, BASE_CUSTOM_PATH);
     ASSERT_EQ(-ENOENT, retVal);
-    ASSERT_EQ(0, nodes.size());
+    ASSERT_EQ(0u, nodes.size());
 }
 

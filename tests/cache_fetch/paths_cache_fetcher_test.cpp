@@ -45,7 +45,7 @@ TEST_F(PathCacheFetcherFixtureTests, TestGetPathsInvalid)
 {
     int retVal = cacheFetcher.getPaths(objects, lines, nodes, INVALID_CUSTOM_PATH);
     ASSERT_EQ(-EBADMSG, retVal);
-    ASSERT_EQ(0, objects.size());
+    ASSERT_EQ(0u, objects.size());
 }
 
 // TODO Add tests for various services, lines, agencies that don't exist. But first, we should be able to create cache files with mock test data
@@ -53,13 +53,13 @@ TEST_F(PathCacheFetcherFixtureTests, TestGetPathsValid)
 {
     int retVal = cacheFetcher.getPaths(objects, lines, nodes, VALID_CUSTOM_PATH);
     ASSERT_EQ(0, retVal);
-    ASSERT_EQ(4, objects.size());
+    ASSERT_EQ(4u, objects.size());
 }
 
 TEST_F(PathCacheFetcherFixtureTests, TestGetPathsFileNotExists)
 {
     int retVal = cacheFetcher.getPaths(objects, lines, nodes, BASE_CUSTOM_PATH);
     ASSERT_EQ(-ENOENT, retVal);
-    ASSERT_EQ(0, objects.size());
+    ASSERT_EQ(0u, objects.size());
 }
 

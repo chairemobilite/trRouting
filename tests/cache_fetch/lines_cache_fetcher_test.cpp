@@ -44,20 +44,20 @@ TEST_F(LineCacheFetcherFixtureTests, TestGetLinesInvalid)
 {
     int retVal = cacheFetcher.getLines(lines, agencies, modes, INVALID_CUSTOM_PATH);
     ASSERT_EQ(-EBADMSG, retVal);
-    ASSERT_EQ(0, lines.size());
+    ASSERT_EQ(0u, lines.size());
 }
 
 TEST_F(LineCacheFetcherFixtureTests, TestGetLinesValid)
 {
     int retVal = cacheFetcher.getLines(lines, agencies, modes, VALID_CUSTOM_PATH);
     ASSERT_EQ(0, retVal);
-    ASSERT_EQ(2, lines.size());
+    ASSERT_EQ(2u, lines.size());
 }
 
 TEST_F(LineCacheFetcherFixtureTests, TestGetLinesFileNotExists)
 {
     int retVal = cacheFetcher.getLines(lines, agencies, modes, BASE_CUSTOM_PATH);
     ASSERT_EQ(-ENOENT, retVal);
-    ASSERT_EQ(0, lines.size());
+    ASSERT_EQ(0u, lines.size());
 }
 

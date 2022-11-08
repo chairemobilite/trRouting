@@ -75,7 +75,7 @@ TEST_F(ResultToV2FixtureTest, TestAlternativesResultV2)
 
     ASSERT_EQ(STATUS_SUCCESS, jsonResponse["status"]);
     ASSERT_EQ(result.totalAlternativesCalculated, jsonResponse["alternativesTotal"]);
-    ASSERT_EQ(2, jsonResponse["alternatives"].size());
+    ASSERT_EQ(2u, jsonResponse["alternatives"].size());
 
     TrRouting::SingleCalculationResult& alternative1 = dynamic_cast<TrRouting::SingleCalculationResult&>(*result.alternatives[0].get());
     assertResultConversion(jsonResponse["alternatives"][0], alternative1, *testParameters.get());

@@ -99,7 +99,7 @@ namespace TrRouting
               auto canUnboards           = capnpTrip.getNodesCanUnboard();
               trip.connectionDepartureTimes.resize(nodeTimesCount);
               // nodeTimesCount - 1, since we process node pairs, we have to stop and the second from last
-              for (int nodeTimeI = 0; nodeTimeI < nodeTimesCount - 1; nodeTimeI++)
+              for (unsigned long nodeTimeI = 0; nodeTimeI < nodeTimesCount - 1; nodeTimeI++)
               {
                   std::shared_ptr<ConnectionTuple> forwardConnection(std::make_shared<ConnectionTuple>(ConnectionTuple(
                     path.nodesRef[nodeTimeI],

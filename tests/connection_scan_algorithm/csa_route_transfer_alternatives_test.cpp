@@ -183,7 +183,7 @@ TEST_F(SingleTAndACalculationFixtureTests, TripWithAlternatives)
     );
 
     TrRouting::AlternativesResult routingResult = calculateWithAlternatives(testParameters);
-    ASSERT_EQ(2, routingResult.alternatives.size());
+    ASSERT_EQ(2u, routingResult.alternatives.size());
     // TODO: Why is it 5? Would it be a sign of an error? To investigate
     ASSERT_EQ(5, routingResult.totalAlternativesCalculated);
 

@@ -89,7 +89,7 @@ TEST_F(RouteOdTripsFixtureTests, NoOdTripsQuery)
     std::vector<std::string> parametersWithValues = initializeParameters();
 
     nlohmann::json result = calculateOdTrips(parametersWithValues);
-    ASSERT_EQ(1, result["odTrips"].size());
+    ASSERT_EQ(1u, result["odTrips"].size());
     ASSERT_EQ(STATUS_SUCCESS, result["odTrips"][0]["status"]);
 }
 

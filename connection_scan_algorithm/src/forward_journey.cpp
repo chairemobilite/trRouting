@@ -23,7 +23,6 @@ namespace TrRouting
     std::unique_ptr<AllNodesResult> allNodesResult = std::make_unique<AllNodesResult>();
 
     int              nodesCount           {1};
-    int              i                    {0};
     int              reachableNodesCount  {0};
     bool             foundLine            {false};
 
@@ -62,7 +61,7 @@ namespace TrRouting
       int totalWalkingTime         { 0}; int transferReadyTime      {-1}; int minimizedDepartureTime {-1};
       int totalWaitingTime         { 0}; int departureTime          {-1}; int numberOfTransfers      {-1};
       int totalTransferWalkingTime { 0}; int arrivalTime            {-1}; int boardingSequence       {-1};
-      int totalTransferWaitingTime { 0}; int inVehicleTime          {-1}; int unboardingSequence     {-1};
+      int totalTransferWaitingTime { 0}; int inVehicleTime          {-1};
       int totalDistance            { 0}; int distance               {-1};
       int inVehicleDistance        {-1}; int totalInVehicleDistance { 0}; int totalWalkingDistance   { 0};
       int totalTransferDistance    {-1}; int accessDistance         { 0}; int egressDistance         { 0};
@@ -84,7 +83,7 @@ namespace TrRouting
         totalWalkingTime         =  0; transferReadyTime      = -1; minimizedDepartureTime = -1;
         totalWaitingTime         =  0; departureTime          = -1; numberOfTransfers      = -1;
         totalTransferWalkingTime =  0; arrivalTime            = -1; boardingSequence       = -1;
-        totalTransferWaitingTime =  0; inVehicleTime          = -1; unboardingSequence     = -1;
+        totalTransferWaitingTime =  0; inVehicleTime          = -1;
         totalDistance            =  0; distance               = -1;
         inVehicleDistance        =  0; totalInVehicleDistance =  0; totalWalkingDistance   =  0;
         totalTransferDistance    =  0; accessDistance         =  0; egressDistance         =  0;
@@ -114,8 +113,8 @@ namespace TrRouting
 
         //std::string stepsJson = "  \"steps\":\n  [\n";
 
-        i = 0;
-        int journeyStepsCount = journey.size();
+        size_t i = 0;
+        size_t journeyStepsCount = journey.size();
         for (auto & journeyStep : journey)
         {
 
@@ -134,7 +133,7 @@ namespace TrRouting
             departureTime              = std::get<connectionIndexes::TIME_DEP>(*journeyStepEnterConnection);
             arrivalTime                = std::get<connectionIndexes::TIME_ARR>(*journeyStepExitConnection);
             boardingSequence           = std::get<connectionIndexes::SEQUENCE>(*journeyStepEnterConnection);
-            unboardingSequence         = std::get<connectionIndexes::SEQUENCE>(*journeyStepExitConnection);
+            int unboardingSequence     = std::get<connectionIndexes::SEQUENCE>(*journeyStepExitConnection);
             inVehicleTime              = arrivalTime   - departureTime;
             waitingTime                = departureTime - transferArrivalTime;
             transferArrivalTime        = arrivalTime   + transferTime;
@@ -182,6 +181,7 @@ namespace TrRouting
               totalInVehicleDistance = -1;
             }
 
+            // TODO confirm that i == 1 is the right index to compare to
             if (i == 1) // first leg
             {
               accessWaitingTime      = waitingTime;

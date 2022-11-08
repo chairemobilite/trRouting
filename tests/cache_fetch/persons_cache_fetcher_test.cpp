@@ -20,7 +20,7 @@ TEST_F(PersonCacheFetcherFixtureTests, TestGetPersonsValid)
 {
     int retVal = cacheFetcher.getPersons(objects, dataSources, VALID_CUSTOM_PATH);
     ASSERT_EQ(0, retVal);
-    ASSERT_EQ(0, objects.size());
+    ASSERT_EQ(0u, objects.size());
 }
 
 // TODO Test with actual data (and invalid ones)
