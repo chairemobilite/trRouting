@@ -39,11 +39,11 @@ namespace TrRouting
       spdlog::debug("Step Visitor line {}", boost::uuids::to_string(step.lineUuid));
       stepLine = lines.at(step.lineUuid);
     }
-    void visitUnboardingStep(const UnboardingStep& step) override {
+    void visitUnboardingStep(const UnboardingStep& ) override {
       //No line for this step type, don't set result
       stepLine.reset();
     }
-    void visitWalkingStep(const WalkingStep& step) override {
+    void visitWalkingStep(const WalkingStep& ) override {
       //No line for this step type, don't set result
       stepLine.reset();
     }
@@ -76,10 +76,10 @@ namespace TrRouting
         }
       }
     };
-    void visitAlternativesResult(const AlternativesResult& result) override {
+    void visitAlternativesResult(const AlternativesResult& ) override {
       // Nothing to do for this result
     }
-    void visitAllNodesResult(const AllNodesResult& result) override {
+    void visitAllNodesResult(const AllNodesResult& ) override {
       // Nothing to do for this result
     }
   };

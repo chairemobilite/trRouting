@@ -37,50 +37,50 @@ namespace TrRouting
     };
     
     virtual int getDataSources(
-      std::map<boost::uuids::uuid, DataSource>& ts,
-      std::string customPath = "") {return 0;}
+      std::map<boost::uuids::uuid, DataSource>& ,
+      std::string = "") {return 0;}
 
     virtual int getPersons(
-      std::map<boost::uuids::uuid, Person>& ts,
-      const std::map<boost::uuids::uuid, DataSource>& dataSources,
-      std::string customPath = ""
+      std::map<boost::uuids::uuid, Person>& ,
+      const std::map<boost::uuids::uuid, DataSource>& ,
+      std::string = ""
                            ) {return 0;}
 
     virtual int getOdTrips(
-      std::map<boost::uuids::uuid, OdTrip>& ts,
-      const std::map<boost::uuids::uuid, DataSource>& dataSources,
-      const std::map<boost::uuids::uuid, Person>& persons,
-      const std::map<boost::uuids::uuid, Node>& nodes,
-      std::string customPath = ""
+      std::map<boost::uuids::uuid, OdTrip>& ,
+      const std::map<boost::uuids::uuid, DataSource>& ,
+      const std::map<boost::uuids::uuid, Person>& ,
+      const std::map<boost::uuids::uuid, Node>& ,
+      std::string = ""
                            ) {return 0;}
 
     virtual int getAgencies(
-      std::map<boost::uuids::uuid, Agency>& ts,
-      std::string customPath = ""
+      std::map<boost::uuids::uuid, Agency>& ,
+      std::string = ""
                             ) {return 0;}
 
     virtual int getServices(
-      std::map<boost::uuids::uuid, Service>& ts,
-      std::string customPath = ""
+      std::map<boost::uuids::uuid, Service>& ,
+      std::string = ""
                             ) {return 0;}
 
     virtual int getNodes(
-      std::map<boost::uuids::uuid, Node>& ts,
-      std::string customPath = ""
+      std::map<boost::uuids::uuid, Node>& ,
+      std::string = ""
                          ) {return 0;}
 
     virtual int getLines(
-      std::map<boost::uuids::uuid, Line>& ts,
-      const std::map<boost::uuids::uuid, Agency>& agencies,
-      const std::map<std::string, Mode>& modes,
-      std::string customPath = ""
+      std::map<boost::uuids::uuid, Line>& ,
+      const std::map<boost::uuids::uuid, Agency>& ,
+      const std::map<std::string, Mode>& ,
+      std::string = ""
                          ) {return 0;}
 
     virtual int getPaths(
-      std::map<boost::uuids::uuid, Path>& ts,
-      const std::map<boost::uuids::uuid, Line>& lines,
-      const std::map<boost::uuids::uuid, Node>& nodes,
-      std::string customPath = ""
+      std::map<boost::uuids::uuid, Path>& ,
+      const std::map<boost::uuids::uuid, Line>& ,
+      const std::map<boost::uuids::uuid, Node>& ,
+      std::string = ""
                          ) {return 0;}
 
     /**
@@ -93,13 +93,13 @@ namespace TrRouting
      * -(error codes from the open system call)
      */
     virtual int getScenarios(
-      std::map<boost::uuids::uuid, Scenario>& ts,
-      const std::map<boost::uuids::uuid, Service>& services,
-      const std::map<boost::uuids::uuid, Line>& lines,
-      const std::map<boost::uuids::uuid, Agency>& agencies,
-      const std::map<boost::uuids::uuid, Node>& nodes,
-      const std::map<std::string, Mode>& modes,
-      std::string customPath = ""
+      std::map<boost::uuids::uuid, Scenario>& ,
+      const std::map<boost::uuids::uuid, Service>& ,
+      const std::map<boost::uuids::uuid, Line>& ,
+      const std::map<boost::uuids::uuid, Agency>& ,
+      const std::map<boost::uuids::uuid, Node>& ,
+      const std::map<std::string, Mode>& ,
+      std::string = ""
                              ) {return 0;}
 
     /**
@@ -112,12 +112,12 @@ namespace TrRouting
      * -(error codes from the open system call)
      */
     virtual int getSchedules(
-      std::map<boost::uuids::uuid, Trip>& trips,
-      const std::map<boost::uuids::uuid, Line>& lines,
-      std::map<boost::uuids::uuid, Path>& paths,
-      const std::map<boost::uuids::uuid, Service>& services,
-      std::vector<std::shared_ptr<ConnectionTuple>>& connections,
-      std::string customPath = "") {return 0;}
+      std::map<boost::uuids::uuid, Trip>& ,
+      const std::map<boost::uuids::uuid, Line>& ,
+      std::map<boost::uuids::uuid, Path>& ,
+      const std::map<boost::uuids::uuid, Service>& ,
+      std::vector<std::shared_ptr<ConnectionTuple>>& ,
+      std::string = "") {return 0;}
 
   };    
 }

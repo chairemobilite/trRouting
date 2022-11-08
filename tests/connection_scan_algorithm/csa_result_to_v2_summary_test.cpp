@@ -88,7 +88,7 @@ void ResultToV2SummaryFixtureTest::assertResultConversion(nlohmann::json jsonRes
    
 }
 
-void ResultToV2SummaryFixtureTest::assertResultConversion(nlohmann::json jsonResponse, TrRouting::SingleCalculationResult &result, TrRouting::RouteParameters &params) {
+void ResultToV2SummaryFixtureTest::assertResultConversion(nlohmann::json , TrRouting::SingleCalculationResult &, TrRouting::RouteParameters &) {
     // Not called by this test
 }
 

@@ -414,6 +414,7 @@ void BaseCsaFixtureTests::assertSuccessResults(TrRouting::RoutingResult& result,
 {
     ASSERT_EQ(TrRouting::result_type::SINGLE_CALCULATION, result.resType);
     TrRouting::SingleCalculationResult& routingResult = dynamic_cast<TrRouting::SingleCalculationResult&>(result);
+    ASSERT_LE(origDepartureTime, routingResult.departureTime);
     ASSERT_EQ(expInVehicleTravelTime + expAccessTime + expEgressTime + expTotalWaitingTime + expTransferTravelTime, routingResult.totalTravelTime);
     ASSERT_EQ(expTransitDepartureTime + expInVehicleTravelTime + expEgressTime + (expTotalWaitingTime - minWaitingTime) + expTransferTravelTime, routingResult.arrivalTime);
     ASSERT_EQ(expTransitDepartureTime - expAccessTime - minWaitingTime, routingResult.departureTime);
