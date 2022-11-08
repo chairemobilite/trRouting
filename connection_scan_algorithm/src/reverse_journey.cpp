@@ -22,7 +22,6 @@ namespace TrRouting
     std::unique_ptr<AllNodesResult> allNodesResult = std::make_unique<AllNodesResult>();
 
     int              nodesCount           {1};
-    int              i                    {0};
     int              reachableNodesCount  {0};
     bool             foundRoute           {false};
 
@@ -142,8 +141,8 @@ namespace TrRouting
           optimizeCasesStr.pop_back();
         }
 
-        int journeyStepsCount = journey.size();
-        i = 0;
+        size_t journeyStepsCount = journey.size();
+        size_t i = 0;
         for (auto & journeyStep : journey)
         {
 

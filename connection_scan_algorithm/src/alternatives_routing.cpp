@@ -167,7 +167,7 @@ namespace TrRouting
       spdlog::debug("fastest line ids: {}", LinesToString(foundLines));
 
       // Generate combination of group of 1 line, then 2 lines up to the total amount of lines
-      for (int k = 1; k <= foundLines.size(); k++)
+      for (size_t k = 1; k <= foundLines.size(); k++)
       {
         Combinations<std::reference_wrapper<const Line>> combinations(foundLines, k);
 
@@ -180,7 +180,7 @@ namespace TrRouting
       }
 
       // Process all combinations and calculate new route with those excluded
-      for (int i = 0; i < allCombinations.size(); i++)
+      for (size_t i = 0; i < allCombinations.size(); i++)
       {
         if (alternativesCalculatedCount < maxAlternatives && alternativeSequence - 1 < params.maxValidAlternatives)
         {
@@ -222,7 +222,7 @@ namespace TrRouting
                 lastFoundedAtNum = alternativesCalculatedCount;
                 alreadyFoundLines[foundLines] = true;
                 foundLinesTravelTimeSeconds[foundLines] = alternativeCalcResult.totalTravelTime;
-                for (int k = 1; k <= foundLines.size(); k++)
+                for (size_t k = 1; k <= foundLines.size(); k++)
                 {
                   Combinations<std::reference_wrapper<const Line>> combinations(foundLines, k);
                   for (auto newCombination : combinations)

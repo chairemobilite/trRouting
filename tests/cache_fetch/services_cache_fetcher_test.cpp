@@ -34,20 +34,20 @@ TEST_F(ServiceCacheFetcherFixtureTests, TestGetServicesInvalid)
 {
     int retVal = cacheFetcher.getServices(services, INVALID_CUSTOM_PATH);
     ASSERT_EQ(-EBADMSG, retVal);
-    ASSERT_EQ(0, services.size());
+    ASSERT_EQ(0u, services.size());
 }
 
 TEST_F(ServiceCacheFetcherFixtureTests, TestGetServicesValid)
 {
     int retVal = cacheFetcher.getServices(services, VALID_CUSTOM_PATH);
     ASSERT_EQ(0, retVal);
-    ASSERT_EQ(2, services.size());
+    ASSERT_EQ(2u, services.size());
 }
 
 TEST_F(ServiceCacheFetcherFixtureTests, TestGetServicesFileNotExists)
 {
     int retVal = cacheFetcher.getServices(services, BASE_CUSTOM_PATH);
     ASSERT_EQ(-ENOENT, retVal);
-    ASSERT_EQ(0, services.size());
+    ASSERT_EQ(0u, services.size());
 }
 

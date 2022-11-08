@@ -130,7 +130,7 @@ namespace TrRouting
         std::vector<NodeTimeDistance> transferableNodes;
         std::vector<NodeTimeDistance> reverseTransferableNodes;
 
-        for (int j = 0; j < transferableNodesCount; j++)
+        for (unsigned int j = 0; j < transferableNodesCount; j++)
         {
           std::string nodeUuidStr {capnpT.getTransferableNodesUuids()[j]};
           boost::uuids::uuid nodeUuid = uuidGenerator(nodeUuidStr);
@@ -194,7 +194,7 @@ namespace TrRouting
         ////});
 
         std::vector<NodeTimeDistance> transferableNodesSorted;
-        for (int i = 0; i < sortedIdx.size(); i++)
+        for (size_t i = 0; i < sortedIdx.size(); i++)
         {
           transferableNodesSorted.push_back( node.transferableNodes.at(i));
         }
@@ -216,7 +216,7 @@ namespace TrRouting
 
         std::vector<NodeTimeDistance> reverseTransferableNodesSorted;
 
-        for (int i = 0; i < sortedReverseIdx.size(); i++)
+        for (size_t i = 0; i < sortedReverseIdx.size(); i++)
         {
           reverseTransferableNodesSorted.push_back( node.reverseTransferableNodes.at(i));
 

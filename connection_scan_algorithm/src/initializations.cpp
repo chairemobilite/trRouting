@@ -104,7 +104,7 @@ namespace TrRouting
     // Copy the connections to both forward and reverse vectors
     forwardConnections.clear();
     reverseConnections.clear();
-    for (int i=0; i<connections.size(); i++)
+    for (size_t i=0; i<connections.size(); i++)
     {
       std::shared_ptr<ConnectionTuple> reverseConnection = connections[i];
       forwardConnections.push_back(std::move(connections[i]));

@@ -146,7 +146,7 @@ namespace TrRouting
 
             const unsigned int originNodesCount {capnpT.getOriginNodesUuids().size()};
             std::vector<NodeTimeDistance> originNodes;
-            for (int i = 0; i < originNodesCount; i++)
+            for (unsigned int i = 0; i < originNodesCount; i++)
             {
               std::string nodeUuid {capnpT.getOriginNodesUuids()[i]};
               originNodes.push_back(NodeTimeDistance(nodes.at(uuidGenerator(nodeUuid)),
@@ -156,7 +156,7 @@ namespace TrRouting
 
             const unsigned int destinationNodesCount {capnpT.getDestinationNodesUuids().size()};
             std::vector<NodeTimeDistance> destinationNodes;
-            for (int i = 0; i < destinationNodesCount; i++)
+            for (unsigned int i = 0; i < destinationNodesCount; i++)
             {
               std::string nodeUuid {capnpT.getDestinationNodesUuids()[i]};
               destinationNodes.push_back(NodeTimeDistance(nodes.at(uuidGenerator(nodeUuid)),

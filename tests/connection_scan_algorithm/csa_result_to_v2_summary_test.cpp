@@ -31,7 +31,7 @@ TEST_F(ResultToV2SummaryFixtureTest, TestNoRoutingFoundResultV2Summary)
     ASSERT_EQ(destination->longitude, jsonResponse["destination"][0]);
     ASSERT_EQ(testParameters.get()->getTimeOfTrip(), jsonResponse["timeOfTrip"]);
     ASSERT_EQ(0, jsonResponse["timeType"]);
-    ASSERT_EQ(0, jsonResponse["lines"].size());
+    ASSERT_EQ(0u, jsonResponse["lines"].size());
 }
 
 TEST_F(ResultToV2SummaryFixtureTest, TestSingleCalculationResultV2Summary)
@@ -76,7 +76,7 @@ void ResultToV2SummaryFixtureTest::assertResultConversion(nlohmann::json jsonRes
     ASSERT_EQ(params.getTimeOfTrip(), jsonResponse["timeOfTrip"]);
     ASSERT_EQ(0, jsonResponse["timeType"]);
     ASSERT_EQ(count, jsonResponse["nbAlternativesCalculated"]);
-    ASSERT_EQ(1, jsonResponse["lines"].size());
+    ASSERT_EQ(1u, jsonResponse["lines"].size());
 
     // Test the lines
     ASSERT_EQ(boardingStep.agencyAcronym, jsonResponse["lines"][0]["agencyAcronym"]);

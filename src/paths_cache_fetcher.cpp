@@ -79,7 +79,7 @@ namespace TrRouting
 
         auto jsonData = nlohmann::json::parse(capnpT.getData());
 
-        for (int i=0; i < nodesRef.size(); i++)
+        for (size_t i=0; i < nodesRef.size(); i++)
         {
           if (jsonData["segments"][i]["distanceMeters"] != nullptr)
           {

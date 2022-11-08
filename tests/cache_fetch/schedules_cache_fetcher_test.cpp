@@ -62,7 +62,7 @@ TEST_F(ScheduleCacheFetcherFixtureTests, TestGetSchedulesInvalidLineFile)
     );
     // TODO: Since a file was invalid, should this return -EBADMSG?
     ASSERT_EQ(0, retVal);
-    ASSERT_EQ(0, trips.size());
+    ASSERT_EQ(0u, trips.size());
 }
 
 TEST_F(ScheduleCacheFetcherFixtureTests, TestGetUnexistingLineFiles)
@@ -76,7 +76,7 @@ TEST_F(ScheduleCacheFetcherFixtureTests, TestGetUnexistingLineFiles)
       INVALID_CUSTOM_PATH
     );
     ASSERT_EQ(0, retVal);
-    ASSERT_EQ(0, trips.size());
+    ASSERT_EQ(0u, trips.size());
 }
 
 TEST_F(ScheduleCacheFetcherFixtureTests, TestGetSchedulesValid)
@@ -90,5 +90,5 @@ TEST_F(ScheduleCacheFetcherFixtureTests, TestGetSchedulesValid)
       VALID_CUSTOM_PATH
     );
     ASSERT_EQ(0, retVal);
-    ASSERT_EQ(50, trips.size());
+    ASSERT_EQ(50u, trips.size());
 }

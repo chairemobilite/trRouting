@@ -34,7 +34,7 @@ TEST_F(DataSourceCacheFetcherFixtureTests, TestGetDataSourcesInvalid)
 {
     int retVal = cacheFetcher.getDataSources(objects, INVALID_CUSTOM_PATH);
     ASSERT_EQ(-EBADMSG, retVal);
-    ASSERT_EQ(0, objects.size());
+    ASSERT_EQ(0u, objects.size());
 }
 
 TEST_F(DataSourceCacheFetcherFixtureTests, TestGetDataSourcesValid)
@@ -42,13 +42,13 @@ TEST_F(DataSourceCacheFetcherFixtureTests, TestGetDataSourcesValid)
     int retVal = cacheFetcher.getDataSources(objects, VALID_CUSTOM_PATH);
     ASSERT_EQ(0, retVal);
     // TODO Test with actual data
-    ASSERT_EQ(0, objects.size());
+    ASSERT_EQ(0u, objects.size());
 }
 
 TEST_F(DataSourceCacheFetcherFixtureTests, TestGetDataSourcesFileNotExists)
 {
     int retVal = cacheFetcher.getDataSources(objects, BASE_CUSTOM_PATH);
     ASSERT_EQ(-ENOENT, retVal);
-    ASSERT_EQ(0, objects.size());
+    ASSERT_EQ(0u, objects.size());
 }
 

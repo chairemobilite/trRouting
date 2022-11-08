@@ -21,7 +21,7 @@ TEST_F(OdTripCacheFetcherFixtureTests, TestGetOdTripsValid)
 {
     int retVal = cacheFetcher.getOdTrips(objects, dataSources, persons, nodes, VALID_CUSTOM_PATH);
     ASSERT_EQ(0, retVal);
-    ASSERT_EQ(0, objects.size());
+    ASSERT_EQ(0u, objects.size());
 }
 
 // TODO Test with actual data (and invalid ones)

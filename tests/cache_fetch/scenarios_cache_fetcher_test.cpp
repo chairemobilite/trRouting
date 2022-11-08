@@ -50,7 +50,7 @@ TEST_F(ScenarioCacheFetcherFixtureTests, TestGetScenariosInvalid)
 {
     int retVal = cacheFetcher.getScenarios(objects, services, lines, agencies, nodes, modes, INVALID_CUSTOM_PATH);
     ASSERT_EQ(-EBADMSG, retVal);
-    ASSERT_EQ(0, objects.size());
+    ASSERT_EQ(0u, objects.size());
 }
 
 // TODO Add tests for various services, lines, agencies that don't exist. But first, we should be able to create cache files with mock test data
@@ -58,13 +58,13 @@ TEST_F(ScenarioCacheFetcherFixtureTests, TestGetScenariosValid)
 {
     int retVal = cacheFetcher.getScenarios(objects, services, lines, agencies, nodes, modes, VALID_CUSTOM_PATH);
     ASSERT_EQ(0, retVal);
-    ASSERT_EQ(2, objects.size());
+    ASSERT_EQ(2u, objects.size());
 }
 
 TEST_F(ScenarioCacheFetcherFixtureTests, TestGetScenariosFileNotExists)
 {
     int retVal = cacheFetcher.getScenarios(objects, services, lines, agencies, nodes, modes, BASE_CUSTOM_PATH);
     ASSERT_EQ(-ENOENT, retVal);
-    ASSERT_EQ(0, objects.size());
+    ASSERT_EQ(0u, objects.size());
 }
 

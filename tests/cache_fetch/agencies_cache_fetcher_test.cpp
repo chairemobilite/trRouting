@@ -34,20 +34,20 @@ TEST_F(AgencyCacheFetcherFixtureTests, TestGetAgenciesInvalid)
 {
     int retVal = cacheFetcher.getAgencies(agencies, INVALID_CUSTOM_PATH);
     ASSERT_EQ(-EBADMSG, retVal);
-    ASSERT_EQ(0, agencies.size());
+    ASSERT_EQ(0u, agencies.size());
 }
 
 TEST_F(AgencyCacheFetcherFixtureTests, TestGetAgenciesValid)
 {
     int retVal = cacheFetcher.getAgencies(agencies, VALID_CUSTOM_PATH);
     ASSERT_EQ(0, retVal);
-    ASSERT_EQ(2, agencies.size());
+    ASSERT_EQ(2u, agencies.size());
 }
 
 TEST_F(AgencyCacheFetcherFixtureTests, TestGetAgenciesFileNotExists)
 {
     int retVal = cacheFetcher.getAgencies(agencies, BASE_CUSTOM_PATH);
     ASSERT_EQ(-ENOENT, retVal);
-    ASSERT_EQ(0, agencies.size());
+    ASSERT_EQ(0u, agencies.size());
 }
 
