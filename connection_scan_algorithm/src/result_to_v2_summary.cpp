@@ -88,13 +88,13 @@ namespace TrRouting
       // Nothing to initialize
     }
     int getResult() { return response; }
-    void visitSingleCalculationResult(const SingleCalculationResult& result) {
+    void visitSingleCalculationResult(const SingleCalculationResult& ) {
       response = 1;
     }
     void visitAlternativesResult(const AlternativesResult& result) {
       response = result.alternatives.size();
     }
-    void visitAllNodesResult(const AllNodesResult& result) {
+    void visitAllNodesResult(const AllNodesResult& ) {
       // Nothing to do
     }
   };
@@ -111,12 +111,12 @@ namespace TrRouting
     ));
   }
 
-  void StepToV2SummaryVisitor::visitUnboardingStep(const UnboardingStep& step)
+  void StepToV2SummaryVisitor::visitUnboardingStep(const UnboardingStep& )
   {
     response.reset();
   }
 
-  void StepToV2SummaryVisitor::visitWalkingStep(const WalkingStep& step)
+  void StepToV2SummaryVisitor::visitWalkingStep(const WalkingStep& )
   {
     response.reset();
   }
@@ -145,12 +145,12 @@ namespace TrRouting
     }
   }
 
-  void ResultToV2SummaryVisitor::visitAllNodesResult(const AllNodesResult& result)
+  void ResultToV2SummaryVisitor::visitAllNodesResult(const AllNodesResult& )
   {
     // TODO This type of result is not defined in v2 yet, we should not be here
   }
 
-  nlohmann::json ResultToV2SummaryResponse::noRoutingFoundResponse(RouteParameters& params, NoRoutingReason noRoutingReason)
+  nlohmann::json ResultToV2SummaryResponse::noRoutingFoundResponse(RouteParameters& params, NoRoutingReason )
   {
     nlohmann::json json;
     json["status"] = STATUS_SUCCESS;

@@ -53,7 +53,7 @@ namespace TrRouting
     unboardingNodesUuids.push_back(step.nodeUuid);
   }
 
-  void StepToOdTripJsonVisitor::visitWalkingStep(const WalkingStep& step)
+  void StepToOdTripJsonVisitor::visitWalkingStep(const WalkingStep& )
   {
     // Nothing to do for walking steps
   }
@@ -116,14 +116,14 @@ namespace TrRouting
     totalTravelTime = result.totalTravelTime;
   }
 
-  void ResultToOdTripJsonVisitor::visitAlternativesResult(const AlternativesResult& result)
+  void ResultToOdTripJsonVisitor::visitAlternativesResult(const AlternativesResult& )
   {
     nlohmann::json json;
     // This type of result should not be visited here
     response = json;
   }
 
-  void ResultToOdTripJsonVisitor::visitAllNodesResult(const AllNodesResult& result)
+  void ResultToOdTripJsonVisitor::visitAllNodesResult(const AllNodesResult& )
   {
     nlohmann::json json;
     // This type of result should not be visited here

@@ -160,7 +160,7 @@ namespace TrRouting
     response = json;
   }
 
-  void ResultToV2Visitor::visitAllNodesResult(const AllNodesResult& result)
+  void ResultToV2Visitor::visitAllNodesResult(const AllNodesResult&)
   {
     // TODO This type of result is not defined in v2 yet, we should not be here
     nlohmann::json json;
