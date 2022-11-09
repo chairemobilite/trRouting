@@ -41,6 +41,8 @@ LDFLAGS+=" $PTHREAD_LIBS"
 LDFLAGS+=" $CAPNP_LIBS"
 LDFLAGS+=" $SPDLOG_LIBS"
 
+CXXFLAGS+=" -Wall -Wextra"
+
 # Do not enable benchmark in the make check by default
 AC_ARG_ENABLE([benchmark],
     [  --enable-benchmark      Benchmarks will be run when running make check],
