@@ -45,6 +45,7 @@ namespace TrRouting
       lineLongname = obj.lineLongname;
       count = obj.count;
     }
+    ~LineSummary(){}
   };
 
   /**

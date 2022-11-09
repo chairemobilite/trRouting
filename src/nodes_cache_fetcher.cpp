@@ -45,8 +45,8 @@ namespace TrRouting
 
     std::string cacheFilePath = getFilePath(cacheFileName, customPath) + ".capnpbin";
 
-    int fd = open(cacheFilePath.c_str(), O_RDWR);
-    if (fd < 0)
+    int cacheFd = open(cacheFilePath.c_str(), O_RDWR);
+    if (cacheFd < 0)
     {
       int err = errno;
       if (err == ENOENT)
@@ -62,7 +62,7 @@ namespace TrRouting
 
     try
     {
-      ::capnp::PackedFdMessageReader capnpTCollectionMessage(fd, {64 * 1024 * 1024});
+      ::capnp::PackedFdMessageReader capnpTCollectionMessage(cacheFd, {64 * 1024 * 1024});
       TCollection::Reader capnpTCollection = capnpTCollectionMessage.getRoot<TCollection>();
       for (cT::Reader capnpT : capnpTCollection.getNodes())
       {
@@ -85,17 +85,17 @@ namespace TrRouting
     catch (const kj::Exception& e)
     {
       spdlog::error("Error opening cache file {}: {}", tStr, e.getDescription().cStr());
-      close(fd);
+      close(cacheFd);
       return -EBADMSG;
     }
     catch (...)
     {
       spdlog::error("Unknown error occurred {} ", tStr);
-      close(fd);
+      close(cacheFd);
       return -EINVAL;
     }
 
-    close(fd);
+    close(cacheFd);
 
     /*CalculationTime algorithmCalculationTime = CalculationTime();
     algorithmCalculationTime.start();

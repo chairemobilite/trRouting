@@ -10,11 +10,9 @@
 #include "routing_result.hpp"
 #include "point.hpp"
 
-namespace TrRouting
-{
-
-
-  std::string LinesToString(const std::vector<std::reference_wrapper<const Line>> & linesList) {
+namespace {
+  // Placed in anynymous namespace so it's local to this file
+  std::string LinesToString(const std::vector<std::reference_wrapper<const TrRouting::Line>> & linesList) {
     std::stringstream formatter;
 
     for(auto line: linesList) {
@@ -22,7 +20,10 @@ namespace TrRouting
     }
     return formatter.str();
   }
-  
+}
+
+namespace TrRouting
+{
   /**
    * @brief Visitor class to get the line ids used by a step
    * 
@@ -283,10 +284,10 @@ namespace TrRouting
       }
 
       int i {0};
-      for (auto foundLines : alreadyFoundLines)
+      for (auto flines : alreadyFoundLines)
       {          
-        spdlog::debug("{}. {} tt: ", i, LinesToString(foundLines.first),
-                      (foundLinesTravelTimeSeconds[foundLines.first] / 60));
+        spdlog::debug("{}. {} tt: ", i, LinesToString(flines.first),
+                      (foundLinesTravelTimeSeconds[flines.first] / 60));
         i++;          
       }
       

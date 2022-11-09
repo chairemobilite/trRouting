@@ -140,9 +140,9 @@ namespace TrRouting
               for (const NodeTimeDistance & transferableNode : nodeDeparture.reverseTransferableNodes)
               {
 
-                auto ite = nodesReverseTentativeTime.find(transferableNode.node.uid);
+                auto trite = nodesReverseTentativeTime.find(transferableNode.node.uid);
 
-                if (nodeDeparture.uuid != transferableNode.node.uuid && ite != nodesReverseTentativeTime.end() && ite->second > connectionDepartureTime - connectionMinWaitingTimeSeconds)
+                if (nodeDeparture.uuid != transferableNode.node.uuid && trite != nodesReverseTentativeTime.end() && trite->second > connectionDepartureTime - connectionMinWaitingTimeSeconds)
                 {
                   footpathIndex++;
                   continue;
@@ -152,8 +152,8 @@ namespace TrRouting
 
                 if (footpathTravelTime <= parameters.getMaxTransferWalkingTravelTimeSeconds())
                 {                  
-                  if ((ite == nodesReverseTentativeTime.end()) || //TODO Unclear if it's equivalent than previous code
-                      connectionDepartureTime - footpathTravelTime - connectionMinWaitingTimeSeconds >= ite->second)
+                  if ((trite == nodesReverseTentativeTime.end()) || //TODO Unclear if it's equivalent than previous code
+                      connectionDepartureTime - footpathTravelTime - connectionMinWaitingTimeSeconds >= trite->second)
                   {
                     footpathDistance = nodeDeparture.reverseTransferableNodes.at(footpathIndex).distance;
                     nodesReverseTentativeTime[transferableNode.node.uid] = connectionDepartureTime - footpathTravelTime - connectionMinWaitingTimeSeconds;

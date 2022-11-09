@@ -26,8 +26,6 @@ public:
         // Load valid data 
         cacheFetcher.getAgencies(agencies, VALID_CUSTOM_PATH);
 
-        std::vector<std::unique_ptr<TrRouting::Line>> lines;
-
         modes = cacheFetcher.getModes();
         
     }

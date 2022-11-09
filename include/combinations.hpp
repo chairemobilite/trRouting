@@ -19,6 +19,7 @@ public:
 
         generate(0, N-1, M-1);
     };
+    virtual ~Combinations() {}
 
     typedef typename std::vector<std::vector<T>>::const_iterator const_iterator;
     typedef typename std::vector<std::vector<T>>::iterator iterator;

@@ -11,10 +11,10 @@ namespace TrRouting
   std::vector<int> Calculator::optimizeJourney(std::deque<JourneyStep> &journey)
   {
 
-    CalculationTime algorithmCalculationTime = CalculationTime();
-    algorithmCalculationTime.start();
-    long long       calculationTime;
-    calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
+    CalculationTime optimizeJourneyCalculationTime = CalculationTime();
+    optimizeJourneyCalculationTime.start();
+    long long       optimizeJourneyStartCalculationTime;
+    optimizeJourneyStartCalculationTime = optimizeJourneyCalculationTime.getDurationMicrosecondsNoStop();
 
     std::vector<int> usedOptimizationCases;
 
@@ -311,7 +311,7 @@ namespace TrRouting
     }
 
 
-    spdlog::debug("-- remove superfluous segments -- {} microseconds", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);    
+    spdlog::debug("-- remove superfluous segments -- {} microseconds", optimizeJourneyCalculationTime.getDurationMicrosecondsNoStop() - optimizeJourneyStartCalculationTime);    
 
     return usedOptimizationCases;
 
