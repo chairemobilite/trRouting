@@ -82,6 +82,10 @@ namespace TrRouting
           case dataSource::DataSource::Type::GPS_TRACES               : t.type = "gpsTraces";               break;
           case dataSource::DataSource::Type::STREET_SEGMENT_SPEEDS    : t.type = "streetSegmentSpeeds";     break;
           case dataSource::DataSource::Type::UNKNOWN                  : t.type = "unknown";                 break;
+          default:
+            //TODO add type to the message
+            throw std::range_error("Unhandled DataSource::Type for uuid " + uuid);
+            break;
         }
 
         //tIndexesByUuid[t.uuid] = ts.size();

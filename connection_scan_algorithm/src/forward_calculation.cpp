@@ -141,9 +141,9 @@ namespace TrRouting
               {
                 // Extract tentative time for current transferable node if found
                 int currentTransferablenNodesTentativeTime = 0;
-                auto ite = nodesTentativeTime.find(transferableNode.node.uid);
-                if (ite != nodesTentativeTime.end()) {
-                  currentTransferablenNodesTentativeTime = ite->second;
+                auto nodesIte = nodesTentativeTime.find(transferableNode.node.uid);
+                if (nodesIte != nodesTentativeTime.end()) {
+                  currentTransferablenNodesTentativeTime = nodesIte->second;
                 } else {
                   currentTransferablenNodesTentativeTime = MAX_INT;
                 }

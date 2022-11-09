@@ -29,27 +29,27 @@ TEST_F(CacheFetcherFixtureTests, TestGetFilePath)
 TEST_F(CacheFetcherFixtureTests, TestFileExists)
 {
     // Test a file that exists
-    std::string cacheFile = "testCache/validCacheFiles/agencies.capnpbin";
-    ASSERT_TRUE(TrRouting::CacheFetcher::capnpCacheFileExists(cacheFile));
+    std::string testFile = "testCache/validCacheFiles/agencies.capnpbin";
+    ASSERT_TRUE(TrRouting::CacheFetcher::capnpCacheFileExists(testFile));
 
     // Test a file that does not exist
-    cacheFile = "testCache/notexists.capnpbin";
-    ASSERT_FALSE(TrRouting::CacheFetcher::capnpCacheFileExists(cacheFile));
+    testFile = "testCache/notexists.capnpbin";
+    ASSERT_FALSE(TrRouting::CacheFetcher::capnpCacheFileExists(testFile));
 }
 
 TEST_F(CacheFetcherFixtureTests, TestGetFileCount)
 {
     // Test count with a count file that does not exist
-    std::string cacheFile = "testCache/notexists.capnpbin";
-    ASSERT_EQ(1, TrRouting::CacheFetcher::getCacheFilesCount(cacheFile));
+    std::string testFile = "testCache/notexists.capnpbin";
+    ASSERT_EQ(1, TrRouting::CacheFetcher::getCacheFilesCount(testFile));
 
     // Test a file that contains a count
-    cacheFile = "testCache/someCache.capnpbin.count";
-    ASSERT_EQ(10, TrRouting::CacheFetcher::getCacheFilesCount(cacheFile));
+    testFile = "testCache/someCache.capnpbin.count";
+    ASSERT_EQ(10, TrRouting::CacheFetcher::getCacheFilesCount(testFile));
 
     // Read a value from an invalid file.
     // TODO It returns 0, is this the right expected value?
-    cacheFile = "testCache/invalidCacheFiles/genericInvalid.capnpbin";
-    ASSERT_EQ(0, TrRouting::CacheFetcher::getCacheFilesCount(cacheFile));
+    testFile = "testCache/invalidCacheFiles/genericInvalid.capnpbin";
+    ASSERT_EQ(0, TrRouting::CacheFetcher::getCacheFilesCount(testFile));
 }
 

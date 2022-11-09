@@ -13,6 +13,7 @@ namespace TrRouting
   const std::string NO_ROUTING_REASON_NO_ACCESS_AT_DESTINATION = "NO_ACCESS_AT_DESTINATION";
   const std::string NO_ROUTING_REASON_NO_SERVICE_FROM_ORIGIN = "NO_SERVICE_FROM_ORIGIN";
   const std::string NO_ROUTING_REASON_NO_SERVICE_TO_DESTINATION = "NO_SERVICE_TO_DESTINATION";
+  const std::string NO_ROUTING_REASON_NO_ACCESS_AT_ORIGIN_AND_DESTINATION = "NO_ACCESS_AT_ORIGIN_AND_DESTINATION";
 
   /**
    * @brief Visitor for the result's steps
@@ -192,6 +193,9 @@ namespace TrRouting
         break;
       case NoRoutingReason::NO_SERVICE_TO_DESTINATION:
         reason = NO_ROUTING_REASON_NO_SERVICE_TO_DESTINATION;
+        break;
+      case NoRoutingReason::NO_ACCESS_AT_ORIGIN_AND_DESTINATION:
+        reason = NO_ROUTING_REASON_NO_ACCESS_AT_ORIGIN_AND_DESTINATION;
         break;
       default:
         reason = NO_ROUTING_REASON_DEFAULT;

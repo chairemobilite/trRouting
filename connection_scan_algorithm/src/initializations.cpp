@@ -178,10 +178,10 @@ namespace TrRouting
         return false;
       });
 
-      CalculationTime algorithmCalculationTime = CalculationTime();
-      algorithmCalculationTime.start();
-      long long       calculationTime;
-      calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
+      CalculationTime initAlgorithmCalculationTime = CalculationTime();
+      initAlgorithmCalculationTime.start();
+      long long       initCalculationTime;
+      initCalculationTime = initAlgorithmCalculationTime.getDurationMicrosecondsNoStop();
 
       // assign connections to trips:
       int i {0};
@@ -200,7 +200,7 @@ namespace TrRouting
         i++;
       }
 
-      spdlog::debug("-- assign connections to trips -- {} microseconds", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
+      spdlog::debug("-- assign connections to trips -- {} microseconds", initAlgorithmCalculationTime.getDurationMicrosecondsNoStop() - initCalculationTime);
       return 0;
     }
     catch (const std::exception& ex)

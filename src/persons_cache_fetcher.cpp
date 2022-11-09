@@ -44,6 +44,10 @@ namespace TrRouting
       case person::Person::AgeGroup::AG9094   : str = "ag9094";   break;
       case person::Person::AgeGroup::AG95PLUS : str = "ag95plus"; break;
       case person::Person::AgeGroup::UNKNOWN  : str = "unknown";  break;
+      default:
+        //TODO add group to message
+        throw std::range_error("Unhandled Person::AgeGroup");
+        break;
     }
     return str;
   }
@@ -57,6 +61,10 @@ namespace TrRouting
       case person::Person::Gender::MALE    : str = "male";    break;
       case person::Person::Gender::CUSTOM  : str = "custom";  break;
       case person::Person::Gender::UNKNOWN : str = "unknown"; break;
+      default:
+        //TODO add gender to message
+        throw std::range_error("Unhandled Person::Gender");
+        break;
     }
     return str;
   }
@@ -75,6 +83,10 @@ namespace TrRouting
       case person::Person::Occupation::OTHER              : str = "other";            break;
       case person::Person::Occupation::NON_APPLICABLE     : str = "nonApplicable";    break;
       case person::Person::Occupation::UNKNOWN            : str = "unknown";          break;
+      default:
+        //TODO add occupation to message
+        throw std::range_error("Unhandled Person::Occupation");
+        break;
     }
     return str;
   }
@@ -104,15 +116,15 @@ namespace TrRouting
     {
       boost::uuids::uuid dataSourceUuid = iter->first;
 
-      std::string cacheFilePath {"dataSources/" + boost::uuids::to_string(dataSourceUuid) + "/" + cacheFileName};
+      std::string dataSourceCacheFilePath {"dataSources/" + boost::uuids::to_string(dataSourceUuid) + "/" + cacheFileName};
 
-      int filesCount {CacheFetcher::getCacheFilesCount(getFilePath(cacheFilePath + ".capnpbin.count", customPath))};
+      int filesCount {CacheFetcher::getCacheFilesCount(getFilePath(dataSourceCacheFilePath + ".capnpbin.count", customPath))};
 
-      spdlog::info("files count persons: {} path: {}", filesCount, cacheFilePath);
+      spdlog::info("files count persons: {} path: {}", filesCount, dataSourceCacheFilePath);
 
       for (int i = 0; i < filesCount; i++)
       {
-        std::string filePath {cacheFilePath + ".capnpbin" + (filesCount > 1 ? "." + std::to_string(i) : "")};
+        std::string filePath {dataSourceCacheFilePath + ".capnpbin" + (filesCount > 1 ? "." + std::to_string(i) : "")};
         std::string cacheFilePath = getFilePath(filePath, customPath);
 
         int fd = open(cacheFilePath.c_str(), O_RDWR);
@@ -137,7 +149,7 @@ namespace TrRouting
           for (cT::Reader capnpT : capnpTCollection.getPersons())
           {
             std::string uuidStr           {capnpT.getUuid()};
-            std::string dataSourceUuid {capnpT.getDataSourceUuid()};
+            std::string dataSourceUuidStr {capnpT.getDataSourceUuid()};
             //TODO #167 Household are ignored for the moment
             std::string householdUuid  {capnpT.getHouseholdUuid()};
 
@@ -196,7 +208,7 @@ namespace TrRouting
             auto uuid = uuidGenerator(uuidStr);
             ts.emplace(uuid, T(uuid,
                                capnpT.getId(),
-                               dataSources.at(uuidGenerator(dataSourceUuid)),
+                               dataSources.at(uuidGenerator(dataSourceUuidStr)),
                                capnpT.getExpansionFactor(),
                                capnpT.getAge(),
                                capnpT.getDrivingLicenseOwner(),

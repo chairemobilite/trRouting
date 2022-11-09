@@ -308,11 +308,12 @@ namespace TrRouting
       else if (parameterWithValueVector[0] == "od_trip_uuid")
       {
         // TODO: Use a new endpoint for od trip uuid. Now we get its od and add them to parameters
-        boost::uuids::uuid odTripUuid = uuidGenerator(parameterWithValueVector[1]);
+        // TODO maybe we should not use the global variable here
+        odTripUuid = uuidGenerator(parameterWithValueVector[1]);
 
-        if (odTrips.count(odTripUuid) == 1)
+        if (odTrips.count(odTripUuid.value()) == 1)
         {
-          const OdTrip & odTrip = odTrips.at(odTripUuid);
+          const OdTrip & odTrip = odTrips.at(odTripUuid.value());
           spdlog::info("od trip uuid {} dts {}", to_string(odTrip.uuid), odTrip.departureTimeSeconds);
 
           newParametersWithValues.push_back(std::make_pair("origin", std::to_string(odTrip.origin.get()->latitude) + ',' + std::to_string(odTrip.origin.get()->longitude)));

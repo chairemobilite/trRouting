@@ -104,6 +104,7 @@ namespace TrRouting
         bool forward
       );
       RouteParameters(const RouteParameters& routeParams);
+      virtual ~RouteParameters() {}
       Point* getOrigin() { return origin.get(); }
       Point* getDestination() { return destination.get(); }
       // FIXME Temporary method, will be removed once calculation specific parameters are implemented. Try not to use.
@@ -207,6 +208,7 @@ namespace TrRouting
       bool calculateByNumberOfTransfers; // calculate first the fastest route, then calculate with decreasing number of transfers until no route is found, return results for each number of transfers.
       bool calculateProfiles;            // calculate profiles for lines, paths and trips (od trips only)
 
+      ~Parameters() {}
       void setDefaultValues();
       /**
        * @deprecated ServerParameters should not be updated this way, directly create a RouteParameters, but legacy endpoints still use this method.
