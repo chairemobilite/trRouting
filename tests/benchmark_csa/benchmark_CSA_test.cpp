@@ -16,12 +16,14 @@
 #include "calculator.hpp"
 #include "benchmark_CSA_test.hpp"
 #include "osrm_fetcher.hpp"
+#include "transit_data.hpp"
 
 using namespace TrRouting;
 
 const int NB_ITER = 30;
 
 // Global test suite variables, they should not be reset for each test
+TransitData* transitData; //TODO Required only to get the scenario, we might want to get it in another way
 Calculator* calculator;
 std::ofstream benchmarkResultsFile;
 std::ofstream benchmarkDetailedResultsFile;
@@ -44,14 +46,14 @@ protected:
   inline static const boost::uuids::uuid scenarioUuid = uuidGenerator("ed42d920-0349-4f64-8590-4698056c2734");
 
 
-  static bool updateCalculatorFromCache(Calculator *calculator)
+  static bool updateCalculatorFromCache(TransitData &transitData)
   {
     std::cout << "Preparing calculator..." << std::endl;
-    Calculator::DataStatus dataStatus = calculator->prepare();
+    TrRouting::DataStatus dataStatus = transitData.getDataStatus();
 
-    if (dataStatus != Calculator::DataStatus::READY)
+    if (dataStatus != DataStatus::READY)
     {
-      std::cout << "Something is wrong with the calculator. Data status: " << (int) dataStatus << std::endl;
+      std::cout << "Something is wrong with the cache data. Data status: " << (int) dataStatus << std::endl;
       return false;
     }
     return true;
@@ -70,14 +72,17 @@ public:
     OsrmFetcher::osrmDrivingHost = "localhost";
 
     CacheFetcher cacheFetcher = TrRouting::CacheFetcher("cache/demo_transition");
+    transitData = new TrRouting::TransitData(cacheFetcher);
     OsrmFetcher::birdDistanceAccessibilityEnabled = true;
 
-    calculator = new TrRouting::Calculator(cacheFetcher);
+    calculator = new TrRouting::Calculator(*transitData);
 
-    if (!updateCalculatorFromCache(calculator)) {
+    if (!updateCalculatorFromCache(*transitData)) {
       ASSERT_EQ(true, false);
       return;
     }
+    //TODO is this necessary? We removed a call to prepare() and added this one
+    calculator->initializeCalculationData();
 
     // Prepare the result files
     time_t rawtime;
@@ -149,7 +154,7 @@ public:
 
   void benchmarkCurrentData(std::string testType, BenchmarkDataTuple paramTuple, bool alternatives, bool forward, int nbIter)
   {
-    const Scenario & scenario = calculator->scenarios.at(scenarioUuid);
+    const Scenario & scenario = transitData->getScenarios().at(scenarioUuid);
 
     TrRouting::RouteParameters routeParams = TrRouting::RouteParameters(
       std::make_unique<TrRouting::Point>(std::get<parameterIndexes::LAT_ORIG>(paramTuple), std::get<parameterIndexes::LON_ORIG>(paramTuple)),

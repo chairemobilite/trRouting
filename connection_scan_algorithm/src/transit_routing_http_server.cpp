@@ -27,55 +27,56 @@
 #include "result_to_v2_summary.hpp"
 #include "routing_result.hpp"
 #include "osrm_fetcher.hpp"
+#include "transit_data.hpp"
 
 using namespace TrRouting;
 
 typedef SimpleWeb::Server<SimpleWeb::HTTP> HttpServer;
 typedef SimpleWeb::Client<SimpleWeb::HTTP> HttpClient;
 
-std::string intializeResponse(Calculator::DataStatus status)
+std::string intializeResponse(DataStatus status)
 {
   switch(status)
   {
-    case Calculator::DataStatus::READY: return "";
-    case Calculator::DataStatus::DATA_READ_ERROR: return "{\"status\": \"data_error\"}";
-    case Calculator::DataStatus::NO_AGENCIES:
+    case DataStatus::READY: return "";
+    case DataStatus::DATA_READ_ERROR: return "{\"status\": \"data_error\"}";
+    case DataStatus::NO_AGENCIES:
       return "{\"status\": \"error\", \"error\": {\"error\": \"No agencies found\", \"code\": \"MISSING_DATA_AGENCIES\"}}";
-    case Calculator::DataStatus::NO_LINES:
+    case DataStatus::NO_LINES:
       return "{\"status\": \"error\", \"error\": {\"error\": \"No lines found\", \"code\": \"MISSING_DATA_LINES\"}}";
-    case Calculator::DataStatus::NO_NODES:
+    case DataStatus::NO_NODES:
       return "{\"status\": \"error\", \"error\": {\"error\": \"No nodes found\", \"code\": \"MISSING_DATA_NODES\"}}";
-    case Calculator::DataStatus::NO_PATHS:
+    case DataStatus::NO_PATHS:
       return "{\"status\": \"error\", \"error\": {\"error\": \"No paths found\", \"code\": \"MISSING_DATA_PATHS\"}}";
-    case Calculator::DataStatus::NO_SCENARIOS:
+    case DataStatus::NO_SCENARIOS:
       return "{\"status\": \"error\", \"error\": {\"error\": \"No scenarios found\", \"code\": \"MISSING_DATA_SCENARIOS\"}}";
-    case Calculator::DataStatus::NO_SCHEDULES:
+    case DataStatus::NO_SCHEDULES:
       return "{\"status\": \"error\", \"error\": {\"error\": \"No schedules found\", \"code\": \"MISSING_DATA_SCHEDULES\"}}";
-    case Calculator::DataStatus::NO_SERVICES:
+    case DataStatus::NO_SERVICES:
       return "{\"status\": \"error\", \"error\": {\"error\": \"No services found\", \"code\": \"MISSING_DATA_SERVICES\"}}";
     default: return "PARAM_ERROR_UNKNOWN";
   }
 }
 
-std::string getFastErrorResponse(Calculator::DataStatus status)
+std::string getFastErrorResponse(DataStatus status)
 {
   switch(status)
   {
-    case Calculator::DataStatus::READY: return "";
-    case Calculator::DataStatus::DATA_READ_ERROR: return "{\"status\": \"data_error\", \"errorCode\": \"DATA_ERROR\"}";
-    case Calculator::DataStatus::NO_AGENCIES:
+    case DataStatus::READY: return "";
+    case DataStatus::DATA_READ_ERROR: return "{\"status\": \"data_error\", \"errorCode\": \"DATA_ERROR\"}";
+    case DataStatus::NO_AGENCIES:
       return "{\"status\": \"data_error\", \"errorCode\": \"MISSING_DATA_AGENCIES\"}";
-    case Calculator::DataStatus::NO_LINES:
+    case DataStatus::NO_LINES:
       return "{\"status\": \"data_error\", \"errorCode\": \"MISSING_DATA_LINES\"}";
-    case Calculator::DataStatus::NO_NODES:
+    case DataStatus::NO_NODES:
       return "{\"status\": \"data_error\", \"errorCode\": \"MISSING_DATA_NODES\"}";
-    case Calculator::DataStatus::NO_PATHS:
+    case DataStatus::NO_PATHS:
       return "{\"status\": \"data_error\", \"errorCode\": \"MISSING_DATA_PATHS\"}";
-    case Calculator::DataStatus::NO_SCENARIOS:
+    case DataStatus::NO_SCENARIOS:
       return "{\"status\": \"data_error\", \"errorCode\": \"MISSING_DATA_SCENARIOS\"}";
-    case Calculator::DataStatus::NO_SCHEDULES:
+    case DataStatus::NO_SCHEDULES:
       return "{\"status\": \"data_error\", \"errorCode\": \"MISSING_DATA_SCHEDULES\"}";
-    case Calculator::DataStatus::NO_SERVICES:
+    case DataStatus::NO_SERVICES:
       return "{\"status\": \"data_error\", \"errorCode\": \"MISSING_DATA_SERVICES\"}";
     default: return "PARAM_ERROR_UNKNOWN";
   }
@@ -125,10 +126,15 @@ int main(int argc, char** argv) {
     exit(-2);
   }
 
-  Calculator calculator(*fetcher);
   spdlog::info("preparing calculator...");
-  Calculator::DataStatus dataStatus = calculator.prepare();
-
+  TransitData transitData(*fetcher);
+  //TODO We wanted to handle error in the constructor, but later part of this code expect a dataStatus
+  // leaving as a todo
+  DataStatus dataStatus = transitData.getDataStatus();
+  
+  Calculator calculator(transitData);
+  //TODO, should this be in the constructor?
+  calculator.initializeCalculationData();
   spdlog::info("preparing server...");
 
   //HTTP-server using 1 thread
@@ -168,7 +174,7 @@ int main(int argc, char** argv) {
 
 
   // updateCache:
-  server.resource["^/updateCache[/]?$"]["GET"]=[&server, &calculator](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
+  server.resource["^/updateCache[/]?$"]["GET"]=[&server, &calculator, &transitData](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
 
     std::string              response {""};
     std::vector<std::string> parametersWithValues;
@@ -214,74 +220,80 @@ int main(int argc, char** argv) {
       if (cacheName == "data_sources" || cacheName == "all")
       {
         correctCacheName = true;
-        calculator.updateDataSourcesFromCache(customCacheDirectoryPath);
+        transitData.updateDataSources(customCacheDirectoryPath);
       }
       /* TODO #167
       if (cacheName == "households" || cacheName == "all")
       {
         correctCacheName = true;
-        calculator.updateHouseholdsFromCache(customCacheDirectoryPath);
+        transitData.updateHouseholds(customCacheDirectoryPath);
       }
       */
       if (cacheName == "persons" || cacheName == "all")
       {
         correctCacheName = true;
-        calculator.updatePersonsFromCache(customCacheDirectoryPath);
+        transitData.updatePersons(customCacheDirectoryPath);
       }
       if (cacheName == "od_trips" || cacheName == "all")
       {
         correctCacheName = true;
-        calculator.updateOdTripsFromCache(customCacheDirectoryPath);
+        transitData.updateOdTrips(customCacheDirectoryPath);
       }
       /* TODO #167
       if (cacheName == "places" || cacheName == "all")
       {
         correctCacheName = true;
-        calculator.updatePlacesFromCache(customCacheDirectoryPath);
+        transitData.updatePlaces(customCacheDirectoryPath);
       }
       */
       if (cacheName == "agencies" || cacheName == "all")
       {
         correctCacheName = true;
-        calculator.updateAgenciesFromCache(customCacheDirectoryPath);
+        transitData.updateAgencies(customCacheDirectoryPath);
       }
       if (cacheName == "services" || cacheName == "all")
       {
         correctCacheName = true;
-        calculator.updateServicesFromCache(customCacheDirectoryPath);
+        transitData.updateServices(customCacheDirectoryPath);
       }
       if (cacheName == "nodes" || cacheName == "all")
       {
         correctCacheName = true;
-        calculator.updateNodesFromCache(customCacheDirectoryPath);
+        transitData.updateNodes(customCacheDirectoryPath);
       }
       if (cacheName == "lines" || cacheName == "all")
       {
         correctCacheName = true;
-        calculator.updateLinesFromCache(customCacheDirectoryPath);
+        transitData.updateLines(customCacheDirectoryPath);
       }
       if (cacheName == "paths" || cacheName == "all")
       {
         correctCacheName = true;
-        calculator.updatePathsFromCache(customCacheDirectoryPath);
+        transitData.updatePaths(customCacheDirectoryPath);
       }
       if (cacheName == "scenarios" || cacheName == "all")
       {
         correctCacheName = true;
-        calculator.updateScenariosFromCache(customCacheDirectoryPath);
+        transitData.updateScenarios(customCacheDirectoryPath);
       }
       if (cacheName == "schedules" || cacheName == "all")
       {
         correctCacheName = true;
-        calculator.updateSchedulesFromCache(customCacheDirectoryPath);
+        transitData.updateSchedules(customCacheDirectoryPath);
       }
 
+      //TODO This is incorrect if we have multiple name and the second one is wrong, correctCacheName is always true
       if (correctCacheName)
       {
         cacheNamesStr += cacheName;
         cacheNamesStr += ",";
       }
     }
+
+    //TODO do this only if we had at least one correct name
+    //Reinit some data after the update
+    // TODO Just the schedules???
+    calculator.initializeCalculationData();
     if (cacheNames.size() > 0)
     {
       // Remove last ","
@@ -318,7 +330,7 @@ int main(int argc, char** argv) {
 
 
   // routing request
-  server.resource["^/route/v1/transit[/]?$"]["GET"]=[&server, &calculator, &dataStatus](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
+  server.resource["^/route/v1/transit[/]?$"]["GET"]=[&server, &calculator, &dataStatus, &transitData](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
 
     std::string response = intializeResponse(dataStatus);
 
@@ -362,10 +374,10 @@ int main(int argc, char** argv) {
       // update params:
       calculator.params.setDefaultValues();
       RouteParameters routeParams = calculator.params.update(parametersWithValues,
-        calculator.scenarios,
-        calculator.odTrips,
-        calculator.nodes,
-        calculator.dataSources);
+                                                             transitData.getScenarios(),
+                                                             transitData.getOdTrips(),
+                                                             transitData.getNodes(),
+                                                             transitData.getDataSources());
 
       // find OdTrip if provided:
       bool   foundOdTrip{false};
@@ -374,9 +386,9 @@ int main(int argc, char** argv) {
 
       try {
 
-        if (calculator.params.odTripUuid.has_value() && calculator.odTrips.count(calculator.params.odTripUuid.value()))
+        if (calculator.params.odTripUuid.has_value() && transitData.getOdTrips().count(calculator.params.odTripUuid.value()))
         {
-          calculator.odTripGlob = calculator.odTrips.at(calculator.params.odTripUuid.value());
+          calculator.odTripGlob = transitData.getOdTrips().at(calculator.params.odTripUuid.value());
           foundOdTrip = true;
           spdlog::info("od trip uuid {}", to_string(calculator.odTripGlob.value().get().uuid));
           spdlog::info("dts {} ", calculator.odTripGlob.value().get().departureTimeSeconds);
@@ -441,7 +453,7 @@ int main(int argc, char** argv) {
 
   // Routing request for a single origin destination
   // TODO Copy-pasted and adapted from /route/v1/transit. There's still a lot of common code. Application code should be extracted to common functions outside the web server
-  server.resource["^/v2/route[/]?$"]["GET"]=[&server, &calculator, &dataStatus](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
+  server.resource["^/v2/route[/]?$"]["GET"]=[&server, &calculator, &dataStatus, &transitData](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
 
     std::string response = getFastErrorResponse(dataStatus);
 
@@ -470,7 +482,7 @@ int main(int argc, char** argv) {
       std::unique_ptr<TrRouting::RoutingResult> routingResult;
       TrRouting::AlternativesResult alternativeResult;
 
-      RouteParameters queryParams = RouteParameters::createRouteODParameter(parametersWithValues, calculator.scenarios);
+      RouteParameters queryParams = RouteParameters::createRouteODParameter(parametersWithValues, transitData.getScenarios());
 
       try {
         if (queryParams.isWithAlternatives())
@@ -506,7 +518,7 @@ int main(int argc, char** argv) {
 
   // Request a summary of lines data for a route
   // TODO Copy pasted from v2/route. There's a lot in common, it should be extracted to common class, just the response parser is different
-  server.resource["^/v2/summary[/]?$"]["GET"]=[&server, &calculator, &dataStatus](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
+  server.resource["^/v2/summary[/]?$"]["GET"]=[&server, &calculator, &dataStatus, &transitData](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
 
     std::string response = getFastErrorResponse(dataStatus);
 
@@ -535,7 +547,7 @@ int main(int argc, char** argv) {
       std::unique_ptr<TrRouting::RoutingResult> routingResult;
       TrRouting::AlternativesResult alternativeResult;
 
-      RouteParameters queryParams = RouteParameters::createRouteODParameter(parametersWithValues, calculator.scenarios);
+      RouteParameters queryParams = RouteParameters::createRouteODParameter(parametersWithValues, transitData.getScenarios());
 
       try {
         if (queryParams.isWithAlternatives())

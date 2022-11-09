@@ -10,7 +10,6 @@ libcsa_la_SOURCES = alternatives_routing.cpp \
 		   od_trips_routing.cpp \
 		   optimize_journey.cpp \
 		   parameters.cpp \
-		   preparations.cpp \
 		   program_options.cpp \
 		   resets.cpp \
 		   reverse_calculation.cpp \

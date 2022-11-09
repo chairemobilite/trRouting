@@ -11,6 +11,7 @@
 #include "service.hpp"
 #include "line.hpp"
 #include "node.hpp"
+#include "transit_data.hpp"
 
 namespace TrRouting
 {
@@ -102,7 +103,7 @@ namespace TrRouting
         {
           spdlog::debug("  fetching nodes with osrm with mode {}", params.accessMode);
 
-          accessFootpaths = std::move(OsrmFetcher::getAccessibleNodesFootpathsFromPoint(*parameters.getOrigin(), nodes, params.accessMode, parameters.getMaxAccessWalkingTravelTimeSeconds(), params.walkingSpeedMetersPerSecond));
+          accessFootpaths = std::move(OsrmFetcher::getAccessibleNodesFootpathsFromPoint(*parameters.getOrigin(), transitData.getNodes(), params.accessMode, parameters.getMaxAccessWalkingTravelTimeSeconds(), params.walkingSpeedMetersPerSecond));
           if (accessFootpaths.size() == 0) {
             accessFootpathOk = false;
           }
@@ -171,7 +172,7 @@ namespace TrRouting
         }
         else
         {
-          egressFootpaths = std::move(OsrmFetcher::getAccessibleNodesFootpathsFromPoint(*parameters.getDestination(), nodes, params.accessMode, parameters.getMaxEgressWalkingTravelTimeSeconds(), params.walkingSpeedMetersPerSecond));
+          egressFootpaths = std::move(OsrmFetcher::getAccessibleNodesFootpathsFromPoint(*parameters.getDestination(), transitData.getNodes(), params.accessMode, parameters.getMaxEgressWalkingTravelTimeSeconds(), params.walkingSpeedMetersPerSecond));
           if (egressFootpaths.size() == 0) {
             egressFootpathOk = false;
           }
@@ -232,7 +233,7 @@ namespace TrRouting
 
       spdlog::debug("  resetting filters");
 
-      for (auto & tripIte : trips)
+      for (auto & tripIte : transitData.getTrips())
       {
         const Trip & trip = tripIte.second;
         bool enabled = true;

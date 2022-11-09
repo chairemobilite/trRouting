@@ -365,7 +365,7 @@ TEST_F(RouteCalculationFixtureTests, NoRoutingTravelTimeLongerTrip)
 std::vector<std::string> RouteCalculationFixtureTests::initializeParameters()
 {
     std::vector<std::string> parametersWithValues;
-    parametersWithValues.push_back("scenario_uuid=" + boost::uuids::to_string(scenarioUuid));
+    parametersWithValues.push_back("scenario_uuid=" + boost::uuids::to_string(TestDataFetcher::scenarioUuid));
     parametersWithValues.push_back("min_waiting_time_seconds=" + std::to_string(MIN_WAITING_TIME));
     return parametersWithValues;
 }
@@ -374,10 +374,10 @@ std::unique_ptr<TrRouting::RoutingResult> RouteCalculationFixtureTests::calculat
 {
     calculator.params.setDefaultValues();
     TrRouting::RouteParameters routeParams = calculator.params.update(parameters,
-        calculator.scenarios,
-        calculator.odTrips,
-        calculator.nodes,
-        calculator.dataSources);
+                                                                      transitData.getScenarios(),
+                                                                      transitData.getOdTrips(),
+                                                                      transitData.getNodes(),
+                                                                      transitData.getDataSources());
     TrRouting::OsrmFetcher::birdDistanceAccessibilityEnabled = true;
 
     // TODO Shouldn't need to do this, but we do for now, benchmark needs to be started

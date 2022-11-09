@@ -31,57 +31,14 @@
 class RouteOdTripsFixtureTests : public RouteCalculationFixtureTests
 {
 private:
-    inline static const boost::uuids::uuid dataSourceUuid = uuidGenerator("12121212-3434-5656-7878-5f008b95c7b8");
-    inline static const boost::uuids::uuid odTripUuid = uuidGenerator("21212121-4343-6565-8787-5422d6a36f46");
 
 public:
     // Return a parameters vector with the scenario and minimum waiting time, which is repetitive and mandatory
     std::vector<std::string> initializeParameters();
     // Helper method to set parameters and calculate OD trip result. Test cases need only provide parameters and validate the result
     nlohmann::json calculateOdTrips(std::vector<std::string> parameters);
-    void SetUp();
-    void setupDataSources();
-    void setupOdTrips();
+
 };
-
-void RouteOdTripsFixtureTests::setupDataSources() {
-    std::map<boost::uuids::uuid, TrRouting::DataSource>& array = calculator.dataSources;
-
-    TrRouting::DataSource dataSource;
-    dataSource.uuid = dataSourceUuid;
-    dataSource.shortname = "testDS";
-    dataSource.name = "Test Data Source";
-
-    array[dataSourceUuid] = dataSource;
-}
-
-void RouteOdTripsFixtureTests::setupOdTrips() {
-    std::map<boost::uuids::uuid, TrRouting::OdTrip>& array = calculator.odTrips;
-
-    std::vector<TrRouting::NodeTimeDistance> originNodes;
-    originNodes.push_back(TrRouting::NodeTimeDistance(calculator.nodes.at(nodeSouth2Uuid), 469, 500));
-    std::vector<TrRouting::NodeTimeDistance> destinationNodes;
-    destinationNodes.push_back(TrRouting::NodeTimeDistance(calculator.nodes.at(nodeMidNodeUuid), 138, 150));
-
-    array.emplace(odTripUuid, TrRouting::OdTrip(odTripUuid,
-                                                12345,
-                                                "12345",
-                                                calculator.dataSources.at(dataSourceUuid),
-                                                std::nullopt,
-                                                getTimeInSeconds(9, 45),
-                                                -1,
-                                                0,
-                                                0,
-                                                0,
-                                                1.0,
-                                                "",
-                                                "",
-                                                "",
-                                                originNodes,
-                                                destinationNodes,
-                                                std::make_unique<TrRouting::Point>(45.5242, -73.5817),
-                                                std::make_unique<TrRouting::Point>(45.54, -73.6146)));
-}
 
 // Simple test to make sure this code path still works
 TEST_F(RouteOdTripsFixtureTests, NoOdTripsQuery)
@@ -91,14 +48,6 @@ TEST_F(RouteOdTripsFixtureTests, NoOdTripsQuery)
     nlohmann::json result = calculateOdTrips(parametersWithValues);
     ASSERT_EQ(1u, result["odTrips"].size());
     ASSERT_EQ(STATUS_SUCCESS, result["odTrips"][0]["status"]);
-}
-
-void RouteOdTripsFixtureTests::SetUp() {
-    BaseCsaFixtureTests::SetUp();
-
-    // Setup one od trip and data source for the test
-    setupDataSources();
-    setupOdTrips();
 }
 
 std::vector<std::string> RouteOdTripsFixtureTests::initializeParameters()
@@ -112,10 +61,10 @@ nlohmann::json RouteOdTripsFixtureTests::calculateOdTrips(std::vector<std::strin
 {
     calculator.params.setDefaultValues();
     TrRouting::RouteParameters routeParams = calculator.params.update(parameters,
-        calculator.scenarios,
-        calculator.odTrips,
-        calculator.nodes,
-        calculator.dataSources);
+                                                                      transitData.getScenarios(),
+                                                                      transitData.getOdTrips(),
+                                                                      transitData.getNodes(),
+                                                                      transitData.getDataSources());
     TrRouting::OsrmFetcher::birdDistanceAccessibilityEnabled = true;
 
     // TODO Shouldn't need to do this, but we do for now, benchmark needs to be started

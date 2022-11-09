@@ -9,6 +9,7 @@
 
 #include "data_fetcher.hpp"
 
+//TODO Consider placing those as forward declation
 #include "agency.hpp"
 #include "line.hpp"
 #include "node.hpp"

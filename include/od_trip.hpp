@@ -3,12 +3,14 @@
 
 #include <vector>
 #include <boost/uuid/uuid.hpp>
+#include <optional>
 #include "point.hpp"
 
 namespace TrRouting
 {
   class DataSource;
   class Person;
+  class NodeTimeDistance;
   
   class OdTrip {
   
