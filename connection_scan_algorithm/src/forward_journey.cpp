@@ -11,6 +11,7 @@
 #include "agency.hpp"
 #include "routing_result.hpp"
 #include "toolbox.hpp" //MAX_INT
+#include "transit_data.hpp"
 
 namespace TrRouting
 {
@@ -29,11 +30,11 @@ namespace TrRouting
     std::vector<std::reference_wrapper<const Node>> resultingNodes;
     if (params.returnAllNodesResult)
     {
-      nodesCount     = nodes.size();
+      nodesCount     = transitData.getNodes().size();
       // Add references to all nodes in the resultingNodes vector
       // TODO this seems heavy. To reconsidered when we split function and consider the
       // allNodes case separately 
-      for(auto nodeIte = nodes.begin(); nodeIte != nodes.end(); nodeIte++) {
+      for(auto nodeIte = transitData.getNodes().begin(); nodeIte != transitData.getNodes().end(); nodeIte++) {
         resultingNodes.push_back(std::cref(nodeIte->second));
       }
     }
@@ -45,6 +46,8 @@ namespace TrRouting
       throw NoRoutingFoundException(NoRoutingReason::NO_ROUTING_FOUND);
     }
 
+    auto & forwardConnections = transitData.getForwardConnections();
+    
     //TODO This if seems unnecessary, we throw before if this condition would be false
     if (foundLine || params.returnAllNodesResult)
     {

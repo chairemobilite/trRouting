@@ -8,7 +8,7 @@
 #include "path.hpp"
 #include "routing_result.hpp"
 #include "agency.hpp"
-
+#include "transit_data.hpp"
 #include "spdlog/spdlog.h"
 
 namespace TrRouting
@@ -28,11 +28,11 @@ namespace TrRouting
     std::vector<std::reference_wrapper<const Node>> resultingNodes;
     if (params.returnAllNodesResult)
     {
-      nodesCount     = nodes.size();
+      nodesCount     = transitData.getNodes().size();
       // Add references to all nodes in the resultingNodes vector
       // TODO this seems heavy. To reconsidered when we split function and consider the
       // allNodes case separately
-      for(auto nodeIte = nodes.begin(); nodeIte != nodes.end(); nodeIte++) {
+      for(auto nodeIte = transitData.getNodes().begin(); nodeIte != transitData.getNodes().end(); nodeIte++) {
         resultingNodes.push_back(std::cref(nodeIte->second));
       }
     }
@@ -64,6 +64,8 @@ namespace TrRouting
       int accessWalkingTime      {-1};
       int transferTime             {-1}; int egressWalkingTime      {-1};
       int waitingTime              {-1}; int accessWaitingTime      {-1};
+
+      auto & reverseConnections = transitData.getReverseConnections();
 
       for (const Node & resultingNode : resultingNodes)
       {

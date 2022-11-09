@@ -5,6 +5,7 @@
 #include "parameters.hpp"
 #include "node.hpp"
 #include "routing_result.hpp"
+#include "transit_data.hpp"
 
 namespace TrRouting
 {
@@ -30,14 +31,14 @@ namespace TrRouting
     bool  nodeWasAccessedFromOrigin       {false};
     int   bestArrivalTime                 {MAX_INT};
     
-    int  connectionsCount  = forwardConnections.size();
+    int  connectionsCount  = transitData.getForwardConnections().size();
     int  departureTimeHour = departureTimeSeconds / 3600;
 
     // main loop:
     //TODO Better identify this i variable
     int i = forwardConnectionsIndexPerDepartureTimeHour[departureTimeHour];
-    auto lastConnection = forwardConnections.end(); // cache last connection for loop
-    for(auto connection = forwardConnections.begin() + forwardConnectionsIndexPerDepartureTimeHour[departureTimeHour]; connection != lastConnection; ++connection)
+    auto lastConnection = transitData.getForwardConnections().end(); // cache last connection for loop
+    for(auto connection = transitData.getForwardConnections().begin() + forwardConnectionsIndexPerDepartureTimeHour[departureTimeHour]; connection != lastConnection; ++connection)
     {
       
       // ignore connections before departure time + minimum access travel time:
@@ -174,7 +175,7 @@ namespace TrRouting
                      //TODO Not fully sure this is equivalent to the ancient code
                      forwardEgressJourneysSteps.count(transferableNode.node.uid) == 0
                       ||
-                     std::get<connectionIndexes::TIME_ARR>(*forwardConnections[std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION>(forwardEgressJourneysSteps.at(transferableNode.node.uid))]) > connectionArrivalTime
+                     std::get<connectionIndexes::TIME_ARR>(*transitData.getForwardConnections()[std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION>(forwardEgressJourneysSteps.at(transferableNode.node.uid))]) > connectionArrivalTime
                     )
                   )
                   {
@@ -213,7 +214,7 @@ namespace TrRouting
           if (egressExitConnection != -1)
           {
             const NodeTimeDistance &egress = nodesEgress.at(egressFootpath.node.uid);
-            egressNodeArrivalTime = std::get<connectionIndexes::TIME_ARR>(*forwardConnections[egressExitConnection]) + egress.time;
+            egressNodeArrivalTime = std::get<connectionIndexes::TIME_ARR>(*transitData.getForwardConnections()[egressExitConnection]) + egress.time;
 
             if (egressNodeArrivalTime >= 0 && egressNodeArrivalTime - departureTimeSeconds <= parameters.getMaxTotalTravelTimeSeconds() && egressNodeArrivalTime < bestArrivalTime && egressNodeArrivalTime < MAX_INT)
             {

@@ -6,6 +6,7 @@
 #include "parameters.hpp"
 #include "node.hpp"
 #include "routing_result.hpp"
+#include "transit_data.hpp"
 
 namespace TrRouting
 {
@@ -31,6 +32,9 @@ namespace TrRouting
     bool reachedAtLeastOneAccessNode      {false};
     int  bestDepartureTime                {-1};
 
+    //TODO could be passed as a parameter
+    auto & reverseConnections = transitData.getReverseConnections();
+    
     int  connectionsCount = reverseConnections.size();
     int  arrivalTimeHour  = arrivalTimeSeconds / 3600;
 

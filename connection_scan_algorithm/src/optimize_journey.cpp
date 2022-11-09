@@ -4,6 +4,7 @@
 #include "trip.hpp"
 #include "parameters.hpp"
 #include "node.hpp"
+#include "transit_data.hpp"
 
 namespace TrRouting
 {
@@ -24,6 +25,11 @@ namespace TrRouting
     bool  startedOptimization {false};
     std::vector<std::reference_wrapper<const Node>> ignoreOptimizationNodes;
 
+    // Get a local reference to not have to call the function everywhere
+    // TODO lot of these use case could go away if we don't refer to connect by index only
+    auto & forwardConnections = transitData.getForwardConnections();
+    auto & reverseConnections = transitData.getReverseConnections();
+    
     //TODO startedOptimization can be replaced with a do...while
     while(!startedOptimization || optimizationCase >= 0)
     {

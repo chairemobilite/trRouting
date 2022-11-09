@@ -12,6 +12,7 @@
 #include "routing_result.hpp"
 #include "od_trip.hpp"
 #include "node.hpp"
+#include "transit_data.hpp"
 
 namespace TrRouting
 {
@@ -163,7 +164,7 @@ namespace TrRouting
     bool   atLeastOneCompatiblePeriod {false};
     bool   attributesMatches          {true};
     bool   resetFilters               {true};
-    int    odTripsCount = odTrips.size();
+    int    odTripsCount = transitData.getOdTrips().size();
     float  maximumSegmentHourlyDemand = 0.0;
     float  maximumSegmentTotalDemand  = 0.0;
     int    countOdTripsCalculated     = 0;
@@ -172,7 +173,7 @@ namespace TrRouting
     json["odTrips"] = nlohmann::json::array();
 
     // Initialize lineProfiles
-    for (auto & linePair : lines)
+    for (auto & linePair : transitData.getLines())
     {
       lineProfiles[linePair.first] = 0.0;
     }
@@ -187,7 +188,7 @@ namespace TrRouting
     // Vector with a copy of the odTrips, so we can shuffle them later
     std::vector<std::reference_wrapper<const OdTrip>> odTripVector;
 
-    for (auto odTripIte = odTrips.begin(); odTripIte != odTrips.end(); odTripIte++) {
+    for (auto odTripIte = transitData.getOdTrips().begin(); odTripIte != transitData.getOdTrips().end(); odTripIte++) {
       odTripVector.push_back(odTripIte->second);
     }
     

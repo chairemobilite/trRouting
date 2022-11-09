@@ -9,6 +9,7 @@
 #include "combinations.hpp"
 #include "routing_result.hpp"
 #include "point.hpp"
+#include "transit_data.hpp"
 
 namespace {
   // Placed in anynymous namespace so it's local to this file
@@ -123,7 +124,7 @@ namespace TrRouting
       alternativeSequence++;
       alternativesCalculatedCount++;
 
-      LineVisitor visitor = LineVisitor(lines);
+      LineVisitor visitor = LineVisitor(transitData.getLines());
 
       //departureTimeSeconds = routingResult.departureTimeSeconds + routingResult.firstWaitingTimeSeconds - params.minWaitingTimeSeconds;
 
@@ -207,7 +208,7 @@ namespace TrRouting
 
               // Extract lines from new results. If the result is valid, add it to the alternative list
               // and then generation new lines combinations to try other alternatives
-              LineVisitor alternativeVisitor = LineVisitor(lines);
+              LineVisitor alternativeVisitor = LineVisitor(transitData.getLines());
               foundLines = alternativeCalcResult.accept(alternativeVisitor);
               std::stable_sort(foundLines.begin(), foundLines.end());
 

@@ -6,43 +6,11 @@
 #include "routing_result.hpp"
 #include "node.hpp"
 #include "trip.hpp"
-
+#include "transit_data.hpp"
 
 namespace TrRouting
 {
   
-  int Calculator::countAgencies() {
-    return agencies.size();
-  }
-
-  int Calculator::countServices() {
-    return services.size();
-  }
-
-  int Calculator::countNodes() {
-    return nodes.size();
-  }
-
-  int Calculator::countLines() {
-    return lines.size();
-  }
-
-  int Calculator::countPaths() {
-    return paths.size();
-  }
-
-  int Calculator::countScenarios() {
-    return scenarios.size();
-  }
-
-  int Calculator::countTrips() {
-    return trips.size();
-  }
-
-  long long Calculator::countConnections() {
-    return forwardConnections.size();
-  }
-
   std::unique_ptr<RoutingResult> Calculator::calculate(RouteParameters &parameters, bool resetAccessPaths, bool resetFilters) {
 
     reset(parameters, resetAccessPaths, resetFilters);
@@ -125,7 +93,7 @@ namespace TrRouting
       initialDepartureTimeSeconds = -1;
       //TODO maybe we can do something different in that case, like a query flag
       // we need to make all trips usable when not coming from forward result because reverse calculation, by default, checks for usableTrips
-      for (auto && tripIte : trips) {
+      for (auto && tripIte : transitData.getTrips()) {
         const Trip & trip = tripIte.second;
         tripsQueryOverlay[trip.uid].usable = true;
       }

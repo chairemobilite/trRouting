@@ -180,10 +180,10 @@ TrRouting::AlternativesResult TAndACalculationFixtureTests::calculateWithAlterna
 {
     calculator.params.setDefaultValues();
     TrRouting::RouteParameters routeParams = calculator.params.update(parameters,
-        calculator.scenarios,
-        calculator.odTrips,
-        calculator.nodes,
-        calculator.dataSources);
+                                                                      transitData.getScenarios(),
+                                                                      transitData.getOdTrips(),
+                                                                      transitData.getNodes(),
+                                                                      transitData.getDataSources());
     TrRouting::OsrmFetcher::birdDistanceAccessibilityEnabled = true;
 
     // TODO Shouldn't need to do this, but we do for now, benchmark needs to be started

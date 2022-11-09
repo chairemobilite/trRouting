@@ -15,6 +15,7 @@ gtest_SOURCES = gtest.cpp \
     ../../src/persons_cache_fetcher.cpp \
     ../../src/modes_initialization.cpp \
     ../../src/od_trips_cache_fetcher.cpp \
+    ../../src/transit_data.cpp \
     ../../src/osrm_fetcher.cpp
 
 #TODO #167 Place/Household removed while refactoring
