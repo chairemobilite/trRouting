@@ -38,6 +38,6 @@ jobs:
       run: make
     - name: make check
       # Disable make check on MacOS, currently does not work, issue #43
-      if: matrix.os == 'ubuntu-latest'
+      #if: matrix.os == 'ubuntu-latest'
       run: make check
 
