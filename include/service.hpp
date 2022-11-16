@@ -9,7 +9,7 @@
 namespace TrRouting
 {
   
-  struct Service {
+  class Service {
   
   public:
    

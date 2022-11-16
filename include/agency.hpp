@@ -8,7 +8,7 @@
 namespace TrRouting
 {
   
-  struct Agency {
+  class Agency {
     
   public:
 

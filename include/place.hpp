@@ -10,7 +10,7 @@
 namespace TrRouting
 {
   
-  struct Place {
+  class Place {
   
   public:
    

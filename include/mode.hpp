@@ -6,7 +6,7 @@
 namespace TrRouting
 {
   
-  struct Mode {
+  class Mode {
   
   public:
     inline static const std::string TRANSFERABLE {"transferable"}; 
