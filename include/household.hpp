@@ -10,7 +10,7 @@
 namespace TrRouting
 {
   
-  struct Household {
+  class Household {
   
   public:
    

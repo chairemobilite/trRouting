@@ -6,7 +6,7 @@
 namespace TrRouting
 {
   
-  struct Point {
+  class Point {
   
   public:
     
