@@ -22,7 +22,7 @@ namespace TrRouting
   private:
     nlohmann::json response;
   public:
-    nlohmann::json getResult() { return response; }
+    nlohmann::json getResult() override { return response; }
     void visitBoardingStep(const BoardingStep& step) override;
     void visitUnboardingStep(const UnboardingStep& step) override;
     void visitWalkingStep(const WalkingStep& step) override;
@@ -39,7 +39,7 @@ namespace TrRouting
     ResultToV1Visitor(RouteParameters& _params): params(_params) {
       // Nothing to initialize
     }
-    nlohmann::json getResult() { return response; }
+    nlohmann::json getResult() override { return response; }
     void visitSingleCalculationResult(const SingleCalculationResult& result) override;
     void visitAlternativesResult(const AlternativesResult& result) override;
     void visitAllNodesResult(const AllNodesResult& result) override;

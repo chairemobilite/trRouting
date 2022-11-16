@@ -55,7 +55,7 @@ namespace TrRouting
   private:
     std::optional<LineSummary> response;
   public:
-    std::optional<LineSummary> getResult() { return response; }
+    std::optional<LineSummary> getResult() override { return response; }
     void visitBoardingStep(const BoardingStep& step) override;
     void visitUnboardingStep(const UnboardingStep& step) override;
     void visitWalkingStep(const WalkingStep& step) override;
@@ -72,7 +72,7 @@ namespace TrRouting
     ResultToV2SummaryVisitor(RouteParameters& _params): params(_params) {
       // Nothing to initialize
     }
-    std::map<std::string, LineSummary> getResult() { return response; }
+    std::map<std::string, LineSummary> getResult() override { return response; }
     void visitSingleCalculationResult(const SingleCalculationResult& result) override;
     void visitAlternativesResult(const AlternativesResult& result) override;
     void visitAllNodesResult(const AllNodesResult& result) override;

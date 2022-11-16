@@ -542,7 +542,6 @@ namespace TrRouting
         {
           accessNodeTravelTimesSeconds.push_back(std::stoi(accessNodeTravelTimeSeconds));
         }
-        accessNodeTravelTimesSeconds = accessNodeTravelTimesSeconds;
         continue;
       }
       else if (parameterWithValueVector[0] == "egress_node_travel_times_seconds" || parameterWithValueVector[0] == "egress_node_travel_times")
@@ -552,7 +551,6 @@ namespace TrRouting
         {
           egressNodeTravelTimesSeconds.push_back(std::stoi(egressNodeTravelTimeSeconds));
         }
-        egressNodeTravelTimesSeconds = egressNodeTravelTimesSeconds;
         continue;
       }
 
