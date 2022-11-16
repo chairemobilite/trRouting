@@ -17,9 +17,6 @@ namespace TrRouting
 
     std::unique_ptr<RoutingResult> result;
     
-    std::tuple<int,int,int> forwardResult;
-    std::tuple<int,int,int> reverseResult;
-    
     int bestArrivalTime {MAX_INT};
     int bestDepartureTime {-1};
     std::optional<std::reference_wrapper<const Node>> bestEgressNode;

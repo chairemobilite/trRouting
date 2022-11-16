@@ -31,6 +31,7 @@ namespace TrRouting
   public:
     enum result_type resType;
     RoutingResult(result_type _resType): resType(_resType) {}
+    virtual ~RoutingResult() {}
     template<class T>
     T accept(ResultVisitor<T> &visitor) {
         do_accept(visitor);
@@ -49,6 +50,7 @@ namespace TrRouting
     RoutingStep(
       result_step_type _action
     ): action(_action) {}
+    virtual ~RoutingStep() {}
     template<class T>
     T accept(StepVisitor<T> &visitor) {
         do_accept(visitor);

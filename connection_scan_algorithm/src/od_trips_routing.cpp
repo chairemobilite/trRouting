@@ -26,7 +26,7 @@ namespace TrRouting
     std::vector<boost::uuids::uuid> boardingNodesUuids;
     std::vector<boost::uuids::uuid> unboardingNodesUuids;
   public:
-    int getResult() { return 1; }
+    int getResult() override { return 1; }
     std::vector<std::string> getLineShortnames() { return lineShortnames; }
     std::vector<std::string> getAgencyAcronyms() { return agencyAcronyms; }
     std::vector<std::string> getModeShortnames() { return modeShortnames; }
@@ -70,7 +70,7 @@ namespace TrRouting
     ResultToOdTripJsonVisitor(RouteParameters& _params): params(_params) {
       // Nothing to initialize
     }
-    nlohmann::json getResult() { return response; }
+    nlohmann::json getResult() override { return response; }
     std::vector<Leg> getLegs() { return legs; }
     int getTotalTravelTime() { return totalTravelTime; }
     void visitSingleCalculationResult(const SingleCalculationResult& result) override;
@@ -167,7 +167,6 @@ namespace TrRouting
     int    odTripsCount = transitData.getOdTrips().size();
     float  maximumSegmentHourlyDemand = 0.0;
     float  maximumSegmentTotalDemand  = 0.0;
-    int    countOdTripsCalculated     = 0;
     int    totalTravelTimeSeconds     = 0;
 
     json["odTrips"] = nlohmann::json::array();
@@ -306,7 +305,6 @@ namespace TrRouting
         try {
           routingResult = calculate(odTripParameters, true, resetFilters); // reset filters only on first calculation
           resetFilters  = false;
-          countOdTripsCalculated++;
           ResultToOdTripJsonVisitor visitor = ResultToOdTripJsonVisitor(odTripParameters);
           odTripJson = routingResult.get()->accept(visitor);
           
