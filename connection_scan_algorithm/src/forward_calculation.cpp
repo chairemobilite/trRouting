@@ -42,9 +42,9 @@ namespace TrRouting
     {
       
       // ignore connections before departure time + minimum access travel time:
-      if (std::get<connectionIndexes::TIME_DEP>(**connection) >= departureTimeSeconds + minAccessTravelTime)
+      if ((**connection).getDepartureTime() >= departureTimeSeconds + minAccessTravelTime)
       {
-        const Trip & trip = std::get<connectionIndexes::TRIP>(**connection);
+        const Trip & trip = (**connection).getTrip();
 
         // Cache the current query data overlay si we don't check the hashmap every time
         auto & currentTripQueryOverlay = tripsQueryOverlay[trip.uid];
@@ -52,8 +52,8 @@ namespace TrRouting
         // enabled trips only here:
         if (tripsEnabled[trip.uid])
         {
-          connectionDepartureTime         = std::get<connectionIndexes::TIME_DEP>(**connection);
-          connectionMinWaitingTimeSeconds = std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(**connection) >= 0 ? std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(**connection) : parameters.getMinWaitingTimeSeconds();
+          connectionDepartureTime         = (**connection).getDepartureTime();
+          connectionMinWaitingTimeSeconds = (**connection).getMinWaitingTimeOrDefault(parameters.getMinWaitingTimeSeconds());
 
           // no need to parse next connections if already reached destination from all egress nodes:
           // yes, we mean connectionDepartureTime and not connectionArrivalTime because travel time for each connections, otherwise you can catch a very short/long connection
@@ -68,7 +68,7 @@ namespace TrRouting
           }
 
           tripEnterConnectionIndex   = currentTripQueryOverlay.enterConnection; // -1 if trip has not yet been used
-          const Node &nodeDeparture = std::get<connectionIndexes::NODE_DEP>(**connection);
+          const Node &nodeDeparture = (**connection).getDepartureNode();
 
           // Extract node departure time if we have a result or set a default value
           auto ite = nodesTentativeTime.find(nodeDeparture.uid);
@@ -104,7 +104,7 @@ namespace TrRouting
             
             // TODO: add constrain for sameLineTransfer (check trip allowSameLineTransfers)
             if (
-              std::get<connectionIndexes::CAN_BOARD>(**connection) == 1 
+                (**connection).canBoard()
               && 
               (
                 tripEnterConnectionIndex == -1 
@@ -124,11 +124,11 @@ namespace TrRouting
               currentTripQueryOverlay.enterConnectionTransferTravelTime = std::get<journeyStepIndexes::TRANSFER_TRAVEL_TIME>(forwardJourneysSteps.at(nodeDeparture.uid));
             }
             
-            if (std::get<connectionIndexes::CAN_UNBOARD>(**connection) == 1 && currentTripQueryOverlay.enterConnection != -1)
+            if ((**connection).canUnboard() && currentTripQueryOverlay.enterConnection != -1)
             {
               // get footpaths for the arrival node to get transferable nodes:
-              const Node &nodeArrival = std::get<connectionIndexes::NODE_ARR>(**connection);
-              connectionArrivalTime           = std::get<connectionIndexes::TIME_ARR>(**connection);
+              const Node &nodeArrival = (**connection).getArrivalNode();
+              connectionArrivalTime           = (**connection).getArrivalTime();
 
               auto nodeArrivalInNodesEgressIte = nodesEgress.find(nodeArrival.uid);              
               if (!params.returnAllNodesResult && !reachedAtLeastOneEgressNode && nodeArrivalInNodesEgressIte != nodesEgress.end() && nodeArrivalInNodesEgressIte->second.time != -1) // check if the arrival node is egressable
@@ -175,7 +175,7 @@ namespace TrRouting
                      //TODO Not fully sure this is equivalent to the ancient code
                      forwardEgressJourneysSteps.count(transferableNode.node.uid) == 0
                       ||
-                     std::get<connectionIndexes::TIME_ARR>(*transitData.getForwardConnections()[std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION>(forwardEgressJourneysSteps.at(transferableNode.node.uid))]) > connectionArrivalTime
+                     (*transitData.getForwardConnections()[std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION>(forwardEgressJourneysSteps.at(transferableNode.node.uid))]).getArrivalTime() > connectionArrivalTime
                     )
                   )
                   {
@@ -214,7 +214,7 @@ namespace TrRouting
           if (egressExitConnection != -1)
           {
             const NodeTimeDistance &egress = nodesEgress.at(egressFootpath.node.uid);
-            egressNodeArrivalTime = std::get<connectionIndexes::TIME_ARR>(*transitData.getForwardConnections()[egressExitConnection]) + egress.time;
+            egressNodeArrivalTime = (*transitData.getForwardConnections()[egressExitConnection]).getArrivalTime() + egress.time;
 
             if (egressNodeArrivalTime >= 0 && egressNodeArrivalTime - departureTimeSeconds <= parameters.getMaxTotalTravelTimeSeconds() && egressNodeArrivalTime < bestArrivalTime && egressNodeArrivalTime < MAX_INT)
             {

@@ -47,17 +47,17 @@ namespace TrRouting
     for(auto connection = reverseConnections.begin() + reverseConnectionsIndexPerArrivalTimeHour[arrivalTimeHour + 1]; connection != lastConnection; ++connection)
     {
       // ignore connections after arrival time - minimum egress travel time:
-      if (std::get<connectionIndexes::TIME_ARR>(**connection) <= arrivalTimeSeconds - (params.returnAllNodesResult ? 0 : minEgressTravelTime))
+      if ((**connection).getArrivalTime() <= arrivalTimeSeconds - (params.returnAllNodesResult ? 0 : minEgressTravelTime))
       {
         
-        const Trip & trip = std::get<connectionIndexes::TRIP>(**connection);
+        const Trip & trip = (**connection).getTrip();
         
         // enabled trips only here:
         auto & currentTripQueryOverlay = tripsQueryOverlay[trip.uid];
         if (currentTripQueryOverlay.usable && tripsEnabled[trip.uid])
         {
 
-          connectionArrivalTime           = std::get<connectionIndexes::TIME_ARR>(**connection);
+          connectionArrivalTime           = (**connection).getArrivalTime();
 
           // no need to parse next connections if already reached destination from all egress nodes, except if max travel time is set, so we can get a reverse profile in the next loop calculation:
           // yes, we mean connectionArrivalTime and not connectionDepartureTime because travel time for each connections, otherwise you can catch a very short/long connection
@@ -67,7 +67,7 @@ namespace TrRouting
           }
 
           tripExitConnectionIndex   = currentTripQueryOverlay.exitConnection;
-          const Node &nodeArrival = std::get<connectionIndexes::NODE_ARR>(**connection);
+          const Node &nodeArrival = (**connection).getArrivalNode();
 
           // Extract node arrival time
           int nodeArrivalTentativeTime  = -1;
@@ -86,7 +86,7 @@ namespace TrRouting
           )
           {
             
-            if (std::get<connectionIndexes::CAN_UNBOARD>(**connection) == 1)
+            if ((**connection).canUnboard())
             {
               // TODO probably extract the reverseJourneysSteps[nodeArrival.uuid] instead of doing lookup multiple the time
               if (tripExitConnectionIndex == -1) // <= to make sure we get the same result as forward calculation, which uses >
@@ -103,11 +103,7 @@ namespace TrRouting
                        std::get<journeyStepIndexes::TRANSFER_TRAVEL_TIME>(reverseJourneysSteps.at(nodeArrival.uid)) < currentTripQueryOverlay.exitConnectionTransferTravelTime
                        )
               {
-                journeyConnectionMinWaitingTimeSeconds = parameters.getMinWaitingTimeSeconds();
-                if(std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(reverseJourneysSteps.at(nodeArrival.uid))].get()) >= 0)
-                {
-                  journeyConnectionMinWaitingTimeSeconds = std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(reverseJourneysSteps.at(nodeArrival.uid))].get());
-                }
+                journeyConnectionMinWaitingTimeSeconds = (*reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(reverseJourneysSteps.at(nodeArrival.uid))].get()).getMinWaitingTimeOrDefault(parameters.getMinWaitingTimeSeconds());
 
                 if (connectionArrivalTime + journeyConnectionMinWaitingTimeSeconds <= nodeArrivalTentativeTime)
                 {
@@ -118,12 +114,12 @@ namespace TrRouting
 
             }
             
-            if (std::get<connectionIndexes::CAN_BOARD>(**connection) == 1 && currentTripQueryOverlay.exitConnection != -1)
+            if ((**connection).canBoard() && currentTripQueryOverlay.exitConnection != -1)
             {
               // get footpaths for the arrival node to get transferable nodes:
-              const Node &nodeDeparture = std::get<connectionIndexes::NODE_DEP>(**connection);
-              connectionDepartureTime         = std::get<connectionIndexes::TIME_DEP>(**connection);
-              connectionMinWaitingTimeSeconds = std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(**connection) >= 0 ? std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(**connection) : parameters.getMinWaitingTimeSeconds();
+              const Node &nodeDeparture = (**connection).getDepartureNode();
+              connectionDepartureTime         = (**connection).getDepartureTime();
+              connectionMinWaitingTimeSeconds = (**connection).getMinWaitingTimeOrDefault(parameters.getMinWaitingTimeSeconds());
 
               auto nodeDepartureInNodesAccessIte = nodesAccess.find(nodeDeparture.uid);
               if (!params.returnAllNodesResult && !reachedAtLeastOneAccessNode &&  nodeDepartureInNodesAccessIte != nodesAccess.end() &&  nodeDepartureInNodesAccessIte->second.time != -1) // check if the departure node is accessable
@@ -170,7 +166,7 @@ namespace TrRouting
                      //TODO Really not sure this is equivalent
                      reverseAccessJourneysSteps.count(transferableNode.node.uid) == 0
                      || 
-                     std::get<connectionIndexes::TIME_DEP>(*reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(reverseAccessJourneysSteps.at(transferableNode.node.uid))].get()) <= connectionDepartureTime - connectionMinWaitingTimeSeconds
+                     (*reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(reverseAccessJourneysSteps.at(transferableNode.node.uid))].get()).getDepartureTime() <= connectionDepartureTime - connectionMinWaitingTimeSeconds
                     )
                   )
                   {                    
@@ -222,9 +218,9 @@ namespace TrRouting
           if (accessEnterConnection != -1) //TODO is this check required with the previous if(count()) added ?
           {
             const NodeTimeDistance & access = nodesAccess.at(accessFootpath.node.uid);
-            int accessEnterConnectionMinWaitingTimeSeconds = std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*reverseConnections[accessEnterConnection]) >= 0 ? std::get<connectionIndexes::MIN_WAITING_TIME_SECONDS>(*reverseConnections[accessEnterConnection]) : parameters.getMinWaitingTimeSeconds();
+            int accessEnterConnectionMinWaitingTimeSeconds = reverseConnections[accessEnterConnection]->getMinWaitingTimeOrDefault(parameters.getMinWaitingTimeSeconds());
 
-            int accessNodeDepartureTime                    = std::get<connectionIndexes::TIME_DEP>(*reverseConnections[accessEnterConnection]) - access.time - accessEnterConnectionMinWaitingTimeSeconds;
+            int accessNodeDepartureTime                    = reverseConnections[accessEnterConnection]->getDepartureTime() - access.time - accessEnterConnectionMinWaitingTimeSeconds;
             if ((accessNodeDepartureTime >= 0) &&
                 (arrivalTimeSeconds - accessNodeDepartureTime <= parameters.getMaxTotalTravelTimeSeconds()) &&
                 (accessNodeDepartureTime > bestDepartureTime) &&

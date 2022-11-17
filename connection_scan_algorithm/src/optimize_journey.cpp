@@ -54,26 +54,28 @@ namespace TrRouting
         )
         {
           const Trip & trip  = std::get<journeyStepIndexes::FINAL_TRIP>(journeyStep).value();
-          int sequenceStartIdx = std::get<connectionIndexes::SEQUENCE>(*(reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journeyStep)].get())) - 1;
-          int sequenceEndIdx   = std::get<connectionIndexes::SEQUENCE>(*(reverseConnections[std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION >(journeyStep)].get())) - 1;
+          int sequenceStartIdx = (*(reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journeyStep)].get())).getSequenceInTrip() - 1;
+          int sequenceEndIdx   = (*(reverseConnections[std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION >(journeyStep)].get())).getSequenceInTrip() - 1;
 
           // get first and last nodes for the journey step trip segment (boarding and unboarding nodes):
           auto enterConnect = *(reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journeyStep)]);
 
-          const Node & firstNodeByJourneyStep  =  std::get<connectionIndexes::NODE_DEP>(enterConnect).get();
+          //TODO Double check this, unsure what type is enterConnect
+          const Node & firstNodeByJourneyStep  =  enterConnect.getDepartureNode();
 
           auto exitConnect = *(reverseConnections[std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION >(journeyStep)]);
 
-          lastNodeByJourneyStepIdx.push_back(std::get<connectionIndexes::NODE_ARR>(exitConnect).get());
+          //TODO Double check this, unsure what type is exitConnect
+          lastNodeByJourneyStepIdx.push_back(exitConnect.getArrivalNode());
           inBetweenNodesByJourneyStepIdx.resize(journeyStepIdx+1); // Resize outer vector so we can push_back in it later
 
           // get in-between nodes for the journet step trip segment (boarding and unboarding excluded):
           for(int sequenceIdx = sequenceStartIdx + 1; sequenceIdx <= sequenceEndIdx; ++sequenceIdx)
           {
-            const Node & nodeDep = std::get<connectionIndexes::NODE_DEP>(*(forwardConnections[ trip.forwardConnectionsIdx[sequenceIdx] ]));
+            const Node & nodeDep = (*(forwardConnections[ trip.forwardConnectionsIdx[sequenceIdx] ])).getDepartureNode();
             if (nodeDep.uuid != firstNodeByJourneyStep.uuid && nodeDep.uuid != lastNodeByJourneyStepIdx.at(journeyStepIdx).value().get().uuid) // ignore repeated nodes at beginning or end
             {
-              inBetweenNodesByJourneyStepIdx[journeyStepIdx].push_back( std::get<connectionIndexes::NODE_DEP>(*(forwardConnections[ trip.forwardConnectionsIdx[sequenceIdx] ])) );
+              inBetweenNodesByJourneyStepIdx[journeyStepIdx].push_back( (*(forwardConnections[ trip.forwardConnectionsIdx[sequenceIdx] ])).getDepartureNode() );
             }
           }
           
@@ -171,17 +173,17 @@ namespace TrRouting
       {
         //TODO We might need to check if the optional have a value
         const Trip & trip = std::get<journeyStepIndexes::FINAL_TRIP>(journey[fromJourneyStepIdx]).value();
-        int sequenceStartIdx = std::get<connectionIndexes::SEQUENCE>(*(reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journey[fromJourneyStepIdx])].get())) - 1;
-        int sequenceEndIdx   = std::get<connectionIndexes::SEQUENCE>(*(reverseConnections[std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION >(journey[fromJourneyStepIdx])].get())) - 1;
+        int sequenceStartIdx = (*(reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journey[fromJourneyStepIdx])].get())).getSequenceInTrip() - 1;
+        int sequenceEndIdx   = (*(reverseConnections[std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION >(journey[fromJourneyStepIdx])].get())).getSequenceInTrip() - 1;
 
         assert(trip.reverseConnectionsIdx.size() > 1 + sequenceEndIdx); // make sure sequenceIdx will be valid
         for(size_t sequenceIdx = trip.reverseConnectionsIdx.size() - 1 - sequenceEndIdx; sequenceIdx <= trip.reverseConnectionsIdx.size() - 1 - sequenceStartIdx; ++sequenceIdx)
         {
           int connectionIdx = trip.reverseConnectionsIdx[sequenceIdx];
           
-          if (optimizationNode == std::get<connectionIndexes::NODE_ARR>(*(reverseConnections[connectionIdx])))
+          if (optimizationNode == (*(reverseConnections[connectionIdx])).getArrivalNode())
           {
-            if (std::get<connectionIndexes::CAN_UNBOARD>(*(reverseConnections[connectionIdx])) != 1)
+            if (!(reverseConnections[connectionIdx])->canUnboard())
             {
               ignoreOptimizationNodes.push_back(optimizationNode.value());
               break;
@@ -209,14 +211,14 @@ namespace TrRouting
       {
 
         const Trip & trip = std::get<journeyStepIndexes::FINAL_TRIP>(journey[toJourneyStepIdx]).value();
-        int sequenceStartIdx = std::get<connectionIndexes::SEQUENCE>(*(reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journey[toJourneyStepIdx])].get())) - 1;
-        int sequenceEndIdx   = std::get<connectionIndexes::SEQUENCE>(*(reverseConnections[std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION >(journey[toJourneyStepIdx])].get())) - 1;
+        int sequenceStartIdx = (*(reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journey[toJourneyStepIdx])].get())).getSequenceInTrip() - 1;
+        int sequenceEndIdx   = (*(reverseConnections[std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION >(journey[toJourneyStepIdx])].get())).getSequenceInTrip() - 1;
         for(size_t sequenceIdx = trip.reverseConnectionsIdx.size() - 1 - sequenceEndIdx; sequenceIdx <= trip.reverseConnectionsIdx.size() - 1 - sequenceStartIdx; ++sequenceIdx)
         {
           int connectionIdx = trip.reverseConnectionsIdx[sequenceIdx];
-          if (optimizationNode == std::get<connectionIndexes::NODE_DEP>(*(reverseConnections[connectionIdx])))
+          if (optimizationNode == (*(reverseConnections[connectionIdx])).getDepartureNode())
           {
-            if (std::get<connectionIndexes::CAN_BOARD>(*(reverseConnections[connectionIdx])) != 1)
+            if (!(reverseConnections[connectionIdx])->canBoard())
             {
               ignoreOptimizationNodes.push_back(optimizationNode.value());
               break;
@@ -237,16 +239,16 @@ namespace TrRouting
       else if (optimizationCase == 3) // GTF // untested
       {
         const Trip & trip = std::get<journeyStepIndexes::FINAL_TRIP>(journey[fromJourneyStepIdx]).value();
-        int sequenceStartIdx = std::get<connectionIndexes::SEQUENCE>(*(reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journey[fromJourneyStepIdx])].get())) - 1;
-        int sequenceEndIdx   = std::get<connectionIndexes::SEQUENCE>(*(reverseConnections[std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION >(journey[fromJourneyStepIdx])].get())) - 1;
+        int sequenceStartIdx = (*(reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journey[fromJourneyStepIdx])].get())).getSequenceInTrip() - 1;
+        int sequenceEndIdx   = (*(reverseConnections[std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION >(journey[fromJourneyStepIdx])].get())).getSequenceInTrip() - 1;
 
         for(size_t sequenceIdx = trip.reverseConnectionsIdx.size() - 1 - sequenceEndIdx; sequenceIdx <= trip.reverseConnectionsIdx.size() - 1 - sequenceStartIdx; ++sequenceIdx)
         {
           int connectionIdx = trip.reverseConnectionsIdx[sequenceIdx];
           
-          if (optimizationNode == std::get<connectionIndexes::NODE_ARR>(*(reverseConnections[connectionIdx])))
+          if (optimizationNode == (*(reverseConnections[connectionIdx])).getArrivalNode())
           {
-            if (std::get<connectionIndexes::CAN_UNBOARD>(*(reverseConnections[connectionIdx])) != 1)
+            if (!(reverseConnections[connectionIdx])->canUnboard())
             {
               ignoreOptimizationNodes.push_back(optimizationNode.value());
               break;
@@ -266,12 +268,12 @@ namespace TrRouting
       else if (optimizationCase == 4) // CSS
       {
         const Trip & arrivalJourneyStepTrip          = std::get<journeyStepIndexes::FINAL_TRIP>(journey[fromJourneyStepIdx]).value();
-        int arrivalJourneyStepSequenceStartIdx = std::get<connectionIndexes::SEQUENCE>(*(reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journey[fromJourneyStepIdx])].get())) - 1;
-        int arrivalJourneyStepSequenceEndIdx   = std::get<connectionIndexes::SEQUENCE>(*(reverseConnections[std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION >(journey[fromJourneyStepIdx])].get())) - 1;
+        int arrivalJourneyStepSequenceStartIdx = (*(reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journey[fromJourneyStepIdx])].get())).getSequenceInTrip() - 1;
+        int arrivalJourneyStepSequenceEndIdx   = (*(reverseConnections[std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION >(journey[fromJourneyStepIdx])].get())).getSequenceInTrip() - 1;
 
         const Trip & departureJourneyStepTrip          = std::get<journeyStepIndexes::FINAL_TRIP>(journey[toJourneyStepIdx]).value();
-        int departureJourneyStepSequenceStartIdx = std::get<connectionIndexes::SEQUENCE>(*(reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journey[toJourneyStepIdx])].get())) - 1;
-        int departureJourneyStepSequenceEndIdx   = std::get<connectionIndexes::SEQUENCE>(*(reverseConnections[std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION >(journey[toJourneyStepIdx])].get())) - 1;
+        int departureJourneyStepSequenceStartIdx = (*(reverseConnections[std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journey[toJourneyStepIdx])].get())).getSequenceInTrip() - 1;
+        int departureJourneyStepSequenceEndIdx   = (*(reverseConnections[std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION >(journey[toJourneyStepIdx])].get())).getSequenceInTrip() - 1;
 
         int  exitConnectionIdx {-1};
 
@@ -279,9 +281,9 @@ namespace TrRouting
           for(size_t sequenceIdx = arrivalJourneyStepTrip.reverseConnectionsIdx.size() - 1 - arrivalJourneyStepSequenceEndIdx; sequenceIdx <= arrivalJourneyStepTrip.reverseConnectionsIdx.size() - 1 - arrivalJourneyStepSequenceStartIdx; ++sequenceIdx)
           {
             int connectionIdx = arrivalJourneyStepTrip.reverseConnectionsIdx[sequenceIdx];
-            if (optimizationNode == std::get<connectionIndexes::NODE_ARR>(*(reverseConnections[ arrivalJourneyStepTrip.reverseConnectionsIdx[sequenceIdx] ])))
+            if (optimizationNode == (*(reverseConnections[ arrivalJourneyStepTrip.reverseConnectionsIdx[sequenceIdx] ])).getArrivalNode())
             {
-              if (std::get<connectionIndexes::CAN_UNBOARD>(*(reverseConnections[ arrivalJourneyStepTrip.reverseConnectionsIdx[sequenceIdx] ])) == 1)
+              if ((*(reverseConnections[ arrivalJourneyStepTrip.reverseConnectionsIdx[sequenceIdx] ])).canUnboard())
               {
                 exitConnectionIdx = connectionIdx;
               }
@@ -295,9 +297,9 @@ namespace TrRouting
           for(size_t sequenceIdx = departureJourneyStepTrip.reverseConnectionsIdx.size() - 1 - departureJourneyStepSequenceEndIdx; sequenceIdx <= departureJourneyStepTrip.reverseConnectionsIdx.size() - 1 - departureJourneyStepSequenceStartIdx; ++sequenceIdx)
           {
             int connectionIdx = departureJourneyStepTrip.reverseConnectionsIdx[sequenceIdx];
-            if (optimizationNode == std::get<connectionIndexes::NODE_DEP>(*(reverseConnections[ departureJourneyStepTrip.reverseConnectionsIdx[sequenceIdx] ])))
+            if (optimizationNode == (*(reverseConnections[ departureJourneyStepTrip.reverseConnectionsIdx[sequenceIdx] ])).getDepartureNode())
             {
-              if (exitConnectionIdx >= 0 && std::get<connectionIndexes::CAN_BOARD>(*(reverseConnections[ departureJourneyStepTrip.reverseConnectionsIdx[sequenceIdx] ])) == 1)
+              if (exitConnectionIdx >= 0 && (reverseConnections[ departureJourneyStepTrip.reverseConnectionsIdx[sequenceIdx] ])->canBoard())
               {
                 usedOptimizationCases.push_back(4);
                 std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION>(journey[fromJourneyStepIdx]) = exitConnectionIdx;

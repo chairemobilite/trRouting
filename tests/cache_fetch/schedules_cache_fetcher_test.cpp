@@ -20,7 +20,7 @@ protected:
     std::map<boost::uuids::uuid, TrRouting::Node> nodes;
     std::map<boost::uuids::uuid, int> tripIndexesByUuid;
     std::map<boost::uuids::uuid, TrRouting::Service> services;
-    std::vector<std::shared_ptr<TrRouting::ConnectionTuple>> connections;
+    std::vector<std::shared_ptr<TrRouting::Connection>> connections;
 
 public:
     void SetUp( ) override

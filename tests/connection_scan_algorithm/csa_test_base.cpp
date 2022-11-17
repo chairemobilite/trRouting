@@ -48,8 +48,6 @@ void BaseCsaFixtureTests::SetUp() {
     // Enable full debug output in the test runs
     spdlog::set_level(spdlog::level::debug);
 
-    std::vector<std::shared_ptr<TrRouting::ConnectionTuple>> connections;
-
     calculator.initializeCalculationData();
 }
 
@@ -73,8 +71,7 @@ void BaseCsaFixtureTests::assertSuccessResults(TrRouting::RoutingResult& result,
     ASSERT_EQ(TrRouting::result_type::SINGLE_CALCULATION, result.resType);
     TrRouting::SingleCalculationResult& routingResult = dynamic_cast<TrRouting::SingleCalculationResult&>(result);
     ASSERT_LE(origDepartureTime, routingResult.departureTime);
-    ASSERT_EQ(expInVehicleTravelTime + expAccessTime + expEgressTime + expTotalWaitingTime + expTransferTravelTime, routingResult.totalTravelTime);
-    ASSERT_EQ(expTransitDepartureTime + expInVehicleTravelTime + expEgressTime + (expTotalWaitingTime - minWaitingTime) + expTransferTravelTime, routingResult.arrivalTime);
+
     ASSERT_EQ(expTransitDepartureTime - expAccessTime - minWaitingTime, routingResult.departureTime);
     ASSERT_EQ(expNbTransfers, routingResult.numberOfTransfers);
     ASSERT_EQ(expInVehicleTravelTime, routingResult.totalInVehicleTime);
@@ -84,5 +81,8 @@ void BaseCsaFixtureTests::assertSuccessResults(TrRouting::RoutingResult& result,
     ASSERT_EQ(expEgressTime, routingResult.egressTravelTime);
     ASSERT_EQ(expTransferWaitingTime, routingResult.transferWaitingTime);
     ASSERT_EQ(minWaitingTime, routingResult.firstWaitingTime);
+    // Test total at the end, so we assert individual value first. (To ease debugging)
     ASSERT_EQ(expAccessTime + expEgressTime + expTransferTravelTime, routingResult.totalNonTransitTravelTime);
+    ASSERT_EQ(expInVehicleTravelTime + expAccessTime + expEgressTime + expTotalWaitingTime + expTransferTravelTime, routingResult.totalTravelTime);
+    ASSERT_EQ(expTransitDepartureTime + expInVehicleTravelTime + expEgressTime + (expTotalWaitingTime - minWaitingTime) + expTransferTravelTime, routingResult.arrivalTime);
 }

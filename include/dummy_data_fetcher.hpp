@@ -116,7 +116,7 @@ namespace TrRouting
       const std::map<boost::uuids::uuid, Line>& ,
       std::map<boost::uuids::uuid, Path>& ,
       const std::map<boost::uuids::uuid, Service>& ,
-      std::vector<std::shared_ptr<ConnectionTuple>>& ,
+      std::vector<std::shared_ptr<Connection>>& ,
       std::string = "") {return 0;}
 
   };    

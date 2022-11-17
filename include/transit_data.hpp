@@ -67,8 +67,8 @@ namespace TrRouting {
     const std::map<boost::uuids::uuid, Scenario> & getScenarios() const {return scenarios;}
     const std::map<boost::uuids::uuid, Trip> & getTrips() const {return trips;}
 
-    const std::vector<std::shared_ptr<ConnectionTuple>> & getForwardConnections() const {return forwardConnections;}
-    const std::vector<std::shared_ptr<ConnectionTuple>> & getReverseConnections() const {return reverseConnections;}
+    const std::vector<std::shared_ptr<Connection>> & getForwardConnections() const {return forwardConnections;}
+    const std::vector<std::shared_ptr<Connection>> & getReverseConnections() const {return reverseConnections;}
 
     /**
      * The update* methods get the data from the data fetcher
@@ -98,7 +98,7 @@ namespace TrRouting {
     
   protected:
     DataStatus loadAllData();
-    int generateForwardAndReverseConnections(const std::vector<std::shared_ptr<ConnectionTuple>> &connections);
+    int generateForwardAndReverseConnections(const std::vector<std::shared_ptr<Connection>> &connections);
 
     DataFetcher &dataFetcher;
 
@@ -114,8 +114,8 @@ namespace TrRouting {
     std::map<boost::uuids::uuid, Scenario>   scenarios;
     std::map<boost::uuids::uuid, Trip>       trips;
 
-    std::vector<std::shared_ptr<ConnectionTuple>> forwardConnections; // Forward connections, sorted by departure time ascending
-    std::vector<std::shared_ptr<ConnectionTuple>> reverseConnections; // Reverse connections, sorted by arrival time descending
+    std::vector<std::shared_ptr<Connection>> forwardConnections; // Forward connections, sorted by departure time ascending
+    std::vector<std::shared_ptr<Connection>> reverseConnections; // Reverse connections, sorted by arrival time descending
   };
 
 }

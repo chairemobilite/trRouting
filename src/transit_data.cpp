@@ -119,7 +119,7 @@ namespace TrRouting {
 
   int TransitData::updateSchedules(std::string customPath)
   {
-    std::vector<std::shared_ptr<ConnectionTuple>> connections;
+    std::vector<std::shared_ptr<Connection>> connections;
     int ret =  dataFetcher.getSchedules(
       trips,
       getLines(),
@@ -136,7 +136,7 @@ namespace TrRouting {
   }
 
   //TODO This should probably take a reference to the connections object and later not use the std::move semantic
-  int TransitData::generateForwardAndReverseConnections(const std::vector<std::shared_ptr<ConnectionTuple>> &connections)
+  int TransitData::generateForwardAndReverseConnections(const std::vector<std::shared_ptr<Connection>> &connections)
   {
 
     // Copy the connections to both forward and reverse vectors
@@ -144,7 +144,7 @@ namespace TrRouting {
     reverseConnections.clear();
     for (size_t i=0; i<connections.size(); i++)
     {
-      std::shared_ptr<ConnectionTuple> reverseConnection = connections[i];
+      std::shared_ptr<Connection> reverseConnection = connections[i];
       forwardConnections.push_back(std::move(connections[i]));
       reverseConnections.push_back(std::move(reverseConnection));
     }
@@ -155,61 +155,60 @@ namespace TrRouting {
     {
       spdlog::info("Sorting connections...");
       // Sort forward connections by departure time, trip id, sequence
-      std::stable_sort(forwardConnections.begin(), forwardConnections.end(), [](const std::shared_ptr<ConnectionTuple>& connectionA, const std::shared_ptr<ConnectionTuple>& connectionB)
+      //TODO Maybe this could be handled by an operator in the connection class or at least some function that we could bind
+      std::stable_sort(forwardConnections.begin(), forwardConnections.end(), [](const std::shared_ptr<Connection>& connectionA, const std::shared_ptr<Connection>& connectionB)
       {
-        // Copied from calculator.hpp
-        // { NODE_DEP = 0, NODE_ARR = 1, TIME_DEP = 2, TIME_ARR = 3, TRIP = 4, CAN_BOARD = 5, CAN_UNBOARD = 6, SEQUENCE = 7, CAN_TRANSFER_SAME_LINE = 8, MIN_WAITING_TIME_SECONDS = 8 };
-        if (std::get<connectionIndexes::TIME_DEP>(*connectionA) < std::get<connectionIndexes::TIME_DEP>(*connectionB))
+        if (connectionA->getDepartureTime() < connectionB->getDepartureTime())
         {
           return true;
         }
-        else if (std::get<connectionIndexes::TIME_DEP>(*connectionA) > std::get<connectionIndexes::TIME_DEP>(*connectionB))
+        else if (connectionA->getDepartureTime() > connectionB->getDepartureTime())
         {
           return false;
         }
         //TODO We could do something  better than comparing uuud for trip. We just need something to have a stable sort
-        if (std::get<connectionIndexes::TRIP>(*connectionA).get().uuid < std::get<connectionIndexes::TRIP>(*connectionB).get().uuid)
+        if (connectionA->getTrip().uuid < connectionB->getTrip().uuid)
         {
           return true;
         }
-        else if (std::get<connectionIndexes::TRIP>(*connectionA).get().uuid > std::get<connectionIndexes::TRIP>(*connectionB).get().uuid)
+        else if (connectionA->getTrip().uuid > connectionB->getTrip().uuid)
         {
           return false;
         }
-        if (std::get<connectionIndexes::SEQUENCE>(*connectionA) < std::get<connectionIndexes::SEQUENCE>(*connectionB))
+        if (connectionA->getSequenceInTrip() < connectionB->getSequenceInTrip())
         {
           return true;
         }
-        else if (std::get<connectionIndexes::SEQUENCE>(*connectionA) > std::get<connectionIndexes::SEQUENCE>(*connectionB))
+        else if (connectionA->getSequenceInTrip() > connectionB->getSequenceInTrip())
         {
           return false;
         }
         return false;
       });
       // Sort reverse connection by arrival time, trip and sequence
-      std::stable_sort(reverseConnections.begin(), reverseConnections.end(), [](const std::shared_ptr<ConnectionTuple>& connectionA, const std::shared_ptr<ConnectionTuple>& connectionB)
+      std::stable_sort(reverseConnections.begin(), reverseConnections.end(), [](const std::shared_ptr<Connection>& connectionA, const std::shared_ptr<Connection>& connectionB)
       {
-        if (std::get<connectionIndexes::TIME_ARR>(*connectionA) > std::get<connectionIndexes::TIME_ARR>(*connectionB))
+        if (connectionA->getArrivalTime() > connectionB->getArrivalTime())
         {
           return true;
         }
-        else if (std::get<connectionIndexes::TIME_ARR>(*connectionA) < std::get<connectionIndexes::TIME_ARR>(*connectionB))
+        else if (connectionA->getArrivalTime() < connectionB->getArrivalTime())
         {
           return false;
         }
-        if (std::get<connectionIndexes::TRIP>(*connectionA).get().uuid > std::get<connectionIndexes::TRIP>(*connectionB).get().uuid) // here we need to reverse sequence!
+        if (connectionA->getTrip().uuid > connectionB->getTrip().uuid) // here we need to reverse sequence!
         {
           return true;
         }
-        else if (std::get<connectionIndexes::TRIP>(*connectionA).get().uuid < std::get<connectionIndexes::TRIP>(*connectionB).get().uuid)
+        else if (connectionA->getTrip().uuid < connectionB->getTrip().uuid)
         {
           return false;
         }
-        if (std::get<connectionIndexes::SEQUENCE>(*connectionA) > std::get<connectionIndexes::SEQUENCE>(*connectionB)) // here we need to reverse sequence!
+        if (connectionA->getSequenceInTrip() > connectionB->getSequenceInTrip()) // here we need to reverse sequence!
         {
           return true;
         }
-        else if (std::get<connectionIndexes::SEQUENCE>(*connectionA) < std::get<connectionIndexes::SEQUENCE>(*connectionB))
+        else if (connectionA->getSequenceInTrip() < connectionB->getSequenceInTrip())
         {
           return false;
         }
@@ -225,7 +224,8 @@ namespace TrRouting {
       int i {0};
       for(auto & connection : forwardConnections)
       {
-        Trip & trip = std::get<connectionIndexes::TRIP>(*connection);
+        //TODO This require a trip to be modified, we might want to revisit how to create Connection and Trip (#201)
+        Trip & trip = connection->getTripMutable();
         trip.forwardConnectionsIdx.push_back(i);
         i++;
       }
@@ -233,7 +233,8 @@ namespace TrRouting {
       i = 0;
       for(auto & connection : reverseConnections)
       {
-        Trip & trip = std::get<connectionIndexes::TRIP>(*connection);
+        //TODO This require a trip to be modified, we might want to revisit how to create Connection and Trip (#201)
+        Trip & trip = connection->getTripMutable();
         trip.reverseConnectionsIdx.push_back(i);
         i++;
       }
