@@ -70,7 +70,7 @@ namespace TrRouting
     int i = 0;
     for (auto & connection : transitData.getForwardConnections())
     {
-      while (std::get<connectionIndexes::TIME_DEP>(*connection) >= hour * 3600 && forwardConnectionsIndexPerDepartureTimeHour[hour] == -1 && hour < 32)
+      while (connection->getDepartureTime() >= hour * 3600 && forwardConnectionsIndexPerDepartureTimeHour[hour] == -1 && hour < 32)
       {
         forwardConnectionsIndexPerDepartureTimeHour[hour] = i;
         hour++;
@@ -82,7 +82,7 @@ namespace TrRouting
     i = 0;
     for (auto & connection : transitData.getReverseConnections())
     {
-      while (std::get<connectionIndexes::TIME_ARR>(*connection) <= hour * 3600 && reverseConnectionsIndexPerArrivalTimeHour[hour] == lastConnectionIndex && hour >= 0)
+      while (connection->getArrivalTime() <= hour * 3600 && reverseConnectionsIndexPerArrivalTimeHour[hour] == lastConnectionIndex && hour >= 0)
       {
         reverseConnectionsIndexPerArrivalTimeHour[hour] = i;
         hour--;
