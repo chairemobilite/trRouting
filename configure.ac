@@ -1,4 +1,4 @@
-AC_INIT([trRouting], [1.0], [https://github.com/kaligrafy/trRouting])
+AC_INIT([trRouting], [1.0], [https://github.com/chairemobilite/trRouting])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
 
 AC_CONFIG_MACRO_DIRS([m4])
