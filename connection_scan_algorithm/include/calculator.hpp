@@ -100,8 +100,9 @@ namespace TrRouting
     long long        calculationTime;
     std::string      accessMode;
     std::string      egressMode;
-    std::vector<int> forwardConnectionsIndexPerDepartureTimeHour;
-    std::vector<int> reverseConnectionsIndexPerArrivalTimeHour;
+    //TODO
+    ////std::vector<int> forwardConnectionsIndexPerDepartureTimeHour;    
+    ////std::vector<int> reverseConnectionsIndexPerArrivalTimeHour;
 
     std::unordered_map<Node::uid_t, int> nodesTentativeTime; // arrival time at node
     std::unordered_map<Node::uid_t, int> nodesReverseTentativeTime; // departure time at node
