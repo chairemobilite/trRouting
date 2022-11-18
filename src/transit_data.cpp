@@ -221,22 +221,18 @@ namespace TrRouting {
       calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
 
       // assign connections to trips:
-      int i {0};
       for(auto & connection : forwardConnections)
       {
         //TODO This require a trip to be modified, we might want to revisit how to create Connection and Trip (#201)
         Trip & trip = connection->getTripMutable();
-        trip.forwardConnectionsIdx.push_back(i);
-        i++;
+        trip.forwardConnections.push_back(connection);
       }
 
-      i = 0;
       for(auto & connection : reverseConnections)
       {
         //TODO This require a trip to be modified, we might want to revisit how to create Connection and Trip (#201)
         Trip & trip = connection->getTripMutable();
-        trip.reverseConnectionsIdx.push_back(i);
-        i++;
+        trip.reverseConnections.push_back(connection);
       }
 
       spdlog::debug("-- assign connections to trips -- {} microseconds", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
