@@ -125,7 +125,7 @@ namespace TrRouting
         nodesAccess.emplace(accessFootpath.node.uid, NodeTimeDistance(accessFootpath.node,
                                                                       footpathTravelTimeSeconds,
                                                                       footpathDistanceMeters));
-        forwardJourneysSteps[accessFootpath.node.uid]  = std::make_tuple(-1, -1, std::nullopt, footpathTravelTimeSeconds, -1, footpathDistanceMeters);
+        forwardJourneysSteps[accessFootpath.node.uid]  = std::make_tuple(std::nullopt, std::nullopt, std::nullopt, footpathTravelTimeSeconds, -1, footpathDistanceMeters);
         nodesTentativeTime[accessFootpath.node.uid]    = departureTimeSeconds + footpathTravelTimeSeconds;
         if (footpathTravelTimeSeconds < minAccessTravelTime)
         {
@@ -195,7 +195,7 @@ namespace TrRouting
                                                                        footpathTravelTimeSeconds,
                                                                        footpathDistanceMeters));
 
-        reverseJourneysSteps[egressFootpath.node.uid] = std::make_tuple(-1, -1, std::nullopt, footpathTravelTimeSeconds, -1, footpathDistanceMeters);
+        reverseJourneysSteps[egressFootpath.node.uid] = std::make_tuple(std::nullopt, std::nullopt, std::nullopt, footpathTravelTimeSeconds, -1, footpathDistanceMeters);
         nodesReverseTentativeTime[egressFootpath.node.uid] = arrivalTimeSeconds - footpathTravelTimeSeconds;
         if (footpathTravelTimeSeconds > maxEgressTravelTime)
         {

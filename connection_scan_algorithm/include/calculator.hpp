@@ -37,7 +37,7 @@ namespace TrRouting
   class AlternativesResult;
   class TransitData;
 
-  using JourneyStep = std::tuple<int,int,std::optional<std::reference_wrapper<const Trip>>,int,short,int>; //final enter connection, final exit connection, final trip, transfer travel time, is same node transfer (first, second, third and fourth values = -1 for access and egress journeys)
+  using JourneyStep = std::tuple<std::optional<std::shared_ptr<Connection>>,std::optional<std::shared_ptr<Connection>>,std::optional<std::reference_wrapper<const Trip>>,int,short,int>; //final enter connection, final exit connection, final trip, transfer travel time, is same node transfer (first, second, third and fourth values = -1 for access and egress journeys)
 
   class Calculator {
 

@@ -45,8 +45,8 @@ namespace TrRouting
     short allowSameLineTransfers;
     int totalCapacity; //Unused
     int seatedCapacity; //Unused
-    std::vector<int> forwardConnectionsIdx;
-    std::vector<int> reverseConnectionsIdx;
+    std::vector<std::shared_ptr<Connection>> forwardConnections;
+    std::vector<std::shared_ptr<Connection>> reverseConnections;
     std::vector<int>   connectionDepartureTimes; // tripIndex: [connectionIndex (sequence in trip): departureTimeSeconds]
 
     uid_t uid; //Local, temporary unique id, used to speed up lookups
@@ -66,17 +66,17 @@ namespace TrRouting
 
     TripQueryData()
       : usable(false),
-        enterConnection(-1),
+        enterConnection(std::nullopt),
         enterConnectionTransferTravelTime(MAX_INT),
-        exitConnection(-1),
+        exitConnection(std::nullopt),
         exitConnectionTransferTravelTime(MAX_INT)
     {
 
     }
     bool usable; // after forward calculation, keep a list of usable trips in time range for reverse calculation
-    int enterConnection; // index of the entering connection
+    std::optional<std::shared_ptr<Connection>> enterConnection; // index of the entering connection
     int enterConnectionTransferTravelTime;
-    int exitConnection; // index of the exiting connection
+    std::optional<std::shared_ptr<Connection>> exitConnection; // index of the exiting connection
     int exitConnectionTransferTravelTime;
   };
 
