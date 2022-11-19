@@ -1,4 +1,4 @@
-FROM debian:buster-slim 
+FROM debian:bullseye-slim
 WORKDIR /source
 # Install dependencies in an intermediate image
 RUN apt-get update && \
