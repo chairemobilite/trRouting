@@ -61,45 +61,6 @@ namespace TrRouting
 
     //int benchmarkingStart = algorithmCalculationTime.getEpoch();
 
-    //TODO See comments in forward_calculation about forwardConnectionsIndexPerDepartureTimeHour
-    /* 
-    int lastConnectionIndex = transitData.getForwardConnections().size() - 1;
-
-    forwardConnectionsIndexPerDepartureTimeHour = std::vector<int>(32, -1);
-    reverseConnectionsIndexPerArrivalTimeHour   = std::vector<int>(32, lastConnectionIndex);
-
-    int hour {0};
-    int i = 0;
-    for (auto & connection : transitData.getForwardConnections())
-    {
-      while (connection->getDepartureTime() >= hour * 3600 && forwardConnectionsIndexPerDepartureTimeHour[hour] == -1 && hour < 32)
-      {
-        forwardConnectionsIndexPerDepartureTimeHour[hour] = i;
-        hour++;
-      }
-      i++;
-    }
-
-    hour = 31;
-    i = 0;
-    for (auto & connection : transitData.getReverseConnections())
-    {
-      while (connection->getArrivalTime() <= hour * 3600 && reverseConnectionsIndexPerArrivalTimeHour[hour] == lastConnectionIndex && hour >= 0)
-      {
-        reverseConnectionsIndexPerArrivalTimeHour[hour] = i;
-        hour--;
-      }
-      i++;
-    }
-
-    for (int h = 0; h < 32; h++)
-    {
-      if (forwardConnectionsIndexPerDepartureTimeHour[h] == -1)
-      {
-        forwardConnectionsIndexPerDepartureTimeHour[h] = lastConnectionIndex;
-      }
-    }*/
-
   }
 
 }

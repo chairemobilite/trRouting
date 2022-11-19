@@ -40,12 +40,8 @@ namespace TrRouting
     // reverse calculation:
 
     // main loop for reverse connections:
-    ////i = (arrivalTimeHour + 1 >= reverseConnectionsIndexPerArrivalTimeHour.size()) ? 0 : reverseConnectionsIndexPerArrivalTimeHour[arrivalTimeHour + 1];
-    //i = 0;
     auto lastConnection = reverseConnections.end();
-    //TODO See comment in forward_calculation about forwardConnectionsIndexPerDepartureTimeHour
-    ////for(auto connection = reverseConnections.begin() + reverseConnectionsIndexPerArrivalTimeHour[arrivalTimeHour + 1]; connection != lastConnection; ++connection)
-    for(auto connection = reverseConnections.begin(); connection != lastConnection; ++connection)
+    for(auto connection = transitData.getReverseConnectionsBeginAtArrivalHour(arrivalTimeHour + 1); connection != lastConnection; ++connection)
     {
       // ignore connections after arrival time - minimum egress travel time:
       if ((**connection).getArrivalTime() <= arrivalTimeSeconds - (params.returnAllNodesResult ? 0 : minEgressTravelTime))
