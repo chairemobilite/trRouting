@@ -34,12 +34,8 @@ namespace TrRouting
     int  departureTimeHour = departureTimeSeconds / 3600;
 
     // main loop:
-    ////int i = forwardConnectionsIndexPerDepartureTimeHour[departureTimeHour];
     auto lastConnection = transitData.getForwardConnections().end(); // cache last connection for loop
-    //TODO Let's ignore the forwardConnectionsIndexPerDepartureTimeHour, it's a small optimization which complexify the code
-    // We can replace it by a transitData.GetFCbeginItePerHour function which will cache the result internally 
-    ////for(auto connection = transitData.getForwardConnections().begin() + forwardConnectionsIndexPerDepartureTimeHour[departureTimeHour]; connection != lastConnection; ++connection)
-    for(auto connection = transitData.getForwardConnections().begin(); connection != lastConnection; ++connection)
+    for(auto connection = transitData.getForwardConnectionsBeginAtDepartureHour(departureTimeHour); connection != lastConnection; ++connection)
     {
       
       // ignore connections before departure time + minimum access travel time:

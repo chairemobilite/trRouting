@@ -135,7 +135,53 @@ namespace TrRouting {
     return generateForwardAndReverseConnections(connections);
   }
 
-  //TODO This should probably take a reference to the connections object and later not use the std::move semantic
+  std::vector<std::shared_ptr<Connection>>::const_iterator TransitData::getForwardConnectionsBeginAtDepartureHour(int hour) const
+  {
+    if (hour > 32 || hour  < 0) {
+      return forwardConnections.cend();
+    }
+
+    return forwardConnectionsBeginIteratorCache[hour];
+  };
+
+  std::vector<std::shared_ptr<Connection>>::const_iterator TransitData::getReverseConnectionsBeginAtArrivalHour(int hour) const
+  {
+    if (hour > 32 || hour  < 0) {
+      return reverseConnections.cend();
+    }
+
+    return reverseConnectionsBeginIteratorCache[hour];
+  };
+
+  // Create a cache with a begin iterator which match the connection closest to the specified hour
+  void TransitData::generateConnectionsIteratorCache() {
+    int currentHour = 0;
+    for (std::vector<std::shared_ptr<Connection>>::const_iterator ite = forwardConnections.cbegin();
+         ite != forwardConnections.cend();
+         ite++) {
+      while ((*ite)->getDepartureTime() >= currentHour * 3600) {
+        //forwardConnectionsBeginIteratorCache[currentHour] = ite;
+        forwardConnectionsBeginIteratorCache.push_back(ite);
+        currentHour++;
+      }
+    }
+    //Finish filling forward cache
+    for (;currentHour < 32; currentHour++) {
+      forwardConnectionsBeginIteratorCache.push_back(forwardConnections.cend());
+    }
+
+    currentHour = 31;
+    for (std::vector<std::shared_ptr<Connection>>::const_iterator ite = reverseConnections.cbegin();
+         ite != reverseConnections.cend();
+         ite++) {
+      while ((*ite)->getArrivalTime() <= currentHour * 3600 && currentHour > 0) {
+        //forwardConnectionsBeginIteratorCache[currentHour] = ite;
+        reverseConnectionsBeginIteratorCache.insert(reverseConnectionsBeginIteratorCache.begin(),ite);
+        currentHour--;
+      }
+    }    
+  }
+
   int TransitData::generateForwardAndReverseConnections(const std::vector<std::shared_ptr<Connection>> &connections)
   {
 
@@ -236,6 +282,8 @@ namespace TrRouting {
       }
 
       spdlog::debug("-- assign connections to trips -- {} microseconds", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
+
+      generateConnectionsIteratorCache();
       return 0;
     }
     catch (const std::exception& ex)
