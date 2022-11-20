@@ -176,7 +176,7 @@ namespace TrRouting
         {
           auto connection = trip.reverseConnections[sequenceIdx];
           
-          if (optimizationNode == connection->getArrivalNode())
+          if (optimizationNode.value() == connection->getArrivalNode())
           {
             if (!connection->canUnboard())
             {
@@ -211,7 +211,7 @@ namespace TrRouting
         for(size_t sequenceIdx = trip.reverseConnections.size() - 1 - sequenceEndIdx; sequenceIdx <= trip.reverseConnections.size() - 1 - sequenceStartIdx; ++sequenceIdx)
         {
           auto connection = trip.reverseConnections[sequenceIdx];
-          if (optimizationNode == connection->getDepartureNode())
+          if (optimizationNode.value() == connection->getDepartureNode())
           {
             if (!connection->canBoard())
             {
@@ -241,7 +241,7 @@ namespace TrRouting
         {
           auto connection = trip.reverseConnections[sequenceIdx];
           
-          if (optimizationNode == connection->getArrivalNode())
+          if (optimizationNode.value() == connection->getArrivalNode())
           {
             if (!connection->canUnboard())
             {
@@ -276,7 +276,7 @@ namespace TrRouting
           for(size_t sequenceIdx = arrivalJourneyStepTrip.reverseConnections.size() - 1 - arrivalJourneyStepSequenceEndIdx; sequenceIdx <= arrivalJourneyStepTrip.reverseConnections.size() - 1 - arrivalJourneyStepSequenceStartIdx; ++sequenceIdx)
           {
             auto connection = arrivalJourneyStepTrip.reverseConnections[sequenceIdx];
-            if (optimizationNode == connection->getArrivalNode())
+            if (optimizationNode.value() == connection->getArrivalNode())
             {
               if (connection->canUnboard())
               {
@@ -292,7 +292,7 @@ namespace TrRouting
           for(size_t sequenceIdx = departureJourneyStepTrip.reverseConnections.size() - 1 - departureJourneyStepSequenceEndIdx; sequenceIdx <= departureJourneyStepTrip.reverseConnections.size() - 1 - departureJourneyStepSequenceStartIdx; ++sequenceIdx)
           {
             auto connection = departureJourneyStepTrip.reverseConnections[sequenceIdx];
-            if (optimizationNode == connection->getDepartureNode())
+            if (optimizationNode.value() == connection->getDepartureNode())
             {
               if (exitConnection.has_value() && connection->canBoard())
               {
