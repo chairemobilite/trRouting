@@ -105,8 +105,9 @@ namespace TrRouting
       );
       RouteParameters(const RouteParameters& routeParams);
       virtual ~RouteParameters() {}
-      Point* getOrigin() { return origin.get(); }
-      Point* getDestination() { return destination.get(); }
+      // TODO Should Point be const here?
+      Point* getOrigin() const { return origin.get(); }
+      Point* getDestination() const { return destination.get(); }
       // FIXME Temporary method, will be removed once calculation specific parameters are implemented. Try not to use.
       const Scenario& getScenario() { return scenario; }
       int getTimeOfTrip() const { return timeOfTrip; }
@@ -130,16 +131,16 @@ namespace TrRouting
       static RouteParameters createRouteODParameter(std::vector<std::pair<std::string, std::string>> &parameters,
                                                     const std::map<boost::uuids::uuid, Scenario> &scenarios
       );
-      const std::vector<std::reference_wrapper<const Service>>& getOnlyServices() { return onlyServices; }
-      const std::vector<std::reference_wrapper<const Service>>& getExceptServices() { return exceptServices; }
-      const std::vector<std::reference_wrapper<const Line>>& getOnlyLines() { return onlyLines; }
-      const std::vector<std::reference_wrapper<const Line>>& getExceptLines() { return exceptLines; }
-      const std::vector<std::reference_wrapper<const Mode>>& getOnlyModes() { return onlyModes; }
-      const std::vector<std::reference_wrapper<const Mode>>& getExceptModes() { return exceptModes; }
-      const std::vector<std::reference_wrapper<const Agency>>& getOnlyAgencies() { return onlyAgencies; }
-      const std::vector<std::reference_wrapper<const Agency>>& getExceptAgencies() { return exceptAgencies; }
-      const std::vector<std::reference_wrapper<const Node>>& getOnlyNodes() { return onlyNodes; }
-      const std::vector<std::reference_wrapper<const Node>>& getExceptNodes() { return exceptNodes; }
+      const std::vector<std::reference_wrapper<const Service>>& getOnlyServices() const { return onlyServices; }
+      const std::vector<std::reference_wrapper<const Service>>& getExceptServices() const { return exceptServices; }
+      const std::vector<std::reference_wrapper<const Line>>& getOnlyLines() const { return onlyLines; }
+      const std::vector<std::reference_wrapper<const Line>>& getExceptLines() const { return exceptLines; }
+      const std::vector<std::reference_wrapper<const Mode>>& getOnlyModes() const { return onlyModes; }
+      const std::vector<std::reference_wrapper<const Mode>>& getExceptModes() const { return exceptModes; }
+      const std::vector<std::reference_wrapper<const Agency>>& getOnlyAgencies() const { return onlyAgencies; }
+      const std::vector<std::reference_wrapper<const Agency>>& getExceptAgencies() const { return exceptAgencies; }
+      const std::vector<std::reference_wrapper<const Node>>& getOnlyNodes() const { return onlyNodes; }
+      const std::vector<std::reference_wrapper<const Node>>& getExceptNodes() const { return exceptNodes; }
   };
 
   class Parameters {
