@@ -14,6 +14,7 @@ namespace TrRouting
   class Line;
   class Path;
   class Trip;
+  class Node;
 
   // TODO These enums are used temporarily, while we need the class hierarchy to be able to determine which type is returned when dynamic cast is necessary
   enum result_type { SINGLE_CALCULATION, ALTERNATIVES, ALL_NODES };
@@ -66,57 +67,21 @@ namespace TrRouting
    */
   class TransitRoutingStep : public RoutingStep {
   public:
-    boost::uuids::uuid agencyUuid;
-    std::string agencyAcronym;
-    std::string agencyName;
-    boost::uuids::uuid lineUuid;
-    std::string lineShortname;
-    std::string lineLongname;
-    boost::uuids::uuid pathUuid;
-    std::string modeName;
-    std::string mode;
-    boost::uuids::uuid tripUuid;
+    const Trip & trip;
     int legSequenceInTrip;
     int stopSequenceInTrip;
-    boost::uuids::uuid nodeUuid;
-    std::string nodeCode;
-    std::string nodeName;
-    Point& nodeCoordinates;
+    const Node & node;
     TransitRoutingStep(
       result_step_type _action,
-      boost::uuids::uuid _agencyUuid,
-      std::string _agencyAcronym,
-      std::string _agencyName,
-      boost::uuids::uuid _lineUuid,
-      std::string _lineShortname,
-      std::string _lineLongname,
-      boost::uuids::uuid _pathUuid,
-      std::string _modeName,
-      std::string _mode,
-      boost::uuids::uuid _tripUuid,
+      const Trip & _trip,
       int _legSequenceInTrip,
       int _stopSequenceInTrip,
-      boost::uuids::uuid _nodeUuid,
-      std::string _nodeCode,
-      std::string _nodeName,
-      Point& _nodeCoordinates
+      const Node & _node
     ): RoutingStep(_action),
-    agencyUuid(_agencyUuid),
-    agencyAcronym(_agencyAcronym),
-    agencyName(_agencyName),
-    lineUuid(_lineUuid),
-    lineShortname(_lineShortname),
-    lineLongname(_lineLongname),
-    pathUuid(_pathUuid),
-    modeName(_modeName),
-    mode(_mode),
-    tripUuid(_tripUuid),
-    legSequenceInTrip(_legSequenceInTrip),
-    stopSequenceInTrip(_stopSequenceInTrip),
-    nodeUuid(_nodeUuid),
-    nodeCode(_nodeCode),
-    nodeName(_nodeName),
-    nodeCoordinates(_nodeCoordinates)
+       trip(_trip),
+       legSequenceInTrip(_legSequenceInTrip),
+       stopSequenceInTrip(_stopSequenceInTrip),
+       node(_node)
     {}
   };
 
@@ -128,29 +93,15 @@ namespace TrRouting
     int departureTime;
     int waitingTime;
     BoardingStep(
-      boost::uuids::uuid _agencyUuid,
-      std::string _agencyAcronym,
-      std::string _agencyName,
-      boost::uuids::uuid _lineUuid,
-      std::string _lineShortname,
-      std::string _lineLongname,
-      boost::uuids::uuid _pathUuid,
-      std::string _modeName,
-      std::string _mode,
-      boost::uuids::uuid _tripUuid,
+      const Trip & _trip,
       int _legSequenceInTrip,
       int _stopSequenceInTrip,
-      boost::uuids::uuid _nodeUuid,
-      std::string _nodeCode,
-      std::string _nodeName,
-      Point& _nodeCoordinates,
+      const Node & _node,
       int _departureTime,
       int _waitingTime
-    ): TransitRoutingStep(result_step_type::BOARDING, _agencyUuid, _agencyAcronym, _agencyName,
-      _lineUuid, _lineShortname, _lineLongname, _pathUuid,
-      _modeName, _mode, _tripUuid, _legSequenceInTrip,
-      _stopSequenceInTrip, _nodeUuid, _nodeCode, _nodeName,
-      _nodeCoordinates), departureTime(_departureTime), waitingTime(_waitingTime)
+                 ): TransitRoutingStep(result_step_type::BOARDING, _trip, _legSequenceInTrip, _stopSequenceInTrip, _node),
+                    departureTime(_departureTime),
+                    waitingTime(_waitingTime)
     {}
     void do_accept(StepVisitorBase &visitor) const override {
       return visitor.visitBoardingStep(*this);
@@ -166,31 +117,16 @@ namespace TrRouting
     int inVehicleTime;
     int inVehicleDistanceMeters;
     UnboardingStep(
-      boost::uuids::uuid _agencyUuid,
-      std::string _agencyAcronym,
-      std::string _agencyName,
-      boost::uuids::uuid _lineUuid,
-      std::string _lineShortname,
-      std::string _lineLongname,
-      boost::uuids::uuid _pathUuid,
-      std::string _modeName,
-      std::string _mode,
-      boost::uuids::uuid _tripUuid,
+      const Trip & _trip,
       int _legSequenceInTrip,
       int _stopSequenceInTrip,
-      boost::uuids::uuid _nodeUuid,
-      std::string _nodeCode,
-      std::string _nodeName,
-      Point& _nodeCoordinates,
+      const Node & _node,
       int _arrivalTime,
       int _inVehicleTime,
       int _inVehicleDistanceMeters
-    ): TransitRoutingStep(result_step_type::UNBOARDING, _agencyUuid, _agencyAcronym, _agencyName,
-      _lineUuid, _lineShortname, _lineLongname, _pathUuid,
-      _modeName, _mode, _tripUuid, _legSequenceInTrip,
-      _stopSequenceInTrip, _nodeUuid, _nodeCode, _nodeName,
-      _nodeCoordinates), arrivalTime(_arrivalTime), inVehicleTime(_inVehicleTime),
-      inVehicleDistanceMeters(_inVehicleDistanceMeters)
+                   ): TransitRoutingStep(result_step_type::UNBOARDING, _trip, _legSequenceInTrip, _stopSequenceInTrip, _node),
+                      arrivalTime(_arrivalTime), inVehicleTime(_inVehicleTime),
+                      inVehicleDistanceMeters(_inVehicleDistanceMeters)
     {}
     void do_accept(StepVisitorBase &visitor) const override {
       return visitor.visitUnboardingStep(*this);

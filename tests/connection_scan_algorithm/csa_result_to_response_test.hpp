@@ -8,7 +8,13 @@
 #include "parameters.hpp"
 #include "toolbox.hpp" //MAX_INT
 #include "scenario.hpp"
-
+#include "mode.hpp"
+#include "agency.hpp"
+#include "line.hpp"
+#include "path.hpp"
+#include "service.hpp"
+#include "trip.hpp"
+#include "node.hpp"
 
 // Base class for all result to responses conversions
 class ResultToResponseFixtureTest : public ::testing::Test
@@ -29,11 +35,21 @@ protected:
     inline static const std::string tripUuid = "aaaaaaaa-4444-cccc-dddd-eeeeeeffffff";
     inline static const std::string boardingNodeUuid = "aaaaaaaa-5555-cccc-dddd-eeeeeeffffff";
     inline static const std::string unboardingNodeUuid = "aaaaaaaa-6666-cccc-dddd-eeeeeeffffff";
-    inline static TrRouting::Point boardingNode = TrRouting::Point(45.526, -73.59);
-    inline static TrRouting::Point unboardingNode = TrRouting::Point(45.53, -73.61);
+    inline static TrRouting::Point boardingNodePoint = TrRouting::Point(45.526, -73.59);
+    inline static TrRouting::Point unboardingNodePoint = TrRouting::Point(45.53, -73.61);
 
     std::unique_ptr<TrRouting::Scenario> scenario;
     std::unique_ptr<TrRouting::RouteParameters> testParameters;
+
+  std::unique_ptr<TrRouting::Mode> mode;
+  std::unique_ptr<TrRouting::Agency> agency;
+  std::unique_ptr<TrRouting::Line> line;
+  std::unique_ptr<TrRouting::Path> path;
+  std::unique_ptr<TrRouting::Service> service;
+  std::unique_ptr<TrRouting::Trip> trip;
+  std::unique_ptr<TrRouting::Node> boardingNode;
+  std::unique_ptr<TrRouting::Node> unboardingNode;
+
 
     std::unique_ptr<TrRouting::SingleCalculationResult> getSingleResult();
     virtual void assertResultConversion(nlohmann::json jsonResponse, TrRouting::SingleCalculationResult &result, TrRouting::RouteParameters &params) = 0;

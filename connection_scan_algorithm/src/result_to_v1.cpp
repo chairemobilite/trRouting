@@ -4,6 +4,12 @@
 #include "toolbox.hpp"
 #include "parameters.hpp"
 #include "routing_result.hpp"
+#include "trip.hpp"
+#include "agency.hpp"
+#include "line.hpp"
+#include "mode.hpp"
+#include "node.hpp"
+#include "path.hpp"
 
 
 namespace TrRouting
@@ -49,22 +55,22 @@ namespace TrRouting
   {
     nlohmann::json stepJson;
     stepJson["action"] = "board";
-    stepJson["agencyAcronym"] = step.agencyAcronym;
-    stepJson["agencyName"] = step.agencyName;
-    stepJson["agencyUuid"] = boost::uuids::to_string(step.agencyUuid);
-    stepJson["lineShortname"] = step.lineShortname;
-    stepJson["lineLongname"] = step.lineLongname;
-    stepJson["lineUuid"] = boost::uuids::to_string(step.lineUuid);
-    stepJson["pathUuid"] = boost::uuids::to_string(step.pathUuid);
-    stepJson["modeName"] = step.modeName;
-    stepJson["mode"] = step.mode;
-    stepJson["tripUuid"] = boost::uuids::to_string(step.tripUuid);
+    stepJson["agencyAcronym"] = step.trip.agency.acronym;
+    stepJson["agencyName"] = step.trip.agency.name;
+    stepJson["agencyUuid"] = boost::uuids::to_string(step.trip.agency.uuid);
+    stepJson["lineShortname"] = step.trip.line.shortname;
+    stepJson["lineLongname"] = step.trip.line.longname;
+    stepJson["lineUuid"] = boost::uuids::to_string(step.trip.line.uuid);
+    stepJson["pathUuid"] = boost::uuids::to_string(step.trip.path.uuid);
+    stepJson["modeName"] = step.trip.line.mode.name;
+    stepJson["mode"] = step.trip.line.mode.shortname;
+    stepJson["tripUuid"] = boost::uuids::to_string(step.trip.uuid);
     stepJson["legSequenceInTrip"] = step.legSequenceInTrip;
     stepJson["stopSequenceInTrip"] = step.stopSequenceInTrip;
-    stepJson["nodeName"] = step.nodeName;
-    stepJson["nodeCode"] = step.nodeCode;
-    stepJson["nodeUuid"] = boost::uuids::to_string(step.nodeUuid);
-    stepJson["nodeCoordinates"] = {step.nodeCoordinates.longitude, step.nodeCoordinates.latitude};
+    stepJson["nodeName"] = step.node.name;
+    stepJson["nodeCode"] = step.node.code;
+    stepJson["nodeUuid"] = boost::uuids::to_string(step.node.uuid);
+    stepJson["nodeCoordinates"] = {step.node.point->longitude, step.node.point->latitude};
     stepJson["departureTime"] = Toolbox::convertSecondsToFormattedTime(step.departureTime);
     stepJson["departureTimeSeconds"] = step.departureTime;
     stepJson["waitingTimeSeconds"] = step.waitingTime;
@@ -76,22 +82,22 @@ namespace TrRouting
   {
     nlohmann::json stepJson;
     stepJson["action"] = "unboard";
-    stepJson["agencyAcronym"] = step.agencyAcronym;
-    stepJson["agencyName"] = step.agencyName;
-    stepJson["agencyUuid"] = boost::uuids::to_string(step.agencyUuid);
-    stepJson["lineShortname"] = step.lineShortname;
-    stepJson["lineLongname"] = step.lineLongname;
-    stepJson["lineUuid"] = boost::uuids::to_string(step.lineUuid);
-    stepJson["pathUuid"] = boost::uuids::to_string(step.pathUuid);
-    stepJson["modeName"] = step.modeName;
-    stepJson["mode"] = step.mode;
-    stepJson["tripUuid"] = boost::uuids::to_string(step.tripUuid);
+    stepJson["agencyAcronym"] = step.trip.agency.acronym;
+    stepJson["agencyName"] = step.trip.agency.name;
+    stepJson["agencyUuid"] = boost::uuids::to_string(step.trip.agency.uuid);
+    stepJson["lineShortname"] = step.trip.line.shortname;
+    stepJson["lineLongname"] = step.trip.line.longname;
+    stepJson["lineUuid"] = boost::uuids::to_string(step.trip.line.uuid);
+    stepJson["pathUuid"] = boost::uuids::to_string(step.trip.path.uuid);
+    stepJson["modeName"] = step.trip.line.mode.name;
+    stepJson["mode"] = step.trip.line.mode.shortname;
+    stepJson["tripUuid"] = boost::uuids::to_string(step.trip.uuid);
     stepJson["legSequenceInTrip"] = step.legSequenceInTrip;
     stepJson["stopSequenceInTrip"] = step.stopSequenceInTrip;
-    stepJson["nodeName"] = step.nodeName;
-    stepJson["nodeCode"] = step.nodeCode;
-    stepJson["nodeUuid"] = boost::uuids::to_string(step.nodeUuid);
-    stepJson["nodeCoordinates"] = {step.nodeCoordinates.longitude, step.nodeCoordinates.latitude};
+    stepJson["nodeName"] = step.node.name;
+    stepJson["nodeCode"] = step.node.code;
+    stepJson["nodeUuid"] = boost::uuids::to_string(step.node.uuid);
+    stepJson["nodeCoordinates"] = {step.node.point->longitude, step.node.point->latitude};
     stepJson["arrivalTime"] = Toolbox::convertSecondsToFormattedTime(step.arrivalTime);
     stepJson["arrivalTimeSeconds"] = step.arrivalTime;
     stepJson["inVehicleTimeSeconds"] = step.inVehicleTime;

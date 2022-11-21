@@ -79,12 +79,12 @@ void ResultToV2SummaryFixtureTest::assertResultConversion(nlohmann::json jsonRes
     ASSERT_EQ(1u, jsonResponse["lines"].size());
 
     // Test the lines
-    ASSERT_EQ(boardingStep.agencyAcronym, jsonResponse["lines"][0]["agencyAcronym"]);
-    ASSERT_EQ(boardingStep.agencyName, jsonResponse["lines"][0]["agencyName"]);
-    ASSERT_EQ(boost::uuids::to_string(boardingStep.agencyUuid), jsonResponse["lines"][0]["agencyUuid"]);
-    ASSERT_EQ(boardingStep.lineShortname, jsonResponse["lines"][0]["lineShortname"]);
-    ASSERT_EQ(boardingStep.lineLongname, jsonResponse["lines"][0]["lineLongname"]);
-    ASSERT_EQ(boost::uuids::to_string(boardingStep.lineUuid), jsonResponse["lines"][0]["lineUuid"]);
+    ASSERT_EQ(agency->acronym, jsonResponse["lines"][0]["agencyAcronym"]);
+    ASSERT_EQ(agency->name, jsonResponse["lines"][0]["agencyName"]);
+    ASSERT_EQ(agencyUuid, jsonResponse["lines"][0]["agencyUuid"]);
+    ASSERT_EQ(line->shortname, jsonResponse["lines"][0]["lineShortname"]);
+    ASSERT_EQ(line->longname, jsonResponse["lines"][0]["lineLongname"]);
+    ASSERT_EQ(lineUuid, jsonResponse["lines"][0]["lineUuid"]);
    
 }
 

@@ -230,43 +230,19 @@ namespace TrRouting
             if (!params.returnAllNodesResult)
             {
               singleResult.get()->steps.push_back(std::make_unique<BoardingStep>(
-                journeyStepTrip.agency.uuid,
-                journeyStepTrip.agency.acronym,
-                journeyStepTrip.agency.name,
-                journeyStepTrip.line.uuid,
-                journeyStepTrip.line.shortname,
-                journeyStepTrip.line.longname,
-                journeyStepTrip.path.uuid,
-                journeyStepTrip.line.mode.name,
-                journeyStepTrip.line.mode.shortname,
-                journeyStepTrip.uuid,
+                journeyStepTrip,
                 boardingSequence,
                 boardingSequence,
-                journeyStepNodeDeparture.uuid,
-                journeyStepNodeDeparture.code,
-                journeyStepNodeDeparture.name,
-                *journeyStepNodeDeparture.point.get(),
+                journeyStepNodeDeparture,
                 departureTime,
                 waitingTime
               ));
 
               singleResult.get()->steps.push_back(std::make_unique<UnboardingStep>(
-                journeyStepTrip.agency.uuid,
-                journeyStepTrip.agency.acronym,
-                journeyStepTrip.agency.name,
-                journeyStepTrip.line.uuid,
-                journeyStepTrip.line.shortname,
-                journeyStepTrip.line.longname,
-                journeyStepTrip.path.uuid,
-                journeyStepTrip.line.mode.name,
-                journeyStepTrip.line.mode.shortname,
-                journeyStepTrip.uuid,
+                journeyStepTrip,
                 unboardingSequence,
                 unboardingSequence + 1,
-                journeyStepNodeArrival.uuid,
-                journeyStepNodeArrival.code,
-                journeyStepNodeArrival.name,
-                *journeyStepNodeArrival.point.get(),
+                journeyStepNodeArrival,
                 arrivalTime,
                 inVehicleTime,
                 inVehicleDistance

@@ -4,7 +4,9 @@
 #include "toolbox.hpp"
 #include "parameters.hpp"
 #include "routing_result.hpp"
-
+#include "trip.hpp"
+#include "agency.hpp"
+#include "line.hpp"
 
 namespace TrRouting
 {
@@ -103,12 +105,12 @@ namespace TrRouting
   void StepToV2SummaryVisitor::visitBoardingStep(const BoardingStep& step)
   {
     response.emplace(LineSummary(
-        boost::uuids::to_string(step.agencyUuid),
-        step.agencyAcronym,
-        step.agencyName,
-        boost::uuids::to_string(step.lineUuid),
-        step.lineShortname,
-        step.lineLongname
+        boost::uuids::to_string(step.trip.agency.uuid),
+        step.trip.agency.acronym,
+        step.trip.agency.name,
+        boost::uuids::to_string(step.trip.line.uuid),
+        step.trip.line.shortname,
+        step.trip.line.longname
     ));
   }
 
