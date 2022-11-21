@@ -91,16 +91,11 @@ namespace TrRouting
     int              departureTimeSeconds;
     int              initialDepartureTimeSeconds;
     int              arrivalTimeSeconds;
-    int              maxTimeValue;
     int              minAccessTravelTime;
     int              maxEgressTravelTime;
     int              maxAccessTravelTime;
     int              minEgressTravelTime;
-    int              maxAccessWalkingTravelTimeFromOriginToFirstNodeSeconds;
-    int              maxAccessWalkingTravelTimeFromLastNodeToDestinationSeconds;
     long long        calculationTime;
-    std::string      accessMode;
-    std::string      egressMode;
 
     std::unordered_map<Node::uid_t, int> nodesTentativeTime; // arrival time at node
     std::unordered_map<Node::uid_t, int> nodesReverseTentativeTime; // departure time at node

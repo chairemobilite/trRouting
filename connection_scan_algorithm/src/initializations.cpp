@@ -27,16 +27,11 @@ namespace TrRouting
     departureTimeSeconds(0),
     initialDepartureTimeSeconds(0),
     arrivalTimeSeconds(-1),
-    maxTimeValue(0),
     minAccessTravelTime(0),
     maxEgressTravelTime(0),
     maxAccessTravelTime(0),
     minEgressTravelTime(0),
-    maxAccessWalkingTravelTimeFromOriginToFirstNodeSeconds(0),
-    maxAccessWalkingTravelTimeFromLastNodeToDestinationSeconds(0),
-    calculationTime(0),
-    accessMode("walking"),
-    egressMode("walking")
+    calculationTime(0)
   {
 
   }
