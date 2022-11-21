@@ -78,7 +78,7 @@ namespace TrRouting
           nodeWasAccessedFromOrigin  = parameters.getMaxFirstWaitingTimeSeconds() > 0 &&
             nodesAccessIte != nodesAccess.end() &&
             nodesAccessIte->second.time >= 0 &&
-            !(std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(forwardJourneysSteps.at(nodeDeparture.uid))).has_value();
+            !forwardJourneysSteps.at(nodeDeparture.uid).getFinalEnterConnection().has_value();
 
           // reachable connections only here:
           if (
@@ -117,7 +117,7 @@ namespace TrRouting
             {
               currentTripQueryOverlay.usable = true;
               currentTripQueryOverlay.enterConnection = *connection;
-              currentTripQueryOverlay.enterConnectionTransferTravelTime = std::get<journeyStepIndexes::TRANSFER_TRAVEL_TIME>(forwardJourneysSteps.at(nodeDeparture.uid));
+              currentTripQueryOverlay.enterConnectionTransferTravelTime = forwardJourneysSteps.at(nodeDeparture.uid).getTransferTravelTime();
             }
             
             if ((**connection).canUnboard() && currentTripQueryOverlay.enterConnection.has_value())
@@ -162,7 +162,7 @@ namespace TrRouting
                     nodesTentativeTime[transferableNode.node.uid] = footpathTravelTime + connectionArrivalTime;
 
                     //TODO DO we need a make_optional here??
-                    forwardJourneysSteps.insert({transferableNode.node.uid, std::make_tuple(currentTripQueryOverlay.enterConnection, *connection, std::cref(trip), footpathTravelTime, (nodeArrival.uuid == transferableNode.node.uuid ? 1 : -1), footpathDistance)});
+                    forwardJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(currentTripQueryOverlay.enterConnection, *connection, std::cref(trip), footpathTravelTime, (nodeArrival.uuid == transferableNode.node.uuid), footpathDistance));
                   }
 
                   if (
@@ -172,12 +172,12 @@ namespace TrRouting
                      //TODO Not fully sure this is equivalent to the ancient code
                      forwardEgressJourneysSteps.count(transferableNode.node.uid) == 0
                       ||
-                     std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION>(forwardEgressJourneysSteps.at(transferableNode.node.uid)).value()->getArrivalTime() > connectionArrivalTime
+                     forwardEgressJourneysSteps.at(transferableNode.node.uid).getFinalExitConnection().value()->getArrivalTime() > connectionArrivalTime
                     )
                   )
                   {
                     footpathDistance = nodeArrival.transferableNodes[footpathIndex].distance;
-                    forwardEgressJourneysSteps.insert({transferableNode.node.uid, std::make_tuple(currentTripQueryOverlay.enterConnection, *connection, std::cref(trip), footpathTravelTime, 1, footpathDistance)});
+                    forwardEgressJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(currentTripQueryOverlay.enterConnection, *connection, std::cref(trip), footpathTravelTime, true, footpathDistance));
                   }
                 }
                 footpathIndex++;
@@ -205,7 +205,7 @@ namespace TrRouting
       for (auto & egressFootpath : egressFootpaths)
       {
         if (forwardEgressJourneysSteps.count(egressFootpath.node.uid)) {
-          egressExitConnection  = std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION>(forwardEgressJourneysSteps.at(egressFootpath.node.uid));
+          egressExitConnection  = forwardEgressJourneysSteps.at(egressFootpath.node.uid).getFinalExitConnection();
           //TODO Would this be always true with the new previous if
           if (egressExitConnection.has_value())
           {
