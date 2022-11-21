@@ -313,15 +313,11 @@ namespace TrRouting
             totalTravelTimeSeconds += correctedExpansionFactor * visitor.getTotalTravelTime();
             for (auto & leg : visitor.getLegs())
             {
-              const Trip &legTrip   = std::get<0>(leg);
-              //std::reference_wrapper<const Line> lineref =  std::get<1>(leg);
-              const Line &legLine   = std::get<1>(leg).get();
-              //const Line &legLine = lineref.get();
-              //std::reference_wrapper<const Path> pathref =  std::get<2>(leg);
-              const Path &legPath   = std::get<2>(leg).get();
-              //const Path &legPath = pathref.get();
-              legConnectionStartIdx = std::get<3>(leg);
-              legConnectionEndIdx   = std::get<4>(leg);
+              const Trip &legTrip   = std::get<0>(leg).get();
+              const Line &legLine   = legTrip.line;
+              const Path &legPath   = legTrip.path;
+              legConnectionStartIdx = std::get<1>(leg);
+              legConnectionEndIdx   = std::get<2>(leg);
               lineProfiles.at(legLine.uuid) += correctedExpansionFactor;
 
               if (pathProfiles.find(legPath.uuid) == pathProfiles.end())

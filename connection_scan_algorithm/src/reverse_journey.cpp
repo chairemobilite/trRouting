@@ -190,8 +190,7 @@ namespace TrRouting
             inVehicleTravelTimesSeconds.push_back(inVehicleTime);
             boardingNodeUuids.push_back(journeyStepNodeDeparture.uuid);
             unboardingNodeUuids.push_back(journeyStepNodeArrival.uuid);
-            //TODO Seems like storing the Trip in the leg instead of Line and Path would be ok
-            legs.push_back(std::make_tuple(std::ref(journeyStepTrip), std::ref(journeyStepTrip.line), std::ref(journeyStepTrip.path), boardingSequence - 1, unboardingSequence - 1));
+            legs.push_back(std::make_tuple(std::ref(journeyStepTrip), boardingSequence - 1, unboardingSequence - 1));
 
             if (unboardingSequence - 1 < journeyStepTrip.path.segmentsDistanceMeters.size()) // check if distances are available for this path
             {
