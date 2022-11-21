@@ -16,7 +16,7 @@
 namespace TrRouting
 {
 
-  void Calculator::reset(RouteParameters &parameters, bool resetAccessPaths, bool resetFilters)
+  void Calculator::reset(RouteParameters &parameters, bool resetAccessPaths, bool doResetFilters)
   {
     
     int benchmarkingStart = algorithmCalculationTime.getEpoch();
@@ -64,48 +64,13 @@ namespace TrRouting
     minEgressTravelTime = MAX_INT;
     maxAccessTravelTime = -1;
 
+    //TODO Question, do we only use accessFootpath when those condtion are true? The whole calculation should probably
+    // be a different path in this case.
     if (!params.returnAllNodesResult || departureTimeSeconds > -1)
     {
       if (resetAccessPaths)
       {
-
-        spdlog::debug("  resetting access paths ");
-
-        if(odTripGlob.has_value())
-        {
-          spdlog::debug("  using odTrip with {} accessible nodes", odTripGlob.value().get().originNodes.size());
-
-          accessFootpaths.clear();
-          //TODO This can be a std::copy
-          for (auto & accessNode : odTripGlob.value().get().originNodes)
-          {
-            accessFootpaths.push_back(accessNode);
-          }
-        }
-        else if (params.accessNodesRef.size() > 0 && params.accessNodeTravelTimesSeconds.size() == params.accessNodesRef.size())
-        {
-          accessFootpaths.clear();
-          int j = 0;
-          for (auto & accessNode : params.accessNodesRef)
-          {
-            int distanceMeters{-1};
-            if (params.accessNodeDistancesMeters.size() == params.accessNodesRef.size())
-            {
-              distanceMeters = params.accessNodeDistancesMeters[j];
-            }
-            accessFootpaths.push_back(NodeTimeDistance(accessNode, params.accessNodeTravelTimesSeconds[j], distanceMeters));
-            j++;
-          }
-        }
-        else
-        {
-          spdlog::debug("  fetching nodes with osrm with mode {}", params.accessMode);
-
-          accessFootpaths = OsrmFetcher::getAccessibleNodesFootpathsFromPoint(*parameters.getOrigin(), transitData.getNodes(), params.accessMode, parameters.getMaxAccessWalkingTravelTimeSeconds(), params.walkingSpeedMetersPerSecond);
-          if (accessFootpaths.size() == 0) {
-            accessFootpathOk = false;
-          }
-        }
+        accessFootpathOk = resetAccessFootpaths(parameters);
       }
 
       spdlog::debug("  parsing access footpaths to find min/max access travel times");
@@ -140,41 +105,7 @@ namespace TrRouting
     {
       if (resetAccessPaths)
       {
-        // fetch nodes footpaths accessible to destination using params or osrm fetcher if not provided:
-        if(odTripGlob.has_value())
-        {
-
-          spdlog::debug("  using odTrip with {} egressible nodes", odTripGlob.value().get().destinationNodes.size());
-
-          egressFootpaths.clear();
-          //TODO This could be a std::copy
-          for (auto & egressNode : odTripGlob.value().get().destinationNodes)
-          {
-            egressFootpaths.push_back(egressNode);
-          }
-        }
-        else if (params.egressNodesRef.size() > 0 && params.egressNodeTravelTimesSeconds.size() == params.egressNodesRef.size())
-        {
-          egressFootpaths.clear();
-          int j = 0;
-          for (auto & egressNode : params.egressNodesRef)
-          {
-            int distanceMeters{-1};
-            if (params.egressNodeDistancesMeters.size() == params.egressNodesRef.size())
-            {
-              distanceMeters = params.egressNodeDistancesMeters[j];
-            }
-            egressFootpaths.push_back(NodeTimeDistance(egressNode, params.egressNodeTravelTimesSeconds[j], distanceMeters));
-            j++;
-          }
-        }
-        else
-        {
-          egressFootpaths = OsrmFetcher::getAccessibleNodesFootpathsFromPoint(*parameters.getDestination(), transitData.getNodes(), params.accessMode, parameters.getMaxEgressWalkingTravelTimeSeconds(), params.walkingSpeedMetersPerSecond);
-          if (egressFootpaths.size() == 0) {
-            egressFootpathOk = false;
-          }
-        }
+        egressFootpathOk = resetEgressFootpaths(parameters);
       }
       
       spdlog::debug("  parsing egress footpaths to find min/max egress travel times");
@@ -226,112 +157,190 @@ namespace TrRouting
 
     // disable trips according to parameters:
 
-    if (resetFilters)
+    if (doResetFilters)
     {
-
-      spdlog::debug("  resetting filters");
-
-      for (auto & tripIte : transitData.getTrips())
-      {
-        const Trip & trip = tripIte.second;
-        bool enabled = true;
-
-        if (enabled && parameters.getOnlyServices().size() > 0)
-        {
-          if (std::find(parameters.getOnlyServices().begin(), parameters.getOnlyServices().end(), trip.service) == parameters.getOnlyServices().end())
-          {
-            enabled = false;
-          }
-        }
-
-        if (enabled && parameters.getOnlyLines().size() > 0)
-        {
-          if (std::find(parameters.getOnlyLines().begin(), parameters.getOnlyLines().end(), trip.line) == parameters.getOnlyLines().end())
-          {
-            enabled = false;
-          }
-        }
-
-        if (enabled && parameters.getOnlyModes().size() > 0)
-        {
-          if (std::find(parameters.getOnlyModes().begin(), parameters.getOnlyModes().end(), trip.mode) == parameters.getOnlyModes().end())
-          {
-            enabled = false;
-          }
-        }
-
-        if (enabled  && parameters.getOnlyNodes().size() > 0)
-        {
-          // FIXME: This is not right, it should look for a node, not the mode
-          // FIXME2: Commented out, since mode is now typed, it won't match
-          /*if (std::find(parameters.getOnlyNodesIdx()->begin(), parameters.getOnlyNodesIdx()->end(), trip->modeIdx) == parameters.getOnlyNodesIdx()->end())
-          {
-            enabled = -1;
-          }(*/
-        }
-
-        if (enabled && parameters.getOnlyAgencies().size() > 0)
-        {
-          if (std::find(parameters.getOnlyAgencies().begin(), parameters.getOnlyAgencies().end(), trip.agency) == parameters.getOnlyAgencies().end())
-          {
-            enabled = false;
-          }
-        }
-
-        if (enabled && parameters.getExceptServices().size() > 0)
-        {
-          if (std::find(parameters.getExceptServices().begin(), parameters.getExceptServices().end(), trip.service) != parameters.getExceptServices().end())
-          {
-            enabled = false;
-          }
-        }
-
-        if (enabled && parameters.getExceptLines().size() > 0)
-        {
-          if (std::find(parameters.getExceptLines().begin(), parameters.getExceptLines().end(), trip.line) != parameters.getExceptLines().end())
-          {
-            enabled = false;
-          }
-        }
-
-        if (enabled && parameters.getExceptNodes().size() > 0)
-        {
-          // FIXME: This is not right, it should look for a node, not the mode
-          // FIXME2: Commented out, since mode is now typed, it won't match
-          /*
-          if (std::find(parameters.getExceptNodesIdx()->begin(), parameters.getExceptNodesIdx()->end(), trip.modeIdx) != parameters.getExceptNodesIdx()->end())
-          {
-            enabled = false;
-            }*/
-        }
-
-        if (enabled && parameters.getExceptModes().size() > 0)
-        {
-          if (std::find(parameters.getExceptModes().begin(), parameters.getExceptModes().end(), trip.mode) != parameters.getExceptModes().end())
-          {
-            enabled = false;
-          }
-        }
-
-        if (enabled && parameters.getExceptAgencies().size() > 0)
-        {
-          if (std::find(parameters.getExceptAgencies().begin(), parameters.getExceptAgencies().end(), trip.agency) != parameters.getExceptAgencies().end())
-          {
-            enabled = false;
-          }
-        }
-        tripsEnabled[trip.uid] = enabled;
-      }
+      resetFilters(parameters);
     }
 
-    
     benchmarking["reset"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
-    
-    
+
     spdlog::debug("-- filter trips -- {} microseconds ", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
 
     calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
 
+  }
+
+  bool Calculator::resetAccessFootpaths(const RouteParameters &parameters) {
+    spdlog::debug("  resetting access paths ");
+    bool accessFootpathOk = true;
+
+    if(odTripGlob.has_value()) {
+      spdlog::debug("  using odTrip with {} accessible nodes", odTripGlob.value().get().originNodes.size());
+
+      accessFootpaths.clear();
+      //TODO This can be a std::copy
+      for (auto & accessNode : odTripGlob.value().get().originNodes) {
+        accessFootpaths.push_back(accessNode);
+      }
+    }
+    else if (params.accessNodesRef.size() > 0 && params.accessNodeTravelTimesSeconds.size() == params.accessNodesRef.size()) {
+      accessFootpaths.clear();
+      int j = 0;
+      for (auto & accessNode : params.accessNodesRef) {
+        int distanceMeters{-1};
+        if (params.accessNodeDistancesMeters.size() == params.accessNodesRef.size())
+        {
+          distanceMeters = params.accessNodeDistancesMeters[j];
+        }
+        accessFootpaths.push_back(NodeTimeDistance(accessNode, params.accessNodeTravelTimesSeconds[j], distanceMeters));
+        j++;
+      }
+    }
+    else
+    {
+      spdlog::debug("  fetching nodes with osrm with mode {}", params.accessMode);
+
+      accessFootpaths = OsrmFetcher::getAccessibleNodesFootpathsFromPoint(*parameters.getOrigin(), transitData.getNodes(), params.accessMode, parameters.getMaxAccessWalkingTravelTimeSeconds(), params.walkingSpeedMetersPerSecond);
+      if (accessFootpaths.size() == 0) {
+        accessFootpathOk = false;
+      }
+    }
+    return accessFootpathOk;
+  }
+
+  bool Calculator::resetEgressFootpaths(const RouteParameters &parameters) {
+    bool egressFootpathOk = true;
+
+    // fetch nodes footpaths accessible to destination using params or osrm fetcher if not provided:
+    if(odTripGlob.has_value())
+    {
+      spdlog::debug("  using odTrip with {} egressible nodes", odTripGlob.value().get().destinationNodes.size());
+
+      egressFootpaths.clear();
+      //TODO This could be a std::copy
+      for (auto & egressNode : odTripGlob.value().get().destinationNodes) {
+        egressFootpaths.push_back(egressNode);
+      }
+    }
+    else if (params.egressNodesRef.size() > 0 && params.egressNodeTravelTimesSeconds.size() == params.egressNodesRef.size())
+    {
+      egressFootpaths.clear();
+      int j = 0;
+      for (auto & egressNode : params.egressNodesRef)
+      {
+        int distanceMeters{-1};
+        if (params.egressNodeDistancesMeters.size() == params.egressNodesRef.size())
+        {
+          distanceMeters = params.egressNodeDistancesMeters[j];
+        }
+        egressFootpaths.push_back(NodeTimeDistance(egressNode, params.egressNodeTravelTimesSeconds[j], distanceMeters));
+        j++;
+      }
+    }
+    else
+    {
+      egressFootpaths = OsrmFetcher::getAccessibleNodesFootpathsFromPoint(*parameters.getDestination(), transitData.getNodes(), params.accessMode, parameters.getMaxEgressWalkingTravelTimeSeconds(), params.walkingSpeedMetersPerSecond);
+      if (egressFootpaths.size() == 0) {
+        egressFootpathOk = false;
+      }
+    }
+    return egressFootpathOk;
+  }
+
+  void Calculator::resetFilters(const RouteParameters &parameters) {
+    spdlog::debug("  resetting filters");
+
+    for (auto & tripIte : transitData.getTrips())
+    {
+      const Trip & trip = tripIte.second;
+      bool enabled = true;
+
+      if (enabled && parameters.getOnlyServices().size() > 0)
+      {
+        if (std::find(parameters.getOnlyServices().begin(), parameters.getOnlyServices().end(), trip.service) == parameters.getOnlyServices().end())
+        {
+          enabled = false;
+        }
+      }
+
+      if (enabled && parameters.getOnlyLines().size() > 0)
+      {
+        if (std::find(parameters.getOnlyLines().begin(), parameters.getOnlyLines().end(), trip.line) == parameters.getOnlyLines().end())
+        {
+          enabled = false;
+        }
+      }
+
+      if (enabled && parameters.getOnlyModes().size() > 0)
+      {
+        if (std::find(parameters.getOnlyModes().begin(), parameters.getOnlyModes().end(), trip.mode) == parameters.getOnlyModes().end())
+        {
+          enabled = false;
+        }
+      }
+
+      if (enabled  && parameters.getOnlyNodes().size() > 0)
+      {
+        // FIXME: This is not right, it should look for a node, not the mode
+        // FIXME2: Commented out, since mode is now typed, it won't match
+        /*if (std::find(parameters.getOnlyNodesIdx()->begin(), parameters.getOnlyNodesIdx()->end(), trip->modeIdx) == parameters.getOnlyNodesIdx()->end())
+          {
+          enabled = -1;
+          }(*/
+      }
+
+      if (enabled && parameters.getOnlyAgencies().size() > 0)
+      {
+        if (std::find(parameters.getOnlyAgencies().begin(), parameters.getOnlyAgencies().end(), trip.agency) == parameters.getOnlyAgencies().end())
+        {
+          enabled = false;
+        }
+      }
+
+      if (enabled && parameters.getExceptServices().size() > 0)
+      {
+        if (std::find(parameters.getExceptServices().begin(), parameters.getExceptServices().end(), trip.service) != parameters.getExceptServices().end())
+        {
+          enabled = false;
+        }
+      }
+
+      if (enabled && parameters.getExceptLines().size() > 0)
+      {
+        if (std::find(parameters.getExceptLines().begin(), parameters.getExceptLines().end(), trip.line) != parameters.getExceptLines().end())
+        {
+          enabled = false;
+        }
+      }
+
+      if (enabled && parameters.getExceptNodes().size() > 0)
+      {
+        // FIXME: This is not right, it should look for a node, not the mode
+        // FIXME2: Commented out, since mode is now typed, it won't match
+        /*
+          if (std::find(parameters.getExceptNodesIdx()->begin(), parameters.getExceptNodesIdx()->end(), trip.modeIdx) != parameters.getExceptNodesIdx()->end())
+          {
+          enabled = false;
+          }*/
+      }
+
+      if (enabled && parameters.getExceptModes().size() > 0)
+      {
+        if (std::find(parameters.getExceptModes().begin(), parameters.getExceptModes().end(), trip.mode) != parameters.getExceptModes().end())
+        {
+          enabled = false;
+        }
+      }
+
+      if (enabled && parameters.getExceptAgencies().size() > 0)
+      {
+        if (std::find(parameters.getExceptAgencies().begin(), parameters.getExceptAgencies().end(), trip.agency) != parameters.getExceptAgencies().end())
+        {
+          enabled = false;
+        }
+      }
+      tripsEnabled[trip.uid] = enabled;
+    }
   }
 
 }

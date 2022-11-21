@@ -81,6 +81,9 @@ namespace TrRouting
     std::optional<std::reference_wrapper<const OdTrip>> odTripGlob;
 
   private:
+    bool resetAccessFootpaths(const RouteParameters &parameters);
+    bool resetEgressFootpaths(const RouteParameters &parameters);
+    void resetFilters(const RouteParameters &parameters);
 
     //TODO set it mutable so it can be changed/reset?
     const TransitData &transitData;
