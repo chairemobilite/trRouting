@@ -232,8 +232,8 @@ namespace TrRouting
    * @brief Class detailing a single trip detail. It describes a single alternative trip.
    * 
    */
-   // tuple: tripIdx, line, path, start connection index, end connection index
-  typedef std::tuple<std::reference_wrapper<const Trip>, std::reference_wrapper<const Line>, std::reference_wrapper<const Path>, int, int> Leg;
+   // tuple: trip, start connection index, end connection index
+  typedef std::tuple<std::reference_wrapper<const Trip>, int, int> Leg;
 
   class SingleCalculationResult : public RoutingResult {
   public:
