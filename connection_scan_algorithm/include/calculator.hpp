@@ -16,6 +16,7 @@
 #include "connection.hpp"
 #include "node.hpp"
 #include "trip.hpp"
+#include "journey_step.hpp"
 
 namespace TrRouting
 {
@@ -36,8 +37,6 @@ namespace TrRouting
   class RoutingResult;
   class AlternativesResult;
   class TransitData;
-
-  using JourneyStep = std::tuple<std::optional<std::shared_ptr<Connection>>,std::optional<std::shared_ptr<Connection>>,std::optional<std::reference_wrapper<const Trip>>,int,short,int>; //final enter connection, final exit connection, final trip, transfer travel time, is same node transfer (first, second, third and fourth values = -1 for access and egress journeys)
 
   class Calculator {
 
@@ -85,7 +84,6 @@ namespace TrRouting
 
     //TODO set it mutable so it can be changed/reset?
     const TransitData &transitData;
-    enum journeyStepIndexes: short { FINAL_ENTER_CONNECTION = 0, FINAL_EXIT_CONNECTION = 1, FINAL_TRIP = 2, TRANSFER_TRAVEL_TIME = 3, IS_SAME_NODE_TRANSFER = 4, TRANSFER_DISTANCE = 5 };
 
     int              departureTimeSeconds;
     int              initialDepartureTimeSeconds;
