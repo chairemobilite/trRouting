@@ -33,13 +33,11 @@ namespace TrRouting
   class LineStepVisitor : public StepVisitor<std::optional<std::reference_wrapper<const Line>>> {
   private:
     std::optional<std::reference_wrapper<const Line>> stepLine;
-    const std::map<boost::uuids::uuid, Line>& lines;
   public:
-    LineStepVisitor(const std::map<boost::uuids::uuid, Line>& _lines):
-      lines(_lines) {}
+    LineStepVisitor() {}
     void visitBoardingStep(const BoardingStep& step) override {
-      spdlog::debug("Step Visitor line {}", boost::uuids::to_string(step.lineUuid));
-      stepLine = lines.at(step.lineUuid);
+      spdlog::debug("Step Visitor line {}", boost::uuids::to_string(step.trip.line.uuid));
+      stepLine = step.trip.line;
     }
     void visitUnboardingStep(const UnboardingStep& ) override {
       //No line for this step type, don't set result
@@ -66,7 +64,7 @@ namespace TrRouting
     std::vector<std::reference_wrapper<const Line>> linesList;
     LineStepVisitor stepVisitor;
   public:
-    LineVisitor(const std::map<boost::uuids::uuid, Line>& _lines): stepVisitor(LineStepVisitor(_lines)) {}
+    LineVisitor(): stepVisitor(LineStepVisitor()) {}
     std::vector<std::reference_wrapper<const Line>> getResult() override {
       return linesList;
     }
@@ -124,7 +122,7 @@ namespace TrRouting
       alternativeSequence++;
       alternativesCalculatedCount++;
 
-      LineVisitor visitor = LineVisitor(transitData.getLines());
+      LineVisitor visitor = LineVisitor();
 
       //departureTimeSeconds = routingResult.departureTimeSeconds + routingResult.firstWaitingTimeSeconds - params.minWaitingTimeSeconds;
 
@@ -208,7 +206,7 @@ namespace TrRouting
 
               // Extract lines from new results. If the result is valid, add it to the alternative list
               // and then generation new lines combinations to try other alternatives
-              LineVisitor alternativeVisitor = LineVisitor(transitData.getLines());
+              LineVisitor alternativeVisitor = LineVisitor();
               foundLines = alternativeCalcResult.accept(alternativeVisitor);
               std::stable_sort(foundLines.begin(), foundLines.end());
 

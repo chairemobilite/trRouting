@@ -11,6 +11,19 @@ void ResultToResponseFixtureTest::SetUp()
     scenario->uuid = uuidGenerator("aaaaaaaa-bbbb-cccc-dddd-eeeeeeffffff");
     scenario->name = "Test arbitrary scenario";
 
+    // Create basic transit objects
+    mode = std::make_unique<TrRouting::Mode>("bus", "autobus", 0, 0);
+    agency = std::make_unique<TrRouting::Agency>();
+    agency->uuid = uuidGenerator(agencyUuid);
+    agency->acronym = "AG";
+    agency->name = "AgencyName";
+    line = std::make_unique<TrRouting::Line>(uuidGenerator(lineUuid), *agency, *mode, "LI", "LineName", "", 0);
+    path = std::make_unique<TrRouting::Path>(uuidGenerator(pathUuid), *line, "N", "", std::vector<TrRouting::NodeTimeDistance>(), std::vector<std::reference_wrapper<const TrRouting::Trip>>());
+    service = std::make_unique<TrRouting::Service>();
+    trip = std::make_unique<TrRouting::Trip>(uuidGenerator(tripUuid), *agency, *line, *path, *mode, *service, 0);
+    boardingNode = std::make_unique<TrRouting::Node>(uuidGenerator(boardingNodeUuid), 0, "NC", "NodeName", "", std::make_unique<TrRouting::Point>(boardingNodePoint));
+    unboardingNode = std::make_unique<TrRouting::Node>(uuidGenerator(unboardingNodeUuid), 0, "NC1", "NodeName2", "", std::make_unique<TrRouting::Point>(unboardingNodePoint));
+
     testParameters = std::make_unique<TrRouting::RouteParameters>(
         std::make_unique<TrRouting::Point>(45.5269, -73.58912),
         std::make_unique<TrRouting::Point>(45.52184, -73.57817),
@@ -60,43 +73,19 @@ std::unique_ptr<TrRouting::SingleCalculationResult> ResultToResponseFixtureTest:
     ));
 
     result.get()->steps.push_back(std::make_unique<TrRouting::BoardingStep>(
-        uuidGenerator(agencyUuid),
-        "AG",
-        "AgencyName",
-        uuidGenerator(lineUuid),
-        "LI",
-        "LineName",
-        uuidGenerator(pathUuid),
-        "bus",
-        "autobus",
-        uuidGenerator(tripUuid),
+        *trip,
         1,
         1,
-        uuidGenerator(boardingNodeUuid),
-        "NC",
-        "NodeName",
-        boardingNode,
+        *boardingNode,
         result.get()->departureTime + result.get()->accessTravelTime + 180,
         100
     ));
 
     result.get()->steps.push_back(std::make_unique<TrRouting::UnboardingStep>(
-        uuidGenerator(agencyUuid),
-        "AG",
-        "AgencyName",
-        uuidGenerator(lineUuid),
-        "LI",
-        "LineName",
-        uuidGenerator(pathUuid),
-        "bus",
-        "autobus",
-        uuidGenerator(tripUuid),
+        *trip,
         3,
         4,
-        uuidGenerator(unboardingNodeUuid),
-        "NC1",
-        "NodeName2",
-        unboardingNode,
+        *unboardingNode,
         result.get()->arrivalTime - result.get()->egressTravelTime,
         result.get()->totalInVehicleTime,
         result.get()->totalInVehicleDistance

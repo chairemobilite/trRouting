@@ -9,6 +9,8 @@
 #include "person.hpp"
 #include "line.hpp"
 #include "trip.hpp"
+#include "agency.hpp"
+#include "mode.hpp"
 #include "routing_result.hpp"
 #include "od_trip.hpp"
 #include "node.hpp"
@@ -41,17 +43,17 @@ namespace TrRouting
 
   void StepToOdTripJsonVisitor::visitBoardingStep(const BoardingStep& step)
   {
-    lineShortnames.push_back(step.lineShortname);
-    agencyAcronyms.push_back(step.agencyAcronym);
-    modeShortnames.push_back(step.mode);
-    agencyUuids.push_back(step.agencyUuid);
-    lineUuids.push_back(step.lineUuid);
-    boardingNodesUuids.push_back(step.nodeUuid);
+    lineShortnames.push_back(step.trip.line.shortname);
+    agencyAcronyms.push_back(step.trip.agency.acronym);
+    modeShortnames.push_back(step.trip.line.mode.shortname);
+    agencyUuids.push_back(step.trip.agency.uuid);
+    lineUuids.push_back(step.trip.line.uuid);
+    boardingNodesUuids.push_back(step.node.uuid);
   }
 
   void StepToOdTripJsonVisitor::visitUnboardingStep(const UnboardingStep& step)
   {
-    unboardingNodesUuids.push_back(step.nodeUuid);
+    unboardingNodesUuids.push_back(step.node.uuid);
   }
 
   void StepToOdTripJsonVisitor::visitWalkingStep(const WalkingStep& )

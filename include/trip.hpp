@@ -11,6 +11,7 @@ namespace TrRouting
   class Agency;
   class Service;
   class Path;
+  class Connection;
   
   class Trip {
   
