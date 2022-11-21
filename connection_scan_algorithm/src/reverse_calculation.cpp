@@ -11,7 +11,8 @@
 namespace TrRouting
 {
     
-  std::optional<std::tuple<int, std::reference_wrapper<const Node>>> Calculator::reverseCalculation(RouteParameters &parameters)
+  std::optional<std::tuple<int, std::reference_wrapper<const Node>>> Calculator::reverseCalculation(RouteParameters &parameters,
+                                                                                                    std::unordered_map<Node::uid_t, JourneyStep> & reverseAccessJourneysSteps)
   {
 
     int benchmarkingStart = algorithmCalculationTime.getEpoch();

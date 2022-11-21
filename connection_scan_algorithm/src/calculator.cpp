@@ -22,12 +22,17 @@ namespace TrRouting
     std::optional<std::reference_wrapper<const Node>> bestEgressNode;
     std::optional<std::reference_wrapper<const Node>> bestAccessNode;
 
+    // TODO Could they be local to each section?
+    std::unordered_map<Node::uid_t, JourneyStep> forwardEgressJourneysSteps;
+    std::unordered_map<Node::uid_t, JourneyStep> reverseAccessJourneysSteps;
+
+
     if (departureTimeSeconds > -1 && parameters.isForwardCalculation())
     {
       
       initialDepartureTimeSeconds = departureTimeSeconds; // set initial departure time so we can find the latest possible departure time with reverse calculation later and still know the initial waiting time
 
-      auto resultCalculation = forwardCalculation(parameters);
+      auto resultCalculation = forwardCalculation(parameters, forwardEgressJourneysSteps);
       if (resultCalculation.has_value()) {
         bestArrivalTime = std::get<0>(*resultCalculation);
         bestEgressNode = std::get<1>(*resultCalculation);
@@ -38,7 +43,7 @@ namespace TrRouting
       
       if (params.returnAllNodesResult)
       {
-        result = forwardJourneyStep(parameters, bestArrivalTime, bestEgressNode);
+        result = forwardJourneyStep(parameters, bestArrivalTime, bestEgressNode, forwardEgressJourneysSteps);
         
         spdlog::debug("-- forward journey -- {} microseconds", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
         calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
@@ -57,7 +62,7 @@ namespace TrRouting
             nodesReverseTentativeTime[egressFootpath.node.uid] = arrivalTimeSeconds - egressFootpath.time;
           }
 
-          auto resultCalculationRev = reverseCalculation(parameters);
+          auto resultCalculationRev = reverseCalculation(parameters, reverseAccessJourneysSteps);
           if (resultCalculationRev) {
             bestDepartureTime = std::get<0>(*resultCalculationRev);
             bestAccessNode = std::get<1>(*resultCalculationRev);
@@ -66,7 +71,7 @@ namespace TrRouting
           spdlog::debug("-- reverse calculation -- {} microseconds", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
           calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
 
-          result = reverseJourneyStep(parameters, bestDepartureTime, bestAccessNode);
+          result = reverseJourneyStep(parameters, bestDepartureTime, bestAccessNode, reverseAccessJourneysSteps);
 
           spdlog::debug("-- reverse journey -- {} microseconds", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
           calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
@@ -75,7 +80,7 @@ namespace TrRouting
         else
         {
 
-          result = forwardJourneyStep(parameters, bestArrivalTime, bestEgressNode);
+          result = forwardJourneyStep(parameters, bestArrivalTime, bestEgressNode, forwardEgressJourneysSteps);
 
           spdlog::debug("-- forward journey -- {} microseconds", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
           calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
@@ -95,7 +100,7 @@ namespace TrRouting
         tripsQueryOverlay[trip.uid].usable = true;
       }
 
-      auto resultCalculation = reverseCalculation(parameters);
+      auto resultCalculation = reverseCalculation(parameters, reverseAccessJourneysSteps);
       if (resultCalculation) {
         bestDepartureTime = std::get<0>(*resultCalculation);
         bestAccessNode = std::get<1>(*resultCalculation);
@@ -104,7 +109,7 @@ namespace TrRouting
       spdlog::debug("-- reverse calculation --  {} microseconds", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
       calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
 
-      result = reverseJourneyStep(parameters, bestDepartureTime, bestAccessNode);
+      result = reverseJourneyStep(parameters, bestDepartureTime, bestAccessNode, reverseAccessJourneysSteps);
 
       spdlog::debug("-- reverse journey -- {} microseconds", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
       calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();

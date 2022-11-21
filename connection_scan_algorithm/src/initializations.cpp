@@ -50,9 +50,7 @@ namespace TrRouting
     nodesAccess.clear();
     nodesEgress.clear();
     forwardJourneysSteps.clear();
-    forwardEgressJourneysSteps.clear();
     reverseJourneysSteps.clear();
-    reverseAccessJourneysSteps.clear();
 
     tripsEnabled.clear();
     tripsQueryOverlay.clear();

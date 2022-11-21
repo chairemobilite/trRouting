@@ -59,12 +59,12 @@ namespace TrRouting
     // a concrete result object instead of pointer (that alternatives could use directly), but still
     // use common calculation functions
     std::unique_ptr<RoutingResult> calculate(RouteParameters &parameters, bool resetAccessPaths = true, bool resetFilters = true);
-    std::optional<std::tuple<int, std::reference_wrapper<const Node>>> forwardCalculation(RouteParameters &parameters); // best arrival time,   best egress node
-    std::optional<std::tuple<int, std::reference_wrapper<const Node>>> reverseCalculation(RouteParameters &parameters); // best departure time, best access node
+    std::optional<std::tuple<int, std::reference_wrapper<const Node>>> forwardCalculation(RouteParameters &parameters, std::unordered_map<Node::uid_t, JourneyStep> & forwardEgressJourneysSteps); // best arrival time,   best egress node
+    std::optional<std::tuple<int, std::reference_wrapper<const Node>>> reverseCalculation(RouteParameters &parameters, std::unordered_map<Node::uid_t, JourneyStep> & reverseAccessJourneysSteps); // best departure time, best access node
     // TODO See calculate
-    std::unique_ptr<RoutingResult> forwardJourneyStep(RouteParameters &parameters, int bestArrivalTime, std::optional<std::reference_wrapper<const Node>> bestEgressNode);
+    std::unique_ptr<RoutingResult> forwardJourneyStep(RouteParameters &parameters, int bestArrivalTime, std::optional<std::reference_wrapper<const Node>> bestEgressNode, const std::unordered_map<Node::uid_t, JourneyStep> & forwardEgressJourneysSteps);
     // TODO See calculate
-    std::unique_ptr<RoutingResult> reverseJourneyStep(RouteParameters &parameters, int bestDepartureTime, std::optional<std::reference_wrapper<const Node>> bestAccessNode);
+    std::unique_ptr<RoutingResult> reverseJourneyStep(RouteParameters &parameters, int bestDepartureTime, std::optional<std::reference_wrapper<const Node>> bestAccessNode, const std::unordered_map<Node::uid_t, JourneyStep> & reverseAccessJourneysSteps);
     AlternativesResult alternativesRouting(RouteParameters &parameters);
     std::string             odTripsRouting(RouteParameters &parameters);
 
@@ -110,9 +110,7 @@ namespace TrRouting
     std::vector<NodeTimeDistance> accessFootpaths; // pair: accessNodeIndex, walkingTravelTimeSeconds, walkingDistanceMeters
     std::vector<NodeTimeDistance> egressFootpaths; // pair: egressNodeIndex, walkingTravelTimeSeconds, walkingDistanceMeters
     std::unordered_map<Node::uid_t, JourneyStep> forwardJourneysSteps; 
-    std::unordered_map<Node::uid_t, JourneyStep> forwardEgressJourneysSteps;
     std::unordered_map<Node::uid_t, JourneyStep> reverseJourneysSteps;
-    std::unordered_map<Node::uid_t, JourneyStep> reverseAccessJourneysSteps;
 
   };
 

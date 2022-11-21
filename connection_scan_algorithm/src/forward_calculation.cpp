@@ -10,7 +10,8 @@
 namespace TrRouting
 {
     
-  std::optional<std::tuple<int, std::reference_wrapper<const Node>>> Calculator::forwardCalculation(RouteParameters &parameters)
+  std::optional<std::tuple<int, std::reference_wrapper<const Node>>> Calculator::forwardCalculation(RouteParameters &parameters,
+                                                                                                    std::unordered_map<Node::uid_t, JourneyStep> & forwardEgressJourneysSteps)
   {
 
     int benchmarkingStart  = algorithmCalculationTime.getEpoch();

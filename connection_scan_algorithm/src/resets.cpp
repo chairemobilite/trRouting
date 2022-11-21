@@ -35,9 +35,7 @@ namespace TrRouting
     }
     tripsQueryOverlay.clear();
     forwardJourneysSteps.clear();
-    forwardEgressJourneysSteps.clear();
     reverseJourneysSteps.clear();
-    reverseAccessJourneysSteps.clear();
 
     
     departureTimeSeconds = -1;
