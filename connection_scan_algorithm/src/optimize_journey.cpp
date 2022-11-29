@@ -171,7 +171,8 @@ namespace TrRouting
         int sequenceStartIdx = std::get<journeyStepIndexes::FINAL_ENTER_CONNECTION>(journey[fromJourneyStepIdx]).value()->getSequenceInTrip() - 1;
         int sequenceEndIdx   = std::get<journeyStepIndexes::FINAL_EXIT_CONNECTION >(journey[fromJourneyStepIdx]).value()->getSequenceInTrip() - 1;
 
-        assert(trip.reverseConnections.size() > 1 + sequenceEndIdx); // make sure sequenceIdx will be valid
+        // Editorial comment: There's lot of +1/-1 in this code. This suggest that we have an array index that start at 1 instead of zero. This need confirmation
+        assert(trip.reverseConnections.size() >= 1 + sequenceEndIdx); // make sure sequenceIdx will be valid
         for(size_t sequenceIdx = trip.reverseConnections.size() - 1 - sequenceEndIdx; sequenceIdx <= trip.reverseConnections.size() - 1 - sequenceStartIdx; ++sequenceIdx)
         {
           auto connection = trip.reverseConnections[sequenceIdx];
