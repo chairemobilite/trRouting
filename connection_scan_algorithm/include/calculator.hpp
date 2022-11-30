@@ -59,6 +59,7 @@ namespace TrRouting
     // a concrete result object instead of pointer (that alternatives could use directly), but still
     // use common calculation functions
     std::unique_ptr<RoutingResult> calculate(RouteParameters &parameters, bool resetAccessPaths = true, bool resetFilters = true);
+    // Forward and and reverse calculation, in addition to their return values will fill up their JourneysSteps map
     std::optional<std::tuple<int, std::reference_wrapper<const Node>>> forwardCalculation(RouteParameters &parameters, std::unordered_map<Node::uid_t, JourneyStep> & forwardEgressJourneysSteps); // best arrival time,   best egress node
     std::optional<std::tuple<int, std::reference_wrapper<const Node>>> reverseCalculation(RouteParameters &parameters, std::unordered_map<Node::uid_t, JourneyStep> & reverseAccessJourneysSteps); // best departure time, best access node
     // TODO See calculate

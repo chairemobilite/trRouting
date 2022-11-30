@@ -99,9 +99,9 @@ namespace TrRouting
       const Node & _node,
       int _departureTime,
       int _waitingTime
-                 ): TransitRoutingStep(result_step_type::BOARDING, _trip, _legSequenceInTrip, _stopSequenceInTrip, _node),
-                    departureTime(_departureTime),
-                    waitingTime(_waitingTime)
+    ): TransitRoutingStep(result_step_type::BOARDING, _trip, _legSequenceInTrip, _stopSequenceInTrip, _node),
+       departureTime(_departureTime),
+       waitingTime(_waitingTime)
     {}
     void do_accept(StepVisitorBase &visitor) const override {
       return visitor.visitBoardingStep(*this);
@@ -124,9 +124,10 @@ namespace TrRouting
       int _arrivalTime,
       int _inVehicleTime,
       int _inVehicleDistanceMeters
-                   ): TransitRoutingStep(result_step_type::UNBOARDING, _trip, _legSequenceInTrip, _stopSequenceInTrip, _node),
-                      arrivalTime(_arrivalTime), inVehicleTime(_inVehicleTime),
-                      inVehicleDistanceMeters(_inVehicleDistanceMeters)
+    ): TransitRoutingStep(result_step_type::UNBOARDING, _trip, _legSequenceInTrip, _stopSequenceInTrip, _node),
+       arrivalTime(_arrivalTime),
+       inVehicleTime(_inVehicleTime),
+       inVehicleDistanceMeters(_inVehicleDistanceMeters)
     {}
     void do_accept(StepVisitorBase &visitor) const override {
       return visitor.visitUnboardingStep(*this);
