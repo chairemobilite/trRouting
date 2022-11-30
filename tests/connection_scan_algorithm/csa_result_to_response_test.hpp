@@ -41,14 +41,14 @@ protected:
     std::unique_ptr<TrRouting::Scenario> scenario;
     std::unique_ptr<TrRouting::RouteParameters> testParameters;
 
-  std::unique_ptr<TrRouting::Mode> mode;
-  std::unique_ptr<TrRouting::Agency> agency;
-  std::unique_ptr<TrRouting::Line> line;
-  std::unique_ptr<TrRouting::Path> path;
-  std::unique_ptr<TrRouting::Service> service;
-  std::unique_ptr<TrRouting::Trip> trip;
-  std::unique_ptr<TrRouting::Node> boardingNode;
-  std::unique_ptr<TrRouting::Node> unboardingNode;
+    std::unique_ptr<TrRouting::Mode> mode;
+    std::unique_ptr<TrRouting::Agency> agency;
+    std::unique_ptr<TrRouting::Line> line;
+    std::unique_ptr<TrRouting::Path> path;
+    std::unique_ptr<TrRouting::Service> service;
+    std::unique_ptr<TrRouting::Trip> trip;
+    std::unique_ptr<TrRouting::Node> boardingNode;
+    std::unique_ptr<TrRouting::Node> unboardingNode;
 
 
     std::unique_ptr<TrRouting::SingleCalculationResult> getSingleResult();
