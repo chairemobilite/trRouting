@@ -108,9 +108,19 @@ namespace TrRouting
 
         if (!params.returnAllNodesResult)
         {
-          journey.push_back(JourneyStep(std::nullopt,std::nullopt,std::nullopt,nodesEgress.at(resultingNode.uid).distance,false,nodesEgress.at(resultingNode.uid).distance));
+          journey.push_back(JourneyStep(std::nullopt,
+                                        std::nullopt,
+                                        std::nullopt,
+                                        nodesEgress.at(resultingNode.uid).distance,
+                                        false,
+                                        nodesEgress.at(resultingNode.uid).distance));
         }
-        journey.push_front(JourneyStep(std::nullopt,std::nullopt,std::nullopt,nodesAccess.at(bestAccessNode.value().get().uid).time,false,nodesAccess.at(bestAccessNode.value().get().uid).distance));
+        journey.push_front(JourneyStep(std::nullopt,
+                                       std::nullopt,
+                                       std::nullopt,
+                                       nodesAccess.at(bestAccessNode.value().get().uid).time,
+                                       false,
+                                       nodesAccess.at(bestAccessNode.value().get().uid).distance));
 
         //std::string stepsJson = "  \"steps\":\n  [\n";
 
