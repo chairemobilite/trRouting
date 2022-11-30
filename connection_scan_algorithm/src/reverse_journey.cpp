@@ -106,9 +106,19 @@ namespace TrRouting
 
         if (!params.returnAllNodesResult)
         {
-          journey.push_front(JourneyStep(std::nullopt,std::nullopt,std::nullopt,nodesAccess.at(resultingNode.uid).time,false,nodesAccess.at(resultingNode.uid).distance));
+          journey.push_front(JourneyStep(std::nullopt,
+                                         std::nullopt,
+                                         std::nullopt,
+                                         nodesAccess.at(resultingNode.uid).time,
+                                         false,
+                                         nodesAccess.at(resultingNode.uid).distance));
         }
-        journey.push_back(JourneyStep(std::nullopt,std::nullopt,std::nullopt,nodesEgress.at(bestEgressNode.value().get().uid).time,false,nodesEgress.at(bestEgressNode.value().get().uid).distance));
+        journey.push_back(JourneyStep(std::nullopt,
+                                      std::nullopt,
+                                      std::nullopt,
+                                      nodesEgress.at(bestEgressNode.value().get().uid).time,
+                                      false,
+                                      nodesEgress.at(bestEgressNode.value().get().uid).distance));
 
 
         //TODO This optimizeCaseStr string does nothing, should be removed
