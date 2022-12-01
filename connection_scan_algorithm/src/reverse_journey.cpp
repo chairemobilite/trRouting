@@ -112,7 +112,7 @@ namespace TrRouting
 
               totalInVehicleTime         += inVehicleTime;
               totalWaitingTime           += waitingTime;
-              if (Mode::TRANSFERABLE != journeyStepTrip.line.mode.shortname)
+              if (!journeyStepTrip.line.mode.isTransferable())
                 {
                   numberOfTransfers += 1;
                 }
@@ -126,7 +126,7 @@ namespace TrRouting
                       inVehicleDistance += journeyStepTrip.path.segmentsDistanceMeters[seqI];
                     }
                   totalDistance += inVehicleDistance;
-                  if (Mode::TRANSFERABLE == journeyStepTrip.line.mode.shortname)
+                  if (journeyStepTrip.line.mode.isTransferable())
                     {
                       totalWalkingDistance     += inVehicleDistance;
                       totalWalkingTime         += inVehicleTime;
@@ -321,7 +321,7 @@ namespace TrRouting
         {
           const Trip &journeyStepTrip = journeyStep.getFinalTrip().value().get();
 
-          if (Mode::TRANSFERABLE != journeyStepTrip.line.mode.shortname) {
+          if (!journeyStepTrip.line.mode.isTransferable()) {
             numberOfTransfers += 1;
           }
         }
