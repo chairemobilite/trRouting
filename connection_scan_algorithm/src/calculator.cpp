@@ -43,7 +43,7 @@ namespace TrRouting
       
       if (params.returnAllNodesResult)
       {
-        result = forwardJourneyStep(parameters, bestArrivalTime, bestEgressNode, forwardEgressJourneysSteps);
+        result = forwardJourneyStepAllNodes(parameters, forwardEgressJourneysSteps);
         
         spdlog::debug("-- forward journey -- {} microseconds", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
         calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
@@ -80,7 +80,7 @@ namespace TrRouting
         else
         {
 
-          result = forwardJourneyStep(parameters, bestArrivalTime, bestEgressNode, forwardEgressJourneysSteps);
+          result = forwardJourneyStep(parameters, bestEgressNode, forwardEgressJourneysSteps);
 
           spdlog::debug("-- forward journey -- {} microseconds", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
           calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
