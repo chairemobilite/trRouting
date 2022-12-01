@@ -105,23 +105,29 @@ namespace TrRouting
         tripsQueryOverlay[trip.uid].usable = true;
       }
 
-      auto resultCalculation = reverseCalculation(parameters, reverseAccessJourneysSteps);
-      if (resultCalculation) {
-        bestDepartureTime = std::get<0>(*resultCalculation);
-        bestAccessNode = std::get<1>(*resultCalculation);
-      }
-
-      spdlog::debug("-- reverse calculation --  {} microseconds", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
-      calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
       if (params.returnAllNodesResult) { //TODO Temporary until we split calculate()
+
+        reverseCalculationAllNodes(parameters, reverseAccessJourneysSteps);
+
+        spdlog::debug("-- reverse calculation --  {} microseconds", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
+        calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
+
         result = reverseJourneyStepAllNodes(parameters, reverseAccessJourneysSteps);
       } else {
+
+        auto resultCalculation = reverseCalculation(parameters, reverseAccessJourneysSteps);
+        if (resultCalculation) {
+          bestDepartureTime = std::get<0>(*resultCalculation);
+          bestAccessNode = std::get<1>(*resultCalculation);
+        }
+
+        spdlog::debug("-- reverse calculation --  {} microseconds", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
+        calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
         result = reverseJourneyStep(parameters, bestDepartureTime, bestAccessNode, reverseAccessJourneysSteps);
       }
 
       spdlog::debug("-- reverse journey -- {} microseconds", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
       calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
-
     }
 
     return result;
