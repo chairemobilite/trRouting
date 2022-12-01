@@ -28,6 +28,11 @@ namespace TrRouting
       return "Mode\n  shortname " + shortname + "\n  name " + name + "\n  gtfsId " + std::to_string(gtfsId) + "\n  extendedGtfsId " + std::to_string(extendedGtfsId);
     }
 
+    //TODO Maybe this function should be part of the Line object?
+    bool isTransferable() const {
+      return TRANSFERABLE == shortname;
+    }
+
     // Equal operator. We only compare the shortname, since they should be unique.
     inline bool operator==(const Mode& other ) const { return shortname == other.shortname; }
   };

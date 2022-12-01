@@ -295,7 +295,7 @@ namespace TrRouting
         // Calling value() direct as we assume if we got here, we have a valid journeyStep
         const Trip &journeyStepTrip            = resultingNodeJourneyStep.getFinalTrip().value().get();
 
-        if (Mode::TRANSFERABLE != journeyStepTrip.line.mode.shortname) {
+        if (!journeyStepTrip.line.mode.isTransferable()) {
           numberOfTransfers += 1;
         }
 

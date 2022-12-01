@@ -111,7 +111,7 @@ namespace TrRouting
                     canUnboards[nodeTimeI + 1] == 1,
                     nodeTimeI + 1,
                     trip.allowSameLineTransfers,
-                    line.mode.shortname == Mode::TRANSFERABLE ? 0 : -1
+                    line.mode.isTransferable() ? 0 : -1
                   )));
 
                   connections.push_back(std::move(forwardConnection));
