@@ -45,7 +45,7 @@ namespace TrRouting
       {
         result = forwardJourneyStepAllNodes(parameters, forwardEgressJourneysSteps);
         
-        spdlog::debug("-- forward journey -- {} microseconds", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
+        spdlog::debug("-- forward journey all nodes -- {} microseconds", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
         calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
       }
       else
@@ -79,9 +79,11 @@ namespace TrRouting
         }
         else
         {
-
+          //TODO This will always throw an exception since to get here bestEgressNode must be invalid
+          //TODO We can probably just remove the function forwardJourneyStep completely
           result = forwardJourneyStep(parameters, bestEgressNode, forwardEgressJourneysSteps);
 
+          assert(false); // See TODO
           spdlog::debug("-- forward journey -- {} microseconds", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
           calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
           
@@ -108,8 +110,11 @@ namespace TrRouting
 
       spdlog::debug("-- reverse calculation --  {} microseconds", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
       calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
-
-      result = reverseJourneyStep(parameters, bestDepartureTime, bestAccessNode, reverseAccessJourneysSteps);
+      if (params.returnAllNodesResult) { //TODO Temporary until we split calculate()
+        result = reverseJourneyStepAllNodes(parameters, reverseAccessJourneysSteps);
+      } else {
+        result = reverseJourneyStep(parameters, bestDepartureTime, bestAccessNode, reverseAccessJourneysSteps);
+      }
 
       spdlog::debug("-- reverse journey -- {} microseconds", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
       calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
