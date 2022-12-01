@@ -70,7 +70,9 @@ namespace TrRouting
     std::unique_ptr<AllNodesResult> forwardJourneyStepAllNodes(RouteParameters &parameters, const std::unordered_map<Node::uid_t, JourneyStep> & forwardEgressJourneysSteps);
 
     // TODO See calculate
-    std::unique_ptr<RoutingResult> reverseJourneyStep(RouteParameters &parameters, int bestDepartureTime, std::optional<std::reference_wrapper<const Node>> bestAccessNode, const std::unordered_map<Node::uid_t, JourneyStep> & reverseAccessJourneysSteps);
+    std::unique_ptr<SingleCalculationResult> reverseJourneyStep(RouteParameters &parameters, int bestDepartureTime, std::optional<std::reference_wrapper<const Node>> bestAccessNode, const std::unordered_map<Node::uid_t, JourneyStep> & reverseAccessJourneysSteps);
+    std::unique_ptr<AllNodesResult> reverseJourneyStepAllNodes(RouteParameters &parameters, const std::unordered_map<Node::uid_t, JourneyStep> & reverseAccessJourneysSteps);
+
     AlternativesResult alternativesRouting(RouteParameters &parameters);
     std::string             odTripsRouting(RouteParameters &parameters);
 
@@ -90,6 +92,8 @@ namespace TrRouting
     bool resetAccessFootpaths(const RouteParameters &parameters);
     bool resetEgressFootpaths(const RouteParameters &parameters);
     void resetFilters(const RouteParameters &parameters);
+    // Convert the optimization case ID returned by optimizeJourney to a string
+    std::string optimizeCasesToString(const std::vector<int> optimizeCases);
 
     //TODO set it mutable so it can be changed/reset?
     const TransitData &transitData;

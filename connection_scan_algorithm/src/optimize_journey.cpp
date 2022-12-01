@@ -9,6 +9,29 @@
 namespace TrRouting
 {
   
+  std::string Calculator::optimizeCasesToString(const std::vector<int> optimizeCases) {
+
+    std::string optimizeCasesStr = "";
+
+    for (int optimizeCase : optimizeCases) {
+      if (optimizeCase == 1) {
+        optimizeCasesStr += "CSL|";
+      } else if (optimizeCase == 2) {
+        optimizeCasesStr += "BTS|";
+      } else if (optimizeCase == 3) {
+        optimizeCasesStr += "GTF|";
+      } else if (optimizeCase == 4) {
+        optimizeCasesStr += "CSS|";
+      }
+    }
+
+    // Remove last |
+    if (optimizeCasesStr.size() > 0) {
+      optimizeCasesStr.pop_back();
+    }
+    return optimizeCasesStr;
+  }
+
   std::vector<int> Calculator::optimizeJourney(std::deque<JourneyStep> &journey)
   {
 
