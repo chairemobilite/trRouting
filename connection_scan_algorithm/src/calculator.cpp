@@ -32,24 +32,27 @@ namespace TrRouting
       
       initialDepartureTimeSeconds = departureTimeSeconds; // set initial departure time so we can find the latest possible departure time with reverse calculation later and still know the initial waiting time
 
-      auto resultCalculation = forwardCalculation(parameters, forwardEgressJourneysSteps);
-      if (resultCalculation.has_value()) {
-        bestArrivalTime = std::get<0>(*resultCalculation);
-        bestEgressNode = std::get<1>(*resultCalculation);
-      }
+      if (params.returnAllNodesResult) {
+        forwardCalculationAllNodes(parameters, forwardEgressJourneysSteps);
 
-      spdlog::debug("-- forward calculation -- {} microseconds", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
-      calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
-      
-      if (params.returnAllNodesResult)
-      {
+        spdlog::debug("-- forward calculation all nodes -- {} microseconds", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
+        calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
+
         result = forwardJourneyStepAllNodes(parameters, forwardEgressJourneysSteps);
-        
+
         spdlog::debug("-- forward journey all nodes -- {} microseconds", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
         calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
       }
       else
       {
+        auto resultCalculation = forwardCalculation(parameters, forwardEgressJourneysSteps);
+        if (resultCalculation.has_value()) {
+          bestArrivalTime = std::get<0>(*resultCalculation);
+          bestEgressNode = std::get<1>(*resultCalculation);
+        }
+
+        spdlog::debug("-- forward calculation -- {} microseconds", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
+        calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
         
         if (bestArrivalTime < MAX_INT)
         {
