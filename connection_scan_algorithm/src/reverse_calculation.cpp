@@ -87,27 +87,28 @@ namespace TrRouting
             
             if ((**connection).canUnboard())
             {
-              // TODO probably extract the reverseJourneysSteps[nodeArrival.uuid] instead of doing lookup multiple the time
+              // Extract journeyStep once from map
+              const JourneyStep & reverseStepAtArrival = reverseJourneysSteps.at(nodeArrival.uid);
               if (!tripExitConnection.has_value()) // <= to make sure we get the same result as forward calculation, which uses >
               {
                 currentTripQueryOverlay.exitConnection = *connection;
-                currentTripQueryOverlay.exitConnectionTransferTravelTime = reverseJourneysSteps.at(nodeArrival.uid).getTransferTravelTime();
+                currentTripQueryOverlay.exitConnectionTransferTravelTime = reverseStepAtArrival.getTransferTravelTime();
               }
               else if (
                        //TODO This was commented out in forward_calculation
-                       reverseJourneysSteps.at(nodeArrival.uid).getFinalEnterConnection().has_value()
+                       reverseStepAtArrival.getFinalEnterConnection().has_value()
                        &&
-                       reverseJourneysSteps.at(nodeArrival.uid).getTransferTravelTime() >= 0
+                       reverseStepAtArrival.getTransferTravelTime() >= 0
                        && 
-                       reverseJourneysSteps.at(nodeArrival.uid).getTransferTravelTime() < currentTripQueryOverlay.exitConnectionTransferTravelTime
+                       reverseStepAtArrival.getTransferTravelTime() < currentTripQueryOverlay.exitConnectionTransferTravelTime
                        )
               {
-                journeyConnectionMinWaitingTimeSeconds = reverseJourneysSteps.at(nodeArrival.uid).getFinalEnterConnection().value()->getMinWaitingTimeOrDefault(parameters.getMinWaitingTimeSeconds());
+                journeyConnectionMinWaitingTimeSeconds = reverseStepAtArrival.getFinalEnterConnection().value()->getMinWaitingTimeOrDefault(parameters.getMinWaitingTimeSeconds());
 
                 if (connectionArrivalTime + journeyConnectionMinWaitingTimeSeconds <= nodeArrivalTentativeTime)
                 {
                   currentTripQueryOverlay.exitConnection = *connection;
-                  currentTripQueryOverlay.exitConnectionTransferTravelTime = reverseJourneysSteps.at(nodeArrival.uid).getTransferTravelTime();
+                  currentTripQueryOverlay.exitConnectionTransferTravelTime = reverseStepAtArrival.getTransferTravelTime();
                 }
               }
 
@@ -302,27 +303,28 @@ namespace TrRouting
           {
             if ((**connection).canUnboard())
             {
-              // TODO probably extract the reverseJourneysSteps[nodeArrival.uuid] instead of doing lookup multiple the time
+              // Extract journeyStep once from map
+              const JourneyStep & reverseStepAtArrival = reverseJourneysSteps.at(nodeArrival.uid);
               if (!tripExitConnection.has_value()) // <= to make sure we get the same result as forward calculation, which uses >
               {
                 currentTripQueryOverlay.exitConnection = *connection;
-                currentTripQueryOverlay.exitConnectionTransferTravelTime = reverseJourneysSteps.at(nodeArrival.uid).getTransferTravelTime();
+                currentTripQueryOverlay.exitConnectionTransferTravelTime = reverseStepAtArrival.getTransferTravelTime();
               }
               else if (
                        //TODO This was commented out in forward_calculation
-                       reverseJourneysSteps.at(nodeArrival.uid).getFinalEnterConnection().has_value()
+                       reverseStepAtArrival.getFinalEnterConnection().has_value()
                        &&
-                       reverseJourneysSteps.at(nodeArrival.uid).getTransferTravelTime() >= 0
+                       reverseStepAtArrival.getTransferTravelTime() >= 0
                        &&
-                       reverseJourneysSteps.at(nodeArrival.uid).getTransferTravelTime() < currentTripQueryOverlay.exitConnectionTransferTravelTime
+                       reverseStepAtArrival.getTransferTravelTime() < currentTripQueryOverlay.exitConnectionTransferTravelTime
                        )
               {
-                journeyConnectionMinWaitingTimeSeconds = reverseJourneysSteps.at(nodeArrival.uid).getFinalEnterConnection().value()->getMinWaitingTimeOrDefault(parameters.getMinWaitingTimeSeconds());
+                journeyConnectionMinWaitingTimeSeconds = reverseStepAtArrival.getFinalEnterConnection().value()->getMinWaitingTimeOrDefault(parameters.getMinWaitingTimeSeconds());
 
                 if (connectionArrivalTime + journeyConnectionMinWaitingTimeSeconds <= nodeArrivalTentativeTime)
                 {
                   currentTripQueryOverlay.exitConnection = *connection;
-                  currentTripQueryOverlay.exitConnectionTransferTravelTime = reverseJourneysSteps.at(nodeArrival.uid).getTransferTravelTime();
+                  currentTripQueryOverlay.exitConnectionTransferTravelTime = reverseStepAtArrival.getTransferTravelTime();
                 }
               }
 
