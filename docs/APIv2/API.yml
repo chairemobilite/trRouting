@@ -108,4 +108,47 @@ paths:
             application/json:
               schema:
                 $ref: 'commonResponse.yml#/query_error'
+
+  /v2/accessibility:
+    get:
+      description: Calculate the accessibility to all nodes in the network from/to a given place
+      parameters:
+      - in: query
+        name: place
+        schema:
+          type: string
+          pattern: '^\-?\d{1,3}(\.\d+)?,\-?\d{1,3}(\.\d+)?$'
+        required: true
+        description: Comma-separated longitude/latitude coordinates of the place, in the WSG84 coordinates system
+      - $ref: "parameters.yml#/scenarioParam"
+      - $ref: "parameters.yml#/timeOfTripParam"
+      - $ref: "parameters.yml#/timeTypeParam"
+      - $ref: "parameters.yml#/minWaitingTimeParam"
+      - $ref: "parameters.yml#/maxAccessTravelTimeParam"
+      - $ref: "parameters.yml#/maxEgressTravelTimeParam"
+      - $ref: "parameters.yml#/maxTransferTravelTimeParam"
+      - $ref: "parameters.yml#/maxTravelTimeParam"
+      - $ref: "parameters.yml#/maxFirstWaitingTime"
+      responses:
+        '200':
+          description: Successful query, but there may be no node
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: 'commonResponse.yml#/data_error'
+                  - $ref: 'accessibilityResponse.yml#/NoRoutingFound'
+                  - $ref: 'accessibilityResponse.yml#/success'
+                discriminator:
+                  propertyName: status
+                  mapping:
+                    success: 'accessibilityResponse.yml#/success'
+                    no_routing_found: 'accessibilityResponse.yml#/NoRoutingFound'
+                    data_error: 'commonResponse.yml#/data_error'
+        '400':
+          description: Query parameters are invalid
+          content:
+            application/json:
+              schema:
+                $ref: 'accessibilityResponse.yml#/access_query_error'
     
