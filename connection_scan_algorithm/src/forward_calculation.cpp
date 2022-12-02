@@ -189,7 +189,7 @@ namespace TrRouting
     {
       if (forwardEgressJourneysSteps.count(egressFootpath.node.uid)) {
         egressExitConnection  = forwardEgressJourneysSteps.at(egressFootpath.node.uid).getFinalExitConnection();
-        //TODO Would this be always true with the new previous if
+        //TODO We seem to always insert a JourneyStep with a valid exit connection, so the if might be unnecessary
         if (egressExitConnection.has_value())
         {
           const NodeTimeDistance &egress = nodesEgress.at(egressFootpath.node.uid);
@@ -200,7 +200,9 @@ namespace TrRouting
             bestArrivalTime      = egressNodeArrivalTime;
             bestEgress = egress;
           }
-        }
+        } else {
+          assert(false); //Should never happen, see TODO above
+        }        
       }
     }
 
