@@ -62,6 +62,9 @@ namespace TrRouting
     // use common calculation functions
     // TODO Once the split is done, we can get rid of the unique_ptr return and have the right concret type returned directly
     std::unique_ptr<RoutingResult> calculate(RouteParameters &parameters, bool resetAccessPaths = true, bool resetFilters = true);
+    std::unique_ptr<SingleCalculationResult> calculateSingle(RouteParameters &parameters, bool resetAccessPaths = true, bool resetFilters = true);
+    std::unique_ptr<AllNodesResult> calculateAllNodes(RouteParameters &parameters, bool resetAccessPaths = true, bool resetFilters = true);
+
     // Forward and and reverse calculation, in addition to their return values will fill up their JourneysSteps map
     std::optional<std::tuple<int, std::reference_wrapper<const Node>>> forwardCalculation(RouteParameters &parameters, std::unordered_map<Node::uid_t, JourneyStep> & forwardEgressJourneysSteps); // best arrival time,   best egress node
     void forwardCalculationAllNodes(RouteParameters &parameters, std::unordered_map<Node::uid_t, JourneyStep> & forwardEgressJourneysSteps);
@@ -98,6 +101,7 @@ namespace TrRouting
     void resetFilters(const RouteParameters &parameters);
     // Convert the optimization case ID returned by optimizeJourney to a string
     std::string optimizeCasesToString(const std::vector<int> optimizeCases);
+    std::unique_ptr<SingleCalculationResult> calculateSingleReverse(RouteParameters &parameters);
 
     //TODO set it mutable so it can be changed/reset?
     const TransitData &transitData;
