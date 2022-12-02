@@ -107,7 +107,6 @@ namespace TrRouting
     const TransitData &transitData;
 
     int              departureTimeSeconds;
-    int              initialDepartureTimeSeconds;
     int              arrivalTimeSeconds;
     int              minAccessTravelTime;
     int              maxEgressTravelTime;

@@ -25,7 +25,6 @@ namespace TrRouting
     odTripGlob(std::nullopt),
     transitData(_transitData),
     departureTimeSeconds(0),
-    initialDepartureTimeSeconds(0),
     arrivalTimeSeconds(-1),
     minAccessTravelTime(0),
     maxEgressTravelTime(0),
