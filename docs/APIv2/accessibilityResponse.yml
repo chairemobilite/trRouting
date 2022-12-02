@@ -1,0 +1,105 @@
+access_query_error: # 'query_error' is a value for the status (discriminator)
+  required:
+    - status
+  type: object
+  properties:
+    status:
+      type: string
+      enum: [query_error]
+    errorCode:
+      type: string
+      enum:
+        - 'EMPTY_SCENARIO'
+        - 'MISSING_PARAM_SCENARIO'
+        - 'MISSING_PARAM_PLACE'
+        - 'MISSING_PARAM_TIME_OF_TRIP'
+        - 'INVALID_PLACE'
+        - 'INVALID_NUMERICAL_DATA'
+        - 'PARAM_ERROR_UNKNOWN'
+
+baseRouteResponse:
+  type: object
+  properties:
+    place:
+      type: array
+      items:
+        type: number
+      minItems: 2
+      maxItems: 2
+      description: Longitude and latitude of the requested place, in the WSG84 coordiantes system
+    timeOfTrip:
+      type: integer
+      description: |
+        The requested time of the trip, in seconds since midnight.
+        The time_type field will determine if it represents a departure or arrival time.
+    timeType:
+      type: integer
+      enum:
+        - 0
+        - 1
+      description: The type of the requestTime. 0 means it is the departure time; 1 means arrival time
+
+NoRoutingFound:
+  required:
+    - status
+  allOf:
+  - $ref: '#/baseRouteResponse'
+  - type: object
+    properties:
+      status:
+        type: string
+        enum: [no_routing_found]
+      reason:
+        type: string
+        enum:
+          # Generic reason, when not possible to specify more
+          - NO_ROUTING_FOUND,
+          # No accessible node around the place
+          - NO_ACCESS_AT_PLACE,
+          # There is no service at this place with the query parameters
+          - NO_SERVICE_AT_PLACE,
+
+success:
+  required:
+    - status
+  allOf:
+  - $ref: '#/baseRouteResponse'
+  - $ref: '#/accessibilityResponse'
+  - type: object
+    properties:
+      status:
+        type: string
+        enum: [success]
+
+accessibilityResponse:
+  type: object
+  properties:
+    nodes:
+      type: array
+      items:
+        $ref: '#/nodeAccessibility'
+    totalNodeCount:
+      type: number
+      description: The total number of nodes in the network
+
+nodeAccessibility:
+  - type: object
+    properties:
+      nodeName:
+        type: string
+        description: Name of the current node
+      nodeCode:
+        type: string
+        description: Code of the current node
+      nodeUuid:
+        type: string
+        description: UUID of the current node
+      nodeTime:
+        type: number
+        description: If the requested time is a departure time, this is the earliest possible arrival time at this node. If the requested time is an arrival time, this is the latest possible departure time from this node.
+      totalTravelTime:
+        type: number
+        description: Total travel time, from/to the requested place to/from this node, in seconds
+      numberOfTransfers: 
+        type: number
+        description: Number of transfers required to access this node.
