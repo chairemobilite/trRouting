@@ -182,11 +182,13 @@ namespace TrRouting
     nlohmann::json json;
     json["status"] = STATUS_SUCCESS;
     json["alternatives"] = nlohmann::json::array();
-    int alternativeSequence = 0;
+    // Sequence is there as parts of results that will be displayed to humans, in csv files, so start at 1
+    int alternativeSequence = 1;
     for (auto &alternative : result.alternatives) {
       nlohmann::json alternativeJson = alternative.get()->accept(*this);
       alternativeJson["alternativeSequence"] = alternativeSequence;
       json["alternatives"].push_back(alternativeJson);
+      alternativeSequence++;
     }
     json["alternativesTotal"] = result.totalAlternativesCalculated;
     response = json;
