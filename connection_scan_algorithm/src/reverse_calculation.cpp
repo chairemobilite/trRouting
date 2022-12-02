@@ -123,17 +123,9 @@ namespace TrRouting
               auto nodeDepartureInNodesAccessIte = nodesAccess.find(nodeDeparture.uid);
               if (!reachedAtLeastOneAccessNode &&  nodeDepartureInNodesAccessIte != nodesAccess.end() &&  nodeDepartureInNodesAccessIte->second.time != -1) // check if the departure node is accessable
               {
-                /*if (
-                  initialDepartureTimeSeconds == -1
-                  ||
-                  params.maxFirstWaitingTimeSeconds < connectionMinWaitingTimeSeconds
-                  ||
-                  connectionDepartureTime - initialDepartureTimeSeconds + nodesAccessTravelTime[nodeDepartureIndex] <= params.maxFirstWaitingTimeSeconds
-                )
-                {*/
-                  reachedAtLeastOneAccessNode      = true;
-                  tentativeAccessNodeDepartureTime = connectionDepartureTime;
-                //}
+                reachedAtLeastOneAccessNode      = true;
+                tentativeAccessNodeDepartureTime = connectionDepartureTime;
+
               }
               footpathIndex = 0;
               for (const NodeTimeDistance & transferableNode : nodeDeparture.reverseTransferableNodes)
@@ -171,18 +163,18 @@ namespace TrRouting
                   )
                   {                    
                     if (
-                      initialDepartureTimeSeconds == -1
+                      departureTimeSeconds == -1
                       ||
                       (nodeDepartureInNodesAccessIte != nodesAccess.end() &&
-                       connectionDepartureTime - nodeDepartureInNodesAccessIte->second.time - connectionMinWaitingTimeSeconds >= initialDepartureTimeSeconds
+                       connectionDepartureTime - nodeDepartureInNodesAccessIte->second.time - connectionMinWaitingTimeSeconds >= departureTimeSeconds
                        ))
                     {
                       if (
-                        initialDepartureTimeSeconds == -1
+                        departureTimeSeconds == -1
                         ||
                         parameters.getMaxFirstWaitingTimeSeconds() < connectionMinWaitingTimeSeconds
                         ||
-                        connectionDepartureTime - initialDepartureTimeSeconds - nodeDepartureInNodesAccessIte->second.time <= parameters.getMaxFirstWaitingTimeSeconds()
+                        connectionDepartureTime - departureTimeSeconds - nodeDepartureInNodesAccessIte->second.time <= parameters.getMaxFirstWaitingTimeSeconds()
                       )
                       {
                         reverseAccessJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(*connection, currentTripQueryOverlay.exitConnection, std::cref(trip), 0, true, 0));
@@ -380,18 +372,18 @@ namespace TrRouting
                   )
                   {
                     if (
-                      initialDepartureTimeSeconds == -1
+                      departureTimeSeconds == -1
                       ||
                       (nodeDepartureInNodesAccessIte != nodesAccess.end() &&
-                       connectionDepartureTime - nodeDepartureInNodesAccessIte->second.time - connectionMinWaitingTimeSeconds >= initialDepartureTimeSeconds
+                       connectionDepartureTime - nodeDepartureInNodesAccessIte->second.time - connectionMinWaitingTimeSeconds >= departureTimeSeconds
                        ))
                     {
                       if (
-                        initialDepartureTimeSeconds == -1
+                        departureTimeSeconds == -1
                         ||
                         parameters.getMaxFirstWaitingTimeSeconds() < connectionMinWaitingTimeSeconds
                         ||
-                        connectionDepartureTime - initialDepartureTimeSeconds - nodeDepartureInNodesAccessIte->second.time <= parameters.getMaxFirstWaitingTimeSeconds()
+                        connectionDepartureTime - departureTimeSeconds - nodeDepartureInNodesAccessIte->second.time <= parameters.getMaxFirstWaitingTimeSeconds()
                       )
                       {
                         reverseAccessJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(*connection, currentTripQueryOverlay.exitConnection, std::cref(trip), 0, true, 0));

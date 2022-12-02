@@ -28,7 +28,6 @@ namespace TrRouting
     if (departureTimeSeconds > -1 && parameters.isForwardCalculation())
     {
       
-      initialDepartureTimeSeconds = departureTimeSeconds; // set initial departure time so we can find the latest possible departure time with reverse calculation later and still know the initial waiting time
       int bestArrivalTime {MAX_INT};
       std::optional<std::reference_wrapper<const Node>> bestEgressNode;
       //TODO With the TODO later that forwardJourneyStep is not necessary, we can also drop this variable
@@ -72,7 +71,6 @@ namespace TrRouting
     else if (arrivalTimeSeconds > -1)
     {
       departureTimeSeconds = -1;
-      initialDepartureTimeSeconds = -1;
       //TODO maybe we can do something different in that case, like a query flag
       // we need to make all trips usable when not coming from forward result because reverse calculation, by default, checks for usableTrips
       for (auto && tripIte : transitData.getTrips()) {
@@ -120,8 +118,6 @@ namespace TrRouting
     {
       std::unordered_map<Node::uid_t, JourneyStep> forwardEgressJourneysSteps;
 
-      initialDepartureTimeSeconds = departureTimeSeconds; // set initial departure time so we can find the latest possible departure time with reverse calculation later and still know the initial waiting time
-
       forwardCalculationAllNodes(parameters, forwardEgressJourneysSteps);
 
       spdlog::debug("-- forward calculation all nodes -- {} microseconds", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
@@ -138,7 +134,6 @@ namespace TrRouting
       std::unordered_map<Node::uid_t, JourneyStep> reverseAccessJourneysSteps;
 
       departureTimeSeconds = -1;
-      initialDepartureTimeSeconds = -1;
       //TODO maybe we can do something different in that case, like a query flag
       // we need to make all trips usable when not coming from forward result because reverse calculation, by default, checks for usableTrips
       for (auto && tripIte : transitData.getTrips()) {
