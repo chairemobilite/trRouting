@@ -133,7 +133,7 @@ namespace TrRouting
 
                 auto trite = nodesReverseTentativeTime.find(transferableNode.node.uid);
 
-                if (nodeDeparture.uuid != transferableNode.node.uuid && trite != nodesReverseTentativeTime.end() && trite->second > connectionDepartureTime - connectionMinWaitingTimeSeconds)
+                if (nodeDeparture != transferableNode.node && trite != nodesReverseTentativeTime.end() && trite->second > connectionDepartureTime - connectionMinWaitingTimeSeconds)
                 {
                   footpathIndex++;
                   continue;
@@ -149,10 +149,10 @@ namespace TrRouting
                     footpathDistance = nodeDeparture.reverseTransferableNodes.at(footpathIndex).distance;
                     nodesReverseTentativeTime[transferableNode.node.uid] = connectionDepartureTime - footpathTravelTime - connectionMinWaitingTimeSeconds;
                     //TODO Do we need a make_optional<...>(connection) ??
-                    reverseJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(*connection, currentTripQueryOverlay.exitConnection, std::cref(trip), footpathTravelTime, (nodeDeparture.uuid == transferableNode.node.uuid), footpathDistance));
+                    reverseJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(*connection, currentTripQueryOverlay.exitConnection, std::cref(trip), footpathTravelTime, (nodeDeparture == transferableNode.node), footpathDistance));
                   }
                   if (
-                    nodeDeparture.uuid == transferableNode.node.uuid
+                    nodeDeparture == transferableNode.node
                     && 
                     (
                      //TODO Really not sure this is equivalent
@@ -342,7 +342,7 @@ namespace TrRouting
 
                 auto trite = nodesReverseTentativeTime.find(transferableNode.node.uid);
 
-                if (nodeDeparture.uuid != transferableNode.node.uuid && trite != nodesReverseTentativeTime.end() && trite->second > connectionDepartureTime - connectionMinWaitingTimeSeconds)
+                if (nodeDeparture != transferableNode.node && trite != nodesReverseTentativeTime.end() && trite->second > connectionDepartureTime - connectionMinWaitingTimeSeconds)
                 {
                   footpathIndex++;
                   continue;
@@ -358,10 +358,10 @@ namespace TrRouting
                     footpathDistance = nodeDeparture.reverseTransferableNodes.at(footpathIndex).distance;
                     nodesReverseTentativeTime[transferableNode.node.uid] = connectionDepartureTime - footpathTravelTime - connectionMinWaitingTimeSeconds;
                     //TODO Do we need a make_optional<...>(connection) ??
-                    reverseJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(*connection, currentTripQueryOverlay.exitConnection, std::cref(trip), footpathTravelTime, (nodeDeparture.uuid == transferableNode.node.uuid), footpathDistance));
+                    reverseJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(*connection, currentTripQueryOverlay.exitConnection, std::cref(trip), footpathTravelTime, (nodeDeparture == transferableNode.node), footpathDistance));
                   }
                   if (
-                    nodeDeparture.uuid == transferableNode.node.uuid
+                    nodeDeparture == transferableNode.node
                     &&
                     (
                      //TODO Really not sure this is equivalent

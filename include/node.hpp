@@ -50,6 +50,7 @@ namespace TrRouting
     // Equal operator. We only compare the local uid, since they should be unique.
     inline bool operator==(const Node& other ) const { return uid == other.uid; }
     inline bool operator<(const Node& other ) const { return uid < other.uid; }
+    inline bool operator!=(const Node& other ) const { return uid != other.uid; }
 
   private:
     //TODO, this could probably be an unsigned long, but current MAX_INT is good enough for our needs

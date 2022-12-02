@@ -129,7 +129,7 @@ namespace TrRouting
                   currentTransferablenNodesTentativeTime = MAX_INT;
                 }
                 
-                if (nodeArrival.uuid != transferableNode.node.uuid &&
+                if (nodeArrival != transferableNode.node &&
                     currentTransferablenNodesTentativeTime < connectionArrivalTime)
                 {
                   footpathIndex++;
@@ -146,7 +146,7 @@ namespace TrRouting
                     nodesTentativeTime[transferableNode.node.uid] = footpathTravelTime + connectionArrivalTime;
 
                     //TODO DO we need a make_optional here??
-                    forwardJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(currentTripQueryOverlay.enterConnection, *connection, std::cref(trip), footpathTravelTime, (nodeArrival.uuid == transferableNode.node.uuid), footpathDistance));
+                    forwardJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(currentTripQueryOverlay.enterConnection, *connection, std::cref(trip), footpathTravelTime, (nodeArrival == transferableNode.node), footpathDistance));
                   }
 
                   if (
@@ -321,7 +321,7 @@ namespace TrRouting
                   currentTransferablenNodesTentativeTime = MAX_INT;
                 }
 
-                if (nodeArrival.uuid != transferableNode.node.uuid &&
+                if (nodeArrival != transferableNode.node &&
                     currentTransferablenNodesTentativeTime < connectionArrivalTime)
                 {
                   footpathIndex++;
@@ -338,7 +338,7 @@ namespace TrRouting
                     nodesTentativeTime[transferableNode.node.uid] = footpathTravelTime + connectionArrivalTime;
 
                     //TODO DO we need a make_optional here??
-                    forwardJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(currentTripQueryOverlay.enterConnection, *connection, std::cref(trip), footpathTravelTime, (nodeArrival.uuid == transferableNode.node.uuid), footpathDistance));
+                    forwardJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(currentTripQueryOverlay.enterConnection, *connection, std::cref(trip), footpathTravelTime, (nodeArrival == transferableNode.node), footpathDistance));
                   }
 
                   if (
