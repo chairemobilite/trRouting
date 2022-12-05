@@ -201,7 +201,7 @@ namespace TrRouting
     json["nodes"] = nlohmann::json::array();
     for (auto &node : result.nodes) {
       nlohmann::json nodeJson;
-      nodeJson["id"]                     = boost::uuids::to_string(node.nodeUuid);
+      nodeJson["id"]                     = boost::uuids::to_string(node.node.uuid);
       nodeJson["arrivalTime"]            = Toolbox::convertSecondsToFormattedTime(node.arrivalTime);
       nodeJson["arrivalTimeSeconds"]     = node.arrivalTime;
       nodeJson["totalTravelTimeSeconds"] = node.totalTravelTime;
@@ -209,7 +209,8 @@ namespace TrRouting
       json["nodes"].push_back(nodeJson);
     }
     json["numberOfReachableNodes"] = result.numberOfReachableNodes;
-    json["percentOfReachableNodes"] = result.percentOfReachableNodes;
+    // Get a number with 2 decimals.
+    json["percentOfReachableNodes"] = round(10000 * (float)(result.numberOfReachableNodes) / (float)(result.totalNodeCount))/100.0;
     response = json;
   }
 

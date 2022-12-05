@@ -129,21 +129,18 @@ TEST_F(ResultToV1FixtureTest, TestAlternativesResult)
 
 TEST_F(ResultToV1FixtureTest, TestAllNodesResult)
 {
-    std::string node1Uuid = "aaaaaaaa-5555-cccc-dddd-eeeeeeffffff";
-    std::string node2Uuid = "aaaaaaaa-6666-cccc-dddd-eeeeeeffffff";
-
     // Prepare the result, we test the conversion, the result doesn't have to make sense
     TrRouting::AllNodesResult result = TrRouting::AllNodesResult();
     result.numberOfReachableNodes = 2;
-    result.percentOfReachableNodes = 0.3;
+    result.totalNodeCount = 4;
     TrRouting::AccessibleNodes node1Result = TrRouting::AccessibleNodes(
-        uuidGenerator(node1Uuid),
+        *boardingNode,
         9 * 60 * 60,
         2000,
         2
     );
     TrRouting::AccessibleNodes node2Result = TrRouting::AccessibleNodes(
-        uuidGenerator(node2Uuid),
+        *unboardingNode,
         9 * 60 * 60 + 5 * 60,
         2100,
         1
@@ -156,17 +153,17 @@ TEST_F(ResultToV1FixtureTest, TestAllNodesResult)
 
     ASSERT_EQ(STATUS_SUCCESS, jsonResponse["status"]);
     ASSERT_EQ(result.numberOfReachableNodes, jsonResponse["numberOfReachableNodes"]);
-    ASSERT_EQ(result.percentOfReachableNodes, jsonResponse["percentOfReachableNodes"]);
+    ASSERT_EQ(50.0, jsonResponse["percentOfReachableNodes"]);
     ASSERT_EQ(result.numberOfReachableNodes, jsonResponse["nodes"].size());
 
     // Test the individual nodes
-    ASSERT_EQ(node1Uuid, jsonResponse["nodes"][0]["id"]);
+    ASSERT_EQ(boardingNodeUuid, jsonResponse["nodes"][0]["id"]);
     ASSERT_EQ(TrRouting::Toolbox::convertSecondsToFormattedTime(node1Result.arrivalTime), jsonResponse["nodes"][0]["arrivalTime"]);
     ASSERT_EQ(node1Result.arrivalTime, jsonResponse["nodes"][0]["arrivalTimeSeconds"]);
     ASSERT_EQ(node1Result.totalTravelTime, jsonResponse["nodes"][0]["totalTravelTimeSeconds"]);
     ASSERT_EQ(node1Result.numberOfTransfers, jsonResponse["nodes"][0]["numberOfTransfers"]);
 
-    ASSERT_EQ(node2Uuid, jsonResponse["nodes"][1]["id"]);
+    ASSERT_EQ(unboardingNodeUuid, jsonResponse["nodes"][1]["id"]);
     ASSERT_EQ(TrRouting::Toolbox::convertSecondsToFormattedTime(node2Result.arrivalTime), jsonResponse["nodes"][1]["arrivalTime"]);
     ASSERT_EQ(node2Result.arrivalTime, jsonResponse["nodes"][1]["arrivalTimeSeconds"]);
     ASSERT_EQ(node2Result.totalTravelTime, jsonResponse["nodes"][1]["totalTravelTimeSeconds"]);

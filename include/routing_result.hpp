@@ -224,15 +224,15 @@ namespace TrRouting
    */
   class AccessibleNodes {
   public:
-    boost::uuids::uuid nodeUuid;
+    const Node & node;
     int arrivalTime;
     int totalTravelTime;
     int numberOfTransfers;
-    AccessibleNodes(boost::uuids::uuid _uuid,
+    AccessibleNodes(const Node & _node,
       int _arrivalTime,
       int _totalTravelTime,
       int _numberOfTransfers
-    ): nodeUuid(_uuid),
+    ): node(_node),
       arrivalTime(_arrivalTime),
       totalTravelTime(_totalTravelTime),
       numberOfTransfers(_numberOfTransfers)
@@ -247,7 +247,7 @@ namespace TrRouting
   public:
     std::vector<AccessibleNodes> nodes;
     int numberOfReachableNodes;
-    float percentOfReachableNodes;
+    int totalNodeCount;
     AllNodesResult(): RoutingResult(result_type::ALL_NODES) {}
     void do_accept(ResultVisitorBase &visitor) const override {
       return visitor.visitAllNodesResult(*this);
