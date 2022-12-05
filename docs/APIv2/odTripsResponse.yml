@@ -1,0 +1,107 @@
+od_trips_query_error: # 'query_error' is a value for the status (discriminator)
+  required:
+    - status
+  type: object
+  properties:
+    status:
+      type: string
+      enum: [query_error]
+    errorCode:
+      type: string
+      enum:
+        - 'EMPTY_SCENARIO'
+        - 'EMPTY_DATA_SOURCE'
+        - 'MISSING_PARAM_SCENARIO'
+        - 'MISSING_PARAM_DATA_SOURCE'
+        - 'INVALID_PERIODS'
+        - 'INVALID_SAMPLE_RATIO'
+        - 'INVALID_NUMERICAL_DATA'
+        - 'PARAM_ERROR_UNKNOWN'
+
+successResponse:
+  required:
+    - status
+  type: object
+  properties:
+    status:
+      type: string
+      enum: [success]
+    query:
+      $ref: '#/odTripsQueryResponse'
+    result:
+      $ref: '#/odTripsResultResponse'
+
+odTripsQueryResponse:
+  type: object
+  properties:
+    dataSourceId:
+      type: string
+      description: ID of the data source from which come the odTrips that were calculated.
+    sampleRatio:
+      type: number
+      description: The ratio of odTrips from the data source for which a route was calculated. This a number between 0 and 1 inclusively.
+
+odTripsResultResponse:
+  type: object
+  properties:
+    odTrips:
+      type: array
+      items:
+        $ref: '#/odTripResult'
+    # TODO v1 also returns line and paths profiles. We don't support it yet, but when we do, add the documentation here
+
+odTripResult:
+  type: object
+  properties:
+    tripData:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID of this OD trip
+        internalId:
+          type: string
+          description: Internal ID to identify this OD trip
+        originActivity:
+          type: string
+          # TODO This could probably be a enum. Also, isn't the activity an atribute of the trip and not of each end?
+          description: Activity done at the origin of the trip
+        destinationActivity:
+          type: string
+          description: Activity done at the destination of the trip
+        declaredMode:
+          type: string
+          # TODO Can't there be multiple modes per trip?
+          description: Mode declared for this trip
+        expansionFactor:
+          type: number
+          description: Expansion factor represented by the person doing this trip
+        onlyWalkingTravelTime:
+          type: number
+          description: Time of this trip, if done entirely by walking, in seconds
+        onlyCyclingTravelTime:
+          type: number
+          description: Time of this trip, if done entirely by cycling, in seconds
+        onlyDrivingTravelTime:
+          type: number
+          description: Time of this trip, if done entirely by walking, in seconds
+        declaredDepartureTime:
+          type: number
+          description: Declared departure time of this trip, in seconds since midnight
+        declaredArrivalTime:
+          type: number
+          description: Declared arrival time of this trip, in seconds since midnight
+      # TODO When we have a batch calculation endpoint, this data's structure may be revisited. Now we just match the v1 returned data
+      description: Data describing the odTrip. It comes from the base odTrip in the data source.
+    result:
+      $ref: '#/odTripRouteResult'
+
+odTripRouteResult:
+  oneOf:
+    - $ref: 'routeResponse.yml#/successResponse'
+    - $ref: 'routeResponse.yml#/NoRoutingFound'
+  discriminator:
+    propertyName: status
+    mapping:
+      success: 'routeResponse.yml#/successResponse'
+      no_routing_found: 'routeResponse.yml#/NoRoutingFound'

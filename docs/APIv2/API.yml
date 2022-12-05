@@ -151,4 +151,57 @@ paths:
             application/json:
               schema:
                 $ref: 'accessibilityResponse.yml#/access_query_error'
+
+  /v2/odTrips:
+    get:
+      description: Calculate in batch all or a subset of the odTrips
+      parameters:
+      - in: query
+        name: data_source_id
+        schema:
+          type: string
+        required: true
+        description: ID of the data source that contains the od trips definitions
+      - in: query
+        name: periods
+        schema:
+          type: string
+          pattern: '^\d+,\d+(,\d+,\d+)*$'
+        required: false
+        description: Comma-separated list of period start and end times, in seconds since midnight. More than one period can be specified, in which case the format is 'start1,end1,start2,end2...'. If set, only the odTrips starting within those periods will be calculated.
+      - in: query
+        name: sample_ratio
+        schema:
+          type: number
+          minimum: 0
+          maximum: 1
+        required: false
+        description: Specify a ratio of odTrips to calculate. If set, a random number of odTrips corresponding to this ratio will be calculated. The odTrips qualify with the other criteria
+      - $ref: "parameters.yml#/scenarioParam"
+      - $ref: "parameters.yml#/minWaitingTimeParam"
+      - $ref: "parameters.yml#/maxAccessTravelTimeParam"
+      - $ref: "parameters.yml#/maxEgressTravelTimeParam"
+      - $ref: "parameters.yml#/maxTransferTravelTimeParam"
+      - $ref: "parameters.yml#/maxTravelTimeParam"
+      - $ref: "parameters.yml#/maxFirstWaitingTime"
+      responses:
+        '200':
+          description: Successful query, but there may be no node
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: 'commonResponse.yml#/data_error'
+                  - $ref: 'odTripsResponse.yml#/successResponse'
+                discriminator:
+                  propertyName: status
+                  mapping:
+                    success: 'odTripsResponse.yml#/successResponse'
+                    data_error: 'commonResponse.yml#/data_error'
+        '400':
+          description: Query parameters are invalid
+          content:
+            application/json:
+              schema:
+                $ref: 'odTripsResponse.yml#/od_trips_query_error'
     
