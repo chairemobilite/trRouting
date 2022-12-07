@@ -83,19 +83,19 @@ routeResponse:
         totalTravelTime:
           type: number
           description: Total travel time, from the optimized departure time to the arrival time, in seconds
-        totalDistanceMeters:
+        totalDistance:
           type: number
           description: Total distance traveled, from departure to arrival
         totalInVehicleTime:
           type: number
           description: Total time spent in a transit vehicle, in seconds
-        totalInVehicleDistanceMeters:
+        totalInVehicleDistance:
           type: number
           description: Total distance traveled in a vehicle, in meters
         totalNonTransitTravelTime:
           type: number
           description: Total time spent traveling, but not in a transit vehicle. This excludes waiting time. In seconds
-        totalNonTransitDistanceMeters:
+        totalNonTransitDistance:
           type: number
           description: Total distance traveled not in a vehicle, in meters
         numberOfBoardings:
@@ -107,19 +107,19 @@ routeResponse:
         transferWalkingTime:
           type: number
           description: Time spent walking to transfer from a transit route to another transit route, in seconds
-        transferWalkingDistanceMeters:
+        transferWalkingDistance:
           type: number
           description: Distance traveled to transfer between transit trips, in meters
         accessTravelTime:
           type: number
           description: Time spent traveling to access the first transit stop of the trip, in seconds
-        accessDistanceMeters:
+        accessDistance:
           type: number
           description: Distance traveled to access the first transit stop of the trip, in meters
         egressTravelTime:
           type: number
           description: Time spent traveling from the last transit stop of the trip, to the destination, in seconds
-        egressDistanceMeters:
+        egressDistance:
           type: number
           description: Distance traveled from the last transit stop of the trip to the destination, in meters
         transferWaitingTime:
@@ -185,7 +185,7 @@ tripStepWalkingBase:
     travelTime:
       type: number
       description: Time spent walking in this step, in seconds
-    distanceMeters:
+    distance:
       type: number
       description: Distance traveled in this step, in meters
     departureTime:
@@ -309,6 +309,6 @@ tripStepUnboarding: # 'unboarding' is a value for the action (discriminator)
         inVehicleTime:
           type: number
           description: Time spent in the vehicle, in seconds
-        inVehicleDistanceMeters:
+        inVehicleDistance:
           type: number
           description: Distance covered in the vehicle, in meters
