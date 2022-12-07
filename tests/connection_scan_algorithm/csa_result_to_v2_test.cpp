@@ -99,19 +99,19 @@ void ResultToV2FixtureTest::assertResultConversion(nlohmann::json jsonResponse, 
     ASSERT_EQ(result.departureTime, jsonResponse["departureTime"]);
     ASSERT_EQ(result.arrivalTime, jsonResponse["arrivalTime"]);
     ASSERT_EQ(result.totalTravelTime, jsonResponse["totalTravelTime"]);
-    ASSERT_EQ(result.totalDistance, jsonResponse["totalDistanceMeters"]);
+    ASSERT_EQ(result.totalDistance, jsonResponse["totalDistance"]);
     ASSERT_EQ(result.totalInVehicleTime, jsonResponse["totalInVehicleTime"]);
-    ASSERT_EQ(result.totalInVehicleDistance, jsonResponse["totalInVehicleDistanceMeters"]);
+    ASSERT_EQ(result.totalInVehicleDistance, jsonResponse["totalInVehicleDistance"]);
     ASSERT_EQ(result.totalNonTransitTravelTime, jsonResponse["totalNonTransitTravelTime"]);
-    ASSERT_EQ(result.totalNonTransitDistance, jsonResponse["totalNonTransitDistanceMeters"]);
+    ASSERT_EQ(result.totalNonTransitDistance, jsonResponse["totalNonTransitDistance"]);
     ASSERT_EQ(result.numberOfBoardings, jsonResponse["numberOfBoardings"]);
     ASSERT_EQ(result.numberOfTransfers, jsonResponse["numberOfTransfers"]);
     ASSERT_EQ(result.transferWalkingTime, jsonResponse["transferWalkingTime"]);
-    ASSERT_EQ(result.transferWalkingDistance, jsonResponse["transferWalkingDistanceMeters"]);
+    ASSERT_EQ(result.transferWalkingDistance, jsonResponse["transferWalkingDistance"]);
     ASSERT_EQ(result.accessTravelTime, jsonResponse["accessTravelTime"]);
-    ASSERT_EQ(result.accessDistance, jsonResponse["accessDistanceMeters"]);
+    ASSERT_EQ(result.accessDistance, jsonResponse["accessDistance"]);
     ASSERT_EQ(result.egressTravelTime, jsonResponse["egressTravelTime"]);
-    ASSERT_EQ(result.egressDistance, jsonResponse["egressDistanceMeters"]);
+    ASSERT_EQ(result.egressDistance, jsonResponse["egressDistance"]);
     ASSERT_EQ(result.transferWaitingTime, jsonResponse["transferWaitingTime"]);
     ASSERT_EQ(result.firstWaitingTime, jsonResponse["firstWaitingTime"]);
     ASSERT_EQ(result.totalWaitingTime, jsonResponse["totalWaitingTime"]);
@@ -121,7 +121,7 @@ void ResultToV2FixtureTest::assertResultConversion(nlohmann::json jsonResponse, 
     ASSERT_EQ("walking", jsonResponse["steps"][0]["action"]);
     ASSERT_EQ("access", jsonResponse["steps"][0]["type"]);
     ASSERT_EQ(walkingStep.travelTime, jsonResponse["steps"][0]["travelTime"]);
-    ASSERT_EQ(walkingStep.distanceMeters, jsonResponse["steps"][0]["distanceMeters"]);
+    ASSERT_EQ(walkingStep.distanceMeters, jsonResponse["steps"][0]["distance"]);
     ASSERT_EQ(walkingStep.departureTime, jsonResponse["steps"][0]["departureTime"]);
     ASSERT_EQ(walkingStep.arrivalTime, jsonResponse["steps"][0]["arrivalTime"]);
     ASSERT_EQ(walkingStep.readyToBoardAt, jsonResponse["steps"][0]["readyToBoardAt"]);
@@ -171,5 +171,5 @@ void ResultToV2FixtureTest::assertResultConversion(nlohmann::json jsonResponse, 
     ASSERT_EQ(unboardingNodePoint.latitude, jsonResponse["steps"][2]["nodeCoordinates"][1]);
     ASSERT_EQ(unboardingStep.arrivalTime, jsonResponse["steps"][2]["arrivalTime"]);
     ASSERT_EQ(unboardingStep.inVehicleTime, jsonResponse["steps"][2]["inVehicleTime"]);
-    ASSERT_EQ(unboardingStep.inVehicleDistanceMeters, jsonResponse["steps"][2]["inVehicleDistanceMeters"]);
+    ASSERT_EQ(unboardingStep.inVehicleDistanceMeters, jsonResponse["steps"][2]["inVehicleDistance"]);
 }

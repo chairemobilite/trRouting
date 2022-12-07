@@ -97,7 +97,7 @@ namespace TrRouting
     stepJson["nodeCoordinates"] = {step.node.point->longitude, step.node.point->latitude};
     stepJson["arrivalTime"] = step.arrivalTime;
     stepJson["inVehicleTime"] = step.inVehicleTime;
-    stepJson["inVehicleDistanceMeters"] = step.inVehicleDistanceMeters;
+    stepJson["inVehicleDistance"] = step.inVehicleDistanceMeters;
     response = stepJson;
   }
 
@@ -107,7 +107,7 @@ namespace TrRouting
     stepJson["action"] = "walking";
     stepJson["type"] = step.walkingType == walking_step_type::ACCESS ? "access" : step.walkingType == walking_step_type::EGRESS ? "egress" : "transfer";
     stepJson["travelTime"] = step.travelTime;
-    stepJson["distanceMeters"] = step.distanceMeters;
+    stepJson["distance"] = step.distanceMeters;
     stepJson["departureTime"] = step.departureTime;
     stepJson["arrivalTime"] = step.arrivalTime;
     if (step.walkingType != walking_step_type::EGRESS) {
@@ -127,19 +127,19 @@ namespace TrRouting
     json["departureTime"] = result.departureTime;
     json["arrivalTime"] = result.arrivalTime;
     json["totalTravelTime"] = result.totalTravelTime;
-    json["totalDistanceMeters"] = result.totalDistance;
+    json["totalDistance"] = result.totalDistance;
     json["totalInVehicleTime"] = result.totalInVehicleTime;
-    json["totalInVehicleDistanceMeters"] = result.totalInVehicleDistance;
+    json["totalInVehicleDistance"] = result.totalInVehicleDistance;
     json["totalNonTransitTravelTime"] = result.totalNonTransitTravelTime;
-    json["totalNonTransitDistanceMeters"] = result.totalNonTransitDistance;
+    json["totalNonTransitDistance"] = result.totalNonTransitDistance;
     json["numberOfBoardings"] = result.numberOfBoardings;
     json["numberOfTransfers"] = result.numberOfTransfers;
     json["transferWalkingTime"] = result.transferWalkingTime;
-    json["transferWalkingDistanceMeters"] = result.transferWalkingDistance;
+    json["transferWalkingDistance"] = result.transferWalkingDistance;
     json["accessTravelTime"] = result.accessTravelTime;
-    json["accessDistanceMeters"] = result.accessDistance;
+    json["accessDistance"] = result.accessDistance;
     json["egressTravelTime"] = result.egressTravelTime;
-    json["egressDistanceMeters"] = result.egressDistance;
+    json["egressDistance"] = result.egressDistance;
     json["transferWaitingTime"] = result.transferWaitingTime;
     json["firstWaitingTime"] = result.firstWaitingTime;
     json["totalWaitingTime"] = result.totalWaitingTime;
