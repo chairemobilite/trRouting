@@ -399,7 +399,7 @@ int main(int argc, char** argv) {
           }
           else
           {
-            routingResult = calculator.calculate(routeParams);
+            routingResult = calculator.calculateSingleOrAllNodes(routeParams);
           }
         }
         else if (routeParams.isWithAlternatives())
@@ -413,7 +413,7 @@ int main(int argc, char** argv) {
         }
         else
         {
-          routingResult = calculator.calculate(routeParams);
+          routingResult = calculator.calculateSingleOrAllNodes(routeParams);
         }
 
         if (routingResult.get() != nullptr) {
@@ -492,7 +492,7 @@ int main(int argc, char** argv) {
         }
         else
         {
-          routingResult = calculator.calculate(queryParams);
+          routingResult = calculator.calculateSingle(queryParams);
           if (routingResult.get() != nullptr) {
             response = ResultToV2Response::resultToJsonString(*routingResult.get(), queryParams).dump(2);
           }
@@ -557,7 +557,7 @@ int main(int argc, char** argv) {
         }
         else
         {
-          routingResult = calculator.calculate(queryParams);
+          routingResult = calculator.calculateSingle(queryParams);
           if (routingResult.get() != nullptr) {
             response = ResultToV2SummaryResponse::resultToJsonString(*routingResult.get(), queryParams).dump(2);
           }

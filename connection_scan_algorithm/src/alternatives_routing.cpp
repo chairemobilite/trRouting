@@ -109,7 +109,7 @@ namespace TrRouting
     spdlog::debug("  alternativesMaxTravelTimeRatio: ", params.alternativesMaxTravelTimeRatio);
     spdlog::debug("calculating fastest alternative...");
   
-    std::unique_ptr<RoutingResult> result = calculate(parameters);
+    std::unique_ptr<RoutingResult> result = calculateSingle(parameters);
 
     // Can technically be allNodes or SingleCalculation, so we check the type
     if (result.get()->resType == result_type::SINGLE_CALCULATION)
@@ -198,7 +198,7 @@ namespace TrRouting
           spdlog::debug("except lines: {}", LinesToString(combination));
 
           try {
-            result = calculate(alternativeParameters, false, true);
+            result = calculateSingle(alternativeParameters, false, true);
 
             if (result.get()->resType == result_type::SINGLE_CALCULATION)
             {

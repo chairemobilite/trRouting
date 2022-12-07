@@ -11,7 +11,7 @@
 namespace TrRouting
 {
   
-  std::unique_ptr<RoutingResult> Calculator::calculate(RouteParameters &parameters, bool resetAccessPaths, bool resetFilters) {
+  std::unique_ptr<RoutingResult> Calculator::calculateSingleOrAllNodes(RouteParameters &parameters, bool resetAccessPaths, bool resetFilters) {
 
     if (params.returnAllNodesResult) {
       return calculateAllNodes(parameters, resetAccessPaths, resetFilters);

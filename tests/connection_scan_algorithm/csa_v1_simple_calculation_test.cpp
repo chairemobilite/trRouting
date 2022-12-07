@@ -384,5 +384,5 @@ std::unique_ptr<TrRouting::RoutingResult> RouteCalculationFixtureTests::calculat
     calculator.algorithmCalculationTime.start();
     calculator.benchmarking.clear();
 
-    return calculator.calculate(routeParams);
+    return calculator.calculateSingleOrAllNodes(routeParams);
 }

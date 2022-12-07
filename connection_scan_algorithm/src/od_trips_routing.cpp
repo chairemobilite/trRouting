@@ -305,7 +305,7 @@ namespace TrRouting
         float correctedExpansionFactor = odTrip.expansionFactor / params.odTripsSampleRatio;
 
         try {
-          routingResult = calculate(odTripParameters, true, resetFilters); // reset filters only on first calculation
+          routingResult = calculateSingle(odTripParameters, true, resetFilters); // reset filters only on first calculation
           resetFilters  = false;
           ResultToOdTripJsonVisitor visitor = ResultToOdTripJsonVisitor(odTripParameters);
           odTripJson = routingResult.get()->accept(visitor);

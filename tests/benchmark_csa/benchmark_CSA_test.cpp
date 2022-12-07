@@ -133,7 +133,7 @@ public:
         }
       } else {
         try {
-          calculator->calculate(routeParams);
+          calculator->calculateSingle(routeParams);
           ASSERT_TRUE(expectResult);
         } catch (TrRouting::NoRoutingFoundException& e) {
           ASSERT_FALSE(expectResult);
