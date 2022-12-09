@@ -138,11 +138,11 @@ paths:
                 oneOf:
                   - $ref: 'commonResponse.yml#/data_error'
                   - $ref: 'accessibilityResponse.yml#/NoRoutingFound'
-                  - $ref: 'accessibilityResponse.yml#/success'
+                  - $ref: 'accessibilityResponse.yml#/successResponse'
                 discriminator:
                   propertyName: status
                   mapping:
-                    success: 'accessibilityResponse.yml#/success'
+                    success: 'accessibilityResponse.yml#/successResponse'
                     no_routing_found: 'accessibilityResponse.yml#/NoRoutingFound'
                     data_error: 'commonResponse.yml#/data_error'
         '400':

@@ -17,7 +17,7 @@ access_query_error: # 'query_error' is a value for the status (discriminator)
         - 'INVALID_NUMERICAL_DATA'
         - 'PARAM_ERROR_UNKNOWN'
 
-baseRouteResponse:
+accessibilityQueryResponse:
   type: object
   properties:
     place:
@@ -42,36 +42,37 @@ baseRouteResponse:
 NoRoutingFound:
   required:
     - status
-  allOf:
-  - $ref: '#/baseRouteResponse'
-  - type: object
-    properties:
-      status:
-        type: string
-        enum: [no_routing_found]
-      reason:
-        type: string
-        enum:
-          # Generic reason, when not possible to specify more
-          - NO_ROUTING_FOUND,
-          # No accessible node around the place
-          - NO_ACCESS_AT_PLACE,
-          # There is no service at this place with the query parameters
-          - NO_SERVICE_AT_PLACE,
+  type: object
+  properties:
+    status:
+      type: string
+      enum: [no_routing_found]
+    query:
+      $ref: '#/accessibilityQueryResponse'
+    reason:
+      type: string
+      enum:
+        # Generic reason, when not possible to specify more
+        - NO_ROUTING_FOUND,
+        # No accessible node around the place
+        - NO_ACCESS_AT_PLACE,
+        # There is no service at this place with the query parameters
+        - NO_SERVICE_AT_PLACE
 
-success:
+successResponse:
   required:
     - status
-  allOf:
-  - $ref: '#/baseRouteResponse'
-  - $ref: '#/accessibilityResponse'
-  - type: object
-    properties:
-      status:
-        type: string
-        enum: [success]
+  type: object
+  properties:
+    status:
+      type: string
+      enum: [success]
+    query:
+      $ref: '#/accessibilityQueryResponse'
+    result:
+      $ref: '#/accessibilityResultResponse'
 
-accessibilityResponse:
+accessibilityResultResponse:
   type: object
   properties:
     nodes:
