@@ -1,46 +1,55 @@
 NoRoutingFound:
   required:
     - status
-  allOf:
-  - $ref: '#/baseRouteResponse'
-  - type: object
-    properties:
-      status:
-        type: string
-        enum: [no_routing_found]
-      reason:
-        type: string
-        enum:
-          # Generic reason, when not possible to specify more
-          - NO_ROUTING_FOUND,
-          # No accessible node at origin
-          - NO_ACCESS_AT_ORIGIN,
-          # No accessible node at destination
-          - NO_ACCESS_AT_DESTINATION
-          # No accessible node at both origin and destination
-          - NO_ACCESS_AT_ORIGIN_AND_DESTINATION
-          # There is no service from origin with the query parameters
-          - NO_SERVICE_FROM_ORIGIN,
-          # There is no service to destination with the query parameters
-          - NO_SERVICE_TO_DESTINATION
+  type: object
+  properties:
+    status:
+      type: string
+      enum: [no_routing_found]
+    query:
+      $ref: '#/routeQueryResponse'
+    reason:
+      type: string
+      enum:
+        # Generic reason, when not possible to specify more
+        - NO_ROUTING_FOUND,
+        # No accessible node at origin
+        - NO_ACCESS_AT_ORIGIN,
+        # No accessible node at destination
+        - NO_ACCESS_AT_DESTINATION
+        # No accessible node at both origin and destination
+        - NO_ACCESS_AT_ORIGIN_AND_DESTINATION
+        # There is no service from origin with the query parameters
+        - NO_SERVICE_FROM_ORIGIN,
+        # There is no service to destination with the query parameters
+        - NO_SERVICE_TO_DESTINATION
 
-success: # TODO: There's a lot of data returned, document it all, but from the code, not from transition
+successResponse:
   required:
     - status
-  allOf:
-  - $ref: '#/routeOrAlternativesResponse'
-  - type: object
-    properties:
-      status:
-        type: string
-        enum: [success]
+  type: object
+  properties:
+    status:
+      type: string
+      enum: [success]
+    query: 
+      $ref: '#/routeQueryResponse'
+    result: 
+      $ref: '#/routeResultResponse'
 
-routeOrAlternativesResponse:
-  oneOf:
-  - $ref: '#/routeResponse'
-  - $ref: '#/alternativesResponse'
+routeResultResponse:
+  type: object
+  properties:
+    routes:
+      type: array
+      items:
+        $ref: '#/singleRouteResponse'
+      description: An array of transit route result. This array contains only one route if alternatives were not requested in the query, otherwise, this array contains all the valid alternatives.
+    totalRoutesCalculated:
+      type: number
+      description: Total number of routes that were calculated, including the failed ones. If the query did not request alternatives, only 1 route will have been calculated.
 
-baseRouteResponse:
+routeQueryResponse:
   type: object
   properties:
     origin:
@@ -68,84 +77,74 @@ baseRouteResponse:
         - 0
         - 1
       description: The type of the requestTime. 0 means it is the departure time; 1 means arrival time
+    alternatives:
+      type: boolean
+      description: Whether or not alternatives were calculated for this route. If false, a successful result will return only one route. Otherwise, there may be more than one route.
 
-routeResponse:
-  allOf:
-    - $ref: '#/baseRouteResponse'
-    - type: object
-      properties:
-        departureTime:
-          type: string
-          description: Optimized departure time in seconds since midnight
-        arrivalTime:
-          type: string
-          description: Arrival time in seconds since midnight
-        totalTravelTime:
-          type: number
-          description: Total travel time, from the optimized departure time to the arrival time, in seconds
-        totalDistance:
-          type: number
-          description: Total distance traveled, from departure to arrival
-        totalInVehicleTime:
-          type: number
-          description: Total time spent in a transit vehicle, in seconds
-        totalInVehicleDistance:
-          type: number
-          description: Total distance traveled in a vehicle, in meters
-        totalNonTransitTravelTime:
-          type: number
-          description: Total time spent traveling, but not in a transit vehicle. This excludes waiting time. In seconds
-        totalNonTransitDistance:
-          type: number
-          description: Total distance traveled not in a vehicle, in meters
-        numberOfBoardings:
-          type: number
-          description: Number of times a vehicle is boarded in the trip
-        numberOfTransfers:
-          type: number
-          description: Number of transfers in this trip
-        transferWalkingTime:
-          type: number
-          description: Time spent walking to transfer from a transit route to another transit route, in seconds
-        transferWalkingDistance:
-          type: number
-          description: Distance traveled to transfer between transit trips, in meters
-        accessTravelTime:
-          type: number
-          description: Time spent traveling to access the first transit stop of the trip, in seconds
-        accessDistance:
-          type: number
-          description: Distance traveled to access the first transit stop of the trip, in meters
-        egressTravelTime:
-          type: number
-          description: Time spent traveling from the last transit stop of the trip, to the destination, in seconds
-        egressDistance:
-          type: number
-          description: Distance traveled from the last transit stop of the trip to the destination, in meters
-        transferWaitingTime:
-          type: number
-          description: Time spent waiting at a transit stop for a transfer (ie exluding the time spent waiting at the first stop), in seconds
-        firstWaitingTime:
-          type: number
-          description: Time spent waiting at the first transit stop of the trip, in seconds
-        totalWaitingTime:
-          type: number
-          description: Total time spent waiting for a transit vehicle, in seconds
-        steps:
-          type: array
-          items:
-            $ref: '#/tripStep'
-
-alternativesResponse:
+singleRouteResponse:
   type: object
   properties:
-    alternatives:
+    departureTime:
+      type: string
+      description: Optimized departure time in seconds since midnight
+    arrivalTime:
+      type: string
+      description: Arrival time in seconds since midnight
+    totalTravelTime:
+      type: number
+      description: Total travel time, from the optimized departure time to the arrival time, in seconds
+    totalDistance:
+      type: number
+      description: Total distance traveled, from departure to arrival
+    totalInVehicleTime:
+      type: number
+      description: Total time spent in a transit vehicle, in seconds
+    totalInVehicleDistance:
+      type: number
+      description: Total distance traveled in a vehicle, in meters
+    totalNonTransitTravelTime:
+      type: number
+      description: Total time spent traveling, but not in a transit vehicle. This excludes waiting time. In seconds
+    totalNonTransitDistance:
+      type: number
+      description: Total distance traveled not in a vehicle, in meters
+    numberOfBoardings:
+      type: number
+      description: Number of times a vehicle is boarded in the trip
+    numberOfTransfers:
+      type: number
+      description: Number of transfers in this trip
+    transferWalkingTime:
+      type: number
+      description: Time spent walking to transfer from a transit route to another transit route, in seconds
+    transferWalkingDistance:
+      type: number
+      description: Distance traveled to transfer between transit trips, in meters
+    accessTravelTime:
+      type: number
+      description: Time spent traveling to access the first transit stop of the trip, in seconds
+    accessDistance:
+      type: number
+      description: Distance traveled to access the first transit stop of the trip, in meters
+    egressTravelTime:
+      type: number
+      description: Time spent traveling from the last transit stop of the trip, to the destination, in seconds
+    egressDistance:
+      type: number
+      description: Distance traveled from the last transit stop of the trip to the destination, in meters
+    transferWaitingTime:
+      type: number
+      description: Time spent waiting at a transit stop for a transfer (ie exluding the time spent waiting at the first stop), in seconds
+    firstWaitingTime:
+      type: number
+      description: Time spent waiting at the first transit stop of the trip, in seconds
+    totalWaitingTime:
+      type: number
+      description: Total time spent waiting for a transit vehicle, in seconds
+    steps:
       type: array
       items:
-        $ref: '#/routeResponse'
-    alternativesTotal:
-      type: number
-      description: Total number of alternatives that were calculated, including the failed ones
+        $ref: '#/tripStep'
 
 tripStep:
   type: object
