@@ -51,11 +51,11 @@ paths:
                 oneOf:
                   - $ref: 'commonResponse.yml#/data_error'
                   - $ref: 'routeResponse.yml#/NoRoutingFound'
-                  - $ref: 'routeResponse.yml#/success'
+                  - $ref: 'routeResponse.yml#/successResponse'
                 discriminator:
                   propertyName: status
                   mapping:
-                    success: 'routeResponse.yml#/success'
+                    success: 'routeResponse.yml#/successResponse'
                     no_routing_found: 'routeResponse.yml#/NoRoutingFound'
                     data_error: 'commonResponse.yml#/data_error'
         '400':
