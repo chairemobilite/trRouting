@@ -96,11 +96,11 @@ paths:
               schema:
                 oneOf:
                   - $ref: 'commonResponse.yml#/data_error'
-                  - $ref: 'summaryResponse.yml#/success'
+                  - $ref: 'summaryResponse.yml#/successResponse'
                 discriminator:
                   propertyName: status
                   mapping:
-                    success: 'summaryResponse.yml#/success'
+                    success: 'summaryResponse.yml#/successResponse'
                     data_error: 'commonResponse.yml#/data_error'
         '400':
           description: Query parameters are invalid

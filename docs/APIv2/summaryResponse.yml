@@ -1,15 +1,17 @@
-success:
+successResponse:
   required:
     - status
-  allOf:
-  - $ref: '#/summaryResponse'
-  - type: object
-    properties:
-      status:
-        type: string
-        enum: [success]
+  type: object
+  properties:
+    status:
+      type: string
+      enum: [success]
+    query:
+      $ref: '#/summaryQueryResponse'
+    result:
+      $ref: '#/summaryResultResponse'
 
-summaryResponse:
+summaryQueryResponse:
   type: object
   properties:
     origin:
@@ -37,9 +39,13 @@ summaryResponse:
         - 0
         - 1
       description: The type of the requestTime. 0 means it is the departure time; 1 means arrival time
-    nbAlternativesCalculated:
+
+summaryResultResponse:
+  type: object
+  properties:
+    nbRoutes:
       type: integer
-      description: Number of alternatives that were calculated in this route calculation
+      description: Number of route alternatives that were calculated in this query
     lines:
       type: array
       items:
