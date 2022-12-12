@@ -109,197 +109,186 @@ namespace TrRouting
     spdlog::debug("  alternativesMaxTravelTimeRatio: ", params.alternativesMaxTravelTimeRatio);
     spdlog::debug("calculating fastest alternative...");
   
-    std::unique_ptr<RoutingResult> result = calculateSingle(parameters);
+    std::unique_ptr<SingleCalculationResult> result = calculateSingle(parameters);
 
-    // Can technically be allNodes or SingleCalculation, so we check the type
-    if (result.get()->resType == result_type::SINGLE_CALCULATION)
+    SingleCalculationResult& routingResult = *result.get();
+    AlternativesResult alternatives = AlternativesResult();
+
+    alternatives.alternatives.push_back(std::move(result));
+
+    alternativeSequence++;
+    alternativesCalculatedCount++;
+
+    LineVisitor visitor = LineVisitor();
+
+    //departureTimeSeconds = routingResult.departureTimeSeconds + routingResult.firstWaitingTimeSeconds - params.minWaitingTimeSeconds;
+
+    maxTravelTime = params.alternativesMaxTravelTimeRatio * routingResult.totalTravelTime + (parameters.isForwardCalculation() ? routingResult.departureTime - parameters.getTimeOfTrip() : 0);
+    if (maxTravelTime < params.minAlternativeMaxTravelTimeSeconds)
     {
-      SingleCalculationResult& routingResult = dynamic_cast<SingleCalculationResult&>(*result.get());
-      AlternativesResult alternatives = AlternativesResult();
+      maxTravelTime = params.minAlternativeMaxTravelTimeSeconds;
+    }
+    else if (maxTravelTime > routingResult.totalTravelTime + params.alternativesMaxAddedTravelTimeSeconds)
+    {
+      maxTravelTime = routingResult.totalTravelTime + params.alternativesMaxAddedTravelTimeSeconds;
+    }
+    // TODO: We should not create a whole new object just to update maxTravelTime. This parameter should be in the calculation specific parameters, which do not exist yet
+    Point* origin = parameters.getOrigin();
+    Point* dest = parameters.getDestination();
+    RouteParameters alternativeParameters = RouteParameters(std::make_unique<Point>(origin->latitude, origin->longitude),
+      std::make_unique<Point>(dest->latitude, dest->longitude),
+      parameters.getScenario(),
+      parameters.getTimeOfTrip(),
+      parameters.getMinWaitingTimeSeconds(),
+      maxTravelTime,
+      parameters.getMaxAccessWalkingTravelTimeSeconds(),
+      parameters.getMaxEgressWalkingTravelTimeSeconds(),
+      parameters.getMaxTransferWalkingTravelTimeSeconds(),
+      parameters.getMaxFirstWaitingTimeSeconds(),
+      parameters.isWithAlternatives(),
+      parameters.isForwardCalculation());
 
-      alternatives.alternatives.push_back(std::move(result));
+    //params.departureTimeSeconds = departureTimeSeconds;
 
-      alternativeSequence++;
-      alternativesCalculatedCount++;
+    spdlog::debug("  fastestTravelTimeSeconds: {}", routingResult.totalTravelTime);
 
-      LineVisitor visitor = LineVisitor();
+    // Get the best result and extract the lines from it
+    // We will generate all the combinations of those lines and redo the calculation
+    // with each of the combination of line excluded
+    LineVector foundLines = routingResult.accept(visitor);
+    std::stable_sort(foundLines.begin(),foundLines.end());
+    alreadyFoundLines[foundLines]           = true;
+    foundLinesTravelTimeSeconds[foundLines] = routingResult.totalTravelTime;
+    lastFoundedAtNum = 1;
 
-      //departureTimeSeconds = routingResult.departureTimeSeconds + routingResult.firstWaitingTimeSeconds - params.minWaitingTimeSeconds;
+    spdlog::debug("fastest line ids: {}", LinesToString(foundLines));
 
-      maxTravelTime = params.alternativesMaxTravelTimeRatio * routingResult.totalTravelTime + (parameters.isForwardCalculation() ? routingResult.departureTime - parameters.getTimeOfTrip() : 0);
-      if (maxTravelTime < params.minAlternativeMaxTravelTimeSeconds)
+    // Generate combination of group of 1 line, then 2 lines up to the total amount of lines
+    for (size_t k = 1; k <= foundLines.size(); k++)
+    {
+      Combinations<std::reference_wrapper<const Line>> combinations(foundLines, k);
+
+      for (auto newCombination : combinations)
       {
-        maxTravelTime = params.minAlternativeMaxTravelTimeSeconds;
+        std::stable_sort(newCombination.begin(), newCombination.end());
+        allCombinations.push_back(newCombination);
+        alreadyCalculatedCombinations[newCombination] = true;
       }
-      else if (maxTravelTime > routingResult.totalTravelTime + params.alternativesMaxAddedTravelTimeSeconds)
+    }
+
+    // Process all combinations and calculate new route with those excluded
+    for (size_t i = 0; i < allCombinations.size(); i++)
+    {
+      if (alternativesCalculatedCount < maxAlternatives && alternativeSequence - 1 < params.maxValidAlternatives)
       {
-        maxTravelTime = routingResult.totalTravelTime + params.alternativesMaxAddedTravelTimeSeconds;
-      }
-      // TODO: We should not create a whole new object just to update maxTravelTime. This parameter should be in the calculation specific parameters, which do not exist yet
-      Point* origin = parameters.getOrigin();
-      Point* dest = parameters.getDestination();
-      RouteParameters alternativeParameters = RouteParameters(std::make_unique<Point>(origin->latitude, origin->longitude),
-        std::make_unique<Point>(dest->latitude, dest->longitude),
-        parameters.getScenario(),
-        parameters.getTimeOfTrip(),
-        parameters.getMinWaitingTimeSeconds(),
-        maxTravelTime,
-        parameters.getMaxAccessWalkingTravelTimeSeconds(),
-        parameters.getMaxEgressWalkingTravelTimeSeconds(),
-        parameters.getMaxTransferWalkingTravelTimeSeconds(),
-        parameters.getMaxFirstWaitingTimeSeconds(),
-        parameters.isWithAlternatives(),
-        parameters.isForwardCalculation());
-
-      //params.departureTimeSeconds = departureTimeSeconds;
-
-      spdlog::debug("  fastestTravelTimeSeconds: {}", routingResult.totalTravelTime);
-
-      // Get the best result and extract the lines from it
-      // We will generate all the combinations of those lines and redo the calculation
-      // with each of the combination of line excluded 
-      LineVector foundLines = routingResult.accept(visitor);
-      std::stable_sort(foundLines.begin(),foundLines.end());
-      alreadyFoundLines[foundLines]           = true;
-      foundLinesTravelTimeSeconds[foundLines] = routingResult.totalTravelTime;
-      lastFoundedAtNum = 1;
-
-      spdlog::debug("fastest line ids: {}", LinesToString(foundLines));
-
-      // Generate combination of group of 1 line, then 2 lines up to the total amount of lines
-      for (size_t k = 1; k <= foundLines.size(); k++)
-      {
-        Combinations<std::reference_wrapper<const Line>> combinations(foundLines, k);
-
-        for (auto newCombination : combinations)
+        // Generate parameters to send to calculate
+        const LineVector combination = allCombinations.at(i);
+        // TODO: The exception should be part of the calculation specific parameters, which do not exist yet
+        alternativeParameters.exceptLines = exceptLinesFromParameters; // reset except lines using parameters
+        for (auto line : combination)
         {
-          std::stable_sort(newCombination.begin(), newCombination.end());
-          allCombinations.push_back(newCombination);
-          alreadyCalculatedCombinations[newCombination] = true;
+          alternativeParameters.exceptLines.push_back(line);
         }
-      }
 
-      // Process all combinations and calculate new route with those excluded
-      for (size_t i = 0; i < allCombinations.size(); i++)
-      {
-        if (alternativesCalculatedCount < maxAlternatives && alternativeSequence - 1 < params.maxValidAlternatives)
-        {
-          // Generate parameters to send to calculate
-          const LineVector combination = allCombinations.at(i);
-          // TODO: The exception should be part of the calculation specific parameters, which do not exist yet
-          alternativeParameters.exceptLines = exceptLinesFromParameters; // reset except lines using parameters
-          for (auto line : combination)
+        spdlog::info("calculating alternative {} from a total of {} ...", alternativeSequence, alternativesCalculatedCount);
+        
+        spdlog::debug("except lines: {}", LinesToString(combination));
+
+        try {
+          result = calculateSingle(alternativeParameters, false, true);
+
+          SingleCalculationResult& alternativeCalcResult = *result.get();
+
+          // Extract lines from new results. If the result is valid, add it to the alternative list
+          // and then generation new lines combinations to try other alternatives
+          LineVisitor alternativeVisitor = LineVisitor();
+          foundLines = alternativeCalcResult.accept(alternativeVisitor);
+          std::stable_sort(foundLines.begin(), foundLines.end());
+
+          if (foundLines.size() > 0 && alreadyFoundLines.count(foundLines) == 0)
           {
-            alternativeParameters.exceptLines.push_back(line);
-          }
+            alternatives.alternatives.push_back(std::move(result));
 
-          spdlog::info("calculating alternative {} from a total of {} ...", alternativeSequence, alternativesCalculatedCount);
-          
-          spdlog::debug("except lines: {}", LinesToString(combination));
+            spdlog::debug("travelTimeSeconds: {}  line Uuids: {}",
+                          alternativeCalcResult.totalTravelTime,
+                          LinesToString(foundLines));
+            
 
-          try {
-            result = calculateSingle(alternativeParameters, false, true);
-
-            if (result.get()->resType == result_type::SINGLE_CALCULATION)
+            lastFoundedAtNum = alternativesCalculatedCount;
+            alreadyFoundLines[foundLines] = true;
+            foundLinesTravelTimeSeconds[foundLines] = alternativeCalcResult.totalTravelTime;
+            for (size_t k = 1; k <= foundLines.size(); k++)
             {
-              SingleCalculationResult& alternativeCalcResult = dynamic_cast<SingleCalculationResult&>(*result.get());
-
-              // Extract lines from new results. If the result is valid, add it to the alternative list
-              // and then generation new lines combinations to try other alternatives
-              LineVisitor alternativeVisitor = LineVisitor();
-              foundLines = alternativeCalcResult.accept(alternativeVisitor);
-              std::stable_sort(foundLines.begin(), foundLines.end());
-
-              if (foundLines.size() > 0 && alreadyFoundLines.count(foundLines) == 0)
+              Combinations<std::reference_wrapper<const Line>> combinations(foundLines, k);
+              for (auto newCombination : combinations)
               {
-                alternatives.alternatives.push_back(std::move(result));
-
-                spdlog::debug("travelTimeSeconds: {}  line Uuids: {}",
-                              alternativeCalcResult.totalTravelTime,
-                              LinesToString(foundLines));
-                
-
-                lastFoundedAtNum = alternativesCalculatedCount;
-                alreadyFoundLines[foundLines] = true;
-                foundLinesTravelTimeSeconds[foundLines] = alternativeCalcResult.totalTravelTime;
-                for (size_t k = 1; k <= foundLines.size(); k++)
+                // Add the lines currently exclused (combination) to the newly generated combinations
+                // from the line in the latest alternative
+                std::copy(combination.begin(), combination.end(),
+                          std::back_inserter(newCombination));
+                std::stable_sort(newCombination.begin(), newCombination.end());
+                if (alreadyCalculatedCombinations.count(newCombination) == 0)
                 {
-                  Combinations<std::reference_wrapper<const Line>> combinations(foundLines, k);
-                  for (auto newCombination : combinations)
+                  combinationMatchesWithAtLeastOneFailed = false;
+                  for (auto failedCombination : failedCombinations)
                   {
-                    // Add the lines currently exclused (combination) to the newly generated combinations
-                    // from the line in the latest alternative
-                    std::copy(combination.begin(), combination.end(),
-                              std::back_inserter(newCombination));
-                    std::stable_sort(newCombination.begin(), newCombination.end());
-                    if (alreadyCalculatedCombinations.count(newCombination) == 0)
+                    combinationMatchesWithFailed = true;
+                    for (auto failedLine : failedCombination)
                     {
-                      combinationMatchesWithAtLeastOneFailed = false;
-                      for (auto failedCombination : failedCombinations)
+                      if (std::find(newCombination.begin(), newCombination.end(), failedLine) == newCombination.end())
                       {
-                        combinationMatchesWithFailed = true;
-                        for (auto failedLine : failedCombination)
-                        {
-                          if (std::find(newCombination.begin(), newCombination.end(), failedLine) == newCombination.end())
-                          {
-                            combinationMatchesWithFailed = false;
-                            break;
-                          }
-                        }
-                        if (combinationMatchesWithFailed)
-                        {
-                          combinationMatchesWithAtLeastOneFailed = true;
-                          break;
-                        }
+                        combinationMatchesWithFailed = false;
+                        break;
                       }
-                      if (!combinationMatchesWithAtLeastOneFailed)
-                      {
-                        allCombinations.push_back(newCombination);
-                      }
-                      alreadyCalculatedCombinations[newCombination] = true;
+                    }
+                    if (combinationMatchesWithFailed)
+                    {
+                      combinationMatchesWithAtLeastOneFailed = true;
+                      break;
                     }
                   }
+                  if (!combinationMatchesWithAtLeastOneFailed)
+                  {
+                    allCombinations.push_back(newCombination);
+                  }
+                  alreadyCalculatedCombinations[newCombination] = true;
                 }
-
-                alternativeSequence++;
-
               }
             }
-          } catch (NoRoutingFoundException& e) {
 
-            failedCombinations.push_back(combination);
+            alternativeSequence++;
+
           }
+        } catch (NoRoutingFoundException& e) {
 
-          alternativesCalculatedCount++;
+          failedCombinations.push_back(combination);
+        }
 
-          if (failedCombinations.size() > 0)
+        alternativesCalculatedCount++;
+
+        if (failedCombinations.size() > 0)
+        {
+          for (auto failedCombination : failedCombinations)
           {
-            for (auto failedCombination : failedCombinations)
-            {
-              spdlog::debug("failed combinations: {}", LinesToString(failedCombination));
-            }
+            spdlog::debug("failed combinations: {}", LinesToString(failedCombination));
           }
         }
       }
-
-      int i {0};
-      for (auto flines : alreadyFoundLines)
-      {          
-        spdlog::debug("{}. {} tt: ", i, LinesToString(flines.first),
-                      (foundLinesTravelTimeSeconds[flines.first] / 60));
-        i++;          
-      }
-      
-      spdlog::debug("last alternative found at: {} on a total of {} calculations", lastFoundedAtNum,  maxAlternatives);
-
-      alternatives.totalAlternativesCalculated = alternativesCalculatedCount;
-      return alternatives;
-
     }
-    throw NoRoutingFoundException(NoRoutingReason::NO_ROUTING_FOUND);
+
+    int i {0};
+    for (auto flines : alreadyFoundLines)
+    {          
+      spdlog::debug("{}. {} tt: ", i, LinesToString(flines.first),
+                    (foundLinesTravelTimeSeconds[flines.first] / 60));
+      i++;          
+    }
+    
+    spdlog::debug("last alternative found at: {} on a total of {} calculations", lastFoundedAtNum,  maxAlternatives);
+
+    alternatives.totalAlternativesCalculated = alternativesCalculatedCount;
+    return alternatives;
 
   }
-
-
 
 }
