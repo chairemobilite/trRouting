@@ -211,7 +211,7 @@ namespace TrRouting
   public:
     // Results should be of SingleCalculationResult, but it's not possible to cast a unique_ptr
     int totalAlternativesCalculated;
-    std::vector<std::unique_ptr<RoutingResult>> alternatives;
+    std::vector<std::unique_ptr<SingleCalculationResult>> alternatives;
     AlternativesResult(): RoutingResult(result_type::ALTERNATIVES) {}
     void do_accept(ResultVisitorBase &visitor) const override {
       return visitor.visitAlternativesResult(*this);
