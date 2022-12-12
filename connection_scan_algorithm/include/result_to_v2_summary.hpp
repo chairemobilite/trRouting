@@ -14,7 +14,8 @@ namespace TrRouting
    */
   class ResultToV2SummaryResponse {
   public:
-    static nlohmann::json resultToJsonString(RoutingResult& result, RouteParameters& params);
+    static nlohmann::json resultToJsonString(AlternativesResult& result, RouteParameters& params);
+    static nlohmann::json resultToJsonString(SingleCalculationResult& result, RouteParameters& params);
     static nlohmann::json noRoutingFoundResponse(RouteParameters& params, NoRoutingReason noRoutingReason);
   };
 

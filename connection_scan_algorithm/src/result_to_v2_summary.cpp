@@ -10,41 +10,19 @@
 
 namespace TrRouting
 {
-  // FIXME See issue #180, this class when it's fixed, we can use the line objects directly
   class LineSummary {
   public:
-    std::string agencyUuid;
-    std::string agencyAcronym;
-    std::string agencyName;
-    std::string lineUuid;
-    std::string lineShortname;
-    std::string lineLongname;
+    const Trip & trip;
     int count;
     LineSummary(
-      std::string _agencyUuid,
-      std::string _agencyAcronym,
-      std::string _agencyName,
-      std::string _lineUuid,
-      std::string _lineShortname,
-      std::string _lineLongname
-    ): agencyUuid(_agencyUuid),
-    agencyAcronym(_agencyAcronym),
-    agencyName(_agencyName),
-    lineUuid(_lineUuid),
-    lineShortname(_lineShortname),
-    lineLongname(_lineLongname)
+      const Trip & _trip
+    ): trip(_trip)
     {
-        count = 1;
+      count = 1;
     }
 
-    LineSummary(const LineSummary& obj)
+    LineSummary(const LineSummary& obj): trip(obj.trip)
     {
-      agencyUuid = obj.agencyUuid;
-      agencyAcronym = obj.agencyAcronym;
-      agencyName = obj.agencyName;
-      lineUuid = obj.lineUuid;
-      lineShortname = obj.lineShortname;
-      lineLongname = obj.lineLongname;
       count = obj.count;
     }
     ~LineSummary(){}
@@ -63,54 +41,10 @@ namespace TrRouting
     void visitWalkingStep(const WalkingStep& step) override;
   };
 
-  /**
-   * @brief Visitor for the result object, returns a map of line uuid to LineSummary
-   */
-  class ResultToV2SummaryVisitor: public ResultVisitor<std::map<std::string, LineSummary>> {
-  private:
-    std::map<std::string, LineSummary> response;
-    RouteParameters& params;
-  public:
-    ResultToV2SummaryVisitor(RouteParameters& _params): params(_params) {
-      // Nothing to initialize
-    }
-    std::map<std::string, LineSummary> getResult() override { return response; }
-    void visitSingleCalculationResult(const SingleCalculationResult& result) override;
-    void visitAlternativesResult(const AlternativesResult& result) override;
-    void visitAllNodesResult(const AllNodesResult& result) override;
-  };
-
-  /**
-   * @brief Visitor for the result object, returns a map of line uuid to LineSummary
-   */
-  class CountAlternativesResultVisitor: public ResultVisitor<int> {
-  private:
-    int response;
-  public:
-    CountAlternativesResultVisitor(): response(0) {
-      // Nothing to initialize
-    }
-    int getResult() { return response; }
-    void visitSingleCalculationResult(const SingleCalculationResult& ) {
-      response = 1;
-    }
-    void visitAlternativesResult(const AlternativesResult& result) {
-      response = result.alternatives.size();
-    }
-    void visitAllNodesResult(const AllNodesResult& ) {
-      // Nothing to do
-    }
-  };
-
   void StepToV2SummaryVisitor::visitBoardingStep(const BoardingStep& step)
   {
     response.emplace(LineSummary(
-        boost::uuids::to_string(step.trip.agency.uuid),
-        step.trip.agency.acronym,
-        step.trip.agency.name,
-        boost::uuids::to_string(step.trip.line.uuid),
-        step.trip.line.shortname,
-        step.trip.line.longname
+        step.trip
     ));
   }
 
@@ -124,7 +58,21 @@ namespace TrRouting
     response.reset();
   }
 
-  void ResultToV2SummaryVisitor::visitSingleCalculationResult(const SingleCalculationResult& result)
+  /**
+   * @brief Parser for calculation results to add statistics to a line summary map
+   */
+  class SummaryResultAccumulator {
+  private:
+    std::map<boost::uuids::uuid, LineSummary> lineSummaries;
+  public:
+    SummaryResultAccumulator() {
+      // Nothing to initialize
+    }
+    const std::map<boost::uuids::uuid, LineSummary> getLineSummaries() const { return lineSummaries; }
+    void processSingleCalculationResult(const SingleCalculationResult& result);
+  };
+
+  void SummaryResultAccumulator::processSingleCalculationResult(const SingleCalculationResult& result)
   {
     // convert the steps
     StepToV2SummaryVisitor stepVisitor = StepToV2SummaryVisitor();
@@ -132,68 +80,104 @@ namespace TrRouting
       std::optional<LineSummary> optSummary = step.get()->accept(stepVisitor);
       if (optSummary.has_value()) {
         LineSummary summary = optSummary.value();
-        if (response.find(summary.lineUuid) == response.end()) {
-          response.emplace(summary.lineUuid, LineSummary(summary));
+        if (lineSummaries.find(summary.trip.line.uuid) == lineSummaries.end()) {
+          lineSummaries.emplace(summary.trip.line.uuid, LineSummary(summary));
         } else {
-          response.at(summary.lineUuid).count++;
+          lineSummaries.at(summary.trip.line.uuid).count++;
         }
       }
     }
   }
 
-  void ResultToV2SummaryVisitor::visitAlternativesResult(const AlternativesResult& result)
+  std::array<double, 2> pointToJson(const Point& point)
   {
-    for (auto &alternative : result.alternatives) {
-      alternative.get()->accept(*this);
-    }
+    return { point.longitude, point.latitude };
   }
 
-  void ResultToV2SummaryVisitor::visitAllNodesResult(const AllNodesResult& )
+  nlohmann::json parametersToQueryResponse(RouteParameters& params)
   {
-    // TODO This type of result is not defined in v2 yet, we should not be here
+    // Query parameters for response
+    nlohmann::json queryJson;
+    queryJson["origin"] = pointToJson(*params.getOrigin());
+    queryJson["destination"] = pointToJson(*params.getDestination());
+    queryJson["timeOfTrip"] = params.getTimeOfTrip();
+    queryJson["timeType"] = params.isForwardCalculation() ? 0 : 1;
+    return queryJson;
   }
 
   nlohmann::json ResultToV2SummaryResponse::noRoutingFoundResponse(RouteParameters& params, NoRoutingReason )
   {
     nlohmann::json json;
+    // No routing returns a success with 0 routes
     json["status"] = STATUS_SUCCESS;
-    json["origin"] = { params.getOrigin()->longitude, params.getOrigin()->latitude };
-    json["destination"] = { params.getDestination()->longitude, params.getDestination()->latitude };
-    json["timeOfTrip"] = params.getTimeOfTrip();
-    json["timeType"] = params.isForwardCalculation() ? 0 : 1;
-    json["nbAlternativesCalculated"] = 0;
-    json["lines"] = nlohmann::json::array();
+    json["query"] = parametersToQueryResponse(params);
+
+    // Result response
+    nlohmann::json resultJson;
+    resultJson["nbRoutes"] = 0;
+    resultJson["lines"] = nlohmann::json::array();
+    json["result"] = resultJson;
     
     return json;
   }
 
-  nlohmann::json ResultToV2SummaryResponse::resultToJsonString(RoutingResult& result, RouteParameters& params)
+  nlohmann::json lineSummariesToJson(const SummaryResultAccumulator & parser)
+  {
+    nlohmann::json lineResult;
+    lineResult["lines"] = nlohmann::json::array();
+    const std::map<boost::uuids::uuid, LineSummary> summaries = parser.getLineSummaries();
+    for (auto it = summaries.begin(); it != summaries.end(); ++it) {
+      nlohmann::json lineJson;
+      LineSummary summary = it->second;
+      lineJson["lineUuid"] = boost::uuids::to_string(summary.trip.line.uuid);
+      lineJson["lineShortname"] = summary.trip.line.shortname;
+      lineJson["lineLongname"] = summary.trip.line.longname;
+      lineJson["agencyUuid"] = boost::uuids::to_string(summary.trip.line.agency.uuid);
+      lineJson["agencyAcronym"] = summary.trip.line.agency.acronym;
+      lineJson["agencyName"] = summary.trip.line.agency.name;
+      lineJson["alternativeCount"] = summary.count;
+      lineResult["lines"].push_back(lineJson);
+    }
+    return lineResult["lines"];
+  }
+
+  nlohmann::json ResultToV2SummaryResponse::resultToJsonString(AlternativesResult& result, RouteParameters& params)
   {
     // Initialize response
     nlohmann::json json;
     json["status"] = STATUS_SUCCESS;
-    json["origin"] = { params.getOrigin()->longitude, params.getOrigin()->latitude };
-    json["destination"] = { params.getDestination()->longitude, params.getDestination()->latitude };
-    json["timeOfTrip"] = params.getTimeOfTrip();
-    json["timeType"] = params.isForwardCalculation() ? 0 : 1;
-    CountAlternativesResultVisitor countVisitor = CountAlternativesResultVisitor();
-    json["nbAlternativesCalculated"] = result.accept(countVisitor);
-    json["lines"] = nlohmann::json::array();
+    json["query"] = parametersToQueryResponse(params);
 
-    ResultToV2SummaryVisitor visitor = ResultToV2SummaryVisitor(params);
-    std::map<std::string, LineSummary> summaries = result.accept(visitor);
-    for (auto it = summaries.begin(); it != summaries.end(); ++it) {
-      nlohmann::json lineJson;
-      LineSummary summary = it->second;
-      lineJson["lineUuid"] = summary.lineUuid;
-      lineJson["lineShortname"] = summary.lineShortname;
-      lineJson["lineLongname"] = summary.lineLongname;
-      lineJson["agencyUuid"] = summary.agencyUuid;
-      lineJson["agencyAcronym"] = summary.agencyAcronym;
-      lineJson["agencyName"] = summary.agencyName;
-      lineJson["alternativeCount"] = summary.count;
-      json["lines"].push_back(lineJson);
+    SummaryResultAccumulator resultParser = SummaryResultAccumulator();
+    for (auto &alternative : result.alternatives) {
+      resultParser.processSingleCalculationResult(*alternative.get());
     }
+
+    // Result response
+    nlohmann::json resultJson;
+    resultJson["nbRoutes"] = result.alternatives.size();
+    resultJson["lines"] = lineSummariesToJson(resultParser);
+    json["result"] = resultJson;
+
+    return json;
+    
+  }
+
+  nlohmann::json ResultToV2SummaryResponse::resultToJsonString(SingleCalculationResult& result, RouteParameters& params)
+  {
+    // Initialize response
+    nlohmann::json json;
+    json["status"] = STATUS_SUCCESS;
+    json["query"] = parametersToQueryResponse(params);
+
+    SummaryResultAccumulator resultParser = SummaryResultAccumulator();
+    resultParser.processSingleCalculationResult(result);
+
+    // Result response
+    nlohmann::json resultJson;
+    resultJson["nbRoutes"] = 1;
+    resultJson["lines"] = lineSummariesToJson(resultParser);
+    json["result"] = resultJson;
 
     return json;
     
