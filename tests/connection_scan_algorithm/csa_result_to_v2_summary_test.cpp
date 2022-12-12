@@ -25,13 +25,14 @@ TEST_F(ResultToV2SummaryFixtureTest, TestNoRoutingFoundResultV2Summary)
     TrRouting::Point* destination = testParameters.get()->getDestination();
 
     ASSERT_EQ(STATUS_SUCCESS, jsonResponse["status"]);
-    ASSERT_EQ(origin->latitude, jsonResponse["origin"][1]);
-    ASSERT_EQ(origin->longitude, jsonResponse["origin"][0]);
-    ASSERT_EQ(destination->latitude, jsonResponse["destination"][1]);
-    ASSERT_EQ(destination->longitude, jsonResponse["destination"][0]);
-    ASSERT_EQ(testParameters.get()->getTimeOfTrip(), jsonResponse["timeOfTrip"]);
-    ASSERT_EQ(0, jsonResponse["timeType"]);
-    ASSERT_EQ(0u, jsonResponse["lines"].size());
+    ASSERT_EQ(origin->latitude, jsonResponse["query"]["origin"][1]);
+    ASSERT_EQ(origin->longitude, jsonResponse["query"]["origin"][0]);
+    ASSERT_EQ(destination->latitude, jsonResponse["query"]["destination"][1]);
+    ASSERT_EQ(destination->longitude, jsonResponse["query"]["destination"][0]);
+    ASSERT_EQ(testParameters.get()->getTimeOfTrip(), jsonResponse["query"]["timeOfTrip"]);
+    ASSERT_EQ(0, jsonResponse["query"]["timeType"]);
+    ASSERT_EQ(0u, jsonResponse["result"]["nbRoutes"]);
+    ASSERT_EQ(0u, jsonResponse["result"]["lines"].size());
 }
 
 TEST_F(ResultToV2SummaryFixtureTest, TestSingleCalculationResultV2Summary)
@@ -62,29 +63,28 @@ TEST_F(ResultToV2SummaryFixtureTest, TestAlternativesResultV2Summary)
     assertResultConversion(jsonResponse, boardingStep, 2, *testParameters.get());
 }
 
-// Matches the single result returned by getSingleResult, with some hard-coded values. If necessary, it will need to be adapted to match any result
-void ResultToV2SummaryFixtureTest::assertResultConversion(nlohmann::json jsonResponse, TrRouting::BoardingStep& boardingStep, int count, TrRouting::RouteParameters &params) {
+void ResultToV2SummaryFixtureTest::assertResultConversion(nlohmann::json jsonResponse, TrRouting::BoardingStep &, int count, TrRouting::RouteParameters &params) {
     TrRouting::Point* origin = params.getOrigin();
     TrRouting::Point* destination = params.getDestination();
 
     // Validate main results
     ASSERT_EQ(STATUS_SUCCESS, jsonResponse["status"]);
-    ASSERT_EQ(origin->latitude, jsonResponse["origin"][1]);
-    ASSERT_EQ(origin->longitude, jsonResponse["origin"][0]);
-    ASSERT_EQ(destination->latitude, jsonResponse["destination"][1]);
-    ASSERT_EQ(destination->longitude, jsonResponse["destination"][0]);
-    ASSERT_EQ(params.getTimeOfTrip(), jsonResponse["timeOfTrip"]);
-    ASSERT_EQ(0, jsonResponse["timeType"]);
-    ASSERT_EQ(count, jsonResponse["nbAlternativesCalculated"]);
-    ASSERT_EQ(1u, jsonResponse["lines"].size());
+    ASSERT_EQ(origin->latitude, jsonResponse["query"]["origin"][1]);
+    ASSERT_EQ(origin->longitude, jsonResponse["query"]["origin"][0]);
+    ASSERT_EQ(destination->latitude, jsonResponse["query"]["destination"][1]);
+    ASSERT_EQ(destination->longitude, jsonResponse["query"]["destination"][0]);
+    ASSERT_EQ(params.getTimeOfTrip(), jsonResponse["query"]["timeOfTrip"]);
+    ASSERT_EQ(0, jsonResponse["query"]["timeType"]);
+    ASSERT_EQ(count, jsonResponse["result"]["nbRoutes"]);
+    ASSERT_EQ(1u, jsonResponse["result"]["lines"].size());
 
     // Test the lines
-    ASSERT_EQ(agency->acronym, jsonResponse["lines"][0]["agencyAcronym"]);
-    ASSERT_EQ(agency->name, jsonResponse["lines"][0]["agencyName"]);
-    ASSERT_EQ(agencyUuid, jsonResponse["lines"][0]["agencyUuid"]);
-    ASSERT_EQ(line->shortname, jsonResponse["lines"][0]["lineShortname"]);
-    ASSERT_EQ(line->longname, jsonResponse["lines"][0]["lineLongname"]);
-    ASSERT_EQ(lineUuid, jsonResponse["lines"][0]["lineUuid"]);
+    ASSERT_EQ(agency->acronym, jsonResponse["result"]["lines"][0]["agencyAcronym"]);
+    ASSERT_EQ(agency->name, jsonResponse["result"]["lines"][0]["agencyName"]);
+    ASSERT_EQ(agencyUuid, jsonResponse["result"]["lines"][0]["agencyUuid"]);
+    ASSERT_EQ(line->shortname, jsonResponse["result"]["lines"][0]["lineShortname"]);
+    ASSERT_EQ(line->longname, jsonResponse["result"]["lines"][0]["lineLongname"]);
+    ASSERT_EQ(lineUuid, jsonResponse["result"]["lines"][0]["lineUuid"]);
    
 }
 
