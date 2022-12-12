@@ -85,10 +85,10 @@ singleRouteResponse:
   type: object
   properties:
     departureTime:
-      type: string
+      type: number
       description: Optimized departure time in seconds since midnight
     arrivalTime:
-      type: string
+      type: number
       description: Arrival time in seconds since midnight
     totalTravelTime:
       type: number
