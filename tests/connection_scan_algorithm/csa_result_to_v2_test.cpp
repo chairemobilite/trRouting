@@ -24,12 +24,12 @@ TEST_F(ResultToV2FixtureTest, TestNoRoutingFoundResultDefaultReasonV2)
     TrRouting::Point* destination = testParameters.get()->getDestination();
 
     ASSERT_EQ(STATUS_NO_ROUTING_FOUND, jsonResponse["status"]);
-    ASSERT_EQ(origin->latitude, jsonResponse["origin"][1]);
-    ASSERT_EQ(origin->longitude, jsonResponse["origin"][0]);
-    ASSERT_EQ(destination->latitude, jsonResponse["destination"][1]);
-    ASSERT_EQ(destination->longitude, jsonResponse["destination"][0]);
-    ASSERT_EQ(testParameters.get()->getTimeOfTrip(), jsonResponse["timeOfTrip"]);
-    ASSERT_EQ(0, jsonResponse["timeType"]);
+    ASSERT_EQ(origin->latitude, jsonResponse["query"]["origin"][1]);
+    ASSERT_EQ(origin->longitude, jsonResponse["query"]["origin"][0]);
+    ASSERT_EQ(destination->latitude, jsonResponse["query"]["destination"][1]);
+    ASSERT_EQ(destination->longitude, jsonResponse["query"]["destination"][0]);
+    ASSERT_EQ(testParameters.get()->getTimeOfTrip(), jsonResponse["query"]["timeOfTrip"]);
+    ASSERT_EQ(0, jsonResponse["query"]["timeType"]);
     ASSERT_EQ("NO_ROUTING_FOUND", jsonResponse["reason"]);
 }
 
@@ -41,12 +41,12 @@ TEST_F(ResultToV2FixtureTest, TestNoRoutingFoundResultWithReasonV2)
     TrRouting::Point* destination = testParameters.get()->getDestination();
 
     ASSERT_EQ(STATUS_NO_ROUTING_FOUND, jsonResponse["status"]);
-    ASSERT_EQ(origin->latitude, jsonResponse["origin"][1]);
-    ASSERT_EQ(origin->longitude, jsonResponse["origin"][0]);
-    ASSERT_EQ(destination->latitude, jsonResponse["destination"][1]);
-    ASSERT_EQ(destination->longitude, jsonResponse["destination"][0]);
-    ASSERT_EQ(testParameters.get()->getTimeOfTrip(), jsonResponse["timeOfTrip"]);
-    ASSERT_EQ(0, jsonResponse["timeType"]);
+    ASSERT_EQ(origin->latitude, jsonResponse["query"]["origin"][1]);
+    ASSERT_EQ(origin->longitude, jsonResponse["query"]["origin"][0]);
+    ASSERT_EQ(destination->latitude, jsonResponse["query"]["destination"][1]);
+    ASSERT_EQ(destination->longitude, jsonResponse["query"]["destination"][0]);
+    ASSERT_EQ(testParameters.get()->getTimeOfTrip(), jsonResponse["query"]["timeOfTrip"]);
+    ASSERT_EQ(0, jsonResponse["query"]["timeType"]);
     ASSERT_EQ("NO_ACCESS_AT_ORIGIN", jsonResponse["reason"]);
 }
 
@@ -55,15 +55,31 @@ TEST_F(ResultToV2FixtureTest, TestSingleCalculationResultV2)
     std::unique_ptr<TrRouting::SingleCalculationResult> resultPtr = getSingleResult();
     TrRouting::SingleCalculationResult &result = *resultPtr.get();
 
+    TrRouting::RouteParameters &params = *testParameters.get();
+
     nlohmann::json jsonResponse = TrRouting::ResultToV2Response::resultToJsonString(result, *testParameters.get());
 
-    assertResultConversion(jsonResponse, result, *testParameters.get());
+    // Validate status and query results
+    ASSERT_EQ(STATUS_SUCCESS, jsonResponse["status"]);
+    ASSERT_EQ(params.getOrigin()->latitude, jsonResponse["query"]["origin"][1]);
+    ASSERT_EQ(params.getOrigin()->longitude, jsonResponse["query"]["origin"][0]);
+    ASSERT_EQ(params.getDestination()->latitude, jsonResponse["query"]["destination"][1]);
+    ASSERT_EQ(params.getDestination()->longitude, jsonResponse["query"]["destination"][0]);
+    ASSERT_EQ(params.getTimeOfTrip(), jsonResponse["query"]["timeOfTrip"]);
+    ASSERT_EQ(0, jsonResponse["query"]["timeType"]);
+
+    // Validate result
+    ASSERT_EQ(1, jsonResponse["result"]["totalRoutesCalculated"]);
+    ASSERT_EQ(1u, jsonResponse["result"]["routes"].size());
+    assertResultConversion(jsonResponse["result"]["routes"][0], result, *testParameters.get());
 }
 
 TEST_F(ResultToV2FixtureTest, TestAlternativesResultV2)
 {
     TrRouting::AlternativesResult result = TrRouting::AlternativesResult();
     result.totalAlternativesCalculated = 4;
+
+    TrRouting::RouteParameters &params = *testParameters.get();
 
     // Add results, both are the same, it's not important
     std::unique_ptr<TrRouting::SingleCalculationResult> resultPtr1 = getSingleResult();
@@ -73,29 +89,27 @@ TEST_F(ResultToV2FixtureTest, TestAlternativesResultV2)
 
     nlohmann::json jsonResponse =  TrRouting::ResultToV2Response::resultToJsonString(result, *testParameters.get());
 
+    // Validate status and query results
     ASSERT_EQ(STATUS_SUCCESS, jsonResponse["status"]);
-    ASSERT_EQ(result.totalAlternativesCalculated, jsonResponse["alternativesTotal"]);
-    ASSERT_EQ(2u, jsonResponse["alternatives"].size());
+    ASSERT_EQ(params.getOrigin()->latitude, jsonResponse["query"]["origin"][1]);
+    ASSERT_EQ(params.getOrigin()->longitude, jsonResponse["query"]["origin"][0]);
+    ASSERT_EQ(params.getDestination()->latitude, jsonResponse["query"]["destination"][1]);
+    ASSERT_EQ(params.getDestination()->longitude, jsonResponse["query"]["destination"][0]);
+    ASSERT_EQ(params.getTimeOfTrip(), jsonResponse["query"]["timeOfTrip"]);
+    ASSERT_EQ(0, jsonResponse["query"]["timeType"]);
 
-    TrRouting::SingleCalculationResult& alternative1 = dynamic_cast<TrRouting::SingleCalculationResult&>(*result.alternatives[0].get());
-    assertResultConversion(jsonResponse["alternatives"][0], alternative1, *testParameters.get());
-    TrRouting::SingleCalculationResult& alternative2 = dynamic_cast<TrRouting::SingleCalculationResult&>(*result.alternatives[1].get());
-    assertResultConversion(jsonResponse["alternatives"][1], alternative2, *testParameters.get());
+    ASSERT_EQ(result.totalAlternativesCalculated, jsonResponse["result"]["totalRoutesCalculated"]);
+    ASSERT_EQ(2u, jsonResponse["result"]["routes"].size());
+
+    TrRouting::SingleCalculationResult& alternative1 = *result.alternatives[0].get();
+    assertResultConversion(jsonResponse["result"]["routes"][0], alternative1, *testParameters.get());
+    TrRouting::SingleCalculationResult& alternative2 = *result.alternatives[1].get();
+    assertResultConversion(jsonResponse["result"]["routes"][1], alternative2, *testParameters.get());
 }
 
 // Matches the single result returned by getSingleResult, with some hard-coded values. If necessary, it will need to be adapted to match any result
-void ResultToV2FixtureTest::assertResultConversion(nlohmann::json jsonResponse, TrRouting::SingleCalculationResult &result, TrRouting::RouteParameters &params) {
-    TrRouting::Point* origin = params.getOrigin();
-    TrRouting::Point* destination = params.getDestination();
+void ResultToV2FixtureTest::assertResultConversion(nlohmann::json jsonResponse, TrRouting::SingleCalculationResult &result, TrRouting::RouteParameters &) {
 
-    // Validate main results
-    ASSERT_EQ(STATUS_SUCCESS, jsonResponse["status"]);
-    ASSERT_EQ(origin->latitude, jsonResponse["origin"][1]);
-    ASSERT_EQ(origin->longitude, jsonResponse["origin"][0]);
-    ASSERT_EQ(destination->latitude, jsonResponse["destination"][1]);
-    ASSERT_EQ(destination->longitude, jsonResponse["destination"][0]);
-    ASSERT_EQ(params.getTimeOfTrip(), jsonResponse["timeOfTrip"]);
-    ASSERT_EQ(0, jsonResponse["timeType"]);
     ASSERT_EQ(result.departureTime, jsonResponse["departureTime"]);
     ASSERT_EQ(result.arrivalTime, jsonResponse["arrivalTime"]);
     ASSERT_EQ(result.totalTravelTime, jsonResponse["totalTravelTime"]);
