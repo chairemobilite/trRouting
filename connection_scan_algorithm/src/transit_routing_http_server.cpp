@@ -479,20 +479,17 @@ int main(int argc, char** argv) {
 
     try
     {
-      std::unique_ptr<TrRouting::RoutingResult> routingResult;
-      TrRouting::AlternativesResult alternativeResult;
-
       RouteParameters queryParams = RouteParameters::createRouteODParameter(parametersWithValues, transitData.getScenarios());
 
       try {
         if (queryParams.isWithAlternatives())
         {
-          alternativeResult = calculator.alternativesRouting(queryParams);
+          TrRouting::AlternativesResult alternativeResult = calculator.alternativesRouting(queryParams);
           response = ResultToV2Response::resultToJsonString(alternativeResult, queryParams).dump(2);
         }
         else
         {
-          routingResult = calculator.calculateSingle(queryParams);
+          std::unique_ptr<TrRouting::SingleCalculationResult> routingResult = calculator.calculateSingle(queryParams);
           if (routingResult.get() != nullptr) {
             response = ResultToV2Response::resultToJsonString(*routingResult.get(), queryParams).dump(2);
           }

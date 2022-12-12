@@ -33,23 +33,6 @@ namespace TrRouting
     void visitWalkingStep(const WalkingStep& step) override;
   };
 
-  /**
-   * @brief Visitor for the result object
-   */
-  class ResultToV2Visitor: public ResultVisitor<nlohmann::json> {
-  private:
-    nlohmann::json response;
-    RouteParameters& params;
-  public:
-    ResultToV2Visitor(RouteParameters& _params): params(_params) {
-      // Nothing to initialize
-    }
-    nlohmann::json getResult() { return response; }
-    void visitSingleCalculationResult(const SingleCalculationResult& result) override;
-    void visitAlternativesResult(const AlternativesResult& result) override;
-    void visitAllNodesResult(const AllNodesResult& result) override;
-  };
-
   void StepToV2Visitor::visitBoardingStep(const BoardingStep& step)
   {
     nlohmann::json stepJson;
@@ -116,14 +99,27 @@ namespace TrRouting
     response = stepJson;
   }
 
-  void ResultToV2Visitor::visitSingleCalculationResult(const SingleCalculationResult& result)
+  std::array<double, 2> pointToRouteJson(const Point& point)
+  {
+    return { point.longitude, point.latitude };
+  }
+
+  nlohmann::json parametersToRouteQueryResponse(RouteParameters& params)
+  {
+    // Query parameters for response
+    nlohmann::json queryJson;
+    queryJson["origin"] = pointToRouteJson(*params.getOrigin());
+    queryJson["destination"] = pointToRouteJson(*params.getDestination());
+    queryJson["timeOfTrip"] = params.getTimeOfTrip();
+    queryJson["timeType"] = params.isForwardCalculation() ? 0 : 1;
+    return queryJson;
+  }
+
+  nlohmann::json getSingleResultJsonString(const SingleCalculationResult& result)
   {
     nlohmann::json json;
-    json["status"] = STATUS_SUCCESS;
-    json["origin"] = { params.getOrigin()->longitude, params.getOrigin()->latitude };
-    json["destination"] = { params.getDestination()->longitude, params.getDestination()->latitude };
-    json["timeOfTrip"] = params.getTimeOfTrip();
-    json["timeType"] = params.isForwardCalculation() ? 0 : 1;
+
+    // Result response for single route
     json["departureTime"] = result.departureTime;
     json["arrivalTime"] = result.arrivalTime;
     json["totalTravelTime"] = result.totalTravelTime;
@@ -150,38 +146,15 @@ namespace TrRouting
     for (auto &step : result.steps) {
       json["steps"].push_back(step.get()->accept(stepVisitor));
     }
-    response = json;
-  }
-
-  void ResultToV2Visitor::visitAlternativesResult(const AlternativesResult& result)
-  {
-    nlohmann::json json;
-    json["status"] = STATUS_SUCCESS;
-    json["alternatives"] = nlohmann::json::array();
-    for (auto &alternative : result.alternatives) {
-      nlohmann::json alternativeJson = alternative.get()->accept(*this);
-      json["alternatives"].push_back(alternativeJson);
-    }
-    json["alternativesTotal"] = result.totalAlternativesCalculated;
-    response = json;
-  }
-
-  void ResultToV2Visitor::visitAllNodesResult(const AllNodesResult&)
-  {
-    // TODO This type of result is not defined in v2 yet, we should not be here
-    nlohmann::json json;
-    json["status"] = "not_implemented_yet";
-    response = json;
+    return json;
   }
 
   nlohmann::json ResultToV2Response::noRoutingFoundResponse(RouteParameters& params, NoRoutingReason noRoutingReason)
   {
     nlohmann::json json;
     json["status"] = STATUS_NO_ROUTING_FOUND;
-    json["origin"] = { params.getOrigin()->longitude, params.getOrigin()->latitude };
-    json["destination"] = { params.getDestination()->longitude, params.getDestination()->latitude };
-    json["timeOfTrip"] = params.getTimeOfTrip();
-    json["timeType"] = params.isForwardCalculation() ? 0 : 1;
+    json["query"] = parametersToRouteQueryResponse(params);
+
     std::string reason;
     switch(noRoutingReason) {
       case NoRoutingReason::NO_ROUTING_FOUND:
@@ -210,9 +183,35 @@ namespace TrRouting
     return json;
   }
 
-  nlohmann::json ResultToV2Response::resultToJsonString(RoutingResult& result, RouteParameters& params)
+  nlohmann::json ResultToV2Response::resultToJsonString(AlternativesResult& result, RouteParameters& params)
   {
-    ResultToV2Visitor visitor = ResultToV2Visitor(params);
-    return result.accept(visitor);
+    nlohmann::json json;
+    json["status"] = STATUS_SUCCESS;
+    json["query"] = parametersToRouteQueryResponse(params);
+
+    nlohmann::json resultJson;
+    resultJson["routes"] = nlohmann::json::array();
+    for (auto &alternative : result.alternatives) {
+      resultJson["routes"].push_back(getSingleResultJsonString(*alternative.get()));
+    }
+    resultJson["totalRoutesCalculated"] = result.totalAlternativesCalculated;
+    json["result"] = resultJson;
+
+    return json;
+  }
+
+  nlohmann::json ResultToV2Response::resultToJsonString(SingleCalculationResult& result, RouteParameters& params)
+  {
+    nlohmann::json json;
+    json["status"] = STATUS_SUCCESS;
+    json["query"] = parametersToRouteQueryResponse(params);
+
+    nlohmann::json resultJson;
+    resultJson["totalRoutesCalculated"] = 1;
+    resultJson["routes"] = nlohmann::json::array();
+    resultJson["routes"].push_back(getSingleResultJsonString(result));
+    json["result"] = resultJson;
+
+    return json;
   }
 }
