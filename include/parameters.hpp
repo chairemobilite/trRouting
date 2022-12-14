@@ -7,6 +7,7 @@
 #include <optional>
 #include <boost/uuid/uuid.hpp>
 #include "data_source.hpp"
+#include "toolbox.hpp" //MAX_INT
 
 namespace TrRouting
 {
@@ -20,6 +21,14 @@ namespace TrRouting
   class Agency;
   class Service;
   class Line;
+
+  // Default values for parameters
+  static const int DEFAULT_MIN_WAITING_TIME = 3 * 60;
+  static const int DEFAULT_MAX_TOTAL_TIME = MAX_INT;
+  static const int DEFAULT_MAX_ACCESS_TRAVEL_TIME = 20 * 60;
+  static const int DEFAULT_MAX_EGRESS_TRAVEL_TIME = 20 * 60;
+  static const int DEFAULT_MAX_TRANSFER_TRAVEL_TIME = 20 * 60;
+  static const int DEFAULT_FIRST_WAITING_TIME = 30 * 60;
 
   class ParameterException : public std::exception
   {
@@ -129,6 +138,18 @@ namespace TrRouting
       static CommonParameters createCommonParameter(std::vector<std::pair<std::string, std::string>> &parameters,
                                                     const std::map<boost::uuids::uuid, Scenario> &scenarios
       );
+
+      /**
+       * @brief Helper function to get an integer value from a string, or throw
+       * a ParameterException with an INVALID_NUMERICAL_VALUE type if the string
+       * is not an integer. This prevents from having to handle an
+       * invalid_argument exception at a higher level if the string value is not
+       * of the proper type
+       *
+       * @param strValue Integer string value
+       * @return int The converted integer
+       */
+      static int getIntegerValue(std::string strValue);
   };
 
   class RouteParameters : public CommonParameters {
@@ -166,12 +187,49 @@ namespace TrRouting
       /**
        * Factory function to create a routeParameters object from  a map of
        * parameters coming from the origin/destination route. It returns a new
-       * immutable routeParameters object with complete parameter initialization.
+       * immutable routeParameters object with complete parameter
+       * initialization.
        *
-       * If there are missing parameters, this function will throw a
+       * If there are missing or invalid parameters, this function will throw a
        * ParameterException error
        **/
       static RouteParameters createRouteODParameter(std::vector<std::pair<std::string, std::string>> &parameters,
+                                                    const std::map<boost::uuids::uuid, Scenario> &scenarios
+      );
+  };
+
+  class AccessibilityParameters : public CommonParameters {
+    private:
+      std::unique_ptr<Point> place;
+      
+    public:
+      AccessibilityParameters(std::unique_ptr<Point> place,
+        const Scenario& scenario,
+        int timeOfTrip,
+        int minWaitingTime,
+        int maxTotalTime,
+        int maxAccessTime,
+        int maxEgressTime,
+        int maxTransferTime,
+        int maxFirstWaitingTime,
+        bool forward
+      );
+      AccessibilityParameters(std::unique_ptr<Point> place,
+        const CommonParameters &common_
+      );
+      virtual ~AccessibilityParameters() {}
+      // TODO Should Point be const here?
+      Point* getPlace() const { return place.get(); }
+
+      /**
+       * Factory function to create a AccessibilityParameters object from  a map of
+       * parameters coming from the accessibility endpoint. It returns a new
+       * immutable AccessibilityParameters object with complete parameter initialization.
+       *
+       * If there are missing or invalid parameters, this function will throw a
+       * ParameterException error
+       **/
+      static AccessibilityParameters createAccessibilityParameter(std::vector<std::pair<std::string, std::string>> &parameters,
                                                     const std::map<boost::uuids::uuid, Scenario> &scenarios
       );
   };

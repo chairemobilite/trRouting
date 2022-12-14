@@ -14,7 +14,7 @@
 const std::string EMPTY_SCENARIO_UUID = "acdcef12-1111-2222-3333-444455558888";
 const std::string TEST_SCENARIO_UUID = "12345678-9999-0000-1111-ababbabaabab";
 
-class RouteParametersFixtureTests : public BaseParametersFixtureTests
+class AccessibilityParametersFixtureTests : public BaseParametersFixtureTests
 {
 protected:
     std::map<boost::uuids::uuid, TrRouting::Scenario> scenarios;
@@ -44,23 +44,20 @@ public:
     }
 };
 
-class InvalidParamTestSuite : public RouteParametersFixtureTests,
+class InvalidAccessibilityParamTestSuite : public AccessibilityParametersFixtureTests,
                               public testing::WithParamInterface<std::tuple<std::string, std::string, TrRouting::ParameterException::Type>> {
 };
 
 INSTANTIATE_TEST_SUITE_P(
-    InvalidRouteParamsStringValues, InvalidParamTestSuite,
+    InvalidAccessibilityParamsStringValues, InvalidAccessibilityParamTestSuite,
     testing::Values(
-        std::make_tuple("origin", "", TrRouting::ParameterException::Type::MISSING_ORIGIN),
-        std::make_tuple("destination", "", TrRouting::ParameterException::Type::MISSING_DESTINATION),
+        std::make_tuple("place", "", TrRouting::ParameterException::Type::MISSING_PLACE),
         std::make_tuple("scenario_id", "", TrRouting::ParameterException::Type::MISSING_SCENARIO),
         std::make_tuple("time_of_trip", "", TrRouting::ParameterException::Type::MISSING_TIME_OF_TRIP),
         std::make_tuple("time_of_trip", "-3", TrRouting::ParameterException::Type::MISSING_TIME_OF_TRIP),
         std::make_tuple("scenario_id", EMPTY_SCENARIO_UUID, TrRouting::ParameterException::Type::EMPTY_SCENARIO),
-        std::make_tuple("origin", "45", TrRouting::ParameterException::Type::INVALID_ORIGIN),
-        std::make_tuple("origin", "foo,bar", TrRouting::ParameterException::Type::INVALID_ORIGIN),
-        std::make_tuple("destination", "-73", TrRouting::ParameterException::Type::INVALID_DESTINATION),
-        std::make_tuple("destination", "foo,bar", TrRouting::ParameterException::Type::INVALID_DESTINATION),
+        std::make_tuple("place", "45", TrRouting::ParameterException::Type::INVALID_PLACE),
+        std::make_tuple("place", "foo,bar", TrRouting::ParameterException::Type::INVALID_PLACE),
         std::make_tuple("min_waiting_time", "nan", TrRouting::ParameterException::Type::INVALID_NUMERICAL_DATA),
         std::make_tuple("max_access_travel_time", "nan", TrRouting::ParameterException::Type::INVALID_NUMERICAL_DATA),
         std::make_tuple("max_egress_travel_time", "nan", TrRouting::ParameterException::Type::INVALID_NUMERICAL_DATA),
@@ -70,7 +67,7 @@ INSTANTIATE_TEST_SUITE_P(
     )
 );
 
-TEST_P(InvalidParamTestSuite, TestParams)
+TEST_P(InvalidAccessibilityParamTestSuite, TestAccessibilityParams)
 {
     std::tuple<std::string, std::string, TrRouting::ParameterException::Type> param = GetParam();
     std::string paramName = std::get<0>(param);
@@ -78,13 +75,9 @@ TEST_P(InvalidParamTestSuite, TestParams)
     TrRouting::ParameterException::Type exceptionType = std::get<2>(param);
 
     std::vector<std::pair<std::string, std::string>> parametersWithValues;
-    if (paramName != "origin")
+    if (paramName != "place")
     {
-        parametersWithValues.push_back(std::make_pair("origin", "-73.5,45.5544"));
-    }
-    if (paramName != "destination")
-    {
-        parametersWithValues.push_back(std::make_pair("destination", "-73.57786713522127,45.55239801892435"));
+        parametersWithValues.push_back(std::make_pair("place", "-73.5,45.5544"));
     }
     if (paramName != "time_of_trip")
     {
@@ -100,7 +93,7 @@ TEST_P(InvalidParamTestSuite, TestParams)
     }
 
     try {
-        TrRouting::RouteParameters queryParams = TrRouting::RouteParameters::createRouteODParameter(parametersWithValues, scenarios);
+        TrRouting::AccessibilityParameters queryParams = TrRouting::AccessibilityParameters::createAccessibilityParameter(parametersWithValues, scenarios);
         FAIL() << "Expected TrRouting::ParameterException, no exception was thrown";
     }
     catch(TrRouting::ParameterException const & err) {
@@ -111,20 +104,16 @@ TEST_P(InvalidParamTestSuite, TestParams)
     }
 }
 
-TEST_F(RouteParametersFixtureTests, DefaultParameters)
+TEST_F(AccessibilityParametersFixtureTests, DefaultParameters)
 {
     std::vector<std::pair<std::string, std::string>> parametersWithValues;
     parametersWithValues.push_back(std::make_pair("scenario_id",  TEST_SCENARIO_UUID));
-    parametersWithValues.push_back(std::make_pair("origin", "-73.5,45.5544"));
-    parametersWithValues.push_back(std::make_pair("destination", "-73.57786713522127, 45.55239801892435"));
+    parametersWithValues.push_back(std::make_pair("place", "-73.5,45.5544"));
     parametersWithValues.push_back(std::make_pair("time_of_trip", "10800"));
 
-    TrRouting::RouteParameters queryParams = TrRouting::RouteParameters::createRouteODParameter(parametersWithValues, scenarios);
-    EXPECT_DOUBLE_EQ(queryParams.getOrigin()->latitude, 45.5544);
-    EXPECT_DOUBLE_EQ(queryParams.getOrigin()->longitude, -73.5);
-    EXPECT_DOUBLE_EQ(queryParams.getDestination()->latitude, 45.55239801892435);
-    EXPECT_DOUBLE_EQ(queryParams.getDestination()->longitude, -73.57786713522127);
-    EXPECT_EQ(queryParams.isWithAlternatives(), false);
+    TrRouting::AccessibilityParameters queryParams = TrRouting::AccessibilityParameters::createAccessibilityParameter(parametersWithValues, scenarios);
+    EXPECT_DOUBLE_EQ(queryParams.getPlace()->latitude, 45.5544);
+    EXPECT_DOUBLE_EQ(queryParams.getPlace()->longitude, -73.5);
     EXPECT_EQ(queryParams.isForwardCalculation(), true);
 
     // Values that should be set to defaults
@@ -137,7 +126,7 @@ TEST_F(RouteParametersFixtureTests, DefaultParameters)
     EXPECT_EQ(queryParams.getMaxFirstWaitingTimeSeconds(), 30 * 60);
 }
 
-TEST_F(RouteParametersFixtureTests, SetAllParameters)
+TEST_F(AccessibilityParametersFixtureTests, SetAllParameters)
 {
     // Set arbitrary values for parameters, different for each case
     int minWaitingTime = 60, maxTotalTime = 3600, maxAccess = 600;
@@ -145,11 +134,9 @@ TEST_F(RouteParametersFixtureTests, SetAllParameters)
 
     std::vector<std::pair<std::string, std::string>> parametersWithValues;
     parametersWithValues.push_back(std::make_pair("scenario_id",  TEST_SCENARIO_UUID));
-    parametersWithValues.push_back(std::make_pair("origin", "-73.5,45.5544"));
-    parametersWithValues.push_back(std::make_pair("destination", "-73.57786713522127, 45.55239801892435"));
+    parametersWithValues.push_back(std::make_pair("place", "-73.5,45.5544"));
     parametersWithValues.push_back(std::make_pair("time_of_trip", "10800"));
     parametersWithValues.push_back(std::make_pair("time_type", "1"));
-    parametersWithValues.push_back(std::make_pair("alternatives", "1"));
     parametersWithValues.push_back(std::make_pair("min_waiting_time", std::to_string(minWaitingTime)));
     parametersWithValues.push_back(std::make_pair("max_access_travel_time", std::to_string(maxAccess)));
     parametersWithValues.push_back(std::make_pair("max_egress_travel_time", std::to_string(maxEgress)));
@@ -157,12 +144,9 @@ TEST_F(RouteParametersFixtureTests, SetAllParameters)
     parametersWithValues.push_back(std::make_pair("max_travel_time", std::to_string(maxTotalTime)));
     parametersWithValues.push_back(std::make_pair("max_first_waiting_time", std::to_string(maxFirst)));
 
-    TrRouting::RouteParameters queryParams = TrRouting::RouteParameters::createRouteODParameter(parametersWithValues, scenarios);
-    EXPECT_DOUBLE_EQ(queryParams.getOrigin()->latitude, 45.5544);
-    EXPECT_DOUBLE_EQ(queryParams.getOrigin()->longitude, -73.5);
-    EXPECT_DOUBLE_EQ(queryParams.getDestination()->latitude, 45.55239801892435);
-    EXPECT_DOUBLE_EQ(queryParams.getDestination()->longitude, -73.57786713522127);
-    EXPECT_EQ(queryParams.isWithAlternatives(), true);
+    TrRouting::AccessibilityParameters queryParams = TrRouting::AccessibilityParameters::createAccessibilityParameter(parametersWithValues, scenarios);
+    EXPECT_DOUBLE_EQ(queryParams.getPlace()->latitude, 45.5544);
+    EXPECT_DOUBLE_EQ(queryParams.getPlace()->longitude, -73.5);
     EXPECT_EQ(queryParams.isForwardCalculation(), false);
 
     // Values that should be set to defaults
