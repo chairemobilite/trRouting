@@ -34,12 +34,16 @@ namespace TrRouting
         MISSING_DESTINATION,
         // time_of_trip should be specified
         MISSING_TIME_OF_TRIP,
+        // Place was not specified, but is mandatory
+        MISSING_PLACE,
         // The selected scenario does not contain any trips
         EMPTY_SCENARIO,
-        // Origin data received is invalid. Expected comma-separate lat/lon
+        // Origin data received is invalid. Expected comma-separated lon/lat
         INVALID_ORIGIN,
-        // Destination data received is invalid. Expected comma-separate lat/lon
+        // Destination data received is invalid. Expected comma-separated lon/lat
         INVALID_DESTINATION,
+        // Place data received is invalid. Expected comma-separated lon/lat
+        INVALID_PLACE,
         // Some parameter value is invalid. Expected an integer
         INVALID_NUMERICAL_DATA
       };
@@ -50,10 +54,8 @@ namespace TrRouting
       Type type;
   };
 
-  class RouteParameters {
+  class CommonParameters {
     private:
-      std::unique_ptr<Point> origin;
-      std::unique_ptr<Point> destination;
 
       // FIXME The scenario pointer is required for now, even if we extract its
       // data, because alternatives calculations will need to create new objects
@@ -80,15 +82,61 @@ namespace TrRouting
       std::vector<std::reference_wrapper<const Service>> exceptServices;
       // FIXME: Temporarily moved to public until calculation specific parameters exist. This is used directly by alternatives routing.
       // see https://github.com/chairemobilite/trRouting/issues/95
-  public:
+    public:
       std::vector<std::reference_wrapper<const Line>> exceptLines;
-  private:
+    private:
       std::vector<std::reference_wrapper<const Agency>> exceptAgencies;
       std::vector<std::reference_wrapper<const Mode>> exceptModes;
       std::vector<std::reference_wrapper<const Node>> exceptNodes;
-      bool withAlternatives; // calculate alternatives or not
       bool forwardCalculation; // forward calculation: default true. if false: reverse calculation, will ride connections backward (useful when setting the arrival time)
 
+    protected:
+      CommonParameters(const CommonParameters& baseParams);
+      
+    public:
+      CommonParameters(const Scenario& scenario,
+        int timeOfTrip,
+        int minWaitingTime,
+        int maxTotalTime,
+        int maxAccessTime,
+        int maxEgressTime,
+        int maxTransferTime,
+        int maxFirstWaitingTime,
+        bool forward
+      );
+      virtual ~CommonParameters() {}
+      // FIXME Temporary method, will be removed once calculation specific parameters are implemented. Try not to use.
+      const Scenario& getScenario() { return scenario; }
+      int getTimeOfTrip() const { return timeOfTrip; }
+      int getMinWaitingTimeSeconds() const { return minWaitingTimeSeconds; }
+      int getMaxTotalTravelTimeSeconds() const { return maxTotalTravelTimeSeconds; }
+      int getMaxAccessWalkingTravelTimeSeconds() const { return maxAccessWalkingTravelTimeSeconds; }
+      int getMaxEgressWalkingTravelTimeSeconds() const { return maxEgressWalkingTravelTimeSeconds; }
+      int getMaxTransferWalkingTravelTimeSeconds() const { return maxTransferWalkingTravelTimeSeconds; }
+      int getMaxFirstWaitingTimeSeconds() const { return maxFirstWaitingTimeSeconds; }
+      bool isForwardCalculation() { return forwardCalculation; }
+      const std::vector<std::reference_wrapper<const Service>>& getOnlyServices() const { return onlyServices; }
+      const std::vector<std::reference_wrapper<const Service>>& getExceptServices() const { return exceptServices; }
+      const std::vector<std::reference_wrapper<const Line>>& getOnlyLines() const { return onlyLines; }
+      const std::vector<std::reference_wrapper<const Line>>& getExceptLines() const { return exceptLines; }
+      const std::vector<std::reference_wrapper<const Mode>>& getOnlyModes() const { return onlyModes; }
+      const std::vector<std::reference_wrapper<const Mode>>& getExceptModes() const { return exceptModes; }
+      const std::vector<std::reference_wrapper<const Agency>>& getOnlyAgencies() const { return onlyAgencies; }
+      const std::vector<std::reference_wrapper<const Agency>>& getExceptAgencies() const { return exceptAgencies; }
+      const std::vector<std::reference_wrapper<const Node>>& getOnlyNodes() const { return onlyNodes; }
+      const std::vector<std::reference_wrapper<const Node>>& getExceptNodes() const { return exceptNodes; }
+
+      static CommonParameters createCommonParameter(std::vector<std::pair<std::string, std::string>> &parameters,
+                                                    const std::map<boost::uuids::uuid, Scenario> &scenarios
+      );
+  };
+
+  class RouteParameters : public CommonParameters {
+    private:
+      std::unique_ptr<Point> origin;
+      std::unique_ptr<Point> destination;
+      bool withAlternatives; // calculate alternatives or not
+      
     public:
       RouteParameters(std::unique_ptr<Point> orig,
         std::unique_ptr<Point> dest,
@@ -100,25 +148,20 @@ namespace TrRouting
         int maxEgressTime,
         int maxTransferTime,
         int maxFirstWaitingTime,
-        bool alt,
+        bool alternatives,
         bool forward
+      );
+      RouteParameters(std::unique_ptr<Point> orig,
+        std::unique_ptr<Point> dest,
+        bool alternatives,
+        const CommonParameters &common_
       );
       RouteParameters(const RouteParameters& routeParams);
       virtual ~RouteParameters() {}
       // TODO Should Point be const here?
       Point* getOrigin() const { return origin.get(); }
       Point* getDestination() const { return destination.get(); }
-      // FIXME Temporary method, will be removed once calculation specific parameters are implemented. Try not to use.
-      const Scenario& getScenario() { return scenario; }
-      int getTimeOfTrip() const { return timeOfTrip; }
-      int getMinWaitingTimeSeconds() const { return minWaitingTimeSeconds; }
-      int getMaxTotalTravelTimeSeconds() const { return maxTotalTravelTimeSeconds; }
-      int getMaxAccessWalkingTravelTimeSeconds() const { return maxAccessWalkingTravelTimeSeconds; }
-      int getMaxEgressWalkingTravelTimeSeconds() const { return maxEgressWalkingTravelTimeSeconds; }
-      int getMaxTransferWalkingTravelTimeSeconds() const { return maxTransferWalkingTravelTimeSeconds; }
-      int getMaxFirstWaitingTimeSeconds() const { return maxFirstWaitingTimeSeconds; }
       bool isWithAlternatives() { return withAlternatives; }
-      bool isForwardCalculation() { return forwardCalculation; }
 
       /**
        * Factory function to create a routeParameters object from  a map of
@@ -131,16 +174,6 @@ namespace TrRouting
       static RouteParameters createRouteODParameter(std::vector<std::pair<std::string, std::string>> &parameters,
                                                     const std::map<boost::uuids::uuid, Scenario> &scenarios
       );
-      const std::vector<std::reference_wrapper<const Service>>& getOnlyServices() const { return onlyServices; }
-      const std::vector<std::reference_wrapper<const Service>>& getExceptServices() const { return exceptServices; }
-      const std::vector<std::reference_wrapper<const Line>>& getOnlyLines() const { return onlyLines; }
-      const std::vector<std::reference_wrapper<const Line>>& getExceptLines() const { return exceptLines; }
-      const std::vector<std::reference_wrapper<const Mode>>& getOnlyModes() const { return onlyModes; }
-      const std::vector<std::reference_wrapper<const Mode>>& getExceptModes() const { return exceptModes; }
-      const std::vector<std::reference_wrapper<const Agency>>& getOnlyAgencies() const { return onlyAgencies; }
-      const std::vector<std::reference_wrapper<const Agency>>& getExceptAgencies() const { return exceptAgencies; }
-      const std::vector<std::reference_wrapper<const Node>>& getOnlyNodes() const { return onlyNodes; }
-      const std::vector<std::reference_wrapper<const Node>>& getExceptNodes() const { return exceptNodes; }
   };
 
   class Parameters {

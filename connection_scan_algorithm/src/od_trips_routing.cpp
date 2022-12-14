@@ -289,18 +289,11 @@ namespace TrRouting
             spdlog::info("{}/{}", (i+1), odTripsCount);
           }
         }
+        // Create a parameter that is a copy of the original parameters, except for the origin and destination
         RouteParameters odTripParameters = RouteParameters(std::make_unique<Point>(odTrip.origin.get()->latitude, odTrip.origin.get()->longitude),
           std::make_unique<Point>(odTrip.destination.get()->latitude, odTrip.destination.get()->longitude),
-          parameters.getScenario(),
-          parameters.getTimeOfTrip(),
-          parameters.getMinWaitingTimeSeconds(),
-          parameters.getMaxTotalTravelTimeSeconds(),
-          parameters.getMaxAccessWalkingTravelTimeSeconds(),
-          parameters.getMaxEgressWalkingTravelTimeSeconds(),
-          parameters.getMaxTransferWalkingTravelTimeSeconds(),
-          parameters.getMaxFirstWaitingTimeSeconds(),
           parameters.isWithAlternatives(),
-          parameters.isForwardCalculation());
+          parameters);
 
         float correctedExpansionFactor = odTrip.expansionFactor / params.odTripsSampleRatio;
 
