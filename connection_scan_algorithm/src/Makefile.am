@@ -9,12 +9,14 @@ libcsa_la_SOURCES = alternatives_routing.cpp \
 		   initializations.cpp \
 		   od_trips_routing.cpp \
 		   optimize_journey.cpp \
-		   parameters.cpp \
+		   parameters/legacyV1_parameters.cpp \
+		   parameters/common_parameters.cpp \
+		   parameters/route_parameters.cpp \
+		   parameters/accessibility_parameters.cpp \
 		   program_options.cpp \
 		   resets.cpp \
 		   reverse_calculation.cpp \
 		   reverse_journey.cpp \
-		   route_parameters.cpp \
 		   result_to_v1.cpp \
 		   result_to_v2.cpp \
 		   result_to_v2_summary.cpp \
