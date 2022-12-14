@@ -135,9 +135,7 @@ namespace TrRouting
     // TODO: We should not create a whole new object just to update maxTravelTime. This parameter should be in the calculation specific parameters, which do not exist yet
     Point* origin = parameters.getOrigin();
     Point* dest = parameters.getDestination();
-    RouteParameters alternativeParameters = RouteParameters(std::make_unique<Point>(origin->latitude, origin->longitude),
-      std::make_unique<Point>(dest->latitude, dest->longitude),
-      parameters.getScenario(),
+    CommonParameters commonAlternativeParameters = CommonParameters(parameters.getScenario(),
       parameters.getTimeOfTrip(),
       parameters.getMinWaitingTimeSeconds(),
       maxTravelTime,
@@ -145,8 +143,13 @@ namespace TrRouting
       parameters.getMaxEgressWalkingTravelTimeSeconds(),
       parameters.getMaxTransferWalkingTravelTimeSeconds(),
       parameters.getMaxFirstWaitingTimeSeconds(),
+      parameters.isForwardCalculation()
+    );
+    RouteParameters alternativeParameters = RouteParameters(std::make_unique<Point>(origin->latitude, origin->longitude),
+      std::make_unique<Point>(dest->latitude, dest->longitude),
       parameters.isWithAlternatives(),
-      parameters.isForwardCalculation());
+      commonAlternativeParameters
+    );
 
     //params.departureTimeSeconds = departureTimeSeconds;
 

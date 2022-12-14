@@ -15,9 +15,7 @@ namespace TrRouting
   static int DEFAULT_MAX_TRANSFER_TRAVEL_TIME = 20 * 60;
   static int DEFAULT_FIRST_WAITING_TIME = 30 * 60;
 
-  RouteParameters::RouteParameters(std::unique_ptr<Point> orig_,
-    std::unique_ptr<Point> dest_,
-    const Scenario& scenario_,
+  CommonParameters::CommonParameters(const Scenario& scenario_,
     int _timeOfTrip,
     int minWaitingTime,
     int maxTotalTime,
@@ -25,10 +23,7 @@ namespace TrRouting
     int maxEgressTime,
     int maxTransferTime,
     int maxFirstWaitingTime,
-    bool alt,
     bool forward) :
-        origin(std::move(orig_)),
-        destination(std::move(dest_)),
         scenario(scenario_),
         timeOfTrip(_timeOfTrip),
         minWaitingTimeSeconds(minWaitingTime),
@@ -37,7 +32,6 @@ namespace TrRouting
         maxEgressWalkingTravelTimeSeconds(maxEgressTime),
         maxTransferWalkingTravelTimeSeconds(maxTransferTime),
         maxFirstWaitingTimeSeconds(maxFirstWaitingTime),
-        withAlternatives(alt),
         forwardCalculation(forward)
   {
     scenarioUuid = scenario.uuid;
@@ -52,29 +46,72 @@ namespace TrRouting
     exceptModes = scenario.exceptModes;
   }
 
+  CommonParameters::CommonParameters(const CommonParameters& baseParams):
+    scenario(baseParams.scenario),
+    timeOfTrip(baseParams.timeOfTrip),
+    minWaitingTimeSeconds(baseParams.minWaitingTimeSeconds),
+    maxTotalTravelTimeSeconds(baseParams.maxTotalTravelTimeSeconds),
+    maxAccessWalkingTravelTimeSeconds(baseParams.maxAccessWalkingTravelTimeSeconds),
+    maxEgressWalkingTravelTimeSeconds(baseParams.maxEgressWalkingTravelTimeSeconds),
+    maxTransferWalkingTravelTimeSeconds(baseParams.maxTransferWalkingTravelTimeSeconds),
+    maxFirstWaitingTimeSeconds(baseParams.maxFirstWaitingTimeSeconds),
+    scenarioUuid(baseParams.scenarioUuid),
+    onlyServices(baseParams.onlyServices),
+    onlyLines(baseParams.onlyLines),
+    onlyAgencies(baseParams.onlyAgencies),
+    onlyModes(baseParams.onlyModes),
+    onlyNodes(baseParams.onlyNodes),
+    exceptLines(baseParams.exceptLines),
+    exceptAgencies(baseParams.exceptAgencies),
+    exceptModes(baseParams.exceptModes),
+    exceptNodes(baseParams.exceptNodes),
+    forwardCalculation(baseParams.forwardCalculation)
+  {
+  }
+
+  RouteParameters::RouteParameters(std::unique_ptr<Point> orig_,
+    std::unique_ptr<Point> dest_,
+    const Scenario& scenario_,
+    int _timeOfTrip,
+    int minWaitingTime,
+    int maxTotalTime,
+    int maxAccessTime,
+    int maxEgressTime,
+    int maxTransferTime,
+    int maxFirstWaitingTime,
+    bool alt,
+    bool forward) : 
+        CommonParameters(scenario_,
+                      _timeOfTrip,
+                      minWaitingTime,
+                      maxTotalTime,
+                      maxAccessTime,
+                      maxEgressTime,
+                      maxTransferTime,
+                      maxFirstWaitingTime,
+                      forward),
+        origin(std::move(orig_)),
+        destination(std::move(dest_)),
+        withAlternatives(alt)
+  {
+  }
+
+  RouteParameters::RouteParameters(std::unique_ptr<Point> orig_,
+    std::unique_ptr<Point> dest_,
+    bool alt,
+    const CommonParameters &common_) : 
+        CommonParameters(common_),
+        origin(std::move(orig_)),
+        destination(std::move(dest_)),
+        withAlternatives(alt)
+  {
+  }
+
   RouteParameters::RouteParameters(const RouteParameters& routeParams):
+    CommonParameters(routeParams),
     origin(std::make_unique<Point>(routeParams.origin.get()->latitude, routeParams.origin.get()->longitude)),
     destination(std::make_unique<Point>(routeParams.destination.get()->latitude, routeParams.destination.get()->longitude)),
-    scenario(routeParams.scenario),
-    timeOfTrip(routeParams.timeOfTrip),
-    minWaitingTimeSeconds(routeParams.minWaitingTimeSeconds),
-    maxTotalTravelTimeSeconds(routeParams.maxTotalTravelTimeSeconds),
-    maxAccessWalkingTravelTimeSeconds(routeParams.maxAccessWalkingTravelTimeSeconds),
-    maxEgressWalkingTravelTimeSeconds(routeParams.maxEgressWalkingTravelTimeSeconds),
-    maxTransferWalkingTravelTimeSeconds(routeParams.maxTransferWalkingTravelTimeSeconds),
-    maxFirstWaitingTimeSeconds(routeParams.maxFirstWaitingTimeSeconds),
-    scenarioUuid(routeParams.scenarioUuid),
-    onlyServices(routeParams.onlyServices),
-    onlyLines(routeParams.onlyLines),
-    onlyAgencies(routeParams.onlyAgencies),
-    onlyModes(routeParams.onlyModes),
-    onlyNodes(routeParams.onlyNodes),
-    exceptLines(routeParams.exceptLines),
-    exceptAgencies(routeParams.exceptAgencies),
-    exceptModes(routeParams.exceptModes),
-    exceptNodes(routeParams.exceptNodes),
-    withAlternatives(routeParams.withAlternatives),
-    forwardCalculation(routeParams.forwardCalculation)
+    withAlternatives(routeParams.withAlternatives)
   {
   }
 
@@ -90,9 +127,8 @@ namespace TrRouting
     }
   }
 
-  RouteParameters RouteParameters::createRouteODParameter(std::vector<std::pair<std::string, std::string>> &parameters, const std::map<boost::uuids::uuid, Scenario> &scenarios)
+  CommonParameters CommonParameters::createCommonParameter(std::vector<std::pair<std::string, std::string>> &parameters, const std::map<boost::uuids::uuid, Scenario> &scenarios)
   {
-
     boost::uuids::string_generator uuidGenerator;
 
     std::optional<std::reference_wrapper<const Scenario>> scenario;
@@ -105,52 +141,13 @@ namespace TrRouting
     int maxEgressWalkingTravelTimeSeconds = DEFAULT_MAX_EGRESS_TRAVEL_TIME;
     int maxTransferWalkingTravelTimeSeconds = DEFAULT_MAX_TRANSFER_TRAVEL_TIME;
     int maxFirstWaitingTimeSeconds = DEFAULT_FIRST_WAITING_TIME; // Ignore all connections at access nodes if waiting time would be more than this value.
-    std::optional<Point> origin;
-    std::optional<Point> destination;
-    bool alternatives = false;
     bool forwardCalculation = true;
-
-    std::vector<std::string> latitudeLongitudeVector;
 
     // TODO Replace manually parsing parameters by a library that does this
     for (auto & parameterWithValue : parameters)
     {
-      // origin and destination:
-      if (parameterWithValue.first == "origin")
-      {
-        try
-        {
-          boost::split(latitudeLongitudeVector, parameterWithValue.second, boost::is_any_of(","));
-          if (latitudeLongitudeVector.size() != 2)
-          {
-            throw ParameterException(ParameterException::Type::INVALID_ORIGIN);
-          }
-          origin = Point(std::stod(latitudeLongitudeVector[1]), std::stod(latitudeLongitudeVector[0]));
-        }
-        catch (...)
-        {
-          throw ParameterException(ParameterException::Type::INVALID_ORIGIN);
-        }
-      }
-      else if (parameterWithValue.first == "destination")
-      {
-        try
-        {
-          boost::split(latitudeLongitudeVector, parameterWithValue.second, boost::is_any_of(","));
-          if (latitudeLongitudeVector.size() != 2)
-          {
-            throw ParameterException(ParameterException::Type::INVALID_DESTINATION);
-          }
-          destination = Point(std::stod(latitudeLongitudeVector[1]), std::stod(latitudeLongitudeVector[0]));
-        }
-        catch (...)
-        {
-          throw ParameterException(ParameterException::Type::INVALID_DESTINATION);
-        }
-      }
-
       // times and date:
-      else if (parameterWithValue.first == "time_of_trip")
+      if (parameterWithValue.first == "time_of_trip")
       {
         timeOfTrip = getIntegerValue(parameterWithValue.second);
         if (timeOfTrip < 0)
@@ -235,15 +232,6 @@ namespace TrRouting
         }
         continue;
       }
-
-      else if (parameterWithValue.first == "alternatives")
-      {
-        if (parameterWithValue.second == "true" || parameterWithValue.second == "1")
-        {
-          alternatives = true;
-        }
-        continue;
-      }
     }
 
     // Validate scenario parameters
@@ -255,22 +243,12 @@ namespace TrRouting
     {
       throw ParameterException(ParameterException::Type::EMPTY_SCENARIO);
     }
-    else if (!origin.has_value())
-    {
-      throw ParameterException(ParameterException::Type::MISSING_ORIGIN);
-    }
-    else if (!destination.has_value())
-    {
-      throw ParameterException(ParameterException::Type::MISSING_DESTINATION);
-    }
     else if (timeOfTrip < 0)
     {
       throw ParameterException(ParameterException::Type::MISSING_TIME_OF_TRIP);
     }
 
-    return RouteParameters(std::make_unique<TrRouting::Point>(origin->latitude, origin->longitude),
-      std::make_unique<TrRouting::Point>(destination->latitude, destination->longitude),
-      scenario.value().get(),
+    return CommonParameters(scenario.value().get(),
       timeOfTrip,
       minWaitingTimeSeconds,
       maxTotalTravelTimeSeconds,
@@ -278,8 +256,80 @@ namespace TrRouting
       maxEgressWalkingTravelTimeSeconds,
       maxTransferWalkingTravelTimeSeconds,
       maxFirstWaitingTimeSeconds,
-      alternatives,
       forwardCalculation);
+  }
+
+  RouteParameters RouteParameters::createRouteODParameter(std::vector<std::pair<std::string, std::string>> &parameters, const std::map<boost::uuids::uuid, Scenario> &scenarios)
+  {
+
+    std::optional<Point> origin;
+    std::optional<Point> destination;
+    bool alternatives = false;
+
+    std::vector<std::string> latitudeLongitudeVector;
+
+    // TODO Replace manually parsing parameters by a library that does this
+    for (auto & parameterWithValue : parameters)
+    {
+      // origin and destination:
+      if (parameterWithValue.first == "origin")
+      {
+        try
+        {
+          boost::split(latitudeLongitudeVector, parameterWithValue.second, boost::is_any_of(","));
+          if (latitudeLongitudeVector.size() != 2)
+          {
+            throw ParameterException(ParameterException::Type::INVALID_ORIGIN);
+          }
+          origin = Point(std::stod(latitudeLongitudeVector[1]), std::stod(latitudeLongitudeVector[0]));
+        }
+        catch (...)
+        {
+          throw ParameterException(ParameterException::Type::INVALID_ORIGIN);
+        }
+      }
+      else if (parameterWithValue.first == "destination")
+      {
+        try
+        {
+          boost::split(latitudeLongitudeVector, parameterWithValue.second, boost::is_any_of(","));
+          if (latitudeLongitudeVector.size() != 2)
+          {
+            throw ParameterException(ParameterException::Type::INVALID_DESTINATION);
+          }
+          destination = Point(std::stod(latitudeLongitudeVector[1]), std::stod(latitudeLongitudeVector[0]));
+        }
+        catch (...)
+        {
+          throw ParameterException(ParameterException::Type::INVALID_DESTINATION);
+        }
+      }
+      else if (parameterWithValue.first == "alternatives")
+      {
+        if (parameterWithValue.second == "true" || parameterWithValue.second == "1")
+        {
+          alternatives = true;
+        }
+        continue;
+      }
+    }
+
+    // Validate parameters
+    if (!origin.has_value())
+    {
+      throw ParameterException(ParameterException::Type::MISSING_ORIGIN);
+    }
+    else if (!destination.has_value())
+    {
+      throw ParameterException(ParameterException::Type::MISSING_DESTINATION);
+    }
+
+    CommonParameters common = CommonParameters::createCommonParameter(parameters, scenarios);
+
+    return RouteParameters(std::make_unique<TrRouting::Point>(origin->latitude, origin->longitude),
+      std::make_unique<TrRouting::Point>(destination->latitude, destination->longitude),
+      alternatives,
+      common);
   }
 
 }
