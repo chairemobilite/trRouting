@@ -10,7 +10,7 @@
 class ResultToV2FixtureTest : public ResultToResponseFixtureTest
 {
 protected:
-    void assertResultConversion(nlohmann::json jsonResponse, TrRouting::SingleCalculationResult &result, TrRouting::RouteParameters &params) override;
+    void assertResultConversion(nlohmann::json jsonResponse, TrRouting::SingleCalculationResult &result, TrRouting::RouteParameters &params);
 
 public:
 
