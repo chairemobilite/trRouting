@@ -16,7 +16,7 @@
 namespace TrRouting
 {
 
-  void Calculator::reset(RouteParameters &parameters, bool resetAccessPaths, bool doResetFilters)
+  void Calculator::reset(CommonParameters &parameters, std::optional<std::reference_wrapper<const Point>> origin, std::optional<std::reference_wrapper<const Point>> destination, bool resetAccessPaths, bool doResetFilters)
   {
     
     int benchmarkingStart = algorithmCalculationTime.getEpoch();
@@ -66,11 +66,11 @@ namespace TrRouting
 
     //TODO Question, do we only use accessFootpath when those condtion are true? The whole calculation should probably
     // be a different path in this case.
-    if (!params.returnAllNodesResult || departureTimeSeconds > -1)
+    if (origin.has_value())
     {
       if (resetAccessPaths)
       {
-        accessFootpathOk = resetAccessFootpaths(parameters);
+        accessFootpathOk = resetAccessFootpaths(parameters, origin.value());
       }
 
       spdlog::debug("  parsing access footpaths to find min/max access travel times");
@@ -101,11 +101,11 @@ namespace TrRouting
       }
     }
   
-    if (!params.returnAllNodesResult || arrivalTimeSeconds > -1)
+    if (destination.has_value())
     {
       if (resetAccessPaths)
       {
-        egressFootpathOk = resetEgressFootpaths(parameters);
+        egressFootpathOk = resetEgressFootpaths(parameters, destination.value());
       }
       
       spdlog::debug("  parsing egress footpaths to find min/max egress travel times");
@@ -170,7 +170,7 @@ namespace TrRouting
 
   }
 
-  bool Calculator::resetAccessFootpaths(const RouteParameters &parameters) {
+  bool Calculator::resetAccessFootpaths(const CommonParameters &parameters, const Point& origin) {
     spdlog::debug("  resetting access paths ");
     bool accessFootpathOk = true;
 
@@ -200,7 +200,7 @@ namespace TrRouting
     {
       spdlog::debug("  fetching nodes with osrm with mode {}", params.accessMode);
 
-      accessFootpaths = OsrmFetcher::getAccessibleNodesFootpathsFromPoint(*parameters.getOrigin(), transitData.getNodes(), params.accessMode, parameters.getMaxAccessWalkingTravelTimeSeconds(), params.walkingSpeedMetersPerSecond);
+      accessFootpaths = OsrmFetcher::getAccessibleNodesFootpathsFromPoint(origin, transitData.getNodes(), params.accessMode, parameters.getMaxAccessWalkingTravelTimeSeconds(), params.walkingSpeedMetersPerSecond);
       if (accessFootpaths.size() == 0) {
         accessFootpathOk = false;
       }
@@ -208,7 +208,7 @@ namespace TrRouting
     return accessFootpathOk;
   }
 
-  bool Calculator::resetEgressFootpaths(const RouteParameters &parameters) {
+  bool Calculator::resetEgressFootpaths(const CommonParameters &parameters, const Point & destination) {
     bool egressFootpathOk = true;
 
     // fetch nodes footpaths accessible to destination using params or osrm fetcher if not provided:
@@ -239,7 +239,7 @@ namespace TrRouting
     }
     else
     {
-      egressFootpaths = OsrmFetcher::getAccessibleNodesFootpathsFromPoint(*parameters.getDestination(), transitData.getNodes(), params.accessMode, parameters.getMaxEgressWalkingTravelTimeSeconds(), params.walkingSpeedMetersPerSecond);
+      egressFootpaths = OsrmFetcher::getAccessibleNodesFootpathsFromPoint(destination, transitData.getNodes(), params.accessMode, parameters.getMaxEgressWalkingTravelTimeSeconds(), params.walkingSpeedMetersPerSecond);
       if (egressFootpaths.size() == 0) {
         egressFootpathOk = false;
       }
@@ -247,7 +247,7 @@ namespace TrRouting
     return egressFootpathOk;
   }
 
-  void Calculator::resetFilters(const RouteParameters &parameters) {
+  void Calculator::resetFilters(const CommonParameters &parameters) {
     spdlog::debug("  resetting filters");
 
     for (auto & tripIte : transitData.getTrips())

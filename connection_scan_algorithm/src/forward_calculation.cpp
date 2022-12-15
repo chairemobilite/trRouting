@@ -216,11 +216,9 @@ namespace TrRouting
   }
 
 
-  void Calculator::forwardCalculationAllNodes(RouteParameters &parameters,
+  void Calculator::forwardCalculationAllNodes(AccessibilityParameters &parameters,
                                                std::unordered_map<Node::uid_t, JourneyStep> & forwardEgressJourneysSteps)
   {
-    assert(params.returnAllNodesResult); // Just make sure we are in the right code path
-
     int benchmarkingStart  = algorithmCalculationTime.getEpoch();
 
     int   reachableConnectionsCount       {0};
@@ -367,8 +365,11 @@ namespace TrRouting
 
     spdlog::debug("-- {} forward connections parsed on {}", reachableConnectionsCount, connectionsCount);
 
-      benchmarking["forward_calculation"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
+    benchmarking["forward_calculation"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
 
+    if (reachableConnectionsCount == 0) {
+      throw NoRoutingFoundException(NoRoutingReason::NO_SERVICE_FROM_ORIGIN);
+    }
 
   }
 
