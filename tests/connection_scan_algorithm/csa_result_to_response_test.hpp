@@ -50,9 +50,7 @@ protected:
     std::unique_ptr<TrRouting::Node> boardingNode;
     std::unique_ptr<TrRouting::Node> unboardingNode;
 
-
     std::unique_ptr<TrRouting::SingleCalculationResult> getSingleResult();
-    virtual void assertResultConversion(nlohmann::json jsonResponse, TrRouting::SingleCalculationResult &result, TrRouting::RouteParameters &params) = 0;
 
 public:
     void SetUp();
