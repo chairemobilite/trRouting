@@ -1,5 +1,6 @@
 #include "json.hpp"
 #include "constants.hpp"
+#include "result_constants.hpp"
 #include "result_to_v2.hpp"
 #include "toolbox.hpp"
 #include "parameters.hpp"
@@ -13,12 +14,6 @@
 
 namespace TrRouting
 {
-  const std::string NO_ROUTING_REASON_DEFAULT = "NO_ROUTING_FOUND";
-  const std::string NO_ROUTING_REASON_NO_ACCESS_AT_ORIGIN = "NO_ACCESS_AT_ORIGIN";
-  const std::string NO_ROUTING_REASON_NO_ACCESS_AT_DESTINATION = "NO_ACCESS_AT_DESTINATION";
-  const std::string NO_ROUTING_REASON_NO_SERVICE_FROM_ORIGIN = "NO_SERVICE_FROM_ORIGIN";
-  const std::string NO_ROUTING_REASON_NO_SERVICE_TO_DESTINATION = "NO_SERVICE_TO_DESTINATION";
-  const std::string NO_ROUTING_REASON_NO_ACCESS_AT_ORIGIN_AND_DESTINATION = "NO_ACCESS_AT_ORIGIN_AND_DESTINATION";
 
   /**
    * @brief Visitor for the result's steps

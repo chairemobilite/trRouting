@@ -17,6 +17,7 @@ csa_test_SOURCES = gtest.cpp \
     csa_result_to_v1_test.cpp \
     csa_result_to_v2_test.cpp \
     csa_result_to_v2_summary_test.cpp \
+    csa_result_to_v2_accessibility_test.cpp \
     parameters/route_param_test.cpp \
     parameters/accessibility_param_test.cpp \
     combinations_test.cpp
