@@ -84,23 +84,30 @@ accessibilityResultResponse:
       description: The total number of nodes in the network
 
 nodeAccessibility:
-  - type: object
-    properties:
-      nodeName:
-        type: string
-        description: Name of the current node
-      nodeCode:
-        type: string
-        description: Code of the current node
-      nodeUuid:
-        type: string
-        description: UUID of the current node
-      nodeTime:
+  type: object
+  properties:
+    nodeName:
+      type: string
+      description: Name of the current node
+    nodeCode:
+      type: string
+      description: Code of the current node
+    nodeUuid:
+      type: string
+      description: UUID of the current node
+    nodeTime:
+      type: number
+      description: If the requested time is a departure time, this is the earliest possible arrival time at this node. If the requested time is an arrival time, this is the latest possible departure time from this node.
+    nodeCoordinates:
+      type: array
+      items:
         type: number
-        description: If the requested time is a departure time, this is the earliest possible arrival time at this node. If the requested time is an arrival time, this is the latest possible departure time from this node.
-      totalTravelTime:
-        type: number
-        description: Total travel time, from/to the requested place to/from this node, in seconds
-      numberOfTransfers: 
-        type: number
-        description: Number of transfers required to access this node.
+      minItems: 2
+      maxItems: 2
+      description: longitude and latitude of the node, in the WSG84 coordinates system
+    totalTravelTime:
+      type: number
+      description: Total travel time, from/to the requested place to/from this node, in seconds
+    numberOfTransfers: 
+      type: number
+      description: Number of transfers required to access this node.
