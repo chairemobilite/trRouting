@@ -39,6 +39,7 @@ namespace TrRouting
   class AllNodesResult;
   class AlternativesResult;
   class TransitData;
+  class Point;
 
   class Calculator {
 
@@ -48,14 +49,7 @@ namespace TrRouting
 
     Calculator(const TransitData &_transitData);
 
-    /**
-     * Prepare the data for the calculator and validate that there are at least
-     * some data to do calculations on
-     *
-     * @return A DataStatus corresponding to the data readiness. Only if the
-     * status is READY will queries be served on this data
-     */
-    void                    reset(RouteParameters &parameters, bool resetAccessPaths = true, bool resetFilters = true);
+    void reset(CommonParameters &parameters, std::optional<std::reference_wrapper<const Point>> origin, std::optional<std::reference_wrapper<const Point>> destination, bool resetAccessPaths = true, bool resetFilters = true);
     // TODO This function supports both allNodes and simple calculation, which
     // are 2 very different return values. They should be split so it can return
     // a concrete result object instead of pointer (that alternatives could use directly), but still
@@ -64,22 +58,22 @@ namespace TrRouting
     // Renamed the common calculate() to calculateSingleOrAllNodes(). It will be easier to remove once we stop supporting the V1 code path
     std::unique_ptr<RoutingResult> calculateSingleOrAllNodes(RouteParameters &parameters, bool resetAccessPaths = true, bool resetFilters = true);
     std::unique_ptr<SingleCalculationResult> calculateSingle(RouteParameters &parameters, bool resetAccessPaths = true, bool resetFilters = true);
-    std::unique_ptr<AllNodesResult> calculateAllNodes(RouteParameters &parameters, bool resetAccessPaths = true, bool resetFilters = true);
+    std::unique_ptr<AllNodesResult> calculateAllNodes(AccessibilityParameters &parameters);
 
     // Forward and and reverse calculation, in addition to their return values will fill up their JourneysSteps map
     std::optional<std::tuple<int, std::reference_wrapper<const Node>>> forwardCalculation(RouteParameters &parameters, std::unordered_map<Node::uid_t, JourneyStep> & forwardEgressJourneysSteps); // best arrival time,   best egress node
-    void forwardCalculationAllNodes(RouteParameters &parameters, std::unordered_map<Node::uid_t, JourneyStep> & forwardEgressJourneysSteps);
+    void forwardCalculationAllNodes(AccessibilityParameters &parameters, std::unordered_map<Node::uid_t, JourneyStep> & forwardEgressJourneysSteps);
 
     std::optional<std::tuple<int, std::reference_wrapper<const Node>>> reverseCalculation(RouteParameters &parameters, std::unordered_map<Node::uid_t, JourneyStep> & reverseAccessJourneysSteps); // best departure time, best access node
-    void reverseCalculationAllNodes(RouteParameters &parameters, std::unordered_map<Node::uid_t, JourneyStep> & reverseAccessJourneysSteps);
+    void reverseCalculationAllNodes(AccessibilityParameters &parameters, std::unordered_map<Node::uid_t, JourneyStep> & reverseAccessJourneysSteps);
 
     // TODO See calculate
     std::unique_ptr<SingleCalculationResult> forwardJourneyStep(RouteParameters &parameters, std::optional<std::reference_wrapper<const Node>> bestEgressNode, const std::unordered_map<Node::uid_t, JourneyStep> & forwardEgressJourneysSteps);
-    std::unique_ptr<AllNodesResult> forwardJourneyStepAllNodes(RouteParameters &parameters, const std::unordered_map<Node::uid_t, JourneyStep> & forwardEgressJourneysSteps);
+    std::unique_ptr<AllNodesResult> forwardJourneyStepAllNodes(AccessibilityParameters &parameters, const std::unordered_map<Node::uid_t, JourneyStep> & forwardEgressJourneysSteps);
 
     // TODO See calculate
     std::unique_ptr<SingleCalculationResult> reverseJourneyStep(RouteParameters &parameters, int bestDepartureTime, std::optional<std::reference_wrapper<const Node>> bestAccessNode, const std::unordered_map<Node::uid_t, JourneyStep> & reverseAccessJourneysSteps);
-    std::unique_ptr<AllNodesResult> reverseJourneyStepAllNodes(RouteParameters &parameters, const std::unordered_map<Node::uid_t, JourneyStep> & reverseAccessJourneysSteps);
+    std::unique_ptr<AllNodesResult> reverseJourneyStepAllNodes(AccessibilityParameters &parameters, const std::unordered_map<Node::uid_t, JourneyStep> & reverseAccessJourneysSteps);
 
     AlternativesResult alternativesRouting(RouteParameters &parameters);
     std::string             odTripsRouting(RouteParameters &parameters);
@@ -97,9 +91,9 @@ namespace TrRouting
     std::optional<std::reference_wrapper<const OdTrip>> odTripGlob;
 
   private:
-    bool resetAccessFootpaths(const RouteParameters &parameters);
-    bool resetEgressFootpaths(const RouteParameters &parameters);
-    void resetFilters(const RouteParameters &parameters);
+    bool resetAccessFootpaths(const CommonParameters &parameters, const Point& origin);
+    bool resetEgressFootpaths(const CommonParameters &parameters, const Point& destination);
+    void resetFilters(const CommonParameters &parameters);
     // Convert the optimization case ID returned by optimizeJourney to a string
     std::string optimizeCasesToString(const std::vector<int> optimizeCases);
     std::unique_ptr<SingleCalculationResult> calculateSingleReverse(RouteParameters &parameters);

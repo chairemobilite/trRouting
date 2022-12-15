@@ -269,10 +269,8 @@ namespace TrRouting
 
   }
 
-  std::unique_ptr<AllNodesResult> Calculator::forwardJourneyStepAllNodes(RouteParameters &parameters, const std::unordered_map<Node::uid_t, JourneyStep> & forwardEgressJourneysSteps)
+  std::unique_ptr<AllNodesResult> Calculator::forwardJourneyStepAllNodes(AccessibilityParameters &parameters, const std::unordered_map<Node::uid_t, JourneyStep> & forwardEgressJourneysSteps)
   {
-    assert(params.returnAllNodesResult); // Just make sure we are in the right code path
-
     std::unique_ptr<AllNodesResult> allNodesResult = std::make_unique<AllNodesResult>();
 
     int              nodesCount           {1};

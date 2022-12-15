@@ -6,22 +6,37 @@
 #include "routing_result.hpp"
 #include "node.hpp"
 #include "trip.hpp"
+#include "point.hpp"
 #include "transit_data.hpp"
 
 namespace TrRouting
 {
+  AccessibilityParameters routeToAccessibilityParameters(RouteParameters &parameters) {
+    return AccessibilityParameters(parameters.isForwardCalculation() ? std::make_unique<Point>(parameters.getOrigin()->latitude, parameters.getOrigin()->longitude) : std::make_unique<Point>(parameters.getDestination()->latitude, parameters.getDestination()->longitude),
+      parameters.getScenario(),
+      parameters.getTimeOfTrip(),
+      parameters.getMinWaitingTimeSeconds(),
+      parameters.getMaxTotalTravelTimeSeconds(),
+      parameters.getMaxAccessWalkingTravelTimeSeconds(),
+      parameters.getMaxEgressWalkingTravelTimeSeconds(),
+      parameters.getMaxTransferWalkingTravelTimeSeconds(),
+      parameters.getMaxFirstWaitingTimeSeconds(),
+      parameters.isForwardCalculation()
+    );
+  }
   
   std::unique_ptr<RoutingResult> Calculator::calculateSingleOrAllNodes(RouteParameters &parameters, bool resetAccessPaths, bool resetFilters) {
 
     if (params.returnAllNodesResult) {
-      return calculateAllNodes(parameters, resetAccessPaths, resetFilters);
+      AccessibilityParameters accessParams = routeToAccessibilityParameters(parameters);
+      return calculateAllNodes(accessParams);
     } else {
       return calculateSingle(parameters, resetAccessPaths, resetFilters);
     }
   }
 
   std::unique_ptr<SingleCalculationResult> Calculator::calculateSingle(RouteParameters &parameters, bool resetAccessPaths, bool resetFilters) {
-    reset(parameters, resetAccessPaths, resetFilters);
+    reset(parameters, *parameters.getOrigin(), *parameters.getDestination(), resetAccessPaths, resetFilters);
 
     std::unique_ptr<SingleCalculationResult> result;
 
@@ -109,8 +124,13 @@ namespace TrRouting
     return result;
   }
 
-  std::unique_ptr<AllNodesResult> Calculator::calculateAllNodes(RouteParameters &parameters, bool resetAccessPaths, bool resetFilters) {
-    reset(parameters, resetAccessPaths, resetFilters);
+  std::unique_ptr<AllNodesResult> Calculator::calculateAllNodes(AccessibilityParameters &parameters) {
+    reset(parameters, 
+        parameters.isForwardCalculation() ? std::make_optional(*parameters.getPlace()) : std::nullopt, 
+        parameters.isForwardCalculation() ? std::nullopt : std::make_optional(*parameters.getPlace()),
+        true,
+        true
+    );
 
     std::unique_ptr<AllNodesResult> result;
 

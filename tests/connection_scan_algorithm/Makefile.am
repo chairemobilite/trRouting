@@ -12,6 +12,7 @@ csa_test_SOURCES = gtest.cpp \
     csa_v1_access_map_test.cpp \
     csa_v1_odtrips_calculation_test.cpp \
     csa_route_calculation_test.cpp \
+    csa_access_map_test.cpp \
     csa_route_transfer_alternatives_test.cpp \
     csa_result_to_response_test.cpp \
     csa_result_to_v1_test.cpp \
