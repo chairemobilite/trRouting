@@ -59,7 +59,7 @@ namespace TrRouting
     {
       filePath += customPath + "/" + cacheFilePath;
     }
-    spdlog::info("reading {} cache file", filePath);
+    spdlog::debug("reading {} cache file", filePath);
     return filePath;
   }
 
