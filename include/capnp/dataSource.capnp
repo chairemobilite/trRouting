@@ -25,7 +25,10 @@ struct DataSource {
     bikeSharingTransactions @8;
     gpsTraces               @9;
     streetSegmentSpeeds     @10; # must match openStreetMap nodes and way ids. this represents measured or interpolated speeds on specific street segments
-    unknown                 @11;
+    zones                   @11;
+    osmData                 @12;
+    places                  @13;
+    unknown                 @14;
   }
 
 }
