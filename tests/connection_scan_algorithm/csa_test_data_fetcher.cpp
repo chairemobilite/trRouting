@@ -124,107 +124,107 @@ int TestDataFetcher::getNodes(
   // Create all 9 points, from south to north, then east to west. Each node MUST be transferable with itself
   // South2 has no transferable node
   array.emplace(nodeSouth2Uuid, TrRouting::Node(nodeSouth2Uuid,
+                                                0,
+                                                "",
+                                                "South2",
+                                                "",
+                                                std::make_unique<TrRouting::Point>(45.5269,-73.58912)));
+  addSelfTransferableNode(array.at(nodeSouth2Uuid));
+
+  // South1 has no transferable node
+  array.emplace(nodeSouth1Uuid, TrRouting::Node(nodeSouth1Uuid,
+                                                0,
+                                                "",
+                                                "South1",
+                                                "",
+                                                std::make_unique<TrRouting::Point>(45.53258,-73.60196)));
+  addSelfTransferableNode(array.at(nodeSouth1Uuid));
+
+  // midNode is transferable with west1, east1 and north1
+  array.emplace(nodeMidNodeUuid, TrRouting::Node(nodeMidNodeUuid,
                                                   0,
                                                   "",
-                                                  "South2",
+                                                  "MidPoint",
                                                   "",
-                                                  std::make_unique<TrRouting::Point>(45.5269,-73.58912)));
-    addSelfTransferableNode(array.at(nodeSouth2Uuid));
+                                                  std::make_unique<TrRouting::Point>(45.53827,-73.614436)));
+  addSelfTransferableNode(array.at(nodeMidNodeUuid));
 
-    // South1 has no transferable node
-    array.emplace(nodeSouth1Uuid, TrRouting::Node(nodeSouth1Uuid,
-                                                  0,
-                                                  "",
-                                                  "South1",
-                                                  "",
-                                                  std::make_unique<TrRouting::Point>(45.53258,-73.60196)));
-    addSelfTransferableNode(array.at(nodeSouth1Uuid));
+  // transferable with midNode
+  array.emplace(nodeNorth1Uuid, TrRouting::Node(nodeNorth1Uuid,
+                                                0,
+                                                "",
+                                                "North1",
+                                                "",
+                                                std::make_unique<TrRouting::Point>(45.54165,-73.62603)));
+  addSelfTransferableNode(array.at(nodeNorth1Uuid));
 
-    // midNode is transferable with west1, east1 and north1
-    array.emplace(nodeMidNodeUuid, TrRouting::Node(nodeMidNodeUuid,
-                                                   0,
-                                                   "",
-                                                   "MidPoint",
-                                                   "",
-                                                   std::make_unique<TrRouting::Point>(45.53827,-73.614436)));
-    addSelfTransferableNode(array.at(nodeMidNodeUuid));
+  // No transferable node
+  array.emplace(nodeNorth2Uuid, TrRouting::Node(nodeNorth2Uuid,
+                                                0,
+                                                "",
+                                                "North2",
+                                                "",
+                                                std::make_unique<TrRouting::Point>(45.54634,-73.64266)));
+  addSelfTransferableNode(array.at(nodeNorth2Uuid));
 
-    // transferable with midNode
-    array.emplace(nodeNorth1Uuid, TrRouting::Node(nodeNorth1Uuid,
-                                                  0,
-                                                  "",
-                                                  "North1",
-                                                  "",
-                                                  std::make_unique<TrRouting::Point>(45.54165,-73.62603)));
-    addSelfTransferableNode(array.at(nodeNorth1Uuid));
+  // Transferable with east1
+  array.emplace(nodeEast2Uuid, TrRouting::Node(nodeEast2Uuid,
+                                                0,
+                                                "",
+                                                "East2",
+                                                "",
+                                                std::make_unique<TrRouting::Point>(45.55027,-73.60496)));
+  addSelfTransferableNode(array.at(nodeEast2Uuid));
 
-    // No transferable node
-    array.emplace(nodeNorth2Uuid, TrRouting::Node(nodeNorth2Uuid,
-                                                  0,
-                                                  "",
-                                                  "North1",
-                                                  "",
-                                                  std::make_unique<TrRouting::Point>(45.54634,-73.64266)));
-    addSelfTransferableNode(array.at(nodeNorth2Uuid));
+  // Transferable with east2 and midNode
+  array.emplace(nodeEast1Uuid, TrRouting::Node(nodeEast1Uuid,
+                                                0,
+                                                "",
+                                                "East1",
+                                                "",
+                                                std::make_unique<TrRouting::Point>(45.54249,-73.61199)));
+  addSelfTransferableNode(array.at(nodeEast1Uuid));
+      
+  // Transferable with midNode and west2
+  array.emplace(nodeWest1Uuid, TrRouting::Node(nodeWest1Uuid,
+                                                0,
+                                                "",
+                                                "West1",
+                                                "",
+                                                std::make_unique<TrRouting::Point>(45.53473,-73.61825)));
+  addSelfTransferableNode(array.at(nodeWest1Uuid));
 
-    // Transferable with east1
-    array.emplace(nodeEast2Uuid, TrRouting::Node(nodeEast2Uuid,
-                                                 0,
-                                                 "",
-                                                 "East2",
-                                                 "",
-                                                 std::make_unique<TrRouting::Point>(45.55027,-73.60496)));
-    addSelfTransferableNode(array.at(nodeEast2Uuid));
+  // Transferable with west1
+  array.emplace(nodeWest2Uuid, TrRouting::Node(nodeWest2Uuid,
+                                                0,
+                                                "",
+                                                "West2",
+                                                "",
+                                                std::make_unique<TrRouting::Point>(45.52962,-73.62265)));
+  addSelfTransferableNode(array.at(nodeWest2Uuid));
 
-    // Transferable with east2 and midNode
-    array.emplace(nodeEast1Uuid, TrRouting::Node(nodeEast1Uuid,
-                                                 0,
-                                                 "",
-                                                 "East1",
-                                                 "",
-                                                 std::make_unique<TrRouting::Point>(45.54249,-73.61199)));
-    addSelfTransferableNode(array.at(nodeEast1Uuid));
-        
-    // Transferable with midNode and west2
-    array.emplace(nodeWest1Uuid, TrRouting::Node(nodeWest1Uuid,
-                                                 0,
-                                                 "",
-                                                 "West1",
-                                                 "",
-                                                 std::make_unique<TrRouting::Point>(45.53473,-73.61825)));
-    addSelfTransferableNode(array.at(nodeWest1Uuid));
-
-    // Transferable with west1
-    array.emplace(nodeWest2Uuid, TrRouting::Node(nodeWest2Uuid,
-                                                 0,
-                                                 "",
-                                                 "West2",
-                                                 "",
-                                                 std::make_unique<TrRouting::Point>(45.52962,-73.62265)));
-    addSelfTransferableNode(array.at(nodeWest2Uuid));
-
-    
-    // Extra1 has no transferable node
-    array.emplace(nodeExtra1Uuid, TrRouting::Node(nodeExtra1Uuid,
-                                                 0,
-                                                 "",
-                                                 "Extra1",
-                                                 "",
-                                                 std::make_unique<TrRouting::Point>(45.55316,-73.61894)));
-    addSelfTransferableNode(array.at(nodeExtra1Uuid));
-
-    // Add all transferable nodes
-    addTransferableNode(array.at(nodeWest1Uuid), TrRouting::NodeTimeDistance(array.at(nodeWest2Uuid), 655,824));
-    addTransferableNode(array.at(nodeWest2Uuid), TrRouting::NodeTimeDistance(array.at(nodeWest1Uuid), 665,824));
-    addTransferableNode(array.at(nodeWest1Uuid), TrRouting::NodeTimeDistance(array.at(nodeMidNodeUuid), 558, 522));
-    addTransferableNode(array.at(nodeEast1Uuid), TrRouting::NodeTimeDistance(array.at(nodeMidNodeUuid), 480, 532));
-    addTransferableNode(array.at(nodeEast1Uuid), TrRouting::NodeTimeDistance(array.at(nodeEast2Uuid), 857, 1030));
-    addTransferableNode(array.at(nodeEast2Uuid), TrRouting::NodeTimeDistance(array.at(nodeEast1Uuid), 857, 1030));
-    addTransferableNode(array.at(nodeNorth1Uuid), TrRouting::NodeTimeDistance(array.at(nodeMidNodeUuid), 801, 983));
-    addTransferableNode(array.at(nodeMidNodeUuid), TrRouting::NodeTimeDistance(array.at(nodeNorth1Uuid), 801, 983));
-    addTransferableNode(array.at(nodeMidNodeUuid), TrRouting::NodeTimeDistance(array.at(nodeWest1Uuid), 558, 522));
-    addTransferableNode(array.at(nodeMidNodeUuid), TrRouting::NodeTimeDistance(array.at(nodeEast1Uuid), 480, 532));
   
+  // Extra1 has no transferable node
+  array.emplace(nodeExtra1Uuid, TrRouting::Node(nodeExtra1Uuid,
+                                                0,
+                                                "",
+                                                "Extra1",
+                                                "",
+                                                std::make_unique<TrRouting::Point>(45.55316,-73.61894)));
+  addSelfTransferableNode(array.at(nodeExtra1Uuid));
+
+  // Add all transferable nodes
+  addTransferableNode(array.at(nodeWest1Uuid), TrRouting::NodeTimeDistance(array.at(nodeWest2Uuid), 655,824));
+  addTransferableNode(array.at(nodeWest2Uuid), TrRouting::NodeTimeDistance(array.at(nodeWest1Uuid), 665,824));
+  addTransferableNode(array.at(nodeWest1Uuid), TrRouting::NodeTimeDistance(array.at(nodeMidNodeUuid), 558, 522));
+  addTransferableNode(array.at(nodeEast1Uuid), TrRouting::NodeTimeDistance(array.at(nodeMidNodeUuid), 480, 532));
+  addTransferableNode(array.at(nodeEast1Uuid), TrRouting::NodeTimeDistance(array.at(nodeEast2Uuid), 857, 1030));
+  addTransferableNode(array.at(nodeEast2Uuid), TrRouting::NodeTimeDistance(array.at(nodeEast1Uuid), 857, 1030));
+  addTransferableNode(array.at(nodeNorth1Uuid), TrRouting::NodeTimeDistance(array.at(nodeMidNodeUuid), 801, 983));
+  addTransferableNode(array.at(nodeMidNodeUuid), TrRouting::NodeTimeDistance(array.at(nodeNorth1Uuid), 801, 983));
+  addTransferableNode(array.at(nodeMidNodeUuid), TrRouting::NodeTimeDistance(array.at(nodeWest1Uuid), 558, 522));
+  addTransferableNode(array.at(nodeMidNodeUuid), TrRouting::NodeTimeDistance(array.at(nodeEast1Uuid), 480, 532));
+
   return 0;
 }
 
