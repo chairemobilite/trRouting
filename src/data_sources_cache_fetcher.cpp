@@ -81,10 +81,15 @@ namespace TrRouting
           case dataSource::DataSource::Type::BIKE_SHARING_TRANSACTIONS: t.type = "bikeSharingTransactions"; break;
           case dataSource::DataSource::Type::GPS_TRACES               : t.type = "gpsTraces";               break;
           case dataSource::DataSource::Type::STREET_SEGMENT_SPEEDS    : t.type = "streetSegmentSpeeds";     break;
+          case dataSource::DataSource::Type::ZONES                    : t.type = "zones";                   break;
+          case dataSource::DataSource::Type::OSM_DATA                 : t.type = "osmData";                 break;
+          case dataSource::DataSource::Type::PLACES                   : t.type = "places";                  break;
           case dataSource::DataSource::Type::UNKNOWN                  : t.type = "unknown";                 break;
           default:
+            // There may be other types that are not supported in trRouting, consider them as unknowns
             //TODO add type to the message
-            throw std::range_error("Unhandled DataSource::Type for uuid " + uuid);
+            spdlog::info("Unsupported data source type for uuid {}: will list as unknown", uuid);
+            t.type = "unknown";
             break;
         }
 
