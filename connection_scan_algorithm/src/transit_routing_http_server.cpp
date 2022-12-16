@@ -25,6 +25,7 @@
 #include "result_to_v1.hpp"
 #include "result_to_v2.hpp"
 #include "result_to_v2_summary.hpp"
+#include "result_to_v2_accessibility.hpp"
 #include "routing_result.hpp"
 #include "osrm_fetcher.hpp"
 #include "transit_data.hpp"
@@ -569,6 +570,66 @@ int main(int argc, char** argv) {
       response = "{\"status\": \"query_error\", \"errorCode\": \"" + getResponseCode(exp.getType()) + "\"}";
       *serverResponse << "HTTP/1.1 400 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
     } catch (...) {
+      response = "{\"status\": \"query_error\", \"errorCode\": \"PARAM_ERROR_UNKNOWN\"}";
+      *serverResponse << "HTTP/1.1 400 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
+    }
+
+  };
+
+  // Routing request for a single origin destination
+  // TODO Copy-pasted and adapted from /route/v1/transit. There's still a lot of common code. Application code should be extracted to common functions outside the web server
+  server.resource["^/v2/accessibility[/]?$"]["GET"]=[&server, &calculator, &dataStatus, &transitData](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
+
+    std::string response = getFastErrorResponse(dataStatus);
+
+    if (!response.empty()) {
+      *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
+      return;
+    }
+
+    // prepare benchmarking and timer:
+    // TODO Shouldn't have to do this, a query is not a benchmark
+    calculator.algorithmCalculationTime.start();
+    calculator.benchmarking.clear();
+
+    // prepare parameters:
+    std::vector<std::pair<std::string, std::string>> parametersWithValues;
+    auto queryFields = request->parse_query_string();
+    for(auto &field : queryFields)
+    {
+      parametersWithValues.push_back(std::make_pair(field.first, field.second));
+    }
+
+    spdlog::debug("-- calculating request -- {}", request->path);
+
+    try
+    {
+      AccessibilityParameters queryParams = AccessibilityParameters::createAccessibilityParameter(parametersWithValues, transitData.getScenarios());
+
+      try {
+        std::unique_ptr<AllNodesResult> accessibilityResult = calculator.calculateAllNodes(queryParams);
+        if (accessibilityResult.get() != nullptr) {
+          response = ResultToV2AccessibilityResponse::resultToJsonString(*accessibilityResult.get(), queryParams).dump(2);
+        }
+
+        spdlog::debug("-- total -- {} microseconds", calculator.algorithmCalculationTime.getDurationMicrosecondsNoStop());
+
+      } catch (NoRoutingFoundException &e) {
+        response = ResultToV2AccessibilityResponse::noRoutingFoundResponse(queryParams, e.getReason()).dump(2);
+      }
+
+      *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
+
+    } catch (ParameterException &exp) {
+      response = "{\"status\": \"query_error\", \"errorCode\": \"" + getResponseCode(exp.getType()) + "\"}";
+      *serverResponse << "HTTP/1.1 400 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
+    } catch (...) {
+       std::exception_ptr eptr = std::current_exception(); // capture
+      try {
+          std::rethrow_exception(eptr);
+      } catch(const std::exception& e) {
+          std::cout << "Caught exception \"" << e.what() << "\"\n";
+      }
       response = "{\"status\": \"query_error\", \"errorCode\": \"PARAM_ERROR_UNKNOWN\"}";
       *serverResponse << "HTTP/1.1 400 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
     }
