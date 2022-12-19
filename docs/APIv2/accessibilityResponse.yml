@@ -79,6 +79,7 @@ accessibilityResultResponse:
       type: array
       items:
         $ref: '#/nodeAccessibility'
+      description: The array of nodes accessible by transit. It lists only the nodes that are unboarded at when time is a departure time, or boarded when time is an arrival time. Additional nodes may be accessible by walking from other nodes, but if no transit is available to take or get out from, they are not listed in the response.
     totalNodeCount:
       type: number
       description: The total number of nodes in the network
@@ -97,7 +98,7 @@ nodeAccessibility:
       description: UUID of the current node
     nodeTime:
       type: number
-      description: If the requested time is a departure time, this is the earliest possible arrival time at this node. If the requested time is an arrival time, this is the latest possible departure time from this node.
+      description: Time of the transit user's arrival at the node. If the requested time is a departure time, this is the earliest possible arrival time at this node. If the requested time is an arrival time, this is the latest possible time the user needs to be at the node to take transit.
     nodeCoordinates:
       type: array
       items:
@@ -107,7 +108,7 @@ nodeAccessibility:
       description: longitude and latitude of the node, in the WSG84 coordinates system
     totalTravelTime:
       type: number
-      description: Total travel time, from/to the requested place to/from this node, in seconds
+      description: Total travel time, from/to the requested place to/from this node, in seconds, including any additional waiting time at origin or destination to depart/arrive exactly at the time_of_trip.
     numberOfTransfers: 
       type: number
       description: Number of transfers required to access this node.
