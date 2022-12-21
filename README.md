@@ -8,6 +8,11 @@ With random origin and destination (multiple accessible stops at origin and dest
 [Connection Scan Algorithm (CSA)][1] (working version)  
 [Trib-Based Algorithm (TBA)][2] (not yet released)
 
+## API Documentation
+
+Documentation of the trRouting API can be found here: 
+https://chairemobilite.github.io/trRouting/
+
 ## Dependencies
 [Open Source Routing Machine (OSRM)][3] (an osrm server with a walking profile must be running for the transit region while making queries to the trRouting server, see [OSRM profiles][5] for more profile info and [Running OSRM][6] to know how to prepare osm data for OSRM and start the server)
 
