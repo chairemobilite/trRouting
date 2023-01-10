@@ -26,7 +26,8 @@ jobs:
       if: matrix.os == 'macOS-latest'
       run: |
           brew update
-          brew upgrade
+          # brew upgrade
+          brew install --overwrite python@3.11 python@3.10
           brew install --overwrite autoconf automake libtool boost capnp spdlog
     - name: Gen configure
       run: autoreconf -i
