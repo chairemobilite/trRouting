@@ -26,6 +26,8 @@ jobs:
       if: matrix.os == 'macOS-latest'
       run: |
           brew update
+          # Temporary Workaround for conflict with multiple python in brew
+          brew install --overwrite python@3.11 python@3.10
           brew install autoconf automake libtool
           brew install boost
           brew install capnp
