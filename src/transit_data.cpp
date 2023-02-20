@@ -20,9 +20,8 @@ namespace TrRouting {
   TransitData::TransitData(DataFetcher& fetcher) :
     dataFetcher(fetcher)
   {
-    
-    loadAllData();
-    if(loadAllData() != DataStatus::READY ) {
+    DataStatus loadStatus = loadAllData();
+    if (loadStatus != DataStatus::READY) {
       //TODO For now, don't throw on error because Transit server expect to get the dataStatus
       //throw std::exception("Incomplete transit data");
       spdlog::error("TransitData loading had error, object will not be valid");
