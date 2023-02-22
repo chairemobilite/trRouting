@@ -58,6 +58,7 @@ class TestDataFetcher : public TrRouting::DataFetcher
     inline static const boost::uuids::uuid serviceUuid = uuidGenerator("11111111-2222-3333-4444-555555666666");
 
     inline static const boost::uuids::uuid scenarioUuid = uuidGenerator("11111111-2222-2345-789a-555555666666");
+    inline static const boost::uuids::uuid scenario2Uuid = uuidGenerator("11111111-2222-2345-789a-555555666667");
 
     inline static const boost::uuids::uuid pathSNUuid = uuidGenerator("2f31893e-b2fb-4ebe-bf1b-2ee77fe1f96b");
     inline static const boost::uuids::uuid pathEWUuid = uuidGenerator("50f8e656-99b5-4ddd-b41f-b4804fe599f3");

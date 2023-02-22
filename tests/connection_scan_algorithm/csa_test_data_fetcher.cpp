@@ -302,7 +302,7 @@ int TestDataFetcher::getPaths(
 int TestDataFetcher::getScenarios(
                                   std::map<boost::uuids::uuid, TrRouting::Scenario>& array,
                                   const std::map<boost::uuids::uuid, TrRouting::Service>& services,
-                                  const std::map<boost::uuids::uuid, TrRouting::Line>&,
+                                  const std::map<boost::uuids::uuid, TrRouting::Line>& lines,
                                   const std::map<boost::uuids::uuid, TrRouting::Agency>&,
                                   const std::map<boost::uuids::uuid, TrRouting::Node>&,
                                   const std::map<std::string, TrRouting::Mode>&,
@@ -311,6 +311,11 @@ int TestDataFetcher::getScenarios(
   array[scenarioUuid].uuid = scenarioUuid;
   array[scenarioUuid].name = "Test valid scenario";
   array[scenarioUuid].servicesList.push_back(services.at(serviceUuid));
+
+  array[scenario2Uuid].uuid = scenario2Uuid;
+  array[scenario2Uuid].name = "Test valid without one line";
+  array[scenario2Uuid].servicesList.push_back(services.at(serviceUuid));
+  array[scenario2Uuid].exceptLines.push_back(lines.at(lineEWUuid));
   
   return 0;
 }
