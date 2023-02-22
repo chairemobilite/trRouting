@@ -8,6 +8,7 @@
 
 #include <boost/uuid/uuid.hpp>
 #include "connection.hpp"
+#include "connection_cache.hpp"
 
 
 namespace TrRouting {
@@ -67,6 +68,8 @@ namespace TrRouting {
     const std::map<boost::uuids::uuid, Scenario> & getScenarios() const {return scenarios;}
     const std::map<boost::uuids::uuid, Trip> & getTrips() const {return trips;}
 
+    std::shared_ptr<ConnectionSet> getConnectionsForScenario(const Scenario & scenario) const;
+
     const std::vector<std::shared_ptr<Connection>> & getForwardConnections() const {return forwardConnections;}
     const std::vector<std::shared_ptr<Connection>> & getReverseConnections() const {return reverseConnections;}
 
@@ -124,6 +127,8 @@ namespace TrRouting {
     // Used to speed up iterating the connections by skipping the connections that are too early or too late
     std::vector<std::vector<std::shared_ptr<Connection>>::const_iterator> forwardConnectionsBeginIteratorCache;
     std::vector<std::vector<std::shared_ptr<Connection>>::const_iterator> reverseConnectionsBeginIteratorCache;
+
+    mutable ScenarioConnectionCache scenarioConnectionCache = ScenarioConnectionCache();
   };
 
 }

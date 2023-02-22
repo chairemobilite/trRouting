@@ -15,6 +15,8 @@ gtest_SOURCES = gtest.cpp \
     ../../src/persons_cache_fetcher.cpp \
     ../../src/modes_initialization.cpp \
     ../../src/od_trips_cache_fetcher.cpp \
+    ../../src/connection_set.cpp \
+    ../../src/connection_cache.cpp \
     ../../src/transit_data.cpp \
     ../../src/osrm_fetcher.cpp
 

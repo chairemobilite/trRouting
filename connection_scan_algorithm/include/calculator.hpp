@@ -39,6 +39,7 @@ namespace TrRouting
   class AllNodesResult;
   class AlternativesResult;
   class TransitData;
+  class ConnectionSet;
   class Point;
 
   class Calculator {
@@ -116,6 +117,8 @@ namespace TrRouting
 
     std::unordered_map<Trip::uid_t, bool> tripsEnabled;
     std::unordered_map<Trip::uid_t, TripQueryData> tripsQueryOverlay; // Store addition trip info during a query processing
+    // A subset of the connections that are used for the current query.
+    std::shared_ptr<ConnectionSet> connectionSet;
 
     std::vector<NodeTimeDistance> accessFootpaths; // pair: accessNodeIndex, walkingTravelTimeSeconds, walkingDistanceMeters
     std::vector<NodeTimeDistance> egressFootpaths; // pair: egressNodeIndex, walkingTravelTimeSeconds, walkingDistanceMeters

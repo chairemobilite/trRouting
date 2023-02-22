@@ -15,6 +15,7 @@
 #include "place.hpp"
 #include "household.hpp"
 #include "person.hpp"
+#include "connection_cache.hpp"
 #include "transit_data.hpp"
 
 namespace TrRouting
