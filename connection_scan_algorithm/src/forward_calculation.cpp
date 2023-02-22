@@ -64,7 +64,7 @@ namespace TrRouting
           {
             break;
           }
-          std::optional<std::shared_ptr<Connection>> tripEnterConnection = currentTripQueryOverlay.enterConnection;
+          std::optional<std::reference_wrapper<const Connection>> tripEnterConnection = currentTripQueryOverlay.enterConnection;
           const Node &nodeDeparture = (**connection).getDepartureNode();
 
           // Extract node departure time if we have a result or set a default value
@@ -100,7 +100,7 @@ namespace TrRouting
             if ((**connection).canBoard() && (!tripEnterConnection.has_value()) )
             {
               currentTripQueryOverlay.usable = true;
-              currentTripQueryOverlay.enterConnection = *connection;
+              currentTripQueryOverlay.enterConnection = **connection;
               currentTripQueryOverlay.enterConnectionTransferTravelTime = forwardJourneysSteps.at(nodeDeparture.uid).getTransferTravelTime();
             }
             
@@ -146,7 +146,7 @@ namespace TrRouting
                     nodesTentativeTime[transferableNode.node.uid] = footpathTravelTime + connectionArrivalTime;
 
                     //TODO DO we need a make_optional here??
-                    forwardJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(currentTripQueryOverlay.enterConnection, *connection, std::cref(trip), footpathTravelTime, (nodeArrival == transferableNode.node), footpathDistance));
+                    forwardJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(currentTripQueryOverlay.enterConnection, **connection, std::cref(trip), footpathTravelTime, (nodeArrival == transferableNode.node), footpathDistance));
                   }
 
                   if (
@@ -156,12 +156,12 @@ namespace TrRouting
                      //TODO Not fully sure this is equivalent to the ancient code
                      forwardEgressJourneysSteps.count(transferableNode.node.uid) == 0
                       ||
-                     forwardEgressJourneysSteps.at(transferableNode.node.uid).getFinalExitConnection().value()->getArrivalTime() > connectionArrivalTime
+                     forwardEgressJourneysSteps.at(transferableNode.node.uid).getFinalExitConnection().value().get().getArrivalTime() > connectionArrivalTime
                     )
                   )
                   {
                     footpathDistance = nodeArrival.transferableNodes[footpathIndex].distance;
-                    forwardEgressJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(currentTripQueryOverlay.enterConnection, *connection, std::cref(trip), footpathTravelTime, true, footpathDistance));
+                    forwardEgressJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(currentTripQueryOverlay.enterConnection, **connection, std::cref(trip), footpathTravelTime, true, footpathDistance));
                   }
                 }
                 footpathIndex++;
@@ -180,7 +180,7 @@ namespace TrRouting
     }
 
     int egressNodeArrivalTime {-1};
-    std::optional<std::shared_ptr<Connection>> egressExitConnection;
+    std::optional<std::reference_wrapper<const Connection>> egressExitConnection;
     // find best egress node:
 
     std::optional<std::reference_wrapper<const NodeTimeDistance>> bestEgress;
@@ -193,7 +193,7 @@ namespace TrRouting
         if (egressExitConnection.has_value())
         {
           const NodeTimeDistance &egress = nodesEgress.at(egressFootpath.node.uid);
-          egressNodeArrivalTime = egressExitConnection.value()->getArrivalTime() + egress.time;
+          egressNodeArrivalTime = egressExitConnection.value().get().getArrivalTime() + egress.time;
 
           if (egressNodeArrivalTime >= 0 && egressNodeArrivalTime - departureTimeSeconds <= parameters.getMaxTotalTravelTimeSeconds() && egressNodeArrivalTime < bestArrivalTime && egressNodeArrivalTime < MAX_INT)
           {
@@ -261,7 +261,7 @@ namespace TrRouting
           {
             break;
           }
-          std::optional<std::shared_ptr<Connection>> tripEnterConnection = currentTripQueryOverlay.enterConnection;
+          std::optional<std::reference_wrapper<const Connection>> tripEnterConnection = currentTripQueryOverlay.enterConnection;
           const Node &nodeDeparture = (**connection).getDepartureNode();
 
           // Extract node departure time if we have a result or set a default value
@@ -297,7 +297,7 @@ namespace TrRouting
             if ((**connection).canBoard() && ( !tripEnterConnection.has_value()))
             {
               currentTripQueryOverlay.usable = true;
-              currentTripQueryOverlay.enterConnection = *connection;
+              currentTripQueryOverlay.enterConnection = **connection;
               currentTripQueryOverlay.enterConnectionTransferTravelTime = forwardJourneysSteps.at(nodeDeparture.uid).getTransferTravelTime();
             }
 
@@ -336,7 +336,7 @@ namespace TrRouting
                     nodesTentativeTime[transferableNode.node.uid] = footpathTravelTime + connectionArrivalTime;
 
                     //TODO DO we need a make_optional here??
-                    forwardJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(currentTripQueryOverlay.enterConnection, *connection, std::cref(trip), footpathTravelTime, (nodeArrival == transferableNode.node), footpathDistance));
+                    forwardJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(currentTripQueryOverlay.enterConnection, **connection, std::cref(trip), footpathTravelTime, (nodeArrival == transferableNode.node), footpathDistance));
                   }
 
                   if (
@@ -346,12 +346,12 @@ namespace TrRouting
                      //TODO Not fully sure this is equivalent to the ancient code
                      forwardEgressJourneysSteps.count(transferableNode.node.uid) == 0
                       ||
-                     forwardEgressJourneysSteps.at(transferableNode.node.uid).getFinalExitConnection().value()->getArrivalTime() > connectionArrivalTime
+                     forwardEgressJourneysSteps.at(transferableNode.node.uid).getFinalExitConnection().value().get().getArrivalTime() > connectionArrivalTime
                     )
                   )
                   {
                     footpathDistance = nodeArrival.transferableNodes[footpathIndex].distance;
-                    forwardEgressJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(currentTripQueryOverlay.enterConnection, *connection, std::cref(trip), footpathTravelTime, true, footpathDistance));
+                    forwardEgressJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(currentTripQueryOverlay.enterConnection, **connection, std::cref(trip), footpathTravelTime, true, footpathDistance));
                   }
                 }
                 footpathIndex++;

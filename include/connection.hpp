@@ -30,19 +30,19 @@ namespace TrRouting
       canTransferSameLineValue(_canTransferSameLine),
       minWaitingTimeSeconds(_minWaitingTimeSeconds) {}
 
-    const Node & getDepartureNode() {return departureNode;}
-    const Node & getArrivalNode() {return arrivalNode;}
-    int getDepartureTime() {return departureTimeSeconds;}
-    int getArrivalTime() {return arrivalTimeSeconds;}
-    const Trip & getTrip() {return trip;}
+    const Node & getDepartureNode() const {return departureNode;}
+    const Node & getArrivalNode() const {return arrivalNode;}
+    int getDepartureTime() const {return departureTimeSeconds;}
+    int getArrivalTime() const {return arrivalTimeSeconds;}
+    const Trip & getTrip() const {return trip;}
     //TODO Revisit how we create Trip and Connection to not require a mutable trip here (issue #201
-    Trip & getTripMutable() {return trip;}
-    bool canBoard() {return canBoardValue;}
-    bool canUnboard() {return canUnboardValue;}
-    int getSequenceInTrip() {return sequenceInTrip;}
-    bool canTransferSameLine() {return canTransferSameLineValue;}
-    short getMinWaitingTime() {return minWaitingTimeSeconds;}
-    short getMinWaitingTimeOrDefault(short defaultMinWaitingTime) {
+    Trip & getTripMutable() const {return trip;}
+    bool canBoard() const {return canBoardValue;}
+    bool canUnboard() const {return canUnboardValue;}
+    int getSequenceInTrip() const {return sequenceInTrip;}
+    bool canTransferSameLine() const {return canTransferSameLineValue;}
+    short getMinWaitingTime() const {return minWaitingTimeSeconds;}
+    short getMinWaitingTimeOrDefault(short defaultMinWaitingTime) const {
       if (minWaitingTimeSeconds >= 0) {
         return minWaitingTimeSeconds;
       } else {
