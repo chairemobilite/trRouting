@@ -4,9 +4,12 @@ check_PROGRAMS = csa_test
 csa_test_SOURCES = gtest.cpp \
     ../../src/calculation_time.cpp \
     ../../src/osrm_fetcher.cpp \
+    ../../src/connection_set.cpp \
+    ../../src/connection_cache.cpp \
     ../../src/transit_data.cpp \
     csa_test_base.cpp \
     csa_test_data_fetcher.cpp \
+    connection_cache_test.cpp \
     csa_v1_simple_calculation_test.cpp \
     csa_v1_transfer_and_alternatives_test.cpp \
     csa_v1_access_map_test.cpp \

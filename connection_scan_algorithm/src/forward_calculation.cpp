@@ -6,6 +6,7 @@
 #include "node.hpp"
 #include "routing_result.hpp"
 #include "transit_data.hpp"
+#include "connection_set.hpp"
 
 namespace TrRouting
 {
@@ -32,18 +33,18 @@ namespace TrRouting
     bool  nodeWasAccessedFromOrigin       {false};
     int   bestArrivalTime                 {MAX_INT};
     
-    int  connectionsCount  = transitData.getForwardConnections().size();
+    int  connectionsCount  = connectionSet.get()->getForwardConnections().size();
     int  departureTimeHour = departureTimeSeconds / 3600;
 
     // main loop:
-    auto lastConnection = transitData.getForwardConnections().end(); // cache last connection for loop
-    for(auto connection = transitData.getForwardConnectionsBeginAtDepartureHour(departureTimeHour); connection != lastConnection; ++connection)
+    auto lastConnection = connectionSet.get()->getForwardConnections().end(); // cache last connection for loop
+    for(auto connection = connectionSet.get()->getForwardConnectionsBeginAtDepartureHour(departureTimeHour); connection != lastConnection; ++connection)
     {
       
       // ignore connections before departure time + minimum access travel time:
-      if ((**connection).getDepartureTime() >= departureTimeSeconds + minAccessTravelTime)
+      if ((*connection).get().getDepartureTime() >= departureTimeSeconds + minAccessTravelTime)
       {
-        const Trip & trip = (**connection).getTrip();
+        const Trip & trip = (*connection).get().getTrip();
 
         // Cache the current query data overlay si we don't check the hashmap every time
         auto & currentTripQueryOverlay = tripsQueryOverlay[trip.uid];
@@ -51,8 +52,8 @@ namespace TrRouting
         // enabled trips only here:
         if (tripsEnabled[trip.uid])
         {
-          connectionDepartureTime         = (**connection).getDepartureTime();
-          connectionMinWaitingTimeSeconds = (**connection).getMinWaitingTimeOrDefault(parameters.getMinWaitingTimeSeconds());
+          connectionDepartureTime         = (*connection).get().getDepartureTime();
+          connectionMinWaitingTimeSeconds = (*connection).get().getMinWaitingTimeOrDefault(parameters.getMinWaitingTimeSeconds());
 
           // no need to parse next connections if already reached destination from all egress nodes:
           // yes, we mean connectionDepartureTime and not connectionArrivalTime because travel time for each connections, otherwise you can catch a very short/long connection
@@ -65,7 +66,7 @@ namespace TrRouting
             break;
           }
           std::optional<std::reference_wrapper<const Connection>> tripEnterConnection = currentTripQueryOverlay.enterConnection;
-          const Node &nodeDeparture = (**connection).getDepartureNode();
+          const Node &nodeDeparture = (*connection).get().getDepartureNode();
 
           // Extract node departure time if we have a result or set a default value
           auto ite = nodesTentativeTime.find(nodeDeparture.uid);
@@ -97,18 +98,18 @@ namespace TrRouting
           )
           {
             // TODO: add constrain for sameLineTransfer (check trip allowSameLineTransfers)
-            if ((**connection).canBoard() && (!tripEnterConnection.has_value()) )
+            if ((*connection).get().canBoard() && (!tripEnterConnection.has_value()) )
             {
               currentTripQueryOverlay.usable = true;
-              currentTripQueryOverlay.enterConnection = **connection;
+              currentTripQueryOverlay.enterConnection = *connection;
               currentTripQueryOverlay.enterConnectionTransferTravelTime = forwardJourneysSteps.at(nodeDeparture.uid).getTransferTravelTime();
             }
             
-            if ((**connection).canUnboard() && currentTripQueryOverlay.enterConnection.has_value())
+            if ((*connection).get().canUnboard() && currentTripQueryOverlay.enterConnection.has_value())
             {
               // get footpaths for the arrival node to get transferable nodes:
-              const Node &nodeArrival = (**connection).getArrivalNode();
-              connectionArrivalTime           = (**connection).getArrivalTime();
+              const Node &nodeArrival = (*connection).get().getArrivalNode();
+              connectionArrivalTime           = (*connection).get().getArrivalTime();
 
               auto nodeArrivalInNodesEgressIte = nodesEgress.find(nodeArrival.uid);              
               if (!reachedAtLeastOneEgressNode && nodeArrivalInNodesEgressIte != nodesEgress.end() && nodeArrivalInNodesEgressIte->second.time != -1) // check if the arrival node is egressable
@@ -146,7 +147,7 @@ namespace TrRouting
                     nodesTentativeTime[transferableNode.node.uid] = footpathTravelTime + connectionArrivalTime;
 
                     //TODO DO we need a make_optional here??
-                    forwardJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(currentTripQueryOverlay.enterConnection, **connection, std::cref(trip), footpathTravelTime, (nodeArrival == transferableNode.node), footpathDistance));
+                    forwardJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(currentTripQueryOverlay.enterConnection, *connection, std::cref(trip), footpathTravelTime, (nodeArrival == transferableNode.node), footpathDistance));
                   }
 
                   if (
@@ -161,7 +162,7 @@ namespace TrRouting
                   )
                   {
                     footpathDistance = nodeArrival.transferableNodes[footpathIndex].distance;
-                    forwardEgressJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(currentTripQueryOverlay.enterConnection, **connection, std::cref(trip), footpathTravelTime, true, footpathDistance));
+                    forwardEgressJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(currentTripQueryOverlay.enterConnection, *connection, std::cref(trip), footpathTravelTime, true, footpathDistance));
                   }
                 }
                 footpathIndex++;
@@ -233,17 +234,17 @@ namespace TrRouting
     int   footpathDistance                {-1};
     bool  nodeWasAccessedFromOrigin       {false};
 
-    int  connectionsCount  = transitData.getForwardConnections().size();
+    int  connectionsCount  = connectionSet.get()->getForwardConnections().size();
     int  departureTimeHour = departureTimeSeconds / 3600;
 
     // main loop:
-    auto lastConnection = transitData.getForwardConnections().end(); // cache last connection for loop
-    for(auto connection = transitData.getForwardConnectionsBeginAtDepartureHour(departureTimeHour); connection != lastConnection; ++connection)
+    auto lastConnection = connectionSet.get()->getForwardConnections().end(); // cache last connection for loop
+    for(auto connection = connectionSet.get()->getForwardConnectionsBeginAtDepartureHour(departureTimeHour); connection != lastConnection; ++connection)
     {
       // ignore connections before departure time + minimum access travel time:
-      if ((**connection).getDepartureTime() >= departureTimeSeconds + minAccessTravelTime)
+      if ((*connection).get().getDepartureTime() >= departureTimeSeconds + minAccessTravelTime)
       {
-        const Trip & trip = (**connection).getTrip();
+        const Trip & trip = (*connection).get().getTrip();
 
         // Cache the current query data overlay si we don't check the hashmap every time
         auto & currentTripQueryOverlay = tripsQueryOverlay[trip.uid];
@@ -251,8 +252,8 @@ namespace TrRouting
         // enabled trips only here:
         if (tripsEnabled[trip.uid])
         {
-          connectionDepartureTime         = (**connection).getDepartureTime();
-          connectionMinWaitingTimeSeconds = (**connection).getMinWaitingTimeOrDefault(parameters.getMinWaitingTimeSeconds());
+          connectionDepartureTime         = (*connection).get().getDepartureTime();
+          connectionMinWaitingTimeSeconds = (*connection).get().getMinWaitingTimeOrDefault(parameters.getMinWaitingTimeSeconds());
 
           //TODO When the allNodes clean, is the comment still releveant?
           // no need to parse next connections if already reached destination from all egress nodes:
@@ -262,7 +263,7 @@ namespace TrRouting
             break;
           }
           std::optional<std::reference_wrapper<const Connection>> tripEnterConnection = currentTripQueryOverlay.enterConnection;
-          const Node &nodeDeparture = (**connection).getDepartureNode();
+          const Node &nodeDeparture = (*connection).get().getDepartureNode();
 
           // Extract node departure time if we have a result or set a default value
           auto ite = nodesTentativeTime.find(nodeDeparture.uid);
@@ -294,18 +295,18 @@ namespace TrRouting
           )
           {
             // TODO: add constrain for sameLineTransfer (check trip allowSameLineTransfers)
-            if ((**connection).canBoard() && ( !tripEnterConnection.has_value()))
+            if ((*connection).get().canBoard() && ( !tripEnterConnection.has_value()))
             {
               currentTripQueryOverlay.usable = true;
-              currentTripQueryOverlay.enterConnection = **connection;
+              currentTripQueryOverlay.enterConnection = *connection;
               currentTripQueryOverlay.enterConnectionTransferTravelTime = forwardJourneysSteps.at(nodeDeparture.uid).getTransferTravelTime();
             }
 
-            if ((**connection).canUnboard() && currentTripQueryOverlay.enterConnection.has_value())
+            if ((*connection).get().canUnboard() && currentTripQueryOverlay.enterConnection.has_value())
             {
               // get footpaths for the arrival node to get transferable nodes:
-              const Node &nodeArrival = (**connection).getArrivalNode();
-              connectionArrivalTime           = (**connection).getArrivalTime();
+              const Node &nodeArrival = (*connection).get().getArrivalNode();
+              connectionArrivalTime           = (*connection).get().getArrivalTime();
 
               footpathIndex = 0;
               for (const NodeTimeDistance & transferableNode : nodeArrival.transferableNodes)
@@ -336,7 +337,7 @@ namespace TrRouting
                     nodesTentativeTime[transferableNode.node.uid] = footpathTravelTime + connectionArrivalTime;
 
                     //TODO DO we need a make_optional here??
-                    forwardJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(currentTripQueryOverlay.enterConnection, **connection, std::cref(trip), footpathTravelTime, (nodeArrival == transferableNode.node), footpathDistance));
+                    forwardJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(currentTripQueryOverlay.enterConnection, *connection, std::cref(trip), footpathTravelTime, (nodeArrival == transferableNode.node), footpathDistance));
                   }
 
                   if (
@@ -351,7 +352,7 @@ namespace TrRouting
                   )
                   {
                     footpathDistance = nodeArrival.transferableNodes[footpathIndex].distance;
-                    forwardEgressJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(currentTripQueryOverlay.enterConnection, **connection, std::cref(trip), footpathTravelTime, true, footpathDistance));
+                    forwardEgressJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(currentTripQueryOverlay.enterConnection, *connection, std::cref(trip), footpathTravelTime, true, footpathDistance));
                   }
                 }
                 footpathIndex++;

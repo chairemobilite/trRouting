@@ -12,6 +12,7 @@
 #include "line.hpp"
 #include "node.hpp"
 #include "transit_data.hpp"
+#include "connection_set.hpp"
 
 namespace TrRouting
 {
@@ -250,9 +251,16 @@ namespace TrRouting
   void Calculator::resetFilters(const CommonParameters &parameters) {
     spdlog::debug("  resetting filters");
 
-    for (auto & tripIte : transitData.getTrips())
+    // TODO med term. Instead of the scenario as cache key, it could be the parameters, with services, lines and agencies
+    connectionSet = transitData.getConnectionsForScenario(parameters.getScenario());
+
+    // This loop is required for alternatives, where parameters have more
+    // exclusions than the scenario (the combinations of lines). It is not
+    // redundant with the one in the connection cache generator
+    // TODO: This code is very similar to the one in getConnectionsForScenario, extract it
+    for (auto & tripIte : connectionSet.get()->getTrips())
     {
-      const Trip & trip = tripIte.second;
+      const Trip & trip = tripIte.get();
       bool enabled = true;
 
       if (enabled && parameters.getOnlyServices().size() > 0)
@@ -312,7 +320,6 @@ namespace TrRouting
           enabled = false;
         }
       }
-
       if (enabled && parameters.getExceptNodes().size() > 0)
       {
         // FIXME: This is not right, it should look for a node, not the mode
@@ -341,6 +348,7 @@ namespace TrRouting
       }
       tripsEnabled[trip.uid] = enabled;
     }
+
   }
 
 }

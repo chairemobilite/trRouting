@@ -13,6 +13,9 @@
 #include "path.hpp"
 #include "scenario.hpp"
 #include "trip.hpp"
+#include "connection.hpp"
+#include "connection_cache.hpp"
+#include "connection_set.hpp"
 
 
 namespace TrRouting {
@@ -156,6 +159,7 @@ namespace TrRouting {
   };
 
   // Create a cache with a begin iterator which match the connection closest to the specified hour
+  // TODO Probably not needed anymore with the connection_cache
   void TransitData::generateConnectionsIteratorCache() {
     int currentHour = CONNECTION_ITERATOR_CACHE_BEGIN_HOUR;
 
@@ -387,4 +391,132 @@ namespace TrRouting {
     return getDataStatus();
   }
   
+  std::shared_ptr<ConnectionSet> TransitData::getConnectionsForScenario(const Scenario & scenario) const {
+    std::optional<std::shared_ptr<ConnectionSet>> optCurrentCache = scenarioConnectionCache.get(scenario.uuid);
+    if (optCurrentCache.has_value()) {
+      return optCurrentCache.value();
+    }
+
+    spdlog::debug("Computing connection cache for scenario {}...", boost::uuids::to_string(scenario.uuid));
+    // Create the cache for scenario
+    // Get the list of enabled trips
+    std::unordered_map<Trip::uid_t, bool> tripsEnabled;
+    std::vector<std::reference_wrapper<const Trip>> trips; 
+    for (auto & tripIte : getTrips())
+    {
+      const Trip & trip = tripIte.second;
+      bool enabled = true;
+
+      if (enabled && scenario.servicesList.size() > 0)
+      {
+        if (std::find(scenario.servicesList.begin(), scenario.servicesList.end(), trip.service) == scenario.servicesList.end())
+        {
+          enabled = false;
+        }
+      }
+
+      if (enabled && scenario.onlyLines.size() > 0)
+      {
+        if (std::find(scenario.onlyLines.begin(), scenario.onlyLines.end(), trip.line) == scenario.onlyLines.end())
+        {
+          enabled = false;
+        }
+      }
+
+      if (enabled && scenario.onlyModes.size() > 0)
+      {
+        if (std::find(scenario.onlyModes.begin(), scenario.onlyModes.end(), trip.mode) == scenario.onlyModes.end())
+        {
+          enabled = false;
+        }
+      }
+
+      if (enabled  && scenario.onlyNodes.size() > 0)
+      {
+        // FIXME: This is not right, it should look for a node, not the mode
+        // FIXME2: Commented out, since mode is now typed, it won't match
+        /*if (std::find(scenario.onlyNodesIdx()->begin(), scenario.onlyNodesIdx()->end(), trip->modeIdx) == scenario.onlyNodesIdx()->end())
+          {
+          enabled = -1;
+          }(*/
+      }
+
+      if (enabled && scenario.onlyAgencies.size() > 0)
+      {
+        if (std::find(scenario.onlyAgencies.begin(), scenario.onlyAgencies.end(), trip.agency) == scenario.onlyAgencies.end())
+        {
+          enabled = false;
+        }
+      }
+
+      if (enabled && scenario.exceptLines.size() > 0)
+      {
+        if (std::find(scenario.exceptLines.begin(), scenario.exceptLines.end(), trip.line) != scenario.exceptLines.end())
+        {
+          enabled = false;
+        }
+      }
+
+      if (enabled && scenario.exceptNodes.size() > 0)
+      {
+        // FIXME: This is not right, it should look for a node, not the mode
+        // FIXME2: Commented out, since mode is now typed, it won't match
+        /*
+          if (std::find(scenario.exceptNodesIdx()->begin(), scenario.exceptNodesIdx()->end(), trip.modeIdx) != scenario.exceptNodesIdx()->end())
+          {
+          enabled = false;
+          }*/
+      }
+
+      if (enabled && scenario.exceptModes.size() > 0)
+      {
+        if (std::find(scenario.exceptModes.begin(), scenario.exceptModes.end(), trip.mode) != scenario.exceptModes.end())
+        {
+          enabled = false;
+        }
+      }
+
+      if (enabled && scenario.exceptAgencies.size() > 0)
+      {
+        if (std::find(scenario.exceptAgencies.begin(), scenario.exceptAgencies.end(), trip.agency) != scenario.exceptAgencies.end())
+        {
+          enabled = false;
+        }
+      }
+      tripsEnabled[trip.uid] = enabled;
+      if (enabled) {
+        trips.push_back(trip);
+      }
+    }
+
+    // Keep only the connections that are active for enabled trips
+    std::vector<std::reference_wrapper<Connection>> scenarioForwardConnections;
+    std::vector<std::reference_wrapper<Connection>> scenarioReverseConnections; 
+    auto forwardLastConnection = getForwardConnections().end(); // cache last connection for loop
+    for(auto connection = getForwardConnections().begin(); connection != forwardLastConnection; ++connection)
+    {
+      const Trip & trip = (**connection).getTrip();
+
+      // enabled trips only here:
+      if (tripsEnabled[trip.uid]) {
+        scenarioForwardConnections.push_back((**connection));
+      }
+    }
+
+    auto reverseLastConnection = getReverseConnections().end(); // cache last connection for loop
+    for(auto connection = getReverseConnections().begin(); connection != reverseLastConnection; ++connection)
+    {
+      const Trip & trip = (**connection).getTrip();
+
+      // enabled trips only here:
+      if (tripsEnabled[trip.uid]) {
+        scenarioReverseConnections.push_back((**connection));
+      }
+    }
+
+    std::shared_ptr<ConnectionSet> currentCache = std::make_shared<ConnectionSet>(trips, scenarioForwardConnections, scenarioReverseConnections);
+    scenarioConnectionCache.set(scenario.uuid, currentCache);
+    return currentCache;
+    
+  }
 }
