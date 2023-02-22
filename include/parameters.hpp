@@ -115,7 +115,7 @@ namespace TrRouting
       );
       virtual ~CommonParameters() {}
       // FIXME Temporary method, will be removed once calculation specific parameters are implemented. Try not to use.
-      const Scenario& getScenario() { return scenario; }
+      const Scenario& getScenario() const { return scenario; }
       int getTimeOfTrip() const { return timeOfTrip; }
       int getMinWaitingTimeSeconds() const { return minWaitingTimeSeconds; }
       int getMaxTotalTravelTimeSeconds() const { return maxTotalTravelTimeSeconds; }
