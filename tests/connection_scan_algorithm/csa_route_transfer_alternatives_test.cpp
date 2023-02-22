@@ -76,6 +76,53 @@ TEST_F(SingleTAndACalculationFixtureTests, TripWithTransfer)
         0);
 }
 
+// Test from OD which includes a transfer to the same node, origin is further
+// south of South2, in the line axis, destination is very close to west2
+// But use the second scenario, where ease-west line is disabled
+TEST_F(SingleTAndACalculationFixtureTests, TripWithTransferButLineNotEnabled)
+{
+    int departureTime = getTimeInSeconds(9, 45);
+    int minWaitingTime = 90;
+    int travelTimeInVehicle = 420;
+    // This is where mocking would be interesting. Those were taken from the first run of the test
+    int accessTime = 469;
+    int egressTime = 884;
+    int expectedTransitDepartureTime = getTimeInSeconds(10);
+    int expectedTransferWaitingTime = 0;
+
+    // Make sure scenario2Uuid is not accidentally equal to scenarioUuid
+    ASSERT_NE(boost::uuids::to_string(TestDataFetcher::scenario2Uuid), boost::uuids::to_string(TestDataFetcher::scenarioUuid));
+
+    TrRouting::RouteParameters testParameters = TrRouting::RouteParameters(
+        std::make_unique<TrRouting::Point>(45.5242, -73.5817),
+        std::make_unique<TrRouting::Point>(45.5295, -73.624),
+        transitData.getScenarios().at(TestDataFetcher::scenario2Uuid),
+        departureTime,
+        minWaitingTime,
+        DEFAULT_MAX_TOTAL_TIME,
+        DEFAULT_MAX_ACCESS_TRAVEL_TIME,
+        DEFAULT_MAX_EGRESS_TRAVEL_TIME,
+        DEFAULT_MAX_TRANSFER_TRAVEL_TIME,
+        DEFAULT_FIRST_WAITING_TIME,
+        false,
+        true
+    );
+
+    // Exit at midpoint, no transfer
+    std::unique_ptr<TrRouting::RoutingResult> result = calculateOd(testParameters);
+    assertSuccessResults(*result.get(),
+        departureTime,
+        expectedTransitDepartureTime,
+        travelTimeInVehicle,
+        accessTime,
+        egressTime,
+        0,
+        minWaitingTime,
+        minWaitingTime + expectedTransferWaitingTime,
+        expectedTransferWaitingTime,
+        0);
+}
+
 // Same as TripWithTransfer but with a minimal transfer time higher than
 // available, the result is a walk from midpoint instead of another bus trip
 TEST_F(SingleTAndACalculationFixtureTests, NoTransferMinTransferTime)
