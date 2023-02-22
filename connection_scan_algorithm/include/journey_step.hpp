@@ -10,8 +10,8 @@ namespace TrRouting {
   //each of the step types. See issue #209
   class JourneyStep {
   public:
-    JourneyStep(std::optional<std::shared_ptr<Connection>> _finalEnterConnection,
-                std::optional<std::shared_ptr<Connection>> _finalExitConnection,
+    JourneyStep(std::optional<std::reference_wrapper<const Connection>> _finalEnterConnection,
+                std::optional<std::reference_wrapper<const Connection>> _finalExitConnection,
                 std::optional<std::reference_wrapper<const Trip>> _finalTrip,
                 int _transferTravelTime,
                 bool _sameNodeTransfer,
@@ -23,8 +23,8 @@ namespace TrRouting {
                                          transferDistance(_transferDistance) { }
 
     //TODO Why is there Final in the function name. Is that appropriate?
-    std::optional<std::shared_ptr<Connection>> getFinalEnterConnection() const {return finalEnterConnection;}
-    std::optional<std::shared_ptr<Connection>> getFinalExitConnection() const {return finalExitConnection;}
+    std::optional<std::reference_wrapper<const Connection>> getFinalEnterConnection() const {return finalEnterConnection;}
+    std::optional<std::reference_wrapper<const Connection>> getFinalExitConnection() const {return finalExitConnection;}
     std::optional<std::reference_wrapper<const Trip>> getFinalTrip() const {return finalTrip;}
     //TODO: Comment from @tahini.
     // So walking is tranferring in a transfer step, but walking is just walking in an access/egress step.
@@ -38,10 +38,10 @@ namespace TrRouting {
 
     //TODO Setting connections midway should also affected other parameters automatically
     // Their usage in the optimise function should be reviewed (Maybe in conjunction with #209)
-    void setFinalEnterConnection(std::shared_ptr<Connection> _connection) {
+    void setFinalEnterConnection(const Connection&  _connection) {
       finalEnterConnection = _connection;
     }
-    void setFinalExitConnection(std::shared_ptr<Connection> _connection) {
+    void setFinalExitConnection(const Connection& _connection) {
       finalExitConnection = _connection;
     }
 
@@ -61,8 +61,8 @@ namespace TrRouting {
     // If we have type of each step type, maybe this would be needed. #209
     bool hasConnections() const {return finalEnterConnection.has_value() && finalExitConnection.has_value();}
   private:
-    std::optional<std::shared_ptr<Connection>> finalEnterConnection;
-    std::optional<std::shared_ptr<Connection>> finalExitConnection;
+    std::optional<std::reference_wrapper<const Connection>> finalEnterConnection;
+    std::optional<std::reference_wrapper<const Connection>> finalExitConnection;
     std::optional<std::reference_wrapper<const Trip>> finalTrip;
     int transferTravelTime;
     bool sameNodeTransfer;

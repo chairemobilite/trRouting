@@ -75,9 +75,9 @@ namespace TrRouting
 
     }
     bool usable; // after forward calculation, keep a list of usable trips in time range for reverse calculation
-    std::optional<std::shared_ptr<Connection>> enterConnection; // index of the entering connection
+    std::optional<std::reference_wrapper<const Connection>> enterConnection; // index of the entering connection
     int enterConnectionTransferTravelTime;
-    std::optional<std::shared_ptr<Connection>> exitConnection; // index of the exiting connection
+    std::optional<std::reference_wrapper<const Connection>> exitConnection; // index of the exiting connection
     int exitConnectionTransferTravelTime;
   };
 

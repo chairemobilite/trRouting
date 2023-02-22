@@ -24,8 +24,6 @@ namespace TrRouting
       throw NoRoutingFoundException(NoRoutingReason::NO_ROUTING_FOUND);
     }
 
-    std::shared_ptr<Connection> journeyStepEnterConnection;
-    std::shared_ptr<Connection> journeyStepExitConnection;
     std::vector<Leg> legs;
 
     int totalInVehicleTime       { 0}; int transferArrivalTime    {-1};
@@ -57,7 +55,7 @@ namespace TrRouting
               journey[journey.size()-1].copyTransferTimeDistance(resultingNodeJourneyStep);
             }
           journey.push_back(resultingNodeJourneyStep);
-          bestEgressNode = resultingNodeJourneyStep.getFinalExitConnection().value()->getArrivalNode();
+          bestEgressNode = resultingNodeJourneyStep.getFinalExitConnection().value().get().getArrivalNode();
           resultingNodeJourneyStep = reverseJourneysSteps.at(bestEgressNode.value().get().uid);
         }
 
@@ -88,18 +86,18 @@ namespace TrRouting
           if (journeyStep.hasConnections())
             {
               // journey tuple: final enter connection, final exit connection, final footpath
-              journeyStepEnterConnection  = journeyStep.getFinalEnterConnection().value();
-              journeyStepExitConnection   = journeyStep.getFinalExitConnection().value();
-              const Node &journeyStepNodeDeparture    = journeyStepEnterConnection->getDepartureNode();
-              const Node &journeyStepNodeArrival      = journeyStepExitConnection->getArrivalNode();
+              const Connection &journeyStepEnterConnection  = journeyStep.getFinalEnterConnection().value().get();
+              const Connection &journeyStepExitConnection   = journeyStep.getFinalExitConnection().value().get();
+              const Node &journeyStepNodeDeparture    = journeyStepEnterConnection.getDepartureNode();
+              const Node &journeyStepNodeArrival      = journeyStepExitConnection.getArrivalNode();
               const Trip &journeyStepTrip             = journeyStep.getFinalTrip().value().get();
               transferTime                = journeyStep.getTransferTravelTime();
               distance                    = journeyStep.getTransferDistance();
               inVehicleDistance           = 0;
-              departureTime               = journeyStepEnterConnection->getDepartureTime();
-              arrivalTime                 = journeyStepExitConnection->getArrivalTime();
-              boardingSequence            = journeyStepEnterConnection->getSequenceInTrip();
-              unboardingSequence          = journeyStepExitConnection->getSequenceInTrip();
+              departureTime               = journeyStepEnterConnection.getDepartureTime();
+              arrivalTime                 = journeyStepExitConnection.getArrivalTime();
+              boardingSequence            = journeyStepEnterConnection.getSequenceInTrip();
+              unboardingSequence          = journeyStepExitConnection.getSequenceInTrip();
               inVehicleTime               = arrivalTime   - departureTime;
               waitingTime                 = departureTime - transferArrivalTime;
               transferArrivalTime         = arrivalTime   + transferTime;
@@ -107,7 +105,7 @@ namespace TrRouting
 
               if (journey.size() > i + 1 && journey[i+1].getFinalEnterConnection().has_value())
                 {
-                  transferReadyTime += journey[i+1].getFinalEnterConnection().value()->getMinWaitingTimeOrDefault(parameters.getMinWaitingTimeSeconds());
+                  transferReadyTime += journey[i+1].getFinalEnterConnection().value().get().getMinWaitingTimeOrDefault(parameters.getMinWaitingTimeSeconds());
                 }
 
               totalInVehicleTime         += inVehicleTime;
@@ -210,7 +208,7 @@ namespace TrRouting
 
                   if (journey.size() > i + 1 && journey[i+1].getFinalEnterConnection().has_value())
                     {
-                      transferReadyTime += journey[i+1].getFinalEnterConnection().value()->getMinWaitingTimeOrDefault(parameters.getMinWaitingTimeSeconds());
+                      transferReadyTime += journey[i+1].getFinalEnterConnection().value().get().getMinWaitingTimeOrDefault(parameters.getMinWaitingTimeSeconds());
                     }
 
                   totalWalkingTime    += transferTime;
@@ -296,7 +294,7 @@ namespace TrRouting
           journey[journey.size()-1].copyTransferTimeDistance(resultingNodeJourneyStep);
         }
         journey.push_back(resultingNodeJourneyStep);
-        bestEgressNode = resultingNodeJourneyStep.getFinalExitConnection().value()->getArrivalNode();
+        bestEgressNode = resultingNodeJourneyStep.getFinalExitConnection().value().get().getArrivalNode();
         resultingNodeJourneyStep = reverseJourneysSteps.at(bestEgressNode.value().get().uid);
       }
 
@@ -328,7 +326,7 @@ namespace TrRouting
       if (reverseAccessJourneysSteps.at(resultingNode.uid).getFinalEnterConnection().has_value()) {
         //TODO Should check taht MinWaiting is not -1 or use OrDefault(0)
         //TODO Could move this operation into a function of class Connection
-        int departureTimeD = reverseAccessJourneysSteps.at(resultingNode.uid).getFinalEnterConnection().value()->getDepartureTime() - reverseAccessJourneysSteps.at(resultingNode.uid).getFinalEnterConnection().value()->getMinWaitingTime();
+        int departureTimeD = reverseAccessJourneysSteps.at(resultingNode.uid).getFinalEnterConnection().value().get().getDepartureTime() - reverseAccessJourneysSteps.at(resultingNode.uid).getFinalEnterConnection().value().get().getMinWaitingTime();
         if (arrivalTimeSeconds - departureTimeD <=  parameters.getMaxTotalTravelTimeSeconds()) {
           reachableNodesCount++;
 
