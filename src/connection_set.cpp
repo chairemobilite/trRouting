@@ -29,7 +29,6 @@ namespace TrRouting {
   };
 
   // Create a cache with a begin iterator which match the connection closest to the specified hour
-  // TODO Copy-pasted from transit_data, remove it from there if not required anymore
   void ConnectionSet::generateConnectionsIteratorCache() {
     int currentHour = CONNECTION_ITERATOR_CACHE_BEGIN_HOUR;
 
