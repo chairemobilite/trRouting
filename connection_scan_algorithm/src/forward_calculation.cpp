@@ -50,7 +50,7 @@ namespace TrRouting
         auto & currentTripQueryOverlay = tripsQueryOverlay[trip.uid];
 
         // enabled trips only here:
-        if (tripsEnabled[trip.uid])
+        if (!isTripDisabled(trip.uid))
         {
           connectionDepartureTime         = (*connection).get().getDepartureTime();
           connectionMinWaitingTimeSeconds = (*connection).get().getMinWaitingTimeOrDefault(parameters.getMinWaitingTimeSeconds());
@@ -250,7 +250,7 @@ namespace TrRouting
         auto & currentTripQueryOverlay = tripsQueryOverlay[trip.uid];
 
         // enabled trips only here:
-        if (tripsEnabled[trip.uid])
+        if (!isTripDisabled(trip.uid))
         {
           connectionDepartureTime         = (*connection).get().getDepartureTime();
           connectionMinWaitingTimeSeconds = (*connection).get().getMinWaitingTimeOrDefault(parameters.getMinWaitingTimeSeconds());

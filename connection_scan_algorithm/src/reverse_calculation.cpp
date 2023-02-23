@@ -54,7 +54,7 @@ namespace TrRouting
         
         // enabled trips only here:
         auto & currentTripQueryOverlay = tripsQueryOverlay[trip.uid];
-        if (currentTripQueryOverlay.usable && tripsEnabled[trip.uid])
+        if (currentTripQueryOverlay.usable && !isTripDisabled(trip.uid))
         {
 
           connectionArrivalTime           = (*connection).get().getArrivalTime();
@@ -270,7 +270,8 @@ namespace TrRouting
 
         // enabled trips only here:
         auto & currentTripQueryOverlay = tripsQueryOverlay[trip.uid];
-        if (currentTripQueryOverlay.usable) // && tripsEnabled[trip.uid])
+        // FIXME Determine with the new connection cache if a trip could be disabled in the all nodes path
+        if ((currentTripQueryOverlay.usable) && !isTripDisabled(trip.uid))
         {
           connectionArrivalTime           = (*connection).get().getArrivalTime();
 

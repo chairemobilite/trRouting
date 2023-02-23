@@ -115,7 +115,9 @@ namespace TrRouting
     std::unordered_map<Node::uid_t, NodeTimeDistance> nodesAccess; // travel time/distance from origin to accessible nodes
     std::unordered_map<Node::uid_t, NodeTimeDistance> nodesEgress; // travel time/distance to reach destination;
 
-    std::unordered_map<Trip::uid_t, bool> tripsEnabled;
+    // Field used at the time of the query, mostly for alternatives, which deactivate some of the scenario trips. Typically, there are less disabled trips and enabled ones, so we keep only those
+    std::unordered_map<Trip::uid_t, bool> tripsDisabled;
+    bool isTripDisabled(Trip::uid_t uid) const { return tripsDisabled.find(uid) != tripsDisabled.end(); }
     std::unordered_map<Trip::uid_t, TripQueryData> tripsQueryOverlay; // Store addition trip info during a query processing
     // A subset of the connections that are used for the current query.
     std::shared_ptr<ConnectionSet> connectionSet;
