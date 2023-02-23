@@ -20,8 +20,8 @@ class ReverseConnectionIteratorTestSuite : public ConnectionSetFixtureTests,
 
 // Create a connection set object with all connections
 std::shared_ptr<ConnectionSet> getConnectionSet(TransitData transitData) {
-    std::vector<std::reference_wrapper<Connection>> forwardConnections;
-    std::vector<std::reference_wrapper<Connection>> reverseConnections;
+    std::vector<std::reference_wrapper<const Connection>> forwardConnections;
+    std::vector<std::reference_wrapper<const Connection>> reverseConnections;
 
     auto forwardLastConnection = getForwardConnections().end(); // cache last connection for loop
     for(auto connection = getForwardConnections().begin(); connection != forwardLastConnection; ++connection)

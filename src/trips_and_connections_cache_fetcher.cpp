@@ -25,7 +25,7 @@ namespace TrRouting
     const std::map<boost::uuids::uuid, Line>& lines,
     std::map<boost::uuids::uuid, Path>& paths,
     const std::map<boost::uuids::uuid, Service>& services,
-    std::vector<std::shared_ptr<Connection>>& connections,
+    std::vector<Connection>& connections,
     std::string customPath
   )
   {
@@ -101,7 +101,8 @@ namespace TrRouting
               // nodeTimesCount - 1, since we process node pairs, we have to stop and the second from last
               for (unsigned long nodeTimeI = 0; nodeTimeI < nodeTimesCount - 1; nodeTimeI++)
               {
-                  std::shared_ptr<Connection> forwardConnection(std::make_shared<Connection>(Connection(
+
+                  connections.push_back(Connection(
                     path.nodesRef[nodeTimeI].get(),
                     path.nodesRef[nodeTimeI + 1].get(),
                     departureTimesSeconds[nodeTimeI],
@@ -112,9 +113,7 @@ namespace TrRouting
                     nodeTimeI + 1,
                     trip.allowSameLineTransfers,
                     line.mode.isTransferable() ? 0 : -1
-                  )));
-
-                  connections.push_back(std::move(forwardConnection));
+                  ));
 
                   trip.connectionDepartureTimes[nodeTimeI] = departureTimesSeconds[nodeTimeI];
 

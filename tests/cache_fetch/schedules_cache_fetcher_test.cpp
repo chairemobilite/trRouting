@@ -20,7 +20,7 @@ protected:
     std::map<boost::uuids::uuid, TrRouting::Node> nodes;
     std::map<boost::uuids::uuid, int> tripIndexesByUuid;
     std::map<boost::uuids::uuid, TrRouting::Service> services;
-    std::vector<std::shared_ptr<TrRouting::Connection>> connections;
+    std::vector<TrRouting::Connection> connections;
 
 public:
     void SetUp( ) override
@@ -63,6 +63,7 @@ TEST_F(ScheduleCacheFetcherFixtureTests, TestGetSchedulesInvalidLineFile)
     // TODO: Since a file was invalid, should this return -EBADMSG?
     ASSERT_EQ(0, retVal);
     ASSERT_EQ(0u, trips.size());
+    ASSERT_EQ(0u, connections.size());
 }
 
 TEST_F(ScheduleCacheFetcherFixtureTests, TestGetUnexistingLineFiles)
@@ -77,6 +78,7 @@ TEST_F(ScheduleCacheFetcherFixtureTests, TestGetUnexistingLineFiles)
     );
     ASSERT_EQ(0, retVal);
     ASSERT_EQ(0u, trips.size());
+    ASSERT_EQ(0u, connections.size());
 }
 
 TEST_F(ScheduleCacheFetcherFixtureTests, TestGetSchedulesValid)
@@ -91,4 +93,5 @@ TEST_F(ScheduleCacheFetcherFixtureTests, TestGetSchedulesValid)
     );
     ASSERT_EQ(0, retVal);
     ASSERT_EQ(50u, trips.size());
+    ASSERT_EQ(275u, connections.size());
 }

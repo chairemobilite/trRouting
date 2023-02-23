@@ -8,7 +8,7 @@ namespace TrRouting {
   const int CONNECTION_ITERATOR_CACHE_BEGIN_HOUR = 0;
   const int CONNECTION_ITERATOR_CACHE_END_HOUR = 32;
 
-  std::vector<std::reference_wrapper<Connection>>::const_iterator ConnectionSet::getForwardConnectionsBeginAtDepartureHour(int hour) const
+  std::vector<std::reference_wrapper<const Connection>>::const_iterator ConnectionSet::getForwardConnectionsBeginAtDepartureHour(int hour) const
   {
     if (hour > CONNECTION_ITERATOR_CACHE_END_HOUR || hour  < CONNECTION_ITERATOR_CACHE_BEGIN_HOUR) {
       return forwardConnections.cend();
@@ -17,7 +17,7 @@ namespace TrRouting {
     return forwardConnectionsBeginIteratorCache[hour];
   };
 
-  std::vector<std::reference_wrapper<Connection>>::const_iterator ConnectionSet::getReverseConnectionsBeginAtArrivalHour(int hour) const
+  std::vector<std::reference_wrapper<const Connection>>::const_iterator ConnectionSet::getReverseConnectionsBeginAtArrivalHour(int hour) const
   {
     if (hour < CONNECTION_ITERATOR_CACHE_BEGIN_HOUR) {
       return reverseConnections.cend();
@@ -35,7 +35,7 @@ namespace TrRouting {
     // Create first part of the forward cache
     // For each hour, we save the iterator matching the connection which as a departure time bigger
     // than this hour
-    for (std::vector<std::reference_wrapper<Connection>>::const_iterator ite = forwardConnections.cbegin();
+    for (std::vector<std::reference_wrapper<const Connection>>::const_iterator ite = forwardConnections.cbegin();
          ite != forwardConnections.cend();
          ite++) {
       // We can have a gap of multiple hours between 2 connections, so the current iterator
@@ -55,7 +55,7 @@ namespace TrRouting {
 
     // Create the reverse cache
     currentHour = CONNECTION_ITERATOR_CACHE_END_HOUR - 1;
-    for (std::vector<std::reference_wrapper<Connection>>::const_iterator ite = reverseConnections.cbegin();
+    for (std::vector<std::reference_wrapper<const Connection>>::const_iterator ite = reverseConnections.cbegin();
          ite != reverseConnections.cend();
          ite++) {
       // Fill cache with same iterator if we have multi hour gap between connection
@@ -75,8 +75,8 @@ namespace TrRouting {
 
   ConnectionSet::ConnectionSet(
     const std::vector<std::reference_wrapper<const Trip>> _trips,
-    const std::vector<std::reference_wrapper<Connection>> _forwardConnections,
-    const std::vector<std::reference_wrapper<Connection>> _reverseConnections
+    const std::vector<std::reference_wrapper<const Connection>> _forwardConnections,
+    const std::vector<std::reference_wrapper<const Connection>> _reverseConnections
   ): trips(_trips), forwardConnections(_forwardConnections), reverseConnections(_reverseConnections) {
     generateConnectionsIteratorCache();
   }

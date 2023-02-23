@@ -121,7 +121,6 @@ namespace TrRouting {
 
   int TransitData::updateSchedules(std::string customPath)
   {
-    std::vector<std::shared_ptr<Connection>> connections;
     int ret =  dataFetcher.getSchedules(
       trips,
       getLines(),
@@ -134,13 +133,13 @@ namespace TrRouting {
     {
       return ret;
     }
-    return generateForwardAndReverseConnections(connections);
+    return generateForwardAndReverseConnections();
   }
 
   const int CONNECTION_ITERATOR_CACHE_BEGIN_HOUR = 0;
   const int CONNECTION_ITERATOR_CACHE_END_HOUR = 32;
 
-  int TransitData::generateForwardAndReverseConnections(const std::vector<std::shared_ptr<Connection>> &connections)
+  int TransitData::generateForwardAndReverseConnections()
   {
 
     // Copy the connections to both forward and reverse vectors
@@ -148,9 +147,8 @@ namespace TrRouting {
     reverseConnections.clear();
     for (size_t i=0; i<connections.size(); i++)
     {
-      std::shared_ptr<Connection> reverseConnection = connections[i];
-      forwardConnections.push_back(std::move(connections[i]));
-      reverseConnections.push_back(std::move(reverseConnection));
+      forwardConnections.push_back(connections[i]);
+      reverseConnections.push_back(connections[i]);
     }
     forwardConnections.shrink_to_fit();
     reverseConnections.shrink_to_fit();
@@ -160,59 +158,59 @@ namespace TrRouting {
       spdlog::info("Sorting connections...");
       // Sort forward connections by departure time, trip id, sequence
       //TODO Maybe this could be handled by an operator in the connection class or at least some function that we could bind
-      std::stable_sort(forwardConnections.begin(), forwardConnections.end(), [](const std::shared_ptr<Connection>& connectionA, const std::shared_ptr<Connection>& connectionB)
+      std::stable_sort(forwardConnections.begin(), forwardConnections.end(), [](const std::reference_wrapper<const Connection>& connectionA, const std::reference_wrapper<const Connection>& connectionB)
       {
-        if (connectionA->getDepartureTime() < connectionB->getDepartureTime())
+        if (connectionA.get().getDepartureTime() < connectionB.get().getDepartureTime())
         {
           return true;
         }
-        else if (connectionA->getDepartureTime() > connectionB->getDepartureTime())
+        else if (connectionA.get().getDepartureTime() > connectionB.get().getDepartureTime())
         {
           return false;
         }
         //TODO We could do something  better than comparing uuud for trip. We just need something to have a stable sort
-        if (connectionA->getTrip().uuid < connectionB->getTrip().uuid)
+        if (connectionA.get().getTrip().uuid < connectionB.get().getTrip().uuid)
         {
           return true;
         }
-        else if (connectionA->getTrip().uuid > connectionB->getTrip().uuid)
+        else if (connectionA.get().getTrip().uuid > connectionB.get().getTrip().uuid)
         {
           return false;
         }
-        if (connectionA->getSequenceInTrip() < connectionB->getSequenceInTrip())
+        if (connectionA.get().getSequenceInTrip() < connectionB.get().getSequenceInTrip())
         {
           return true;
         }
-        else if (connectionA->getSequenceInTrip() > connectionB->getSequenceInTrip())
+        else if (connectionA.get().getSequenceInTrip() > connectionB.get().getSequenceInTrip())
         {
           return false;
         }
         return false;
       });
       // Sort reverse connection by arrival time, trip and sequence
-      std::stable_sort(reverseConnections.begin(), reverseConnections.end(), [](const std::shared_ptr<Connection>& connectionA, const std::shared_ptr<Connection>& connectionB)
+      std::stable_sort(reverseConnections.begin(), reverseConnections.end(), [](const std::reference_wrapper<const Connection>& connectionA, const std::reference_wrapper<const Connection>& connectionB)
       {
-        if (connectionA->getArrivalTime() > connectionB->getArrivalTime())
+        if (connectionA.get().getArrivalTime() > connectionB.get().getArrivalTime())
         {
           return true;
         }
-        else if (connectionA->getArrivalTime() < connectionB->getArrivalTime())
+        else if (connectionA.get().getArrivalTime() < connectionB.get().getArrivalTime())
         {
           return false;
         }
-        if (connectionA->getTrip().uuid > connectionB->getTrip().uuid) // here we need to reverse sequence!
+        if (connectionA.get().getTrip().uuid > connectionB.get().getTrip().uuid) // here we need to reverse sequence!
         {
           return true;
         }
-        else if (connectionA->getTrip().uuid < connectionB->getTrip().uuid)
+        else if (connectionA.get().getTrip().uuid < connectionB.get().getTrip().uuid)
         {
           return false;
         }
-        if (connectionA->getSequenceInTrip() > connectionB->getSequenceInTrip()) // here we need to reverse sequence!
+        if (connectionA.get().getSequenceInTrip() > connectionB.get().getSequenceInTrip()) // here we need to reverse sequence!
         {
           return true;
         }
-        else if (connectionA->getSequenceInTrip() < connectionB->getSequenceInTrip())
+        else if (connectionA.get().getSequenceInTrip() < connectionB.get().getSequenceInTrip())
         {
           return false;
         }
@@ -228,14 +226,14 @@ namespace TrRouting {
       for(auto & connection : forwardConnections)
       {
         //TODO This require a trip to be modified, we might want to revisit how to create Connection and Trip (#201)
-        Trip & trip = connection->getTripMutable();
+        Trip & trip = connection.get().getTripMutable();
         trip.forwardConnections.push_back(connection);
       }
 
       for(auto & connection : reverseConnections)
       {
         //TODO This require a trip to be modified, we might want to revisit how to create Connection and Trip (#201)
-        Trip & trip = connection->getTripMutable();
+        Trip & trip = connection.get().getTripMutable();
         trip.reverseConnections.push_back(connection);
       }
 
@@ -432,27 +430,27 @@ namespace TrRouting {
     }
 
     // Keep only the connections that are active for enabled trips
-    std::vector<std::reference_wrapper<Connection>> scenarioForwardConnections;
-    std::vector<std::reference_wrapper<Connection>> scenarioReverseConnections; 
+    std::vector<std::reference_wrapper<const Connection>> scenarioForwardConnections;
+    std::vector<std::reference_wrapper<const Connection>> scenarioReverseConnections; 
     auto forwardLastConnection = forwardConnections.end(); // cache last connection for loop
     for(auto connection = forwardConnections.begin(); connection != forwardLastConnection; ++connection)
     {
-      const Trip & trip = (**connection).getTrip();
+      const Trip & trip = (*connection).get().getTrip();
 
       // enabled trips only here:
       if (tripsEnabled[trip.uid]) {
-        scenarioForwardConnections.push_back((**connection));
+        scenarioForwardConnections.push_back(*connection);
       }
     }
 
     auto reverseLastConnection = reverseConnections.end(); // cache last connection for loop
     for(auto connection = reverseConnections.begin(); connection != reverseLastConnection; ++connection)
     {
-      const Trip & trip = (**connection).getTrip();
+      const Trip & trip = (*connection).get().getTrip();
 
       // enabled trips only here:
       if (tripsEnabled[trip.uid]) {
-        scenarioReverseConnections.push_back((**connection));
+        scenarioReverseConnections.push_back(*connection);
       }
     }
 
