@@ -140,63 +140,6 @@ namespace TrRouting {
   const int CONNECTION_ITERATOR_CACHE_BEGIN_HOUR = 0;
   const int CONNECTION_ITERATOR_CACHE_END_HOUR = 32;
 
-  std::vector<std::shared_ptr<Connection>>::const_iterator TransitData::getForwardConnectionsBeginAtDepartureHour(int hour) const
-  {
-    if (hour > CONNECTION_ITERATOR_CACHE_END_HOUR || hour  < CONNECTION_ITERATOR_CACHE_BEGIN_HOUR) {
-      return forwardConnections.cend();
-    }
-
-    return forwardConnectionsBeginIteratorCache[hour];
-  };
-
-  std::vector<std::shared_ptr<Connection>>::const_iterator TransitData::getReverseConnectionsBeginAtArrivalHour(int hour) const
-  {
-    if (hour > CONNECTION_ITERATOR_CACHE_END_HOUR || hour  < CONNECTION_ITERATOR_CACHE_BEGIN_HOUR) {
-      return reverseConnections.cend();
-    }
-
-    return reverseConnectionsBeginIteratorCache[hour];
-  };
-
-  // Create a cache with a begin iterator which match the connection closest to the specified hour
-  // TODO Probably not needed anymore with the connection_cache
-  void TransitData::generateConnectionsIteratorCache() {
-    int currentHour = CONNECTION_ITERATOR_CACHE_BEGIN_HOUR;
-
-    // Create first part of the forward cache
-    // For each hour, we save the iterator matching the connection which as a departure time bigger
-    // than this hour
-    for (std::vector<std::shared_ptr<Connection>>::const_iterator ite = forwardConnections.cbegin();
-         ite != forwardConnections.cend();
-         ite++) {
-      // We can have a gap of multiple hours between 2 connections, so the current iterator
-      // can be valid for multiple hour slots
-      while ((*ite)->getDepartureTime() >= currentHour * 3600) {
-        forwardConnectionsBeginIteratorCache.push_back(ite);
-        currentHour++;
-      }
-    }
-
-    //Finish filling forward cache
-    //We reached the end of the forwardConnections in the previously, so here we
-    //fill the rest of the forward cache with end iterator
-    for (;currentHour < CONNECTION_ITERATOR_CACHE_END_HOUR; currentHour++) {
-      forwardConnectionsBeginIteratorCache.push_back(forwardConnections.cend());
-    }
-
-    // Create the reverse cache
-    currentHour = CONNECTION_ITERATOR_CACHE_END_HOUR - 1;
-    for (std::vector<std::shared_ptr<Connection>>::const_iterator ite = reverseConnections.cbegin();
-         ite != reverseConnections.cend();
-         ite++) {
-      // Fill cache with same iterator if we have multi hour gap between connection
-      while ((*ite)->getArrivalTime() <= currentHour * 3600 && currentHour > CONNECTION_ITERATOR_CACHE_BEGIN_HOUR) {
-        reverseConnectionsBeginIteratorCache.insert(reverseConnectionsBeginIteratorCache.begin(),ite);
-        currentHour--;
-      }
-    }
-  }
-
   int TransitData::generateForwardAndReverseConnections(const std::vector<std::shared_ptr<Connection>> &connections)
   {
 
@@ -298,7 +241,6 @@ namespace TrRouting {
 
       spdlog::debug("-- assign connections to trips -- {} microseconds", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
 
-      generateConnectionsIteratorCache();
       return 0;
     }
     catch (const std::exception& ex)
@@ -492,8 +434,8 @@ namespace TrRouting {
     // Keep only the connections that are active for enabled trips
     std::vector<std::reference_wrapper<Connection>> scenarioForwardConnections;
     std::vector<std::reference_wrapper<Connection>> scenarioReverseConnections; 
-    auto forwardLastConnection = getForwardConnections().end(); // cache last connection for loop
-    for(auto connection = getForwardConnections().begin(); connection != forwardLastConnection; ++connection)
+    auto forwardLastConnection = forwardConnections.end(); // cache last connection for loop
+    for(auto connection = forwardConnections.begin(); connection != forwardLastConnection; ++connection)
     {
       const Trip & trip = (**connection).getTrip();
 
@@ -503,8 +445,8 @@ namespace TrRouting {
       }
     }
 
-    auto reverseLastConnection = getReverseConnections().end(); // cache last connection for loop
-    for(auto connection = getReverseConnections().begin(); connection != reverseLastConnection; ++connection)
+    auto reverseLastConnection = reverseConnections.end(); // cache last connection for loop
+    for(auto connection = reverseConnections.begin(); connection != reverseLastConnection; ++connection)
     {
       const Trip & trip = (**connection).getTrip();
 

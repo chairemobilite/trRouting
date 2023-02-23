@@ -67,14 +67,10 @@ namespace TrRouting {
     const std::map<boost::uuids::uuid, Path> & getPaths() const {return paths;}
     const std::map<boost::uuids::uuid, Scenario> & getScenarios() const {return scenarios;}
     const std::map<boost::uuids::uuid, Trip> & getTrips() const {return trips;}
+    unsigned int getConnectionCount() const {return forwardConnections.size();}
 
     std::shared_ptr<ConnectionSet> getConnectionsForScenario(const Scenario & scenario) const;
 
-    const std::vector<std::shared_ptr<Connection>> & getForwardConnections() const {return forwardConnections;}
-    const std::vector<std::shared_ptr<Connection>> & getReverseConnections() const {return reverseConnections;}
-
-    std::vector<std::shared_ptr<Connection>>::const_iterator getForwardConnectionsBeginAtDepartureHour(int hour) const;
-    std::vector<std::shared_ptr<Connection>>::const_iterator getReverseConnectionsBeginAtArrivalHour(int hour) const;
     /**
      * The update* methods get the data from the data fetcher
      *
@@ -103,7 +99,6 @@ namespace TrRouting {
     
   protected:
     DataStatus loadAllData();
-    void generateConnectionsIteratorCache();
     int generateForwardAndReverseConnections(const std::vector<std::shared_ptr<Connection>> &connections);
 
     DataFetcher &dataFetcher;
@@ -122,11 +117,6 @@ namespace TrRouting {
 
     std::vector<std::shared_ptr<Connection>> forwardConnections; // Forward connections, sorted by departure time ascending
     std::vector<std::shared_ptr<Connection>> reverseConnections; // Reverse connections, sorted by arrival time descending
-
-    // Contains iterator matching each hour of the day from the corresponding connections container.
-    // Used to speed up iterating the connections by skipping the connections that are too early or too late
-    std::vector<std::vector<std::shared_ptr<Connection>>::const_iterator> forwardConnectionsBeginIteratorCache;
-    std::vector<std::vector<std::shared_ptr<Connection>>::const_iterator> reverseConnectionsBeginIteratorCache;
 
     mutable ScenarioConnectionCache scenarioConnectionCache = ScenarioConnectionCache();
   };

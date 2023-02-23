@@ -50,7 +50,7 @@ namespace TrRouting
     tripsEnabled.clear();
     tripsQueryOverlay.clear();
 
-    spdlog::info("{} connections", transitData.getForwardConnections().size());;
+    spdlog::info("{} connections", transitData.getConnectionCount());;
 
     //int benchmarkingStart = algorithmCalculationTime.getEpoch();
 
