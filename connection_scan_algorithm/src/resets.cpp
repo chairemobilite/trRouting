@@ -258,6 +258,7 @@ namespace TrRouting
     // exclusions than the scenario (the combinations of lines). It is not
     // redundant with the one in the connection cache generator
     // TODO: This code is very similar to the one in getConnectionsForScenario, extract it
+    tripsDisabled.clear();
     for (auto & tripIte : connectionSet.get()->getTrips())
     {
       const Trip & trip = tripIte.get();
@@ -346,7 +347,9 @@ namespace TrRouting
           enabled = false;
         }
       }
-      tripsEnabled[trip.uid] = enabled;
+      if (!enabled) {
+        tripsDisabled[trip.uid] = true;
+      }
     }
 
   }

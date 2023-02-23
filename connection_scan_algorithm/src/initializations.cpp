@@ -47,7 +47,7 @@ namespace TrRouting
     forwardJourneysSteps.clear();
     reverseJourneysSteps.clear();
 
-    tripsEnabled.clear();
+    tripsDisabled.clear();
     tripsQueryOverlay.clear();
 
     spdlog::info("{} connections", transitData.getConnectionCount());;
