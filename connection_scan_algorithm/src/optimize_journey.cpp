@@ -89,10 +89,10 @@ namespace TrRouting
           // get in-between nodes for the journet step trip segment (boarding and unboarding excluded):
           for(int sequenceIdx = sequenceStartIdx + 1; sequenceIdx <= sequenceEndIdx; ++sequenceIdx)
           {
-            const Node & nodeDep = trip.forwardConnections[sequenceIdx]->getDepartureNode();
+            const Node & nodeDep = trip.forwardConnections[sequenceIdx].get().getDepartureNode();
             if (nodeDep.uuid != firstNodeByJourneyStep.uuid && nodeDep.uuid != lastNodeByJourneyStepIdx.at(journeyStepIdx).value().get().uuid) // ignore repeated nodes at beginning or end
             {
-              inBetweenNodesByJourneyStepIdx[journeyStepIdx].push_back( trip.forwardConnections[sequenceIdx]->getDepartureNode() );
+              inBetweenNodesByJourneyStepIdx[journeyStepIdx].push_back( trip.forwardConnections[sequenceIdx].get().getDepartureNode() );
             }
           }
           
@@ -199,9 +199,9 @@ namespace TrRouting
         {
           auto connection = trip.reverseConnections[sequenceIdx];
           
-          if (optimizationNode.value() == connection->getArrivalNode())
+          if (optimizationNode.value() == connection.get().getArrivalNode())
           {
-            if (!connection->canUnboard())
+            if (!connection.get().canUnboard())
             {
               ignoreOptimizationNodes.push_back(optimizationNode.value());
               break;
@@ -217,7 +217,7 @@ namespace TrRouting
               {
                 journey.erase(journey.begin() + fromJourneyStepIdx + 1, journey.begin() + toJourneyStepIdx);
               }
-              journey[fromJourneyStepIdx].setFinalExitConnection(*connection);
+              journey[fromJourneyStepIdx].setFinalExitConnection(connection);
 
               break;
             }
@@ -235,9 +235,9 @@ namespace TrRouting
         for(size_t sequenceIdx = trip.reverseConnections.size() - 1 - sequenceEndIdx; sequenceIdx <= trip.reverseConnections.size() - 1 - sequenceStartIdx; ++sequenceIdx)
         {
           auto connection = trip.reverseConnections[sequenceIdx];
-          if (optimizationNode.value() == connection->getDepartureNode())
+          if (optimizationNode.value() == connection.get().getDepartureNode())
           {
-            if (!connection->canBoard())
+            if (!connection.get().canBoard())
             {
               ignoreOptimizationNodes.push_back(optimizationNode.value());
               break;
@@ -245,7 +245,7 @@ namespace TrRouting
             else
             {
               usedOptimizationCases.push_back(2);
-              journey[toJourneyStepIdx].setFinalEnterConnection(*connection);
+              journey[toJourneyStepIdx].setFinalEnterConnection(connection);
               journey[toJourneyStepIdx].setTransferTimeDistance(0,0);
               break;
             }
@@ -264,9 +264,9 @@ namespace TrRouting
         {
           auto connection = trip.reverseConnections[sequenceIdx];
           
-          if (optimizationNode.value() == connection->getArrivalNode())
+          if (optimizationNode.value() == connection.get().getArrivalNode())
           {
-            if (!connection->canUnboard())
+            if (!connection.get().canUnboard())
             {
               ignoreOptimizationNodes.push_back(optimizationNode.value());
               break;
@@ -274,7 +274,7 @@ namespace TrRouting
             else
             {
               usedOptimizationCases.push_back(3);
-              journey[fromJourneyStepIdx].setFinalExitConnection(*connection);
+              journey[fromJourneyStepIdx].setFinalExitConnection(connection);
               journey[toJourneyStepIdx].setTransferTimeDistance(0,0);
               break;
             }
@@ -292,17 +292,17 @@ namespace TrRouting
         int departureJourneyStepSequenceStartIdx = journey[toJourneyStepIdx].getFinalEnterConnection().value().get().getSequenceInTrip() - 1;
         int departureJourneyStepSequenceEndIdx   = journey[toJourneyStepIdx].getFinalExitConnection().value().get().getSequenceInTrip() - 1;
 
-        std::optional<std::reference_wrapper<Connection>> exitConnection;
+        std::optional<std::reference_wrapper<const Connection>> exitConnection;
 
         {
           for(size_t sequenceIdx = arrivalJourneyStepTrip.reverseConnections.size() - 1 - arrivalJourneyStepSequenceEndIdx; sequenceIdx <= arrivalJourneyStepTrip.reverseConnections.size() - 1 - arrivalJourneyStepSequenceStartIdx; ++sequenceIdx)
           {
             auto connection = arrivalJourneyStepTrip.reverseConnections[sequenceIdx];
-            if (optimizationNode.value() == connection->getArrivalNode())
+            if (optimizationNode.value() == connection.get().getArrivalNode())
             {
-              if (connection->canUnboard())
+              if (connection.get().canUnboard())
               {
-                exitConnection = *connection;
+                exitConnection = connection;
               }
               else
               {
@@ -314,13 +314,13 @@ namespace TrRouting
           for(size_t sequenceIdx = departureJourneyStepTrip.reverseConnections.size() - 1 - departureJourneyStepSequenceEndIdx; sequenceIdx <= departureJourneyStepTrip.reverseConnections.size() - 1 - departureJourneyStepSequenceStartIdx; ++sequenceIdx)
           {
             auto connection = departureJourneyStepTrip.reverseConnections[sequenceIdx];
-            if (optimizationNode.value() == connection->getDepartureNode())
+            if (optimizationNode.value() == connection.get().getDepartureNode())
             {
-              if (exitConnection.has_value() && connection->canBoard())
+              if (exitConnection.has_value() && connection.get().canBoard())
               {
                 usedOptimizationCases.push_back(4);
                 journey[fromJourneyStepIdx].setFinalExitConnection(exitConnection.value());
-                journey[toJourneyStepIdx].setFinalEnterConnection(*connection);
+                journey[toJourneyStepIdx].setFinalEnterConnection(connection);
               }
               else
               {

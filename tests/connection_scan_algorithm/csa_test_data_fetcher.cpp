@@ -322,14 +322,14 @@ int TestDataFetcher::getScenarios(
 
 
 
-void addTripData(TrRouting::Trip & trip, TrRouting::Path & path, std::vector<std::shared_ptr<TrRouting::Connection>>& connections, int arrivalTimes[], int departureTimes[], int arraySize)
+void addTripData(TrRouting::Trip & trip, TrRouting::Path & path, std::vector<TrRouting::Connection>& connections, int arrivalTimes[], int departureTimes[], int arraySize)
 {
     path.tripsRef.push_back(trip);
 
     trip.connectionDepartureTimes.resize(arraySize);
 
     for (int nodeTimeI = 0; nodeTimeI < arraySize - 1; nodeTimeI++) {
-      std::shared_ptr<TrRouting::Connection> forwardConnection(std::make_shared<TrRouting::Connection>(TrRouting::Connection(
+        connections.push_back(TrRouting::Connection(
             path.nodesRef[nodeTimeI],
             path.nodesRef[nodeTimeI + 1],
             departureTimes[nodeTimeI],
@@ -340,9 +340,7 @@ void addTripData(TrRouting::Trip & trip, TrRouting::Path & path, std::vector<std
             nodeTimeI + 1,
             trip.allowSameLineTransfers,
             -1
-        )));
-
-        connections.push_back(std::move(forwardConnection));
+        ));
 
         trip.connectionDepartureTimes[nodeTimeI] = departureTimes[nodeTimeI];
 
@@ -359,7 +357,7 @@ int TestDataFetcher::getSchedules(
                                   const std::map<boost::uuids::uuid, TrRouting::Line>& lines,
                                   std::map<boost::uuids::uuid, TrRouting::Path>& paths,
                                   const std::map<boost::uuids::uuid, TrRouting::Service>& services,
-                                  std::vector<std::shared_ptr<TrRouting::Connection>>& connections,
+                                  std::vector<TrRouting::Connection>& connections,
                                   std::string
                                   ) {
 
