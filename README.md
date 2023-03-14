@@ -27,6 +27,7 @@ https://chairemobilite.github.io/trRouting/
 ```
 brew install boost
 brew install capnp
+brew install spdlog
 ```
 
 ## Ubuntu 16.04 Install
