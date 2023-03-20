@@ -268,6 +268,59 @@ TEST_F(SingleTAndACalculationFixtureTests, TripWithAlternatives)
     );
 }
 
+// Test a trip with alternatives, the same as TripWithAlternatives, but with a
+// max travel time just above the first alternative's, so that the second
+// alternative should not be present
+TEST_F(SingleTAndACalculationFixtureTests, TripWithAlternativesTooLong)
+{
+    int departureTime = getTimeInSeconds(9, 45);
+    // This is where mocking would be interesting. Those were taken from the first run of the test
+    int accessTime = 469;
+    int expectedTransitDepartureTime = getTimeInSeconds(10);
+    // First trip gets off at midpoint, walks to east 1 and takes extra line and walks from extra node to destination
+    int egressTimeAlt1 = 77;
+    int expTransferWaitingTime1 = 300;
+    int expTransferWalkingTime = 480;
+
+    int alt1TravelTime = expectedTransitDepartureTime - departureTime + egressTimeAlt1 + expTransferWaitingTime1 + expTransferWalkingTime + 12 * 60;
+
+    // Set the max travel time to 1 minute above the first alternative's time
+    TrRouting::RouteParameters testParameters = TrRouting::RouteParameters(
+        std::make_unique<TrRouting::Point>(45.5242, -73.5817),
+        std::make_unique<TrRouting::Point>(45.5541, -73.6186),
+        transitData.getScenarios().at(TestDataFetcher::scenarioUuid),
+        departureTime,
+        DEFAULT_MIN_WAITING_TIME,
+        alt1TravelTime + 60,
+        DEFAULT_MAX_ACCESS_TRAVEL_TIME,
+        DEFAULT_MAX_EGRESS_TRAVEL_TIME,
+        DEFAULT_MAX_TRANSFER_TRAVEL_TIME,
+        DEFAULT_FIRST_WAITING_TIME,
+        true,
+        true
+    );
+
+    TrRouting::AlternativesResult routingResult = calculateWithAlternatives(testParameters);
+    ASSERT_EQ(1u, routingResult.alternatives.size());
+    // TODO: Why is it 5? Would it be a sign of an error? To investigate
+    ASSERT_EQ(5, routingResult.totalAlternativesCalculated);
+
+    TrRouting::SingleCalculationResult& alternativeResult1 = dynamic_cast<TrRouting::SingleCalculationResult&>(*routingResult.alternatives[0].get());
+    assertSuccessResults(alternativeResult1,
+        departureTime,
+        expectedTransitDepartureTime,
+        12 * 60,
+        accessTime,
+        egressTimeAlt1,
+        1,
+        MIN_WAITING_TIME,
+        MIN_WAITING_TIME + expTransferWaitingTime1,
+        expTransferWaitingTime1,
+        expTransferWalkingTime
+    );
+
+}
+
 // Test a query with alternatives, for a trip with no routing found because too far from network
 TEST_F(SingleTAndACalculationFixtureTests, TripWithNoRoutingAlternatives)
 {
