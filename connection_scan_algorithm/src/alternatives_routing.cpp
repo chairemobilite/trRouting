@@ -194,7 +194,7 @@ namespace TrRouting
           alternativeParameters.exceptLines.push_back(line);
         }
 
-        spdlog::info("calculating alternative {} from a total of {} ...", alternativeSequence, alternativesCalculatedCount);
+        spdlog::debug("calculating alternative {} from a total of {} ...", alternativeSequence, alternativesCalculatedCount);
         
         spdlog::debug("except lines: {}", LinesToString(combination));
 

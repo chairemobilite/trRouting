@@ -391,8 +391,8 @@ int main(int argc, char** argv) {
         {
           calculator.odTripGlob = transitData.getOdTrips().at(calculator.params.odTripUuid.value());
           foundOdTrip = true;
-          spdlog::info("od trip uuid {}", to_string(calculator.odTripGlob.value().get().uuid));
-          spdlog::info("dts {} ", calculator.odTripGlob.value().get().departureTimeSeconds);
+          spdlog::debug("od trip uuid {}", to_string(calculator.odTripGlob.value().get().uuid));
+          spdlog::debug("dts {} ", calculator.odTripGlob.value().get().departureTimeSeconds);
           if (routeParams.isWithAlternatives())
           {
             alternativeResult = calculator.alternativesRouting(routeParams);
@@ -476,7 +476,7 @@ int main(int argc, char** argv) {
       parametersWithValues.push_back(std::make_pair(field.first, field.second));
     }
 
-    spdlog::debug("-- calculating request -- {}", request->path);
+    spdlog::info("-- calculating route request --");
 
     try
     {
@@ -496,7 +496,7 @@ int main(int argc, char** argv) {
           }
         }
 
-        spdlog::debug("-- total -- {} microseconds", calculator.algorithmCalculationTime.getDurationMicrosecondsNoStop());
+        spdlog::info("-- route request complete --");
 
       } catch (NoRoutingFoundException &e) {
         response = ResultToV2Response::noRoutingFoundResponse(queryParams, e.getReason()).dump(2);
@@ -505,9 +505,18 @@ int main(int argc, char** argv) {
       *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
 
     } catch (ParameterException &exp) {
-      response = "{\"status\": \"query_error\", \"errorCode\": \"" + getResponseCode(exp.getType()) + "\"}";
+      auto responseCode = getResponseCode(exp.getType());
+      spdlog::info("-- parameter exception in route calculation -- {}", responseCode);
+      response = "{\"status\": \"query_error\", \"errorCode\": \"" + responseCode + "\"}";
       *serverResponse << "HTTP/1.1 400 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
     } catch (...) {
+      std::exception_ptr eptr = std::current_exception(); // capture
+      try {
+          std::rethrow_exception(eptr);
+      } catch(const std::exception& e) {
+          spdlog::error("-- unknown exception in route calculation -- {}", e.what());
+          std::cout << "Caught exception \"" << e.what() << "\"\n";
+      }
       response = "{\"status\": \"query_error\", \"errorCode\": \"PARAM_ERROR_UNKNOWN\"}";
       *serverResponse << "HTTP/1.1 400 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
     }
@@ -538,7 +547,7 @@ int main(int argc, char** argv) {
       parametersWithValues.push_back(std::make_pair(field.first, field.second));
     }
 
-    spdlog::debug("-- calculating request -- {}", request->path);
+    spdlog::info("-- calculating summary request --");
 
     try
     {
@@ -558,7 +567,7 @@ int main(int argc, char** argv) {
           }
         }
 
-        spdlog::debug("-- total -- {} microseconds", calculator.algorithmCalculationTime.getDurationMicrosecondsNoStop());
+        spdlog::info("-- summary request complete --");
 
       } catch (NoRoutingFoundException &e) {
         response = ResultToV2SummaryResponse::noRoutingFoundResponse(queryParams, e.getReason()).dump(2);
@@ -567,9 +576,18 @@ int main(int argc, char** argv) {
       *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
 
     } catch (ParameterException &exp) {
-      response = "{\"status\": \"query_error\", \"errorCode\": \"" + getResponseCode(exp.getType()) + "\"}";
+      auto responseCode = getResponseCode(exp.getType());
+      spdlog::info("-- parameter exception in summary calculation -- {}", responseCode);
+      response = "{\"status\": \"query_error\", \"errorCode\": \"" + responseCode + "\"}";
       *serverResponse << "HTTP/1.1 400 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
     } catch (...) {
+      std::exception_ptr eptr = std::current_exception(); // capture
+      try {
+          std::rethrow_exception(eptr);
+      } catch(const std::exception& e) {
+          spdlog::error("-- unknown exception in summary calculation -- {}", e.what());
+          std::cout << "Caught exception \"" << e.what() << "\"\n";
+      }
       response = "{\"status\": \"query_error\", \"errorCode\": \"PARAM_ERROR_UNKNOWN\"}";
       *serverResponse << "HTTP/1.1 400 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
     }
@@ -600,7 +618,7 @@ int main(int argc, char** argv) {
       parametersWithValues.push_back(std::make_pair(field.first, field.second));
     }
 
-    spdlog::debug("-- calculating request -- {}", request->path);
+    spdlog::info("-- calculating accessibility request --");
 
     try
     {
@@ -612,7 +630,7 @@ int main(int argc, char** argv) {
           response = ResultToV2AccessibilityResponse::resultToJsonString(*accessibilityResult.get(), queryParams).dump(2);
         }
 
-        spdlog::debug("-- total -- {} microseconds", calculator.algorithmCalculationTime.getDurationMicrosecondsNoStop());
+        spdlog::info("-- accessibility request complete --");
 
       } catch (NoRoutingFoundException &e) {
         response = ResultToV2AccessibilityResponse::noRoutingFoundResponse(queryParams, e.getReason()).dump(2);
@@ -621,13 +639,16 @@ int main(int argc, char** argv) {
       *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
 
     } catch (ParameterException &exp) {
-      response = "{\"status\": \"query_error\", \"errorCode\": \"" + getResponseCode(exp.getType()) + "\"}";
+      auto responseCode = getResponseCode(exp.getType());
+      spdlog::info("-- parameter exception in accessibility map calculation -- {}", responseCode);
+      response = "{\"status\": \"query_error\", \"errorCode\": \"" + responseCode + "\"}";
       *serverResponse << "HTTP/1.1 400 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
     } catch (...) {
-       std::exception_ptr eptr = std::current_exception(); // capture
+      std::exception_ptr eptr = std::current_exception(); // capture
       try {
           std::rethrow_exception(eptr);
       } catch(const std::exception& e) {
+          spdlog::error("-- unknown exception in accessibility calculation -- {}", e.what());
           std::cout << "Caught exception \"" << e.what() << "\"\n";
       }
       response = "{\"status\": \"query_error\", \"errorCode\": \"PARAM_ERROR_UNKNOWN\"}";
