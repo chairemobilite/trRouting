@@ -76,6 +76,7 @@ namespace TrRouting
             nodeDepartureTentativeTime = MAX_INT;
           }
 
+          // TODO Do we need to make sure the departure node exists in the forwardJourneySteps map? For the reverse calculation, we had to in order to fix issue https://github.com/chairemobilite/trRouting/issues/250 The issue may apply to forward too, but we have no example
           auto nodesAccessIte = nodesAccess.find(nodeDeparture.uid);          
           nodeWasAccessedFromOrigin  = parameters.getMaxFirstWaitingTimeSeconds() > 0 &&
             nodesAccessIte != nodesAccess.end() &&

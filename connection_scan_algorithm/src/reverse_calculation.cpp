@@ -86,10 +86,12 @@ namespace TrRouting
           )
           {
             
-            if ((*connection).get().canUnboard())
+            // Make sure the arrival of the connection can unboard and is a candidate for the journey. Nodes are candidate if they can either reach the destination by foot, or a connection that can reach the destination within the specified parameters.
+            auto rjsIte = reverseJourneysSteps.find(nodeArrival.uid);
+            if ((*connection).get().canUnboard() && rjsIte != reverseJourneysSteps.end())
             {
               // Extract journeyStep once from map
-              const JourneyStep & reverseStepAtArrival = reverseJourneysSteps.at(nodeArrival.uid);
+              const JourneyStep & reverseStepAtArrival = rjsIte->second;
               if (!tripExitConnection.has_value()) // <= to make sure we get the same result as forward calculation, which uses >
               {
                 currentTripQueryOverlay.exitConnection = *connection;
