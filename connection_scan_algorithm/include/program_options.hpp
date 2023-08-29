@@ -16,6 +16,7 @@ namespace TrRouting
     std::string cachePath;
     int         port;
     bool        debug;
+    bool        cacheAllConnectionSets;
     std::string algorithm;
     std::string dataFetcherShortname;
     std::string osrmWalkingPort;

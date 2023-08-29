@@ -20,7 +20,7 @@
 
 namespace TrRouting {
 
-  TransitData::TransitData(DataFetcher& fetcher) :
+  TransitData::TransitData(DataFetcher& fetcher, bool cacheAllScenarios) :
     dataFetcher(fetcher)
   {
     DataStatus loadStatus = loadAllData();
@@ -29,6 +29,17 @@ namespace TrRouting {
       //throw std::exception("Incomplete transit data");
       spdlog::error("TransitData loading had error, object will not be valid");
     }
+    if (cacheAllScenarios) {
+      scenarioConnectionCache = new ScenarioConnectionCacheAll();
+      spdlog::info("Will cache all connectionSets");
+    } else {
+      scenarioConnectionCache = new ScenarioConnectionCacheOne();
+      spdlog::info("Will cache one connectionSet");
+    }
+  }
+
+  TransitData::~TransitData() {
+    delete scenarioConnectionCache;
   }
 
   DataStatus TransitData::getDataStatus() const {
@@ -332,7 +343,7 @@ namespace TrRouting {
   }
   
   std::shared_ptr<ConnectionSet> TransitData::getConnectionsForScenario(const Scenario & scenario) const {
-    std::optional<std::shared_ptr<ConnectionSet>> optCurrentCache = scenarioConnectionCache.get(scenario.uuid);
+    std::optional<std::shared_ptr<ConnectionSet>> optCurrentCache = scenarioConnectionCache->get(scenario.uuid);
     if (optCurrentCache.has_value()) {
       return optCurrentCache.value();
     }
@@ -455,7 +466,7 @@ namespace TrRouting {
     }
 
     std::shared_ptr<ConnectionSet> currentCache = std::make_shared<ConnectionSet>(trips, scenarioForwardConnections, scenarioReverseConnections);
-    scenarioConnectionCache.set(scenario.uuid, currentCache);
+    scenarioConnectionCache->set(scenario.uuid, currentCache);
     return currentCache;
     
   }
