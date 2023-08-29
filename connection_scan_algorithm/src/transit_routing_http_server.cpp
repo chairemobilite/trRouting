@@ -128,7 +128,7 @@ int main(int argc, char** argv) {
   }
 
   spdlog::info("preparing calculator...");
-  TransitData transitData(*fetcher);
+  TransitData transitData(*fetcher, programOptions.cacheAllConnectionSets);
   //TODO We wanted to handle error in the constructor, but later part of this code expect a dataStatus
   // leaving as a todo
   DataStatus dataStatus = transitData.getDataStatus();

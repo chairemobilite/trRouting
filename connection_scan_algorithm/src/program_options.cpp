@@ -16,6 +16,8 @@ namespace TrRouting {
       ("dataFetcher,data",                                  boost::program_options::value<std::string>()->default_value("cache"), "data fetcher (csv, gtfs or cache)"); // only cache implemented for now
     options.add_options()
       ("cachePath",                                         boost::program_options::value<std::string>()->default_value("cache"), "cache path");
+   options.add_options()
+      ("cacheAllConnectionSets",                            boost::program_options::value<bool>()       ->default_value(false), "cache all connections set instead of the ones from the last used scenario");
     options.add_options()
       ("osrmPort,osrmWalkPort,osrmWalkingPort",             boost::program_options::value<std::string>()->default_value("5000"), "osrm walking port");
     options.add_options()
@@ -40,6 +42,7 @@ namespace TrRouting {
     debug                = false;
     dataFetcherShortname = "cache";
     cachePath            = "cache";
+    cacheAllConnectionSets = false;
     osrmWalkingPort      = "5000";
     osrmCyclingPort      = "8000";
     osrmDrivingPort      = "7000";
@@ -70,6 +73,10 @@ namespace TrRouting {
     if(variablesMap.count("cachePath") == 1)
     {
       cachePath = variablesMap["cachePath"].as<std::string>();
+    }
+    if(variablesMap.count("cacheAllConnectionSets") == 1)
+    {
+      cacheAllConnectionSets = variablesMap["cacheAllConnectionSets"].as<bool>();
     }
 
     if(variablesMap.count("osrmWalkPort") == 1)

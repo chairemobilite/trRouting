@@ -52,7 +52,8 @@ namespace TrRouting {
 
   class TransitData {
   public:
-    TransitData(DataFetcher& dataFetcher);
+    TransitData(DataFetcher& dataFetcher, bool cacheAllScenarios = false);
+    virtual ~TransitData();
     DataStatus getDataStatus() const;
     
     // const data access functions
@@ -119,7 +120,8 @@ namespace TrRouting {
     std::vector<std::reference_wrapper<const Connection>> forwardConnections; // Forward connections, sorted by departure time ascending
     std::vector<std::reference_wrapper<const Connection>> reverseConnections; // Reverse connections, sorted by arrival time descending
 
-    mutable ScenarioConnectionCache scenarioConnectionCache = ScenarioConnectionCache();
+    //TODO Consider using a reference instead, making sure the object is always valid
+    mutable ScenarioConnectionCache *scenarioConnectionCache;
   };
 
 }
