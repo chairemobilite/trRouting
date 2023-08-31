@@ -29,6 +29,7 @@
 #include "routing_result.hpp"
 #include "transit_data.hpp"
 #include "osrmgeofilter.hpp"
+#include "euclideangeofilter.hpp"
 
 using namespace TrRouting;
 
@@ -125,8 +126,18 @@ int main(int argc, char** argv) {
   //TODO We wanted to handle error in the constructor, but later part of this code expect a dataStatus
   // leaving as a todo
   DataStatus dataStatus = transitData.getDataStatus();
-  OsrmGeoFilter geoFilter("walking", programOptions.osrmWalkingHost, programOptions.osrmWalkingPort);
-  Calculator calculator(transitData, geoFilter);
+
+  // Selection which geofilter to use. OSRM is the default one. Euclidean mostly used for debugging and testing
+  GeoFilter *geoFilter = 0;
+  if (programOptions.useEuclideanDistance) {
+    geoFilter = new EuclideanGeoFilter();
+    spdlog::info("Using Euclidean distance for access/egress node time/distance");
+  } else {
+    geoFilter = new OsrmGeoFilter("walking", programOptions.osrmWalkingHost, programOptions.osrmWalkingPort);
+    spdlog::info("Using OSRM for access/egress node time/distance");
+  }
+
+  Calculator calculator(transitData, *geoFilter);
   //TODO, should this be in the constructor?
   calculator.initializeCalculationData();
   spdlog::info("preparing server...");
