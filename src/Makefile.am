@@ -11,7 +11,9 @@ lines_cache_fetcher.cpp \
 modes_initialization.cpp \
 nodes_cache_fetcher.cpp \
 od_trips_cache_fetcher.cpp \
-osrm_fetcher.cpp \
+geofilter.cpp \
+euclideangeofilter.cpp \
+osrmgeofilter.cpp \
 paths_cache_fetcher.cpp \
 persons_cache_fetcher.cpp \
 scenarios_cache_fetcher.cpp \

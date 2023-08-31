@@ -6,7 +6,6 @@
 #include "csa_test_base.hpp"
 #include "scenario.hpp"
 #include "toolbox.hpp" //MAX_INT
-#include "osrm_fetcher.hpp"
 
 // This fixture tests the calculations for the accessibility map from/to a point
 class AccessMapFixtureTests : public BaseCsaFixtureTests
@@ -35,7 +34,6 @@ std::unique_ptr<TrRouting::AllNodesResult> AccessMapFixtureTests::calculateOd(Tr
 {
     // FIXME: This needs to be called to set some default values that are still part of the global parameters
     calculator.params.setDefaultValues();
-    TrRouting::OsrmFetcher::birdDistanceAccessibilityEnabled = true;
 
     // TODO Shouldn't need to do this, but we do for now, benchmark needs to be started
     calculator.algorithmCalculationTime.start();

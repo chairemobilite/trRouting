@@ -19,7 +19,6 @@
 #include "trip.hpp"
 #include "od_trip.hpp"
 #include "node.hpp"
-#include "osrm_fetcher.hpp"
 
 /**
  * This file covers od trips use cases, where the value of od_trips is set to 1
@@ -65,7 +64,6 @@ nlohmann::json RouteOdTripsFixtureTests::calculateOdTrips(std::vector<std::strin
                                                                       transitData.getOdTrips(),
                                                                       transitData.getNodes(),
                                                                       transitData.getDataSources());
-    TrRouting::OsrmFetcher::birdDistanceAccessibilityEnabled = true;
 
     // TODO Shouldn't need to do this, but we do for now, benchmark needs to be started
     calculator.algorithmCalculationTime.start();

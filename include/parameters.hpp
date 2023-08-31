@@ -281,8 +281,6 @@ namespace TrRouting
       std::optional<boost::uuids::uuid> startingNodeUuid;
       std::optional<boost::uuids::uuid> endingNodeUuid;
 
-      std::string accessMode;
-      std::string egressMode;
       bool tryNextModeIfRoutingFails;
       std::string noResultSecondMode;
       int noResultNextAccessTimeSecondsIncrement;

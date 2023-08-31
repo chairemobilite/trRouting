@@ -2,7 +2,6 @@
 #include "calculator.hpp"
 #include "parameters.hpp"
 #include "trip.hpp"
-#include "osrm_fetcher.hpp"
 #include "toolbox.hpp" //MAX_INT
 #include "od_trip.hpp"
 #include "routing_result.hpp"
@@ -13,6 +12,7 @@
 #include "node.hpp"
 #include "transit_data.hpp"
 #include "connection_set.hpp"
+#include "geofilter.hpp"
 
 namespace TrRouting
 {
@@ -199,9 +199,9 @@ namespace TrRouting
     }
     else
     {
-      spdlog::debug("  fetching nodes with osrm with mode {}", params.accessMode);
+      spdlog::debug("  fetching nodes with osrm");
 
-      accessFootpaths = OsrmFetcher::getAccessibleNodesFootpathsFromPoint(origin, transitData.getNodes(), params.accessMode, parameters.getMaxAccessWalkingTravelTimeSeconds(), params.walkingSpeedMetersPerSecond);
+      accessFootpaths = geoFilter.getAccessibleNodesFootpathsFromPoint(origin, transitData.getNodes(), parameters.getMaxAccessWalkingTravelTimeSeconds(), params.walkingSpeedMetersPerSecond);
       if (accessFootpaths.size() == 0) {
         accessFootpathOk = false;
       }
@@ -240,7 +240,7 @@ namespace TrRouting
     }
     else
     {
-      egressFootpaths = OsrmFetcher::getAccessibleNodesFootpathsFromPoint(destination, transitData.getNodes(), params.accessMode, parameters.getMaxEgressWalkingTravelTimeSeconds(), params.walkingSpeedMetersPerSecond);
+      egressFootpaths = geoFilter.getAccessibleNodesFootpathsFromPoint(destination, transitData.getNodes(), parameters.getMaxEgressWalkingTravelTimeSeconds(), params.walkingSpeedMetersPerSecond);
       if (egressFootpaths.size() == 0) {
         egressFootpathOk = false;
       }

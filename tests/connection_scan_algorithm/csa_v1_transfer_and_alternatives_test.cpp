@@ -21,7 +21,6 @@
 #include "person.hpp"
 #include "place.hpp"
 #include "od_trip.hpp"
-#include "osrm_fetcher.hpp"
 
 /**
  * This file covers tests with transfers and requests for alternatives
@@ -184,7 +183,6 @@ TrRouting::AlternativesResult TAndACalculationFixtureTests::calculateWithAlterna
                                                                       transitData.getOdTrips(),
                                                                       transitData.getNodes(),
                                                                       transitData.getDataSources());
-    TrRouting::OsrmFetcher::birdDistanceAccessibilityEnabled = true;
 
     // TODO Shouldn't need to do this, but we do for now, benchmark needs to be started
     calculator.algorithmCalculationTime.start();
