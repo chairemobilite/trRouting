@@ -47,8 +47,6 @@ namespace TrRouting
     maxTotalWalkingTravelTimeSeconds       = 60*60; // not used right now
     maxOnlyWalkingAccessTravelTimeRatio    = 1.5; // prefer walking only if it is faster than transit and total only walking travel time <= maxAccessWalkingTravelTimeSeconds * this ratio
     transferPenaltySeconds                 = 0; // not used right now
-    accessMode                             = "walking";
-    egressMode                             = "walking";
     noResultSecondMode                     = "driving";
     tryNextModeIfRoutingFails              = false;
     noResultNextAccessTimeSecondsIncrement = 5*60;

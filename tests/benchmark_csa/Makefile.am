@@ -18,7 +18,8 @@ gtest_SOURCES = gtest.cpp \
     ../../src/connection_set.cpp \
     ../../src/connection_cache.cpp \
     ../../src/transit_data.cpp \
-    ../../src/osrm_fetcher.cpp
+    ../../src/geofilter.cpp \
+    ../../src/euclideangeofilter.cpp
 
 #TODO #167 Place/Household removed while refactoring
 #../../src/households_cache_fetcher.cpp \

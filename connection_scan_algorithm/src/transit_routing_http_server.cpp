@@ -27,8 +27,8 @@
 #include "result_to_v2_summary.hpp"
 #include "result_to_v2_accessibility.hpp"
 #include "routing_result.hpp"
-#include "osrm_fetcher.hpp"
 #include "transit_data.hpp"
+#include "osrmgeofilter.hpp"
 
 using namespace TrRouting;
 
@@ -108,13 +108,6 @@ int main(int argc, char** argv) {
   // setup program options:
   spdlog::info("Starting transit routing on port {} for the data: {}", programOptions.port, programOptions.cachePath);
   
-  OsrmFetcher::osrmWalkingPort        = programOptions.osrmWalkingPort;
-  OsrmFetcher::osrmCyclingPort        = programOptions.osrmCyclingPort;
-  OsrmFetcher::osrmDrivingPort        = programOptions.osrmDrivingPort;
-  OsrmFetcher::osrmWalkingHost        = programOptions.osrmWalkingHost;
-  OsrmFetcher::osrmCyclingHost        = programOptions.osrmCyclingHost;
-  OsrmFetcher::osrmDrivingHost        = programOptions.osrmDrivingHost;
-
   if (programOptions.debug) {
     spdlog::set_level(spdlog::level::debug);
   }
@@ -132,8 +125,8 @@ int main(int argc, char** argv) {
   //TODO We wanted to handle error in the constructor, but later part of this code expect a dataStatus
   // leaving as a todo
   DataStatus dataStatus = transitData.getDataStatus();
-  
-  Calculator calculator(transitData);
+  OsrmGeoFilter geoFilter("walking", programOptions.osrmWalkingHost, programOptions.osrmWalkingPort);
+  Calculator calculator(transitData, geoFilter);
   //TODO, should this be in the constructor?
   calculator.initializeCalculationData();
   spdlog::info("preparing server...");

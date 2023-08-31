@@ -6,6 +6,7 @@
 #include "gtest/gtest.h"
 #include "csa_test_data_fetcher.hpp"
 #include "transit_data.hpp"
+#include "euclideangeofilter.hpp"
 #include "calculator.hpp"
 #include "routing_result.hpp"
 
@@ -19,11 +20,12 @@ protected:
     // A DataFetcher is required to initialize the calculator
     TestDataFetcher dataFetcher;
     TrRouting::TransitData transitData;
+    TrRouting::EuclideanGeoFilter geoFilter;
     // Calculator is the entry point to run the algorithm, it is part of the test object since (for now) there is nothing specific for its initialization.
     TrRouting::Calculator calculator;
 
 public:
-    BaseCsaFixtureTests() : dataFetcher(TestDataFetcher()), transitData(TrRouting::TransitData(dataFetcher)), calculator(TrRouting::Calculator(transitData)) {}
+    BaseCsaFixtureTests() : dataFetcher(TestDataFetcher()), transitData(TrRouting::TransitData(dataFetcher)), calculator(TrRouting::Calculator(transitData, geoFilter)) {}
     void SetUp();
     // Assert the result returned an exception and that the reason matches the expected reason
     void assertNoRouting(const TrRouting::NoRoutingFoundException& exception, TrRouting::NoRoutingReason expectedReason);

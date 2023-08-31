@@ -15,8 +15,8 @@
 #include "scenario.hpp"
 #include "calculator.hpp"
 #include "benchmark_CSA_test.hpp"
-#include "osrm_fetcher.hpp"
 #include "transit_data.hpp"
+#include "euclideangeofilter.hpp"
 
 using namespace TrRouting;
 
@@ -24,6 +24,7 @@ const int NB_ITER = 30;
 
 // Global test suite variables, they should not be reset for each test
 TransitData* transitData; //TODO Required only to get the scenario, we might want to get it in another way
+EuclideanGeoFilter* geoFilter;
 Calculator* calculator;
 std::ofstream benchmarkResultsFile;
 std::ofstream benchmarkDetailedResultsFile;
@@ -64,18 +65,12 @@ public:
   // Initialize calculator and parameters. Open the result files and add headers
   static void SetUpTestSuite()
   {
-    OsrmFetcher::osrmWalkingPort = "5000";
-    OsrmFetcher::osrmWalkingHost = "localhost"; //"http://localhost";
-    OsrmFetcher::osrmCyclingPort = "8000";
-    OsrmFetcher::osrmCyclingHost = "localhost";
-    OsrmFetcher::osrmDrivingPort = "7000";
-    OsrmFetcher::osrmDrivingHost = "localhost";
-
     CacheFetcher cacheFetcher = TrRouting::CacheFetcher("cache/demo_transition");
     transitData = new TrRouting::TransitData(cacheFetcher);
-    OsrmFetcher::birdDistanceAccessibilityEnabled = true;
+    // Use simple distance in the benchmark instead of OSRM
+    geoFilter = new TrRouting::EuclideanGeoFilter();
 
-    calculator = new TrRouting::Calculator(*transitData);
+    calculator = new TrRouting::Calculator(*transitData, *geoFilter);
 
     if (!updateCalculatorFromCache(*transitData)) {
       ASSERT_EQ(true, false);

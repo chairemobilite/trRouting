@@ -3,7 +3,8 @@ check_PROGRAMS = csa_test
 # Consider refactoring or mocking so that files from ../../src are not necessary
 csa_test_SOURCES = gtest.cpp \
     ../../src/calculation_time.cpp \
-    ../../src/osrm_fetcher.cpp \
+    ../../src/euclideangeofilter.cpp \
+    ../../src/geofilter.cpp \
     ../../src/connection_set.cpp \
     ../../src/connection_cache.cpp \
     ../../src/transit_data.cpp \

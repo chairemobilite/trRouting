@@ -17,14 +17,16 @@
 #include "person.hpp"
 #include "connection_cache.hpp"
 #include "transit_data.hpp"
+#include "geofilter.hpp"
 
 namespace TrRouting
 {
 
-  Calculator::Calculator(const TransitData &_transitData) :
+  Calculator::Calculator(const TransitData &_transitData, GeoFilter &_geoFilter) :
     algorithmCalculationTime(CalculationTime()),
     odTripGlob(std::nullopt),
     transitData(_transitData),
+    geoFilter(_geoFilter),
     departureTimeSeconds(0),
     arrivalTimeSeconds(-1),
     minAccessTravelTime(0),
