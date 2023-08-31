@@ -57,7 +57,12 @@ namespace TrRouting {
     HttpClient client(host + ":" + port);
     auto s = client.request("GET", queryString);
 
-    //TODO CHeck status of s
+    if (s->status_code != "200 OK") {
+      spdlog::error("Error fetching OSRM data ({})", s->status_code);
+      //TODO We should throw an exception somehow here to invalidate the current calculation
+      // and returne an informative error code to the user
+      return accessibleNodesFootpaths;
+    }
     
     std::stringstream responseJsonSs;
     responseJsonSs << s->content.rdbuf();
