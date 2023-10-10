@@ -469,6 +469,7 @@ int main(int argc, char** argv) {
     calculator.benchmarking.clear();
 
     // prepare parameters:
+    calculator.params.setDefaultValues(); // Reset global params object (TODO only need while its global)
     std::vector<std::pair<std::string, std::string>> parametersWithValues;
     auto queryFields = request->parse_query_string();
     for(auto &field : queryFields)
@@ -540,6 +541,7 @@ int main(int argc, char** argv) {
     calculator.benchmarking.clear();
 
     // prepare parameters:
+    calculator.params.setDefaultValues(); // Reset global params object (TODO only need while its global)
     std::vector<std::pair<std::string, std::string>> parametersWithValues;
     auto queryFields = request->parse_query_string();
     for(auto &field : queryFields)
@@ -611,6 +613,7 @@ int main(int argc, char** argv) {
     calculator.benchmarking.clear();
 
     // prepare parameters:
+    calculator.params.setDefaultValues(); // Reset global params object (TODO only need while its global)
     std::vector<std::pair<std::string, std::string>> parametersWithValues;
     auto queryFields = request->parse_query_string();
     for(auto &field : queryFields)
