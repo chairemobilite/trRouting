@@ -31,6 +31,9 @@ namespace TrRouting {
 
     std::string queryString = "/table/v1/" + mode + "/" + std::to_string(point.longitude) + "," + std::to_string(point.latitude);
 
+    // We first filter the nodes with euclidean distance using the common distance calculation
+    // to only send a subset of nodes to OSRM. We do not reuse the EuclideanGeoFilter directly, since
+    // we process the data differently here. (We directly compute the OSRM query.)
     for (auto &&[uuid,node] : nodes)
     {
       distanceMetersSquared = calculateNodeDistanceSquared(node.point.get(), point, lengthOfOneDegree);
