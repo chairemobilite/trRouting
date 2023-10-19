@@ -455,7 +455,8 @@ int main(int argc, char** argv) {
   // Routing request for a single origin destination
   // TODO Copy-pasted and adapted from /route/v1/transit. There's still a lot of common code. Application code should be extracted to common functions outside the web server
   server.resource["^/v2/route[/]?$"]["GET"]=[&server, &calculator, &dataStatus, &transitData](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
-
+    // Have a global id to match the requests in the logs
+    static int routeRequestId = 0;
     std::string response = getFastErrorResponse(dataStatus);
 
     if (!response.empty()) {
@@ -476,8 +477,8 @@ int main(int argc, char** argv) {
     {
       parametersWithValues.push_back(std::make_pair(field.first, field.second));
     }
-
-    spdlog::info("-- calculating route request --");
+    int currentRequestId = routeRequestId++;
+    spdlog::info("-- calculating route request -- {}", currentRequestId);
 
     try
     {
@@ -497,10 +498,12 @@ int main(int argc, char** argv) {
           }
         }
 
-        spdlog::info("-- route request complete --");
+        spdlog::info("-- route request complete -- {}", currentRequestId);
 
       } catch (NoRoutingFoundException &e) {
         response = ResultToV2Response::noRoutingFoundResponse(queryParams, e.getReason()).dump(2);
+        spdlog::info("-- route request not found -- {}", currentRequestId);
+
       }
 
       *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
