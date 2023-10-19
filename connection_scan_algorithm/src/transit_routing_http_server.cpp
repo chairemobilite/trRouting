@@ -530,6 +530,8 @@ int main(int argc, char** argv) {
   // Request a summary of lines data for a route
   // TODO Copy pasted from v2/route. There's a lot in common, it should be extracted to common class, just the response parser is different
   server.resource["^/v2/summary[/]?$"]["GET"]=[&server, &calculator, &dataStatus, &transitData](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
+    // Have a global id to match the requests in the logs
+    static int summaryRequestId = 0;
 
     std::string response = getFastErrorResponse(dataStatus);
 
@@ -551,8 +553,9 @@ int main(int argc, char** argv) {
     {
       parametersWithValues.push_back(std::make_pair(field.first, field.second));
     }
+    int currentRequestId = summaryRequestId++;
 
-    spdlog::info("-- calculating summary request --");
+    spdlog::info("-- calculating summary request -- {}", currentRequestId);
 
     try
     {
@@ -572,10 +575,11 @@ int main(int argc, char** argv) {
           }
         }
 
-        spdlog::info("-- summary request complete --");
+        spdlog::info("-- summary request complete -- {}", currentRequestId);
 
       } catch (NoRoutingFoundException &e) {
         response = ResultToV2SummaryResponse::noRoutingFoundResponse(queryParams, e.getReason()).dump(2);
+        spdlog::info("-- summary request not found -- {}", currentRequestId);
       }
 
       *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
@@ -602,6 +606,8 @@ int main(int argc, char** argv) {
   // Routing request for a single origin destination
   // TODO Copy-pasted and adapted from /route/v1/transit. There's still a lot of common code. Application code should be extracted to common functions outside the web server
   server.resource["^/v2/accessibility[/]?$"]["GET"]=[&server, &calculator, &dataStatus, &transitData](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
+    // Have a global id to match the requests in the logs
+    static int accessibilityRequestId = 0;
 
     std::string response = getFastErrorResponse(dataStatus);
 
@@ -624,7 +630,8 @@ int main(int argc, char** argv) {
       parametersWithValues.push_back(std::make_pair(field.first, field.second));
     }
 
-    spdlog::info("-- calculating accessibility request --");
+    int currentRequestId = accessibilityRequestId++;
+    spdlog::info("-- calculating accessibility request -- {}", currentRequestId);
 
     try
     {
@@ -636,10 +643,11 @@ int main(int argc, char** argv) {
           response = ResultToV2AccessibilityResponse::resultToJsonString(*accessibilityResult.get(), queryParams).dump(2);
         }
 
-        spdlog::info("-- accessibility request complete --");
+        spdlog::info("-- accessibility request complete -- {}", currentRequestId);
 
       } catch (NoRoutingFoundException &e) {
         response = ResultToV2AccessibilityResponse::noRoutingFoundResponse(queryParams, e.getReason()).dump(2);
+        spdlog::info("-- accessibility request not found -- {}", currentRequestId);
       }
 
       *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
