@@ -42,7 +42,6 @@ namespace TrRouting
     spdlog::info("preparing nodes tentative times, trips enter connections and journeys...");
 
       
-    nodesTentativeTime.clear();
     nodesReverseTentativeTime.clear();
     nodesAccess.clear();
     nodesEgress.clear();

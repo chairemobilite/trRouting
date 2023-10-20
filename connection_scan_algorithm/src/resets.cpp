@@ -65,6 +65,11 @@ namespace TrRouting
     minEgressTravelTime = MAX_INT;
     maxAccessTravelTime = -1;
 
+    // Clear temporary calculation data
+    for (auto &&[uuid,node] : transitData.getNodes()) {
+      node.resetMutables();
+    }
+
     //TODO Question, do we only use accessFootpath when those condtion are true? The whole calculation should probably
     // be a different path in this case.
     if (origin.has_value())
@@ -80,7 +85,7 @@ namespace TrRouting
       int footpathDistanceMeters;
       nodesAccess.clear();
       forwardJourneysSteps.clear();
-      nodesTentativeTime.clear();
+
       for (auto & accessFootpath : accessFootpaths)
       {
         footpathTravelTimeSeconds = (int)ceil((float)(accessFootpath.time) / params.walkingSpeedFactor);
@@ -90,7 +95,7 @@ namespace TrRouting
                                                                       footpathTravelTimeSeconds,
                                                                       footpathDistanceMeters));
         forwardJourneysSteps.insert_or_assign(accessFootpath.node.uid, JourneyStep(std::nullopt, std::nullopt, std::nullopt, footpathTravelTimeSeconds, false, footpathDistanceMeters));
-        nodesTentativeTime[accessFootpath.node.uid]    = departureTimeSeconds + footpathTravelTimeSeconds;
+        accessFootpath.node.tentativeTime = departureTimeSeconds + footpathTravelTimeSeconds;
         if (footpathTravelTimeSeconds < minAccessTravelTime)
         {
           minAccessTravelTime = footpathTravelTimeSeconds;

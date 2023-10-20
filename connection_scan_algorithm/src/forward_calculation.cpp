@@ -68,13 +68,8 @@ namespace TrRouting
           std::optional<std::reference_wrapper<const Connection>> tripEnterConnection = currentTripQueryOverlay.enterConnection;
           const Node &nodeDeparture = (*connection).get().getDepartureNode();
 
-          // Extract node departure time if we have a result or set a default value
-          auto ite = nodesTentativeTime.find(nodeDeparture.uid);
-          if (ite != nodesTentativeTime.end()) {
-            nodeDepartureTentativeTime = ite->second;
-          } else{
-            nodeDepartureTentativeTime = MAX_INT;
-          }
+          // Extract node departure time that was set or use its default value
+          nodeDepartureTentativeTime = nodeDeparture.tentativeTime;
 
           // TODO Do we need to make sure the departure node exists in the forwardJourneySteps map? For the reverse calculation, we had to in order to fix issue https://github.com/chairemobilite/trRouting/issues/250 The issue may apply to forward too, but we have no example
           auto nodesAccessIte = nodesAccess.find(nodeDeparture.uid);          
@@ -123,13 +118,7 @@ namespace TrRouting
               for (const NodeTimeDistance & transferableNode : nodeArrival.transferableNodes)
               {
                 // Extract tentative time for current transferable node if found
-                int currentTransferablenNodesTentativeTime = 0;
-                auto nodesIte = nodesTentativeTime.find(transferableNode.node.uid);
-                if (nodesIte != nodesTentativeTime.end()) {
-                  currentTransferablenNodesTentativeTime = nodesIte->second;
-                } else {
-                  currentTransferablenNodesTentativeTime = MAX_INT;
-                }
+                int currentTransferablenNodesTentativeTime = transferableNode.node.tentativeTime;
                 
                 if (nodeArrival != transferableNode.node &&
                     currentTransferablenNodesTentativeTime < connectionArrivalTime)
@@ -145,8 +134,7 @@ namespace TrRouting
                   if (footpathTravelTime + connectionArrivalTime < currentTransferablenNodesTentativeTime)
                   {
                     footpathDistance = nodeArrival.transferableNodes[footpathIndex].distance;
-                    nodesTentativeTime[transferableNode.node.uid] = footpathTravelTime + connectionArrivalTime;
-
+                    transferableNode.node.tentativeTime = footpathTravelTime + connectionArrivalTime;
                     //TODO DO we need a make_optional here??
                     forwardJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(currentTripQueryOverlay.enterConnection, *connection, std::cref(trip), footpathTravelTime, (nodeArrival == transferableNode.node), footpathDistance));
                   }
@@ -266,14 +254,8 @@ namespace TrRouting
           std::optional<std::reference_wrapper<const Connection>> tripEnterConnection = currentTripQueryOverlay.enterConnection;
           const Node &nodeDeparture = (*connection).get().getDepartureNode();
 
-          // Extract node departure time if we have a result or set a default value
-          auto ite = nodesTentativeTime.find(nodeDeparture.uid);
-          if (ite != nodesTentativeTime.end()) {
-            nodeDepartureTentativeTime = ite->second;
-          } else{
-            nodeDepartureTentativeTime = MAX_INT;
-          }
-
+          // Extract node departure time if it was set or use the default value
+          nodeDepartureTentativeTime = nodeDeparture.tentativeTime;
           auto nodesAccessIte = nodesAccess.find(nodeDeparture.uid);
           nodeWasAccessedFromOrigin  = parameters.getMaxFirstWaitingTimeSeconds() > 0 &&
             nodesAccessIte != nodesAccess.end() &&
@@ -312,15 +294,8 @@ namespace TrRouting
               footpathIndex = 0;
               for (const NodeTimeDistance & transferableNode : nodeArrival.transferableNodes)
               {
-                // Extract tentative time for current transferable node if found
-                int currentTransferablenNodesTentativeTime = 0;
-                auto nodesIte = nodesTentativeTime.find(transferableNode.node.uid);
-                if (nodesIte != nodesTentativeTime.end()) {
-                  currentTransferablenNodesTentativeTime = nodesIte->second;
-                } else {
-                  currentTransferablenNodesTentativeTime = MAX_INT;
-                }
-
+                // Extract tentative time for current transferable node. MAX_INT is default
+                int currentTransferablenNodesTentativeTime = transferableNode.node.tentativeTime;
                 if (nodeArrival != transferableNode.node &&
                     currentTransferablenNodesTentativeTime < connectionArrivalTime)
                 {
@@ -335,8 +310,7 @@ namespace TrRouting
                   if (footpathTravelTime + connectionArrivalTime < currentTransferablenNodesTentativeTime)
                   {
                     footpathDistance = nodeArrival.transferableNodes[footpathIndex].distance;
-                    nodesTentativeTime[transferableNode.node.uid] = footpathTravelTime + connectionArrivalTime;
-
+                    transferableNode.node.tentativeTime = footpathTravelTime + connectionArrivalTime;
                     //TODO DO we need a make_optional here??
                     forwardJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(currentTripQueryOverlay.enterConnection, *connection, std::cref(trip), footpathTravelTime, (nodeArrival == transferableNode.node), footpathDistance));
                   }

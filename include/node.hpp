@@ -5,7 +5,7 @@
 #include <string>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_io.hpp>
-
+#include <limits>
 #include "point.hpp"
 #include <boost/functional/hash.hpp>
 
@@ -32,6 +32,7 @@ namespace TrRouting
              uid(++global_uid)
              {
                point = std::move(_point);
+               resetMutables();
              }
    
     boost::uuids::uuid uuid;
@@ -43,6 +44,14 @@ namespace TrRouting
     std::unique_ptr<Point> point; //TODO Does this need to be a ptr or could be part of the object?
     std::vector<NodeTimeDistance> transferableNodes;
     std::vector<NodeTimeDistance> reverseTransferableNodes; //TODO Add comment on what this is
+    // These mutable components contain temporary data used during the calculation
+    // We'll need a different solution to implement multithreaded computation
+    mutable int tentativeTime;
+
+    // Return temporary data to their initial values
+    void resetMutables() const {
+      tentativeTime = std::numeric_limits<int>::max();
+    }
 
     const std::string toString() {
       return "Node " + boost::uuids::to_string(uuid) + " (id " + std::to_string(id) + ")\n  code " + code + "\n  name " + name + "\n  latitude " + std::to_string(point.get()->latitude)  + "\n  longitude " + std::to_string(point.get()->longitude);
