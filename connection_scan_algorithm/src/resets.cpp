@@ -80,7 +80,8 @@ namespace TrRouting
       int footpathDistanceMeters;
       nodesAccess.clear();
       forwardJourneysSteps.clear();
-      nodesTentativeTime.clear();
+      nodesTentativeTime.assign(Node::getMaxUid() + 1, MAX_INT); //Assign default values to all indexes
+      
       for (auto & accessFootpath : accessFootpaths)
       {
         footpathTravelTimeSeconds = (int)ceil((float)(accessFootpath.time) / params.walkingSpeedFactor);

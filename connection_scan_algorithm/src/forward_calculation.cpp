@@ -68,13 +68,8 @@ namespace TrRouting
           std::optional<std::reference_wrapper<const Connection>> tripEnterConnection = currentTripQueryOverlay.enterConnection;
           const Node &nodeDeparture = (*connection).get().getDepartureNode();
 
-          // Extract node departure time if we have a result or set a default value
-          auto ite = nodesTentativeTime.find(nodeDeparture.uid);
-          if (ite != nodesTentativeTime.end()) {
-            nodeDepartureTentativeTime = ite->second;
-          } else{
-            nodeDepartureTentativeTime = MAX_INT;
-          }
+          // Extract node departure time if we have a result or use default value
+          nodeDepartureTentativeTime = nodesTentativeTime.at(nodeDeparture.uid);
 
           // TODO Do we need to make sure the departure node exists in the forwardJourneySteps map? For the reverse calculation, we had to in order to fix issue https://github.com/chairemobilite/trRouting/issues/250 The issue may apply to forward too, but we have no example
           auto nodesAccessIte = nodesAccess.find(nodeDeparture.uid);          
@@ -123,14 +118,8 @@ namespace TrRouting
               for (const NodeTimeDistance & transferableNode : nodeArrival.transferableNodes)
               {
                 // Extract tentative time for current transferable node if found
-                int currentTransferablenNodesTentativeTime = 0;
-                auto nodesIte = nodesTentativeTime.find(transferableNode.node.uid);
-                if (nodesIte != nodesTentativeTime.end()) {
-                  currentTransferablenNodesTentativeTime = nodesIte->second;
-                } else {
-                  currentTransferablenNodesTentativeTime = MAX_INT;
-                }
-                
+                int currentTransferablenNodesTentativeTime = nodesTentativeTime.at(transferableNode.node.uid);
+
                 if (nodeArrival != transferableNode.node &&
                     currentTransferablenNodesTentativeTime < connectionArrivalTime)
                 {
@@ -266,13 +255,8 @@ namespace TrRouting
           std::optional<std::reference_wrapper<const Connection>> tripEnterConnection = currentTripQueryOverlay.enterConnection;
           const Node &nodeDeparture = (*connection).get().getDepartureNode();
 
-          // Extract node departure time if we have a result or set a default value
-          auto ite = nodesTentativeTime.find(nodeDeparture.uid);
-          if (ite != nodesTentativeTime.end()) {
-            nodeDepartureTentativeTime = ite->second;
-          } else{
-            nodeDepartureTentativeTime = MAX_INT;
-          }
+          // Extract node departure time if we have a result or use default value
+          nodeDepartureTentativeTime = nodesTentativeTime.at(nodeDeparture.uid);
 
           auto nodesAccessIte = nodesAccess.find(nodeDeparture.uid);
           nodeWasAccessedFromOrigin  = parameters.getMaxFirstWaitingTimeSeconds() > 0 &&
@@ -313,13 +297,7 @@ namespace TrRouting
               for (const NodeTimeDistance & transferableNode : nodeArrival.transferableNodes)
               {
                 // Extract tentative time for current transferable node if found
-                int currentTransferablenNodesTentativeTime = 0;
-                auto nodesIte = nodesTentativeTime.find(transferableNode.node.uid);
-                if (nodesIte != nodesTentativeTime.end()) {
-                  currentTransferablenNodesTentativeTime = nodesIte->second;
-                } else {
-                  currentTransferablenNodesTentativeTime = MAX_INT;
-                }
+                int currentTransferablenNodesTentativeTime = nodesTentativeTime.at(transferableNode.node.uid);
 
                 if (nodeArrival != transferableNode.node &&
                     currentTransferablenNodesTentativeTime < connectionArrivalTime)
