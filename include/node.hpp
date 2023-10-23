@@ -52,6 +52,8 @@ namespace TrRouting
     inline bool operator<(const Node& other ) const { return uid < other.uid; }
     inline bool operator!=(const Node& other ) const { return uid != other.uid; }
 
+    static uid_t getMaxUid() { return global_uid; }
+
   private:
     //TODO, this could probably be an unsigned long, but current MAX_INT is good enough for our needs
     inline static uid_t global_uid = 0;
