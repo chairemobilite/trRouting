@@ -1,6 +1,7 @@
 #include <boost/uuid/string_generator.hpp>
 #include <boost/algorithm/string.hpp>
 
+#include "spdlog/spdlog.h"
 #include "parameters.hpp"
 #include "scenario.hpp"
 #include "point.hpp"
@@ -66,6 +67,8 @@ namespace TrRouting
     // TODO Replace manually parsing parameters by a library that does this
     for (auto & parameterWithValue : parameters)
     {
+      spdlog::debug(" received parameter {} with value {}", parameterWithValue.first, parameterWithValue.second);
+
       // origin and destination:
       if (parameterWithValue.first == "origin")
       {
