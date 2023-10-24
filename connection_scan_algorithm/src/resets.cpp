@@ -116,7 +116,7 @@ namespace TrRouting
       int footpathDistanceMeters;
       nodesEgress.clear();
       reverseJourneysSteps.clear();
-      nodesReverseTentativeTime.clear();
+      nodesReverseTentativeTime.assign(Node::getMaxUid() + 1, -1); //Assign default values to all indexes
       for (auto & egressFootpath : egressFootpaths)
       {
         footpathTravelTimeSeconds  = (int)ceil((float)(egressFootpath.time) / params.walkingSpeedFactor);

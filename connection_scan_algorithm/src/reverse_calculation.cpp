@@ -70,13 +70,7 @@ namespace TrRouting
           const Node &nodeArrival = (*connection).get().getArrivalNode();
 
           // Extract node arrival time
-          int nodeArrivalTentativeTime  = -1;
-          auto ite = nodesReverseTentativeTime.find(nodeArrival.uid);
-          if (ite != nodesReverseTentativeTime.end()) {
-            nodeArrivalTentativeTime = ite->second;
-          } else {
-            nodeArrivalTentativeTime = -1;
-          }
+          int nodeArrivalTentativeTime = nodesReverseTentativeTime.at(nodeArrival.uid);
 
           // reachable connections only here:
           if (
@@ -135,9 +129,7 @@ namespace TrRouting
               for (const NodeTimeDistance & transferableNode : nodeDeparture.reverseTransferableNodes)
               {
 
-                auto trite = nodesReverseTentativeTime.find(transferableNode.node.uid);
-
-                if (nodeDeparture != transferableNode.node && trite != nodesReverseTentativeTime.end() && trite->second > connectionDepartureTime - connectionMinWaitingTimeSeconds)
+                if (nodeDeparture != transferableNode.node && nodesReverseTentativeTime.at(transferableNode.node.uid) > connectionDepartureTime - connectionMinWaitingTimeSeconds)
                 {
                   footpathIndex++;
                   continue;
@@ -147,8 +139,7 @@ namespace TrRouting
 
                 if (footpathTravelTime <= parameters.getMaxTransferWalkingTravelTimeSeconds())
                 {                  
-                  if ((trite == nodesReverseTentativeTime.end()) || //TODO Unclear if it's equivalent than previous code
-                      connectionDepartureTime - footpathTravelTime - connectionMinWaitingTimeSeconds >= trite->second)
+                  if (connectionDepartureTime - footpathTravelTime - connectionMinWaitingTimeSeconds >= nodesReverseTentativeTime.at(transferableNode.node.uid))
                   {
                     footpathDistance = nodeDeparture.reverseTransferableNodes.at(footpathIndex).distance;
                     nodesReverseTentativeTime[transferableNode.node.uid] = connectionDepartureTime - footpathTravelTime - connectionMinWaitingTimeSeconds;
@@ -288,13 +279,7 @@ namespace TrRouting
           const Node &nodeArrival = (*connection).get().getArrivalNode();
 
           // Extract node arrival time
-          int nodeArrivalTentativeTime  = -1;
-          auto ite = nodesReverseTentativeTime.find(nodeArrival.uid);
-          if (ite != nodesReverseTentativeTime.end()) {
-            nodeArrivalTentativeTime = ite->second;
-          } else {
-            nodeArrivalTentativeTime = -1;
-          }
+          int nodeArrivalTentativeTime = nodesReverseTentativeTime.at(nodeArrival.uid);
 
           // reachable connections only here:
           if (
@@ -344,9 +329,7 @@ namespace TrRouting
               for (const NodeTimeDistance & transferableNode : nodeDeparture.reverseTransferableNodes)
               {
 
-                auto trite = nodesReverseTentativeTime.find(transferableNode.node.uid);
-
-                if (nodeDeparture != transferableNode.node && trite != nodesReverseTentativeTime.end() && trite->second > connectionDepartureTime - connectionMinWaitingTimeSeconds)
+                if (nodeDeparture != transferableNode.node && nodesReverseTentativeTime.at(transferableNode.node.uid) > connectionDepartureTime - connectionMinWaitingTimeSeconds)
                 {
                   footpathIndex++;
                   continue;
@@ -356,8 +339,7 @@ namespace TrRouting
 
                 if (footpathTravelTime <= parameters.getMaxTransferWalkingTravelTimeSeconds())
                 {
-                  if ((trite == nodesReverseTentativeTime.end()) || //TODO Unclear if it's equivalent than previous code
-                      connectionDepartureTime - footpathTravelTime - connectionMinWaitingTimeSeconds >= trite->second)
+                  if (connectionDepartureTime - footpathTravelTime - connectionMinWaitingTimeSeconds >= nodesReverseTentativeTime.at(transferableNode.node.uid))
                   {
                     footpathDistance = nodeDeparture.reverseTransferableNodes.at(footpathIndex).distance;
                     nodesReverseTentativeTime[transferableNode.node.uid] = connectionDepartureTime - footpathTravelTime - connectionMinWaitingTimeSeconds;
