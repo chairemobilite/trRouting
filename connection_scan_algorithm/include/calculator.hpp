@@ -114,7 +114,7 @@ namespace TrRouting
     long long        calculationTime;
 
     std::vector<int> nodesTentativeTime; // arrival time at node, using the Node::id as index
-    std::unordered_map<Node::uid_t, int> nodesReverseTentativeTime; // departure time at node
+    std::vector<int> nodesReverseTentativeTime; // departure time at node
     std::unordered_map<Node::uid_t, NodeTimeDistance> nodesAccess; // travel time/distance from origin to accessible nodes
     std::unordered_map<Node::uid_t, NodeTimeDistance> nodesEgress; // travel time/distance to reach destination;
 
