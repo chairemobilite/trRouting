@@ -53,7 +53,7 @@ namespace TrRouting
         const Trip & trip = (*connection).get().getTrip();
         
         // enabled trips only here:
-        auto & currentTripQueryOverlay = tripsQueryOverlay[trip.uid];
+        auto & currentTripQueryOverlay = tripsQueryOverlay.at(trip.uid);
         if (currentTripQueryOverlay.usable && !isTripDisabled(trip.uid))
         {
 
@@ -262,7 +262,7 @@ namespace TrRouting
         const Trip & trip = (*connection).get().getTrip();
 
         // enabled trips only here:
-        auto & currentTripQueryOverlay = tripsQueryOverlay[trip.uid];
+        auto & currentTripQueryOverlay = tripsQueryOverlay.at(trip.uid);
         // FIXME Determine with the new connection cache if a trip could be disabled in the all nodes path
         if ((currentTripQueryOverlay.usable) && !isTripDisabled(trip.uid))
         {

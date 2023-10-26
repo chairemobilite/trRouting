@@ -34,7 +34,7 @@ namespace TrRouting
       egressFootpaths.clear();
       egressFootpaths.shrink_to_fit();
     }
-    tripsQueryOverlay.clear();
+    tripsQueryOverlay.assign(Trip::getMaxUid()+1, TripQueryData());
     forwardJourneysSteps.clear();
     reverseJourneysSteps.clear();
 
