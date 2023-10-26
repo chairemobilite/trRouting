@@ -47,7 +47,7 @@ namespace TrRouting
         const Trip & trip = (*connection).get().getTrip();
 
         // Cache the current query data overlay si we don't check the hashmap every time
-        auto & currentTripQueryOverlay = tripsQueryOverlay[trip.uid];
+        auto & currentTripQueryOverlay = tripsQueryOverlay.at(trip.uid);
 
         // enabled trips only here:
         if (!isTripDisabled(trip.uid))
@@ -237,7 +237,7 @@ namespace TrRouting
         const Trip & trip = (*connection).get().getTrip();
 
         // Cache the current query data overlay si we don't check the hashmap every time
-        auto & currentTripQueryOverlay = tripsQueryOverlay[trip.uid];
+        auto & currentTripQueryOverlay = tripsQueryOverlay.at(trip.uid);
 
         // enabled trips only here:
         if (!isTripDisabled(trip.uid))
