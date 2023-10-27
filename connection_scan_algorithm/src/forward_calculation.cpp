@@ -137,7 +137,7 @@ namespace TrRouting
                     nodesTentativeTime[transferableNode.node.uid] = footpathTravelTime + connectionArrivalTime;
 
                     //TODO DO we need a make_optional here??
-                    forwardJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(currentTripQueryOverlay.enterConnection, *connection, std::cref(trip), footpathTravelTime, (nodeArrival == transferableNode.node), footpathDistance));
+                    forwardJourneysSteps.at(transferableNode.node.uid) = JourneyStep(currentTripQueryOverlay.enterConnection, *connection, std::cref(trip), footpathTravelTime, (nodeArrival == transferableNode.node), footpathDistance);
                   }
 
                   if (
@@ -316,7 +316,7 @@ namespace TrRouting
                     nodesTentativeTime[transferableNode.node.uid] = footpathTravelTime + connectionArrivalTime;
 
                     //TODO DO we need a make_optional here??
-                    forwardJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(currentTripQueryOverlay.enterConnection, *connection, std::cref(trip), footpathTravelTime, (nodeArrival == transferableNode.node), footpathDistance));
+                    forwardJourneysSteps.at(transferableNode.node.uid) = JourneyStep(currentTripQueryOverlay.enterConnection, *connection, std::cref(trip), footpathTravelTime, (nodeArrival == transferableNode.node), footpathDistance);
                   }
 
                   if (

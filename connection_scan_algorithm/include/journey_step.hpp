@@ -21,6 +21,7 @@ namespace TrRouting {
                                          transferTravelTime(_transferTravelTime),
                                          sameNodeTransfer(_sameNodeTransfer),
                                          transferDistance(_transferDistance) { }
+    JourneyStep() : JourneyStep(std::nullopt, std::nullopt, std::nullopt, -1, false, -1) {}
 
     //TODO Why is there Final in the function name. Is that appropriate?
     std::optional<std::reference_wrapper<const Connection>> getFinalEnterConnection() const {return finalEnterConnection;}

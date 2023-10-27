@@ -79,7 +79,7 @@ namespace TrRouting
       int footpathTravelTimeSeconds;
       int footpathDistanceMeters;
       nodesAccess.clear();
-      forwardJourneysSteps.clear();
+      forwardJourneysSteps.assign(Node::getMaxUid() + 1, JourneyStep());
       nodesTentativeTime.assign(Node::getMaxUid() + 1, MAX_INT); //Assign default values to all indexes
       
       for (auto & accessFootpath : accessFootpaths)
@@ -90,7 +90,7 @@ namespace TrRouting
         nodesAccess.emplace(accessFootpath.node.uid, NodeTimeDistance(accessFootpath.node,
                                                                       footpathTravelTimeSeconds,
                                                                       footpathDistanceMeters));
-        forwardJourneysSteps.insert_or_assign(accessFootpath.node.uid, JourneyStep(std::nullopt, std::nullopt, std::nullopt, footpathTravelTimeSeconds, false, footpathDistanceMeters));
+        forwardJourneysSteps.at(accessFootpath.node.uid) = JourneyStep(std::nullopt, std::nullopt, std::nullopt, footpathTravelTimeSeconds, false, footpathDistanceMeters);
         nodesTentativeTime[accessFootpath.node.uid]    = departureTimeSeconds + footpathTravelTimeSeconds;
         if (footpathTravelTimeSeconds < minAccessTravelTime)
         {
@@ -115,7 +115,7 @@ namespace TrRouting
       int footpathTravelTimeSeconds;
       int footpathDistanceMeters;
       nodesEgress.clear();
-      reverseJourneysSteps.clear();
+      reverseJourneysSteps.assign(Node::getMaxUid() + 1, JourneyStep());
       nodesReverseTentativeTime.assign(Node::getMaxUid() + 1, -1); //Assign default values to all indexes
       for (auto & egressFootpath : egressFootpaths)
       {
@@ -126,7 +126,7 @@ namespace TrRouting
                                                                        footpathTravelTimeSeconds,
                                                                        footpathDistanceMeters));
 
-        reverseJourneysSteps.insert_or_assign(egressFootpath.node.uid, JourneyStep(std::nullopt, std::nullopt, std::nullopt, footpathTravelTimeSeconds, false, footpathDistanceMeters));
+        reverseJourneysSteps.at(egressFootpath.node.uid) = JourneyStep(std::nullopt, std::nullopt, std::nullopt, footpathTravelTimeSeconds, false, footpathDistanceMeters);
         nodesReverseTentativeTime[egressFootpath.node.uid] = arrivalTimeSeconds - footpathTravelTimeSeconds;
         if (footpathTravelTimeSeconds > maxEgressTravelTime)
         {
