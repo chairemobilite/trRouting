@@ -81,11 +81,10 @@ namespace TrRouting
           {
             
             // Make sure the arrival of the connection can unboard and is a candidate for the journey. Nodes are candidate if they can either reach the destination by foot, or a connection that can reach the destination within the specified parameters.
-            auto rjsIte = reverseJourneysSteps.find(nodeArrival.uid);
-            if ((*connection).get().canUnboard() && rjsIte != reverseJourneysSteps.end())
+            if ((*connection).get().canUnboard())
             {
               // Extract journeyStep once from map
-              const JourneyStep & reverseStepAtArrival = rjsIte->second;
+              const JourneyStep & reverseStepAtArrival = reverseJourneysSteps.at(nodeArrival.uid);
               if (!tripExitConnection.has_value()) // <= to make sure we get the same result as forward calculation, which uses >
               {
                 currentTripQueryOverlay.exitConnection = *connection;
@@ -144,7 +143,7 @@ namespace TrRouting
                     footpathDistance = nodeDeparture.reverseTransferableNodes.at(footpathIndex).distance;
                     nodesReverseTentativeTime[transferableNode.node.uid] = connectionDepartureTime - footpathTravelTime - connectionMinWaitingTimeSeconds;
                     //TODO Do we need a make_optional<...>(connection) ??
-                    reverseJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(*connection, currentTripQueryOverlay.exitConnection, std::cref(trip), footpathTravelTime, (nodeDeparture == transferableNode.node), footpathDistance));
+                    reverseJourneysSteps.at(transferableNode.node.uid) =  JourneyStep(*connection, currentTripQueryOverlay.exitConnection, std::cref(trip), footpathTravelTime, (nodeDeparture == transferableNode.node), footpathDistance);
                   }
                   if (
                     nodeDeparture == transferableNode.node
@@ -344,7 +343,7 @@ namespace TrRouting
                     footpathDistance = nodeDeparture.reverseTransferableNodes.at(footpathIndex).distance;
                     nodesReverseTentativeTime[transferableNode.node.uid] = connectionDepartureTime - footpathTravelTime - connectionMinWaitingTimeSeconds;
                     //TODO Do we need a make_optional<...>(connection) ??
-                    reverseJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(*connection, currentTripQueryOverlay.exitConnection, std::cref(trip), footpathTravelTime, (nodeDeparture == transferableNode.node), footpathDistance));
+                    reverseJourneysSteps.at(transferableNode.node.uid) = JourneyStep(*connection, currentTripQueryOverlay.exitConnection, std::cref(trip), footpathTravelTime, (nodeDeparture == transferableNode.node), footpathDistance);
                   }
                   if (
                     nodeDeparture == transferableNode.node

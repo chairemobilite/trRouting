@@ -128,8 +128,8 @@ namespace TrRouting
 
     std::vector<NodeTimeDistance> accessFootpaths; // pair: accessNodeIndex, walkingTravelTimeSeconds, walkingDistanceMeters
     std::vector<NodeTimeDistance> egressFootpaths; // pair: egressNodeIndex, walkingTravelTimeSeconds, walkingDistanceMeters
-    std::unordered_map<Node::uid_t, JourneyStep> forwardJourneysSteps; 
-    std::unordered_map<Node::uid_t, JourneyStep> reverseJourneysSteps;
+    std::vector<JourneyStep> forwardJourneysSteps; // indexed by Node::uid
+    std::vector<JourneyStep> reverseJourneysSteps; // indexed by Node::uid
 
   };
 
