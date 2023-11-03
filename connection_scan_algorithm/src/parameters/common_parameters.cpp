@@ -27,16 +27,7 @@ namespace TrRouting
         maxFirstWaitingTimeSeconds(maxFirstWaitingTime),
         forwardCalculation(forward)
   {
-    scenarioUuid = scenario.uuid;
-    onlyServices = scenario.servicesList;
-    onlyLines = scenario.onlyLines;
-    onlyAgencies = scenario.onlyAgencies;
-    onlyNodes = scenario.onlyNodes;
-    onlyModes = scenario.onlyModes;
-    exceptLines = scenario.exceptLines;
-    exceptAgencies = scenario.exceptAgencies;
-    exceptNodes = scenario.exceptNodes;
-    exceptModes = scenario.exceptModes;
+    scenarioUuid = scenario.uuid; //TODO Check if this is used somewhere
   }
 
   CommonParameters::CommonParameters(const CommonParameters& baseParams):
