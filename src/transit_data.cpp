@@ -352,7 +352,7 @@ namespace TrRouting {
     // Create the cache for scenario
     // Get the list of enabled trips
     std::unordered_map<Trip::uid_t, bool> tripsEnabled;
-    std::vector<std::reference_wrapper<const Trip>> trips; 
+    std::vector<std::reference_wrapper<const Trip>> cachedTrips; 
     for (auto & tripIte : getTrips())
     {
       const Trip & trip = tripIte.second;
@@ -436,7 +436,7 @@ namespace TrRouting {
       }
       tripsEnabled[trip.uid] = enabled;
       if (enabled) {
-        trips.push_back(trip);
+        cachedTrips.push_back(trip);
       }
     }
 
@@ -465,7 +465,7 @@ namespace TrRouting {
       }
     }
 
-    std::shared_ptr<ConnectionSet> currentCache = std::make_shared<ConnectionSet>(trips, scenarioForwardConnections, scenarioReverseConnections);
+    std::shared_ptr<ConnectionSet> currentCache = std::make_shared<ConnectionSet>(cachedTrips, scenarioForwardConnections, scenarioReverseConnections);
     scenarioConnectionCache->set(scenario.uuid, currentCache);
     return currentCache;
     
