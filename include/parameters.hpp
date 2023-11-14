@@ -256,13 +256,6 @@ namespace TrRouting
 
       //TODO Make it a reference or not??
       std::optional<DataSource> onlyDataSource;
-      //TODO We could convert those to NodeTimeDistance object
-      std::vector<std::reference_wrapper<const Node>> accessNodesRef;
-      std::vector<int> accessNodeTravelTimesSeconds;
-      std::vector<int> accessNodeDistancesMeters;
-      std::vector<std::reference_wrapper<const Node>> egressNodesRef;
-      std::vector<int> egressNodeTravelTimesSeconds;
-      std::vector<int> egressNodeDistancesMeters;
 
       std::vector<std::pair<int,int>> odTripsPeriods; // pair: start_at_seconds, end_at_seconds
       std::vector<std::string>        odTripsGenders;

@@ -19,13 +19,6 @@ namespace TrRouting
     odTripsActivities.clear();
     odTripsModes.clear();
 
-    accessNodesRef.clear();
-    accessNodeTravelTimesSeconds.clear();
-    accessNodeDistancesMeters.clear();
-    egressNodesRef.clear();
-    egressNodeTravelTimesSeconds.clear();
-    egressNodeDistancesMeters.clear();
-
     onlyDataSource.reset();
 
     batchNumber                            = 1;
@@ -360,56 +353,6 @@ namespace TrRouting
       else if (parameterWithValueVector[0] == "seed" || parameterWithValueVector[0] == "random_seed")
       {
         seed = std::stoi(parameterWithValueVector[1]);
-        continue;
-      }
-
-      // not sure we want to keep this: or supply node indexes instead, to limit request size?
-      else if (parameterWithValueVector[0] == "access_node_uuids")
-      {
-        std::vector<std::string> accessNodeUuidsVector;
-        boost::split(accessNodeUuidsVector, parameterWithValueVector[1], boost::is_any_of(","));
-        boost::uuids::uuid accessNodeUuid;
-        for(std::string accessNodeUuidStr : accessNodeUuidsVector)
-        {
-          accessNodeUuid = uuidGenerator(accessNodeUuidStr);
-          if (nodes.count(accessNodeUuid) == 1)
-          {
-            accessNodesRef.push_back(nodes.at(accessNodeUuid));
-          }
-        }
-        continue;
-      }
-      else if (parameterWithValueVector[0] == "egress_node_uuids")
-      {
-        std::vector<std::string> exceptNodeUuidsVector;
-        boost::split(egressNodeUuidsVector, parameterWithValueVector[1], boost::is_any_of(","));
-        boost::uuids::uuid egressNodeUuid;
-        for(std::string egressNodeUuidStr : egressNodeUuidsVector)
-        {
-          egressNodeUuid = uuidGenerator(egressNodeUuidStr);
-          if (nodes.count(egressNodeUuid) == 1)
-          {
-            egressNodesRef.push_back(nodes.at(egressNodeUuid));
-          }
-        }
-        continue;
-      }
-      else if (parameterWithValueVector[0] == "access_node_travel_times_seconds" || parameterWithValueVector[0] == "access_node_travel_times")
-      {
-        boost::split(accessNodeTravelTimesSecondsVector, parameterWithValueVector[1], boost::is_any_of(","));
-        for(std::string accessNodeTravelTimeSeconds : accessNodeTravelTimesSecondsVector)
-        {
-          accessNodeTravelTimesSeconds.push_back(std::stoi(accessNodeTravelTimeSeconds));
-        }
-        continue;
-      }
-      else if (parameterWithValueVector[0] == "egress_node_travel_times_seconds" || parameterWithValueVector[0] == "egress_node_travel_times")
-      {
-        boost::split(egressNodeTravelTimesSecondsVector, parameterWithValueVector[1], boost::is_any_of(","));
-        for(std::string egressNodeTravelTimeSeconds : egressNodeTravelTimesSecondsVector)
-        {
-          egressNodeTravelTimesSeconds.push_back(std::stoi(egressNodeTravelTimeSeconds));
-        }
         continue;
       }
 
