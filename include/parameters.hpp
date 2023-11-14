@@ -243,9 +243,6 @@ namespace TrRouting
       int odTripsSampleSize;
       unsigned int seed;
 
-      int routingDateYear;   // not implemented, use onlyServicesIdx or exceptServicesIdx for now
-      int routingDateMonth;  // not implemented, use onlyServicesIdx or exceptServicesIdx for now
-      int routingDateDay;    // not implemented, use onlyServicesIdx or exceptServicesIdx for now
       //TODO Make it a reference or not??
       std::optional<DataSource> onlyDataSource;
       //TODO We could convert those to NodeTimeDistance object
@@ -263,28 +260,12 @@ namespace TrRouting
       std::vector<std::string>        odTripsActivities;
       std::vector<std::string>        odTripsModes;
 
-      int maxNumberOfTransfers;
-      int transferPenaltySeconds;
-      int maxAccessWalkingDistanceMeters;
-      int maxTotalWalkingTravelTimeSeconds;
       float odTripsSampleRatio;
-      float maxOnlyWalkingAccessTravelTimeRatio;
       float walkingSpeedFactor;
       float walkingSpeedMetersPerSecond;
-      float drivingSpeedMetersPerSecond;
-      float cyclingSpeedMetersPerSecond;
 
-      int originNodeIdx;
-      int destinationNodeIdx;
-      bool calculateAllOdTrips;
       std::optional<boost::uuids::uuid> odTripUuid;
-      std::optional<boost::uuids::uuid> startingNodeUuid;
-      std::optional<boost::uuids::uuid> endingNodeUuid;
 
-      bool tryNextModeIfRoutingFails;
-      std::string noResultSecondMode;
-      int noResultNextAccessTimeSecondsIncrement;
-      int maxNoResultNextAccessTimeSeconds;
       int maxAlternatives; // number of alternatives to calculate before returning results (when alternatives parameter is set to true)
       float alternativesMaxTravelTimeRatio; // travel time of fastest route is multiplied by this ratio to find plausible alternative with a max travel time.
       float minAlternativeMaxTravelTimeSeconds; // if multiplying max travel time ratio with max travel time is too small, keep max travel time to this minimum.
@@ -293,9 +274,6 @@ namespace TrRouting
 
       bool returnAllNodesResult;         // keep results for all nodes (used in creating accessibility map)
       bool forwardCalculation;           // forward calculation: default. if false: reverse calculation, will ride connections backward (useful when setting the arrival time)
-      bool detailedResults;              // return detailed results when using results for all nodes
-      bool transferBetweenSameLine;      // allow transfers between the same line
-      bool calculateByNumberOfTransfers; // calculate first the fastest route, then calculate with decreasing number of transfers until no route is found, return results for each number of transfers.
       bool calculateProfiles;            // calculate profiles for lines, paths and trips (od trips only)
 
       ~Parameters() {}

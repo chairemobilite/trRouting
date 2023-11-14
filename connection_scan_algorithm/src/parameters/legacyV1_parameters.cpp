@@ -32,30 +32,9 @@ namespace TrRouting
     batchesCount                           = 1;
     odTripsSampleRatio                     = 1.0;
     odTripUuid.reset();
-    startingNodeUuid.reset();
-    endingNodeUuid.reset();
-    routingDateYear                        = 0;
-    routingDateMonth                       = 0;
-    routingDateDay                         = 0;
-    originNodeIdx                          = -1;
-    destinationNodeIdx                     = -1;
-    calculateAllOdTrips                    = false;
     walkingSpeedMetersPerSecond            = 5/3.6; // 5 km/h
-    drivingSpeedMetersPerSecond            = 90/3.6; // 90 km/h
-    cyclingSpeedMetersPerSecond            = 25/3.6; // 25 km/h
-    maxNumberOfTransfers                   = -1; // -1 means no limit
-    maxTotalWalkingTravelTimeSeconds       = 60*60; // not used right now
-    maxOnlyWalkingAccessTravelTimeRatio    = 1.5; // prefer walking only if it is faster than transit and total only walking travel time <= maxAccessWalkingTravelTimeSeconds * this ratio
-    transferPenaltySeconds                 = 0; // not used right now
-    noResultSecondMode                     = "driving";
-    tryNextModeIfRoutingFails              = false;
-    noResultNextAccessTimeSecondsIncrement = 5*60;
-    maxNoResultNextAccessTimeSeconds       = 40*60;
     returnAllNodesResult                   = false;
     forwardCalculation                     = true;
-    detailedResults                        = false;
-    transferBetweenSameLine                = true;
-    calculateByNumberOfTransfers           = false;
     maxAlternatives                        = 200;
     alternativesMaxTravelTimeRatio         = 1.75;
     minAlternativeMaxTravelTimeSeconds     = 30*60;
@@ -296,11 +275,6 @@ namespace TrRouting
         newParametersWithValues.push_back(std::make_pair("max_first_waiting_time", parameterWithValueVector[1]));
         continue;
       }
-      else if (parameterWithValueVector[0] == "max_only_walking_access_travel_time_ratio")
-      {
-        maxOnlyWalkingAccessTravelTimeRatio = std::stof(parameterWithValueVector[1]);
-        continue;
-      }
 
       // od trips:
       else if (parameterWithValueVector[0] == "od_trip_uuid")
@@ -324,7 +298,6 @@ namespace TrRouting
       {
         if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1")
         {
-          calculateAllOdTrips = true;
           // This parameter does not require origin/destination/departure_time parameters, so we fake one so the parameter creation will work
           // TODO Eventually move this parameter to its own endpoint
           newParametersWithValues.push_back(std::make_pair("origin", "0,0"));
@@ -445,23 +418,9 @@ namespace TrRouting
       }
 
       // other:
-      else if (parameterWithValueVector[0] == "transfer_penalty" || parameterWithValueVector[0] == "transfer_penalty_minutes")
-      {
-        // not used right now
-        transferPenaltySeconds = std::stoi(parameterWithValueVector[1]) * 60;
-        continue;
-      }
       else if (parameterWithValueVector[0] == "walking_speed_factor" || parameterWithValueVector[0] == "walk_factor") // > 1.0 means faster walking
       {
         walkingSpeedFactor = std::stof(parameterWithValueVector[1]);
-        continue;
-      }
-      else if (parameterWithValueVector[0] == "detailed"
-               || parameterWithValueVector[0] == "detailed_results"
-               || parameterWithValueVector[0] == "detailed_result"
-              )
-      {
-        if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1") { detailedResults = true; }
         continue;
       }
       else if (parameterWithValueVector[0] == "profiles"
@@ -471,34 +430,9 @@ namespace TrRouting
         if (parameterWithValueVector[1] == "false" || parameterWithValueVector[1] == "0") { calculateProfiles = false; }
         continue;
       }
-      else if (parameterWithValueVector[0] == "transfer_between_same_line"
-               || parameterWithValueVector[0] == "allow_same_line_transfer"
-               || parameterWithValueVector[0] == "transfers_between_same_line"
-               || parameterWithValueVector[0] == "allow_same_line_transfers"
-              )
-      {
-        if (parameterWithValueVector[1] == "false" || parameterWithValueVector[1] == "0") { transferBetweenSameLine = false; }
-        continue;
-      }
       else if (parameterWithValueVector[0] == "seed" || parameterWithValueVector[0] == "random_seed")
       {
         seed = std::stoi(parameterWithValueVector[1]);
-        continue;
-      }
-
-      // not yet implemented
-      else if (parameterWithValueVector[0] == "max_number_of_transfers" || parameterWithValueVector[0] == "max_transfers")
-      {
-        maxNumberOfTransfers = std::stoi(parameterWithValueVector[1]);
-        continue;
-      }
-      // not yet implemented
-      else if (parameterWithValueVector[0] == "calculate_by_number_of_transfers" || parameterWithValueVector[0] == "by_num_transfers")
-      {
-        if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1")
-        {
-          calculateByNumberOfTransfers = true;
-        }
         continue;
       }
 
@@ -549,15 +483,6 @@ namespace TrRouting
         {
           egressNodeTravelTimesSeconds.push_back(std::stoi(egressNodeTravelTimeSeconds));
         }
-        continue;
-      }
-
-      else if (parameterWithValueVector[0] == "date")
-      {
-        boost::split(dateVector, parameterWithValueVector[1], boost::is_any_of("/"));
-        routingDateYear  = std::stoi(dateVector[0]);
-        routingDateMonth = std::stoi(dateVector[1]);
-        routingDateDay   = std::stoi(dateVector[2]);
         continue;
       }
 
