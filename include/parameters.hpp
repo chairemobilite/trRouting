@@ -134,6 +134,8 @@ namespace TrRouting
       const std::vector<std::reference_wrapper<const Agency>>& getExceptAgencies() const { return exceptAgencies; }
       const std::vector<std::reference_wrapper<const Node>>& getOnlyNodes() const { return onlyNodes; }
       const std::vector<std::reference_wrapper<const Node>>& getExceptNodes() const { return exceptNodes; }
+      float getWalkingSpeedFactor() const { return 1.0; } // all walking segments are weighted with this value. > 1.0 means faster walking, < 1.0 means slower walking
+      float getWalkingSpeedMetersPerSecond() const { return 5/3.6; } // 5 km/h;
 
       static CommonParameters createCommonParameter(std::vector<std::pair<std::string, std::string>> &parameters,
                                                     const std::map<boost::uuids::uuid, Scenario> &scenarios
@@ -270,8 +272,6 @@ namespace TrRouting
       std::vector<std::string>        odTripsModes;
 
       float odTripsSampleRatio;
-      float walkingSpeedFactor;
-      float walkingSpeedMetersPerSecond;
 
       std::optional<boost::uuids::uuid> odTripUuid;
 
