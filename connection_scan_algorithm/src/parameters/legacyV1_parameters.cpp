@@ -33,7 +33,6 @@ namespace TrRouting
     odTripsSampleRatio                     = 1.0;
     odTripUuid.reset();
     walkingSpeedMetersPerSecond            = 5/3.6; // 5 km/h
-    returnAllNodesResult                   = false;
     forwardCalculation                     = true;
     maxAlternatives                        = 200;
     alternativesMaxTravelTimeRatio         = 1.75;
@@ -143,21 +142,6 @@ namespace TrRouting
         }
         continue;
       }
-      else if (parameterWithValueVector[0] == "return_all_nodes_results"
-               || parameterWithValueVector[0] == "return_all_nodes_result"
-               || parameterWithValueVector[0] == "all_nodes"
-              )
-      {
-        if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1")
-        {
-          returnAllNodesResult = true;
-          // This parameter requires only origin or destination, but the routeParameters class requires both,so we fake one so the parameter creation will work
-          // TODO Eventually move this parameter to its own endpoint
-          newParametersWithValues.insert(newParametersWithValues.begin(), std::make_pair("origin", "0,0"));
-          newParametersWithValues.insert(newParametersWithValues.begin(), std::make_pair("destination", "1,1"));
-        }
-      }
-
       // times and date:
       else if (parameterWithValueVector[0] == "time"
                || parameterWithValueVector[0] == "departure"
