@@ -272,7 +272,6 @@ namespace TrRouting
       int   alternativesMaxAddedTravelTimeSeconds; // how many seconds to add to fastest travel time to limit alternatives travel time.
       int   maxValidAlternatives; // max number of valid alternatives to return
 
-      bool returnAllNodesResult;         // keep results for all nodes (used in creating accessibility map)
       bool forwardCalculation;           // forward calculation: default. if false: reverse calculation, will ride connections backward (useful when setting the arrival time)
       bool calculateProfiles;            // calculate profiles for lines, paths and trips (od trips only)
 

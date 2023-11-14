@@ -57,8 +57,6 @@ namespace TrRouting
     // a concrete result object instead of pointer (that alternatives could use directly), but still
     // use common calculation functions
     // TODO Once the split is done, we can get rid of the unique_ptr return and have the right concret type returned directly
-    // Renamed the common calculate() to calculateSingleOrAllNodes(). It will be easier to remove once we stop supporting the V1 code path
-    std::unique_ptr<RoutingResult> calculateSingleOrAllNodes(RouteParameters &parameters, bool resetAccessPaths = true, bool resetFilters = true);
     std::unique_ptr<SingleCalculationResult> calculateSingle(RouteParameters &parameters, bool resetAccessPaths = true, bool resetFilters = true);
     std::unique_ptr<AllNodesResult> calculateAllNodes(AccessibilityParameters &parameters);
 

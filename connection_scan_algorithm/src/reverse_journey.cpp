@@ -15,8 +15,6 @@ namespace TrRouting
 {
   std::unique_ptr<SingleCalculationResult> Calculator::reverseJourneyStep(RouteParameters &parameters, int bestDepartureTime, std::optional<std::reference_wrapper<const Node>> bestAccessNode, const std::unordered_map<Node::uid_t, JourneyStep> & reverseAccessJourneysSteps)
   {
-    assert(!params.returnAllNodesResult); // Just make sure we are in the right code path
-
     std::unique_ptr<SingleCalculationResult> singleResult = std::make_unique<SingleCalculationResult>();
 
     if (!bestAccessNode.has_value()) // route node found

@@ -25,16 +25,6 @@ namespace TrRouting
     );
   }
   
-  std::unique_ptr<RoutingResult> Calculator::calculateSingleOrAllNodes(RouteParameters &parameters, bool resetAccessPaths, bool resetFilters) {
-
-    if (params.returnAllNodesResult) {
-      AccessibilityParameters accessParams = routeToAccessibilityParameters(parameters);
-      return calculateAllNodes(accessParams);
-    } else {
-      return calculateSingle(parameters, resetAccessPaths, resetFilters);
-    }
-  }
-
   std::unique_ptr<SingleCalculationResult> Calculator::calculateSingle(RouteParameters &parameters, bool resetAccessPaths, bool resetFilters) {
     reset(parameters, *parameters.getOrigin(), *parameters.getDestination(), resetAccessPaths, resetFilters);
 

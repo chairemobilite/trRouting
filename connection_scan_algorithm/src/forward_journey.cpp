@@ -18,8 +18,6 @@ namespace TrRouting
 
   std::unique_ptr<SingleCalculationResult> Calculator::forwardJourneyStep(RouteParameters &parameters, std::optional<std::reference_wrapper<const Node>> bestEgressNode, const std::unordered_map<Node::uid_t, JourneyStep> & forwardEgressJourneysSteps)
   {
-    assert(!params.returnAllNodesResult); // Just make sure we are in the right code path
-
     std::unique_ptr<SingleCalculationResult> singleResult = std::make_unique<SingleCalculationResult>();
 
     if (!bestEgressNode.has_value())
