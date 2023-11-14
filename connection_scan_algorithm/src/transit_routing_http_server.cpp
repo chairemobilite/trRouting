@@ -22,7 +22,6 @@
 #include "scenario.hpp"
 #include "calculator.hpp"
 #include "program_options.hpp"
-#include "result_to_v1.hpp"
 #include "result_to_v2.hpp"
 #include "result_to_v2_summary.hpp"
 #include "result_to_v2_accessibility.hpp"
