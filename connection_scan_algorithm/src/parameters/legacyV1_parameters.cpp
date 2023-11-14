@@ -33,11 +33,6 @@ namespace TrRouting
     odTripsSampleRatio                     = 1.0;
     odTripUuid.reset();
     walkingSpeedMetersPerSecond            = 5/3.6; // 5 km/h
-    maxAlternatives                        = 200;
-    alternativesMaxTravelTimeRatio         = 1.75;
-    minAlternativeMaxTravelTimeSeconds     = 30*60;
-    alternativesMaxAddedTravelTimeSeconds  = 60*60;
-    maxValidAlternatives                   = 50;
     odTripsSampleSize                      = -1;
     calculateProfiles                      = true;
     walkingSpeedFactor                     = 1.0; // all walking segments are weighted with this value. > 1.0 means faster walking, < 1.0 means slower walking
@@ -353,43 +348,6 @@ namespace TrRouting
         {
           odTripsModes.push_back(odTripsMode);
         }
-        continue;
-      }
-
-      // alternatives:
-      else if (parameterWithValueVector[0] == "alternatives" || parameterWithValueVector[0] == "alt")
-      {
-        newParametersWithValues.push_back(std::make_pair("alternatives", parameterWithValueVector[1]));
-        continue;
-      }
-       else if (parameterWithValueVector[0] == "max_alternatives" || parameterWithValueVector[0] == "max_alt")
-      {
-        maxAlternatives = std::stoi(parameterWithValueVector[1]);
-        continue;
-      }
-      else if (parameterWithValueVector[0] == "alternatives_max_added_travel_time_minutes" || parameterWithValueVector[0] == "alt_max_added_travel_time")
-      {
-        alternativesMaxAddedTravelTimeSeconds = std::stoi(parameterWithValueVector[1]) * 60;
-        continue;
-      }
-      else if (parameterWithValueVector[0] == "alternatives_max_added_travel_time_seconds" || parameterWithValueVector[0] == "alt_max_added_travel_time_seconds")
-      {
-        alternativesMaxAddedTravelTimeSeconds = std::stoi(parameterWithValueVector[1]);
-        continue;
-      }
-      else if (parameterWithValueVector[0] == "alternatives_max_travel_time_ratio" || parameterWithValueVector[0] == "alt_max_ratio")
-      {
-        alternativesMaxTravelTimeRatio = std::stof(parameterWithValueVector[1]);
-        continue;
-      }
-      else if (parameterWithValueVector[0] == "alternatives_min_max_travel_time_minutes" || parameterWithValueVector[0] == "alt_min_max_travel_time")
-      {
-        minAlternativeMaxTravelTimeSeconds = std::stoi(parameterWithValueVector[1]) * 60;
-        continue;
-      }
-      else if (parameterWithValueVector[0] == "alternatives_min_max_travel_time_seconds" || parameterWithValueVector[0] == "alt_min_max_travel_time_seconds")
-      {
-        minAlternativeMaxTravelTimeSeconds = std::stoi(parameterWithValueVector[1]);
         continue;
       }
 

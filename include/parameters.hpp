@@ -184,6 +184,15 @@ namespace TrRouting
       Point* getDestination() const { return destination.get(); }
       bool isWithAlternatives() { return withAlternatives; }
 
+      // TODO Those values used to be in the legacy parameters object. They are not exposed
+      // in the V2 api yet, but we used the default values in the alternative calculation.
+      // For the moment, let's return default constant values
+      int getMaxAlternatives() { return 200; } // number of alternatives to calculate before returning results (when alternatives parameter is set to true)
+      float getAlternativesMaxTravelTimeRatio() { return 1.75; } // travel time of fastest route is multiplied by this ratio to find plausible alternative with a max travel time.
+      float getMinAlternativeMaxTravelTimeSeconds() { return 30*60; } // if multiplying max travel time ratio with max travel time is too small, keep max travel time to this minimum.
+      int getAlternativesMaxAddedTravelTimeSeconds() { return 60*60; } // how many seconds to add to fastest travel time to limit alternatives travel time.
+      int getMaxValidAlternatives() { return 50; } // max number of valid alternatives to return
+
       /**
        * Factory function to create a routeParameters object from  a map of
        * parameters coming from the origin/destination route. It returns a new
@@ -265,12 +274,6 @@ namespace TrRouting
       float walkingSpeedMetersPerSecond;
 
       std::optional<boost::uuids::uuid> odTripUuid;
-
-      int maxAlternatives; // number of alternatives to calculate before returning results (when alternatives parameter is set to true)
-      float alternativesMaxTravelTimeRatio; // travel time of fastest route is multiplied by this ratio to find plausible alternative with a max travel time.
-      float minAlternativeMaxTravelTimeSeconds; // if multiplying max travel time ratio with max travel time is too small, keep max travel time to this minimum.
-      int   alternativesMaxAddedTravelTimeSeconds; // how many seconds to add to fastest travel time to limit alternatives travel time.
-      int   maxValidAlternatives; // max number of valid alternatives to return
 
       bool calculateProfiles;            // calculate profiles for lines, paths and trips (od trips only)
 
