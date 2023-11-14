@@ -84,7 +84,7 @@ namespace TrRouting
       
       for (auto & accessFootpath : accessFootpaths)
       {
-        footpathTravelTimeSeconds = (int)ceil((float)(accessFootpath.time) / params.walkingSpeedFactor);
+        footpathTravelTimeSeconds = (int)ceil((float)(accessFootpath.time) / parameters.getWalkingSpeedFactor());
         footpathDistanceMeters    = accessFootpath.distance;
 
         nodesAccess.emplace(accessFootpath.node.uid, NodeTimeDistance(accessFootpath.node,
@@ -119,7 +119,7 @@ namespace TrRouting
       nodesReverseTentativeTime.assign(Node::getMaxUid() + 1, -1); //Assign default values to all indexes
       for (auto & egressFootpath : egressFootpaths)
       {
-        footpathTravelTimeSeconds  = (int)ceil((float)(egressFootpath.time) / params.walkingSpeedFactor);
+        footpathTravelTimeSeconds  = (int)ceil((float)(egressFootpath.time) / parameters.getWalkingSpeedFactor());
         footpathDistanceMeters     = egressFootpath.distance;
 
         nodesEgress.emplace(egressFootpath.node.uid, NodeTimeDistance(egressFootpath.node,
@@ -202,7 +202,7 @@ namespace TrRouting
     {
       spdlog::debug("  fetching nodes with osrm");
 
-      accessFootpaths = geoFilter.getAccessibleNodesFootpathsFromPoint(origin, transitData.getNodes(), parameters.getMaxAccessWalkingTravelTimeSeconds(), params.walkingSpeedMetersPerSecond);
+      accessFootpaths = geoFilter.getAccessibleNodesFootpathsFromPoint(origin, transitData.getNodes(), parameters.getMaxAccessWalkingTravelTimeSeconds(), parameters.getWalkingSpeedMetersPerSecond());
       if (accessFootpaths.size() == 0) {
         accessFootpathOk = false;
       }
@@ -241,7 +241,7 @@ namespace TrRouting
     }
     else
     {
-      egressFootpaths = geoFilter.getAccessibleNodesFootpathsFromPoint(destination, transitData.getNodes(), parameters.getMaxEgressWalkingTravelTimeSeconds(), params.walkingSpeedMetersPerSecond);
+      egressFootpaths = geoFilter.getAccessibleNodesFootpathsFromPoint(destination, transitData.getNodes(), parameters.getMaxEgressWalkingTravelTimeSeconds(), parameters.getWalkingSpeedMetersPerSecond());
       if (egressFootpaths.size() == 0) {
         egressFootpathOk = false;
       }

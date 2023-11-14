@@ -32,10 +32,8 @@ namespace TrRouting
     batchesCount                           = 1;
     odTripsSampleRatio                     = 1.0;
     odTripUuid.reset();
-    walkingSpeedMetersPerSecond            = 5/3.6; // 5 km/h
     odTripsSampleSize                      = -1;
     calculateProfiles                      = true;
-    walkingSpeedFactor                     = 1.0; // all walking segments are weighted with this value. > 1.0 means faster walking, < 1.0 means slower walking
     seed                                   = std::chrono::system_clock::now().time_since_epoch().count();
 
   }
@@ -352,11 +350,6 @@ namespace TrRouting
       }
 
       // other:
-      else if (parameterWithValueVector[0] == "walking_speed_factor" || parameterWithValueVector[0] == "walk_factor") // > 1.0 means faster walking
-      {
-        walkingSpeedFactor = std::stof(parameterWithValueVector[1]);
-        continue;
-      }
       else if (parameterWithValueVector[0] == "profiles"
                || parameterWithValueVector[0] == "calculate_profiles"
               )

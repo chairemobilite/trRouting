@@ -131,8 +131,9 @@ namespace TrRouting
                   footpathIndex++;
                   continue;
                 }
-                
-                footpathTravelTime = params.walkingSpeedFactor == 1.0 ? nodeDeparture.reverseTransferableNodes[footpathIndex].time : (int)ceil((float)nodeDeparture.reverseTransferableNodes[footpathIndex].time / params.walkingSpeedFactor);
+
+                //TODO We should not do a direct == with float values
+                footpathTravelTime = parameters.getWalkingSpeedFactor() == 1.0 ? nodeDeparture.reverseTransferableNodes[footpathIndex].time : (int)ceil((float)nodeDeparture.reverseTransferableNodes[footpathIndex].time / parameters.getWalkingSpeedFactor());
 
                 if (footpathTravelTime <= parameters.getMaxTransferWalkingTravelTimeSeconds())
                 {                  
@@ -332,7 +333,8 @@ namespace TrRouting
                   continue;
                 }
 
-                footpathTravelTime = params.walkingSpeedFactor == 1.0 ? nodeDeparture.reverseTransferableNodes[footpathIndex].time : (int)ceil((float)nodeDeparture.reverseTransferableNodes[footpathIndex].time / params.walkingSpeedFactor);
+                //TODO We should not do a direct == with float values
+                footpathTravelTime = parameters.getWalkingSpeedFactor() == 1.0 ? nodeDeparture.reverseTransferableNodes[footpathIndex].time : (int)ceil((float)nodeDeparture.reverseTransferableNodes[footpathIndex].time / parameters.getWalkingSpeedFactor());
 
                 if (footpathTravelTime <= parameters.getMaxTransferWalkingTravelTimeSeconds())
                 {
