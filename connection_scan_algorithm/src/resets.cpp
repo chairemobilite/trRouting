@@ -185,19 +185,6 @@ namespace TrRouting
         accessFootpaths.push_back(accessNode);
       }
     }
-    else if (params.accessNodesRef.size() > 0 && params.accessNodeTravelTimesSeconds.size() == params.accessNodesRef.size()) {
-      accessFootpaths.clear();
-      int j = 0;
-      for (auto & accessNode : params.accessNodesRef) {
-        int distanceMeters{-1};
-        if (params.accessNodeDistancesMeters.size() == params.accessNodesRef.size())
-        {
-          distanceMeters = params.accessNodeDistancesMeters[j];
-        }
-        accessFootpaths.push_back(NodeTimeDistance(accessNode, params.accessNodeTravelTimesSeconds[j], distanceMeters));
-        j++;
-      }
-    }
     else
     {
       spdlog::debug("  fetching nodes with osrm");
@@ -222,21 +209,6 @@ namespace TrRouting
       //TODO This could be a std::copy
       for (auto & egressNode : odTripGlob.value().get().destinationNodes) {
         egressFootpaths.push_back(egressNode);
-      }
-    }
-    else if (params.egressNodesRef.size() > 0 && params.egressNodeTravelTimesSeconds.size() == params.egressNodesRef.size())
-    {
-      egressFootpaths.clear();
-      int j = 0;
-      for (auto & egressNode : params.egressNodesRef)
-      {
-        int distanceMeters{-1};
-        if (params.egressNodeDistancesMeters.size() == params.egressNodesRef.size())
-        {
-          distanceMeters = params.egressNodeDistancesMeters[j];
-        }
-        egressFootpaths.push_back(NodeTimeDistance(egressNode, params.egressNodeTravelTimesSeconds[j], distanceMeters));
-        j++;
       }
     }
     else
