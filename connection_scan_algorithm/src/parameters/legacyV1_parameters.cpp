@@ -33,7 +33,6 @@ namespace TrRouting
     odTripsSampleRatio                     = 1.0;
     odTripUuid.reset();
     walkingSpeedMetersPerSecond            = 5/3.6; // 5 km/h
-    forwardCalculation                     = true;
     maxAlternatives                        = 200;
     alternativesMaxTravelTimeRatio         = 1.75;
     minAlternativeMaxTravelTimeSeconds     = 30*60;
@@ -193,13 +192,6 @@ namespace TrRouting
         boost::uuids::uuid dataSourceUuid    = uuidGenerator(parameterWithValueVector[1]);
         // This will throw an exception if specified data_source_uuid is not valid
         onlyDataSource = dataSources.at(dataSourceUuid);
-        continue;
-      }
-
-      // forward/reverse:
-      else if (parameterWithValueVector[0] == "reverse")
-      {
-        if (parameterWithValueVector[1] == "true" || parameterWithValueVector[1] == "1") { forwardCalculation = false; }
         continue;
       }
 
