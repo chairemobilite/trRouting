@@ -98,15 +98,15 @@ namespace TrRouting
     int maxTravelTime;
     int alternativeSequence = 1;
     int alternativesCalculatedCount = 1;
-    int maxAlternatives = params.maxAlternatives;
+    int maxAlternatives = parameters.getMaxAlternatives();
     int lastFoundedAtNum = 0;
     //int departureTimeSeconds = -1;
 
     spdlog::debug("alternatives parameters:");
     spdlog::debug("  maxTotalTravelTimeSeconds: {}", parameters.getMaxTotalTravelTimeSeconds());
-    spdlog::debug("  minAlternativeMaxTravelTimeSeconds: ", params.minAlternativeMaxTravelTimeSeconds);
-    spdlog::debug("  alternativesMaxAddedTravelTimeSeconds: ", params.alternativesMaxAddedTravelTimeSeconds);
-    spdlog::debug("  alternativesMaxTravelTimeRatio: ", params.alternativesMaxTravelTimeRatio);
+    spdlog::debug("  minAlternativeMaxTravelTimeSeconds: ", parameters.getMinAlternativeMaxTravelTimeSeconds());
+    spdlog::debug("  alternativesMaxAddedTravelTimeSeconds: ", parameters.getAlternativesMaxAddedTravelTimeSeconds());
+    spdlog::debug("  alternativesMaxTravelTimeRatio: ", parameters.getAlternativesMaxTravelTimeRatio());
     spdlog::debug("calculating fastest alternative...");
   
     std::unique_ptr<SingleCalculationResult> result = calculateSingle(parameters);
@@ -123,14 +123,14 @@ namespace TrRouting
 
     //departureTimeSeconds = routingResult.departureTimeSeconds + routingResult.firstWaitingTimeSeconds - params.minWaitingTimeSeconds;
     // TODO Extract the max travel time calculation to a function
-    maxTravelTime = params.alternativesMaxTravelTimeRatio * routingResult.totalTravelTime + (parameters.isForwardCalculation() ? routingResult.departureTime - parameters.getTimeOfTrip() : 0);
-    if (maxTravelTime < params.minAlternativeMaxTravelTimeSeconds)
+    maxTravelTime = parameters.getAlternativesMaxTravelTimeRatio() * routingResult.totalTravelTime + (parameters.isForwardCalculation() ? routingResult.departureTime - parameters.getTimeOfTrip() : 0);
+    if (maxTravelTime < parameters.getMinAlternativeMaxTravelTimeSeconds())
     {
-      maxTravelTime = params.minAlternativeMaxTravelTimeSeconds;
+      maxTravelTime = parameters.getMinAlternativeMaxTravelTimeSeconds();
     }
-    else if (maxTravelTime > routingResult.totalTravelTime + params.alternativesMaxAddedTravelTimeSeconds)
+    else if (maxTravelTime > routingResult.totalTravelTime + parameters.getAlternativesMaxAddedTravelTimeSeconds())
     {
-      maxTravelTime = routingResult.totalTravelTime + params.alternativesMaxAddedTravelTimeSeconds;
+      maxTravelTime = routingResult.totalTravelTime + parameters.getAlternativesMaxAddedTravelTimeSeconds();
     }
     maxTravelTime = std::min(maxTravelTime, parameters.getMaxTotalTravelTimeSeconds());
     // TODO: We should not create a whole new object just to update maxTravelTime. This parameter should be in the calculation specific parameters, which do not exist yet
@@ -183,7 +183,7 @@ namespace TrRouting
     // Process all combinations and calculate new route with those excluded
     for (size_t i = 0; i < allCombinations.size(); i++)
     {
-      if (alternativesCalculatedCount < maxAlternatives && alternativeSequence - 1 < params.maxValidAlternatives)
+      if (alternativesCalculatedCount < maxAlternatives && alternativeSequence - 1 < parameters.getMaxValidAlternatives())
       {
         // Generate parameters to send to calculate
         const LineVector combination = allCombinations.at(i);
