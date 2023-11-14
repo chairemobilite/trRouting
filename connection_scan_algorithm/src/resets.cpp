@@ -42,7 +42,7 @@ namespace TrRouting
     departureTimeSeconds = -1;
     arrivalTimeSeconds   = -1;
     
-    if(odTripGlob.has_value() && params.forwardCalculation == true)
+    if(odTripGlob.has_value() && parameters.isForwardCalculation())
     {
       departureTimeSeconds = odTripGlob.value().get().departureTimeSeconds;
     }
