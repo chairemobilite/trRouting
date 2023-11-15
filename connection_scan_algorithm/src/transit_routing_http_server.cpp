@@ -147,10 +147,6 @@ int main(int argc, char** argv) {
   HttpServer server;
   server.config.port = programOptions.port;
 
-  // FIXME: Now, all endpoints, including v2 needs this param object to be initialized, so let's do it here, but it should not be necessary (see https://github.com/chairemobilite/trRouting/issues/58)
-  calculator.params.setDefaultValues();
-
-
   server.resource["^/saveCache[/]?$"]["POST"] = [&server, &calculator](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
 
     std::string response {""};
@@ -351,7 +347,6 @@ int main(int argc, char** argv) {
     calculator.benchmarking.clear();
 
     // prepare parameters:
-    calculator.params.setDefaultValues(); // Reset global params object (TODO only need while its global)
     std::vector<std::pair<std::string, std::string>> parametersWithValues;
     auto queryFields = request->parse_query_string();
     for(auto &field : queryFields)
@@ -427,7 +422,6 @@ int main(int argc, char** argv) {
     calculator.benchmarking.clear();
 
     // prepare parameters:
-    calculator.params.setDefaultValues(); // Reset global params object (TODO only need while its global)
     std::vector<std::pair<std::string, std::string>> parametersWithValues;
     auto queryFields = request->parse_query_string();
     for(auto &field : queryFields)
@@ -503,7 +497,6 @@ int main(int argc, char** argv) {
     calculator.benchmarking.clear();
 
     // prepare parameters:
-    calculator.params.setDefaultValues(); // Reset global params object (TODO only need while its global)
     std::vector<std::pair<std::string, std::string>> parametersWithValues;
     auto queryFields = request->parse_query_string();
     for(auto &field : queryFields)

@@ -32,9 +32,6 @@ void AccessMapFixtureTests::SetUp()
 
 std::unique_ptr<TrRouting::AllNodesResult> AccessMapFixtureTests::calculateOd(TrRouting::AccessibilityParameters& parameters)
 {
-    // FIXME: This needs to be called to set some default values that are still part of the global parameters
-    calculator.params.setDefaultValues();
-
     // TODO Shouldn't need to do this, but we do for now, benchmark needs to be started
     calculator.algorithmCalculationTime.start();
     calculator.benchmarking.clear();

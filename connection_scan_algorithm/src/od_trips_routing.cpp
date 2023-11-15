@@ -158,7 +158,7 @@ namespace TrRouting
     std::map<boost::uuids::uuid, std::vector<std::vector<float>>> pathProfiles; // key: path uuid, value: [index: segment index, value: [index: hourOfDay, demand]]
     std::map<boost::uuids::uuid, std::vector<float>> pathTotalProfiles; // key: path uuid, value: [index: segment index, value: totalDemand]
     std::vector<float> demandByHourOfDay;
-
+ 
     int    legConnectionStartIdx;
     int    legConnectionEndIdx;
     int    connectionDepartureTimeSeconds;
@@ -171,6 +171,9 @@ namespace TrRouting
     float  maximumSegmentTotalDemand  = 0.0;
     int    totalTravelTimeSeconds     = 0;
 
+    // Moved the legacy V1 parameters into this object. For now, we don't have an API for it
+    // So it's just a series of constants
+    OdTripLegacyParameters params;
     json["odTrips"] = nlohmann::json::array();
 
     // Initialize lineProfiles

@@ -108,7 +108,6 @@ public:
   void benchmarkCurrentParams(TrRouting::RouteParameters &routeParams, bool expectResult, int nbIter)
   {
     // TODO Shouldn't have to do this, a query is not a benchmark
-    calculator->params.setDefaultValues();
     calculator->algorithmCalculationTime.start();
     calculator->benchmarking.clear();
 
