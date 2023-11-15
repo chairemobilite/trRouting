@@ -84,7 +84,6 @@ namespace TrRouting
     // TODO As part of issue https://github.com/chairemobilite/trRouting/issues/95, this will be removed
     void initializeCalculationData();
 
-    Parameters params;
     CalculationTime algorithmCalculationTime;
 
     // TODO Added Glob suffix to easily track which one was local and which was global

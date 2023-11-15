@@ -245,7 +245,7 @@ namespace TrRouting
       );
   };
 
-  class Parameters {
+  class OdTripLegacyParameters {
 
     public:
 
@@ -270,16 +270,8 @@ namespace TrRouting
 
       bool calculateProfiles;            // calculate profiles for lines, paths and trips (od trips only)
 
-      ~Parameters() {}
-      void setDefaultValues();
-      /**
-       * @deprecated ServerParameters should not be updated this way, directly create a RouteParameters, but legacy endpoints still use this method.
-       * */
-      RouteParameters update(std::vector<std::string> &parameters,
-                             const std::map<boost::uuids::uuid, Scenario> &scenario,
-                             const std::map<boost::uuids::uuid, OdTrip> &odTrips,
-                             const std::map<boost::uuids::uuid, Node> &nodes,
-                             const std::map<boost::uuids::uuid, DataSource> &dataSources);
+      ~OdTripLegacyParameters() {}
+      OdTripLegacyParameters();
 
   };
 

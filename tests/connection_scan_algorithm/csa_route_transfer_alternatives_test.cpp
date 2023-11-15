@@ -352,9 +352,6 @@ TEST_F(SingleTAndACalculationFixtureTests, TripWithNoRoutingAlternatives)
 
 TrRouting::AlternativesResult SingleTAndACalculationFixtureTests::calculateWithAlternatives(TrRouting::RouteParameters& parameters)
 {
-    // TODO: This needs to be called to set some default values that are still part of the global parameters
-    calculator.params.setDefaultValues();
-
     // TODO Shouldn't need to do this, but we do for now, benchmark needs to be started
     calculator.algorithmCalculationTime.start();
     calculator.benchmarking.clear();
