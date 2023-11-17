@@ -537,7 +537,6 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingTravelTimeLongerTrip)
 
 std::unique_ptr<TrRouting::RoutingResult> SingleRouteCalculationFixtureTests::calculateOd(TrRouting::RouteParameters& parameters)
 {
-    // TODO Shouldn't need to do this, but we do for now, benchmark needs to be started
-    calculator.algorithmCalculationTime.start();
+    TrRouting::Calculator calculator(transitData, geoFilter);
     return calculator.calculateSingle(parameters);
 }

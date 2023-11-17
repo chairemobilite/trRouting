@@ -78,16 +78,8 @@ namespace TrRouting
 
     std::vector<int>        optimizeJourney(std::deque<JourneyStep> &journey);
 
-    // Public for testing, this function initializes the calculation vectors and should be called whenever nodes and schedules are updated
-    // TODO As part of issue https://github.com/chairemobilite/trRouting/issues/95, this will be removed
-    void initializeCalculationData();
-
-    CalculationTime algorithmCalculationTime;
-
-    // TODO Added Glob suffix to easily track which one was local and which was global
-    std::optional<std::reference_wrapper<const OdTrip>> odTripGlob;
-
   private:
+    void initializeCalculationData();
     bool resetAccessFootpaths(const CommonParameters &parameters, const Point& origin);
     bool resetEgressFootpaths(const CommonParameters &parameters, const Point& destination);
     void resetFilters(const CommonParameters &parameters);
@@ -95,6 +87,7 @@ namespace TrRouting
     std::string optimizeCasesToString(const std::vector<int> optimizeCases);
     std::unique_ptr<SingleCalculationResult> calculateSingleReverse(RouteParameters &parameters);
 
+    CalculationTime algorithmCalculationTime;
     //TODO set it mutable so it can be changed/reset?
     const TransitData &transitData;
     //TODO Should it be const?
@@ -107,6 +100,9 @@ namespace TrRouting
     int              maxAccessTravelTime;
     int              minEgressTravelTime;
     long long        calculationTime;
+
+    // TODO Added Glob suffix to easily track which one was local and which was global
+    std::optional<std::reference_wrapper<const OdTrip>> odTripGlob; //Used to tell the reset function that we are doing an OdTrip calculations
 
     std::vector<int> nodesTentativeTime; // arrival time at node, using the Node::id as index
     std::vector<int> nodesReverseTentativeTime; // departure time at node

@@ -48,7 +48,6 @@ void BaseCsaFixtureTests::SetUp() {
     // Enable full debug output in the test runs
     spdlog::set_level(spdlog::level::debug);
 
-    calculator.initializeCalculationData();
 }
 
 void BaseCsaFixtureTests::assertNoRouting(const TrRouting::NoRoutingFoundException& exception, TrRouting::NoRoutingReason expectedReason)
