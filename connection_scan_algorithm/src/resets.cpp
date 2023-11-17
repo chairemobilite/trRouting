@@ -20,7 +20,6 @@ namespace TrRouting
   void Calculator::reset(CommonParameters &parameters, std::optional<std::reference_wrapper<const Point>> origin, std::optional<std::reference_wrapper<const Point>> destination, bool resetAccessPaths, bool doResetFilters)
   {
     
-    int benchmarkingStart = algorithmCalculationTime.getEpoch();
     //TODO Should we just check the size of accessFootpath and egressFootpath instead of adding a flag?
     bool accessFootpathOk = true;
     bool egressFootpathOk = true;
@@ -163,8 +162,6 @@ namespace TrRouting
     {
       resetFilters(parameters);
     }
-
-    benchmarking["reset"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
 
     spdlog::debug("-- filter trips -- {} microseconds ", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
 

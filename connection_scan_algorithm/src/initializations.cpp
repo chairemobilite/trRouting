@@ -54,8 +54,6 @@ namespace TrRouting
 
     spdlog::info("{} connections", transitData.getConnectionCount());;
 
-    //int benchmarkingStart = algorithmCalculationTime.getEpoch();
-
   }
 
 }

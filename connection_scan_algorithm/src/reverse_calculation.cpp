@@ -15,8 +15,6 @@ namespace TrRouting
   std::optional<std::tuple<int, std::reference_wrapper<const Node>>> Calculator::reverseCalculation(RouteParameters &parameters,
                                                                                                     std::unordered_map<Node::uid_t, JourneyStep> & reverseAccessJourneysSteps)
   {
-    int benchmarkingStart = algorithmCalculationTime.getEpoch();
-
     int  reachableConnectionsCount        {0};
     std::optional<std::reference_wrapper<const Connection>> tripExitConnection;
     int  connectionDepartureTime          {-1};
@@ -215,8 +213,6 @@ namespace TrRouting
       }
     }
 
-    benchmarking["reverse_calculation"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
-
     if (bestAccess.has_value()) {
       return std::optional(std::make_tuple(bestDepartureTime, std::cref(bestAccess.value().get().node)));
     } else {
@@ -228,8 +224,6 @@ namespace TrRouting
   void Calculator::reverseCalculationAllNodes(AccessibilityParameters &parameters,
                                               std::unordered_map<Node::uid_t, JourneyStep> & reverseAccessJourneysSteps)
   {
-    int benchmarkingStart = algorithmCalculationTime.getEpoch();
-
     int  reachableConnectionsCount        {0};
     std::optional<std::reference_wrapper<const Connection>> tripExitConnection;
     int  connectionDepartureTime          {-1};
@@ -386,8 +380,6 @@ namespace TrRouting
     }
 
     spdlog::debug("-- {}  reverse connections parsed on {}", reachableConnectionsCount, connectionsCount);
-
-    benchmarking["reverse_calculation"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
 
     if (reachableConnectionsCount == 0) {
       throw NoRoutingFoundException(NoRoutingReason::NO_SERVICE_TO_DESTINATION);
