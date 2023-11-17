@@ -341,10 +341,9 @@ int main(int argc, char** argv) {
       return;
     }
 
-    // prepare benchmarking and timer:
+    // prepare timer:
     // TODO Shouldn't have to do this, a query is not a benchmark
     calculator.algorithmCalculationTime.start();
-    calculator.benchmarking.clear();
 
     // prepare parameters:
     std::vector<std::pair<std::string, std::string>> parametersWithValues;
@@ -416,10 +415,9 @@ int main(int argc, char** argv) {
       return;
     }
 
-    // prepare benchmarking and timer:
+    // prepare timer:
     // TODO Shouldn't have to do this, a query is not a benchmark
     calculator.algorithmCalculationTime.start();
-    calculator.benchmarking.clear();
 
     // prepare parameters:
     std::vector<std::pair<std::string, std::string>> parametersWithValues;
@@ -491,10 +489,9 @@ int main(int argc, char** argv) {
       return;
     }
 
-    // prepare benchmarking and timer:
+    // prepare timer:
     // TODO Shouldn't have to do this, a query is not a benchmark
     calculator.algorithmCalculationTime.start();
-    calculator.benchmarking.clear();
 
     // prepare parameters:
     std::vector<std::pair<std::string, std::string>> parametersWithValues;
