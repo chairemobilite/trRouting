@@ -352,9 +352,6 @@ TEST_F(SingleTAndACalculationFixtureTests, TripWithNoRoutingAlternatives)
 
 TrRouting::AlternativesResult SingleTAndACalculationFixtureTests::calculateWithAlternatives(TrRouting::RouteParameters& parameters)
 {
-    // TODO Shouldn't need to do this, but we do for now, benchmark needs to be started
-    calculator.algorithmCalculationTime.start();
-
+    TrRouting::Calculator calculator(transitData, geoFilter);
     return calculator.alternativesRouting(parameters);
-
 }

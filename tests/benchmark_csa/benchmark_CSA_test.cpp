@@ -25,7 +25,6 @@ const int NB_ITER = 30;
 // Global test suite variables, they should not be reset for each test
 TransitData* transitData; //TODO Required only to get the scenario, we might want to get it in another way
 EuclideanGeoFilter* geoFilter;
-Calculator* calculator;
 std::ofstream benchmarkResultsFile;
 std::ofstream benchmarkDetailedResultsFile;
 
@@ -70,14 +69,10 @@ public:
     // Use simple distance in the benchmark instead of OSRM
     geoFilter = new TrRouting::EuclideanGeoFilter();
 
-    calculator = new TrRouting::Calculator(*transitData, *geoFilter);
-
     if (!updateCalculatorFromCache(*transitData)) {
       ASSERT_EQ(true, false);
       return;
     }
-    //TODO is this necessary? We removed a call to prepare() and added this one
-    calculator->initializeCalculationData();
 
     // Prepare the result files
     time_t rawtime;
@@ -102,14 +97,10 @@ public:
   {
     benchmarkResultsFile.close();
     benchmarkDetailedResultsFile.close();
-    delete calculator;
   }
 
   void benchmarkCurrentParams(TrRouting::RouteParameters &routeParams, bool expectResult, int nbIter)
   {
-    // TODO Shouldn't have to do this, a query is not a benchmark
-    calculator->algorithmCalculationTime.start();
-
     double results[nbIter];
     for (int i = 0; i < nbIter; i++)
     {
@@ -119,14 +110,16 @@ public:
 
       if (routeParams.isWithAlternatives()) {
         try {
-          calculator->alternativesRouting(routeParams);
+          Calculator calculator(*transitData, *geoFilter);
+          calculator.alternativesRouting(routeParams);
           ASSERT_TRUE(expectResult);
         } catch (TrRouting::NoRoutingFoundException& e) {
           ASSERT_FALSE(expectResult);
         }
       } else {
         try {
-          calculator->calculateSingle(routeParams);
+          Calculator calculator(*transitData, *geoFilter);
+          calculator.calculateSingle(routeParams);
           ASSERT_TRUE(expectResult);
         } catch (TrRouting::NoRoutingFoundException& e) {
           ASSERT_FALSE(expectResult);

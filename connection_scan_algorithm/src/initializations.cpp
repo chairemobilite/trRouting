@@ -24,7 +24,6 @@ namespace TrRouting
 
   Calculator::Calculator(const TransitData &_transitData, GeoFilter &_geoFilter) :
     algorithmCalculationTime(CalculationTime()),
-    odTripGlob(std::nullopt),
     transitData(_transitData),
     geoFilter(_geoFilter),
     departureTimeSeconds(0),
@@ -33,11 +32,14 @@ namespace TrRouting
     maxEgressTravelTime(0),
     maxAccessTravelTime(0),
     minEgressTravelTime(0),
-    calculationTime(0)
+    calculationTime(0),
+    odTripGlob(std::nullopt)
   {
-
+    initializeCalculationData();
+    algorithmCalculationTime.start(); //Automatically start timer on construction
   }
 
+  //TODO Maybe merge into the constructor
   void Calculator::initializeCalculationData() {
     spdlog::info("preparing nodes tentative times, trips enter connections and journeys...");
 

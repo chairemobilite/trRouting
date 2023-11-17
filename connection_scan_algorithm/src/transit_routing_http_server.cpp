@@ -136,9 +136,6 @@ int main(int argc, char** argv) {
     spdlog::info("Using OSRM for access/egress node time/distance");
   }
 
-  Calculator calculator(transitData, *geoFilter);
-  //TODO, should this be in the constructor?
-  calculator.initializeCalculationData();
   spdlog::info("preparing server...");
 
   //HTTP-server using 1 thread
@@ -147,34 +144,8 @@ int main(int argc, char** argv) {
   HttpServer server;
   server.config.port = programOptions.port;
 
-  server.resource["^/saveCache[/]?$"]["POST"] = [&server, &calculator](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
-
-    std::string response {""};
-
-
-    try {
-      boost::property_tree::ptree pt;
-      boost::property_tree::read_json(request->content, pt);
-
-      //auto name = pt.get<string>("firstName") + " " + pt.get<string>("lastName");
-
-      //response = "{\"status\": \"error\", \"error\": \"missing or wrong cache name\"}";
-    }
-    catch(const std::exception &e) {
-      std::string error(e.what());
-      response = "{\"status\": \"error\", \"error\": \"" + error + "\"}";
-    }
-
-
-    response = "{\"status\": \"error\", \"error\": \"missing or wrong cache name\"}";
-
-    *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
-
-  };
-
-
   // updateCache:
-  server.resource["^/updateCache[/]?$"]["GET"]=[&server, &calculator, &transitData](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
+  server.resource["^/updateCache[/]?$"]["GET"]=[&server, &transitData](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
 
     std::string              response {""};
     std::vector<std::string> parametersWithValues;
@@ -293,7 +264,6 @@ int main(int argc, char** argv) {
     //TODO do this only if we had at least one correct name
     //Reinit some data after the update
     // TODO Just the schedules???
-    calculator.initializeCalculationData();
     if (cacheNames.size() > 0)
     {
       // Remove last ","
@@ -315,7 +285,7 @@ int main(int argc, char** argv) {
 
 
   // closeServer and exit app:
-  server.resource["^/exit[/]?\\?([0-9a-zA-Z&=_,:/.-]+)$"]["GET"]=[&server, &calculator](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> ) {
+  server.resource["^/exit[/]?\\?([0-9a-zA-Z&=_,:/.-]+)$"]["GET"]=[&server](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> ) {
 
     std::string response {""};
     *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
@@ -331,7 +301,7 @@ int main(int argc, char** argv) {
 
   // Routing request for a single origin destination
   // TODO Copy-pasted and adapted from /route/v1/transit. There's still a lot of common code. Application code should be extracted to common functions outside the web server
-  server.resource["^/v2/route[/]?$"]["GET"]=[&server, &calculator, &dataStatus, &transitData](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
+  server.resource["^/v2/route[/]?$"]["GET"]=[&server, &dataStatus, &transitData, &geoFilter](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
     // Have a global id to match the requests in the logs
     static int routeRequestId = 0;
     std::string response = getFastErrorResponse(dataStatus);
@@ -340,10 +310,7 @@ int main(int argc, char** argv) {
       *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
       return;
     }
-
-    // prepare timer:
-    // TODO Shouldn't have to do this, a query is not a benchmark
-    calculator.algorithmCalculationTime.start();
+    Calculator calculator(transitData, *geoFilter);
 
     // prepare parameters:
     std::vector<std::pair<std::string, std::string>> parametersWithValues;
@@ -404,7 +371,7 @@ int main(int argc, char** argv) {
 
   // Request a summary of lines data for a route
   // TODO Copy pasted from v2/route. There's a lot in common, it should be extracted to common class, just the response parser is different
-  server.resource["^/v2/summary[/]?$"]["GET"]=[&server, &calculator, &dataStatus, &transitData](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
+  server.resource["^/v2/summary[/]?$"]["GET"]=[&server, &dataStatus, &transitData, &geoFilter](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
     // Have a global id to match the requests in the logs
     static int summaryRequestId = 0;
 
@@ -414,10 +381,7 @@ int main(int argc, char** argv) {
       *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
       return;
     }
-
-    // prepare timer:
-    // TODO Shouldn't have to do this, a query is not a benchmark
-    calculator.algorithmCalculationTime.start();
+    Calculator calculator(transitData, *geoFilter);
 
     // prepare parameters:
     std::vector<std::pair<std::string, std::string>> parametersWithValues;
@@ -478,7 +442,7 @@ int main(int argc, char** argv) {
 
   // Routing request for a single origin destination
   // TODO Copy-pasted and adapted from /route/v1/transit. There's still a lot of common code. Application code should be extracted to common functions outside the web server
-  server.resource["^/v2/accessibility[/]?$"]["GET"]=[&server, &calculator, &dataStatus, &transitData](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
+  server.resource["^/v2/accessibility[/]?$"]["GET"]=[&server, &dataStatus, &transitData, &geoFilter](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
     // Have a global id to match the requests in the logs
     static int accessibilityRequestId = 0;
 
@@ -488,10 +452,7 @@ int main(int argc, char** argv) {
       *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
       return;
     }
-
-    // prepare timer:
-    // TODO Shouldn't have to do this, a query is not a benchmark
-    calculator.algorithmCalculationTime.start();
+    Calculator calculator(transitData, *geoFilter);
 
     // prepare parameters:
     std::vector<std::pair<std::string, std::string>> parametersWithValues;
