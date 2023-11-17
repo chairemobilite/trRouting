@@ -14,9 +14,8 @@ namespace TrRouting
   std::optional<std::tuple<int, std::reference_wrapper<const Node>>> Calculator::forwardCalculation(RouteParameters &parameters,
                                                                                                     std::unordered_map<Node::uid_t, JourneyStep> & forwardEgressJourneysSteps)
   {
-    assert(!params.returnAllNodesResult); // Just make sure we are in the right code path
 
-    int benchmarkingStart  = algorithmCalculationTime.getEpoch();
+    assert(!params.returnAllNodesResult); // Just make sure we are in the right code path
 
     int   reachableConnectionsCount       {0};
     int   nodeDepartureTentativeTime      {MAX_INT};
@@ -197,8 +196,6 @@ namespace TrRouting
       }
     }
 
-    benchmarking["forward_calculation"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
-
     if (bestEgress.has_value()) {
       return std::optional(std::make_tuple(bestArrivalTime, std::cref(bestEgress.value().get().node)));
     } else {
@@ -210,8 +207,6 @@ namespace TrRouting
   void Calculator::forwardCalculationAllNodes(AccessibilityParameters &parameters,
                                                std::unordered_map<Node::uid_t, JourneyStep> & forwardEgressJourneysSteps)
   {
-    int benchmarkingStart  = algorithmCalculationTime.getEpoch();
-
     int   reachableConnectionsCount       {0};
     int   nodeDepartureTentativeTime      {MAX_INT};
     int   connectionDepartureTime         {-1};
@@ -344,8 +339,6 @@ namespace TrRouting
     }
 
     spdlog::debug("-- {} forward connections parsed on {}", reachableConnectionsCount, connectionsCount);
-
-    benchmarking["forward_calculation"] += algorithmCalculationTime.getEpoch() - benchmarkingStart;
 
     if (reachableConnectionsCount == 0) {
       throw NoRoutingFoundException(NoRoutingReason::NO_SERVICE_FROM_ORIGIN);

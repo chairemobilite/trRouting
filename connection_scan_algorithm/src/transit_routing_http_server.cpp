@@ -468,10 +468,9 @@ int main(int argc, char** argv) {
       return;
     }
 
-    // prepare benchmarking and timer:
+    // prepare timer:
     // TODO Shouldn't have to do this, a query is not a benchmark
     calculator.algorithmCalculationTime.start();
-    calculator.benchmarking.clear();
 
     // prepare parameters:
     calculator.params.setDefaultValues(); // Reset global params object (TODO only need while its global)
@@ -544,10 +543,9 @@ int main(int argc, char** argv) {
       return;
     }
 
-    // prepare benchmarking and timer:
+    // prepare timer:
     // TODO Shouldn't have to do this, a query is not a benchmark
     calculator.algorithmCalculationTime.start();
-    calculator.benchmarking.clear();
 
     // prepare parameters:
     calculator.params.setDefaultValues(); // Reset global params object (TODO only need while its global)
@@ -620,10 +618,9 @@ int main(int argc, char** argv) {
       return;
     }
 
-    // prepare benchmarking and timer:
+    // prepare timer:
     // TODO Shouldn't have to do this, a query is not a benchmark
     calculator.algorithmCalculationTime.start();
-    calculator.benchmarking.clear();
 
     // prepare parameters:
     calculator.params.setDefaultValues(); // Reset global params object (TODO only need while its global)

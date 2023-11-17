@@ -37,7 +37,6 @@ std::unique_ptr<TrRouting::AllNodesResult> AccessMapFixtureTests::calculateOd(Tr
 
     // TODO Shouldn't need to do this, but we do for now, benchmark needs to be started
     calculator.algorithmCalculationTime.start();
-    calculator.benchmarking.clear();
     return calculator.calculateAllNodes(parameters);
 }
 

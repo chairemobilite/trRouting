@@ -110,7 +110,6 @@ public:
     // TODO Shouldn't have to do this, a query is not a benchmark
     calculator->params.setDefaultValues();
     calculator->algorithmCalculationTime.start();
-    calculator->benchmarking.clear();
 
     double results[nbIter];
     for (int i = 0; i < nbIter; i++)

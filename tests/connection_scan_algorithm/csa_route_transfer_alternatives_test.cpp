@@ -357,7 +357,6 @@ TrRouting::AlternativesResult SingleTAndACalculationFixtureTests::calculateWithA
 
     // TODO Shouldn't need to do this, but we do for now, benchmark needs to be started
     calculator.algorithmCalculationTime.start();
-    calculator.benchmarking.clear();
 
     return calculator.alternativesRouting(parameters);
 

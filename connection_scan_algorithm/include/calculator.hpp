@@ -47,8 +47,6 @@ namespace TrRouting
 
   public:
 
-    std::map<std::string, int> benchmarking;
-
     Calculator(const TransitData &_transitData, GeoFilter &_geofilter);
 
     void reset(CommonParameters &parameters, std::optional<std::reference_wrapper<const Point>> origin, std::optional<std::reference_wrapper<const Point>> destination, bool resetAccessPaths = true, bool resetFilters = true);
