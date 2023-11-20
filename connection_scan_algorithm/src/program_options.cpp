@@ -21,6 +21,8 @@ namespace TrRouting {
     options.add_options()
       ("useEuclideanDistance",                              boost::program_options::value<bool>()       ->default_value(false), "Use euclidean distance calculation instead of OSRM for access and egress calculations");
     options.add_options()
+      ("threads",                                           boost::program_options::value<int>()        ->default_value(1), "Number of threads to use to serve requests");
+    options.add_options()
       ("osrmPort,osrmWalkPort,osrmWalkingPort",             boost::program_options::value<std::string>()->default_value("5000"), "osrm walking port");
     options.add_options()
       ("osrmCyclingPort",                                   boost::program_options::value<std::string>()->default_value("8000"), "osrm cycling port");
@@ -46,6 +48,7 @@ namespace TrRouting {
     cachePath            = "cache";
     cacheAllConnectionSets = false;
     useEuclideanDistance = false;
+    numberOfThreads      = 1;
     osrmWalkingPort      = "5000";
     osrmCyclingPort      = "8000";
     osrmDrivingPort      = "7000";
@@ -84,6 +87,10 @@ namespace TrRouting {
     if(variablesMap.count("useEuclideanDistance") == 1)
     {
       useEuclideanDistance = variablesMap["useEuclideanDistance"].as<bool>();
+    }
+    if(variablesMap.count("threads") == 1)
+    {
+      numberOfThreads = variablesMap["threads"].as<int>();
     }
 
     if(variablesMap.count("osrmWalkPort") == 1)

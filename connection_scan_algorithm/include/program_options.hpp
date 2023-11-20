@@ -18,6 +18,7 @@ namespace TrRouting
     bool        debug;
     bool        cacheAllConnectionSets;
     bool        useEuclideanDistance;
+    int         numberOfThreads;
     std::string algorithm;
     std::string dataFetcherShortname;
     std::string osrmWalkingPort;

@@ -136,13 +136,11 @@ int main(int argc, char** argv) {
     spdlog::info("Using OSRM for access/egress node time/distance");
   }
 
-  spdlog::info("preparing server...");
+  spdlog::info("preparing server with {} threads...", programOptions.numberOfThreads);
 
-  //HTTP-server using 1 thread
-  //Unless you do more heavy non-threaded processing in the resources,
-  //1 thread is usually faster than several threads
   HttpServer server;
   server.config.port = programOptions.port;
+  server.config.thread_pool_size = programOptions.numberOfThreads;
 
   // updateCache:
   server.resource["^/updateCache[/]?$"]["GET"]=[&server, &transitData](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
