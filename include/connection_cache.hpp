@@ -6,6 +6,7 @@
 #include <boost/uuid/uuid.hpp>
 #include <memory>
 #include <map>
+#include <shared_mutex>
 
 namespace TrRouting {
 
@@ -46,6 +47,7 @@ class ScenarioConnectionCacheOne : public ScenarioConnectionCache {
     virtual void set(boost::uuids::uuid uuid, std::shared_ptr<ConnectionSet> cache);
 
   private:
+  mutable std::shared_mutex mutex; //Reader/Writer locking
     std::optional<boost::uuids::uuid> lastUuid;
     std::shared_ptr<ConnectionSet> lastConnection;
 };
@@ -68,6 +70,7 @@ class ScenarioConnectionCacheAll : public ScenarioConnectionCache {
     virtual void set(boost::uuids::uuid uuid, std::shared_ptr<ConnectionSet> cache);
 
   private:
+    mutable std::shared_mutex mutex; //Reader/Writer locking
     std::map<boost::uuids::uuid, std::shared_ptr<ConnectionSet> > connectionSets;
 };
 
