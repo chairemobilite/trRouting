@@ -6,7 +6,6 @@
 #include <boost/uuid/uuid.hpp>
 #include <stdlib.h>
 #include "routing_result_visitor.hpp"
-#include "json.hpp"
 #include "point.hpp" //Not using a forward declaration, as we use it more directly, see issue #129
 
 namespace TrRouting

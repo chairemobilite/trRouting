@@ -12,7 +12,7 @@
 #include "cache_fetcher.hpp"
 #include "path.hpp"
 #include "capnp/pathCollection.capnp.h"
-#include "json.hpp"
+#include <nlohmann/json.hpp>
 #include "spdlog/spdlog.h"
 
 namespace TrRouting

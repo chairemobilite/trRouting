@@ -1,5 +1,5 @@
 #include "osrmgeofilter.hpp"
-#include "json.hpp"
+#include <nlohmann/json.hpp>
 #include "point.hpp"
 #include "node.hpp"
 #include "client_http.hpp"

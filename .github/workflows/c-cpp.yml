@@ -21,7 +21,7 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: |
           sudo apt-get update
-          sudo apt-get install libboost-all-dev libexpat1-dev libjsoncpp-dev libspdlog-dev libcapnp-dev capnproto
+          sudo apt-get install libboost-all-dev libexpat1-dev libjsoncpp-dev libspdlog-dev libcapnp-dev capnproto nlohmann-json3-dev
     - name: Install deps
       if: matrix.os == 'macOS-latest'
       run: |
@@ -32,6 +32,7 @@ jobs:
           brew install boost
           brew install capnp
           brew install spdlog
+          brew install nlohmann-json
     - name: Gen configure
       run: autoreconf -i
     - name: configure

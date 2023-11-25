@@ -1,5 +1,6 @@
 #include <random>
 #include "spdlog/spdlog.h"
+#include <nlohmann/json.hpp>
 
 #include "calculator.hpp"
 #include "toolbox.hpp"
