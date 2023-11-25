@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include <math.h>
+#include <cmath>
 
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_io.hpp>
