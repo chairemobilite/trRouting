@@ -28,13 +28,14 @@ https://chairemobilite.github.io/trRouting/
 brew install boost
 brew install capnp
 brew install spdlog
+brew install nlohmann-json
 ```
 
 ## Ubuntu 16.04 Install
 
 [Install Cap'nProto](https://capnproto.org/install.html)
 ```
-sudo apt-get install clang libboost-all-dev libexpat1-dev libjsoncpp-dev libspdlog-dev
+sudo apt-get install clang libboost-all-dev libexpat1-dev libjsoncpp-dev libspdlog-dev nlohmann-json3-dev
 ```
 
 ## Compilation

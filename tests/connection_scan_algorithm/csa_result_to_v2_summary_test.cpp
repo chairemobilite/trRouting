@@ -3,7 +3,7 @@
 #include "gtest/gtest.h" // we will add the path to C preprocessor later
 #include "csa_result_to_response_test.hpp"
 #include "routing_result.hpp"
-#include "json.hpp"
+#include <nlohmann/json.hpp>
 #include "constants.hpp"
 #include "result_to_v2_summary.hpp"
 

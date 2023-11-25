@@ -1,4 +1,4 @@
-#include "json.hpp"
+#include <nlohmann/json.hpp>
 #include "constants.hpp"
 #include "result_constants.hpp"
 #include "result_to_v2.hpp"

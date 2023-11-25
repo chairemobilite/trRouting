@@ -1,7 +1,7 @@
 #ifndef TR_RESULT_TO_V2_RESPONSE
 #define TR_RESULT_TO_V2_RESPONSE
 
-#include "json.hpp"
+#include <nlohmann/json.hpp>
 #include "routing_result.hpp"
 
 namespace TrRouting
