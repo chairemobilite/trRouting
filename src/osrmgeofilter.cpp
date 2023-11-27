@@ -45,6 +45,14 @@ namespace TrRouting {
       }
     }
 
+    // If we don't have any node accessible with the euclidean distance, don't bother calculating
+    // the exact distance with OSRM
+    if (birdDistanceAccessibleNodeIndexes.size() == 0) {
+      // Return the empty vector
+      spdlog::debug("There was no node potentially accessible, we did not ask OSRM");
+      return accessibleNodesFootpaths;
+    }
+
     queryString += "?annotations=duration,distance";
 
     if (reversed)
