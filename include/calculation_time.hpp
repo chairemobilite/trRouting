@@ -10,7 +10,7 @@ namespace TrRouting
   class CalculationTime {
     
     public:
-      
+      CalculationTime();
       //static CalculationTime algorithmCalculationTime;
       long long getDurationMicroseconds();
       long long getDurationMicrosecondsNoStop();
