@@ -64,19 +64,26 @@ namespace TrRouting {
       queryString += "&sources=0";
     }
 
-    using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
-    HttpClient client(host + ":" + port);
-    auto s = client.request("GET", queryString);
+    std::stringstream responseJsonSs;
+    try {
+      using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
+      HttpClient client(host + ":" + port);
+      auto s = client.request("GET", queryString);
 
-    if (s->status_code != "200 OK") {
-      spdlog::error("Error fetching OSRM data ({})", s->status_code);
-      //TODO We should throw an exception somehow here to invalidate the current calculation
-      // and returne an informative error code to the user
+      if (s->status_code != "200 OK") {
+        spdlog::error("Error fetching OSRM data ({})", s->status_code);
+        //TODO We should throw an exception somehow here to invalidate the current calculation
+        // and returne an informative error code to the user
+        return accessibleNodesFootpaths;
+      }
+
+      responseJsonSs << s->content.rdbuf();
+    } catch (const std::exception& e){
+      spdlog::error("exception during OSRM request: {}", e.what());
+      //TODO See above TODO about handling the errors
       return accessibleNodesFootpaths;
     }
     
-    std::stringstream responseJsonSs;
-    responseJsonSs << s->content.rdbuf();
     nlohmann::json responseJson = nlohmann::json::parse(responseJsonSs.str());
 
     if (responseJson["durations"] != nullptr && responseJson["distances"] != nullptr && responseJson["durations"][0] != nullptr && responseJson["distances"][0] != nullptr)
