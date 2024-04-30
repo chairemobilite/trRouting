@@ -40,6 +40,5 @@ jobs:
     - name: make
       run: make
     - name: make check
-      # Disable make check on MacOS, currently does not work, issue #43
       run: make check
 
