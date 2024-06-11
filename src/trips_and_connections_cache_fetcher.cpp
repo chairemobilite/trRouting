@@ -102,9 +102,10 @@ namespace TrRouting
               for (unsigned long nodeTimeI = 0; nodeTimeI < nodeTimesCount - 1; nodeTimeI++)
               {
 
+                try {
                   connections.push_back(Connection(
-                    path.nodesRef[nodeTimeI].get(),
-                    path.nodesRef[nodeTimeI + 1].get(),
+                    path.nodesRef.at(nodeTimeI).get(),
+                    path.nodesRef.at(nodeTimeI + 1).get(),
                     departureTimesSeconds[nodeTimeI],
                     arrivalTimesSeconds[nodeTimeI + 1],
                     trip,
@@ -116,7 +117,10 @@ namespace TrRouting
                   ));
 
                   trip.connectionDepartureTimes[nodeTimeI] = departureTimesSeconds[nodeTimeI];
-
+                } catch (std::out_of_range const& exc) {
+                  spdlog::error("Index out of range while parsing connection for trip on line ({})", path.line.longname);
+                  return -1;
+                }
               }
             }
           }
