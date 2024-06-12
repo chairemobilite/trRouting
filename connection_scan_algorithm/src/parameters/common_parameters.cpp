@@ -105,12 +105,20 @@ namespace TrRouting
       // scenario:
       else if (parameterWithValue.first == "scenario_id")
       {
-        boost::uuids::uuid scenarioUuid  = uuidGenerator(parameterWithValue.second);
-
+        boost::uuids::uuid scenarioUuid;
+        try {
+          scenarioUuid  = uuidGenerator(parameterWithValue.second);
+        } catch (std::runtime_error const& exc) {
+          // If we cannot parse the parameter as a valid uuid, return an INVALID error
+          throw ParameterException(ParameterException::Type::INVALID_SCENARIO);
+        }
         auto scenarioIte = scenarios.find(scenarioUuid);
         if (scenarioIte != scenarios.end())
         {
           scenario = scenarioIte->second;
+        } else {
+          // If the scenario UUID is not in our DB return an INVALID error
+          throw ParameterException(ParameterException::Type::INVALID_SCENARIO);
         }
         continue;
       }

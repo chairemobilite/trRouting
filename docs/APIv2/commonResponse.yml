@@ -34,6 +34,7 @@ query_error: # 'query_error' is a value for the status (discriminator)
         - 'MISSING_PARAM_ORIGIN'
         - 'MISSING_PARAM_DESTINATION'
         - 'MISSING_PARAM_TIME_OF_TRIP'
+        - 'INVALID_SCENARIO'
         - 'INVALID_ORIGIN'
         - 'INVALID_DESTINATION'
         - 'INVALID_NUMERICAL_DATA'

@@ -47,6 +47,8 @@ namespace TrRouting
         MISSING_PLACE,
         // The selected scenario does not contain any trips
         EMPTY_SCENARIO,
+        // The specified scenario id is invalid
+        INVALID_SCENARIO,
         // Origin data received is invalid. Expected comma-separated lon/lat
         INVALID_ORIGIN,
         // Destination data received is invalid. Expected comma-separated lon/lat

@@ -92,6 +92,7 @@ std::string getResponseCode(ParameterException::Type type)
     case ParameterException::Type::MISSING_ORIGIN: return "MISSING_PARAM_ORIGIN";
     case ParameterException::Type::MISSING_DESTINATION: return "MISSING_PARAM_DESTINATION";
     case ParameterException::Type::MISSING_TIME_OF_TRIP: return "MISSING_PARAM_TIME_OF_TRIP";
+    case ParameterException::Type::INVALID_SCENARIO: return "INVALID_SCENARIO";
     case ParameterException::Type::INVALID_ORIGIN: return "INVALID_ORIGIN";
     case ParameterException::Type::INVALID_DESTINATION: return "INVALID_DESTINATION";
     case ParameterException::Type::INVALID_NUMERICAL_DATA: return "INVALID_NUMERICAL_DATA";

@@ -13,6 +13,7 @@
 
 const std::string EMPTY_SCENARIO_UUID = "acdcef12-1111-2222-3333-444455558888";
 const std::string TEST_SCENARIO_UUID = "12345678-9999-0000-1111-ababbabaabab";
+const std::string INVALID_SCENARIO_UUID = "11111111-0000-0000-1111-ababbabaabab";
 
 class AccessibilityParametersFixtureTests : public BaseParametersFixtureTests
 {
@@ -56,6 +57,8 @@ INSTANTIATE_TEST_SUITE_P(
         std::make_tuple("time_of_trip", "", TrRouting::ParameterException::Type::MISSING_TIME_OF_TRIP),
         std::make_tuple("time_of_trip", "-3", TrRouting::ParameterException::Type::MISSING_TIME_OF_TRIP),
         std::make_tuple("scenario_id", EMPTY_SCENARIO_UUID, TrRouting::ParameterException::Type::EMPTY_SCENARIO),
+        std::make_tuple("scenario_id", "SOMEGARBAGE", TrRouting::ParameterException::Type::INVALID_SCENARIO),
+        std::make_tuple("scenario_id", INVALID_SCENARIO_UUID, TrRouting::ParameterException::Type::INVALID_SCENARIO),
         std::make_tuple("place", "45", TrRouting::ParameterException::Type::INVALID_PLACE),
         std::make_tuple("place", "foo,bar", TrRouting::ParameterException::Type::INVALID_PLACE),
         std::make_tuple("min_waiting_time", "nan", TrRouting::ParameterException::Type::INVALID_NUMERICAL_DATA),

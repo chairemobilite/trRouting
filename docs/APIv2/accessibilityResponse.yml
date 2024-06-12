@@ -13,6 +13,7 @@ access_query_error: # 'query_error' is a value for the status (discriminator)
         - 'MISSING_PARAM_SCENARIO'
         - 'MISSING_PARAM_PLACE'
         - 'MISSING_PARAM_TIME_OF_TRIP'
+        - 'INVALID_SCENARIO'
         - 'INVALID_PLACE'
         - 'INVALID_NUMERICAL_DATA'
         - 'PARAM_ERROR_UNKNOWN'
