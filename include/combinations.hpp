@@ -2,6 +2,7 @@
 // from https://stackoverflow.com/a/25497877
 // With later  modifications to adapt for std::reference_wrapper
 #include <vector>
+#include <algorithm>
 
 template<typename T> class Combinations {
 // Combinations(std::vector<T> s, int m) iterate all Combinations without repetition
