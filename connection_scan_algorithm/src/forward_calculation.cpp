@@ -21,7 +21,6 @@ namespace TrRouting
     short connectionMinWaitingTimeSeconds {-1};
     //long long   footpathsRangeStart       {-1};
     //long long   footpathsRangeEnd         {-1};
-    int   footpathIndex                   {-1};
     int   footpathTravelTime              {-1};
     int   footpathDistance                {-1};
     int   tentativeEgressNodeArrivalTime  {MAX_INT};
@@ -110,7 +109,6 @@ namespace TrRouting
                 tentativeEgressNodeArrivalTime = connectionArrivalTime;
               }
 
-              footpathIndex = 0;
               for (const NodeTimeDistance & transferableNode : nodeArrival.transferableNodes)
               {
                 // Extract tentative time for current transferable node if found
@@ -119,18 +117,17 @@ namespace TrRouting
                 if (nodeArrival != transferableNode.node &&
                     currentTransferablenNodesTentativeTime < connectionArrivalTime)
                 {
-                  footpathIndex++;
                   continue;
                 }
 
                 //TODO We should not do a direct == with float values
-                footpathTravelTime = parameters.getWalkingSpeedFactor() == 1.0 ? nodeArrival.transferableNodes[footpathIndex].time : (int)ceil((float)nodeArrival.transferableNodes[footpathIndex].time / parameters.getWalkingSpeedFactor());
+                footpathTravelTime = parameters.getWalkingSpeedFactor() == 1.0 ? transferableNode.time : (int)ceil((float)transferableNode.time / parameters.getWalkingSpeedFactor());
 
                 if (footpathTravelTime <= parameters.getMaxTransferWalkingTravelTimeSeconds())
                 {
                   if (footpathTravelTime + connectionArrivalTime < currentTransferablenNodesTentativeTime)
                   {
-                    footpathDistance = nodeArrival.transferableNodes[footpathIndex].distance;
+                    footpathDistance = transferableNode.distance;
                     nodesTentativeTime[transferableNode.node.uid] = footpathTravelTime + connectionArrivalTime;
 
                     //TODO DO we need a make_optional here??
@@ -148,11 +145,10 @@ namespace TrRouting
                     )
                   )
                   {
-                    footpathDistance = nodeArrival.transferableNodes[footpathIndex].distance;
+                    footpathDistance = transferableNode.distance;
                     forwardEgressJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(currentTripQueryOverlay.enterConnection, *connection, std::cref(trip), footpathTravelTime, true, footpathDistance));
                   }
                 }
-                footpathIndex++;
               }
             }
             reachableConnectionsCount++;
@@ -212,7 +208,6 @@ namespace TrRouting
     short connectionMinWaitingTimeSeconds {-1};
     //long long   footpathsRangeStart       {-1};
     //long long   footpathsRangeEnd         {-1};
-    int   footpathIndex                   {-1};
     int   footpathTravelTime              {-1};
     int   footpathDistance                {-1};
     bool  nodeWasAccessedFromOrigin       {false};
@@ -286,7 +281,6 @@ namespace TrRouting
               const Node &nodeArrival = (*connection).get().getArrivalNode();
               connectionArrivalTime           = (*connection).get().getArrivalTime();
 
-              footpathIndex = 0;
               for (const NodeTimeDistance & transferableNode : nodeArrival.transferableNodes)
               {
                 // Extract tentative time for current transferable node if found
@@ -295,18 +289,17 @@ namespace TrRouting
                 if (nodeArrival != transferableNode.node &&
                     currentTransferablenNodesTentativeTime < connectionArrivalTime)
                 {
-                  footpathIndex++;
                   continue;
                 }
 
                 //TODO We should not do a direct == with float values
-                footpathTravelTime = parameters.getWalkingSpeedFactor() == 1.0 ? nodeArrival.transferableNodes[footpathIndex].time : (int)ceil((float)nodeArrival.transferableNodes[footpathIndex].time / parameters.getWalkingSpeedFactor());
+                footpathTravelTime = parameters.getWalkingSpeedFactor() == 1.0 ? transferableNode.time : (int)ceil((float)transferableNode.time / parameters.getWalkingSpeedFactor());
 
                 if (footpathTravelTime <= parameters.getMaxTransferWalkingTravelTimeSeconds())
                 {
                   if (footpathTravelTime + connectionArrivalTime < currentTransferablenNodesTentativeTime)
                   {
-                    footpathDistance = nodeArrival.transferableNodes[footpathIndex].distance;
+                    footpathDistance = transferableNode.distance;
                     nodesTentativeTime[transferableNode.node.uid] = footpathTravelTime + connectionArrivalTime;
 
                     //TODO DO we need a make_optional here??
@@ -324,11 +317,10 @@ namespace TrRouting
                     )
                   )
                   {
-                    footpathDistance = nodeArrival.transferableNodes[footpathIndex].distance;
+                    footpathDistance = transferableNode.distance;
                     forwardEgressJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(currentTripQueryOverlay.enterConnection, *connection, std::cref(trip), footpathTravelTime, true, footpathDistance));
                   }
                 }
-                footpathIndex++;
               }
             }
             reachableConnectionsCount++;
