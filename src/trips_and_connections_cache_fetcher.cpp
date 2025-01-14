@@ -118,7 +118,7 @@ namespace TrRouting
 
                   trip.connectionDepartureTimes[nodeTimeI] = departureTimesSeconds[nodeTimeI];
                 } catch (std::out_of_range const& exc) {
-                  spdlog::error("Index out of range while parsing connection for trip on line ({})", path.line.longname);
+                  spdlog::error("Index out of range while parsing connection for trip on line ({}, {})", path.line.longname, boost::uuids::to_string(path.line.uuid));
                   return -1;
                 }
               }
