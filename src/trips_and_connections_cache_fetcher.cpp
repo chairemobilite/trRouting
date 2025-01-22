@@ -75,52 +75,59 @@ namespace TrRouting
               pathUuidStr  = capnpTrip.getPathUuid();
               tripUuid     = uuidGenerator(tripUuidStr);
               pathUuid     = uuidGenerator(pathUuidStr);
-              Path &path = paths.at(pathUuid);
-              
-              trips.emplace(tripUuid, Trip(tripUuid,
-                                           line.agency,
-                                           line,
-                                           path,
-                                           line.mode,
-                                           service,
-                                           line.allowSameLineTransfers,
-                                           capnpTrip.getTotalCapacity(),
-                                           capnpTrip.getSeatedCapacity()));
-              //Current trip
-              Trip & trip = trips.at(tripUuid);
-              
-              // TODO This should probably be done in the Trip constructor (setting the back reference)
-              path.tripsRef.push_back(trip);
+              try {
+                Path &path = paths.at(pathUuid);
 
-              nodeTimesCount             = capnpTrip.getNodeArrivalTimesSeconds().size();
-              auto arrivalTimesSeconds   = capnpTrip.getNodeArrivalTimesSeconds();
-              auto departureTimesSeconds = capnpTrip.getNodeDepartureTimesSeconds();
-              auto canBoards             = capnpTrip.getNodesCanBoard();
-              auto canUnboards           = capnpTrip.getNodesCanUnboard();
-              trip.connectionDepartureTimes.resize(nodeTimesCount);
-              // nodeTimesCount - 1, since we process node pairs, we have to stop and the second from last
-              for (unsigned long nodeTimeI = 0; nodeTimeI < nodeTimesCount - 1; nodeTimeI++)
-              {
+                trips.emplace(tripUuid, Trip(tripUuid,
+                                             line.agency,
+                                             line,
+                                             path,
+                                             line.mode,
+                                             service,
+                                             line.allowSameLineTransfers,
+                                             capnpTrip.getTotalCapacity(),
+                                             capnpTrip.getSeatedCapacity()));
+                //Current trip
+                Trip & trip = trips.at(tripUuid);
 
-                try {
-                  connections.push_back(Connection(
-                    path.nodesRef.at(nodeTimeI).get(),
-                    path.nodesRef.at(nodeTimeI + 1).get(),
-                    departureTimesSeconds[nodeTimeI],
-                    arrivalTimesSeconds[nodeTimeI + 1],
-                    trip,
-                    canBoards[nodeTimeI] == 1,
-                    canUnboards[nodeTimeI + 1] == 1,
-                    nodeTimeI + 1,
-                    trip.allowSameLineTransfers,
-                    line.mode.isTransferable() ? 0 : -1
-                  ));
+                // TODO This should probably be done in the Trip constructor (setting the back reference)
+                path.tripsRef.push_back(trip);
 
-                  trip.connectionDepartureTimes[nodeTimeI] = departureTimesSeconds[nodeTimeI];
-                } catch (std::out_of_range const& exc) {
-                  spdlog::error("Index out of range while parsing connection for trip on line ({}, {})", path.line.longname, boost::uuids::to_string(path.line.uuid));
-                  return -1;
+                nodeTimesCount             = capnpTrip.getNodeArrivalTimesSeconds().size();
+                auto arrivalTimesSeconds   = capnpTrip.getNodeArrivalTimesSeconds();
+                auto departureTimesSeconds = capnpTrip.getNodeDepartureTimesSeconds();
+                auto canBoards             = capnpTrip.getNodesCanBoard();
+                auto canUnboards           = capnpTrip.getNodesCanUnboard();
+                trip.connectionDepartureTimes.resize(nodeTimesCount);
+                // nodeTimesCount - 1, since we process node pairs, we have to stop and the second from last
+                for (unsigned long nodeTimeI = 0; nodeTimeI < nodeTimesCount - 1; nodeTimeI++)
+                {
+
+                  try {
+                    connections.push_back(Connection(
+                                                     path.nodesRef.at(nodeTimeI).get(),
+                                                     path.nodesRef.at(nodeTimeI + 1).get(),
+                                                     departureTimesSeconds[nodeTimeI],
+                                                     arrivalTimesSeconds[nodeTimeI + 1],
+                                                     trip,
+                                                     canBoards[nodeTimeI] == 1,
+                                                     canUnboards[nodeTimeI + 1] == 1,
+                                                     nodeTimeI + 1,
+                                                     trip.allowSameLineTransfers,
+                                                     line.mode.isTransferable() ? 0 : -1
+                                                     )
+                                          );
+
+                    trip.connectionDepartureTimes[nodeTimeI] = departureTimesSeconds[nodeTimeI];
+                  } catch (std::out_of_range const& exc) {
+                    spdlog::error("Index out of range while parsing connection for trip on line ({}, {})", path.line.longname, boost::uuids::to_string(path.line.uuid));
+                    return -1;
+                  }
                 }
+              } catch (std::out_of_range const& exc) {
+                // This will catch some of the early at()
+                spdlog::error("Index out of range while getting schedules for trip ({}) and path ({})", tripUuidStr, pathUuidStr);
+                return -1;
               }
             }
           }
