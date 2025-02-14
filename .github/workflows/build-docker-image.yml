@@ -4,6 +4,7 @@ on:
   push:
     branches: 
       - "v2c"
+      - "ghdockbuild"
   workflow_dispatch:
 
 env:
