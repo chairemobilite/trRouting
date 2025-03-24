@@ -27,6 +27,8 @@ namespace TrRouting
     std::string osrmWalkingHost;
     std::string osrmCyclingHost;
     std::string osrmDrivingHost;
+    bool useMemcached;
+    std::string memcachedServers;
 
     ProgramOptions();
     void parseOptions(int argc, char** argv);

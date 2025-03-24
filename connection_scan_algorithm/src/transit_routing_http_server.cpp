@@ -29,6 +29,9 @@
 #include "transit_data.hpp"
 #include "osrmgeofilter.hpp"
 #include "euclideangeofilter.hpp"
+#ifdef HAVE_MEMCACHED
+  #include "memcachedgeofilter.hpp"
+#endif
 
 using namespace TrRouting;
 
@@ -136,6 +139,18 @@ int main(int argc, char** argv) {
     geoFilter = new OsrmGeoFilter("walking", programOptions.osrmWalkingHost, programOptions.osrmWalkingPort);
     spdlog::info("Using OSRM for access/egress node time/distance");
   }
+
+  // Wrap the geoFilter with memcached if requested and available
+  if (programOptions.useMemcached) {
+    #ifdef HAVE_MEMCACHED
+      geoFilter =  new TrRouting::MemcachedGeoFilter(geoFilter, programOptions.memcachedServers);
+      spdlog::info("Using memcached for caching GeoFilter results with server(s): {}", programOptions.memcachedServers);
+      // Don't delete the original filter, as it's now managed by the cached filter
+    #else
+      spdlog::warn("Memcached support was requested but is not available (not compiled in). Continuing without caching.");
+    #endif
+  }
+
 
   spdlog::info("preparing server with {} threads...", programOptions.numberOfThreads);
 
