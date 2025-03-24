@@ -29,8 +29,10 @@ brew install boost
 brew install capnp
 brew install spdlog
 brew install nlohmann-json
+brew install libmemcached
 ```
 
+libmemcached is optional
 ## Ubuntu 24.04 Install
 
 ```
@@ -41,6 +43,7 @@ You if you haven't installed other basic build dependencies, like autoconf, you 
 sudo apt install build-essential autoconf pkg-config
 ```
 
+libmemcached-dev is optional
 ## Compilation
 trRouting use autoconf/automake as its build system. A recap of the usual commands: 
 
