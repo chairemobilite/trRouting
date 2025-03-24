@@ -19,6 +19,7 @@ AX_BOOST_SYSTEM # For include/asio_compatibility.hpp
 AX_BOOST_REGEX # For include/server_http.hpp
 AX_BOOST_PROGRAM_OPTIONS
 AX_BOOST_DATE_TIME # For include/service.hpp
+AX_BOOST_SERIALIZATION # For memcached serialization
 
 AX_PTHREAD # Explicitely checking, needed by std::thread
 
@@ -31,17 +32,42 @@ PKG_CHECK_MODULES(SPDLOG, spdlog)
 
 PKG_CHECK_MODULES(JSON, nlohmann_json)
 
+# Check for libmemcached
+AC_ARG_WITH([memcached],
+    [AS_HELP_STRING([--with-memcached],
+        [enable memcached support @<:@default=check@:>@])],
+    [],
+    [with_memcached=check])
+
+AS_IF(
+    [test "x$with_memcached" != xno],
+    [PKG_CHECK_MODULES([MEMCACHED], [libmemcached],
+        [have_memcached=yes
+         AC_DEFINE([HAVE_MEMCACHED], [1], [Define if libmemcached is available])],
+        [have_memcached=no
+         AS_IF([test "x$with_memcached" != xcheck],
+               [AC_MSG_FAILURE([--with-memcached was given, but libmemcached was not found])])])],
+    [have_memcached=no])
+
+AM_CONDITIONAL([HAVE_MEMCACHED], [test "x$have_memcached" = xyes])
+
 # TODO: Add link to doc of this override flag
 CPPFLAGS+=" -DBOOST_BIND_GLOBAL_PLACEHOLDERS"
 
 CPPFLAGS+=" $BOOST_CPPFLAGS $CAPNP_CFLAGS $PTHREAD_CFLAGS $SPDLOG_CFLAGS $JSON_CLAGS"
+# Add memcached flags if available
+AS_IF([test "x$have_memcached" = xyes],
+      [CPPFLAGS+=" $MEMCACHED_CFLAGS"])
 
 # Add BOOST flags
-LDFLAGS+=" $BOOST_LDFLAGS $BOOST_REGEX_LIB $BOOST_SYSTEM_LIB $BOOST_PROGRAM_OPTIONS_LIB $BOOST_DATE_TIME_LIB"
+LDFLAGS+=" $BOOST_LDFLAGS $BOOST_REGEX_LIB $BOOST_SYSTEM_LIB $BOOST_PROGRAM_OPTIONS_LIB $BOOST_DATE_TIME_LIB $BOOST_SERIALIZATION_LIB"
 # Add various flags
 LDFLAGS+=" $PTHREAD_LIBS"
 LDFLAGS+=" $CAPNP_LIBS"
 LDFLAGS+=" $SPDLOG_LIBS"
+# Add memcached flags if available
+AS_IF([test "x$have_memcached" = xyes],
+      [LDFLAGS+=" $MEMCACHED_LIBS"])
 
 CXXFLAGS+=" -Wall -Wextra"
 

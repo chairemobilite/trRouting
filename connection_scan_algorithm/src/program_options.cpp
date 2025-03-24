@@ -34,6 +34,8 @@ namespace TrRouting {
       ("osrmCyclingHost",                                   boost::program_options::value<std::string>()->default_value("localhost"), "osrm cycling host");
     options.add_options()
       ("osrmDrivingHost",                                   boost::program_options::value<std::string>()->default_value("localhost"), "osrm driving host");
+    options.add_options()
+      ("useMemcached",                                     boost::program_options::value<std::string>()->implicit_value("localhost:11211"), "Enable memcached caching with optional server string");
 
   }
 
@@ -55,6 +57,8 @@ namespace TrRouting {
     osrmWalkingHost      = "localhost";
     osrmCyclingHost      = "localhost";
     osrmDrivingHost      = "localhost";
+    useMemcached         = false;
+    memcachedServers     = "localhost:11211";
 
     if(variablesMap.count("help")) {
       std::cout << options << std::endl;
@@ -133,6 +137,11 @@ namespace TrRouting {
     if(variablesMap.count("osrmDrivingHost") == 1)
     {
       osrmDrivingHost = variablesMap["osrmDrivingHost"].as<std::string>();
+    }
+    if(variablesMap.count("useMemcached") == 1)
+    {
+      useMemcached = true;
+      memcachedServers = variablesMap["useMemcached"].as<std::string>();
     }
 
   }

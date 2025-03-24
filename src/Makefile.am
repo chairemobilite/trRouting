@@ -26,4 +26,9 @@ transit_data.cpp
 #places_cache_fetcher.cpp \
 #households_cache_fetcher.cpp 
 
+# Conditionally add memcached-related files if libmemcached is available
+if HAVE_MEMCACHED
+trRouting_SOURCES += memcachedgeofilter.cpp
+endif
+
 trRouting_LDADD = ../connection_scan_algorithm/src/libcsa.la
