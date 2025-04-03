@@ -23,6 +23,16 @@ https://chairemobilite.github.io/trRouting/
 [5]: https://github.com/Project-OSRM/osrm-backend/blob/master/docs/profiles.md "OSRM profiles"
 [6]: https://github.com/Project-OSRM/osrm-backend/wiki/Running-OSRM "Running OSRM"
 
+### Memcached support
+trRouting have the ability to cache some of the accessible node calculation results. To do so, it can
+use an external memcached daemon.
+You tell trRouting to do this by passing the --useMemcached parameter. By default it will
+try to access memcached on the default port, 11211 on the localhost. You can pass an hostname/port
+to the useMemcached parameter like so: --useMemcached=localhost:11111
+
+The memcached support will only be compiled if the configure script can detect libmemcached on
+the system, hence why it's marked as optional in the instructions bellow
+
 ## Mac OS X Install with homebrew
 ```
 brew install boost

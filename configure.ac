@@ -32,23 +32,31 @@ PKG_CHECK_MODULES(SPDLOG, spdlog)
 
 PKG_CHECK_MODULES(JSON, nlohmann_json)
 
-# Check for libmemcached
+# Check for libmemcached and libmemcachedutil
 AC_ARG_WITH([memcached],
     [AS_HELP_STRING([--with-memcached],
         [enable memcached support @<:@default=check@:>@])],
     [],
     [with_memcached=check])
 
+# Default to not having memcached
+have_memcached=no
+
 AS_IF(
     [test "x$with_memcached" != xno],
     [PKG_CHECK_MODULES([MEMCACHED], [libmemcached],
-        [have_memcached=yes
-         AC_DEFINE([HAVE_MEMCACHED], [1], [Define if libmemcached is available])],
-        [have_memcached=no
-         AS_IF([test "x$with_memcached" != xcheck],
-               [AC_MSG_FAILURE([--with-memcached was given, but libmemcached was not found])])])],
-    [have_memcached=no])
+        [# Now check for libmemcachedutil
+         AC_CHECK_LIB([memcachedutil], [memcached_pool_create],
+            [have_memcached=yes
+             AC_DEFINE([HAVE_MEMCACHED], [1], [Define if libmemcached and libmemcachedutil are available])
+             MEMCACHED_LIBS="$MEMCACHED_LIBS -lmemcachedutil"],
+            [# Both libraries are required
+             AS_IF([test "x$with_memcached" != xcheck],
+                   [AC_MSG_FAILURE([--with-memcached was given, but libmemcachedutil was not found])])])],
+        [AS_IF([test "x$with_memcached" != xcheck],
+               [AC_MSG_FAILURE([--with-memcached was given, but libmemcached was not found])])])])
 
+# Set memcached conditional
 AM_CONDITIONAL([HAVE_MEMCACHED], [test "x$have_memcached" = xyes])
 
 # TODO: Add link to doc of this override flag

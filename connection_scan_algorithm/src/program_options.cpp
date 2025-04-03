@@ -35,7 +35,7 @@ namespace TrRouting {
     options.add_options()
       ("osrmDrivingHost",                                   boost::program_options::value<std::string>()->default_value("localhost"), "osrm driving host");
     options.add_options()
-      ("useMemcached",                                     boost::program_options::value<std::string>()->implicit_value("localhost:11211"), "Enable memcached caching with optional server string");
+      ("useMemcached",                                     boost::program_options::value<std::string>()->implicit_value("localhost:11211"), "Enable memcached caching. You can specify a non-default memcached server to use by adding an optional hostname:port string");
 
   }
 

@@ -3,7 +3,9 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <mutex>
 #include <libmemcached/memcached.h>
+#include <libmemcached/util.h>
 #include <boost/uuid/uuid.hpp>
 #include <boost/serialization/vector.hpp>
 #include "serialization_boost_uuid.hpp" // Custom serialization for boost::uuid
@@ -42,10 +44,11 @@ struct SerializableNodeTimeDistance {
 // Memcached-backed implementation of GeoFilter
 class MemcachedGeoFilter : public GeoFilter {
 private:
-    memcached_st *memc;
+    memcached_pool_st *memcPool;
     GeoFilter* baseGeoFilter;
     uint32_t cacheExpirySeconds;
-    
+    std::mutex poolMutex; // Mutex for thread safety of pool operations
+
     // Helper function to generate a cache key
     std::string generateCacheKey(const Point &point, 
                                 int maxWalkingTravelTime,
@@ -67,12 +70,15 @@ private:
         const std::vector<SerializableNodeTimeDistance> &serializableResults,
         const std::map<boost::uuids::uuid, Node> &nodes);
 
+    // Initialize the connection pool with specified size
+  void initializePool(size_t poolSize, const std::string& memcachedServersStr);
 public:
     // Constructor with configurable memcached servers and cache expiry
     MemcachedGeoFilter(
         GeoFilter* baseGeoFilter,
         const std::string& memcachedServers = "localhost:11211",
-        uint32_t cacheExpiry = 3600
+        uint32_t cacheExpiry = 3600,
+        size_t poolSize = 0  // 0 means auto-detect thread count
     );
     
     // Destructor

@@ -142,15 +142,14 @@ int main(int argc, char** argv) {
 
   // Wrap the geoFilter with memcached if requested and available
   if (programOptions.useMemcached) {
-    #ifdef HAVE_MEMCACHED
-      geoFilter =  new TrRouting::MemcachedGeoFilter(geoFilter, programOptions.memcachedServers);
-      spdlog::info("Using memcached for caching GeoFilter results with server(s): {}", programOptions.memcachedServers);
-      // Don't delete the original filter, as it's now managed by the cached filter
-    #else
-      spdlog::warn("Memcached support was requested but is not available (not compiled in). Continuing without caching.");
-    #endif
+  #ifdef HAVE_MEMCACHED
+    geoFilter =  new TrRouting::MemcachedGeoFilter(geoFilter, programOptions.memcachedServers, 3600, programOptions.numberOfThreads);
+    spdlog::info("Using memcached for caching GeoFilter results with server(s): {}", programOptions.memcachedServers);
+    // Don't delete the original filter, as it's now managed by the cached filter
+  #else
+    spdlog::warn("Memcached support was requested but is not available (not compiled in). Continuing without caching.");
+  #endif
   }
-
 
   spdlog::info("preparing server with {} threads...", programOptions.numberOfThreads);
 
