@@ -31,11 +31,14 @@ brew install spdlog
 brew install nlohmann-json
 ```
 
-## Ubuntu 16.04 Install
+## Ubuntu 24.04 Install
 
-[Install Cap'nProto](https://capnproto.org/install.html)
 ```
-sudo apt-get install clang libboost-all-dev libexpat1-dev libjsoncpp-dev libspdlog-dev nlohmann-json3-dev
+sudo apt install libboost-all-dev libcapnp-dev capnproto libexpat1-dev libjsoncpp-dev libspdlog-dev nlohmann-json3-dev
+```
+You if you haven't installed other basic build dependencies, like autoconf, you will need to install them:
+```
+sudo apt install build-essential autoconf pkg-config
 ```
 
 ## Compilation
