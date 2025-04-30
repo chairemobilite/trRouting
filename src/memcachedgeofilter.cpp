@@ -26,8 +26,9 @@ namespace TrRouting {
 
     // Configure connection string with all servers
     // Format: --SERVER=server1:port1 --SERVER=server2:port2
-    std::string poolOptions = "--POOL-MIN=" + std::to_string(poolSize / 2) +
-      " --POOL-MAX=" + std::to_string(poolSize);
+    // Calculate minimum pool size with half the pool size, with at least one
+    size_t minPoolSize = std::max(poolSize/2, static_cast<size_t>(1));
+    std::string poolOptions = "--POOL-MIN=" + std::to_string(minPoolSize) + " --POOL-MAX=" + std::to_string(poolSize);
 
     // Add all servers from the servers string
     std::istringstream serverStream(memcachedServersStr);
@@ -51,7 +52,7 @@ namespace TrRouting {
       spdlog::error("Failed to create memcached connection pool");
     } else {
       spdlog::info("Created memcached connection pool with initial size {} and max size {}",
-                  poolSize / 2, poolSize);
+                  minPoolSize, poolSize);
     }
   }
 
