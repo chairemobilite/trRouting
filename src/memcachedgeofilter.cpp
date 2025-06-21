@@ -165,6 +165,61 @@ namespace TrRouting {
     return results;
   }
 
+  /**
+   * @brief RAII guard for automatic Memcached connection pool management.
+   *
+   * Acquires a connection from the pool on construction and automatically releases it
+   * on destruction, ensuring proper cleanup even when exceptions occur. Non-copyable
+   * for safety. Should be the only we way that we call memcached_pool_fetch and
+   * memcached_pool_release, to insure proper release of each connection.
+   *
+   * Usage:
+   * @code
+   * MemcachedConnectionGuard guard(memcPool);
+   * if (guard.valid()) {
+   *     memcached_set(guard.get(), ...);
+   * }
+   * // Connection automatically released when guard goes out of scope
+   * @endcode
+   *
+   * @warning Do not manually release the connection - the guard handles this automatically
+   */
+  class MemcachedConnectionGuard {
+  private:
+    memcached_pool_st* pool;
+    memcached_st* connection;
+
+  public:
+    MemcachedConnectionGuard(memcached_pool_st* pool) : pool(pool), connection(nullptr) {
+      if (pool) {
+        memcached_return_t rc;
+        connection = memcached_pool_fetch(pool, NULL, &rc);
+        if (connection == nullptr) {
+          spdlog::error("Failed to acquire connection from pool: {}",
+                        memcached_strerror(NULL, rc));
+        }
+      }
+    }
+
+    ~MemcachedConnectionGuard() {
+      if (connection && pool) {
+        memcached_return_t rc = memcached_pool_release(pool, connection);
+        if (rc != MEMCACHED_SUCCESS) {
+          spdlog::warn("Failed to return connection to pool: {}",
+                       memcached_strerror(NULL, rc));
+          memcached_free(connection);
+        }
+      }
+    }
+
+    memcached_st* get() { return connection; }
+    bool valid() const { return connection != nullptr; }
+
+    // Non-copyable
+    MemcachedConnectionGuard(const MemcachedConnectionGuard&) = delete;
+    MemcachedConnectionGuard& operator=(const MemcachedConnectionGuard&) = delete;
+  };
+
   // Thread-safe implementation of the main interface method using connection pool
   std::vector<NodeTimeDistance> MemcachedGeoFilter::getAccessibleNodesFootpathsFromPoint(
                                                                                          const Point &point,
@@ -184,12 +239,10 @@ namespace TrRouting {
         point, nodes, maxWalkingTravelTime, walkingSpeedMetersPerSecond, reversed);
     }
 
-    // Acquire a connection from the pool
-    memcached_return_t rc;
-    memcached_st *memc = memcached_pool_fetch(memcPool, NULL, &rc);
+    // Acquire a connection from the pool, will be freed automatically when out of scope
+    MemcachedConnectionGuard mcConnectionGuard(memcPool);
 
-    if (memc == NULL) {
-      spdlog::error("Failed to acquire connection from pool: {}", memcached_strerror(NULL, rc));
+    if (!mcConnectionGuard.valid()) {
       return baseGeoFilter->getAccessibleNodesFootpathsFromPoint(
         point, nodes, maxWalkingTravelTime, walkingSpeedMetersPerSecond, reversed);
     }
@@ -197,9 +250,9 @@ namespace TrRouting {
     // Try to get from cache
     size_t valueLength;
     uint32_t flags;
-    
+    memcached_return_t rc;
     char *cachedResult = memcached_get(
-                                       memc, 
+                                       mcConnectionGuard.get(),
                                        cacheKey.c_str(), 
                                        cacheKey.length(), 
                                        &valueLength, 
@@ -241,7 +294,7 @@ namespace TrRouting {
       if (!serializedResults.empty()) {
         // Store in cache
         rc = memcached_set(
-                           memc,
+                           mcConnectionGuard.get(),
                            cacheKey.c_str(),
                            cacheKey.length(),
                            serializedResults.c_str(),
@@ -251,19 +304,11 @@ namespace TrRouting {
                            );
 
         if (rc != MEMCACHED_SUCCESS) {
-          spdlog::warn("Failed to store footpaths in cache: {}", memcached_strerror(memc, rc));
+          spdlog::warn("Failed to store footpaths in cache: {}", memcached_strerror(mcConnectionGuard.get(), rc));
         }
       }
     }
     
-    // Return the connection to the pool
-    rc = memcached_pool_release(memcPool, memc);
-    if (rc != MEMCACHED_SUCCESS) {
-      spdlog::warn("Failed to return connection to pool: {}", memcached_strerror(NULL, rc));
-      // We have to free the connection if we can't return it to the pool
-      memcached_free(memc);
-    }
-
     return results;
   }
 
@@ -276,31 +321,19 @@ namespace TrRouting {
       return false;
     }
 
-    // Get a connection from the pool
-    memcached_return_t rc;
-    memcached_st *memc = memcached_pool_fetch(memcPool, NULL, &rc);
+    // Acquire a connection from the pool, will be freed automatically when out of scope
+    MemcachedConnectionGuard mcConnectionGuard(memcPool);
 
-    if (memc == NULL) {
-      spdlog::error("Failed to acquire connection from pool for cache flush: {}",
-                   memcached_strerror(NULL, rc));
+    if (!mcConnectionGuard.valid()) {
       return false;
     }
 
     // Flush the cache
-    rc = memcached_flush(memc, 0);
+    memcached_return_t rc = memcached_flush(mcConnectionGuard.get(), 0);
     bool success = (rc == MEMCACHED_SUCCESS);
 
     if (!success) {
-      spdlog::error("Failed to flush cache: {}", memcached_strerror(memc, rc));
-    }
-
-    // Return the connection to the pool
-    memcached_return_t pushRc = memcached_pool_release(memcPool, memc);
-    if (pushRc != MEMCACHED_SUCCESS) {
-      spdlog::warn("Failed to return connection to pool after flush: {}",
-                  memcached_strerror(NULL, pushRc));
-      // We have to free the connection if we can't return it to the pool
-      memcached_free(memc);
+      spdlog::error("Failed to flush cache: {}", memcached_strerror(mcConnectionGuard.get(), rc));
     }
 
     return success;
