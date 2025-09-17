@@ -303,6 +303,53 @@ TEST_F(SingleRouteCalculationFixtureTests, SimpleODCalculationArrivalTime)
         egressTime);
 }
 
+// Test case developed to reproduce
+// https://github.com/chairemobilite/trRouting/issues/298 There are 2
+// alternatives, who both start at the same time. One with a transfer to the
+// extra line arrives at 10:25, while the other walks longer and arrives at
+// 10:30. The one with transfer should always be preferred.
+TEST_F(SingleRouteCalculationFixtureTests, SimpleODCalculationArrivalTimeWith2Alternatives)
+{
+    int arrivalTime = getTimeInSeconds(10, 35);
+    int travelTimeInVehicle = 720; // north line and extra line
+    // This is where mocking would be interesting. Those were taken from the first run of the test
+    int accessTime = 469;
+    int egressTime = 48;
+    int expectedTransitDepartureTime = getTimeInSeconds(10);
+    int expectedNbTransfers = 1;
+    int expectedTransferWaitingTime = 120 + DEFAULT_MIN_WAITING_TIME; // 2 minutes wait + min waiting time before boarding
+    int expectedTransferWalkingTime = 480;
+
+    TrRouting::RouteParameters testParameters = TrRouting::RouteParameters(
+        std::make_unique<TrRouting::Point>(45.5242, -73.5817),
+        std::make_unique<TrRouting::Point>(45.55372, -73.61859),
+        //std::make_unique<TrRouting::Point>(45.54888, -73.62364), // Closer to extra1, forces transfer
+        transitData.getScenarios().at(TestDataFetcher::scenarioUuid),
+        arrivalTime,
+        DEFAULT_MIN_WAITING_TIME,
+        DEFAULT_MAX_TOTAL_TIME,
+        DEFAULT_MAX_ACCESS_TRAVEL_TIME,
+        DEFAULT_MAX_EGRESS_TRAVEL_TIME,
+        DEFAULT_MAX_TRANSFER_TRAVEL_TIME,
+        DEFAULT_FIRST_WAITING_TIME,
+        false,
+        false
+    );
+
+    std::unique_ptr<TrRouting::RoutingResult> result = calculateOd(testParameters);
+    assertSuccessResults(*result.get(),
+        -1,
+        expectedTransitDepartureTime,
+        travelTimeInVehicle,
+        accessTime,
+        egressTime,
+        expectedNbTransfers,
+        DEFAULT_MIN_WAITING_TIME,
+        DEFAULT_MIN_WAITING_TIME + expectedTransferWaitingTime,
+        expectedTransferWaitingTime,
+        expectedTransferWalkingTime);
+}
+
 // Test from OD With access/egress, origin is further south of South2, in the line axis, destination slightly north-west of midpoint
 // Specify each parameter with a value that allows the result
 TEST_F(SingleRouteCalculationFixtureTests, SimpleODCalculationWithAllParams)
