@@ -7,8 +7,8 @@
 #include <libmemcached/memcached.h>
 #include <libmemcached/util.h>
 #include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_serialize.hpp> //This need to be included before any other serialization includes
 #include <boost/serialization/vector.hpp>
-#include "serialization_boost_uuid.hpp" // Custom serialization for boost::uuid
 
 #include "geofilter.hpp"
 #include "node.hpp"
