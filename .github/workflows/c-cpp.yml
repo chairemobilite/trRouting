@@ -8,21 +8,29 @@ on:
 
 jobs:
   build:
-    name: Test build on ${{ matrix.os }}
+    name: "Test build on ${{ matrix.os }} (memcached: ${{ matrix.memcached }})"
     runs-on: ${{ matrix.os }}
     strategy:
       matrix: 
        os: [ubuntu-latest, macOS-latest]
+       memcached: [true, false]
     steps:
     - uses: actions/checkout@v4
       with:
         submodules: recursive
-    - name: Install deps
+
+    - name: Install base deps (Ubuntu)
       if: matrix.os == 'ubuntu-latest'
       run: |
           sudo apt-get update
           sudo apt-get install libboost-all-dev libexpat1-dev libjsoncpp-dev libspdlog-dev libcapnp-dev capnproto nlohmann-json3-dev
-    - name: Install deps
+
+    - name: Install libmemcached-dev (Ubuntu)
+      if: matrix.os == 'ubuntu-latest' && matrix.memcached == true
+      run: |
+          sudo apt-get install libmemcached-dev
+
+    - name: Install base deps (macOS)
       if: matrix.os == 'macOS-latest'
       run: |
           brew update
@@ -33,12 +41,20 @@ jobs:
           brew install capnp
           brew install spdlog
           brew install nlohmann-json
+
+    - name: Install libmemcached (macOS)
+      if: matrix.os == 'macOS-latest' && matrix.memcached == true
+      run: |
+          brew install libmemcached
+
     - name: Gen configure
       run: autoreconf -i
+
     - name: configure
       run: ./configure
+
     - name: make
       run: make
+
     - name: make check
       run: make check
-
