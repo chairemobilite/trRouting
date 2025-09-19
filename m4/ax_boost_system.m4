@@ -12,6 +12,9 @@
 #   a preceding call to AX_BOOST_BASE. Further documentation is available at
 #   <http://randspringer.de/boost/index.html>.
 #
+#   This macro supports both the traditional linked version and the newer
+#   header-only version of Boost::System (available since Boost 1.69).
+#
 #   This macro calls:
 #
 #     AC_SUBST(BOOST_SYSTEM_LIB)
@@ -31,14 +34,14 @@
 #   and this notice are preserved. This file is offered as-is, without any
 #   warranty.
 
-#serial 20
+#serial 21
 
 AC_DEFUN([AX_BOOST_SYSTEM],
 [
 	AC_ARG_WITH([boost-system],
 	AS_HELP_STRING([--with-boost-system@<:@=special-lib@:>@],
                    [use the System library from boost - it is possible to specify a certain library for the linker
-                        e.g. --with-boost-system=boost_system-gcc-mt ]),
+                        e.g. --with-boost-system=boost_system-gcc-mt, or use header-only version if no library found]),
         [
         if test "$withval" = "no"; then
 			want_boost="no"
@@ -82,7 +85,9 @@ AC_DEFUN([AX_BOOST_SYSTEM],
 			AC_DEFINE(HAVE_BOOST_SYSTEM,,[define if the Boost::System library is available])
             BOOSTLIBDIR=`echo $BOOST_LDFLAGS | sed -e 's/@<:@^\/@:>@*//'`
 
-			LDFLAGS_SAVE=$LDFLAGS
+            link_system="no"
+
+            # Try to find and link against the library first (traditional approach)
             if test "x$ax_boost_user_system_lib" = "x"; then
                 for libextension in `ls -r $BOOSTLIBDIR/libboost_system* 2>/dev/null | sed 's,.*/lib,,' | sed 's,\..*,,'` ; do
                      ax_lib=${libextension}
@@ -98,20 +103,43 @@ AC_DEFUN([AX_BOOST_SYSTEM],
                                  [link_system="no"])
 				done
                 fi
-
             else
                for ax_lib in $ax_boost_user_system_lib boost_system-$ax_boost_user_system_lib; do
 				      AC_CHECK_LIB($ax_lib, exit,
                                    [BOOST_SYSTEM_LIB="-l$ax_lib"; AC_SUBST(BOOST_SYSTEM_LIB) link_system="yes"; break],
                                    [link_system="no"])
                   done
+            fi
 
+            # If library linking failed, try header-only approach
+            if test "x$link_system" != "xyes"; then
+                AC_CACHE_CHECK(whether Boost::System is header-only,
+                              ax_cv_boost_system_header_only,
+                [AC_LANG_PUSH([C++])
+                 CXXFLAGS_SAVE=$CXXFLAGS
+                 CXXFLAGS=
+                 AC_LINK_IFELSE([AC_LANG_PROGRAM([[@%:@include <boost/system/error_code.hpp>
+@%:@include <boost/system/system_error.hpp>]],
+                                [[boost::system::error_code ec;
+                                  boost::system::error_category const& cat = boost::system::generic_category();
+                                  boost::system::system_error se(ec);]])],
+                               ax_cv_boost_system_header_only=yes,
+                               ax_cv_boost_system_header_only=no)
+                 CXXFLAGS=$CXXFLAGS_SAVE
+                 AC_LANG_POP([C++])
+                ])
+
+                if test "x$ax_cv_boost_system_header_only" = "xyes"; then
+                    # Header-only version works
+                    BOOST_SYSTEM_LIB=""
+                    AC_SUBST(BOOST_SYSTEM_LIB)
+                    link_system="yes"
+                fi
             fi
-            if test "x$ax_lib" = "x"; then
-                AC_MSG_ERROR(Could not find a version of the Boost::System library!)
-            fi
+
+            # If neither library nor header-only version works, error out
 			if test "x$link_system" = "xno"; then
-				AC_MSG_ERROR(Could not link against $ax_lib !)
+				AC_MSG_ERROR(Could not find a working version of the Boost::System library (neither linked nor header-only)!)
 			fi
 		fi
 
