@@ -91,4 +91,19 @@ maxFirstWaitingTime:
   schema:
     type: integer
   required: false
-  description: The maximum time, in seconds, one can wait at first stop/station to consider this trip valid
+  deprecated: true
+  x-deprecated-in-version: "2.1-beta"
+  description: "[DEPRECATED - Use max_inner_time_of_trip_buffer instead] The maximum time, in seconds, one can wait at first stop/station to consider this trip valid"
+maxInnerTimeOfTripBuffer:
+  in: query
+  name: max_inner_time_of_trip_buffer
+  schema:
+    type: integer
+  required: false
+  x-added-in-version: "2.1-beta"
+  description: |
+    Maximum allowed time difference (in seconds) between the requested time and the actual trip time.
+    - For departure time requests (time_type = 0): Maximum allowed waiting time at the first stop before boarding.
+    - For arrival time requests (time_type = 1): Maximum allowed time between the actual arrival and the requested arrival time.
+    If this buffer is exceeded, the trip is considered invalid. Replaces the deprecated max_first_waiting_time parameter.
+    Added in version 2.1-beta.

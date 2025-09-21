@@ -24,7 +24,7 @@ namespace TrRouting
         maxAccessWalkingTravelTimeSeconds(maxAccessTime),
         maxEgressWalkingTravelTimeSeconds(maxEgressTime),
         maxTransferWalkingTravelTimeSeconds(maxTransferTime),
-        maxFirstWaitingTimeSeconds(maxFirstWaitingTime),
+        maxInnerTimeOfTripBufferSeconds(maxFirstWaitingTime),
         forwardCalculation(forward)
   {
     scenarioUuid = scenario.uuid; //TODO Check if this is used somewhere
@@ -38,7 +38,7 @@ namespace TrRouting
     maxAccessWalkingTravelTimeSeconds(baseParams.maxAccessWalkingTravelTimeSeconds),
     maxEgressWalkingTravelTimeSeconds(baseParams.maxEgressWalkingTravelTimeSeconds),
     maxTransferWalkingTravelTimeSeconds(baseParams.maxTransferWalkingTravelTimeSeconds),
-    maxFirstWaitingTimeSeconds(baseParams.maxFirstWaitingTimeSeconds),
+    maxInnerTimeOfTripBufferSeconds(baseParams.maxInnerTimeOfTripBufferSeconds),
     scenarioUuid(baseParams.scenarioUuid),
     onlyServices(baseParams.onlyServices),
     onlyLines(baseParams.onlyLines),
@@ -78,7 +78,7 @@ namespace TrRouting
     int maxAccessWalkingTravelTimeSeconds = DEFAULT_MAX_ACCESS_TRAVEL_TIME;
     int maxEgressWalkingTravelTimeSeconds = DEFAULT_MAX_EGRESS_TRAVEL_TIME;
     int maxTransferWalkingTravelTimeSeconds = DEFAULT_MAX_TRANSFER_TRAVEL_TIME;
-    int maxFirstWaitingTimeSeconds = DEFAULT_FIRST_WAITING_TIME; // Ignore all connections at access nodes if waiting time would be more than this value.
+    int maxInnerTimeOfTripBufferSeconds = DEFAULT_MAX_INNER_TIME_OF_TRIP_BUFFER; // Ignore all connections at access nodes (if forwardCalculation) or egress nodes (if reverse) if waiting time would be more than this value.
     bool forwardCalculation = true;
 
     // TODO Replace manually parsing parameters by a library that does this
@@ -171,10 +171,20 @@ namespace TrRouting
       }
       else if (parameterWithValue.first == "max_first_waiting_time")
       {
-        maxFirstWaitingTimeSeconds = CommonParameters::getIntegerValue(parameterWithValue.second);
-        if (maxFirstWaitingTimeSeconds <= 0)
+        // Deprecated parameter, kept for backward compatibility
+        maxInnerTimeOfTripBufferSeconds = CommonParameters::getIntegerValue(parameterWithValue.second);
+        if (maxInnerTimeOfTripBufferSeconds <= 0)
         {
-          maxFirstWaitingTimeSeconds = -1;
+          maxInnerTimeOfTripBufferSeconds = -1;
+        }
+        continue;
+      }
+      else if (parameterWithValue.first == "max_inner_time_of_trip_buffer")
+      {
+        maxInnerTimeOfTripBufferSeconds = CommonParameters::getIntegerValue(parameterWithValue.second);
+        if (maxInnerTimeOfTripBufferSeconds <= 0)
+        {
+          maxInnerTimeOfTripBufferSeconds = -1;
         }
         continue;
       }
@@ -201,7 +211,7 @@ namespace TrRouting
       maxAccessWalkingTravelTimeSeconds,
       maxEgressWalkingTravelTimeSeconds,
       maxTransferWalkingTravelTimeSeconds,
-      maxFirstWaitingTimeSeconds,
+      maxInnerTimeOfTripBufferSeconds,
       forwardCalculation);
   }
 

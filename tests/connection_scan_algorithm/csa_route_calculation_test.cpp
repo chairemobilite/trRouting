@@ -48,7 +48,7 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingBecauseNoPath)
         DEFAULT_MAX_ACCESS_TRAVEL_TIME,
         DEFAULT_MAX_EGRESS_TRAVEL_TIME,
         DEFAULT_MAX_TRANSFER_TRAVEL_TIME,
-        DEFAULT_FIRST_WAITING_TIME,
+        DEFAULT_MAX_INNER_TIME_OF_TRIP_BUFFER,
         false,
         true
     );
@@ -76,7 +76,7 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingBecauseNoNodeAtOrigin)
         DEFAULT_MAX_ACCESS_TRAVEL_TIME,
         DEFAULT_MAX_EGRESS_TRAVEL_TIME,
         DEFAULT_MAX_TRANSFER_TRAVEL_TIME,
-        DEFAULT_FIRST_WAITING_TIME,
+        DEFAULT_MAX_INNER_TIME_OF_TRIP_BUFFER,
         false,
         true
     );
@@ -104,7 +104,7 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingBecauseNoNodeAtDestination)
         DEFAULT_MAX_ACCESS_TRAVEL_TIME,
         DEFAULT_MAX_EGRESS_TRAVEL_TIME,
         DEFAULT_MAX_TRANSFER_TRAVEL_TIME,
-        DEFAULT_FIRST_WAITING_TIME,
+        DEFAULT_MAX_INNER_TIME_OF_TRIP_BUFFER,
         false,
         true
     );
@@ -132,7 +132,7 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingBecauseNoNodeAtOriginAndDest
         DEFAULT_MAX_ACCESS_TRAVEL_TIME,
         DEFAULT_MAX_EGRESS_TRAVEL_TIME,
         DEFAULT_MAX_TRANSFER_TRAVEL_TIME,
-        DEFAULT_FIRST_WAITING_TIME,
+        DEFAULT_MAX_INNER_TIME_OF_TRIP_BUFFER,
         false,
         true
     );
@@ -160,7 +160,7 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingBecauseTooEarly)
         DEFAULT_MAX_ACCESS_TRAVEL_TIME,
         DEFAULT_MAX_EGRESS_TRAVEL_TIME,
         DEFAULT_MAX_TRANSFER_TRAVEL_TIME,
-        DEFAULT_FIRST_WAITING_TIME,
+        DEFAULT_MAX_INNER_TIME_OF_TRIP_BUFFER,
         false,
         true
     );
@@ -189,7 +189,7 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingBecauseTooEarlyArrival)
         DEFAULT_MAX_ACCESS_TRAVEL_TIME,
         DEFAULT_MAX_EGRESS_TRAVEL_TIME,
         DEFAULT_MAX_TRANSFER_TRAVEL_TIME,
-        DEFAULT_FIRST_WAITING_TIME,
+        DEFAULT_MAX_INNER_TIME_OF_TRIP_BUFFER,
         false,
         false // reverse journey
     );
@@ -222,7 +222,7 @@ TEST_F(SingleRouteCalculationFixtureTests, NodeToNodeCalculation)
         DEFAULT_MAX_ACCESS_TRAVEL_TIME,
         DEFAULT_MAX_EGRESS_TRAVEL_TIME,
         DEFAULT_MAX_TRANSFER_TRAVEL_TIME,
-        DEFAULT_FIRST_WAITING_TIME,
+        DEFAULT_MAX_INNER_TIME_OF_TRIP_BUFFER,
         false,
         true
     );
@@ -255,7 +255,7 @@ TEST_F(SingleRouteCalculationFixtureTests, SimpleODCalculationDepartureTime)
         DEFAULT_MAX_ACCESS_TRAVEL_TIME,
         DEFAULT_MAX_EGRESS_TRAVEL_TIME,
         DEFAULT_MAX_TRANSFER_TRAVEL_TIME,
-        DEFAULT_FIRST_WAITING_TIME,
+        DEFAULT_MAX_INNER_TIME_OF_TRIP_BUFFER,
         false,
         true
     );
@@ -289,7 +289,7 @@ TEST_F(SingleRouteCalculationFixtureTests, SimpleODCalculationArrivalTime)
         DEFAULT_MAX_ACCESS_TRAVEL_TIME,
         DEFAULT_MAX_EGRESS_TRAVEL_TIME,
         DEFAULT_MAX_TRANSFER_TRAVEL_TIME,
-        DEFAULT_FIRST_WAITING_TIME,
+        DEFAULT_MAX_INNER_TIME_OF_TRIP_BUFFER,
         false,
         false
     );
@@ -330,7 +330,7 @@ TEST_F(SingleRouteCalculationFixtureTests, SimpleODCalculationArrivalTimeWith2Al
         DEFAULT_MAX_ACCESS_TRAVEL_TIME,
         DEFAULT_MAX_EGRESS_TRAVEL_TIME,
         DEFAULT_MAX_TRANSFER_TRAVEL_TIME,
-        DEFAULT_FIRST_WAITING_TIME,
+        DEFAULT_MAX_INNER_TIME_OF_TRIP_BUFFER,
         false,
         false
     );
@@ -388,7 +388,7 @@ TEST_F(SingleRouteCalculationFixtureTests, SimpleODCalculationWithAllParams)
         minWaitingTime);
 }
 
-// Same as SimpleODCalculation, but with max_access_travel_time lower than access time
+// Same as SimpleODCalculationDepartureTime, but with max_access_travel_time lower than access time
 TEST_F(SingleRouteCalculationFixtureTests, NoRoutingAccessTimeLimit)
 {
     int departureTime = getTimeInSeconds(9, 45);
@@ -405,7 +405,7 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingAccessTimeLimit)
         accessTime - 5,
         DEFAULT_MAX_EGRESS_TRAVEL_TIME,
         DEFAULT_MAX_TRANSFER_TRAVEL_TIME,
-        DEFAULT_FIRST_WAITING_TIME,
+        DEFAULT_MAX_INNER_TIME_OF_TRIP_BUFFER,
         false,
         true
     );
@@ -420,7 +420,7 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingAccessTimeLimit)
     }
 }
 
-// Same as SimpleODCalculation, but with max_egress_travel_time lower than egress time
+// Same as SimpleODCalculationDepartureTime, but with max_egress_travel_time lower than egress time
 TEST_F(SingleRouteCalculationFixtureTests, NoRoutingEgressTimeLimit)
 {
     int departureTime = getTimeInSeconds(9, 45);
@@ -437,7 +437,7 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingEgressTimeLimit)
         DEFAULT_MAX_ACCESS_TRAVEL_TIME,
         egressTime - 5,
         DEFAULT_MAX_TRANSFER_TRAVEL_TIME,
-        DEFAULT_FIRST_WAITING_TIME,
+        DEFAULT_MAX_INNER_TIME_OF_TRIP_BUFFER,
         false,
         true
     );
@@ -452,8 +452,8 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingEgressTimeLimit)
     }
 }
 
-// Same as SimpleODCalculation, but with max_first_waiting_time lower than should be
-TEST_F(SingleRouteCalculationFixtureTests, NoRoutingMaxFirstWaitingTime)
+// Same as SimpleODCalculationDepartureTime, but with max_inner_time_of_trip_buffer lower than should be
+TEST_F(SingleRouteCalculationFixtureTests, NoRoutingMaxInnerTimeOfTripBufferDeparture)
 {
     int departureTime = getTimeInSeconds(9, 45);
         // This is where mocking would be interesting. Those were taken from the first run of the test
@@ -485,6 +485,42 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingMaxFirstWaitingTime)
     }
 }
 
+// Same as SimpleODCalculationArrivalTime, but with max_inner_time_of_trip_buffer lower than should be
+TEST_F(SingleRouteCalculationFixtureTests, NoRoutingMaxInnerTimeOfTripBufferArrival)
+{
+    int arrivalTime = getTimeInSeconds(11, 15);
+        // This is where mocking would be interesting. Those were taken from the first run of the test
+    int egressTime = 138;
+    int travelTimeInVehicle = 420;
+    int expectedTransitDepartureTime = getTimeInSeconds(11);
+    int tripArrivalTime = expectedTransitDepartureTime + egressTime + travelTimeInVehicle;
+
+    TrRouting::RouteParameters testParameters = TrRouting::RouteParameters(
+        std::make_unique<TrRouting::Point>(45.5242, -73.5817),
+        std::make_unique<TrRouting::Point>(45.54, -73.6146),
+        transitData.getScenarios().at(TestDataFetcher::scenarioUuid),
+        arrivalTime,
+        DEFAULT_MIN_WAITING_TIME,
+        DEFAULT_MAX_TOTAL_TIME,
+        DEFAULT_MAX_ACCESS_TRAVEL_TIME,
+        DEFAULT_MAX_EGRESS_TRAVEL_TIME,
+        DEFAULT_MAX_TRANSFER_TRAVEL_TIME,
+        // max first waiting time, 5 seconds less than needed
+        arrivalTime - tripArrivalTime - 5,
+        false,
+        false
+    );
+
+    try {
+        calculateOd(testParameters);
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, no exception thrown";
+    } catch (TrRouting::NoRoutingFoundException const & e) {
+        assertNoRouting(e, TrRouting::NoRoutingReason::NO_SERVICE_TO_DESTINATION);
+    } catch(...) {
+        FAIL() << "Expected TrRouting::NoRoutingFoundException, another type was thrown";
+    }
+}
+
 // Same as SimpleODCalculation, but with min_waiting_time higher than available
 TEST_F(SingleRouteCalculationFixtureTests, NoRoutingMinWaitingTime)
 {
@@ -502,7 +538,7 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingMinWaitingTime)
         DEFAULT_MAX_ACCESS_TRAVEL_TIME,
         DEFAULT_MAX_EGRESS_TRAVEL_TIME,
         DEFAULT_MAX_TRANSFER_TRAVEL_TIME,
-        DEFAULT_FIRST_WAITING_TIME,
+        DEFAULT_MAX_INNER_TIME_OF_TRIP_BUFFER,
         false,
         true
     );
@@ -533,7 +569,7 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingTravelTime)
         DEFAULT_MAX_ACCESS_TRAVEL_TIME,
         DEFAULT_MAX_EGRESS_TRAVEL_TIME,
         DEFAULT_MAX_TRANSFER_TRAVEL_TIME,
-        DEFAULT_FIRST_WAITING_TIME,
+        DEFAULT_MAX_INNER_TIME_OF_TRIP_BUFFER,
         false,
         true
     );
@@ -566,7 +602,7 @@ TEST_F(SingleRouteCalculationFixtureTests, NoRoutingTravelTimeLongerTrip)
         DEFAULT_MAX_ACCESS_TRAVEL_TIME,
         DEFAULT_MAX_EGRESS_TRAVEL_TIME,
         DEFAULT_MAX_TRANSFER_TRAVEL_TIME,
-        DEFAULT_FIRST_WAITING_TIME,
+        DEFAULT_MAX_INNER_TIME_OF_TRIP_BUFFER,
         false,
         true
     );

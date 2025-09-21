@@ -28,7 +28,8 @@ namespace TrRouting
   static const int DEFAULT_MAX_ACCESS_TRAVEL_TIME = 20 * 60;
   static const int DEFAULT_MAX_EGRESS_TRAVEL_TIME = 20 * 60;
   static const int DEFAULT_MAX_TRANSFER_TRAVEL_TIME = 20 * 60;
-  static const int DEFAULT_FIRST_WAITING_TIME = 30 * 60;
+  // 30 minutes: Buffer time added to time_of_trip when searching for first/last connections within the trip
+  static const int DEFAULT_MAX_INNER_TIME_OF_TRIP_BUFFER = 30 * 60;
 
   class ParameterException : public std::exception
   {
@@ -81,7 +82,7 @@ namespace TrRouting
       int maxAccessWalkingTravelTimeSeconds;
       int maxEgressWalkingTravelTimeSeconds;
       int maxTransferWalkingTravelTimeSeconds;
-      int maxFirstWaitingTimeSeconds;
+      int maxInnerTimeOfTripBufferSeconds;
 
       boost::uuids::uuid scenarioUuid;
       std::vector<std::reference_wrapper<const Service>> onlyServices;
@@ -112,7 +113,7 @@ namespace TrRouting
         int maxAccessTime,
         int maxEgressTime,
         int maxTransferTime,
-        int maxFirstWaitingTime,
+        int maxTimeOfTripBuffer,
         bool forward
       );
       virtual ~CommonParameters() {}
@@ -124,7 +125,16 @@ namespace TrRouting
       int getMaxAccessWalkingTravelTimeSeconds() const { return maxAccessWalkingTravelTimeSeconds; }
       int getMaxEgressWalkingTravelTimeSeconds() const { return maxEgressWalkingTravelTimeSeconds; }
       int getMaxTransferWalkingTravelTimeSeconds() const { return maxTransferWalkingTravelTimeSeconds; }
-      int getMaxFirstWaitingTimeSeconds() const { return maxFirstWaitingTimeSeconds; }
+      /**
+       * @brief Gets the value of the inner time of trip buffer, in seconds
+       *
+       * Get the time of trip buffer in seconds, used to bound initial
+       * connection searches. This buffer will be added to the time of trip if
+       * it is a departure time, or substracted if it is an arrival time.
+       *
+       * @return int 
+       */
+      int getMaxInnerTimeOfTripBufferSeconds() const { return maxInnerTimeOfTripBufferSeconds; }
       bool isForwardCalculation() { return forwardCalculation; }
       const std::vector<std::reference_wrapper<const Service>>& getOnlyServices() const { return onlyServices; }
       const std::vector<std::reference_wrapper<const Service>>& getExceptServices() const { return exceptServices; }

@@ -1,7 +1,13 @@
 openapi: '3.0.2'
 info:
   title: TrRouting
-  version: '2.0-beta'
+  version: '2.1-beta'
+  description: |
+    Transit routing API
+    
+    Version history:
+    - 2.0-beta: Initial API release
+    - 2.1-beta: Added maxInnerTimeOfTripBuffer parameter, to replace deprecated maxFirstWaitingTime
 servers:
   - url: http://localhost:4000
 
@@ -42,6 +48,7 @@ paths:
       - $ref: "parameters.yml#/maxTransferTravelTimeParam"
       - $ref: "parameters.yml#/maxTravelTimeParam"
       - $ref: "parameters.yml#/maxFirstWaitingTime"
+      - $ref: "parameters.yml#/maxInnerTimeOfTripBuffer"
       responses:
         '200':
           description: Successful query, but may not have returned a routing result
@@ -81,6 +88,7 @@ paths:
       - $ref: "parameters.yml#/maxTransferTravelTimeParam"
       - $ref: "parameters.yml#/maxTravelTimeParam"
       - $ref: "parameters.yml#/maxFirstWaitingTime"
+      - $ref: "parameters.yml#/maxInnerTimeOfTripBuffer"
       - in: query
         name: type
         schema:
@@ -129,6 +137,7 @@ paths:
       - $ref: "parameters.yml#/maxTransferTravelTimeParam"
       - $ref: "parameters.yml#/maxTravelTimeParam"
       - $ref: "parameters.yml#/maxFirstWaitingTime"
+      - $ref: "parameters.yml#/maxInnerTimeOfTripBuffer"
       responses:
         '200':
           description: Successful query, but there may be no node
@@ -184,6 +193,7 @@ paths:
       - $ref: "parameters.yml#/maxTransferTravelTimeParam"
       - $ref: "parameters.yml#/maxTravelTimeParam"
       - $ref: "parameters.yml#/maxFirstWaitingTime"
+      - $ref: "parameters.yml#/maxInnerTimeOfTripBuffer"
       responses:
         '200':
           description: Successful query, but there may be no node
@@ -204,4 +214,3 @@ paths:
             application/json:
               schema:
                 $ref: 'odTripsResponse.yml#/od_trips_query_error'
-    

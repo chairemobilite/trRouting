@@ -26,7 +26,7 @@ protected:
     inline static const int DEFAULT_MAX_ACCESS_TRAVEL_TIME = 20 * 60;
     inline static const int DEFAULT_MAX_EGRESS_TRAVEL_TIME = 20 * 60;
     inline static const int DEFAULT_MAX_TRANSFER_TRAVEL_TIME = 20 * 60;
-    inline static const int DEFAULT_FIRST_WAITING_TIME = 30 * 60;
+    inline static const int DEFAULT_MAX_INNER_TIME_OF_TRIP_BUFFER = 30 * 60;
     inline static const int DEFAULT_TIME = 8 * 60 * 60;
     inline static const std::string agencyUuid = "aaaaaaaa-1111-cccc-dddd-eeeeeeffffff";
     inline static const std::string lineUuid = "aaaaaaaa-2222-cccc-dddd-eeeeeeffffff";

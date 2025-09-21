@@ -18,7 +18,7 @@ protected:
     static const int DEFAULT_MAX_ACCESS_TRAVEL_TIME = 20 * 60;
     static const int DEFAULT_MAX_EGRESS_TRAVEL_TIME = 20 * 60;
     static const int DEFAULT_MAX_TRANSFER_TRAVEL_TIME = 20 * 60;
-    static const int DEFAULT_FIRST_WAITING_TIME = 30 * 60;
+    static const int DEFAULT_MAX_INNER_TIME_OF_TRIP_BUFFER = 30 * 60;
 
 public:
     // Helper method to set parameters and calculate OD trip result. Test cases need only provide parameters and validate the result
