@@ -20,7 +20,7 @@ namespace TrRouting
       parameters.getMaxAccessWalkingTravelTimeSeconds(),
       parameters.getMaxEgressWalkingTravelTimeSeconds(),
       parameters.getMaxTransferWalkingTravelTimeSeconds(),
-      parameters.getMaxFirstWaitingTimeSeconds(),
+      parameters.getMaxInnerTimeOfTripBufferSeconds(),
       parameters.isForwardCalculation()
     );
   }

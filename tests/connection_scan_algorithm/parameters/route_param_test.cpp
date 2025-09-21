@@ -69,7 +69,8 @@ INSTANTIATE_TEST_SUITE_P(
         std::make_tuple("max_egress_travel_time", "nan", TrRouting::ParameterException::Type::INVALID_NUMERICAL_DATA),
         std::make_tuple("max_transfer_travel_time", "nan", TrRouting::ParameterException::Type::INVALID_NUMERICAL_DATA),
         std::make_tuple("max_travel_time", "nan", TrRouting::ParameterException::Type::INVALID_NUMERICAL_DATA),
-        std::make_tuple("max_first_waiting_time", "nan", TrRouting::ParameterException::Type::INVALID_NUMERICAL_DATA)
+        std::make_tuple("max_first_waiting_time", "nan", TrRouting::ParameterException::Type::INVALID_NUMERICAL_DATA),
+        std::make_tuple("max_inner_time_of_trip_buffer", "nan", TrRouting::ParameterException::Type::INVALID_NUMERICAL_DATA)
     )
 );
 
@@ -137,7 +138,7 @@ TEST_F(RouteParametersFixtureTests, DefaultParameters)
     EXPECT_EQ(queryParams.getMaxAccessWalkingTravelTimeSeconds(), 20 * 60);
     EXPECT_EQ(queryParams.getMaxEgressWalkingTravelTimeSeconds(), 20 * 60);
     EXPECT_EQ(queryParams.getMaxTransferWalkingTravelTimeSeconds(), 20 * 60);
-    EXPECT_EQ(queryParams.getMaxFirstWaitingTimeSeconds(), 30 * 60);
+    EXPECT_EQ(queryParams.getMaxInnerTimeOfTripBufferSeconds(), 30 * 60);
 }
 
 TEST_F(RouteParametersFixtureTests, SetAllParameters)
@@ -158,7 +159,7 @@ TEST_F(RouteParametersFixtureTests, SetAllParameters)
     parametersWithValues.push_back(std::make_pair("max_egress_travel_time", std::to_string(maxEgress)));
     parametersWithValues.push_back(std::make_pair("max_transfer_travel_time", std::to_string(maxTransfer)));
     parametersWithValues.push_back(std::make_pair("max_travel_time", std::to_string(maxTotalTime)));
-    parametersWithValues.push_back(std::make_pair("max_first_waiting_time", std::to_string(maxFirst)));
+    parametersWithValues.push_back(std::make_pair("max_inner_time_of_trip_buffer", std::to_string(maxFirst)));
 
     TrRouting::RouteParameters queryParams = TrRouting::RouteParameters::createRouteODParameter(parametersWithValues, scenarios);
     EXPECT_DOUBLE_EQ(queryParams.getOrigin()->latitude, 45.5544);
@@ -175,5 +176,5 @@ TEST_F(RouteParametersFixtureTests, SetAllParameters)
     EXPECT_EQ(queryParams.getMaxAccessWalkingTravelTimeSeconds(), maxAccess);
     EXPECT_EQ(queryParams.getMaxEgressWalkingTravelTimeSeconds(), maxEgress);
     EXPECT_EQ(queryParams.getMaxTransferWalkingTravelTimeSeconds(), maxTransfer);
-    EXPECT_EQ(queryParams.getMaxFirstWaitingTimeSeconds(), maxFirst);
+    EXPECT_EQ(queryParams.getMaxInnerTimeOfTripBufferSeconds(), maxFirst);
 }

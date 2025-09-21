@@ -56,7 +56,7 @@ TEST_F(SingleTAndACalculationFixtureTests, TripWithTransfer)
         DEFAULT_MAX_ACCESS_TRAVEL_TIME,
         DEFAULT_MAX_EGRESS_TRAVEL_TIME,
         DEFAULT_MAX_TRANSFER_TRAVEL_TIME,
-        DEFAULT_FIRST_WAITING_TIME,
+        DEFAULT_MAX_INNER_TIME_OF_TRIP_BUFFER,
         false,
         true
     );
@@ -102,7 +102,7 @@ TEST_F(SingleTAndACalculationFixtureTests, TripWithTransferButLineNotEnabled)
         DEFAULT_MAX_ACCESS_TRAVEL_TIME,
         DEFAULT_MAX_EGRESS_TRAVEL_TIME,
         DEFAULT_MAX_TRANSFER_TRAVEL_TIME,
-        DEFAULT_FIRST_WAITING_TIME,
+        DEFAULT_MAX_INNER_TIME_OF_TRIP_BUFFER,
         false,
         true
     );
@@ -143,7 +143,7 @@ TEST_F(SingleTAndACalculationFixtureTests, NoTransferMinTransferTime)
         DEFAULT_MAX_ACCESS_TRAVEL_TIME,
         DEFAULT_MAX_EGRESS_TRAVEL_TIME,
         DEFAULT_MAX_TRANSFER_TRAVEL_TIME,
-        DEFAULT_FIRST_WAITING_TIME,
+        DEFAULT_MAX_INNER_TIME_OF_TRIP_BUFFER,
         false,
         true
     );
@@ -184,7 +184,7 @@ TEST_F(SingleTAndACalculationFixtureTests, TripWithWalkingTransfer)
         DEFAULT_MAX_ACCESS_TRAVEL_TIME,
         DEFAULT_MAX_EGRESS_TRAVEL_TIME,
         DEFAULT_MAX_TRANSFER_TRAVEL_TIME,
-        DEFAULT_FIRST_WAITING_TIME,
+        DEFAULT_MAX_INNER_TIME_OF_TRIP_BUFFER,
         false,
         true
     );
@@ -223,7 +223,7 @@ TEST_F(SingleTAndACalculationFixtureTests, TripWithAlternatives)
         DEFAULT_MAX_ACCESS_TRAVEL_TIME,
         DEFAULT_MAX_EGRESS_TRAVEL_TIME,
         DEFAULT_MAX_TRANSFER_TRAVEL_TIME,
-        DEFAULT_FIRST_WAITING_TIME,
+        DEFAULT_MAX_INNER_TIME_OF_TRIP_BUFFER,
         true,
         true
     );
@@ -294,7 +294,7 @@ TEST_F(SingleTAndACalculationFixtureTests, TripWithAlternativesTooLong)
         DEFAULT_MAX_ACCESS_TRAVEL_TIME,
         DEFAULT_MAX_EGRESS_TRAVEL_TIME,
         DEFAULT_MAX_TRANSFER_TRAVEL_TIME,
-        DEFAULT_FIRST_WAITING_TIME,
+        DEFAULT_MAX_INNER_TIME_OF_TRIP_BUFFER,
         true,
         true
     );
@@ -335,7 +335,7 @@ TEST_F(SingleTAndACalculationFixtureTests, TripWithNoRoutingAlternatives)
         DEFAULT_MAX_ACCESS_TRAVEL_TIME,
         DEFAULT_MAX_EGRESS_TRAVEL_TIME,
         DEFAULT_MAX_TRANSFER_TRAVEL_TIME,
-        DEFAULT_FIRST_WAITING_TIME,
+        DEFAULT_MAX_INNER_TIME_OF_TRIP_BUFFER,
         true,
         true
     );

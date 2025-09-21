@@ -34,7 +34,7 @@ void ResultToResponseFixtureTest::SetUp()
         DEFAULT_MAX_ACCESS_TRAVEL_TIME,
         DEFAULT_MAX_EGRESS_TRAVEL_TIME,
         DEFAULT_MAX_TRANSFER_TRAVEL_TIME,
-        DEFAULT_FIRST_WAITING_TIME,
+        DEFAULT_MAX_INNER_TIME_OF_TRIP_BUFFER,
         false,
         true
     );

@@ -143,7 +143,7 @@ namespace TrRouting
       parameters.getMaxAccessWalkingTravelTimeSeconds(),
       parameters.getMaxEgressWalkingTravelTimeSeconds(),
       parameters.getMaxTransferWalkingTravelTimeSeconds(),
-      parameters.getMaxFirstWaitingTimeSeconds(),
+      parameters.getMaxInnerTimeOfTripBufferSeconds(),
       parameters.isForwardCalculation()
     );
     RouteParameters alternativeParameters = RouteParameters(std::make_unique<Point>(origin->latitude, origin->longitude),

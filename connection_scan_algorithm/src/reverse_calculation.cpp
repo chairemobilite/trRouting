@@ -28,6 +28,7 @@ namespace TrRouting
     int  footpathDistance                 {-1};
     int  tentativeAccessNodeDepartureTime {-1};
     bool reachedAtLeastOneAccessNode      {false};
+    bool nodeWasEgressedAtDestination     {false};
     int  bestDepartureTime                {-1};
 
     //TODO could be passed as a parameter
@@ -65,14 +66,35 @@ namespace TrRouting
           tripExitConnection   = currentTripQueryOverlay.exitConnection;
           const Node &nodeArrival = (*connection).get().getArrivalNode();
 
-          // Extract node arrival time
+
+          // Extract node latest possible arrival time
           int nodeArrivalTentativeTime = nodesReverseTentativeTime.at(nodeArrival.uid);
+
+          // TODO Refactor this complex condition. The
+          // maxInnerTimeOfTripBufferSeconds > 0 has nothing to do with whether
+          // the node was egressed at destination. The absence of a final exit
+          // connection in the steps just means we have not found a transit
+          // connection that would lead to destination through this node faster
+          // than by walking. So it is an egressed node.
+          auto nodeEgressIte = nodesEgress.find(nodeArrival.uid);          
+          nodeWasEgressedAtDestination = parameters.getMaxInnerTimeOfTripBufferSeconds() > 0 &&
+            nodeEgressIte != nodesEgress.end() &&
+            nodeEgressIte->second.time >= 0 &&
+            !reverseJourneysSteps.at(nodeArrival.uid).getFinalExitConnection().has_value();
 
           // reachable connections only here:
           if (
+            (
               tripExitConnection.has_value()
-            ||
-            nodeArrivalTentativeTime >= connectionArrivalTime
+              ||
+              nodeArrivalTentativeTime >= connectionArrivalTime
+            )
+            &&
+            (
+              !nodeWasEgressedAtDestination
+              ||
+              nodeArrivalTentativeTime - connectionArrivalTime <= parameters.getMaxInnerTimeOfTripBufferSeconds()
+            )
           )
           {
             
@@ -167,9 +189,9 @@ namespace TrRouting
                       if (
                         departureTimeSeconds == -1
                         ||
-                        parameters.getMaxFirstWaitingTimeSeconds() < connectionMinWaitingTimeSeconds
+                        parameters.getMaxInnerTimeOfTripBufferSeconds() < connectionMinWaitingTimeSeconds
                         ||
-                        connectionDepartureTime - departureTimeSeconds - nodeDepartureInNodesAccessIte->second.time <= parameters.getMaxFirstWaitingTimeSeconds()
+                        connectionDepartureTime - departureTimeSeconds - nodeDepartureInNodesAccessIte->second.time <= parameters.getMaxInnerTimeOfTripBufferSeconds()
                       )
                       {
                         reverseAccessJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(*connection, currentTripQueryOverlay.exitConnection, std::cref(trip), 0, true, 0));
@@ -360,9 +382,9 @@ namespace TrRouting
                       if (
                         departureTimeSeconds == -1
                         ||
-                        parameters.getMaxFirstWaitingTimeSeconds() < connectionMinWaitingTimeSeconds
+                        parameters.getMaxInnerTimeOfTripBufferSeconds() < connectionMinWaitingTimeSeconds
                         ||
-                        connectionDepartureTime - departureTimeSeconds - nodeDepartureInNodesAccessIte->second.time <= parameters.getMaxFirstWaitingTimeSeconds()
+                        connectionDepartureTime - departureTimeSeconds - nodeDepartureInNodesAccessIte->second.time <= parameters.getMaxInnerTimeOfTripBufferSeconds()
                       )
                       {
                         reverseAccessJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(*connection, currentTripQueryOverlay.exitConnection, std::cref(trip), 0, true, 0));
