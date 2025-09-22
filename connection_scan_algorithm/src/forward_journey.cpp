@@ -44,7 +44,6 @@ namespace TrRouting
       int waitingTime              {-1}; int accessWaitingTime      {-1};
 
       // recreate journey:
-
       JourneyStep resultingNodeJourneyStep = forwardEgressJourneysSteps.at(resultingNode.uid);
 
       std::optional<std::reference_wrapper<const Node>> bestAccessNode;
@@ -58,7 +57,7 @@ namespace TrRouting
       journey.push_back(JourneyStep(std::nullopt,
                                     std::nullopt,
                                     std::nullopt,
-                                    nodesEgress.at(resultingNode.uid).distance,
+                                    nodesEgress.at(resultingNode.uid).time,
                                     false,
                                     nodesEgress.at(resultingNode.uid).distance));
 
@@ -68,6 +67,9 @@ namespace TrRouting
                                      nodesAccess.at(bestAccessNode.value().get().uid).time,
                                      false,
                                      nodesAccess.at(bestAccessNode.value().get().uid).distance));
+      std::vector<int> optimizeCases = optimizeJourney(journey);
+
+      spdlog::debug("-- {} optimization case used {} ", optimizeCases.size(), optimizeCasesToString(optimizeCases) );
 
       size_t i = 0;
       size_t journeyStepsCount = journey.size();
@@ -150,7 +152,7 @@ namespace TrRouting
                                                                              boardingSequence,
                                                                              boardingSequence,
                                                                              journeyStepNodeDeparture,
-                                                                             minimizedDepartureTime,
+                                                                             departureTime,
                                                                              waitingTime
                                                                              ));
 
