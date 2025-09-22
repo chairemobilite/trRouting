@@ -62,16 +62,66 @@ namespace TrRouting
     }
     else if (arrivalTimeSeconds > -1)
     {
-      departureTimeSeconds = -1;
-      //TODO maybe we can do something different in that case, like a query flag
+      std::unordered_map<Node::uid_t, JourneyStep> reverseAccessJourneysSteps;
+
+      // TODO maybe we can do something different in that case, like a query flag
       // we need to make all trips usable when not coming from forward result because reverse calculation, by default, checks for usableTrips
       for (auto && tripIte : transitData.getTrips()) {
         const Trip & trip = tripIte.second;
         tripsQueryOverlay[trip.uid].usable = true;
       }
-      result = calculateSingleReverse(parameters);
+
+      auto resultCalculation = reverseCalculation(parameters, reverseAccessJourneysSteps);
+      spdlog::debug("-- reverse calculation -- {} microseconds", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
+      calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
+      if (resultCalculation.has_value()) {
+        int bestDepartureTime = std::get<0>(*resultCalculation);
+        std::reference_wrapper<const Node> bestAccessNode = std::get<1>(*resultCalculation);
+
+        spdlog::debug("bestDepartureTime after reverse journey: {}", bestDepartureTime);
+          
+        departureTimeSeconds = bestDepartureTime;
+          
+        for (auto & accessFootpath : accessFootpaths) // reset nodes reverse tentative times with new arrival time:
+        {
+          nodesTentativeTime[accessFootpath.node.uid] = departureTimeSeconds + accessFootpath.time;
+        }
+
+        result = calculateSingleForward(parameters);
+      }
+      else
+      {
+        // There's service at access/egress but no routing found
+        spdlog::debug("no routing found in reverse trip calculation");
+        throw NoRoutingFoundException(NoRoutingReason::NO_ROUTING_FOUND);
+      }
 
     }
+
+    return result;
+  }
+
+  // To be called only by calculateSingle, depends on preparations steps done there
+  std::unique_ptr<SingleCalculationResult> Calculator::calculateSingleForward(RouteParameters &parameters) {
+
+    std::unique_ptr<SingleCalculationResult> result;
+
+    int bestArrivalTime {MAX_INT};
+    std::optional<std::reference_wrapper<const Node>> bestEgressNode;
+    std::unordered_map<Node::uid_t, JourneyStep> forwardEgressJourneysSteps;
+
+    auto resultCalculation = forwardCalculation(parameters, forwardEgressJourneysSteps);
+    if (resultCalculation) {
+      bestArrivalTime = std::get<0>(*resultCalculation);
+      bestEgressNode = std::get<1>(*resultCalculation);
+    }
+
+    spdlog::debug("-- forward calculation --  {} microseconds", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
+    calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
+    result = forwardJourneyStep(parameters, bestEgressNode, forwardEgressJourneysSteps);
+
+    spdlog::debug("-- forward journey -- {} microseconds", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
+    calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
 
     return result;
   }

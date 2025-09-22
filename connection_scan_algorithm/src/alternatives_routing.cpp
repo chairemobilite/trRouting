@@ -154,7 +154,7 @@ namespace TrRouting
 
     //params.departureTimeSeconds = departureTimeSeconds;
 
-    spdlog::debug("  fastestTravelTimeSeconds: {}", routingResult.totalTravelTime);
+    spdlog::debug("  fastestTravelTimeSeconds: {} Maximum alternative travel time: {}", routingResult.totalTravelTime, maxTravelTime);
 
     // Get the best result and extract the lines from it
     // We will generate all the combinations of those lines and redo the calculation

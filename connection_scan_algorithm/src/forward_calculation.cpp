@@ -89,11 +89,41 @@ namespace TrRouting
           )
           {
             // TODO: add constrain for sameLineTransfer (check trip allowSameLineTransfers)
-            if ((*connection).get().canBoard() && (!tripEnterConnection.has_value()) )
+            if ((*connection).get().canBoard())
             {
-              currentTripQueryOverlay.usable = true;
-              currentTripQueryOverlay.enterConnection = *connection;
-              currentTripQueryOverlay.enterConnectionTransferTravelTime = forwardJourneysSteps.at(nodeDeparture.uid).getTransferTravelTime();
+               // Extract journeyStep once from map
+               const JourneyStep & stepAtDeparture = forwardJourneysSteps.at(nodeDeparture.uid);
+               if (!tripEnterConnection.has_value()) // <= to make sure we get the same result as forward calculation, which uses >
+               {
+                currentTripQueryOverlay.usable = true;
+                currentTripQueryOverlay.enterConnection = *connection;
+                currentTripQueryOverlay.enterConnectionTransferTravelTime = forwardJourneysSteps.at(nodeDeparture.uid).getTransferTravelTime();
+               }
+               else if (
+                        // This 'if' checks if the previous journey step leading
+                        // to the departure node of this journey has a transfer
+                        // time lesser than the one to enter the current trip.
+                        // If so, the current connection becomes the new trip
+                        // entry connection if departure time is feasible. This
+                        // has the effect of minimizing the transfer time.
+                        // Otherwise, the waiting time will be filled by walking
+                        // to another bus stop or by taking a short transit
+                        // trips that will come back to this point eventually.
+                        stepAtDeparture.getFinalExitConnection().has_value()
+                        &&
+                        stepAtDeparture.getTransferTravelTime() >= 0
+                        && 
+                        stepAtDeparture.getTransferTravelTime() < currentTripQueryOverlay.enterConnectionTransferTravelTime
+                        )
+               {
+                 short previousStepMinWaitingTimeSeconds = stepAtDeparture.getFinalEnterConnection().value().get().getMinWaitingTimeOrDefault(parameters.getMinWaitingTimeSeconds());
+ 
+                 if (connectionDepartureTime - previousStepMinWaitingTimeSeconds >= nodeDepartureTentativeTime)
+                 {
+                   currentTripQueryOverlay.enterConnection = *connection;
+                   currentTripQueryOverlay.enterConnectionTransferTravelTime = stepAtDeparture.getTransferTravelTime();
+                 }
+               }
             }
             
             if ((*connection).get().canUnboard() && currentTripQueryOverlay.enterConnection.has_value())

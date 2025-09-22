@@ -86,6 +86,7 @@ namespace TrRouting
     // Convert the optimization case ID returned by optimizeJourney to a string
     std::string optimizeCasesToString(const std::vector<int> optimizeCases);
     std::unique_ptr<SingleCalculationResult> calculateSingleReverse(RouteParameters &parameters);
+    std::unique_ptr<SingleCalculationResult> calculateSingleForward(RouteParameters &parameters);
 
     CalculationTime algorithmCalculationTime;
     //TODO set it mutable so it can be changed/reset?

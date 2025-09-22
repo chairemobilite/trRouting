@@ -97,6 +97,10 @@ namespace TrRouting
               {
                 journeyConnectionMinWaitingTimeSeconds = reverseStepAtArrival.getFinalEnterConnection().value().get().getMinWaitingTimeOrDefault(parameters.getMinWaitingTimeSeconds());
 
+                // FIXME Understand why we need to add the
+                // journeyConnectionMinWaitingTimeSeconds here as we are at the
+                // arrival time. But without it, it exits the trip and re-enters
+                // it right away.
                 if (connectionArrivalTime + journeyConnectionMinWaitingTimeSeconds <= nodeArrivalTentativeTime)
                 {
                   currentTripQueryOverlay.exitConnection = *connection;
