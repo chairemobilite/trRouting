@@ -269,26 +269,25 @@ namespace TrRouting
         }
 
         alternativesCalculatedCount++;
-
-        if (failedCombinations.size() > 0)
-        {
-          for (auto failedCombination : failedCombinations)
-          {
-            spdlog::debug("failed combinations: {}", LinesToString(failedCombination));
-          }
-        }
       }
     }
 
     int i {0};
     for (auto flines : alreadyFoundLines)
     {          
-      spdlog::debug("{}. {} tt: ", i, LinesToString(flines.first),
+      spdlog::debug("{}. {} travel time minutes: {}", i, LinesToString(flines.first),
                     (foundLinesTravelTimeSeconds[flines.first] / 60));
       i++;          
     }
+
+    // Print failed combinations
+    for (auto failedCombination : failedCombinations)
+    {
+      spdlog::debug("failed combinations: {}", LinesToString(failedCombination));
+    }
     
-    spdlog::debug("last alternative found at: {} on a total of {} calculations", lastFoundedAtNum,  maxAlternatives);
+    spdlog::debug("last alternative found at: {} on a total of {} calculations done. Maximum possible: {}",
+      lastFoundedAtNum,  alternativesCalculatedCount, maxAlternatives);
 
     alternatives.totalAlternativesCalculated = alternativesCalculatedCount;
     return alternatives;
