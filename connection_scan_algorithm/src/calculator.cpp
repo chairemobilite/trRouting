@@ -32,45 +32,32 @@ namespace TrRouting
 
     if (departureTimeSeconds > -1 && parameters.isForwardCalculation())
     {
-      
-      int bestArrivalTime {MAX_INT};
-      std::optional<std::reference_wrapper<const Node>> bestEgressNode;
-      //TODO With the TODO later that forwardJourneyStep is not necessary, we can also drop this variable
       std::unordered_map<Node::uid_t, JourneyStep> forwardEgressJourneysSteps;
 
       auto resultCalculation = forwardCalculation(parameters, forwardEgressJourneysSteps);
-      if (resultCalculation.has_value()) {
-        bestArrivalTime = std::get<0>(*resultCalculation);
-        bestEgressNode = std::get<1>(*resultCalculation);
-      }
-
       spdlog::debug("-- forward calculation -- {} microseconds", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
       calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
-        
-      if (bestArrivalTime < MAX_INT)
-      {
+
+      if (resultCalculation.has_value()) {
+        int bestArrivalTime = std::get<0>(*resultCalculation);
+        std::reference_wrapper<const Node> bestEgressNode = std::get<1>(*resultCalculation);
+
         spdlog::debug("bestArrivalTime after forward journey: {}", bestArrivalTime);
-          
+
         arrivalTimeSeconds = bestArrivalTime;
-          
+
         for (auto & egressFootpath : egressFootpaths) // reset nodes reverse tentative times with new arrival time:
         {
           nodesReverseTentativeTime[egressFootpath.node.uid] = arrivalTimeSeconds - egressFootpath.time;
         }
 
         result = calculateSingleReverse(parameters);
-          
       }
       else
       {
-        //TODO This will always throw an exception since to get here bestEgressNode must be invalid
-        //TODO We can probably just remove the function forwardJourneyStep completely
-        result = forwardJourneyStep(parameters, bestEgressNode, forwardEgressJourneysSteps);
-
-        assert(false); // See TODO
-        spdlog::debug("-- forward journey -- {} microseconds", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
-        calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
-          
+        // There's service at access/egress but no routing found
+        spdlog::debug("no routing found in forward trip calculation");
+        throw NoRoutingFoundException(NoRoutingReason::NO_ROUTING_FOUND);
       }
     }
     else if (arrivalTimeSeconds > -1)
