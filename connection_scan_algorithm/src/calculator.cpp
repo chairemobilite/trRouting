@@ -40,8 +40,7 @@ namespace TrRouting
 
       if (resultCalculation.has_value()) {
         int bestArrivalTime = std::get<0>(*resultCalculation);
-        std::reference_wrapper<const Node> bestEgressNode = std::get<1>(*resultCalculation);
-
+        
         spdlog::debug("bestArrivalTime after forward journey: {}", bestArrivalTime);
 
         arrivalTimeSeconds = bestArrivalTime;
@@ -76,8 +75,7 @@ namespace TrRouting
       calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
       if (resultCalculation.has_value()) {
         int bestDepartureTime = std::get<0>(*resultCalculation);
-        std::reference_wrapper<const Node> bestAccessNode = std::get<1>(*resultCalculation);
-
+        
         spdlog::debug("bestDepartureTime after reverse journey: {}", bestDepartureTime);
           
         departureTimeSeconds = bestDepartureTime;
@@ -106,13 +104,11 @@ namespace TrRouting
 
     std::unique_ptr<SingleCalculationResult> result;
 
-    int bestArrivalTime {MAX_INT};
     std::optional<std::reference_wrapper<const Node>> bestEgressNode;
     std::unordered_map<Node::uid_t, JourneyStep> forwardEgressJourneysSteps;
 
     auto resultCalculation = forwardCalculation(parameters, forwardEgressJourneysSteps);
     if (resultCalculation) {
-      bestArrivalTime = std::get<0>(*resultCalculation);
       bestEgressNode = std::get<1>(*resultCalculation);
     }
 
