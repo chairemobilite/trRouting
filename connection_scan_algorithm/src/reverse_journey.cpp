@@ -53,7 +53,8 @@ namespace TrRouting
               journey[journey.size()-1].copyTransferTimeDistance(resultingNodeJourneyStep);
             }
           journey.push_back(resultingNodeJourneyStep);
-          bestEgressNode = resultingNodeJourneyStep.getFinalExitConnection().value().get().getArrivalNode();
+          auto exitConnectionOptRef = resultingNodeJourneyStep.getFinalExitConnection();
+          bestEgressNode = exitConnectionOptRef.value().get().getArrivalNode();
           resultingNodeJourneyStep = reverseJourneysSteps.at(bestEgressNode.value().get().uid);
         }
 
@@ -83,12 +84,16 @@ namespace TrRouting
           // check if it is an in-vehicle journey:
           if (journeyStep.hasConnections())
             {
-              // journey tuple: final enter connection, final exit connection, final footpath
-              const Connection &journeyStepEnterConnection  = journeyStep.getFinalEnterConnection().value().get();
-              const Connection &journeyStepExitConnection   = journeyStep.getFinalExitConnection().value().get();
-              const Node &journeyStepNodeDeparture    = journeyStepEnterConnection.getDepartureNode();
-              const Node &journeyStepNodeArrival      = journeyStepExitConnection.getArrivalNode();
-              const Trip &journeyStepTrip             = journeyStep.getFinalTrip().value().get();
+              auto enterConnectionOptRef = journeyStep.getFinalEnterConnection();
+              auto exitConnectionOptRef = journeyStep.getFinalExitConnection();
+              auto tripOptRef = journeyStep.getFinalTrip();
+              
+              const Connection &journeyStepEnterConnection = enterConnectionOptRef.value().get();
+              const Connection &journeyStepExitConnection = exitConnectionOptRef.value().get();
+              const Node &journeyStepNodeDeparture = journeyStepEnterConnection.getDepartureNode();
+              const Node &journeyStepNodeArrival = journeyStepExitConnection.getArrivalNode();
+              const Trip &journeyStepTrip = tripOptRef.value().get();
+              
               transferTime                = journeyStep.getTransferTravelTime();
               distance                    = journeyStep.getTransferDistance();
               inVehicleDistance           = 0;
@@ -103,7 +108,8 @@ namespace TrRouting
 
               if (journey.size() > i + 1 && journey[i+1].getFinalEnterConnection().has_value())
                 {
-                  transferReadyTime += journey[i+1].getFinalEnterConnection().value().get().getMinWaitingTimeOrDefault(parameters.getMinWaitingTimeSeconds());
+                  auto nextEnterConnectionOptRef = journey[i+1].getFinalEnterConnection();
+                  transferReadyTime += nextEnterConnectionOptRef.value().get().getMinWaitingTimeOrDefault(parameters.getMinWaitingTimeSeconds());
                 }
 
               totalInVehicleTime         += inVehicleTime;
@@ -206,7 +212,8 @@ namespace TrRouting
 
                   if (journey.size() > i + 1 && journey[i+1].getFinalEnterConnection().has_value())
                     {
-                      transferReadyTime += journey[i+1].getFinalEnterConnection().value().get().getMinWaitingTimeOrDefault(parameters.getMinWaitingTimeSeconds());
+                      auto nextEnterConnectionOptRef = journey[i+1].getFinalEnterConnection();
+                      transferReadyTime += nextEnterConnectionOptRef.value().get().getMinWaitingTimeOrDefault(parameters.getMinWaitingTimeSeconds());
                     }
 
                   totalWalkingTime    += transferTime;
@@ -292,7 +299,8 @@ namespace TrRouting
           journey[journey.size()-1].copyTransferTimeDistance(resultingNodeJourneyStep);
         }
         journey.push_back(resultingNodeJourneyStep);
-        bestEgressNode = resultingNodeJourneyStep.getFinalExitConnection().value().get().getArrivalNode();
+        auto exitConnectionOptRef = resultingNodeJourneyStep.getFinalExitConnection();
+        bestEgressNode = exitConnectionOptRef.value().get().getArrivalNode();
         resultingNodeJourneyStep = reverseJourneysSteps.at(bestEgressNode.value().get().uid);
       }
 
@@ -313,7 +321,8 @@ namespace TrRouting
         // check if it is an in-vehicle journey:
         if (journeyStep.hasConnections())
         {
-          const Trip &journeyStepTrip = journeyStep.getFinalTrip().value().get();
+          auto tripOptRef = journeyStep.getFinalTrip();
+          const Trip &journeyStepTrip = tripOptRef.value().get();
 
           if (!journeyStepTrip.line.mode.isTransferable()) {
             numberOfTransfers += 1;
@@ -322,9 +331,10 @@ namespace TrRouting
       }
 
       if (reverseAccessJourneysSteps.at(resultingNode.uid).getFinalEnterConnection().has_value()) {
-        //TODO Should check taht MinWaiting is not -1 or use OrDefault(0)
+        auto enterConnectionOptRef = reverseAccessJourneysSteps.at(resultingNode.uid).getFinalEnterConnection();
+        //TODO Should check that MinWaiting is not -1 or use OrDefault(0)
         //TODO Could move this operation into a function of class Connection
-        int departureTimeD = reverseAccessJourneysSteps.at(resultingNode.uid).getFinalEnterConnection().value().get().getDepartureTime() - reverseAccessJourneysSteps.at(resultingNode.uid).getFinalEnterConnection().value().get().getMinWaitingTime();
+        int departureTimeD = enterConnectionOptRef.value().get().getDepartureTime() - enterConnectionOptRef.value().get().getMinWaitingTime();
         if (arrivalTimeSeconds - departureTimeD <=  parameters.getMaxTotalTravelTimeSeconds()) {
           reachableNodesCount++;
 
