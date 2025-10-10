@@ -113,7 +113,7 @@ namespace TrRouting
           }
           legs.push_back(std::make_tuple(std::ref(journeyStepTrip), boardingSequence - 1, unboardingSequence - 1));
 
-          if (unboardingSequence - 1 < journeyStepTrip.path.segmentsDistanceMeters.size()) // check if distances are available for this path
+          if (unboardingSequence > 1 && (static_cast<size_t>(unboardingSequence - 1) < journeyStepTrip.path.segmentsDistanceMeters.size())) // check if distances are available for this path
           {
             for (int seqI = boardingSequence - 1; seqI < unboardingSequence; seqI++)
             {
