@@ -1,4 +1,3 @@
-
 #include "spdlog/spdlog.h"
 #include "calculator.hpp"
 #include "constants.hpp"
@@ -77,13 +76,17 @@ namespace TrRouting
 
         if (journeyStep.hasConnections())
         {
-          // journey tuple: final enter connection, final exit connection, final footpath
-          const Connection& journeyStepEnterConnection = journeyStep.getFinalEnterConnection().value().get();
-          const Connection& journeyStepExitConnection  = journeyStep.getFinalExitConnection().value().get();
-          const Node &journeyStepNodeDeparture   = journeyStepEnterConnection.getDepartureNode();
-          const Node &journeyStepNodeArrival     = journeyStepExitConnection.getArrivalNode();
+          auto enterConnectionOptRef = journeyStep.getFinalEnterConnection();
+          auto exitConnectionOptRef = journeyStep.getFinalExitConnection();
+          auto tripOptRef = journeyStep.getFinalTrip();
+          
+          const Connection& journeyStepEnterConnection = enterConnectionOptRef.value().get();
+          const Connection& journeyStepExitConnection = exitConnectionOptRef.value().get();
+          const Node &journeyStepNodeDeparture = journeyStepEnterConnection.getDepartureNode();
+          const Node &journeyStepNodeArrival = journeyStepExitConnection.getArrivalNode();
+
           // Calling value() direct as we assume if we got here, we have a valid journeyStep
-          const Trip &journeyStepTrip            = journeyStep.getFinalTrip().value().get();
+          const Trip &journeyStepTrip = tripOptRef.value().get();
           transferTime               = journeyStep.getTransferTravelTime();
           distance                   = journeyStep.getTransferDistance();
           inVehicleDistance          = 0;
@@ -98,7 +101,8 @@ namespace TrRouting
 
           if (journey.size() > i + 1 && journey[i+1].getFinalEnterConnection().has_value())
           {
-            transferReadyTime += journey[i+1].getFinalEnterConnection().value().get().getMinWaitingTimeOrDefault(parameters.getMinWaitingTimeSeconds());
+            auto nextEnterConnectionOptRef = journey[i+1].getFinalEnterConnection();
+            transferReadyTime += nextEnterConnectionOptRef.value().get().getMinWaitingTimeOrDefault(parameters.getMinWaitingTimeSeconds());
           }
 
           totalInVehicleTime         += inVehicleTime;
@@ -203,7 +207,8 @@ namespace TrRouting
 
             if (journey.size() > i + 1 && journey[i+1].getFinalEnterConnection().has_value())
             {
-              transferReadyTime += journey[i+1].getFinalEnterConnection().value().get().getMinWaitingTimeOrDefault(parameters.getMinWaitingTimeSeconds());
+              auto nextEnterConnectionOptRef = journey[i+1].getFinalEnterConnection();
+              transferReadyTime += nextEnterConnectionOptRef.value().get().getMinWaitingTimeOrDefault(parameters.getMinWaitingTimeSeconds());
             }
 
             totalWalkingTime    += transferTime;
@@ -288,7 +293,8 @@ namespace TrRouting
       std::optional<std::reference_wrapper<const Node>> bestAccessNode;
       while (resultingNodeJourneyStep.hasConnections()) {
         // Calling value() direct as we assume if we got here, we have a valid journeyStep
-        const Trip &journeyStepTrip            = resultingNodeJourneyStep.getFinalTrip().value().get();
+        auto tripOptRef = resultingNodeJourneyStep.getFinalTrip();
+        const Trip &journeyStepTrip = tripOptRef.value().get();
 
         if (!journeyStepTrip.line.mode.isTransferable()) {
           numberOfTransfers += 1;

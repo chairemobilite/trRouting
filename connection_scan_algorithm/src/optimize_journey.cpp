@@ -70,20 +70,17 @@ namespace TrRouting
             && journeyStep.hasConnections()
         )
         {
-          const Trip & trip  = journeyStep.getFinalTrip().value().get();
-          int sequenceStartIdx = journeyStep.getFinalEnterConnection().value().get().getSequenceInTrip() - 1;
-          int sequenceEndIdx   = journeyStep.getFinalExitConnection().value().get().getSequenceInTrip() - 1;
+          auto tripOptRef = journeyStep.getFinalTrip();
+          auto enterConnectOptRef = journeyStep.getFinalEnterConnection();
+          auto exitConnectOptRef = journeyStep.getFinalExitConnection();
+          
+          const Trip & trip = tripOptRef.value().get();
+          int sequenceStartIdx = enterConnectOptRef.value().get().getSequenceInTrip() - 1;
+          int sequenceEndIdx = exitConnectOptRef.value().get().getSequenceInTrip() - 1;
 
           // get first and last nodes for the journey step trip segment (boarding and unboarding nodes):
-          auto enterConnect = journeyStep.getFinalEnterConnection().value().get();
-
-          //TODO Double check this, unsure what type is enterConnect
-          const Node & firstNodeByJourneyStep  =  enterConnect.getDepartureNode();
-
-          auto exitConnect = journeyStep.getFinalExitConnection().value().get();
-
-          //TODO Double check this, unsure what type is exitConnect
-          lastNodeByJourneyStepIdx.push_back(exitConnect.getArrivalNode());
+          const Node & firstNodeByJourneyStep = enterConnectOptRef.value().get().getDepartureNode();
+          lastNodeByJourneyStepIdx.push_back(exitConnectOptRef.value().get().getArrivalNode());
           inBetweenNodesByJourneyStepIdx.resize(journeyStepIdx+1); // Resize outer vector so we can push_back in it later
 
           // get in-between nodes for the journet step trip segment (boarding and unboarding excluded):
@@ -189,9 +186,13 @@ namespace TrRouting
       if (optimizationCase == 1) // CSL
       {
         //TODO We might need to check if the optional have a value
-        const Trip & trip = journey[fromJourneyStepIdx].getFinalTrip().value().get();
-        int sequenceStartIdx = journey[fromJourneyStepIdx].getFinalEnterConnection().value().get().getSequenceInTrip() - 1;
-        int sequenceEndIdx   = journey[fromJourneyStepIdx].getFinalExitConnection().value().get().getSequenceInTrip() - 1;
+        auto tripOptRef = journey[fromJourneyStepIdx].getFinalTrip();
+        auto enterConnectOptRef = journey[fromJourneyStepIdx].getFinalEnterConnection();
+        auto exitConnectOptRef = journey[fromJourneyStepIdx].getFinalExitConnection();
+        
+        const Trip & trip = tripOptRef.value().get();
+        int sequenceStartIdx = enterConnectOptRef.value().get().getSequenceInTrip() - 1;
+        int sequenceEndIdx = exitConnectOptRef.value().get().getSequenceInTrip() - 1;
 
         // Editorial comment: There's lot of +1/-1 in this code. This suggest that we have an array index that start at 1 instead of zero. This need confirmation
         assert(trip.reverseConnections.size() >= 1 + sequenceEndIdx); // make sure sequenceIdx will be valid
@@ -228,10 +229,14 @@ namespace TrRouting
 
       else if (optimizationCase == 2) // BTS // untested
       {
+        auto tripOptRef = journey[toJourneyStepIdx].getFinalTrip();
+        auto enterConnectOptRef = journey[toJourneyStepIdx].getFinalEnterConnection();
+        auto exitConnectOptRef = journey[toJourneyStepIdx].getFinalExitConnection();
 
-        const Trip & trip = journey[toJourneyStepIdx].getFinalTrip().value().get();
-        int sequenceStartIdx = journey[toJourneyStepIdx].getFinalEnterConnection().value().get().getSequenceInTrip() - 1;
-        int sequenceEndIdx   = journey[toJourneyStepIdx].getFinalExitConnection().value().get().getSequenceInTrip() - 1;
+        const Trip & trip = tripOptRef.value().get();
+        int sequenceStartIdx = enterConnectOptRef.value().get().getSequenceInTrip() - 1;
+        int sequenceEndIdx = exitConnectOptRef.value().get().getSequenceInTrip() - 1;
+
         for(size_t sequenceIdx = trip.reverseConnections.size() - 1 - sequenceEndIdx; sequenceIdx <= trip.reverseConnections.size() - 1 - sequenceStartIdx; ++sequenceIdx)
         {
           auto connection = trip.reverseConnections[sequenceIdx];
@@ -256,9 +261,13 @@ namespace TrRouting
 
       else if (optimizationCase == 3) // GTF // untested
       {
-        const Trip & trip = journey[fromJourneyStepIdx].getFinalTrip().value().get();
-        int sequenceStartIdx = journey[fromJourneyStepIdx].getFinalEnterConnection().value().get().getSequenceInTrip() - 1;
-        int sequenceEndIdx   = journey[fromJourneyStepIdx].getFinalExitConnection().value().get().getSequenceInTrip() - 1;
+        auto tripOptRef = journey[fromJourneyStepIdx].getFinalTrip();
+        auto enterConnectOptRef = journey[fromJourneyStepIdx].getFinalEnterConnection();
+        auto exitConnectOptRef = journey[fromJourneyStepIdx].getFinalExitConnection();
+        
+        const Trip & trip = tripOptRef.value().get();
+        int sequenceStartIdx = enterConnectOptRef.value().get().getSequenceInTrip() - 1;
+        int sequenceEndIdx = exitConnectOptRef.value().get().getSequenceInTrip() - 1;
 
         for(size_t sequenceIdx = trip.reverseConnections.size() - 1 - sequenceEndIdx; sequenceIdx <= trip.reverseConnections.size() - 1 - sequenceStartIdx; ++sequenceIdx)
         {
@@ -284,13 +293,21 @@ namespace TrRouting
 
       else if (optimizationCase == 4) // CSS
       {
-        const Trip & arrivalJourneyStepTrip          = journey[fromJourneyStepIdx].getFinalTrip().value().get();
-        int arrivalJourneyStepSequenceStartIdx = journey[fromJourneyStepIdx].getFinalEnterConnection().value().get().getSequenceInTrip() - 1;
-        int arrivalJourneyStepSequenceEndIdx   = journey[fromJourneyStepIdx].getFinalExitConnection().value().get().getSequenceInTrip() - 1;
+        auto arrivalTripOptRef = journey[fromJourneyStepIdx].getFinalTrip();
+        auto arrivalEnterConnectOptRef = journey[fromJourneyStepIdx].getFinalEnterConnection();
+        auto arrivalExitConnectOptRef = journey[fromJourneyStepIdx].getFinalExitConnection();
+        
+        const Trip & arrivalJourneyStepTrip = arrivalTripOptRef.value().get();
+        int arrivalJourneyStepSequenceStartIdx = arrivalEnterConnectOptRef.value().get().getSequenceInTrip() - 1;
+        int arrivalJourneyStepSequenceEndIdx = arrivalExitConnectOptRef.value().get().getSequenceInTrip() - 1;
 
-        const Trip & departureJourneyStepTrip          = journey[toJourneyStepIdx].getFinalTrip().value().get();
-        int departureJourneyStepSequenceStartIdx = journey[toJourneyStepIdx].getFinalEnterConnection().value().get().getSequenceInTrip() - 1;
-        int departureJourneyStepSequenceEndIdx   = journey[toJourneyStepIdx].getFinalExitConnection().value().get().getSequenceInTrip() - 1;
+        auto departureTripOptRef = journey[toJourneyStepIdx].getFinalTrip();
+        auto departureEnterConnectOptRef = journey[toJourneyStepIdx].getFinalEnterConnection();
+        auto departureExitConnectOptRef = journey[toJourneyStepIdx].getFinalExitConnection();
+        
+        const Trip & departureJourneyStepTrip = departureTripOptRef.value().get();
+        int departureJourneyStepSequenceStartIdx = departureEnterConnectOptRef.value().get().getSequenceInTrip() - 1;
+        int departureJourneyStepSequenceEndIdx = departureExitConnectOptRef.value().get().getSequenceInTrip() - 1;
 
         std::optional<std::reference_wrapper<const Connection>> exitConnection;
 
