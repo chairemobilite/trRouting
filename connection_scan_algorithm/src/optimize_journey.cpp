@@ -195,7 +195,7 @@ namespace TrRouting
         int sequenceEndIdx = exitConnectOptRef.value().get().getSequenceInTrip() - 1;
 
         // Editorial comment: There's lot of +1/-1 in this code. This suggest that we have an array index that start at 1 instead of zero. This need confirmation
-        assert(trip.reverseConnections.size() >= 1 + sequenceEndIdx); // make sure sequenceIdx will be valid
+        assert(trip.reverseConnections.size() >= static_cast<size_t>(1 + sequenceEndIdx)); // make sure sequenceIdx will be valid
         for(size_t sequenceIdx = trip.reverseConnections.size() - 1 - sequenceEndIdx; sequenceIdx <= trip.reverseConnections.size() - 1 - sequenceStartIdx; ++sequenceIdx)
         {
           auto connection = trip.reverseConnections[sequenceIdx];
