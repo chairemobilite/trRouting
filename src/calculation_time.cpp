@@ -17,7 +17,7 @@ namespace TrRouting
   long long CalculationTime::getEpoch()
   {
     calculationEpoch = std::chrono::duration_cast< std::chrono::microseconds >(
-      std::chrono::system_clock::now().time_since_epoch()
+      std::chrono::steady_clock::now().time_since_epoch()
     );
     return calculationEpoch.count();
   }
