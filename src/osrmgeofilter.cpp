@@ -97,13 +97,21 @@ namespace TrRouting {
         int distanceMeters;
         for (int i = 1; i < numberOfDurations; i++) // ignore first (duration with itself)
         {
-          travelTimeSeconds = (int)ceil((float)responseJson["durations"][0][i]);
-          if (travelTimeSeconds <= maxWalkingTravelTime)
+          // Check if the duration and distance values are null before attempting to convert them
+          if (!responseJson["durations"][0][i].is_null() && !responseJson["distances"][0][i].is_null())
           {
-            distanceMeters = (int)ceil((float)responseJson["distances"][0][i]);
-            accessibleNodesFootpaths.push_back(NodeTimeDistance(birdDistanceAccessibleNodeIndexes[i - 1],
+            travelTimeSeconds = (int)ceil((float)responseJson["durations"][0][i]);
+            if (travelTimeSeconds <= maxWalkingTravelTime)
+            {
+              distanceMeters = (int)ceil((float)responseJson["distances"][0][i]);
+              accessibleNodesFootpaths.push_back(NodeTimeDistance(birdDistanceAccessibleNodeIndexes[i - 1],
                                                                 travelTimeSeconds,
                                                                 distanceMeters));
+            }
+          }
+          else
+          {
+            spdlog::debug("skipping node at index {} due to null duration or distance from OSRM", i);
           }
         }
       }
