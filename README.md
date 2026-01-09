@@ -24,14 +24,124 @@ https://chairemobilite.github.io/trRouting/
 [6]: https://github.com/Project-OSRM/osrm-backend/wiki/Running-OSRM "Running OSRM"
 
 ### Memcached support
-trRouting have the ability to cache some of the accessible node calculation results. To do so, it can
-use an external memcached daemon.
-You tell trRouting to do this by passing the --useMemcached parameter. By default it will
-try to access memcached on the default port, 11211 on the localhost. You can pass an hostname/port
-to the useMemcached parameter like so: --useMemcached=localhost:11111
+trRouting can cache accessible node calculation results using an external memcached daemon.
+This significantly speeds up repeated queries with the same origin/destination locations.
+
+#### Installing memcached
+
+**macOS (Homebrew):**
+```bash
+brew install memcached
+```
+
+**Ubuntu/Debian:**
+```bash
+sudo apt install memcached
+```
+
+#### Running memcached
+
+**macOS - Start as a background service:**
+```bash
+brew services start memcached
+```
+
+**macOS - Run manually (foreground):**
+```bash
+memcached -l localhost -p 11211
+```
+
+**Ubuntu - Start as a service:**
+```bash
+sudo systemctl start memcached
+sudo systemctl enable memcached  # To start on boot
+```
+
+**Ubuntu - Run manually:**
+```bash
+memcached -l 127.0.0.1 -p 11211 -m 64
+```
+
+The `-m` flag sets the maximum memory in MB (default is 64MB). Increase this if you have many unique origin/destination pairs.
+
+#### Using memcached with trRouting
+
+Enable caching by passing the `--useMemcached` parameter:
+```bash
+./trRouting --useMemcached
+```
+
+By default, trRouting connects to `localhost:11211`. To use a different server:
+```bash
+./trRouting --useMemcached=localhost:11211
+```
+
+#### Cache persistence
+
+trRouting can persist the cache to disk so it survives restarts. By default, the cache is saved to `footpaths.cache`:
+```bash
+./trRouting --useMemcached --memcachedPersistPath=footpaths.cache
+```
+
+To disable persistence, pass an empty path:
+```bash
+./trRouting --useMemcached --memcachedPersistPath=""
+```
+
+**What is cached:**
+
+The cache stores the walking travel times and distances from geographic coordinates to nearby transit nodes (and vice versa). These are computed by OSRM and can be expensive to calculate repeatedly.
+
+**Automatic behavior:**
+- **On startup**: The cache file is loaded and validated against current transit nodes
+- **On shutdown**: Cache is saved when receiving Ctrl+C (SIGINT) or SIGTERM signals
+- **On first query**: Node validation occurs to ensure cache validity
+
+**API endpoints for manual control:**
+- `GET /saveCache` - Save cache to disk immediately
+- `GET /loadCache` - Reload cache from disk
+- `GET /resetCache` - Clear all cache (memcached + local + delete cache file)
+- `GET /cacheStatus` - Get current cache status and entry count
+
+#### When the cache is invalidated
+
+**Transit node changes:**
+
+The cache file stores a hash signature of all transit nodes (their UUIDs and locations). On startup, this signature is validated against the current nodes. If any nodes have been:
+- Added or removed
+- Relocated (latitude/longitude changed)
+
+The cache is automatically invalidated and cleared. You'll see a log message like:
+```
+Cache invalidated: nodes have changed (count: 1000 -> 1005, hash: abc123 -> def456)
+Clearing cached footpaths data - will recalculate on demand
+```
+
+**OSRM data changes:**
+
+**Important:** The cache does NOT detect changes to OSRM routing data. If you update your OSRM data (e.g., new OpenStreetMap extract, updated walking network), you must manually invalidate the cache:
+
+1. **Delete the cache file:**
+   ```bash
+   rm footpaths.cache
+   ```
+
+2. **Or restart with a fresh cache:**
+   ```bash
+   ./trRouting --useMemcached --memcachedPersistPath=""  # Run without persistence once
+   ```
+
+3. **Or flush memcached:**
+   ```bash
+   echo "flush_all" | nc localhost 11211
+   ```
+
+Failure to invalidate the cache after OSRM updates will result in stale walking times that don't reflect the new routing data.
+
+#### Build requirements
 
 The memcached support will only be compiled if the configure script can detect libmemcached on
-the system, hence why it's marked as optional in the instructions bellow
+the system, hence why it's marked as optional in the instructions below
 
 ## Mac OS X Install with homebrew
 ```

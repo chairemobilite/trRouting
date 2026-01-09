@@ -8,6 +8,8 @@
 #include <algorithm>
 #include <string>
 #include <iterator>
+#include <csignal>
+#include <atomic>
 #include "spdlog/spdlog.h"
 
 #include <boost/uuid/uuid.hpp>
@@ -32,6 +34,34 @@
 #ifdef HAVE_MEMCACHED
   #include "memcachedgeofilter.hpp"
 #endif
+
+// Global pointers for signal handler access
+#ifdef HAVE_MEMCACHED
+static TrRouting::MemcachedGeoFilter* g_memcachedGeoFilter = nullptr;
+static TrRouting::TransitData* g_transitData = nullptr; // For access to nodes during cache save
+#endif
+static std::atomic<bool> g_shutdownRequested(false);
+
+// Signal handler for graceful shutdown
+void signalHandler(int signum) {
+  spdlog::info("Received signal {} - initiating graceful shutdown...", signum);
+  g_shutdownRequested = true;
+
+#ifdef HAVE_MEMCACHED
+  if (g_memcachedGeoFilter != nullptr && g_transitData != nullptr &&
+      g_memcachedGeoFilter->isPersistenceEnabled()) {
+    spdlog::info("Saving cache before exit...");
+    if (g_memcachedGeoFilter->saveCacheToFile(g_transitData->getNodes())) {
+      spdlog::info("Cache saved successfully");
+    } else {
+      spdlog::warn("Failed to save cache");
+    }
+  }
+#endif
+
+  // Exit after saving
+  std::exit(0);
+}
 
 using namespace TrRouting;
 
@@ -143,9 +173,26 @@ int main(int argc, char** argv) {
   // Wrap the geoFilter with memcached if requested and available
   if (programOptions.useMemcached) {
   #ifdef HAVE_MEMCACHED
-    geoFilter =  new TrRouting::MemcachedGeoFilter(geoFilter, programOptions.memcachedServers, 3600, programOptions.numberOfThreads);
+    auto* memcachedFilter = new TrRouting::MemcachedGeoFilter(
+        geoFilter,
+        programOptions.memcachedServers,
+        0, // 0: Never expires (but can still be evicted by LRU when memory is full)
+        programOptions.numberOfThreads,
+        programOptions.memcachedPersistPath
+    );
+    geoFilter = memcachedFilter;
+    g_memcachedGeoFilter = memcachedFilter; // Store for signal handler and API access
+    g_transitData = &transitData; // Store for signal handler access to nodes
     spdlog::info("Using memcached for caching GeoFilter results with server(s): {}", programOptions.memcachedServers);
+    if (!programOptions.memcachedPersistPath.empty()) {
+      spdlog::info("Memcached cache persistence enabled at: {}", programOptions.memcachedPersistPath);
+    }
     // Don't delete the original filter, as it's now managed by the cached filter
+
+    // Register signal handlers for graceful shutdown
+    std::signal(SIGINT, signalHandler);
+    std::signal(SIGTERM, signalHandler);
+    spdlog::info("Signal handlers registered for graceful cache save on exit");
   #else
     spdlog::warn("Memcached support was requested but is not available (not compiled in). Continuing without caching.");
   #endif
@@ -292,7 +339,86 @@ int main(int argc, char** argv) {
 
   };
 
+#ifdef HAVE_MEMCACHED
+  // Save memcached cache to disk
+  server.resource["^/saveCache[/]?$"]["GET"]=[&server, &transitData](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> ) {
+    std::string response;
 
+    if (g_memcachedGeoFilter == nullptr) {
+      response = "{\"status\": \"error\", \"error\": \"Memcached not enabled\"}";
+    } else if (!g_memcachedGeoFilter->isPersistenceEnabled()) {
+      response = "{\"status\": \"error\", \"error\": \"Cache persistence not configured (memcachedPersistPath is empty)\"}";
+    } else {
+      if (g_memcachedGeoFilter->saveCacheToFile(transitData.getNodes())) {
+        size_t cacheSize = g_memcachedGeoFilter->getCacheSize();
+        response = "{\"status\": \"success\", \"message\": \"Cache saved\", \"entries\": " + std::to_string(cacheSize) + "}";
+        spdlog::info("Cache saved via API request ({} entries)", cacheSize);
+      } else {
+        response = "{\"status\": \"error\", \"error\": \"Failed to save cache\"}";
+      }
+    }
+
+    *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
+  };
+
+  // Load/restore memcached cache from disk
+  server.resource["^/loadCache[/]?$"]["GET"]=[&server](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> ) {
+    std::string response;
+
+    if (g_memcachedGeoFilter == nullptr) {
+      response = "{\"status\": \"error\", \"error\": \"Memcached not enabled\"}";
+    } else if (!g_memcachedGeoFilter->isPersistenceEnabled()) {
+      response = "{\"status\": \"error\", \"error\": \"Cache persistence not configured (memcachedPersistPath is empty)\"}";
+    } else {
+      if (g_memcachedGeoFilter->loadCacheFromFile()) {
+        size_t cacheSize = g_memcachedGeoFilter->getCacheSize();
+        response = "{\"status\": \"success\", \"message\": \"Cache loaded\", \"entries\": " + std::to_string(cacheSize) + "}";
+        spdlog::info("Cache loaded via API request ({} entries)", cacheSize);
+      } else {
+        response = "{\"status\": \"error\", \"error\": \"Failed to load cache\"}";
+      }
+    }
+
+    *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
+  };
+
+  // Get cache statistics
+  server.resource["^/cacheStatus[/]?$"]["GET"]=[&server](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> ) {
+    std::string response;
+
+    if (g_memcachedGeoFilter == nullptr) {
+      response = "{\"status\": \"disabled\", \"message\": \"Memcached not enabled\"}";
+    } else {
+      size_t cacheSize = g_memcachedGeoFilter->getCacheSize();
+      response = "{\"status\": \"enabled\", \"entries\": " + std::to_string(cacheSize) + "}";
+    }
+
+    *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
+  };
+
+  // Reset cache: flush memcached, clear local cache, and delete cache file if configured
+  server.resource["^/resetCache[/]?$"]["GET"]=[&server](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> ) {
+    std::string response;
+
+    if (g_memcachedGeoFilter == nullptr) {
+      response = "{\"status\": \"error\", \"error\": \"Memcached not enabled\"}";
+    } else {
+      bool hasPersistence = g_memcachedGeoFilter->isPersistenceEnabled();
+      if (g_memcachedGeoFilter->resetCache()) {
+        if (hasPersistence) {
+          response = "{\"status\": \"success\", \"message\": \"Cache reset complete (memcached flushed, local cache cleared, cache file deleted)\"}";
+        } else {
+          response = "{\"status\": \"success\", \"message\": \"Cache reset complete (memcached flushed, local cache cleared)\"}";
+        }
+        spdlog::info("Cache reset via API request");
+      } else {
+        response = "{\"status\": \"error\", \"error\": \"Failed to reset cache completely\"}";
+      }
+    }
+
+    *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
+  };
+#endif
 
 
 
@@ -546,12 +672,3 @@ int main(int argc, char** argv) {
 
   return 0;
 }
-
-
-
-
-
-
-
-
-

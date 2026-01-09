@@ -29,6 +29,7 @@ namespace TrRouting
     std::string osrmDrivingHost;
     bool useMemcached;
     std::string memcachedServers;
+    std::string memcachedPersistPath;  // Path to persist memcached data to disk
 
     ProgramOptions();
     void parseOptions(int argc, char** argv);

@@ -18,11 +18,19 @@ gtest_SOURCES = gtest.cpp \
 #../../src/places_cache_fetcher.cpp places_cache_fetcher_test.cpp
 #../../src/households_cache_fetcher.cpp households_cache_fetcher_test.cpp
 
+# Conditionally add memcached persistence tests if libmemcached is available
+if HAVE_MEMCACHED
+gtest_SOURCES += memcached_persistence_test.cpp \
+    ../../src/memcachedgeofilter.cpp \
+    ../../src/geofilter.cpp \
+    ../../src/euclideangeofilter.cpp
+endif
+
 gtest_LDADD = $(top_srcdir)/tests/libgtest.la
 
 gtest_LDFLAGS = -pthread
 
-gtest_CPPFLAGS = -I$(top_srcdir)/googletest/googletest/include -I$(top_srcdir)/googletest/googletest -I$(top_srcdir)/include -I$(top_srcdir)/connection_scan_algorithm/include -pthread 
+gtest_CPPFLAGS = -I$(top_srcdir)/googletest/googletest/include -I$(top_srcdir)/googletest/googletest -I$(top_srcdir)/include -I$(top_srcdir)/connection_scan_algorithm/include -pthread
 
 TESTS = gtest
 
