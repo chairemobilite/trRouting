@@ -1,4 +1,4 @@
-FROM debian:bookworm-slim
+FROM debian:trixie-slim
 WORKDIR /source
 # Install dependencies in an intermediate image
 RUN apt-get update && \
