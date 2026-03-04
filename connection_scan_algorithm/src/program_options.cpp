@@ -36,7 +36,8 @@ namespace TrRouting {
       ("osrmDrivingHost",                                   boost::program_options::value<std::string>()->default_value("localhost"), "osrm driving host");
     options.add_options()
       ("useMemcached",                                     boost::program_options::value<std::string>()->implicit_value("localhost:11211"), "Enable memcached caching. You can specify a non-default memcached server to use by adding an optional hostname:port string");
-
+    options.add_options()
+      ("enableReusePort",                                   boost::program_options::value<bool>()       ->default_value(false), "enable REUSEPORT on the listening socket. This allow to process requests on multiple processes");
   }
 
   void ProgramOptions::parseOptions(int argc, char** argv) {
@@ -59,6 +60,7 @@ namespace TrRouting {
     osrmDrivingHost      = "localhost";
     useMemcached         = false;
     memcachedServers     = "localhost:11211";
+    enableReusePort      = false;
 
     if(variablesMap.count("help")) {
       std::cout << options << std::endl;
@@ -143,7 +145,10 @@ namespace TrRouting {
       useMemcached = true;
       memcachedServers = variablesMap["useMemcached"].as<std::string>();
     }
-
+    if(variablesMap.count("enableReusePort") == 1)
+    {
+      enableReusePort = variablesMap["enableReusePort"].as<bool>();
+    }
   }
 
 }
