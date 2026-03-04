@@ -156,6 +156,7 @@ int main(int argc, char** argv) {
   HttpServer server;
   server.config.port = programOptions.port;
   server.config.thread_pool_size = programOptions.numberOfThreads;
+  server.config.reuse_port = programOptions.enableReusePort; // Allow multiple processes to share a port if set
 
   // updateCache:
   server.resource["^/updateCache[/]?$"]["GET"]=[&server, &transitData](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {

@@ -357,6 +357,8 @@ namespace SimpleWeb {
       bool reuse_address = true;
       /// Make use of RFC 7413 or TCP Fast Open (TFO)
       bool fast_open = false;
+      /// Set to true to allow multiple process to bind to the port
+      bool reuse_port = false;
     };
     /// Set before calling start().
     Config config;
@@ -422,6 +424,13 @@ namespace SimpleWeb {
           throw;
       }
       acceptor->set_option(asio::socket_base::reuse_address(config.reuse_address));
+      if(config.reuse_port) {
+#if defined(__linux__) && defined(SO_REUSEPORT)
+        using reuse_port_option = asio::detail::socket_option::boolean<SOL_SOCKET, SO_REUSEPORT>;
+        error_code ec;
+        acceptor->set_option(reuse_port_option(true), ec);
+#endif
+      }
       if(config.fast_open) {
 #if defined(__linux__) && defined(TCP_FASTOPEN)
         const int qlen = 5; // This seems to be the value that is used in other examples.
