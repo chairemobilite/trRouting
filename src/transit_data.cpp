@@ -161,8 +161,6 @@ namespace TrRouting {
       forwardConnections.push_back(connections[i]);
       reverseConnections.push_back(connections[i]);
     }
-    forwardConnections.shrink_to_fit();
-    reverseConnections.shrink_to_fit();
 
     try
     {

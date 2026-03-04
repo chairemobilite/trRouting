@@ -31,7 +31,6 @@ namespace TrRouting
   {
     trips.clear();
     connections.clear();
-    connections.shrink_to_fit();
 
     boost::uuids::string_generator uuidGenerator;
     boost::uuids::uuid tripUuid, pathUuid;

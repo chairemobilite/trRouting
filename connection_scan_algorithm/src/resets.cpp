@@ -29,9 +29,7 @@ namespace TrRouting
     if (resetAccessPaths)
     {
       accessFootpaths.clear();
-      accessFootpaths.shrink_to_fit();
       egressFootpaths.clear();
-      egressFootpaths.shrink_to_fit();
     }
     tripsQueryOverlay.assign(Trip::getMaxUid()+1, TripQueryData());
     forwardJourneysSteps.clear();
