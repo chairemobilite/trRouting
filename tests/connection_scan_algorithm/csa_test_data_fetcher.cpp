@@ -15,64 +15,6 @@ const std::map<std::string, TrRouting::Mode> TestDataFetcher::getModes() {
   return modes;
 }
 
-int TestDataFetcher::getDataSources(
-                                    std::map<boost::uuids::uuid, TrRouting::DataSource>& ts,
-                                    std::string
-                                    ) {
-  TrRouting::DataSource dataSource;
-  dataSource.uuid = dataSourceUuid;
-  dataSource.shortname = "testDS";
-  dataSource.name = "Test Data Source";
-  
-  ts[dataSourceUuid] = dataSource;
-
-  return 0;
-}
-
-    int TestDataFetcher::getPersons(
-      std::map<boost::uuids::uuid, TrRouting::Person>&,
-      const std::map<boost::uuids::uuid, TrRouting::DataSource>&,
-      std::string
-    )
-    {
-      // No person in this test
-      return 0;
-    }
-
-int TestDataFetcher::getOdTrips(
-                                std::map<boost::uuids::uuid, TrRouting::OdTrip>& ts,
-                                const std::map<boost::uuids::uuid, TrRouting::DataSource>& dataSources,
-                                const std::map<boost::uuids::uuid, TrRouting::Person>&,
-                                const std::map<boost::uuids::uuid, TrRouting::Node>& nodes,
-                                std::string
-                                ) {
-  std::vector<TrRouting::NodeTimeDistance> originNodes;
-  originNodes.push_back(TrRouting::NodeTimeDistance(nodes.at(nodeSouth2Uuid), 469, 500));
-  std::vector<TrRouting::NodeTimeDistance> destinationNodes;
-  destinationNodes.push_back(TrRouting::NodeTimeDistance(nodes.at(nodeMidNodeUuid), 138, 150));
-  
-  ts.emplace(odTripUuid, TrRouting::OdTrip(odTripUuid,
-                                              12345,
-                                              "12345",
-                                              dataSources.at(dataSourceUuid),
-                                              std::nullopt,
-                                              getTimeInSeconds(9, 45),
-                                              -1,
-                                              0,
-                                              0,
-                                              0,
-                                              1.0,
-                                              "",
-                                              "",
-                                              "",
-                                              originNodes,
-                                              destinationNodes,
-                                              std::make_unique<TrRouting::Point>(45.5242, -73.5817),
-                                              std::make_unique<TrRouting::Point>(45.54, -73.6146)));
-  
-  return 0;
-}
-
 int TestDataFetcher::getAgencies(
                                  std::map<boost::uuids::uuid, TrRouting::Agency>& ts,
                                  std::string

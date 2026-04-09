@@ -3,7 +3,6 @@
 #include "parameters.hpp"
 #include "trip.hpp"
 #include "toolbox.hpp" //MAX_INT
-#include "od_trip.hpp"
 #include "routing_result.hpp"
 #include "mode.hpp"
 #include "agency.hpp"
@@ -41,11 +40,7 @@ namespace TrRouting
     departureTimeSeconds = -1;
     arrivalTimeSeconds   = -1;
     
-    if(odTripGlob.has_value() && parameters.isForwardCalculation())
-    {
-      departureTimeSeconds = odTripGlob.value().get().departureTimeSeconds;
-    }
-    else if (parameters.isForwardCalculation())
+    if (parameters.isForwardCalculation())
     {
       departureTimeSeconds = parameters.getTimeOfTrip();
     }
@@ -173,24 +168,13 @@ namespace TrRouting
     spdlog::debug("  resetting access paths ");
     bool accessFootpathOk = true;
 
-    if(odTripGlob.has_value()) {
-      spdlog::debug("  using odTrip with {} accessible nodes", odTripGlob.value().get().originNodes.size());
+    spdlog::debug("  fetching nodes with osrm");
 
-      accessFootpaths.clear();
-      //TODO This can be a std::copy
-      for (auto & accessNode : odTripGlob.value().get().originNodes) {
-        accessFootpaths.push_back(accessNode);
-      }
+    accessFootpaths = geoFilter.getAccessibleNodesFootpathsFromPoint(origin, transitData.getNodes(), parameters.getMaxAccessWalkingTravelTimeSeconds(), parameters.getWalkingSpeedMetersPerSecond());
+    if (accessFootpaths.size() == 0) {
+      accessFootpathOk = false;
     }
-    else
-    {
-      spdlog::debug("  fetching nodes with osrm");
 
-      accessFootpaths = geoFilter.getAccessibleNodesFootpathsFromPoint(origin, transitData.getNodes(), parameters.getMaxAccessWalkingTravelTimeSeconds(), parameters.getWalkingSpeedMetersPerSecond());
-      if (accessFootpaths.size() == 0) {
-        accessFootpathOk = false;
-      }
-    }
     return accessFootpathOk;
   }
 
@@ -198,23 +182,11 @@ namespace TrRouting
     bool egressFootpathOk = true;
 
     // fetch nodes footpaths accessible to destination using params or osrm fetcher if not provided:
-    if(odTripGlob.has_value())
-    {
-      spdlog::debug("  using odTrip with {} egressible nodes", odTripGlob.value().get().destinationNodes.size());
+    egressFootpaths = geoFilter.getAccessibleNodesFootpathsFromPoint(destination, transitData.getNodes(), parameters.getMaxEgressWalkingTravelTimeSeconds(), parameters.getWalkingSpeedMetersPerSecond());
+    if (egressFootpaths.size() == 0) {
+      egressFootpathOk = false;
+    }
 
-      egressFootpaths.clear();
-      //TODO This could be a std::copy
-      for (auto & egressNode : odTripGlob.value().get().destinationNodes) {
-        egressFootpaths.push_back(egressNode);
-      }
-    }
-    else
-    {
-      egressFootpaths = geoFilter.getAccessibleNodesFootpathsFromPoint(destination, transitData.getNodes(), parameters.getMaxEgressWalkingTravelTimeSeconds(), parameters.getWalkingSpeedMetersPerSecond());
-      if (egressFootpaths.size() == 0) {
-        egressFootpathOk = false;
-      }
-    }
     return egressFootpathOk;
   }
 

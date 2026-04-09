@@ -10,11 +10,6 @@
 
 namespace TrRouting
 {
-  class DataSource;
-  //class Household;  //TODO #167
-  class Person;
-  class OdTrip;
-  //class Place;  //TODO #167
   class Agency;
   class Service;
   class Node;
@@ -33,85 +28,6 @@ namespace TrRouting
       virtual const std::map<std::string, Mode> getModes() = 0;
 
       //TODO the customPath does not make much sense to a generic data access pattern (see issue #160)
-    /**
-     * Read the data sources cache file and fill the data sources vector.
-     * 
-     * @return 0 in case of success, values below 0 when errors occurred:
-     * -EBADMSG if deserialization did not work
-     * -ENOENT if the file does not exist
-     * -EINVAL For any other data related error
-     * -(error codes from the open system call)
-     */
-    virtual int getDataSources(
-      std::map<boost::uuids::uuid, DataSource>& ts, 
-      std::string customPath = "") = 0;
-
-    /**
-     * Read the households cache file and fill the households vector.
-     * 
-     * @return 0 in case of success, values below 0 when errors occurred:
-     * -EBADMSG if deserialization did not work
-     * -ENOENT if the file does not exist
-     * -EINVAL For any other data related error
-     * -(error codes from the open system call)
-     */
-    //TODO #167 Place/Household removed while refactoring
-    // virtual int getHouseholds(
-    //  std::vector<std::unique_ptr<Household>>& ts,
-    //  std::map<boost::uuids::uuid, int>& tIndexesById,
-    //  const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
-    //  std::string customPath = "") = 0;
-
-    /**
-     * Read the persons cache file and fill the persons vector.
-     * 
-     * @return 0 in case of success, values below 0 when errors occurred:
-     * -EBADMSG if deserialization did not work
-     * -ENOENT if the file does not exist
-     * -EINVAL For any other data related error
-     * -(error codes from the open system call)
-     */
-    virtual int getPersons(
-      std::map<boost::uuids::uuid, Person>& ts,
-      const std::map<boost::uuids::uuid, DataSource>& dataSources,
-      std::string customPath = ""
-    ) = 0;
-
-    /**
-     * Read the odTrips cache file and fill the odTrips vector.
-     * 
-     * @return 0 in case of success, values below 0 when errors occurred:
-     * -EBADMSG if deserialization did not work
-     * -ENOENT if the file does not exist
-     * -EINVAL For any other data related error
-     * -(error codes from the open system call)
-     */
-    virtual int getOdTrips(
-      std::map<boost::uuids::uuid, OdTrip>& ts,
-      const std::map<boost::uuids::uuid, DataSource>& dataSources,
-      const std::map<boost::uuids::uuid, Person>& persons,
-      const std::map<boost::uuids::uuid, Node>& nodes,
-      std::string customPath = ""
-    ) = 0;
-
-    /**
-     * Read the places cache file and fill the places vector.
-     * 
-     * @return 0 in case of success, values below 0 when errors occurred:
-     * -EBADMSG if deserialization did not work
-     * -ENOENT if the file does not exist
-     * -EINVAL For any other data related error
-     * -(error codes from the open system call)
-     */
-    //TODO #167 Place/Household removed while refactoring
-    //virtual int getPlaces(
-    //  std::vector<std::unique_ptr<Place>>& ts,
-    //  std::map<boost::uuids::uuid, int>& tIndexesById,
-    //  const std::map<boost::uuids::uuid, int>& dataSourceIndexesByUuid,
-    //  const std::map<boost::uuids::uuid, int>& nodeIndexesByUuid,
-    //  std::string customPath = ""
-    //) = 0;
-
     /**
      * Read the agencies cache file and fill the agencies vector.
      * 

@@ -202,35 +202,6 @@ int main(int argc, char** argv) {
     //TODO Merge this and the preparations.cpp code
     for(std::string cacheName : cacheNames)
     {
-      if (cacheName == "data_sources" || cacheName == "all")
-      {
-        correctCacheName = true;
-        transitData.updateDataSources(customCacheDirectoryPath);
-      }
-      /* TODO #167
-      if (cacheName == "households" || cacheName == "all")
-      {
-        correctCacheName = true;
-        transitData.updateHouseholds(customCacheDirectoryPath);
-      }
-      */
-      if (cacheName == "persons" || cacheName == "all")
-      {
-        correctCacheName = true;
-        transitData.updatePersons(customCacheDirectoryPath);
-      }
-      if (cacheName == "od_trips" || cacheName == "all")
-      {
-        correctCacheName = true;
-        transitData.updateOdTrips(customCacheDirectoryPath);
-      }
-      /* TODO #167
-      if (cacheName == "places" || cacheName == "all")
-      {
-        correctCacheName = true;
-        transitData.updatePlaces(customCacheDirectoryPath);
-      }
-      */
       if (cacheName == "agencies" || cacheName == "all")
       {
         correctCacheName = true;

@@ -8,16 +8,11 @@
 #include "csa_route_calculation_test.hpp"
 #include "constants.hpp"
 #include "mode.hpp"
-#include "data_source.hpp"
-#include "household.hpp"
-#include "person.hpp"
-#include "place.hpp"
 #include "agency.hpp"
 #include "service.hpp"
 #include "line.hpp"
 #include "path.hpp"
 #include "trip.hpp"
-#include "od_trip.hpp"
 #include "node.hpp"
 
 /**

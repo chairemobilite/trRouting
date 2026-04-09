@@ -6,18 +6,15 @@
 #include <map>
 #include <optional>
 #include <boost/uuid/uuid.hpp>
-#include "data_source.hpp"
 #include "toolbox.hpp" //MAX_INT
 
 namespace TrRouting
 {
 
   class Point;
-  class OdTrip;
   class Scenario;
   class Node;
   class Mode;
-  class DataSource;
   class Agency;
   class Service;
   class Line;
@@ -256,37 +253,6 @@ namespace TrRouting
                                                     const std::map<boost::uuids::uuid, Scenario> &scenarios
       );
   };
-
-  class OdTripLegacyParameters {
-
-    public:
-
-      int batchNumber;
-      int batchesCount;
-      int odTripsSampleSize;
-      unsigned int seed;
-
-      //TODO Make it a reference or not??
-      std::optional<DataSource> onlyDataSource;
-
-      std::vector<std::pair<int,int>> odTripsPeriods; // pair: start_at_seconds, end_at_seconds
-      std::vector<std::string>        odTripsGenders;
-      std::vector<std::string>        odTripsAgeGroups;
-      std::vector<std::string>        odTripsOccupations;
-      std::vector<std::string>        odTripsActivities;
-      std::vector<std::string>        odTripsModes;
-
-      float odTripsSampleRatio;
-
-      std::optional<boost::uuids::uuid> odTripUuid;
-
-      bool calculateProfiles;            // calculate profiles for lines, paths and trips (od trips only)
-
-      ~OdTripLegacyParameters() {}
-      OdTripLegacyParameters();
-
-  };
-
 }
 
 
