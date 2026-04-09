@@ -7,9 +7,7 @@ libcsa_la_SOURCES = alternatives_routing.cpp \
 		   forward_calculation.cpp \
 		   forward_journey.cpp \
 		   initializations.cpp \
-		   od_trips_routing.cpp \
 		   optimize_journey.cpp \
-		   parameters/legacyV1_parameters.cpp \
 		   parameters/common_parameters.cpp \
 		   parameters/route_parameters.cpp \
 		   parameters/accessibility_parameters.cpp \

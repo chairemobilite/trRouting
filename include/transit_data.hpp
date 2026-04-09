@@ -15,14 +15,8 @@ namespace TrRouting {
 
   class DataFetcher;
   class Mode;
-  class DataSource;
-  class Household;
-  class Person;
-  class OdTrip;
-  class Place;
   class Agency;
   class Service;
-  class Station;
   class Line;
   class Path;
   class Scenario;
@@ -58,9 +52,6 @@ namespace TrRouting {
     
     // const data access functions
     const std::map<std::string, Mode> & getModes() const {return modes;}
-    const std::map<boost::uuids::uuid, DataSource> & getDataSources() const {return dataSources;}
-    const std::map<boost::uuids::uuid, Person> & getPersons() const {return persons;}
-    const std::map<boost::uuids::uuid, OdTrip> & getOdTrips() const {return odTrips;}
     const std::map<boost::uuids::uuid, Agency> & getAgencies() const {return agencies;}
     const std::map<boost::uuids::uuid, Service> & getServices() const {return services;}
     const std::map<boost::uuids::uuid, Node> & getNodes() const {return nodes;}
@@ -81,15 +72,6 @@ namespace TrRouting {
      * -EINVAL For any other data related error
      * -(error codes from the open system call)
      */
-    int updateDataSources(std::string customPath = "");
-    // TODO #167
-    //int updateHouseholds(std::string customPath = "");
-    int updatePersons(std::string customPath = "");
-    int updateOdTrips(std::string customPath = "");
-    // TODO #167
-    //int updatePlaces(std::string customPath = "");
-
-    int updateStations(std::string customPath = "");
     int updateAgencies(std::string customPath = "");
     int updateServices(std::string customPath = "");
     int updateNodes(std::string customPath = "");
@@ -105,9 +87,6 @@ namespace TrRouting {
     DataFetcher &dataFetcher;
 
     std::map<std::string, Mode>              modes;
-    std::map<boost::uuids::uuid, DataSource> dataSources;
-    std::map<boost::uuids::uuid, Person>     persons;
-    std::map<boost::uuids::uuid, OdTrip>     odTrips;
     std::map<boost::uuids::uuid, Agency>     agencies;
     std::map<boost::uuids::uuid, Service>    services;
     std::map<boost::uuids::uuid, Node>       nodes;

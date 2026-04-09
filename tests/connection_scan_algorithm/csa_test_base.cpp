@@ -15,11 +15,6 @@
 #include "point.hpp"
 #include "mode.hpp"
 #include "trip.hpp"
-#include "data_source.hpp"
-#include "household.hpp"
-#include "person.hpp"
-#include "place.hpp"
-#include "od_trip.hpp"
 #include "spdlog/spdlog.h"
 
 /**

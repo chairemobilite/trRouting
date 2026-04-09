@@ -5,16 +5,11 @@
 #include "trip.hpp"
 #include "mode.hpp"
 #include "agency.hpp"
-#include "data_source.hpp"
 #include "node.hpp"
 #include "line.hpp"
 #include "path.hpp"
 #include "scenario.hpp"
 #include "service.hpp"
-#include "od_trip.hpp"
-#include "place.hpp"
-#include "household.hpp"
-#include "person.hpp"
 #include "connection_cache.hpp"
 #include "transit_data.hpp"
 #include "geofilter.hpp"
@@ -32,8 +27,7 @@ namespace TrRouting
     maxEgressTravelTime(0),
     maxAccessTravelTime(0),
     minEgressTravelTime(0),
-    calculationTime(0),
-    odTripGlob(std::nullopt)
+    calculationTime(0)
   {
     initializeCalculationData();
     algorithmCalculationTime.start(); //Automatically start timer on construction

@@ -13,11 +13,6 @@
 #include "agency.hpp"
 #include "line.hpp"
 #include "node.hpp"
-#include "data_source.hpp"
-#include "household.hpp"
-#include "person.hpp"
-#include "od_trip.hpp"
-#include "place.hpp"
 #include "service.hpp"
 #include "scenario.hpp"
 #include "path.hpp"
@@ -62,25 +57,6 @@ namespace TrRouting
     virtual const std::map<std::string, Mode> getModes();
 
     /** Refer to the base class for these functions documentations */
-    virtual int getDataSources(
-      std::map<boost::uuids::uuid, DataSource>& ts,
-      std::string customPath = ""
-    );
-
-    virtual int getPersons(
-      std::map<boost::uuids::uuid, Person>& ts,
-      const std::map<boost::uuids::uuid, DataSource>& dataSources,
-      std::string customPath = ""
-    );
-
-    virtual int getOdTrips(
-      std::map<boost::uuids::uuid, OdTrip>& ts,
-      const std::map<boost::uuids::uuid, DataSource>& dataSources,
-      const std::map<boost::uuids::uuid, Person>& persons,
-      const std::map<boost::uuids::uuid, Node>& nodes,
-      std::string customPath = ""
-    );
-
     virtual int getAgencies(
       std::map<boost::uuids::uuid, Agency>& ts,
       std::string customPath = ""

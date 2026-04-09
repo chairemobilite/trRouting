@@ -74,7 +74,6 @@ namespace TrRouting
     std::unique_ptr<AllNodesResult> reverseJourneyStepAllNodes(AccessibilityParameters &parameters, const std::unordered_map<Node::uid_t, JourneyStep> & reverseAccessJourneysSteps);
 
     AlternativesResult alternativesRouting(RouteParameters &parameters);
-    std::string             odTripsRouting(RouteParameters &parameters);
 
     std::vector<int>        optimizeJourney(std::deque<JourneyStep> &journey);
 
@@ -101,9 +100,6 @@ namespace TrRouting
     int              maxAccessTravelTime;
     int              minEgressTravelTime;
     long long        calculationTime;
-
-    // TODO Added Glob suffix to easily track which one was local and which was global
-    std::optional<std::reference_wrapper<const OdTrip>> odTripGlob; //Used to tell the reset function that we are doing an OdTrip calculations
 
     std::vector<int> nodesTentativeTime; // arrival time at node, using the Node::id as index
     std::vector<int> nodesReverseTentativeTime; // departure time at node

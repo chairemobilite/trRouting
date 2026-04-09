@@ -14,11 +14,6 @@
 #include "agency.hpp"
 #include "line.hpp"
 #include "node.hpp"
-#include "data_source.hpp"
-#include "household.hpp"
-#include "person.hpp"
-#include "od_trip.hpp"
-#include "place.hpp"
 #include "service.hpp"
 #include "scenario.hpp"
 #include "path.hpp"
@@ -76,25 +71,6 @@ class TestDataFetcher : public TrRouting::DataFetcher
     virtual const std::map<std::string, TrRouting::Mode> getModes();
 
     /** Refer to the base class for these functions documentations */
-    virtual int getDataSources(
-      std::map<boost::uuids::uuid, TrRouting::DataSource>& ts,
-      std::string customPath = ""
-    );
-
-    virtual int getPersons(
-      std::map<boost::uuids::uuid, TrRouting::Person>& ts,
-      const std::map<boost::uuids::uuid, TrRouting::DataSource>& dataSources,
-      std::string customPath = ""
-    );
-
-    virtual int getOdTrips(
-      std::map<boost::uuids::uuid, TrRouting::OdTrip>& ts,
-      const std::map<boost::uuids::uuid, TrRouting::DataSource>& dataSources,
-      const std::map<boost::uuids::uuid, TrRouting::Person>& persons,
-      const std::map<boost::uuids::uuid, TrRouting::Node>& nodes,
-      std::string customPath = ""
-    );
-
     virtual int getAgencies(
       std::map<boost::uuids::uuid, TrRouting::Agency>& ts,
       std::string customPath = ""

@@ -4,9 +4,6 @@
 #include "data_fetcher.hpp"
 #include "calculation_time.hpp"
 #include "mode.hpp"
-#include "data_source.hpp"
-#include "person.hpp"
-#include "od_trip.hpp"
 #include "agency.hpp"
 #include "service.hpp"
 #include "line.hpp"
@@ -80,31 +77,6 @@ namespace TrRouting {
     return dataFetcher.getNodes(nodes, customPath);
   }
 
-  int TransitData::updateDataSources(std::string customPath)
-  {
-    return dataFetcher.getDataSources(dataSources, customPath);
-  }
-  /* TODO #167
-  int TransitData::updateHouseholds(std::string customPath)
-  {
-    return dataFetcher.getHouseholds(households, householdIndexesByUuid, dataSourceIndexesByUuid, nodeIndexesByUuid, customPath);
-  }
-  */
-  int TransitData::updatePersons(std::string customPath)
-  {
-    return dataFetcher.getPersons(persons, getDataSources(), customPath);
-  }
-  
-  int TransitData::updateOdTrips(std::string customPath)
-  {
-    return dataFetcher.getOdTrips(odTrips, dataSources, getPersons(), getNodes(), customPath);
-  }
-  /* TODO #167
-  int TransitData::updatePlaces(std::string customPath)
-  {
-    return dataFetcher.getPlaces(places, placeIndexesByUuid, dataSourceIndexesByUuid, nodeIndexesByUuid, customPath);
-  }
-  */ 
   int TransitData::updateAgencies(std::string customPath)
   {
     return dataFetcher.getAgencies(agencies, customPath);
@@ -272,36 +244,6 @@ namespace TrRouting {
     {
       return DataStatus::DATA_READ_ERROR;
     }
-    ret = updateDataSources();
-    // Ignore missing data sources file
-    if (ret < 0 && ret != -ENOENT)
-    {
-      return DataStatus::DATA_READ_ERROR;
-    }
-    /* TODO #167
-    ret = updateHouseholds();
-    if (ret < 0)
-    {
-      return DataStatus::DATA_READ_ERROR;
-    }
-    */
-    ret = updatePersons();
-    if (ret < 0)
-    {
-      return DataStatus::DATA_READ_ERROR;
-    }
-    ret = updateOdTrips();
-    if (ret < 0)
-    {
-      return DataStatus::DATA_READ_ERROR;
-    }
-    /* TODO #167
-    ret = updatePlaces();
-    if (ret < 0)
-    {
-      return DataStatus::DATA_READ_ERROR;
-    }
-    */
     ret = updateAgencies();
     // Ignore missing file
     if (ret < 0 && ret != -ENOENT)
