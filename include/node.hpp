@@ -22,13 +22,11 @@ namespace TrRouting
          unsigned long long _id,
          const std::string &_code,
          const std::string &_name,
-         const std::string &_internalId,
          std::unique_ptr<Point> _point
          ) : uuid(_uuid),
              id(_id),
              code(_code),
              name(_name),
-             internalId(_internalId),
              uid(++global_uid)
              {
                point = std::move(_point);
@@ -38,7 +36,6 @@ namespace TrRouting
     unsigned long long id;
     std::string code;
     std::string name;
-    std::string internalId;
     uid_t uid; //Local, temporary unique id, used to speed up lookups
     std::unique_ptr<Point> point; //TODO Does this need to be a ptr or could be part of the object?
     std::vector<NodeTimeDistance> transferableNodes;

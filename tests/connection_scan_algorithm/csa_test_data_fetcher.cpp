@@ -69,7 +69,6 @@ int TestDataFetcher::getNodes(
                                                 0,
                                                 "",
                                                 "South2",
-                                                "",
                                                 std::make_unique<TrRouting::Point>(45.5269,-73.58912)));
   addSelfTransferableNode(array.at(nodeSouth2Uuid));
 
@@ -78,7 +77,6 @@ int TestDataFetcher::getNodes(
                                                 0,
                                                 "",
                                                 "South1",
-                                                "",
                                                 std::make_unique<TrRouting::Point>(45.53258,-73.60196)));
   addSelfTransferableNode(array.at(nodeSouth1Uuid));
 
@@ -87,7 +85,6 @@ int TestDataFetcher::getNodes(
                                                   0,
                                                   "",
                                                   "MidPoint",
-                                                  "",
                                                   std::make_unique<TrRouting::Point>(45.53827,-73.614436)));
   addSelfTransferableNode(array.at(nodeMidNodeUuid));
 
@@ -96,7 +93,6 @@ int TestDataFetcher::getNodes(
                                                 0,
                                                 "",
                                                 "North1",
-                                                "",
                                                 std::make_unique<TrRouting::Point>(45.54165,-73.62603)));
   addSelfTransferableNode(array.at(nodeNorth1Uuid));
 
@@ -105,7 +101,6 @@ int TestDataFetcher::getNodes(
                                                 0,
                                                 "",
                                                 "North2",
-                                                "",
                                                 std::make_unique<TrRouting::Point>(45.54634,-73.64266)));
   addSelfTransferableNode(array.at(nodeNorth2Uuid));
 
@@ -114,7 +109,6 @@ int TestDataFetcher::getNodes(
                                                 0,
                                                 "",
                                                 "East2",
-                                                "",
                                                 std::make_unique<TrRouting::Point>(45.55027,-73.60496)));
   addSelfTransferableNode(array.at(nodeEast2Uuid));
 
@@ -123,7 +117,6 @@ int TestDataFetcher::getNodes(
                                                 0,
                                                 "",
                                                 "East1",
-                                                "",
                                                 std::make_unique<TrRouting::Point>(45.54249,-73.61199)));
   addSelfTransferableNode(array.at(nodeEast1Uuid));
       
@@ -132,7 +125,6 @@ int TestDataFetcher::getNodes(
                                                 0,
                                                 "",
                                                 "West1",
-                                                "",
                                                 std::make_unique<TrRouting::Point>(45.53473,-73.61825)));
   addSelfTransferableNode(array.at(nodeWest1Uuid));
 
@@ -141,7 +133,6 @@ int TestDataFetcher::getNodes(
                                                 0,
                                                 "",
                                                 "West2",
-                                                "",
                                                 std::make_unique<TrRouting::Point>(45.52962,-73.62265)));
   addSelfTransferableNode(array.at(nodeWest2Uuid));
 
@@ -151,7 +142,6 @@ int TestDataFetcher::getNodes(
                                                 0,
                                                 "",
                                                 "Extra1",
-                                                "",
                                                 std::make_unique<TrRouting::Point>(45.55316,-73.61894)));
   addSelfTransferableNode(array.at(nodeExtra1Uuid));
 
@@ -180,11 +170,11 @@ int TestDataFetcher::getLines(
   auto & busMode = modes.at("bus");
   const auto & defaultAgency = agencies.at(agencyUuid);
 
-  ts.emplace(lineSNUuid, TrRouting::Line(lineSNUuid, defaultAgency, busMode, "01", "South/North", "", 0));
+  ts.emplace(lineSNUuid, TrRouting::Line(lineSNUuid, defaultAgency, busMode, "01", "South/North", 0));
 
-  ts.emplace(lineEWUuid, TrRouting::Line(lineEWUuid, defaultAgency, busMode, "02", "East/West", "", 0));
+  ts.emplace(lineEWUuid, TrRouting::Line(lineEWUuid, defaultAgency, busMode, "02", "East/West", 0));
   
-  ts.emplace(lineExtraUuid, TrRouting::Line(lineExtraUuid, defaultAgency, busMode, "03", "Extra", "", 0));
+  ts.emplace(lineExtraUuid, TrRouting::Line(lineExtraUuid, defaultAgency, busMode, "03", "Extra", 0));
   return 0;
 }
 
@@ -209,7 +199,6 @@ int TestDataFetcher::getPaths(
   ts.emplace(pathSNUuid, TrRouting::Path(pathSNUuid,
                                          lines.at(lineSNUuid),
                                          "outbound",
-                                         "",
                                          nodesref,
                                          emptyVector));
   // Path's trip data will be filled in the setUpSchedules
@@ -223,7 +212,6 @@ int TestDataFetcher::getPaths(
   ts.emplace(pathEWUuid, TrRouting::Path(pathEWUuid,
                                          lines.at(lineEWUuid),
                                          "outbound",
-                                         "",
                                          nodesref,
                                          emptyVector));
   // Path's trip data will be filled in the setUpSchedules
@@ -234,7 +222,6 @@ int TestDataFetcher::getPaths(
   ts.emplace(pathExtraUuid, TrRouting::Path(pathExtraUuid,
                                             lines.at(lineExtraUuid),
                                             "outbound",
-                                            "",
                                             nodesref,
                                             emptyVector));
   // Path's trip data will be filled in the setUpSchedules

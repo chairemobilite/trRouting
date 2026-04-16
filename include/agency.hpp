@@ -15,7 +15,6 @@ namespace TrRouting
     boost::uuids::uuid uuid;
     std::string acronym;
     std::string name;
-    std::string internalId;
     boost::uuids::uuid simulationUuid;
 
     const std::string toString() {

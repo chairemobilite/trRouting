@@ -78,7 +78,6 @@ namespace TrRouting
                              capnpT.getId(),
                              capnpT.getCode(),
                              capnpT.getName(),
-                             capnpT.getInternalId(),
                              std::move(point)));
       }
     }
