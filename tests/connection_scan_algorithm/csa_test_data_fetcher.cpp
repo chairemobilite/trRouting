@@ -313,8 +313,7 @@ int TestDataFetcher::getSchedules(
                                              paths.at(pathSNUuid),
                                              busMode,
                                              services.at(serviceUuid),
-                                             -1,
-                                             0));
+                                             -1));
   int arrivalTimesT1[5] = { getTimeInSeconds(10), getTimeInSeconds(10, 3, 30), getTimeInSeconds(10, 7), getTimeInSeconds(10, 13), getTimeInSeconds(10, 18) };
   int departureTimesT1[5] = { getTimeInSeconds(10), getTimeInSeconds(10, 3, 50), getTimeInSeconds(10, 10), getTimeInSeconds(10, 13, 30), getTimeInSeconds(10, 18) };
 
@@ -327,8 +326,7 @@ int TestDataFetcher::getSchedules(
                                               paths.at(pathSNUuid),
                                               busMode,
                                               services.at(serviceUuid),
-                                              -1,
-                                              0));
+                                              -1));
   int arrivalTimesT2[5] = { getTimeInSeconds(11), getTimeInSeconds(11, 3, 30), getTimeInSeconds(11, 7), getTimeInSeconds(11, 11), getTimeInSeconds(11, 16) };
   int departureTimesT2[5] = { getTimeInSeconds(11), getTimeInSeconds(11, 3, 50), getTimeInSeconds(11, 8), getTimeInSeconds(11, 11, 30), getTimeInSeconds(11, 17) };
   
@@ -341,8 +339,7 @@ int TestDataFetcher::getSchedules(
                                             paths.at(pathEWUuid),
                                             busMode,
                                             services.at(serviceUuid),
-                                            -1,
-                                            0));
+                                            -1));
   
   int arrivalTimesT3[5] = { getTimeInSeconds(9), getTimeInSeconds(9, 2, 30), getTimeInSeconds(9, 4, 40), getTimeInSeconds(9, 7, 30), getTimeInSeconds(9, 10) };
   int departureTimesT3[5] = { getTimeInSeconds(9), getTimeInSeconds(9, 2, 50), getTimeInSeconds(9, 5), getTimeInSeconds(9, 8), getTimeInSeconds(9, 11) };
@@ -358,8 +355,7 @@ int TestDataFetcher::getSchedules(
                                              paths.at(pathEWUuid),
                                              busMode,
                                              services.at(serviceUuid),
-                                             -1,
-                                             0));
+                                             -1));
   
   int arrivalTimesT4[5] = { getTimeInSeconds(10, 2), getTimeInSeconds(10, 4, 30), getTimeInSeconds(10, 7), getTimeInSeconds(10, 11, 30), getTimeInSeconds(10, 14) };
   int departureTimesT4[5] = { getTimeInSeconds(10, 2), getTimeInSeconds(10, 5, 10), getTimeInSeconds(10, 9), getTimeInSeconds(10, 12), getTimeInSeconds(10, 15) };
@@ -373,8 +369,7 @@ int TestDataFetcher::getSchedules(
                                                 paths.at(pathExtraUuid),
                                                 busMode,
                                                 services.at(serviceUuid),
-                                                -1,
-                                                0));
+                                                -1));
   
   int arrivalTimesT5[2] = { getTimeInSeconds(10, 20), getTimeInSeconds(10, 25) };
   int departureTimesT5[2] = { getTimeInSeconds(10, 20), getTimeInSeconds(10,26) };
