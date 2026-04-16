@@ -96,7 +96,6 @@ namespace TrRouting
                 auto departureTimesSeconds = capnpTrip.getNodeDepartureTimesSeconds();
                 auto canBoards             = capnpTrip.getNodesCanBoard();
                 auto canUnboards           = capnpTrip.getNodesCanUnboard();
-                trip.connectionDepartureTimes.resize(nodeTimesCount);
                 // nodeTimesCount - 1, since we process node pairs, we have to stop and the second from last
                 for (unsigned long nodeTimeI = 0; nodeTimeI < nodeTimesCount - 1; nodeTimeI++)
                 {
@@ -115,8 +114,6 @@ namespace TrRouting
                                                      line.mode.isTransferable() ? 0 : -1
                                                      )
                                           );
-
-                    trip.connectionDepartureTimes[nodeTimeI] = departureTimesSeconds[nodeTimeI];
                   } catch (std::out_of_range const& exc) {
                     spdlog::error("Index out of range while parsing connection for trip on line ({}, {})", path.line.longname, boost::uuids::to_string(path.line.uuid));
                     return -1;

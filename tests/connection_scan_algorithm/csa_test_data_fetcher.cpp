@@ -268,8 +268,6 @@ void addTripData(TrRouting::Trip & trip, TrRouting::Path & path, std::vector<TrR
 {
     path.tripsRef.push_back(trip);
 
-    trip.connectionDepartureTimes.resize(arraySize);
-
     for (int nodeTimeI = 0; nodeTimeI < arraySize - 1; nodeTimeI++) {
         connections.push_back(TrRouting::Connection(
             path.nodesRef[nodeTimeI],
@@ -283,8 +281,6 @@ void addTripData(TrRouting::Trip & trip, TrRouting::Path & path, std::vector<TrR
             trip.allowSameLineTransfers,
             -1
         ));
-
-        trip.connectionDepartureTimes[nodeTimeI] = departureTimes[nodeTimeI];
 
     }
 
