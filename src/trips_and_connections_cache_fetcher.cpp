@@ -84,9 +84,7 @@ namespace TrRouting
                                              path,
                                              line.mode,
                                              service,
-                                             line.allowSameLineTransfers,
-                                             capnpTrip.getTotalCapacity(),
-                                             capnpTrip.getSeatedCapacity()));
+                                             line.allowSameLineTransfers));
                 //Current trip
                 Trip & trip = trips.at(tripUuid);
 

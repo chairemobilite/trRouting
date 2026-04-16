@@ -24,17 +24,13 @@ namespace TrRouting
           const Path &apath,
           const Mode &amode,
           const Service &aservice,
-          short aallowSameLineTransfers,
-          int atotalCapacity = -1,
-          int aseatedCapacity = -1): uuid(auuid),
+          short aallowSameLineTransfers): uuid(auuid),
                                      agency(aagency),
                                      line(aline),
                                      path(apath),
                                      mode(amode),
                                      service(aservice),
                                      allowSameLineTransfers(aallowSameLineTransfers),
-                                     totalCapacity(atotalCapacity),
-                                     seatedCapacity(aseatedCapacity),
                                      uid(++global_uid) {}
    
     boost::uuids::uuid uuid;
@@ -44,8 +40,6 @@ namespace TrRouting
     const Mode &mode; //TODO Mode is part of Line, we could merge them
     const Service &service;
     short allowSameLineTransfers;
-    int totalCapacity; //Unused
-    int seatedCapacity; //Unused
     std::vector<std::reference_wrapper<const Connection>> forwardConnections;
     std::vector<std::reference_wrapper<const Connection>> reverseConnections;
     std::vector<int>   connectionDepartureTimes; // tripIndex: [connectionIndex (sequence in trip): departureTimeSeconds]
