@@ -42,7 +42,6 @@ namespace TrRouting
     short allowSameLineTransfers;
     std::vector<std::reference_wrapper<const Connection>> forwardConnections;
     std::vector<std::reference_wrapper<const Connection>> reverseConnections;
-    std::vector<int>   connectionDepartureTimes; // tripIndex: [connectionIndex (sequence in trip): departureTimeSeconds]
 
     uid_t uid; //Local, temporary unique id, used to speed up lookups
 
