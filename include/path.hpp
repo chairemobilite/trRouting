@@ -17,7 +17,6 @@ namespace TrRouting
     Path(const boost::uuids::uuid &auuid,
          const Line &aline,
          const std::string &adirection,
-         const std::string &ainternalId,
          const std::vector<std::reference_wrapper<const Node>> &anodesRef,
          const std::vector<std::reference_wrapper<const Trip>> &atripsRef,
          const std::vector<int> &asegmentsTravelTimeSeconds,
@@ -25,7 +24,6 @@ namespace TrRouting
       uuid(auuid),
       line(aline),
       direction(adirection),
-      internalId(ainternalId),
       nodesRef(anodesRef),
       tripsRef(atripsRef),
       segmentsTravelTimeSeconds(asegmentsTravelTimeSeconds),
@@ -36,13 +34,11 @@ namespace TrRouting
     Path(const boost::uuids::uuid &auuid,
          const Line &aline,
          const std::string &adirection,
-         const std::string &ainternalId,
          const std::vector<NodeTimeDistance> &anodesTimeDistance,
          const std::vector<std::reference_wrapper<const Trip>> &atripsRef):
       uuid(auuid),
       line(aline),
       direction(adirection),
-      internalId(ainternalId),
       tripsRef(atripsRef)
       {
         for (const NodeTimeDistance & ntd: anodesTimeDistance) {
@@ -55,7 +51,6 @@ namespace TrRouting
     boost::uuids::uuid uuid;
     const Line &line;
     std::string direction;
-    std::string internalId;
     std::vector<std::reference_wrapper<const Node>> nodesRef;
     std::vector<std::reference_wrapper<const Trip>> tripsRef;
     //TODO Should probably be integrated with nodes as a NodeTimeDistance object. Need

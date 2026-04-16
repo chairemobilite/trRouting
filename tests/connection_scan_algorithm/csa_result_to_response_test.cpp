@@ -17,12 +17,12 @@ void ResultToResponseFixtureTest::SetUp()
     agency->uuid = uuidGenerator(agencyUuid);
     agency->acronym = "AG";
     agency->name = "AgencyName";
-    line = std::make_unique<TrRouting::Line>(uuidGenerator(lineUuid), *agency, *mode, "LI", "LineName", "", 0);
-    path = std::make_unique<TrRouting::Path>(uuidGenerator(pathUuid), *line, "N", "", std::vector<TrRouting::NodeTimeDistance>(), std::vector<std::reference_wrapper<const TrRouting::Trip>>());
+    line = std::make_unique<TrRouting::Line>(uuidGenerator(lineUuid), *agency, *mode, "LI", "LineName", 0);
+    path = std::make_unique<TrRouting::Path>(uuidGenerator(pathUuid), *line, "N", std::vector<TrRouting::NodeTimeDistance>(), std::vector<std::reference_wrapper<const TrRouting::Trip>>());
     service = std::make_unique<TrRouting::Service>();
     trip = std::make_unique<TrRouting::Trip>(uuidGenerator(tripUuid), *agency, *line, *path, *mode, *service, 0);
-    boardingNode = std::make_unique<TrRouting::Node>(uuidGenerator(boardingNodeUuid), 0, "NC", "NodeName", "", std::make_unique<TrRouting::Point>(boardingNodePoint));
-    unboardingNode = std::make_unique<TrRouting::Node>(uuidGenerator(unboardingNodeUuid), 0, "NC1", "NodeName2", "", std::make_unique<TrRouting::Point>(unboardingNodePoint));
+    boardingNode = std::make_unique<TrRouting::Node>(uuidGenerator(boardingNodeUuid), 0, "NC", "NodeName", std::make_unique<TrRouting::Point>(boardingNodePoint));
+    unboardingNode = std::make_unique<TrRouting::Node>(uuidGenerator(unboardingNodeUuid), 0, "NC1", "NodeName2", std::make_unique<TrRouting::Point>(unboardingNodePoint));
 
     testParameters = std::make_unique<TrRouting::RouteParameters>(
         std::make_unique<TrRouting::Point>(45.5269, -73.58912),

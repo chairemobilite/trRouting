@@ -94,7 +94,6 @@ namespace TrRouting
         ts.emplace(pathUuid, T(pathUuid,
                                lines.at(uuidGenerator(lineUuid)),
                                capnpT.getDirection(),
-                               capnpT.getInternalId(),
                                nodesRef,
                                tripsRef, //TODO This is empty
                                travelTimesSeconds,

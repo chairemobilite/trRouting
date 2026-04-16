@@ -71,7 +71,6 @@ namespace TrRouting
                                           modes.at(capnpT.getMode()),
                                           capnpT.getShortname(),
                                           capnpT.getLongname(),
-                                          capnpT.getInternalId(),
                                           capnpT.getAllowSameLineTransfers()));
       }
     }

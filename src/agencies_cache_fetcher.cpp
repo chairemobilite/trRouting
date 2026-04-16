@@ -74,7 +74,6 @@ namespace TrRouting
         t.uuid           = uuidGenerator(uuid);
         t.acronym        = capnpT.getAcronym();
         t.name           = capnpT.getName();
-        t.internalId     = capnpT.getInternalId();
         t.simulationUuid = simulationUuid.empty() ? uuidNilGenerator() : uuidGenerator(simulationUuid);
         ts[t.uuid] = t;
       }

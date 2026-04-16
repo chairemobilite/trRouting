@@ -22,14 +22,12 @@ namespace TrRouting
          const Mode &amode,
          const std::string &ashortname,
          const std::string &alongname,
-         const std::string &ainternalId,
          short aallowSameLineTransfers):
       uuid(auuid),
       agency(aagency),
       mode(amode),
       shortname(ashortname),
       longname(alongname),
-      internalId(ainternalId),
       allowSameLineTransfers(aallowSameLineTransfers),
       uid(++global_uid) {}
 
@@ -38,7 +36,6 @@ namespace TrRouting
     const Mode &mode;
     std::string shortname;
     std::string longname;
-    std::string internalId;
     short allowSameLineTransfers;
     uid_t uid; //Local, temporary unique id, used to speed up lookups
 
