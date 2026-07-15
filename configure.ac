@@ -12,11 +12,10 @@ LT_INIT
 # AX_ macros copied from the autoconf-archive
 
 # TODO Do we need the strict mode or not here ?
-AX_CXX_COMPILE_STDCXX(17,noext)
+AX_CXX_COMPILE_STDCXX(17,noext,mandatory)
 
 AX_BOOST_BASE
 AX_BOOST_SYSTEM # For include/asio_compatibility.hpp
-AX_BOOST_REGEX # For include/server_http.hpp
 AX_BOOST_PROGRAM_OPTIONS
 AX_BOOST_DATE_TIME # For include/service.hpp
 AX_BOOST_SERIALIZATION # For memcached serialization
@@ -61,6 +60,23 @@ AS_IF(
 # Set memcached conditional
 AM_CONDITIONAL([HAVE_MEMCACHED], [test "x$have_memcached" = xyes])
 
+# Required by drogon
+PKG_CHECK_MODULES([JSONCPP], [jsoncpp])
+CPPFLAGS="$CPPFLAGS $JSONCPP_CFLAGS"
+# Drogon (no official .pc file; check header + libs directly)
+# Fiddle with include path for macOS brew package
+if test -x "$(command -v brew)"; then
+  BREW_PREFIX=`brew --prefix`
+  CPPFLAGS="$CPPFLAGS -I$BREW_PREFIX/include"
+  LDFLAGS="$LDFLAGS -L$BREW_PREFIX/lib"
+fi
+AC_LANG_PUSH([C++])
+AC_CHECK_HEADER([drogon/drogon.h], [], [AC_MSG_ERROR([drogon headers not found])])
+AC_LANG_POP([C++])
+# TODO The trantor and drogon should check actual lib functions
+AC_CHECK_LIB([trantor], [main], [], [AC_MSG_ERROR([libtrantor not found])])
+AC_CHECK_LIB([drogon], [main], [], [AC_MSG_ERROR([libdrogon not found])])
+
 # TODO: Add link to doc of this override flag
 CPPFLAGS+=" -DBOOST_BIND_GLOBAL_PLACEHOLDERS"
 
@@ -70,12 +86,13 @@ AS_IF([test "x$have_memcached" = xyes],
       [CPPFLAGS+=" $MEMCACHED_CFLAGS"])
 
 # Add BOOST flags
-LDFLAGS+=" $BOOST_LDFLAGS $BOOST_REGEX_LIB $BOOST_SYSTEM_LIB $BOOST_PROGRAM_OPTIONS_LIB $BOOST_DATE_TIME_LIB $BOOST_SERIALIZATION_LIB"
+LDFLAGS+=" $BOOST_LDFLAGS $BOOST_SYSTEM_LIB $BOOST_PROGRAM_OPTIONS_LIB $BOOST_DATE_TIME_LIB $BOOST_SERIALIZATION_LIB"
 # Add various flags
 LDFLAGS+=" $PTHREAD_LIBS"
 LDFLAGS+=" $JEMALLOC_LIBS"
 LDFLAGS+=" $CAPNP_LIBS"
 LDFLAGS+=" $SPDLOG_LIBS"
+LDFLAGS+=" $JSONCPP_LIBS"
 # Add memcached flags if available
 AS_IF([test "x$have_memcached" = xyes],
       [LDFLAGS+=" $MEMCACHED_LIBS"])

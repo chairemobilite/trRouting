@@ -146,7 +146,7 @@ namespace TrRouting
       float getWalkingSpeedFactor() const { return 1.0; } // all walking segments are weighted with this value. > 1.0 means faster walking, < 1.0 means slower walking
       float getWalkingSpeedMetersPerSecond() const { return 5/3.6; } // 5 km/h;
 
-      static CommonParameters createCommonParameter(std::vector<std::pair<std::string, std::string>> &parameters,
+      static CommonParameters createCommonParameter(const std::vector<std::pair<std::string, std::string>> &parameters,
                                                     const std::map<boost::uuids::uuid, Scenario> &scenarios
       );
 
@@ -213,7 +213,7 @@ namespace TrRouting
        * If there are missing or invalid parameters, this function will throw a
        * ParameterException error
        **/
-      static RouteParameters createRouteODParameter(std::vector<std::pair<std::string, std::string>> &parameters,
+      static RouteParameters createRouteODParameter(const std::vector<std::pair<std::string, std::string>> &parameters,
                                                     const std::map<boost::uuids::uuid, Scenario> &scenarios
       );
   };
@@ -249,7 +249,7 @@ namespace TrRouting
        * If there are missing or invalid parameters, this function will throw a
        * ParameterException error
        **/
-      static AccessibilityParameters createAccessibilityParameter(std::vector<std::pair<std::string, std::string>> &parameters,
+      static AccessibilityParameters createAccessibilityParameter(const std::vector<std::pair<std::string, std::string>> &parameters,
                                                     const std::map<boost::uuids::uuid, Scenario> &scenarios
       );
   };
