@@ -39,7 +39,7 @@ namespace TrRouting
   {
   }
 
-  AccessibilityParameters AccessibilityParameters::createAccessibilityParameter(std::vector<std::pair<std::string, std::string>> &parameters, const std::map<boost::uuids::uuid, Scenario> &scenarios)
+  AccessibilityParameters AccessibilityParameters::createAccessibilityParameter(const std::vector<std::pair<std::string, std::string>> &parameters, const std::map<boost::uuids::uuid, Scenario> &scenarios)
   {
     std::optional<Point> place;
 

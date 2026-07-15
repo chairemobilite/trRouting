@@ -65,7 +65,7 @@ namespace TrRouting
     }
   }
 
-  CommonParameters CommonParameters::createCommonParameter(std::vector<std::pair<std::string, std::string>> &parameters, const std::map<boost::uuids::uuid, Scenario> &scenarios)
+  CommonParameters CommonParameters::createCommonParameter(const std::vector<std::pair<std::string, std::string>> &parameters, const std::map<boost::uuids::uuid, Scenario> &scenarios)
   {
     boost::uuids::string_generator uuidGenerator;
 

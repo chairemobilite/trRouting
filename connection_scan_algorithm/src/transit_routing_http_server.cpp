@@ -1,19 +1,16 @@
-#include "server_http.hpp"
-#include "client_http.hpp"
-
-//Added for the json-example
-#define BOOST_SPIRIT_THREADSAFE
+#include <drogon/drogon.h>
+#include <trantor/utils/ConcurrentTaskQueue.h>
 
 #include <vector>
 #include <algorithm>
 #include <string>
 #include <iterator>
+#include <atomic>
+#include <functional>
 #include "spdlog/spdlog.h"
 
 #include <boost/uuid/uuid.hpp>
 #include <boost/program_options.hpp>
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
 #include <boost/algorithm/string.hpp>
 
 #include "cache_fetcher.hpp"
@@ -35,8 +32,8 @@
 
 using namespace TrRouting;
 
-typedef SimpleWeb::Server<SimpleWeb::HTTP> HttpServer;
-typedef SimpleWeb::Client<SimpleWeb::HTTP> HttpClient;
+typedef std::function<void(const drogon::HttpResponsePtr &)> HandlerCallback;
+typedef std::function<void(const drogon::HttpRequestPtr &, HandlerCallback &&)> Handler;
 
 std::string intializeResponse(DataStatus status)
 {
@@ -103,6 +100,64 @@ std::string getResponseCode(ParameterException::Type type)
   }
 }
 
+// Build a JSON response with the same headers the previous implementation
+// streamed by hand (CORS + content type). Content-Length is handled by Drogon.
+static drogon::HttpResponsePtr makeJsonResponse(const std::string &body,
+                                                drogon::HttpStatusCode code = drogon::k200OK)
+{
+  auto resp = drogon::HttpResponse::newHttpResponse();
+  resp->setStatusCode(code);
+  resp->setContentTypeString("application/json; charset=utf-8");
+  resp->addHeader("Access-Control-Allow-Origin", "*");
+  resp->setBody(body);
+  return resp;
+}
+
+// Query parameters as the vector of pairs expected by the parameter parsers
+static std::vector<std::pair<std::string, std::string>> extractParameters(const drogon::HttpRequestPtr &request)
+{
+  std::vector<std::pair<std::string, std::string>> parametersWithValues;
+  for (const auto &field : request->getParameters())
+  {
+    parametersWithValues.push_back(std::make_pair(field.first, field.second));
+  }
+  return parametersWithValues;
+}
+
+// Run a calculation on the compute pool and reply through the Drogon callback.
+// The compute function returns the JSON response body; ParameterException and
+// unknown exceptions are mapped to the same 400 responses as before.
+static void runCalculation(trantor::ConcurrentTaskQueue &computePool,
+                           const std::string &name,
+                           HandlerCallback &&callback,
+                           std::function<std::string()> compute)
+{
+  computePool.runTaskInQueue(
+    [name, callback = std::move(callback), compute = std::move(compute)]() {
+      try
+      {
+        callback(makeJsonResponse(compute()));
+      } catch (ParameterException &exp) {
+        auto responseCode = getResponseCode(exp.getType());
+        spdlog::info("-- parameter exception in {} calculation -- {}", name, responseCode);
+        std::string response = "{\"status\": \"query_error\", \"errorCode\": \"" + responseCode + "\"}";
+        callback(makeJsonResponse(response, drogon::k400BadRequest));
+      } catch (const std::exception &e) {
+        spdlog::error("-- unknown exception in {} calculation -- {}", name, e.what());
+        std::string response = "{\"status\": \"query_error\", \"errorCode\": \"PARAM_ERROR_UNKNOWN\"}";
+        callback(makeJsonResponse(response, drogon::k400BadRequest));
+      }
+    });
+}
+
+// Register a GET handler for both /path and /path/ to keep the behavior of
+// the previous "[/]?" route regexes
+static void registerGet(const std::string &path, Handler handler)
+{
+  drogon::app().registerHandler(path, Handler(handler), {drogon::Get});
+  drogon::app().registerHandler(path + "/", std::move(handler), {drogon::Get});
+}
+
 int main(int argc, char** argv) {
 
   // Set params:
@@ -111,7 +166,7 @@ int main(int argc, char** argv) {
 
   // setup program options:
   spdlog::info("Starting transit routing on port {} for the data: {}", programOptions.port, programOptions.cachePath);
-  
+
   if (programOptions.debug) {
     spdlog::set_level(spdlog::level::debug);
   }
@@ -143,7 +198,7 @@ int main(int argc, char** argv) {
   // Wrap the geoFilter with memcached if requested and available
   if (programOptions.useMemcached) {
   #ifdef HAVE_MEMCACHED
-    geoFilter =  new TrRouting::MemcachedGeoFilter(geoFilter, programOptions.memcachedServers, 3600, programOptions.numberOfThreads);
+    geoFilter = new TrRouting::MemcachedGeoFilter(geoFilter, programOptions.memcachedServers, 3600, programOptions.numberOfThreads);
     spdlog::info("Using memcached for caching GeoFilter results with server(s): {}", programOptions.memcachedServers);
     // Don't delete the original filter, as it's now managed by the cached filter
   #else
@@ -151,49 +206,40 @@ int main(int argc, char** argv) {
   #endif
   }
 
-  spdlog::info("preparing server with {} threads...", programOptions.numberOfThreads);
+  spdlog::info("preparing server with {} compute threads...", programOptions.numberOfThreads);
 
-  HttpServer server;
-  server.config.port = programOptions.port;
-  server.config.thread_pool_size = programOptions.numberOfThreads;
-  server.config.reuse_port = programOptions.enableReusePort; // Allow multiple processes to share a port if set
+  // Compute pool for the CSA calculations. This is where --threads goes now:
+  // the Drogon IO loops only accept connections and parse HTTP, all heavy
+  // work is dispatched here so IO is never blocked by a calculation.
+  trantor::ConcurrentTaskQueue computePool(programOptions.numberOfThreads, "csa-compute");
 
   // updateCache:
-  server.resource["^/updateCache[/]?$"]["GET"]=[&server, &transitData](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
+  registerGet("/updateCache",
+    [&transitData](const drogon::HttpRequestPtr &request, HandlerCallback &&callback) {
 
     std::string              response {""};
-    std::vector<std::string> parametersWithValues;
-    std::vector<std::string> parameterWithValueVector;
-    std::string              queryString;
     std::string              customCacheDirectoryPath {""};
     std::string              cacheNamesStr {""};
     std::vector<std::string> cacheNames;
     std::vector<std::string> cacheNamesVector;
 
     // prepare parameters:
-    auto queryFields = request->parse_query_string();
-    for(auto &field : queryFields)
+    for (const auto &field : request->getParameters())
     {
-      parametersWithValues.push_back(field.first + "=" + field.second);
-    }
+      const std::string &parameterName = field.first;
 
-    for(auto & parameterWithValue : parametersWithValues)
-    {
-      boost::split(parameterWithValueVector, parameterWithValue, boost::is_any_of("="));
-
-      if (parameterWithValueVector[0] == "names" || parameterWithValueVector[0] == "caches" || parameterWithValueVector[0] == "cache_names" || parameterWithValueVector[0] == "name" || parameterWithValueVector[0] == "cache" || parameterWithValueVector[0] == "cache_name")
+      if (parameterName == "names" || parameterName == "caches" || parameterName == "cache_names" || parameterName == "name" || parameterName == "cache" || parameterName == "cache_name")
       {
-
-        boost::split(cacheNamesVector, parameterWithValueVector[1], boost::is_any_of(","));
+        boost::split(cacheNamesVector, field.second, boost::is_any_of(","));
         for(std::string cacheName : cacheNamesVector)
         {
           cacheNames.push_back(cacheName);
         }
         continue;
       }
-      if (parameterWithValueVector[0] == "path" || parameterWithValueVector[0] == "custom_path" || parameterWithValueVector[0] == "custom_cache_path")
+      if (parameterName == "path" || parameterName == "custom_path" || parameterName == "custom_cache_path")
       {
-        customCacheDirectoryPath = parameterWithValueVector[1];
+        customCacheDirectoryPath = field.second;
         continue;
       }
     }
@@ -260,58 +306,45 @@ int main(int argc, char** argv) {
       response = "{\"status\": \"error\", \"error\": \"missing or wrong cache name\"}";
     }
 
-    *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
+    callback(makeJsonResponse(response));
 
-  };
-
-
-
-
-
+  });
 
   // closeServer and exit app:
-  server.resource["^/exit[/]?\\?([0-9a-zA-Z&=_,:/.-]+)$"]["GET"]=[&server](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> ) {
+  registerGet("/exit",
+    [](const drogon::HttpRequestPtr &, HandlerCallback &&callback) {
 
-    std::string response {""};
-    *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
+    callback(makeJsonResponse(""));
 
-    // todo
+    // todo (drogon::app().quit() will stop the event loops and return from run())
 
-  };
-
-
-
-
-
+  });
 
   // Routing request for a single origin destination
-  // TODO Copy-pasted and adapted from /route/v1/transit. There's still a lot of common code. Application code should be extracted to common functions outside the web server
-  server.resource["^/v2/route[/]?$"]["GET"]=[&server, &dataStatus, &transitData, &geoFilter](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
+  registerGet("/v2/route",
+    [&dataStatus, &transitData, &geoFilter, &computePool](const drogon::HttpRequestPtr &request, HandlerCallback &&callback) {
     // Have a global id to match the requests in the logs
-    static int routeRequestId = 0;
-    std::string response = getFastErrorResponse(dataStatus);
+    static std::atomic<int> routeRequestId {0};
 
-    if (!response.empty()) {
-      *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
+    std::string fastError = getFastErrorResponse(dataStatus);
+    if (!fastError.empty()) {
+      callback(makeJsonResponse(fastError));
       return;
     }
-    Calculator calculator(transitData, *geoFilter);
 
-    // prepare parameters:
-    std::vector<std::pair<std::string, std::string>> parametersWithValues;
-    auto queryFields = request->parse_query_string();
-    for(auto &field : queryFields)
-    {
-      parametersWithValues.push_back(std::make_pair(field.first, field.second));
-    }
+    auto parametersWithValues = extractParameters(request);
     int currentRequestId = routeRequestId++;
-    spdlog::info("-- calculating route request -- {}", currentRequestId);
 
-    try
-    {
+    runCalculation(computePool, "route", std::move(callback),
+      [parametersWithValues = std::move(parametersWithValues), currentRequestId, &transitData, &geoFilter]() -> std::string {
+
+      spdlog::info("-- calculating route request -- {}", currentRequestId);
+
+      Calculator calculator(transitData, *geoFilter);
       RouteParameters queryParams = RouteParameters::createRouteODParameter(parametersWithValues, transitData.getScenarios());
 
       try {
+        std::string response;
         if (queryParams.isWithAlternatives())
         {
           TrRouting::AlternativesResult alternativeResult = calculator.alternativesRouting(queryParams);
@@ -326,64 +359,40 @@ int main(int argc, char** argv) {
         }
 
         spdlog::info("-- route request complete -- {}", currentRequestId);
+        return response;
 
       } catch (NoRoutingFoundException &e) {
-        response = ResultToV2Response::noRoutingFoundResponse(queryParams, e.getReason()).dump(2);
         spdlog::info("-- route request not found -- {}", currentRequestId);
-
+        return ResultToV2Response::noRoutingFoundResponse(queryParams, e.getReason()).dump(2);
       }
-
-      *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
-
-    } catch (ParameterException &exp) {
-      auto responseCode = getResponseCode(exp.getType());
-      spdlog::info("-- parameter exception in route calculation -- {}", responseCode);
-      response = "{\"status\": \"query_error\", \"errorCode\": \"" + responseCode + "\"}";
-      *serverResponse << "HTTP/1.1 400 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
-    } catch (...) {
-      std::exception_ptr eptr = std::current_exception(); // capture
-      try {
-          std::rethrow_exception(eptr);
-      } catch(const std::exception& e) {
-          spdlog::error("-- unknown exception in route calculation -- {}", e.what());
-          std::cout << "Caught exception \"" << e.what() << "\"\n";
-      }
-      response = "{\"status\": \"query_error\", \"errorCode\": \"PARAM_ERROR_UNKNOWN\"}";
-      *serverResponse << "HTTP/1.1 400 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
-    }
-
-  };
+    });
+  });
 
   // Request a summary of lines data for a route
-  // TODO Copy pasted from v2/route. There's a lot in common, it should be extracted to common class, just the response parser is different
-  server.resource["^/v2/summary[/]?$"]["GET"]=[&server, &dataStatus, &transitData, &geoFilter](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
+  registerGet("/v2/summary",
+    [&dataStatus, &transitData, &geoFilter, &computePool](const drogon::HttpRequestPtr &request, HandlerCallback &&callback) {
     // Have a global id to match the requests in the logs
-    static int summaryRequestId = 0;
+    static std::atomic<int> summaryRequestId {0};
 
-    std::string response = getFastErrorResponse(dataStatus);
-
-    if (!response.empty()) {
-      *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
+    std::string fastError = getFastErrorResponse(dataStatus);
+    if (!fastError.empty()) {
+      callback(makeJsonResponse(fastError));
       return;
     }
-    Calculator calculator(transitData, *geoFilter);
 
-    // prepare parameters:
-    std::vector<std::pair<std::string, std::string>> parametersWithValues;
-    auto queryFields = request->parse_query_string();
-    for(auto &field : queryFields)
-    {
-      parametersWithValues.push_back(std::make_pair(field.first, field.second));
-    }
+    auto parametersWithValues = extractParameters(request);
     int currentRequestId = summaryRequestId++;
 
-    spdlog::info("-- calculating summary request -- {}", currentRequestId);
+    runCalculation(computePool, "summary", std::move(callback),
+      [parametersWithValues = std::move(parametersWithValues), currentRequestId, &transitData, &geoFilter]() -> std::string {
 
-    try
-    {
+      spdlog::info("-- calculating summary request -- {}", currentRequestId);
+
+      Calculator calculator(transitData, *geoFilter);
       RouteParameters queryParams = RouteParameters::createRouteODParameter(parametersWithValues, transitData.getScenarios());
 
       try {
+        std::string response;
         if (queryParams.isWithAlternatives())
         {
           TrRouting::AlternativesResult alternativeResult = calculator.alternativesRouting(queryParams);
@@ -398,132 +407,76 @@ int main(int argc, char** argv) {
         }
 
         spdlog::info("-- summary request complete -- {}", currentRequestId);
+        return response;
 
       } catch (NoRoutingFoundException &e) {
-        response = ResultToV2SummaryResponse::noRoutingFoundResponse(queryParams, e.getReason()).dump(2);
         spdlog::info("-- summary request not found -- {}", currentRequestId);
+        return ResultToV2SummaryResponse::noRoutingFoundResponse(queryParams, e.getReason()).dump(2);
       }
+    });
+  });
 
-      *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
-
-    } catch (ParameterException &exp) {
-      auto responseCode = getResponseCode(exp.getType());
-      spdlog::info("-- parameter exception in summary calculation -- {}", responseCode);
-      response = "{\"status\": \"query_error\", \"errorCode\": \"" + responseCode + "\"}";
-      *serverResponse << "HTTP/1.1 400 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
-    } catch (...) {
-      std::exception_ptr eptr = std::current_exception(); // capture
-      try {
-          std::rethrow_exception(eptr);
-      } catch(const std::exception& e) {
-          spdlog::error("-- unknown exception in summary calculation -- {}", e.what());
-          std::cout << "Caught exception \"" << e.what() << "\"\n";
-      }
-      response = "{\"status\": \"query_error\", \"errorCode\": \"PARAM_ERROR_UNKNOWN\"}";
-      *serverResponse << "HTTP/1.1 400 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
-    }
-
-  };
-
-  // Routing request for a single origin destination
-  // TODO Copy-pasted and adapted from /route/v1/transit. There's still a lot of common code. Application code should be extracted to common functions outside the web server
-  server.resource["^/v2/accessibility[/]?$"]["GET"]=[&server, &dataStatus, &transitData, &geoFilter](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
+  // Accessibility map from/to a single point
+  registerGet("/v2/accessibility",
+    [&dataStatus, &transitData, &geoFilter, &computePool](const drogon::HttpRequestPtr &request, HandlerCallback &&callback) {
     // Have a global id to match the requests in the logs
-    static int accessibilityRequestId = 0;
+    static std::atomic<int> accessibilityRequestId {0};
 
-    std::string response = getFastErrorResponse(dataStatus);
-
-    if (!response.empty()) {
-      *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
+    std::string fastError = getFastErrorResponse(dataStatus);
+    if (!fastError.empty()) {
+      callback(makeJsonResponse(fastError));
       return;
     }
-    Calculator calculator(transitData, *geoFilter);
 
-    // prepare parameters:
-    std::vector<std::pair<std::string, std::string>> parametersWithValues;
-    auto queryFields = request->parse_query_string();
-    for(auto &field : queryFields)
-    {
-      parametersWithValues.push_back(std::make_pair(field.first, field.second));
-    }
-
+    auto parametersWithValues = extractParameters(request);
     int currentRequestId = accessibilityRequestId++;
-    spdlog::info("-- calculating accessibility request -- {}", currentRequestId);
 
-    try
-    {
+    runCalculation(computePool, "accessibility", std::move(callback),
+      [parametersWithValues = std::move(parametersWithValues), currentRequestId, &transitData, &geoFilter]() -> std::string {
+
+      spdlog::info("-- calculating accessibility request -- {}", currentRequestId);
+
+      Calculator calculator(transitData, *geoFilter);
       AccessibilityParameters queryParams = AccessibilityParameters::createAccessibilityParameter(parametersWithValues, transitData.getScenarios());
 
       try {
+        std::string response;
         std::unique_ptr<AllNodesResult> accessibilityResult = calculator.calculateAllNodes(queryParams);
         if (accessibilityResult.get() != nullptr) {
           response = ResultToV2AccessibilityResponse::resultToJsonString(*accessibilityResult.get(), queryParams).dump(2);
         }
 
         spdlog::info("-- accessibility request complete -- {}", currentRequestId);
+        return response;
 
       } catch (NoRoutingFoundException &e) {
-        response = ResultToV2AccessibilityResponse::noRoutingFoundResponse(queryParams, e.getReason()).dump(2);
         spdlog::info("-- accessibility request not found -- {}", currentRequestId);
+        return ResultToV2AccessibilityResponse::noRoutingFoundResponse(queryParams, e.getReason()).dump(2);
       }
-
-      *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
-
-    } catch (ParameterException &exp) {
-      auto responseCode = getResponseCode(exp.getType());
-      spdlog::info("-- parameter exception in accessibility map calculation -- {}", responseCode);
-      response = "{\"status\": \"query_error\", \"errorCode\": \"" + responseCode + "\"}";
-      *serverResponse << "HTTP/1.1 400 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
-    } catch (...) {
-      std::exception_ptr eptr = std::current_exception(); // capture
-      try {
-          std::rethrow_exception(eptr);
-      } catch(const std::exception& e) {
-          spdlog::error("-- unknown exception in accessibility calculation -- {}", e.what());
-          std::cout << "Caught exception \"" << e.what() << "\"\n";
-      }
-      response = "{\"status\": \"query_error\", \"errorCode\": \"PARAM_ERROR_UNKNOWN\"}";
-      *serverResponse << "HTTP/1.1 400 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
-    }
-
-  };
-
-  server.default_resource["GET"] = [](std::shared_ptr<HttpServer::Response> serverResponse, std::shared_ptr<HttpServer::Request> request) {
-    spdlog::info("calculating request: {}", request->content.string());
-
-    std::string response = "{\"status\": \"error\", \"error\": \"missing params\"}";
-
-    *serverResponse << "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: application/json; charset=utf-8\r\nContent-Length: " << response.length() << "\r\n\r\n" << response;
-  };
-
-  server.on_error = [](std::shared_ptr<HttpServer::Request> /*request*/, const SimpleWeb::error_code & /*ec*/) {
-    // Handle errors here
-    // Note that connection timeouts will also call this handle with ec set to SimpleWeb::errc::operation_canceled
-  };
-
-  spdlog::info("starting server...");
-  std::thread server_thread([&server](){
-    server.start();
+    });
   });
 
-  // Wait for server to start so that the client can connect:
-  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  // Default handler for unmatched paths (replaces default_resource)
+  drogon::app().setDefaultHandler(
+    [](const drogon::HttpRequestPtr &request, HandlerCallback &&callback) {
+    spdlog::info("unmatched request: {}", request->path());
 
-  spdlog::info("ready.");
+    callback(makeJsonResponse("{\"status\": \"error\", \"error\": \"missing params\"}"));
+  });
 
-  server_thread.join();
+  spdlog::info("starting server...");
+
+  drogon::app().enableReusePort(programOptions.enableReusePort);
+  drogon::app()
+    .addListener("0.0.0.0", programOptions.port)
+    .setThreadNum(4) // IO event loops only; calculations run on the compute pool
+    .registerBeginningAdvice([]() {
+      spdlog::info("ready.");
+    })
+    .run(); // blocks until drogon::app().quit()
 
   // Cleanup
   delete fetcher;
 
   return 0;
 }
-
-
-
-
-
-
-
-
-

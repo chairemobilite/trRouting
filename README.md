@@ -41,13 +41,15 @@ brew install capnp
 brew install spdlog
 brew install nlohmann-json
 brew install libmemcached
+brew install drogon
 ```
 
 libmemcached is optional
+
 ## Ubuntu 24.04 Install
 
-```
-sudo apt install libboost-all-dev libjemalloc-dev libcapnp-dev capnproto libexpat1-dev libjsoncpp-dev libspdlog-dev nlohmann-json3-dev
+```bash
+sudo apt install libboost-all-dev libjemalloc-dev libcapnp-dev capnproto libexpat1-dev libjsoncpp-dev libspdlog-dev nlohmann-json3-dev libdrogon-dev
 ```
 You if you haven't installed other basic build dependencies, like autoconf, you will need to install them:
 ```
