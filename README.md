@@ -36,6 +36,7 @@ the system, hence why it's marked as optional in the instructions bellow
 ## Mac OS X Install with homebrew
 ```
 brew install boost
+brew install jemalloc
 brew install capnp
 brew install spdlog
 brew install nlohmann-json
@@ -46,7 +47,7 @@ libmemcached is optional
 ## Ubuntu 24.04 Install
 
 ```
-sudo apt install libboost-all-dev libcapnp-dev capnproto libexpat1-dev libjsoncpp-dev libspdlog-dev nlohmann-json3-dev
+sudo apt install libboost-all-dev libjemalloc-dev libcapnp-dev capnproto libexpat1-dev libjsoncpp-dev libspdlog-dev nlohmann-json3-dev
 ```
 You if you haven't installed other basic build dependencies, like autoconf, you will need to install them:
 ```

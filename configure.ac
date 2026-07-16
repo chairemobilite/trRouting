@@ -23,6 +23,8 @@ AX_BOOST_SERIALIZATION # For memcached serialization
 
 AX_PTHREAD # Explicitely checking, needed by std::thread
 
+PKG_CHECK_MODULES([JEMALLOC], [jemalloc]) # For performance enhancement
+
 PKG_CHECK_MODULES(CAPNP, capnp)
 # Check for the capnp binary presence
 AC_PATH_PROG(CAPNP_BIN, capnp, no)
@@ -71,6 +73,7 @@ AS_IF([test "x$have_memcached" = xyes],
 LDFLAGS+=" $BOOST_LDFLAGS $BOOST_REGEX_LIB $BOOST_SYSTEM_LIB $BOOST_PROGRAM_OPTIONS_LIB $BOOST_DATE_TIME_LIB $BOOST_SERIALIZATION_LIB"
 # Add various flags
 LDFLAGS+=" $PTHREAD_LIBS"
+LDFLAGS+=" $JEMALLOC_LIBS"
 LDFLAGS+=" $CAPNP_LIBS"
 LDFLAGS+=" $SPDLOG_LIBS"
 # Add memcached flags if available
