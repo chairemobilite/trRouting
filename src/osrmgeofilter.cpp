@@ -64,7 +64,7 @@ namespace TrRouting {
       queryString += "&sources=0";
     }
 
-    std::stringstream responseJsonSs;
+    nlohmann::json responseJson;
     try {
       using HttpClient = SimpleWeb::Client<SimpleWeb::HTTP>;
       HttpClient client(host + ":" + port);
@@ -77,14 +77,12 @@ namespace TrRouting {
         return accessibleNodesFootpaths;
       }
 
-      responseJsonSs << s->content.rdbuf();
+      responseJson = nlohmann::json::parse(s->content);
     } catch (const std::exception& e){
-      spdlog::error("exception during OSRM request: {}", e.what());
+      spdlog::error("exception during OSRM request or response parsing: : {}", e.what());
       //TODO See above TODO about handling the errors
       return accessibleNodesFootpaths;
     }
-    
-    nlohmann::json responseJson = nlohmann::json::parse(responseJsonSs.str());
 
     if (responseJson["durations"] != nullptr && responseJson["distances"] != nullptr && responseJson["durations"][0] != nullptr && responseJson["distances"][0] != nullptr)
     {
