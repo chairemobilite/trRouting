@@ -11,4 +11,8 @@ on:
 jobs:
   retry:
     name: Process rate-limited reviews
+    permissions:
+      pull-requests: write
+      contents: read
     uses: chairemobilite/transition/.github/workflows/coderabbit-retry.yml@main
+    secrets: inherit
