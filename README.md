@@ -5,8 +5,8 @@ Transit routing server app written in C++ using the Connection Scan Algorithm in
 With random origin and destination (multiple accessible stops at origin and destination): ~150 ms for access and egress footpaths calculation, ~8 ms for CSA two-way calculation (tested with montreal area GTFS data including all urban and suburban transit agencies, with transfer footpaths between stops of 10 minutes walking or less) on a MacPro 2013 with single thread used (you can start multiple servers and execute parallel requests).
 
 ## References
-[Connection Scan Algorithm (CSA)][1] (working version)  
-[Trib-Based Algorithm (TBA)][2] (not yet released)
+[Connection Scan Algorithm (CSA)][1] (working version)
+[Trip-Based Algorithm (TBA)][2] (not yet released)
 
 ## API Documentation
 
@@ -16,8 +16,8 @@ https://chairemobilite.github.io/trRouting/
 ## Dependencies
 [Open Source Routing Machine (OSRM)][3] (an osrm server with a walking profile must be running for the transit region while making queries to the trRouting server, see [OSRM profiles][5] for more profile info and [Running OSRM][6] to know how to prepare osm data for OSRM and start the server)
 
-[1]: https://i11www.iti.kit.edu/extra/publications/dpsw-isftr-13.pdf "Intriguingly Simple and Fast Transit Routing"
-[2]: https://arxiv.org/pdf/1504.07149v2.pdf "Trip-Based Public Transit Routing"
+[1]: https://www.ben-strasser.net/paper/intriguingly_simple_and_fast_transit_routing_symposium_on_experimental_algorithms_sea.pdf "Intriguingly Simple and Fast Transit Routing" (publisher link: https://link.springer.com/chapter/10.1007/978-3-642-38527-8_6)
+[2]: https://publikationen.bibliothek.kit.edu/1000097658/37678794 "Trip-Based Public Transit Routing"
 [3]: https://github.com/Project-OSRM/osrm-backend/ "Open Source Routing Machine Github Repository"
 [4]: https://github.com/Project-OSRM/osrm-backend/wiki "OSRM Wiki"
 [5]: https://github.com/Project-OSRM/osrm-backend/blob/master/docs/profiles.md "OSRM profiles"
