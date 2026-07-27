@@ -470,6 +470,9 @@ int main(int argc, char** argv) {
   drogon::app()
     .addListener("0.0.0.0", programOptions.port)
     .setThreadNum(4) // IO event loops only; calculations run on the compute pool
+    .setIdleConnectionTimeout(1200)  // by default drogon kick an idle connection after 60 seconds
+                                     // but we have calculation that can run longer
+                                     // For now set a really long time to still clean up stale connections
     .registerBeginningAdvice([]() {
       spdlog::info("ready.");
     })
