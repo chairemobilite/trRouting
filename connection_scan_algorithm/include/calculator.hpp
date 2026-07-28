@@ -77,6 +77,13 @@ namespace TrRouting
 
     std::vector<int>        optimizeJourney(std::deque<JourneyStep> &journey);
 
+    // Start the timer used by the per-step debug timing logs. The constructor
+    // does this for a fresh Calculator; a reused one needs it called once at
+    // each request boundary. Deliberately not done in reset(), since
+    // alternativesRouting() resets once per alternative while the timer is
+    // meant to span the whole request.
+    void startRequestTimer() { algorithmCalculationTime.start(); }
+
   private:
     void initializeCalculationData();
     bool resetAccessFootpaths(const CommonParameters &parameters, const Point& origin);

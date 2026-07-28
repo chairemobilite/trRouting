@@ -28,13 +28,13 @@ namespace TrRouting
     if (resetAccessPaths)
     {
       accessFootpaths.clear();
-      accessFootpaths.shrink_to_fit();
       egressFootpaths.clear();
-      egressFootpaths.shrink_to_fit();
     }
     tripsQueryOverlay.assign(Trip::getMaxUid()+1, TripQueryData());
     forwardJourneysSteps.clear();
     reverseJourneysSteps.clear();
+    nodesAccess.clear();
+    nodesEgress.clear();
 
     
     departureTimeSeconds = -1;
@@ -72,7 +72,6 @@ namespace TrRouting
 
       int footpathTravelTimeSeconds;
       int footpathDistanceMeters;
-      nodesAccess.clear();
       forwardJourneysSteps.assign(Node::getMaxUid() + 1, JourneyStep());
       nodesTentativeTime.assign(Node::getMaxUid() + 1, MAX_INT); //Assign default values to all indexes
       
@@ -108,7 +107,6 @@ namespace TrRouting
 
       int footpathTravelTimeSeconds;
       int footpathDistanceMeters;
-      nodesEgress.clear();
       reverseJourneysSteps.assign(Node::getMaxUid() + 1, JourneyStep());
       nodesReverseTentativeTime.assign(Node::getMaxUid() + 1, -1); //Assign default values to all indexes
       for (auto & egressFootpath : egressFootpaths)

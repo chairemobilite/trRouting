@@ -150,6 +150,23 @@ static void runCalculation(trantor::ConcurrentTaskQueue &computePool,
     });
 }
 
+// Return the Calculator owned by the calling compute thread, creating it on
+// first use. Constructing a Calculator per request allocated (and immediately
+// freed) network-sized containers, which dominated system time under load.
+// The compute pool threads live for the whole process, and a task always runs
+// to completion on a single thread, so one instance per thread is safe and
+// lets reset() reuse warm allocations instead of faulting in fresh pages.
+// Note: this must not be called from the Drogon IO loop threads, only from
+// tasks queued on the compute pool.
+static Calculator & getThreadCalculator(const TransitData &transitData, GeoFilter &geoFilter)
+{
+  thread_local Calculator calculator(transitData, geoFilter);
+  // Start the timer at the beginning of each request.
+  // TODO Maybe we should move the timer out of the calculator
+  calculator.startRequestTimer();
+  return calculator;
+}
+
 // Register a GET handler for both /path and /path/ to keep the behavior of
 // the previous "[/]?" route regexes
 static void registerGet(const std::string &path, Handler handler)
@@ -340,7 +357,7 @@ int main(int argc, char** argv) {
 
       spdlog::info("-- calculating route request -- {}", currentRequestId);
 
-      Calculator calculator(transitData, *geoFilter);
+      Calculator &calculator = getThreadCalculator(transitData, *geoFilter);
       RouteParameters queryParams = RouteParameters::createRouteODParameter(parametersWithValues, transitData.getScenarios());
 
       try {
@@ -388,7 +405,7 @@ int main(int argc, char** argv) {
 
       spdlog::info("-- calculating summary request -- {}", currentRequestId);
 
-      Calculator calculator(transitData, *geoFilter);
+      Calculator &calculator = getThreadCalculator(transitData, *geoFilter);
       RouteParameters queryParams = RouteParameters::createRouteODParameter(parametersWithValues, transitData.getScenarios());
 
       try {
@@ -436,7 +453,7 @@ int main(int argc, char** argv) {
 
       spdlog::info("-- calculating accessibility request -- {}", currentRequestId);
 
-      Calculator calculator(transitData, *geoFilter);
+      Calculator &calculator = getThreadCalculator(transitData, *geoFilter);
       AccessibilityParameters queryParams = AccessibilityParameters::createAccessibilityParameter(parametersWithValues, transitData.getScenarios());
 
       try {
