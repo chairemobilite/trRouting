@@ -87,6 +87,8 @@ namespace TrRouting
 
         ts[scenarioUuid].name           = capnpT.getName();
         ts[scenarioUuid].simulationUuid = simulationUuid.empty() ? uuidNilGenerator() : uuidGenerator(simulationUuid);
+        // Print scenario ID on data load for an easier way to find a test scenario without relying on Transition
+        spdlog::info("Serving scenario {} ({})", uuid, ts[scenarioUuid].name);
         
         for (std::string serviceUuidStr : capnpT.getServicesUuids())
         {
