@@ -25,6 +25,7 @@ const int NB_ITER = 30;
 // Global test suite variables, they should not be reset for each test
 TransitData* transitData; //TODO Required only to get the scenario, we might want to get it in another way
 EuclideanGeoFilter* geoFilter;
+Calculator* calculator;
 std::ofstream benchmarkResultsFile;
 std::ofstream benchmarkDetailedResultsFile;
 
@@ -59,6 +60,8 @@ protected:
     return true;
   }
 
+  
+
 public:
 
   // Initialize calculator and parameters. Open the result files and add headers
@@ -74,6 +77,35 @@ public:
       return;
     }
 
+    // Create a global calculator to mimic the thread local approach from the server
+    calculator = new Calculator(*transitData, *geoFilter);
+
+    // Warm-up run: first calculation grows the allocator arenas and touches the
+    // data structures for the first time. Discard it so it doesn't skew results.
+    {
+      const Scenario & scenario = transitData->getScenarios().at(scenarioUuid);
+      TrRouting::RouteParameters warmupParams = TrRouting::RouteParameters(
+        std::make_unique<TrRouting::Point>(45.552398, -73.577867),
+        std::make_unique<TrRouting::Point>(45.542273, -73.622594),
+        scenario,
+        8 * 60 * 60,
+        3 * 60,
+        180 * 60,
+        20 * 60,
+        20 * 60,
+        20 * 60,
+        15 * 60,
+        false,
+        true
+      );
+      std::cout << "Warming up calculator..." << std::endl;
+      try {
+        calculator->calculateSingle(warmupParams);
+      } catch (TrRouting::NoRoutingFoundException&) {
+        // Ignored, we only care about the side effects of running once
+      }
+    }
+    
     // Prepare the result files
     time_t rawtime;
     struct tm * timeinfo;
@@ -97,6 +129,7 @@ public:
   {
     benchmarkResultsFile.close();
     benchmarkDetailedResultsFile.close();
+    // TODO We should delete the various objects allocated in the Setup. Not urgent, since we don't run it mulitple times
   }
 
   void benchmarkCurrentParams(TrRouting::RouteParameters &routeParams, bool expectResult, int nbIter)
@@ -110,16 +143,14 @@ public:
 
       if (routeParams.isWithAlternatives()) {
         try {
-          Calculator calculator(*transitData, *geoFilter);
-          calculator.alternativesRouting(routeParams);
+          calculator->alternativesRouting(routeParams);
           ASSERT_TRUE(expectResult);
         } catch (TrRouting::NoRoutingFoundException& e) {
           ASSERT_FALSE(expectResult);
         }
       } else {
         try {
-          Calculator calculator(*transitData, *geoFilter);
-          calculator.calculateSingle(routeParams);
+          calculator->calculateSingle(routeParams);
           ASSERT_TRUE(expectResult);
         } catch (TrRouting::NoRoutingFoundException& e) {
           ASSERT_FALSE(expectResult);
