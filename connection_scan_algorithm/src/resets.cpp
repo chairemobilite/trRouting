@@ -188,6 +188,7 @@ namespace TrRouting
     return egressFootpathOk;
   }
 
+  /* Disable trips for alternatives calculations */
   void Calculator::resetFilters(const CommonParameters &parameters) {
     spdlog::debug("  resetting filters");
 
@@ -197,63 +198,13 @@ namespace TrRouting
     // This loop is required for alternatives, where parameters have more
     // exclusions than the scenario (the combinations of lines). It is not
     // redundant with the one in the connection cache generator
-    // TODO: This code is very similar to the one in getConnectionsForScenario, extract it
     tripsDisabled.clear();
     for (auto & tripIte : connectionSet.get()->getTrips())
     {
       const Trip & trip = tripIte.get();
       bool enabled = true;
 
-      if (enabled && parameters.getOnlyServices().size() > 0)
-      {
-        if (std::find(parameters.getOnlyServices().begin(), parameters.getOnlyServices().end(), trip.service) == parameters.getOnlyServices().end())
-        {
-          enabled = false;
-        }
-      }
-
-      if (enabled && parameters.getOnlyLines().size() > 0)
-      {
-        if (std::find(parameters.getOnlyLines().begin(), parameters.getOnlyLines().end(), trip.line) == parameters.getOnlyLines().end())
-        {
-          enabled = false;
-        }
-      }
-
-      if (enabled && parameters.getOnlyModes().size() > 0)
-      {
-        if (std::find(parameters.getOnlyModes().begin(), parameters.getOnlyModes().end(), trip.mode) == parameters.getOnlyModes().end())
-        {
-          enabled = false;
-        }
-      }
-
-      if (enabled  && parameters.getOnlyNodes().size() > 0)
-      {
-        // FIXME: This is not right, it should look for a node, not the mode
-        // FIXME2: Commented out, since mode is now typed, it won't match
-        /*if (std::find(parameters.getOnlyNodesIdx()->begin(), parameters.getOnlyNodesIdx()->end(), trip->modeIdx) == parameters.getOnlyNodesIdx()->end())
-          {
-          enabled = -1;
-          }(*/
-      }
-
-      if (enabled && parameters.getOnlyAgencies().size() > 0)
-      {
-        if (std::find(parameters.getOnlyAgencies().begin(), parameters.getOnlyAgencies().end(), trip.agency) == parameters.getOnlyAgencies().end())
-        {
-          enabled = false;
-        }
-      }
-
-      if (enabled && parameters.getExceptServices().size() > 0)
-      {
-        if (std::find(parameters.getExceptServices().begin(), parameters.getExceptServices().end(), trip.service) != parameters.getExceptServices().end())
-        {
-          enabled = false;
-        }
-      }
-
+      // Currently alternatives only excludes some lines, so that's the only filter needed
       if (enabled && parameters.getExceptLines().size() > 0)
       {
         if (std::find(parameters.getExceptLines().begin(), parameters.getExceptLines().end(), trip.line) != parameters.getExceptLines().end())
@@ -261,32 +212,7 @@ namespace TrRouting
           enabled = false;
         }
       }
-      if (enabled && parameters.getExceptNodes().size() > 0)
-      {
-        // FIXME: This is not right, it should look for a node, not the mode
-        // FIXME2: Commented out, since mode is now typed, it won't match
-        /*
-          if (std::find(parameters.getExceptNodesIdx()->begin(), parameters.getExceptNodesIdx()->end(), trip.modeIdx) != parameters.getExceptNodesIdx()->end())
-          {
-          enabled = false;
-          }*/
-      }
 
-      if (enabled && parameters.getExceptModes().size() > 0)
-      {
-        if (std::find(parameters.getExceptModes().begin(), parameters.getExceptModes().end(), trip.mode) != parameters.getExceptModes().end())
-        {
-          enabled = false;
-        }
-      }
-
-      if (enabled && parameters.getExceptAgencies().size() > 0)
-      {
-        if (std::find(parameters.getExceptAgencies().begin(), parameters.getExceptAgencies().end(), trip.agency) != parameters.getExceptAgencies().end())
-        {
-          enabled = false;
-        }
-      }
       if (!enabled) {
         tripsDisabled[trip.uid] = true;
       }
