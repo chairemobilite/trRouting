@@ -25,8 +25,8 @@ namespace TrRouting
     );
   }
   
-  std::unique_ptr<SingleCalculationResult> Calculator::calculateSingle(RouteParameters &parameters, bool resetAccessPaths, bool resetFilters) {
-    reset(parameters, *parameters.getOrigin(), *parameters.getDestination(), resetAccessPaths, resetFilters);
+  std::unique_ptr<SingleCalculationResult> Calculator::calculateSingle(RouteParameters &parameters, bool resetAccessPaths, AlternativeFilter *alternativeFilter) {
+    reset(parameters, *parameters.getOrigin(), *parameters.getDestination(), resetAccessPaths, alternativeFilter);
 
     std::unique_ptr<SingleCalculationResult> result;
 
@@ -151,7 +151,6 @@ namespace TrRouting
     reset(parameters, 
         parameters.isForwardCalculation() ? std::make_optional(*parameters.getPlace()) : std::nullopt, 
         parameters.isForwardCalculation() ? std::nullopt : std::make_optional(*parameters.getPlace()),
-        true,
         true
     );
 

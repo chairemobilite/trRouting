@@ -12,11 +12,12 @@
 #include "transit_data.hpp"
 #include "connection_set.hpp"
 #include "geofilter.hpp"
+#include "alternative_filter.hpp"
 
 namespace TrRouting
 {
 
-  void Calculator::reset(CommonParameters &parameters, std::optional<std::reference_wrapper<const Point>> origin, std::optional<std::reference_wrapper<const Point>> destination, bool resetAccessPaths, bool doResetFilters)
+  void Calculator::reset(CommonParameters &parameters, std::optional<std::reference_wrapper<const Point>> origin, std::optional<std::reference_wrapper<const Point>> destination, bool resetAccessPaths, AlternativeFilter *alternativeFilter)
   {
     
     //TODO Should we just check the size of accessFootpath and egressFootpath instead of adding a flag?
@@ -148,12 +149,15 @@ namespace TrRouting
     
     calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();
 
+    // Save a copy of the current connection set
+    connectionSet = transitData.getConnectionsForScenario(parameters.getScenario());
 
-    // disable trips according to parameters:
+    // Clear the tripsDisabled before applying the filter, so we don't carry previous filter around.
+    tripsDisabled.clear();
 
-    if (doResetFilters)
-    {
-      resetFilters(parameters);
+    // disable trips according for alternatives:
+    if (alternativeFilter) {
+      alternativeFilter->runFilter(tripsDisabled, (*connectionSet));
     }
 
     spdlog::debug("-- filter trips -- {} microseconds ", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);
@@ -186,38 +190,6 @@ namespace TrRouting
     }
 
     return egressFootpathOk;
-  }
-
-  /* Disable trips for alternatives calculations */
-  void Calculator::resetFilters(const CommonParameters &parameters) {
-    spdlog::debug("  resetting filters");
-
-    // TODO med term. Instead of the scenario as cache key, it could be the parameters, with services, lines and agencies
-    connectionSet = transitData.getConnectionsForScenario(parameters.getScenario());
-
-    // This loop is required for alternatives, where parameters have more
-    // exclusions than the scenario (the combinations of lines). It is not
-    // redundant with the one in the connection cache generator
-    tripsDisabled.clear();
-    for (auto & tripIte : connectionSet.get()->getTrips())
-    {
-      const Trip & trip = tripIte.get();
-      bool enabled = true;
-
-      // Currently alternatives only excludes some lines, so that's the only filter needed
-      if (enabled && parameters.getExceptLines().size() > 0)
-      {
-        if (std::find(parameters.getExceptLines().begin(), parameters.getExceptLines().end(), trip.line) != parameters.getExceptLines().end())
-        {
-          enabled = false;
-        }
-      }
-
-      if (!enabled) {
-        tripsDisabled[trip.uid] = true;
-      }
-    }
-
   }
 
 }

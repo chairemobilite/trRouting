@@ -10,6 +10,7 @@
 #include "routing_result.hpp"
 #include "point.hpp"
 #include "transit_data.hpp"
+#include "alternative_filter.hpp"
 
 namespace {
   // Placed in anynymous namespace so it's local to this file
@@ -87,7 +88,6 @@ namespace TrRouting
   AlternativesResult Calculator::alternativesRouting(RouteParameters &parameters)
   {
     using LineVector = std::vector<std::reference_wrapper<const Line>>;
-    LineVector exceptLinesFromParameters = parameters.getExceptLines(); // make a copy of lines that are already disabled in parameters
     std::vector< LineVector >  allCombinations;
     std::vector< LineVector >  failedCombinations;
     bool                             combinationMatchesWithFailed {false};
@@ -187,19 +187,15 @@ namespace TrRouting
       {
         // Generate parameters to send to calculate
         const LineVector combination = allCombinations.at(i);
-        // TODO: The exception should be part of the calculation specific parameters, which do not exist yet
-        alternativeParameters.exceptLines = exceptLinesFromParameters; // reset except lines using parameters
-        for (auto line : combination)
-        {
-          alternativeParameters.exceptLines.push_back(line);
-        }
+
+        AlternativeLineFilter lineFilter(combination);
 
         spdlog::debug("calculating alternative {} from a total of {} ...", alternativeSequence, alternativesCalculatedCount);
         
         spdlog::debug("except lines: {}", LinesToString(combination));
 
         try {
-          result = calculateSingle(alternativeParameters, false, true);
+          result = calculateSingle(alternativeParameters, false, &lineFilter);
 
           SingleCalculationResult& alternativeCalcResult = *result.get();
 

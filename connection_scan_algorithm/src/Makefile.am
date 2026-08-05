@@ -2,7 +2,8 @@ AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/connection_scan_algorithm/
 
 noinst_LTLIBRARIES = libcsa.la
 
-libcsa_la_SOURCES = alternatives_routing.cpp \
+libcsa_la_SOURCES = alternative_filter.cpp \
+	           alternatives_routing.cpp \
 		   calculator.cpp \
 		   forward_calculation.cpp \
 		   forward_journey.cpp \

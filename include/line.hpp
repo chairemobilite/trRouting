@@ -2,6 +2,7 @@
 #define TR_LINE
 
 #include <string>
+#include <memory>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_io.hpp>
 
