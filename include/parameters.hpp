@@ -82,6 +82,7 @@ namespace TrRouting
       int maxInnerTimeOfTripBufferSeconds;
 
       boost::uuids::uuid scenarioUuid;
+      //TODO We don't do anything with those filter at the moment
       std::vector<std::reference_wrapper<const Service>> onlyServices;
       std::vector<std::reference_wrapper<const Line>> onlyLines;
       std::vector<std::reference_wrapper<const Agency>> onlyAgencies;
@@ -89,11 +90,7 @@ namespace TrRouting
       std::vector<std::reference_wrapper<const Node>> onlyNodes;
       //TODO exceptServices is never filled with anything
       std::vector<std::reference_wrapper<const Service>> exceptServices;
-      // FIXME: Temporarily moved to public until calculation specific parameters exist. This is used directly by alternatives routing.
-      // see https://github.com/chairemobilite/trRouting/issues/95
-    public:
       std::vector<std::reference_wrapper<const Line>> exceptLines;
-    private:
       std::vector<std::reference_wrapper<const Agency>> exceptAgencies;
       std::vector<std::reference_wrapper<const Mode>> exceptModes;
       std::vector<std::reference_wrapper<const Node>> exceptNodes;

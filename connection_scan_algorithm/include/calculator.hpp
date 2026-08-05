@@ -42,6 +42,7 @@ namespace TrRouting
   class ConnectionSet;
   class Point;
   class GeoFilter;
+  class AlternativeFilter;
 
   class Calculator {
 
@@ -49,13 +50,13 @@ namespace TrRouting
 
     Calculator(const TransitData &_transitData, GeoFilter &_geofilter);
 
-    void reset(CommonParameters &parameters, std::optional<std::reference_wrapper<const Point>> origin, std::optional<std::reference_wrapper<const Point>> destination, bool resetAccessPaths = true, bool resetFilters = true);
+    void reset(CommonParameters &parameters, std::optional<std::reference_wrapper<const Point>> origin, std::optional<std::reference_wrapper<const Point>> destination, bool resetAccessPaths = true, AlternativeFilter *alternativeFilter = nullptr);
     // TODO This function supports both allNodes and simple calculation, which
     // are 2 very different return values. They should be split so it can return
     // a concrete result object instead of pointer (that alternatives could use directly), but still
     // use common calculation functions
     // TODO Once the split is done, we can get rid of the unique_ptr return and have the right concret type returned directly
-    std::unique_ptr<SingleCalculationResult> calculateSingle(RouteParameters &parameters, bool resetAccessPaths = true, bool resetFilters = true);
+    std::unique_ptr<SingleCalculationResult> calculateSingle(RouteParameters &parameters, bool resetAccessPaths = true, AlternativeFilter *alternativeFilter = nullptr);
     std::unique_ptr<AllNodesResult> calculateAllNodes(AccessibilityParameters &parameters);
 
     // Forward and and reverse calculation, in addition to their return values will fill up their JourneysSteps map
@@ -88,7 +89,6 @@ namespace TrRouting
     void initializeCalculationData();
     bool resetAccessFootpaths(const CommonParameters &parameters, const Point& origin);
     bool resetEgressFootpaths(const CommonParameters &parameters, const Point& destination);
-    void resetFilters(const CommonParameters &parameters);
     // Convert the optimization case ID returned by optimizeJourney to a string
     std::string optimizeCasesToString(const std::vector<int> optimizeCases);
     std::unique_ptr<SingleCalculationResult> calculateSingleReverse(RouteParameters &parameters);

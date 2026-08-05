@@ -3,6 +3,7 @@
 
 #include <boost/uuid/uuid.hpp>
 #include <vector>
+#include <optional>
 #include "toolbox.hpp" //MAX_INT
 
 namespace TrRouting
