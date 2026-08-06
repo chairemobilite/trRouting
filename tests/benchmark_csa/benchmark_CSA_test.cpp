@@ -13,7 +13,6 @@
 #include "parameters.hpp"
 #include "routing_result.hpp"
 #include "scenario.hpp"
-#include "calculator.hpp"
 #include "benchmark_CSA_test.hpp"
 #include "transit_data.hpp"
 #include "euclideangeofilter.hpp"
