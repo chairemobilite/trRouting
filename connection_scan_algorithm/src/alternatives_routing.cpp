@@ -7,7 +7,6 @@
 #include "line.hpp"
 #include "parameters.hpp"
 #include "combinations.hpp"
-#include "routing_result.hpp"
 #include "point.hpp"
 #include "transit_data.hpp"
 #include "alternative_filter.hpp"
