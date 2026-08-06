@@ -44,7 +44,7 @@ namespace TrRouting
       return "Line " + boost::uuids::to_string(uuid) + "\n  shortname " + shortname + "\n  longname " + longname;
     }
 
-    // Equal operator. We only compare the uid, since they should be unique.
+    // Equal operator. We only compare the uid, since they are unique.
     inline bool operator==(const Line& other ) const { return uid == other.uid; }
     inline bool operator<(const Line& other ) const { return uid < other.uid; }
     inline bool operator!=(const Line& other ) const { return uid != other.uid; }

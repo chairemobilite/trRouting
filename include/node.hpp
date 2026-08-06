@@ -44,7 +44,7 @@ namespace TrRouting
     const std::string toString() {
       return "Node " + boost::uuids::to_string(uuid) + " (id " + std::to_string(id) + ")\n  code " + code + "\n  name " + name + "\n  latitude " + std::to_string(point.get()->latitude)  + "\n  longitude " + std::to_string(point.get()->longitude);
     }
-    // Equal operator. We only compare the local uid, since they should be unique.
+    // Equal operator. We only compare the local uid, since they are unique.
     inline bool operator==(const Node& other ) const { return uid == other.uid; }
     inline bool operator<(const Node& other ) const { return uid < other.uid; }
     inline bool operator!=(const Node& other ) const { return uid != other.uid; }
