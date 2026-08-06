@@ -27,7 +27,7 @@ namespace TrRouting
     int  bestDepartureTime                {-1};
 
     //TODO could be passed as a parameter
-    auto & reverseConnections = connectionSet.get()->getReverseConnections();
+    auto & reverseConnections = connectionSet->getReverseConnections();
     
     int  arrivalTimeHour  = arrivalTimeSeconds / 3600;
 
@@ -35,7 +35,7 @@ namespace TrRouting
 
     // main loop for reverse connections:
     auto lastConnection = reverseConnections.end();
-    for(auto connection = connectionSet.get()->getReverseConnectionsBeginAtArrivalHour(arrivalTimeHour + 1); connection != lastConnection; ++connection)
+    for(auto connection = connectionSet->getReverseConnectionsBeginAtArrivalHour(arrivalTimeHour + 1); connection != lastConnection; ++connection)
     {
       // ignore connections after arrival time - minimum egress travel time:
       if ((*connection).get().getArrivalTime() <= arrivalTimeSeconds - minEgressTravelTime)
@@ -250,7 +250,7 @@ namespace TrRouting
     short journeyConnectionMinWaitingTimeSeconds {-1};
 
     //TODO could be passed as a parameter
-    auto & reverseConnections = connectionSet.get()->getReverseConnections();
+    auto & reverseConnections = connectionSet->getReverseConnections();
 
     int  arrivalTimeHour  = arrivalTimeSeconds / 3600;
 
@@ -258,7 +258,7 @@ namespace TrRouting
 
     // main loop for reverse connections:
     auto lastConnection = reverseConnections.end();
-    for(auto connection = connectionSet.get()->getReverseConnectionsBeginAtArrivalHour(arrivalTimeHour + 1); connection != lastConnection; ++connection)
+    for(auto connection = connectionSet->getReverseConnectionsBeginAtArrivalHour(arrivalTimeHour + 1); connection != lastConnection; ++connection)
     {
       // ignore connections after arrival time - minimum egress travel time:
       if ((*connection).get().getArrivalTime() <= arrivalTimeSeconds)
