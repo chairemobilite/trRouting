@@ -35,7 +35,6 @@ namespace TrRouting
   int CacheFetcher::getCacheFilesCount(std::string cacheFilePath) {
     std::ifstream iCacheFile;
     iCacheFile.open(cacheFilePath);
-    std::string strCount;
     int count {1};
     if (iCacheFile.is_open())
     {
