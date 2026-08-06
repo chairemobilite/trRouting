@@ -19,10 +19,6 @@ namespace TrRouting
     int   connectionDepartureTime         {-1};
     int   connectionArrivalTime           {-1};
     short connectionMinWaitingTimeSeconds {-1};
-    //long long   footpathsRangeStart       {-1};
-    //long long   footpathsRangeEnd         {-1};
-    int   footpathTravelTime              {-1};
-    int   footpathDistance                {-1};
     int   tentativeEgressNodeArrivalTime  {MAX_INT};
     bool  reachedAtLeastOneEgressNode     {false};
     bool  nodeWasAccessedFromOrigin       {false};
@@ -151,13 +147,13 @@ namespace TrRouting
                 }
 
                 //TODO We should not do a direct == with float values
-                footpathTravelTime = parameters.getWalkingSpeedFactor() == 1.0 ? transferableNode.time : (int)ceil((float)transferableNode.time / parameters.getWalkingSpeedFactor());
+                int footpathTravelTime = parameters.getWalkingSpeedFactor() == 1.0 ? transferableNode.time : (int)ceil((float)transferableNode.time / parameters.getWalkingSpeedFactor());
 
                 if (footpathTravelTime <= parameters.getMaxTransferWalkingTravelTimeSeconds())
                 {
                   if (footpathTravelTime + connectionArrivalTime < currentTransferablenNodesTentativeTime)
                   {
-                    footpathDistance = transferableNode.distance;
+                    int footpathDistance = transferableNode.distance;
                     nodesTentativeTime[transferableNode.node.uid] = footpathTravelTime + connectionArrivalTime;
 
                     //TODO DO we need a make_optional here??
@@ -175,7 +171,7 @@ namespace TrRouting
                     )
                   )
                   {
-                    footpathDistance = transferableNode.distance;
+                    int footpathDistance = transferableNode.distance;
                     forwardEgressJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(currentTripQueryOverlay.enterConnection, *connection, std::cref(trip), footpathTravelTime, true, footpathDistance));
                   }
                 }
@@ -236,10 +232,6 @@ namespace TrRouting
     int   connectionDepartureTime         {-1};
     int   connectionArrivalTime           {-1};
     short connectionMinWaitingTimeSeconds {-1};
-    //long long   footpathsRangeStart       {-1};
-    //long long   footpathsRangeEnd         {-1};
-    int   footpathTravelTime              {-1};
-    int   footpathDistance                {-1};
     bool  nodeWasAccessedFromOrigin       {false};
 
     int  connectionsCount  = connectionSet.get()->getForwardConnections().size();
@@ -323,13 +315,13 @@ namespace TrRouting
                 }
 
                 //TODO We should not do a direct == with float values
-                footpathTravelTime = parameters.getWalkingSpeedFactor() == 1.0 ? transferableNode.time : (int)ceil((float)transferableNode.time / parameters.getWalkingSpeedFactor());
+                int footpathTravelTime = parameters.getWalkingSpeedFactor() == 1.0 ? transferableNode.time : (int)ceil((float)transferableNode.time / parameters.getWalkingSpeedFactor());
 
                 if (footpathTravelTime <= parameters.getMaxTransferWalkingTravelTimeSeconds())
                 {
                   if (footpathTravelTime + connectionArrivalTime < currentTransferablenNodesTentativeTime)
                   {
-                    footpathDistance = transferableNode.distance;
+                    int footpathDistance = transferableNode.distance;
                     nodesTentativeTime[transferableNode.node.uid] = footpathTravelTime + connectionArrivalTime;
 
                     //TODO DO we need a make_optional here??
@@ -347,7 +339,7 @@ namespace TrRouting
                     )
                   )
                   {
-                    footpathDistance = transferableNode.distance;
+                    int footpathDistance = transferableNode.distance;
                     forwardEgressJourneysSteps.insert_or_assign(transferableNode.node.uid, JourneyStep(currentTripQueryOverlay.enterConnection, *connection, std::cref(trip), footpathTravelTime, true, footpathDistance));
                   }
                 }
