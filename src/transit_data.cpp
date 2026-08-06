@@ -119,9 +119,6 @@ namespace TrRouting {
     return generateForwardAndReverseConnections();
   }
 
-  const int CONNECTION_ITERATOR_CACHE_BEGIN_HOUR = 0;
-  const int CONNECTION_ITERATOR_CACHE_END_HOUR = 32;
-
   int TransitData::generateForwardAndReverseConnections()
   {
 
