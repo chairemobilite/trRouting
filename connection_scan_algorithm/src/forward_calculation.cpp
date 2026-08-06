@@ -24,12 +24,11 @@ namespace TrRouting
     bool  nodeWasAccessedFromOrigin       {false};
     int   bestArrivalTime                 {MAX_INT};
     
-    int  connectionsCount  = connectionSet.get()->getForwardConnections().size();
     int  departureTimeHour = departureTimeSeconds / 3600;
 
     // main loop:
-    auto lastConnection = connectionSet.get()->getForwardConnections().end(); // cache last connection for loop
-    for(auto connection = connectionSet.get()->getForwardConnectionsBeginAtDepartureHour(departureTimeHour); connection != lastConnection; ++connection)
+    auto lastConnection = connectionSet->getForwardConnections().end(); // cache last connection for loop
+    for(auto connection = connectionSet->getForwardConnectionsBeginAtDepartureHour(departureTimeHour); connection != lastConnection; ++connection)
     {
       
       // ignore connections before departure time + minimum access travel time:
@@ -183,7 +182,7 @@ namespace TrRouting
       }
     }
 
-    spdlog::debug("-- {} forward connections parsed on {}", reachableConnectionsCount, connectionsCount);
+    spdlog::debug("-- {} forward connections parsed on {}", reachableConnectionsCount, connectionSet->getForwardConnections().size());
 
     if (reachableConnectionsCount == 0) {
       throw NoRoutingFoundException(NoRoutingReason::NO_SERVICE_FROM_ORIGIN);
@@ -234,12 +233,11 @@ namespace TrRouting
     short connectionMinWaitingTimeSeconds {-1};
     bool  nodeWasAccessedFromOrigin       {false};
 
-    int  connectionsCount  = connectionSet.get()->getForwardConnections().size();
     int  departureTimeHour = departureTimeSeconds / 3600;
 
     // main loop:
-    auto lastConnection = connectionSet.get()->getForwardConnections().end(); // cache last connection for loop
-    for(auto connection = connectionSet.get()->getForwardConnectionsBeginAtDepartureHour(departureTimeHour); connection != lastConnection; ++connection)
+    auto lastConnection = connectionSet->getForwardConnections().end(); // cache last connection for loop
+    for(auto connection = connectionSet->getForwardConnectionsBeginAtDepartureHour(departureTimeHour); connection != lastConnection; ++connection)
     {
       // ignore connections before departure time + minimum access travel time:
       if ((*connection).get().getDepartureTime() >= departureTimeSeconds + minAccessTravelTime)
@@ -351,7 +349,7 @@ namespace TrRouting
       }
     }
 
-    spdlog::debug("-- {} forward connections parsed on {}", reachableConnectionsCount, connectionsCount);
+    spdlog::debug("-- {} forward connections parsed on {}", reachableConnectionsCount, connectionSet->getForwardConnections().size());
 
     if (reachableConnectionsCount == 0) {
       throw NoRoutingFoundException(NoRoutingReason::NO_SERVICE_FROM_ORIGIN);
