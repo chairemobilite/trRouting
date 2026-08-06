@@ -46,7 +46,10 @@ namespace TrRouting
 
     uid_t uid; //Local, temporary unique id, used to speed up lookups
 
-    inline bool operator==(const Trip& other ) const { return uuid == other.uuid; }
+    // Equal operator. We only compare the uid, since they are unique.
+    inline bool operator==(const Trip& other ) const { return uid == other.uid; }
+    inline bool operator<(const Trip& other ) const { return uid < other.uid; }
+    inline bool operator!=(const Trip& other ) const { return uid != other.uid; }
 
     static uid_t getMaxUid() { return global_uid; }
   private:
