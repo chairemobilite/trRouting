@@ -21,11 +21,6 @@ namespace TrRouting
     int  connectionArrivalTime            {-1};
     short connectionMinWaitingTimeSeconds {-1};
     short journeyConnectionMinWaitingTimeSeconds {-1};
-    //long long  footpathsRangeStart        {-1};
-    //long long  footpathsRangeEnd          {-1};
-    int  footpathIndex                    {-1};
-    int  footpathTravelTime               {-1};
-    int  footpathDistance                 {-1};
     int  tentativeAccessNodeDepartureTime {-1};
     bool reachedAtLeastOneAccessNode      {false};
     bool nodeWasEgressedAtDestination     {false};
@@ -34,7 +29,6 @@ namespace TrRouting
     //TODO could be passed as a parameter
     auto & reverseConnections = connectionSet.get()->getReverseConnections();
     
-    int  connectionsCount = reverseConnections.size();
     int  arrivalTimeHour  = arrivalTimeSeconds / 3600;
 
     // reverse calculation:
@@ -152,18 +146,17 @@ namespace TrRouting
 
                 if (nodeDeparture != transferableNode.node && nodesReverseTentativeTime.at(transferableNode.node.uid) > connectionDepartureTime - connectionMinWaitingTimeSeconds)
                 {
-                  footpathIndex++;
                   continue;
                 }
 
                 //TODO We should not do a direct == with float values
-                footpathTravelTime = parameters.getWalkingSpeedFactor() == 1.0 ? transferableNode.time : (int)ceil((float)transferableNode.time / parameters.getWalkingSpeedFactor());
+                int footpathTravelTime = parameters.getWalkingSpeedFactor() == 1.0 ? transferableNode.time : (int)ceil((float)transferableNode.time / parameters.getWalkingSpeedFactor());
 
                 if (footpathTravelTime <= parameters.getMaxTransferWalkingTravelTimeSeconds())
                 {                  
                   if (connectionDepartureTime - footpathTravelTime - connectionMinWaitingTimeSeconds >= nodesReverseTentativeTime.at(transferableNode.node.uid))
                   {
-                    footpathDistance = transferableNode.distance;
+                    int footpathDistance = transferableNode.distance;
                     nodesReverseTentativeTime[transferableNode.node.uid] = connectionDepartureTime - footpathTravelTime - connectionMinWaitingTimeSeconds;
                     //TODO Do we need a make_optional<...>(connection) ??
                     reverseJourneysSteps.at(transferableNode.node.uid) =  JourneyStep(*connection, currentTripQueryOverlay.exitConnection, std::cref(trip), footpathTravelTime, (nodeDeparture == transferableNode.node), footpathDistance);
@@ -207,7 +200,7 @@ namespace TrRouting
       }
     }
     
-    spdlog::debug("-- {}  reverse connections parsed on {}", reachableConnectionsCount, connectionsCount);
+    spdlog::debug("-- {}  reverse connections parsed on {}", reachableConnectionsCount, reverseConnections.size());
 
     if (reachableConnectionsCount == 0) {
       throw NoRoutingFoundException(NoRoutingReason::NO_SERVICE_TO_DESTINATION);
@@ -255,15 +248,10 @@ namespace TrRouting
     int  connectionArrivalTime            {-1};
     short connectionMinWaitingTimeSeconds {-1};
     short journeyConnectionMinWaitingTimeSeconds {-1};
-    //long long  footpathsRangeStart        {-1};
-    //long long  footpathsRangeEnd          {-1};
-    int  footpathTravelTime               {-1};
-    int  footpathDistance                 {-1};
 
     //TODO could be passed as a parameter
     auto & reverseConnections = connectionSet.get()->getReverseConnections();
 
-    int  connectionsCount = reverseConnections.size();
     int  arrivalTimeHour  = arrivalTimeSeconds / 3600;
 
     // reverse calculation:
@@ -350,13 +338,13 @@ namespace TrRouting
                 }
 
                 //TODO We should not do a direct == with float values
-                footpathTravelTime = parameters.getWalkingSpeedFactor() == 1.0 ? transferableNode.time : (int)ceil((float)transferableNode.time / parameters.getWalkingSpeedFactor());
+                int footpathTravelTime = parameters.getWalkingSpeedFactor() == 1.0 ? transferableNode.time : (int)ceil((float)transferableNode.time / parameters.getWalkingSpeedFactor());
 
                 if (footpathTravelTime <= parameters.getMaxTransferWalkingTravelTimeSeconds())
                 {
                   if (connectionDepartureTime - footpathTravelTime - connectionMinWaitingTimeSeconds >= nodesReverseTentativeTime.at(transferableNode.node.uid))
                   {
-                    footpathDistance = transferableNode.distance;
+                    int footpathDistance = transferableNode.distance;
                     nodesReverseTentativeTime[transferableNode.node.uid] = connectionDepartureTime - footpathTravelTime - connectionMinWaitingTimeSeconds;
                     //TODO Do we need a make_optional<...>(connection) ??
                     reverseJourneysSteps.at(transferableNode.node.uid) = JourneyStep(*connection, currentTripQueryOverlay.exitConnection, std::cref(trip), footpathTravelTime, (nodeDeparture == transferableNode.node), footpathDistance);
@@ -400,7 +388,7 @@ namespace TrRouting
       }
     }
 
-    spdlog::debug("-- {}  reverse connections parsed on {}", reachableConnectionsCount, connectionsCount);
+    spdlog::debug("-- {}  reverse connections parsed on {}", reachableConnectionsCount, reverseConnections.size());
 
     if (reachableConnectionsCount == 0) {
       throw NoRoutingFoundException(NoRoutingReason::NO_SERVICE_TO_DESTINATION);
