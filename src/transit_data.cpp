@@ -123,13 +123,10 @@ namespace TrRouting {
   {
 
     // Copy the connections to both forward and reverse vectors
-    forwardConnections.clear();
-    reverseConnections.clear();
-    for (size_t i=0; i<connections.size(); i++)
-    {
-      forwardConnections.push_back(connections[i]);
-      reverseConnections.push_back(connections[i]);
-    }
+    forwardConnections.assign(connections.begin(), connections.end());
+    reverseConnections.assign(connections.begin(), connections.end());
+
+    // Only necessary when someone call updateSchedules with a smaller set of connections
     forwardConnections.shrink_to_fit();
     reverseConnections.shrink_to_fit();
 
