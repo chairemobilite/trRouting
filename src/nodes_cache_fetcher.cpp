@@ -96,11 +96,6 @@ namespace TrRouting
 
     close(cacheFd);
 
-    /*CalculationTime algorithmCalculationTime = CalculationTime();
-    algorithmCalculationTime.start();
-    long long       calculationTime;
-    calculationTime = algorithmCalculationTime.getDurationMicrosecondsNoStop();*/
-
     //std::vector<int>::iterator nodeIndex;
     // find reverse transferable nodes:
     for (auto nodeIter = ts.begin(); nodeIter != ts.end(); nodeIter++)

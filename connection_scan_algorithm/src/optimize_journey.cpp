@@ -43,8 +43,6 @@ namespace TrRouting
 
     std::vector<int> usedOptimizationCases;
 
-    //json["optimizedNodes"] = nlohmann::json::array();
-
     short optimizationCase    {-1}; // 1: CSL, 2: BTS, 3: GTF, 4: CSS | For optimization cases diagrams, see in the references directory
     bool  startedOptimization {false};
     std::vector<std::reference_wrapper<const Node>> ignoreOptimizationNodes;

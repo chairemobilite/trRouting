@@ -99,7 +99,6 @@ namespace TrRouting
     int alternativesCalculatedCount = 1;
     int maxAlternatives = parameters.getMaxAlternatives();
     int lastFoundedAtNum = 0;
-    //int departureTimeSeconds = -1;
 
     spdlog::debug("alternatives parameters:");
     spdlog::debug("  maxTotalTravelTimeSeconds: {}", parameters.getMaxTotalTravelTimeSeconds());
@@ -120,7 +119,6 @@ namespace TrRouting
 
     LineVisitor visitor = LineVisitor();
 
-    //departureTimeSeconds = routingResult.departureTimeSeconds + routingResult.firstWaitingTimeSeconds - params.minWaitingTimeSeconds;
     // TODO Extract the max travel time calculation to a function
     maxTravelTime = parameters.getAlternativesMaxTravelTimeRatio() * routingResult.totalTravelTime + (parameters.isForwardCalculation() ? routingResult.departureTime - parameters.getTimeOfTrip() : 0);
     if (maxTravelTime < parameters.getMinAlternativeMaxTravelTimeSeconds())
@@ -150,8 +148,6 @@ namespace TrRouting
       parameters.isWithAlternatives(),
       commonAlternativeParameters
     );
-
-    //params.departureTimeSeconds = departureTimeSeconds;
 
     spdlog::debug("  fastestTravelTimeSeconds: {} Maximum alternative travel time: {}", routingResult.totalTravelTime, maxTravelTime);
 
