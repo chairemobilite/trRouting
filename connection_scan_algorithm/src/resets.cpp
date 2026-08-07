@@ -17,7 +17,7 @@
 namespace TrRouting
 {
 
-  void Calculator::reset(CommonParameters &parameters, std::optional<std::reference_wrapper<const Point>> origin, std::optional<std::reference_wrapper<const Point>> destination, bool resetAccessPaths, AlternativeFilter *alternativeFilter)
+  void Calculator::reset(const CommonParameters &parameters, std::optional<std::reference_wrapper<const Point>> origin, std::optional<std::reference_wrapper<const Point>> destination, bool resetAccessPaths, AlternativeFilter *alternativeFilter)
   {
     
     //TODO Should we just check the size of accessFootpath and egressFootpath instead of adding a flag?

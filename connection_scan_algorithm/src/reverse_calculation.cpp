@@ -12,7 +12,7 @@
 namespace TrRouting
 {
     
-  std::optional<std::tuple<int, std::reference_wrapper<const Node>>> Calculator::reverseCalculation(RouteParameters &parameters,
+  std::optional<std::tuple<int, std::reference_wrapper<const Node>>> Calculator::reverseCalculation(const RouteParameters &parameters,
                                                                                                     std::unordered_map<Node::uid_t, JourneyStep> & reverseAccessJourneysSteps)
   {
     int  reachableConnectionsCount        {0};
@@ -239,7 +239,7 @@ namespace TrRouting
   }
 
 
-  void Calculator::reverseCalculationAllNodes(AccessibilityParameters &parameters,
+  void Calculator::reverseCalculationAllNodes(const AccessibilityParameters &parameters,
                                               std::unordered_map<Node::uid_t, JourneyStep> & reverseAccessJourneysSteps)
   {
     int  reachableConnectionsCount        {0};

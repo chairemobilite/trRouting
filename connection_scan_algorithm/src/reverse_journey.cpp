@@ -13,7 +13,7 @@
 
 namespace TrRouting
 {
-  std::unique_ptr<SingleCalculationResult> Calculator::reverseJourneyStep(RouteParameters &parameters, int bestDepartureTime, std::optional<std::reference_wrapper<const Node>> bestAccessNode, const std::unordered_map<Node::uid_t, JourneyStep> & reverseAccessJourneysSteps)
+  std::unique_ptr<SingleCalculationResult> Calculator::reverseJourneyStep(const RouteParameters &parameters, int bestDepartureTime, std::optional<std::reference_wrapper<const Node>> bestAccessNode, const std::unordered_map<Node::uid_t, JourneyStep> & reverseAccessJourneysSteps)
   {
     std::unique_ptr<SingleCalculationResult> singleResult = std::make_unique<SingleCalculationResult>();
 
@@ -272,7 +272,7 @@ namespace TrRouting
     return singleResult;
   }
 
-  std::unique_ptr<AllNodesResult> Calculator::reverseJourneyStepAllNodes(AccessibilityParameters &parameters, const std::unordered_map<Node::uid_t, JourneyStep> & reverseAccessJourneysSteps)
+  std::unique_ptr<AllNodesResult> Calculator::reverseJourneyStepAllNodes(const AccessibilityParameters &parameters, const std::unordered_map<Node::uid_t, JourneyStep> & reverseAccessJourneysSteps)
   {
     std::unique_ptr<AllNodesResult> allNodesResult = std::make_unique<AllNodesResult>();
 

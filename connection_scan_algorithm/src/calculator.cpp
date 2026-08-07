@@ -25,7 +25,7 @@ namespace TrRouting
     );
   }
   
-  std::unique_ptr<SingleCalculationResult> Calculator::calculateSingle(RouteParameters &parameters, bool resetAccessPaths, AlternativeFilter *alternativeFilter) {
+  std::unique_ptr<SingleCalculationResult> Calculator::calculateSingle(const RouteParameters &parameters, bool resetAccessPaths, AlternativeFilter *alternativeFilter) {
     reset(parameters, *parameters.getOrigin(), *parameters.getDestination(), resetAccessPaths, alternativeFilter);
 
     std::unique_ptr<SingleCalculationResult> result;
@@ -100,7 +100,7 @@ namespace TrRouting
   }
 
   // To be called only by calculateSingle, depends on preparations steps done there
-  std::unique_ptr<SingleCalculationResult> Calculator::calculateSingleForward(RouteParameters &parameters) {
+  std::unique_ptr<SingleCalculationResult> Calculator::calculateSingleForward(const RouteParameters &parameters) {
 
     std::unique_ptr<SingleCalculationResult> result;
 
@@ -123,7 +123,7 @@ namespace TrRouting
   }
 
   // To be called only by calculateSingle, depends on preparations steps done there
-  std::unique_ptr<SingleCalculationResult> Calculator::calculateSingleReverse(RouteParameters &parameters) {
+  std::unique_ptr<SingleCalculationResult> Calculator::calculateSingleReverse(const RouteParameters &parameters) {
 
     std::unique_ptr<SingleCalculationResult> result;
 
@@ -147,7 +147,7 @@ namespace TrRouting
     return result;
   }
 
-  std::unique_ptr<AllNodesResult> Calculator::calculateAllNodes(AccessibilityParameters &parameters) {
+  std::unique_ptr<AllNodesResult> Calculator::calculateAllNodes(const AccessibilityParameters &parameters) {
     reset(parameters, 
         parameters.isForwardCalculation() ? std::make_optional(*parameters.getPlace()) : std::nullopt, 
         parameters.isForwardCalculation() ? std::nullopt : std::make_optional(*parameters.getPlace()),

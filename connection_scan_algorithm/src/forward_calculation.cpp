@@ -11,7 +11,7 @@
 namespace TrRouting
 {
   //TODO Need to divide in smaller chunks and reuse common bits between forwardCalculation and forwardCalculationAllNodes
-  std::optional<std::tuple<int, std::reference_wrapper<const Node>>> Calculator::forwardCalculation(RouteParameters &parameters,
+  std::optional<std::tuple<int, std::reference_wrapper<const Node>>> Calculator::forwardCalculation(const RouteParameters &parameters,
                                                                                                     std::unordered_map<Node::uid_t, JourneyStep> & forwardEgressJourneysSteps)
   {
     int   reachableConnectionsCount       {0};
@@ -223,7 +223,7 @@ namespace TrRouting
   }
 
 
-  void Calculator::forwardCalculationAllNodes(AccessibilityParameters &parameters,
+  void Calculator::forwardCalculationAllNodes(const AccessibilityParameters &parameters,
                                                std::unordered_map<Node::uid_t, JourneyStep> & forwardEgressJourneysSteps)
   {
     int   reachableConnectionsCount       {0};

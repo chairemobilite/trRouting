@@ -15,7 +15,7 @@
 namespace TrRouting
 {
 
-  std::unique_ptr<SingleCalculationResult> Calculator::forwardJourneyStep(RouteParameters &parameters, std::optional<std::reference_wrapper<const Node>> bestEgressNode, const std::unordered_map<Node::uid_t, JourneyStep> & forwardEgressJourneysSteps)
+  std::unique_ptr<SingleCalculationResult> Calculator::forwardJourneyStep(const RouteParameters &parameters, std::optional<std::reference_wrapper<const Node>> bestEgressNode, const std::unordered_map<Node::uid_t, JourneyStep> & forwardEgressJourneysSteps)
   {
     std::unique_ptr<SingleCalculationResult> singleResult = std::make_unique<SingleCalculationResult>();
 
@@ -271,7 +271,7 @@ namespace TrRouting
 
   }
 
-  std::unique_ptr<AllNodesResult> Calculator::forwardJourneyStepAllNodes(AccessibilityParameters &parameters, const std::unordered_map<Node::uid_t, JourneyStep> & forwardEgressJourneysSteps)
+  std::unique_ptr<AllNodesResult> Calculator::forwardJourneyStepAllNodes(const AccessibilityParameters &parameters, const std::unordered_map<Node::uid_t, JourneyStep> & forwardEgressJourneysSteps)
   {
     std::unique_ptr<AllNodesResult> allNodesResult = std::make_unique<AllNodesResult>();
 
