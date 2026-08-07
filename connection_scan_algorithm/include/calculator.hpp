@@ -50,31 +50,31 @@ namespace TrRouting
 
     Calculator(const TransitData &_transitData, GeoFilter &_geofilter);
 
-    void reset(CommonParameters &parameters, std::optional<std::reference_wrapper<const Point>> origin, std::optional<std::reference_wrapper<const Point>> destination, bool resetAccessPaths = true, AlternativeFilter *alternativeFilter = nullptr);
+    void reset(const CommonParameters &parameters, std::optional<std::reference_wrapper<const Point>> origin, std::optional<std::reference_wrapper<const Point>> destination, bool resetAccessPaths = true, AlternativeFilter *alternativeFilter = nullptr);
     // TODO This function supports both allNodes and simple calculation, which
     // are 2 very different return values. They should be split so it can return
     // a concrete result object instead of pointer (that alternatives could use directly), but still
     // use common calculation functions
     // TODO Once the split is done, we can get rid of the unique_ptr return and have the right concret type returned directly
-    std::unique_ptr<SingleCalculationResult> calculateSingle(RouteParameters &parameters, bool resetAccessPaths = true, AlternativeFilter *alternativeFilter = nullptr);
-    std::unique_ptr<AllNodesResult> calculateAllNodes(AccessibilityParameters &parameters);
+    std::unique_ptr<SingleCalculationResult> calculateSingle(const RouteParameters &parameters, bool resetAccessPaths = true, AlternativeFilter *alternativeFilter = nullptr);
+    std::unique_ptr<AllNodesResult> calculateAllNodes(const AccessibilityParameters &parameters);
 
     // Forward and and reverse calculation, in addition to their return values will fill up their JourneysSteps map
-    std::optional<std::tuple<int, std::reference_wrapper<const Node>>> forwardCalculation(RouteParameters &parameters, std::unordered_map<Node::uid_t, JourneyStep> & forwardEgressJourneysSteps); // best arrival time,   best egress node
-    void forwardCalculationAllNodes(AccessibilityParameters &parameters, std::unordered_map<Node::uid_t, JourneyStep> & forwardEgressJourneysSteps);
+    std::optional<std::tuple<int, std::reference_wrapper<const Node>>> forwardCalculation(const RouteParameters &parameters, std::unordered_map<Node::uid_t, JourneyStep> & forwardEgressJourneysSteps); // best arrival time,   best egress node
+    void forwardCalculationAllNodes(const AccessibilityParameters &parameters, std::unordered_map<Node::uid_t, JourneyStep> & forwardEgressJourneysSteps);
 
-    std::optional<std::tuple<int, std::reference_wrapper<const Node>>> reverseCalculation(RouteParameters &parameters, std::unordered_map<Node::uid_t, JourneyStep> & reverseAccessJourneysSteps); // best departure time, best access node
-    void reverseCalculationAllNodes(AccessibilityParameters &parameters, std::unordered_map<Node::uid_t, JourneyStep> & reverseAccessJourneysSteps);
-
-    // TODO See calculate
-    std::unique_ptr<SingleCalculationResult> forwardJourneyStep(RouteParameters &parameters, std::optional<std::reference_wrapper<const Node>> bestEgressNode, const std::unordered_map<Node::uid_t, JourneyStep> & forwardEgressJourneysSteps);
-    std::unique_ptr<AllNodesResult> forwardJourneyStepAllNodes(AccessibilityParameters &parameters, const std::unordered_map<Node::uid_t, JourneyStep> & forwardEgressJourneysSteps);
+    std::optional<std::tuple<int, std::reference_wrapper<const Node>>> reverseCalculation(const RouteParameters &parameters, std::unordered_map<Node::uid_t, JourneyStep> & reverseAccessJourneysSteps); // best departure time, best access node
+    void reverseCalculationAllNodes(const AccessibilityParameters &parameters, std::unordered_map<Node::uid_t, JourneyStep> & reverseAccessJourneysSteps);
 
     // TODO See calculate
-    std::unique_ptr<SingleCalculationResult> reverseJourneyStep(RouteParameters &parameters, int bestDepartureTime, std::optional<std::reference_wrapper<const Node>> bestAccessNode, const std::unordered_map<Node::uid_t, JourneyStep> & reverseAccessJourneysSteps);
-    std::unique_ptr<AllNodesResult> reverseJourneyStepAllNodes(AccessibilityParameters &parameters, const std::unordered_map<Node::uid_t, JourneyStep> & reverseAccessJourneysSteps);
+    std::unique_ptr<SingleCalculationResult> forwardJourneyStep(const RouteParameters &parameters, std::optional<std::reference_wrapper<const Node>> bestEgressNode, const std::unordered_map<Node::uid_t, JourneyStep> & forwardEgressJourneysSteps);
+    std::unique_ptr<AllNodesResult> forwardJourneyStepAllNodes(const AccessibilityParameters &parameters, const std::unordered_map<Node::uid_t, JourneyStep> & forwardEgressJourneysSteps);
 
-    AlternativesResult alternativesRouting(RouteParameters &parameters);
+    // TODO See calculate
+    std::unique_ptr<SingleCalculationResult> reverseJourneyStep(const RouteParameters &parameters, int bestDepartureTime, std::optional<std::reference_wrapper<const Node>> bestAccessNode, const std::unordered_map<Node::uid_t, JourneyStep> & reverseAccessJourneysSteps);
+    std::unique_ptr<AllNodesResult> reverseJourneyStepAllNodes(const AccessibilityParameters &parameters, const std::unordered_map<Node::uid_t, JourneyStep> & reverseAccessJourneysSteps);
+
+    AlternativesResult alternativesRouting(const RouteParameters &parameters);
 
     std::vector<int>        optimizeJourney(std::deque<JourneyStep> &journey);
 
@@ -91,8 +91,8 @@ namespace TrRouting
     bool resetEgressFootpaths(const CommonParameters &parameters, const Point& destination);
     // Convert the optimization case ID returned by optimizeJourney to a string
     std::string optimizeCasesToString(const std::vector<int> optimizeCases);
-    std::unique_ptr<SingleCalculationResult> calculateSingleReverse(RouteParameters &parameters);
-    std::unique_ptr<SingleCalculationResult> calculateSingleForward(RouteParameters &parameters);
+    std::unique_ptr<SingleCalculationResult> calculateSingleReverse(const RouteParameters &parameters);
+    std::unique_ptr<SingleCalculationResult> calculateSingleForward(const RouteParameters &parameters);
 
     CalculationTime algorithmCalculationTime;
     //TODO set it mutable so it can be changed/reset?

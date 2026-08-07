@@ -84,7 +84,7 @@ namespace TrRouting
     }
   };
 
-  AlternativesResult Calculator::alternativesRouting(RouteParameters &parameters)
+  AlternativesResult Calculator::alternativesRouting(const RouteParameters &parameters)
   {
     using LineVector = std::vector<std::reference_wrapper<const Line>>;
     std::vector< LineVector >  allCombinations;

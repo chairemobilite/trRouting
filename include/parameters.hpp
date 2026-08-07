@@ -129,7 +129,7 @@ namespace TrRouting
        * @return int 
        */
       int getMaxInnerTimeOfTripBufferSeconds() const { return maxInnerTimeOfTripBufferSeconds; }
-      bool isForwardCalculation() { return forwardCalculation; }
+      bool isForwardCalculation() const { return forwardCalculation; }
       const std::vector<std::reference_wrapper<const Service>>& getOnlyServices() const { return onlyServices; }
       const std::vector<std::reference_wrapper<const Service>>& getExceptServices() const { return exceptServices; }
       const std::vector<std::reference_wrapper<const Line>>& getOnlyLines() const { return onlyLines; }
@@ -190,16 +190,16 @@ namespace TrRouting
       // TODO Should Point be const here?
       Point* getOrigin() const { return origin.get(); }
       Point* getDestination() const { return destination.get(); }
-      bool isWithAlternatives() { return withAlternatives; }
+      bool isWithAlternatives() const { return withAlternatives; }
 
       // TODO Those values used to be in the legacy parameters object. They are not exposed
       // in the V2 api yet, but we used the default values in the alternative calculation.
       // For the moment, let's return default constant values
-      int getMaxAlternatives() { return 200; } // number of alternatives to calculate before returning results (when alternatives parameter is set to true)
-      float getAlternativesMaxTravelTimeRatio() { return 1.75; } // travel time of fastest route is multiplied by this ratio to find plausible alternative with a max travel time.
-      float getMinAlternativeMaxTravelTimeSeconds() { return 30*60; } // if multiplying max travel time ratio with max travel time is too small, keep max travel time to this minimum.
-      int getAlternativesMaxAddedTravelTimeSeconds() { return 60*60; } // how many seconds to add to fastest travel time to limit alternatives travel time.
-      int getMaxValidAlternatives() { return 50; } // max number of valid alternatives to return
+      int getMaxAlternatives() const { return 200; } // number of alternatives to calculate before returning results (when alternatives parameter is set to true)
+      float getAlternativesMaxTravelTimeRatio() const { return 1.75; } // travel time of fastest route is multiplied by this ratio to find plausible alternative with a max travel time.
+      float getMinAlternativeMaxTravelTimeSeconds() const { return 30*60; } // if multiplying max travel time ratio with max travel time is too small, keep max travel time to this minimum.
+      int getAlternativesMaxAddedTravelTimeSeconds() const { return 60*60; } // how many seconds to add to fastest travel time to limit alternatives travel time.
+      int getMaxValidAlternatives() const { return 50; } // max number of valid alternatives to return
 
       /**
        * Factory function to create a routeParameters object from  a map of
