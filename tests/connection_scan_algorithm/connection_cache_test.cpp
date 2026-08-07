@@ -19,25 +19,25 @@ TEST_F(ConnectionSetFixtureTests, TestCacheAssignation)
     // Get the cache a first time for a given scenario
     std::shared_ptr<TrRouting::ConnectionSet> cache = transitData.getConnectionsForScenario(scenario);
 
-    ASSERT_EQ(17, cache->getForwardConnections().size());
-    ASSERT_EQ(17, cache->getReverseConnections().size());
+    ASSERT_EQ(17u, cache->getForwardConnections().size());
+    ASSERT_EQ(17u, cache->getReverseConnections().size());
 
     // Get the cache a second time for the same scenario
     cache = transitData.getConnectionsForScenario(scenario);
 
-    ASSERT_EQ(17, cache->getForwardConnections().size());
-    ASSERT_EQ(17, cache->getReverseConnections().size());
+    ASSERT_EQ(17u, cache->getForwardConnections().size());
+    ASSERT_EQ(17u, cache->getReverseConnections().size());
 
     // Get the cache for a second scenario
     cache = transitData.getConnectionsForScenario(scenario2);
 
-    ASSERT_EQ(9, cache->getForwardConnections().size());
-    ASSERT_EQ(9, cache->getReverseConnections().size());
+    ASSERT_EQ(9u, cache->getForwardConnections().size());
+    ASSERT_EQ(9u, cache->getReverseConnections().size());
 
     // Get the cache for a first scenario again
     cache = transitData.getConnectionsForScenario(scenario);
 
-    ASSERT_EQ(17, cache->getForwardConnections().size());
-    ASSERT_EQ(17, cache->getReverseConnections().size());
+    ASSERT_EQ(17u, cache->getForwardConnections().size());
+    ASSERT_EQ(17u, cache->getReverseConnections().size());
 
 }
