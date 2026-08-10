@@ -21,7 +21,8 @@ csa_test_SOURCES = gtest.cpp \
     parameters/route_param_test.cpp \
     parameters/accessibility_param_test.cpp \
     combinations_test.cpp \
-    alternative_filter_test.cpp
+    alternative_filter_test.cpp \
+    line_combinations_test.cpp
 
 csa_test_LDADD = $(top_srcdir)/tests/libgtest.la ../../connection_scan_algorithm/src/libcsa.la
 
