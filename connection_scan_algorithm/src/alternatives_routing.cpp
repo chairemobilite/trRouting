@@ -95,7 +95,7 @@ namespace TrRouting
     int maxTravelTime;
     int alternativeSequence = 1;
     int alternativesCalculatedCount = 1;
-    int maxAlternatives = parameters.getMaxAlternatives();
+    const int maxAlternatives = parameters.getMaxAlternatives();
     int lastFoundedAtNum = 0;
 
     spdlog::debug("alternatives parameters:");
@@ -163,54 +163,55 @@ namespace TrRouting
     generateCombinations(foundLines, {}, failedCombinations, allCombinations, alreadyCalculatedCombinations);
 
     // Process all combinations and calculate new route with those excluded
-    for (size_t i = 0; i < allCombinations.size(); i++)
+    const int maxValidAlternatives = parameters.getMaxValidAlternatives();
+    for (size_t i = 0;
+         i < allCombinations.size()
+           && alternativesCalculatedCount < maxAlternatives
+           && alternativeSequence - 1 < maxValidAlternatives;
+         i++)
     {
-      if (alternativesCalculatedCount < maxAlternatives && alternativeSequence - 1 < parameters.getMaxValidAlternatives())
-      {
-        // Generate parameters to send to calculate
-        const LineVector combination = allCombinations.at(i);
+      // Generate parameters to send to calculate
+      const LineVector combination = allCombinations.at(i);
 
-        AlternativeLineFilter lineFilter(combination);
+      AlternativeLineFilter lineFilter(combination);
 
-        spdlog::debug("calculating alternative {} from a total of {} ...", alternativeSequence, alternativesCalculatedCount);
+      spdlog::debug("calculating alternative {} from a total of {} ...", alternativeSequence, alternativesCalculatedCount);
         
-        spdlog::debug("except lines: {}", LinesToString(combination));
+      spdlog::debug("except lines: {}", LinesToString(combination));
 
-        try {
-          result = calculateSingle(alternativeParameters, false, &lineFilter);
+      try {
+        result = calculateSingle(alternativeParameters, false, &lineFilter);
 
-          SingleCalculationResult& alternativeCalcResult = *result.get();
+        SingleCalculationResult& alternativeCalcResult = *result.get();
 
-          // Extract lines from new results. If the result is valid, add it to the alternative list
-          // and then generation new lines combinations to try other alternatives
-          LineVisitor alternativeVisitor = LineVisitor();
-          foundLines = alternativeCalcResult.accept(alternativeVisitor);
-          std::stable_sort(foundLines.begin(), foundLines.end());
+        // Extract lines from new results. If the result is valid, add it to the alternative list
+        // and then generation new lines combinations to try other alternatives
+        LineVisitor alternativeVisitor = LineVisitor();
+        foundLines = alternativeCalcResult.accept(alternativeVisitor);
+        std::stable_sort(foundLines.begin(), foundLines.end());
 
-          if (foundLines.size() > 0 && alreadyFoundLines.count(foundLines) == 0)
-          {
-            alternatives.alternatives.push_back(std::move(result));
+        if (foundLines.size() > 0 && alreadyFoundLines.count(foundLines) == 0)
+        {
+          alternatives.alternatives.push_back(std::move(result));
 
-            spdlog::debug("travelTimeSeconds: {}  line Uuids: {}",
-                          alternativeCalcResult.totalTravelTime,
-                          LinesToString(foundLines));
-            
+          spdlog::debug("travelTimeSeconds: {}  line Uuids: {}",
+                        alternativeCalcResult.totalTravelTime,
+                        LinesToString(foundLines));
 
             lastFoundedAtNum = alternativesCalculatedCount;
             alreadyFoundLines[foundLines] = true;
             // Generate new combinations from the new foundlines
             generateCombinations(foundLines, combination, failedCombinations, allCombinations, alreadyCalculatedCombinations);
 
-            alternativeSequence++;
+          alternativeSequence++;
 
-          }
-        } catch (NoRoutingFoundException& e) {
-
-          failedCombinations.push_back(combination);
         }
+      } catch (NoRoutingFoundException& e) {
 
-        alternativesCalculatedCount++;
+        failedCombinations.push_back(combination);
       }
+
+      alternativesCalculatedCount++;
     }
 
     // Print failed combinations
