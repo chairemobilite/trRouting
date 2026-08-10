@@ -66,6 +66,7 @@ namespace TrRouting
 
     TripQueryData()
       : usable(false),
+        disabled(false),
         enterConnection(std::nullopt),
         enterConnectionTransferTravelTime(MAX_INT),
         exitConnection(std::nullopt),
@@ -74,6 +75,9 @@ namespace TrRouting
 
     }
     bool usable; // after forward calculation, keep a list of usable trips in time range for reverse calculation
+    // Trip deactivated for the current query, mostly for alternatives which exclude some of the scenario trips.
+    // Kept next to `usable` so both flags are on the cache line already loaded by the connection scan.
+    bool disabled;
     std::optional<std::reference_wrapper<const Connection>> enterConnection; // index of the entering connection
     int enterConnectionTransferTravelTime;
     std::optional<std::reference_wrapper<const Connection>> exitConnection; // index of the exiting connection
