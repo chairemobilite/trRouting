@@ -1,6 +1,5 @@
 #pragma once
 
-#include <unordered_map>
 #include <vector>
 
 #include "line.hpp"
@@ -19,15 +18,15 @@ namespace TrRouting
     AlternativeFilter() {}
     virtual ~AlternativeFilter() = default;
     /**
-       Apply a filter to a connectionSet and set flags in the trips disabled overlay. The clearing
+       Apply a filter to a connectionSet and set the disabled flag in the trips query overlay. The clearing
        of the trips overlay should be done outside of the filter, so we can apply multiple filter to the same set
 
-       @param tripsDisabled Container to be filled with flags of which trips are no longer available
+       @param tripsQueryOverlay Per query trip scratch data, indexed by Trip::uid, in which the disabled flags are set
        @param connectionSet Current list of trips matching the query scenarios
 
        @return void (Could be changed to return a bool to represent if something was filtered or not)
      */
-    virtual void runFilter(std::unordered_map<Trip::uid_t, bool> &tripsDisabled, const ConnectionSet &connectionSet) = 0;
+    virtual void runFilter(std::vector<TripQueryData> &tripsQueryOverlay, const ConnectionSet &connectionSet) = 0;
   };
 
   /** Alternative Line filter
@@ -36,7 +35,7 @@ namespace TrRouting
   class AlternativeLineFilter : public AlternativeFilter {
   public:
     AlternativeLineFilter(const std::vector<std::reference_wrapper<const Line>> &_excludedLines);
-    virtual void runFilter(std::unordered_map<Trip::uid_t, bool> &tripsDisabled, const ConnectionSet &connectionSet) override;
+    virtual void runFilter(std::vector<TripQueryData> &tripsQueryOverlay, const ConnectionSet &connectionSet) override;
   protected:
     /** Simplified copy of the line vector (with only the UIDs) */
     std::vector<Line::uid_t> excludedLinesUids;

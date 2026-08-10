@@ -152,12 +152,10 @@ namespace TrRouting
     // Save a copy of the current connection set
     connectionSet = transitData.getConnectionsForScenario(parameters.getScenario());
 
-    // Clear the tripsDisabled before applying the filter, so we don't carry previous filter around.
-    tripsDisabled.clear();
-
-    // disable trips according for alternatives:
+    // disable trips according for alternatives. The disabled flags were already cleared by the
+    // tripsQueryOverlay.assign() above, so we don't carry the previous filter around.
     if (alternativeFilter) {
-      alternativeFilter->runFilter(tripsDisabled, (*connectionSet));
+      alternativeFilter->runFilter(tripsQueryOverlay, (*connectionSet));
     }
 
     spdlog::debug("-- filter trips -- {} microseconds ", algorithmCalculationTime.getDurationMicrosecondsNoStop() - calculationTime);

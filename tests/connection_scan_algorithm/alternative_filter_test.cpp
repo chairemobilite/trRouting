@@ -1,4 +1,6 @@
 #include <errno.h>
+#include <algorithm>
+#include <vector>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_io.hpp>
 
@@ -13,17 +15,28 @@
 // Tests for the alternative filters, which mark trips as disabled based on the
 // lines excluded by a given alternative combination.
 //
-// Filters accumulate: runFilter only ever adds to tripsDisabled, so several
-// filters can be applied to the same container.
+// Filters accumulate: runFilter only ever sets disabled flags, so several
+// filters can be applied to the same overlay.
 
 class AlternativeFilterFixtureTests : public ConnectionSetFixtureTests
 {
 protected:
-  // Mirrors Calculator::isTripDisabled: presence in the map means disabled
-  static bool isDisabled(const std::unordered_map<TrRouting::Trip::uid_t, bool> & tripsDisabled,
+  // A fresh overlay, sized and zeroed the same way Calculator::reset does it
+  static std::vector<TrRouting::TripQueryData> makeOverlay()
+  {
+    return std::vector<TrRouting::TripQueryData>(TrRouting::Trip::getMaxUid() + 1);
+  }
+
+  static bool isDisabled(const std::vector<TrRouting::TripQueryData> & tripsQueryOverlay,
                          const TrRouting::Trip & trip)
   {
-    return tripsDisabled.find(trip.uid) != tripsDisabled.end();
+    return tripsQueryOverlay.at(trip.uid).disabled;
+  }
+
+  static size_t countDisabled(const std::vector<TrRouting::TripQueryData> & tripsQueryOverlay)
+  {
+    return std::count_if(tripsQueryOverlay.begin(), tripsQueryOverlay.end(),
+                         [](const TrRouting::TripQueryData & data) { return data.disabled; });
   }
 
   const TrRouting::Line & getLine(const boost::uuids::uuid & uuid) const
@@ -53,10 +66,10 @@ TEST_F(AlternativeFilterFixtureTests, EmptyExcludeListDisablesNothing)
   std::vector<std::reference_wrapper<const TrRouting::Line>> excludeLines;
   TrRouting::AlternativeLineFilter filter(excludeLines);
 
-  std::unordered_map<TrRouting::Trip::uid_t, bool> tripsDisabled;
-  filter.runFilter(tripsDisabled, *connectionSet);
+  std::vector<TrRouting::TripQueryData> tripsQueryOverlay = makeOverlay();
+  filter.runFilter(tripsQueryOverlay, *connectionSet);
 
-  EXPECT_EQ(0u, tripsDisabled.size());
+  EXPECT_EQ(0u, countDisabled(tripsQueryOverlay));
 }
 
 // Excluding a single line should disable exactly the trips of that line
@@ -68,15 +81,15 @@ TEST_F(AlternativeFilterFixtureTests, SingleExcludedLineDisablesItsTripsOnly)
   excludeLines.push_back(getLine(TestDataFetcher::lineSNUuid));
   TrRouting::AlternativeLineFilter filter(excludeLines);
 
-  std::unordered_map<TrRouting::Trip::uid_t, bool> tripsDisabled;
-  filter.runFilter(tripsDisabled, *connectionSet);
+  std::vector<TrRouting::TripQueryData> tripsQueryOverlay = makeOverlay();
+  filter.runFilter(tripsQueryOverlay, *connectionSet);
 
-  EXPECT_EQ(2u, tripsDisabled.size());
-  EXPECT_TRUE(isDisabled(tripsDisabled, getTrip(TestDataFetcher::trip1SNUuid)));
-  EXPECT_TRUE(isDisabled(tripsDisabled, getTrip(TestDataFetcher::trip2SNUuid)));
-  EXPECT_FALSE(isDisabled(tripsDisabled, getTrip(TestDataFetcher::trip1EWUuid)));
-  EXPECT_FALSE(isDisabled(tripsDisabled, getTrip(TestDataFetcher::trip2EWUuid)));
-  EXPECT_FALSE(isDisabled(tripsDisabled, getTrip(TestDataFetcher::trip1ExtraUuid)));
+  EXPECT_EQ(2u, countDisabled(tripsQueryOverlay));
+  EXPECT_TRUE(isDisabled(tripsQueryOverlay, getTrip(TestDataFetcher::trip1SNUuid)));
+  EXPECT_TRUE(isDisabled(tripsQueryOverlay, getTrip(TestDataFetcher::trip2SNUuid)));
+  EXPECT_FALSE(isDisabled(tripsQueryOverlay, getTrip(TestDataFetcher::trip1EWUuid)));
+  EXPECT_FALSE(isDisabled(tripsQueryOverlay, getTrip(TestDataFetcher::trip2EWUuid)));
+  EXPECT_FALSE(isDisabled(tripsQueryOverlay, getTrip(TestDataFetcher::trip1ExtraUuid)));
 }
 
 // Excluding several lines should disable the union of their trips
@@ -89,15 +102,15 @@ TEST_F(AlternativeFilterFixtureTests, MultipleExcludedLinesDisableAllTheirTrips)
   excludeLines.push_back(getLine(TestDataFetcher::lineExtraUuid));
   TrRouting::AlternativeLineFilter filter(excludeLines);
 
-  std::unordered_map<TrRouting::Trip::uid_t, bool> tripsDisabled;
-  filter.runFilter(tripsDisabled, *connectionSet);
+  std::vector<TrRouting::TripQueryData> tripsQueryOverlay = makeOverlay();
+  filter.runFilter(tripsQueryOverlay, *connectionSet);
 
-  EXPECT_EQ(3u, tripsDisabled.size());
-  EXPECT_TRUE(isDisabled(tripsDisabled, getTrip(TestDataFetcher::trip1SNUuid)));
-  EXPECT_TRUE(isDisabled(tripsDisabled, getTrip(TestDataFetcher::trip2SNUuid)));
-  EXPECT_TRUE(isDisabled(tripsDisabled, getTrip(TestDataFetcher::trip1ExtraUuid)));
-  EXPECT_FALSE(isDisabled(tripsDisabled, getTrip(TestDataFetcher::trip1EWUuid)));
-  EXPECT_FALSE(isDisabled(tripsDisabled, getTrip(TestDataFetcher::trip2EWUuid)));
+  EXPECT_EQ(3u, countDisabled(tripsQueryOverlay));
+  EXPECT_TRUE(isDisabled(tripsQueryOverlay, getTrip(TestDataFetcher::trip1SNUuid)));
+  EXPECT_TRUE(isDisabled(tripsQueryOverlay, getTrip(TestDataFetcher::trip2SNUuid)));
+  EXPECT_TRUE(isDisabled(tripsQueryOverlay, getTrip(TestDataFetcher::trip1ExtraUuid)));
+  EXPECT_FALSE(isDisabled(tripsQueryOverlay, getTrip(TestDataFetcher::trip1EWUuid)));
+  EXPECT_FALSE(isDisabled(tripsQueryOverlay, getTrip(TestDataFetcher::trip2EWUuid)));
 }
 
 // Excluding every line should disable every trip of the connection set
@@ -111,13 +124,13 @@ TEST_F(AlternativeFilterFixtureTests, AllLinesExcludedDisablesAllTrips)
   excludeLines.push_back(getLine(TestDataFetcher::lineExtraUuid));
   TrRouting::AlternativeLineFilter filter(excludeLines);
 
-  std::unordered_map<TrRouting::Trip::uid_t, bool> tripsDisabled;
-  filter.runFilter(tripsDisabled, *connectionSet);
+  std::vector<TrRouting::TripQueryData> tripsQueryOverlay = makeOverlay();
+  filter.runFilter(tripsQueryOverlay, *connectionSet);
 
-  EXPECT_EQ(connectionSet->getTrips().size(), tripsDisabled.size());
+  EXPECT_EQ(connectionSet->getTrips().size(), countDisabled(tripsQueryOverlay));
   for (auto & tripIte : connectionSet->getTrips())
   {
-    EXPECT_TRUE(isDisabled(tripsDisabled, tripIte.get()));
+    EXPECT_TRUE(isDisabled(tripsQueryOverlay, tripIte.get()));
   }
 }
 
@@ -134,10 +147,10 @@ TEST_F(AlternativeFilterFixtureTests, ExcludedLineAbsentFromConnectionSet)
   excludeLines.push_back(getLine(TestDataFetcher::lineEWUuid));
   TrRouting::AlternativeLineFilter filter(excludeLines);
 
-  std::unordered_map<TrRouting::Trip::uid_t, bool> tripsDisabled;
-  filter.runFilter(tripsDisabled, *connectionSet);
+  std::vector<TrRouting::TripQueryData> tripsQueryOverlay = makeOverlay();
+  filter.runFilter(tripsQueryOverlay, *connectionSet);
 
-  EXPECT_EQ(0u, tripsDisabled.size());
+  EXPECT_EQ(0u, countDisabled(tripsQueryOverlay));
 }
 
 // Successive filters accumulate: the second filter must add to the results of
@@ -146,26 +159,26 @@ TEST_F(AlternativeFilterFixtureTests, SuccessiveFiltersAccumulate)
 {
   std::shared_ptr<TrRouting::ConnectionSet> connectionSet = getFullConnectionSet();
 
-  std::unordered_map<TrRouting::Trip::uid_t, bool> tripsDisabled;
+  std::vector<TrRouting::TripQueryData> tripsQueryOverlay = makeOverlay();
 
   std::vector<std::reference_wrapper<const TrRouting::Line>> firstExcludeLines;
   firstExcludeLines.push_back(getLine(TestDataFetcher::lineSNUuid));
   TrRouting::AlternativeLineFilter firstFilter(firstExcludeLines);
-  firstFilter.runFilter(tripsDisabled, *connectionSet);
-  ASSERT_EQ(2u, tripsDisabled.size());
+  firstFilter.runFilter(tripsQueryOverlay, *connectionSet);
+  ASSERT_EQ(2u, countDisabled(tripsQueryOverlay));
 
   std::vector<std::reference_wrapper<const TrRouting::Line>> secondExcludeLines;
   secondExcludeLines.push_back(getLine(TestDataFetcher::lineExtraUuid));
   TrRouting::AlternativeLineFilter secondFilter(secondExcludeLines);
-  secondFilter.runFilter(tripsDisabled, *connectionSet);
+  secondFilter.runFilter(tripsQueryOverlay, *connectionSet);
 
   // Both the SN trips and the Extra trip must now be disabled
-  EXPECT_EQ(3u, tripsDisabled.size());
-  EXPECT_TRUE(isDisabled(tripsDisabled, getTrip(TestDataFetcher::trip1SNUuid)));
-  EXPECT_TRUE(isDisabled(tripsDisabled, getTrip(TestDataFetcher::trip2SNUuid)));
-  EXPECT_TRUE(isDisabled(tripsDisabled, getTrip(TestDataFetcher::trip1ExtraUuid)));
-  EXPECT_FALSE(isDisabled(tripsDisabled, getTrip(TestDataFetcher::trip1EWUuid)));
-  EXPECT_FALSE(isDisabled(tripsDisabled, getTrip(TestDataFetcher::trip2EWUuid)));
+  EXPECT_EQ(3u, countDisabled(tripsQueryOverlay));
+  EXPECT_TRUE(isDisabled(tripsQueryOverlay, getTrip(TestDataFetcher::trip1SNUuid)));
+  EXPECT_TRUE(isDisabled(tripsQueryOverlay, getTrip(TestDataFetcher::trip2SNUuid)));
+  EXPECT_TRUE(isDisabled(tripsQueryOverlay, getTrip(TestDataFetcher::trip1ExtraUuid)));
+  EXPECT_FALSE(isDisabled(tripsQueryOverlay, getTrip(TestDataFetcher::trip1EWUuid)));
+  EXPECT_FALSE(isDisabled(tripsQueryOverlay, getTrip(TestDataFetcher::trip2EWUuid)));
 }
 
 // Accumulating in either order must give the same result, so that the caller
@@ -182,15 +195,15 @@ TEST_F(AlternativeFilterFixtureTests, AccumulationIsOrderIndependent)
   extraExcludeLines.push_back(getLine(TestDataFetcher::lineExtraUuid));
   TrRouting::AlternativeLineFilter extraFilter(extraExcludeLines);
 
-  std::unordered_map<TrRouting::Trip::uid_t, bool> snThenExtra;
+  std::vector<TrRouting::TripQueryData> snThenExtra = makeOverlay();
   snFilter.runFilter(snThenExtra, *connectionSet);
   extraFilter.runFilter(snThenExtra, *connectionSet);
 
-  std::unordered_map<TrRouting::Trip::uid_t, bool> extraThenSn;
+  std::vector<TrRouting::TripQueryData> extraThenSn = makeOverlay();
   extraFilter.runFilter(extraThenSn, *connectionSet);
   snFilter.runFilter(extraThenSn, *connectionSet);
 
-  EXPECT_EQ(snThenExtra.size(), extraThenSn.size());
+  EXPECT_EQ(countDisabled(snThenExtra), countDisabled(extraThenSn));
   for (auto & tripIte : connectionSet->getTrips())
   {
     const TrRouting::Trip & trip = tripIte.get();
@@ -203,23 +216,23 @@ TEST_F(AlternativeFilterFixtureTests, OverlappingFiltersAccumulateToTheUnion)
 {
   std::shared_ptr<TrRouting::ConnectionSet> connectionSet = getFullConnectionSet();
 
-  std::unordered_map<TrRouting::Trip::uid_t, bool> tripsDisabled;
+  std::vector<TrRouting::TripQueryData> tripsQueryOverlay = makeOverlay();
 
   std::vector<std::reference_wrapper<const TrRouting::Line>> firstExcludeLines;
   firstExcludeLines.push_back(getLine(TestDataFetcher::lineSNUuid));
   firstExcludeLines.push_back(getLine(TestDataFetcher::lineEWUuid));
   TrRouting::AlternativeLineFilter firstFilter(firstExcludeLines);
-  firstFilter.runFilter(tripsDisabled, *connectionSet);
-  ASSERT_EQ(4u, tripsDisabled.size());
+  firstFilter.runFilter(tripsQueryOverlay, *connectionSet);
+  ASSERT_EQ(4u, countDisabled(tripsQueryOverlay));
 
   // Line SN is already disabled, line Extra is not
   std::vector<std::reference_wrapper<const TrRouting::Line>> secondExcludeLines;
   secondExcludeLines.push_back(getLine(TestDataFetcher::lineSNUuid));
   secondExcludeLines.push_back(getLine(TestDataFetcher::lineExtraUuid));
   TrRouting::AlternativeLineFilter secondFilter(secondExcludeLines);
-  secondFilter.runFilter(tripsDisabled, *connectionSet);
+  secondFilter.runFilter(tripsQueryOverlay, *connectionSet);
 
-  EXPECT_EQ(5u, tripsDisabled.size());
+  EXPECT_EQ(5u, countDisabled(tripsQueryOverlay));
 }
 
 // The filter must never remove entries it did not add, so that results set by
@@ -228,18 +241,18 @@ TEST_F(AlternativeFilterFixtureTests, ExistingResultsArePreserved)
 {
   std::shared_ptr<TrRouting::ConnectionSet> connectionSet = getFullConnectionSet();
 
-  std::unordered_map<TrRouting::Trip::uid_t, bool> tripsDisabled;
-  tripsDisabled[getTrip(TestDataFetcher::trip1EWUuid).uid] = true;
+  std::vector<TrRouting::TripQueryData> tripsQueryOverlay = makeOverlay();
+  tripsQueryOverlay.at(getTrip(TestDataFetcher::trip1EWUuid).uid).disabled = true;
 
   std::vector<std::reference_wrapper<const TrRouting::Line>> excludeLines;
   excludeLines.push_back(getLine(TestDataFetcher::lineSNUuid));
   TrRouting::AlternativeLineFilter filter(excludeLines);
-  filter.runFilter(tripsDisabled, *connectionSet);
+  filter.runFilter(tripsQueryOverlay, *connectionSet);
 
-  EXPECT_EQ(3u, tripsDisabled.size());
-  EXPECT_TRUE(isDisabled(tripsDisabled, getTrip(TestDataFetcher::trip1EWUuid)));
-  EXPECT_TRUE(isDisabled(tripsDisabled, getTrip(TestDataFetcher::trip1SNUuid)));
-  EXPECT_TRUE(isDisabled(tripsDisabled, getTrip(TestDataFetcher::trip2SNUuid)));
+  EXPECT_EQ(3u, countDisabled(tripsQueryOverlay));
+  EXPECT_TRUE(isDisabled(tripsQueryOverlay, getTrip(TestDataFetcher::trip1EWUuid)));
+  EXPECT_TRUE(isDisabled(tripsQueryOverlay, getTrip(TestDataFetcher::trip1SNUuid)));
+  EXPECT_TRUE(isDisabled(tripsQueryOverlay, getTrip(TestDataFetcher::trip2SNUuid)));
 }
 
 // An empty exclusion list must be a no-op, in particular it must not clear
@@ -247,15 +260,15 @@ TEST_F(AlternativeFilterFixtureTests, EmptyExcludeListPreservesExistingResults)
 {
   std::shared_ptr<TrRouting::ConnectionSet> connectionSet = getFullConnectionSet();
 
-  std::unordered_map<TrRouting::Trip::uid_t, bool> tripsDisabled;
-  tripsDisabled[getTrip(TestDataFetcher::trip1SNUuid).uid] = true;
+  std::vector<TrRouting::TripQueryData> tripsQueryOverlay = makeOverlay();
+  tripsQueryOverlay.at(getTrip(TestDataFetcher::trip1SNUuid).uid).disabled = true;
 
   std::vector<std::reference_wrapper<const TrRouting::Line>> excludeLines;
   TrRouting::AlternativeLineFilter filter(excludeLines);
-  filter.runFilter(tripsDisabled, *connectionSet);
+  filter.runFilter(tripsQueryOverlay, *connectionSet);
 
-  EXPECT_EQ(1u, tripsDisabled.size());
-  EXPECT_TRUE(isDisabled(tripsDisabled, getTrip(TestDataFetcher::trip1SNUuid)));
+  EXPECT_EQ(1u, countDisabled(tripsQueryOverlay));
+  EXPECT_TRUE(isDisabled(tripsQueryOverlay, getTrip(TestDataFetcher::trip1SNUuid)));
 }
 
 // Running the same filter twice must be idempotent: accumulating means the
@@ -268,13 +281,62 @@ TEST_F(AlternativeFilterFixtureTests, RunFilterIsIdempotent)
   excludeLines.push_back(getLine(TestDataFetcher::lineEWUuid));
   TrRouting::AlternativeLineFilter filter(excludeLines);
 
-  std::unordered_map<TrRouting::Trip::uid_t, bool> tripsDisabled;
-  filter.runFilter(tripsDisabled, *connectionSet);
-  ASSERT_EQ(2u, tripsDisabled.size());
+  std::vector<TrRouting::TripQueryData> tripsQueryOverlay = makeOverlay();
+  filter.runFilter(tripsQueryOverlay, *connectionSet);
+  ASSERT_EQ(2u, countDisabled(tripsQueryOverlay));
 
-  filter.runFilter(tripsDisabled, *connectionSet);
+  filter.runFilter(tripsQueryOverlay, *connectionSet);
 
-  EXPECT_EQ(2u, tripsDisabled.size());
-  EXPECT_TRUE(isDisabled(tripsDisabled, getTrip(TestDataFetcher::trip1EWUuid)));
-  EXPECT_TRUE(isDisabled(tripsDisabled, getTrip(TestDataFetcher::trip2EWUuid)));
+  EXPECT_EQ(2u, countDisabled(tripsQueryOverlay));
+  EXPECT_TRUE(isDisabled(tripsQueryOverlay, getTrip(TestDataFetcher::trip1EWUuid)));
+  EXPECT_TRUE(isDisabled(tripsQueryOverlay, getTrip(TestDataFetcher::trip2EWUuid)));
+}
+
+// The disabled flag now shares TripQueryData with the rest of the per query trip
+// scratch data, so the filter must not disturb the other fields
+TEST_F(AlternativeFilterFixtureTests, RunFilterLeavesOtherOverlayFieldsUntouched)
+{
+  std::shared_ptr<TrRouting::ConnectionSet> connectionSet = getFullConnectionSet();
+
+  std::vector<TrRouting::TripQueryData> tripsQueryOverlay = makeOverlay();
+  for (auto & tripIte : connectionSet->getTrips())
+  {
+    tripsQueryOverlay.at(tripIte.get().uid).usable = true;
+  }
+
+  std::vector<std::reference_wrapper<const TrRouting::Line>> excludeLines;
+  excludeLines.push_back(getLine(TestDataFetcher::lineSNUuid));
+  TrRouting::AlternativeLineFilter filter(excludeLines);
+  filter.runFilter(tripsQueryOverlay, *connectionSet);
+
+  ASSERT_EQ(2u, countDisabled(tripsQueryOverlay));
+  for (auto & tripIte : connectionSet->getTrips())
+  {
+    const TrRouting::TripQueryData & data = tripsQueryOverlay.at(tripIte.get().uid);
+    EXPECT_TRUE(data.usable);
+    EXPECT_FALSE(data.enterConnection.has_value());
+    EXPECT_FALSE(data.exitConnection.has_value());
+    EXPECT_EQ(TrRouting::MAX_INT, data.enterConnectionTransferTravelTime);
+    EXPECT_EQ(TrRouting::MAX_INT, data.exitConnectionTransferTravelTime);
+  }
+}
+
+// Trips outside the connection set must keep their default state, since the
+// overlay is sized for every trip but the filter only walks the scenario trips
+TEST_F(AlternativeFilterFixtureTests, TripsOutsideConnectionSetAreNotTouched)
+{
+  std::shared_ptr<TrRouting::ConnectionSet> connectionSet =
+    transitData.getConnectionsForScenario(
+      transitData.getScenarios().at(TestDataFetcher::scenario2Uuid));
+
+  std::vector<TrRouting::TripQueryData> tripsQueryOverlay = makeOverlay();
+
+  std::vector<std::reference_wrapper<const TrRouting::Line>> excludeLines;
+  excludeLines.push_back(getLine(TestDataFetcher::lineSNUuid));
+  TrRouting::AlternativeLineFilter filter(excludeLines);
+  filter.runFilter(tripsQueryOverlay, *connectionSet);
+
+  // Line EW is excluded from scenario 2, so its trips must stay enabled
+  EXPECT_FALSE(isDisabled(tripsQueryOverlay, getTrip(TestDataFetcher::trip1EWUuid)));
+  EXPECT_FALSE(isDisabled(tripsQueryOverlay, getTrip(TestDataFetcher::trip2EWUuid)));
 }

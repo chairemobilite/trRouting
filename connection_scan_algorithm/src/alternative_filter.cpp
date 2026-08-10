@@ -19,7 +19,7 @@ namespace TrRouting {
     
   }
   
-  void AlternativeLineFilter::runFilter(std::unordered_map<Trip::uid_t, bool> &tripsDisabled, const ConnectionSet &connectionSet) {
+  void AlternativeLineFilter::runFilter(std::vector<TripQueryData> &tripsQueryOverlay, const ConnectionSet &connectionSet) {
 
     if (excludedLinesUids.size() > 0) {
       for (auto & tripIte : connectionSet.getTrips())
@@ -29,7 +29,7 @@ namespace TrRouting {
         // If the Trip match any lines in the filter, disable it
         if (std::find(excludedLinesUids.begin(), excludedLinesUids.end(), trip.line.uid) != excludedLinesUids.end())
         {
-          tripsDisabled[trip.uid] = true;
+          tripsQueryOverlay.at(trip.uid).disabled = true;
         }
       }
     }

@@ -36,11 +36,11 @@ namespace TrRouting
       {
         const Trip & trip = (*connection).get().getTrip();
 
-        // Cache the current query data overlay si we don't check the hashmap every time
+        // Cache the current query data overlay si we don't check the vector every time
         auto & currentTripQueryOverlay = tripsQueryOverlay.at(trip.uid);
 
         // enabled trips only here:
-        if (!isTripDisabled(trip.uid))
+        if (!currentTripQueryOverlay.disabled)
         {
           connectionDepartureTime         = (*connection).get().getDepartureTime();
           connectionMinWaitingTimeSeconds = (*connection).get().getMinWaitingTimeOrDefault(parameters.getMinWaitingTimeSeconds());
@@ -244,11 +244,11 @@ namespace TrRouting
       {
         const Trip & trip = (*connection).get().getTrip();
 
-        // Cache the current query data overlay si we don't check the hashmap every time
+        // Cache the current query data overlay si we don't check the vector every time
         auto & currentTripQueryOverlay = tripsQueryOverlay.at(trip.uid);
 
         // enabled trips only here:
-        if (!isTripDisabled(trip.uid))
+        if (!currentTripQueryOverlay.disabled)
         {
           connectionDepartureTime         = (*connection).get().getDepartureTime();
           connectionMinWaitingTimeSeconds = (*connection).get().getMinWaitingTimeOrDefault(parameters.getMinWaitingTimeSeconds());
