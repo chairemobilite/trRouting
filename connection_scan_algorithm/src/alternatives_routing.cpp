@@ -10,6 +10,7 @@
 #include "point.hpp"
 #include "transit_data.hpp"
 #include "alternative_filter.hpp"
+#include "line_combinations.hpp"
 
 namespace {
   // Placed in anynymous namespace so it's local to this file
@@ -86,14 +87,11 @@ namespace TrRouting
 
   AlternativesResult Calculator::alternativesRouting(const RouteParameters &parameters)
   {
-    using LineVector = std::vector<std::reference_wrapper<const Line>>;
+
     std::vector< LineVector >  allCombinations;
     std::vector< LineVector >  failedCombinations;
-    bool                             combinationMatchesWithFailed {false};
-    bool                             combinationMatchesWithAtLeastOneFailed {false};
-    std::map<LineVector, bool> alreadyCalculatedCombinations;
-    std::map<LineVector, bool> alreadyFoundLines;
-    std::map<LineVector, int>  foundLinesTravelTimeSeconds;
+    CombinationMap alreadyCalculatedCombinations;
+    CombinationMap alreadyFoundLines;
     int maxTravelTime;
     int alternativeSequence = 1;
     int alternativesCalculatedCount = 1;
@@ -157,23 +155,12 @@ namespace TrRouting
     LineVector foundLines = routingResult.accept(visitor);
     std::stable_sort(foundLines.begin(),foundLines.end());
     alreadyFoundLines[foundLines]           = true;
-    foundLinesTravelTimeSeconds[foundLines] = routingResult.totalTravelTime;
     lastFoundedAtNum = 1;
 
     spdlog::debug("fastest line ids: {}", LinesToString(foundLines));
 
     // Generate combination of group of 1 line, then 2 lines up to the total amount of lines
-    for (size_t k = 1; k <= foundLines.size(); k++)
-    {
-      Combinations<std::reference_wrapper<const Line>> combinations(foundLines, k);
-
-      for (auto newCombination : combinations)
-      {
-        std::stable_sort(newCombination.begin(), newCombination.end());
-        allCombinations.push_back(newCombination);
-        alreadyCalculatedCombinations[newCombination] = true;
-      }
-    }
+    generateCombinations(foundLines, {}, failedCombinations, allCombinations, alreadyCalculatedCombinations);
 
     // Process all combinations and calculate new route with those excluded
     for (size_t i = 0; i < allCombinations.size(); i++)
@@ -211,45 +198,8 @@ namespace TrRouting
 
             lastFoundedAtNum = alternativesCalculatedCount;
             alreadyFoundLines[foundLines] = true;
-            foundLinesTravelTimeSeconds[foundLines] = alternativeCalcResult.totalTravelTime;
-            for (size_t k = 1; k <= foundLines.size(); k++)
-            {
-              Combinations<std::reference_wrapper<const Line>> combinations(foundLines, k);
-              for (auto newCombination : combinations)
-              {
-                // Add the lines currently exclused (combination) to the newly generated combinations
-                // from the line in the latest alternative
-                std::copy(combination.begin(), combination.end(),
-                          std::back_inserter(newCombination));
-                std::stable_sort(newCombination.begin(), newCombination.end());
-                if (alreadyCalculatedCombinations.count(newCombination) == 0)
-                {
-                  combinationMatchesWithAtLeastOneFailed = false;
-                  for (auto failedCombination : failedCombinations)
-                  {
-                    combinationMatchesWithFailed = true;
-                    for (auto failedLine : failedCombination)
-                    {
-                      if (std::find(newCombination.begin(), newCombination.end(), failedLine) == newCombination.end())
-                      {
-                        combinationMatchesWithFailed = false;
-                        break;
-                      }
-                    }
-                    if (combinationMatchesWithFailed)
-                    {
-                      combinationMatchesWithAtLeastOneFailed = true;
-                      break;
-                    }
-                  }
-                  if (!combinationMatchesWithAtLeastOneFailed)
-                  {
-                    allCombinations.push_back(newCombination);
-                  }
-                  alreadyCalculatedCombinations[newCombination] = true;
-                }
-              }
-            }
+            // Generate new combinations from the new foundlines
+            generateCombinations(foundLines, combination, failedCombinations, allCombinations, alreadyCalculatedCombinations);
 
             alternativeSequence++;
 
@@ -261,14 +211,6 @@ namespace TrRouting
 
         alternativesCalculatedCount++;
       }
-    }
-
-    int i {0};
-    for (auto flines : alreadyFoundLines)
-    {          
-      spdlog::debug("{}. {} travel time minutes: {}", i, LinesToString(flines.first),
-                    (foundLinesTravelTimeSeconds[flines.first] / 60));
-      i++;          
     }
 
     // Print failed combinations

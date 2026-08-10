@@ -1,3 +1,4 @@
+#pragma once
 // combinations.hpp 
 // from https://stackoverflow.com/a/25497877
 // With later  modifications to adapt for std::reference_wrapper
