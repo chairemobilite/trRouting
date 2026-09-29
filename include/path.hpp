@@ -18,13 +18,11 @@ namespace TrRouting
          const Line &aline,
          const std::string &adirection,
          const std::vector<std::reference_wrapper<const Node>> &anodesRef,
-         const std::vector<std::reference_wrapper<const Trip>> &atripsRef,
          const std::vector<int> &asegmentsDistanceMeters):
       uuid(auuid),
       line(aline),
       direction(adirection),
       nodesRef(anodesRef),
-      tripsRef(atripsRef),
       segmentsDistanceMeters(asegmentsDistanceMeters) {}
 
     /* Alternative constructor where we pass a NodeTimeDistance vector instead of
@@ -32,12 +30,10 @@ namespace TrRouting
     Path(const boost::uuids::uuid &auuid,
          const Line &aline,
          const std::string &adirection,
-         const std::vector<NodeTimeDistance> &anodesTimeDistance,
-         const std::vector<std::reference_wrapper<const Trip>> &atripsRef):
+         const std::vector<NodeTimeDistance> &anodesTimeDistance):
       uuid(auuid),
       line(aline),
-      direction(adirection),
-      tripsRef(atripsRef)
+      direction(adirection)
       {
         for (const NodeTimeDistance & ntd: anodesTimeDistance) {
           nodesRef.push_back(ntd.node);
@@ -49,7 +45,6 @@ namespace TrRouting
     const Line &line;
     std::string direction;
     std::vector<std::reference_wrapper<const Node>> nodesRef;
-    std::vector<std::reference_wrapper<const Trip>> tripsRef;
     //TODO Should probably be integrated with nodes as a NodeTimeDistance object. Need
     // to validate their usage
     std::vector<int> segmentsDistanceMeters;

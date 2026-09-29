@@ -18,7 +18,7 @@ void ResultToResponseFixtureTest::SetUp()
     agency->acronym = "AG";
     agency->name = "AgencyName";
     line = std::make_unique<TrRouting::Line>(uuidGenerator(lineUuid), *agency, *mode, "LI", "LineName", 0);
-    path = std::make_unique<TrRouting::Path>(uuidGenerator(pathUuid), *line, "N", std::vector<TrRouting::NodeTimeDistance>(), std::vector<std::reference_wrapper<const TrRouting::Trip>>());
+    path = std::make_unique<TrRouting::Path>(uuidGenerator(pathUuid), *line, "N", std::vector<TrRouting::NodeTimeDistance>());
     service = std::make_unique<TrRouting::Service>();
     trip = std::make_unique<TrRouting::Trip>(uuidGenerator(tripUuid), *agency, *line, *path, *mode, *service, 0);
     boardingNode = std::make_unique<TrRouting::Node>(uuidGenerator(boardingNodeUuid), 0, "NC", "NodeName", std::make_unique<TrRouting::Point>(boardingNodePoint));

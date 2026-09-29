@@ -66,7 +66,6 @@ namespace TrRouting
         std::string uuid     {capnpT.getUuid()};
         std::string lineUuid {capnpT.getLineUuid()};
         std::vector<std::reference_wrapper<const Node>> nodesRef;
-        std::vector<std::reference_wrapper<const Trip>> tripsRef;
         std::vector<int> distancesMeters;
         boost::uuids::uuid nodeUuid;
         boost::uuids::uuid pathUuid = uuidGenerator(uuid);
@@ -90,7 +89,6 @@ namespace TrRouting
                                lines.at(uuidGenerator(lineUuid)),
                                capnpT.getDirection(),
                                nodesRef,
-                               tripsRef, //TODO This is empty
                                distancesMeters));
       }
     }
