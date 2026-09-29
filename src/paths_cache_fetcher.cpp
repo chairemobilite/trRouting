@@ -68,7 +68,6 @@ namespace TrRouting
         std::vector<std::reference_wrapper<const Node>> nodesRef;
         std::vector<std::reference_wrapper<const Trip>> tripsRef;
         std::vector<int> distancesMeters;
-        std::vector<int> travelTimesSeconds;
         boost::uuids::uuid nodeUuid;
         boost::uuids::uuid pathUuid = uuidGenerator(uuid);
         for (std::string nodeUuidStr : capnpT.getNodesUuids())
@@ -85,10 +84,6 @@ namespace TrRouting
           {
             distancesMeters.push_back(jsonData["segments"][i]["distanceMeters"]);
           }
-          if (jsonData["segments"][i]["travelTimeSeconds"] != nullptr)
-          {
-            travelTimesSeconds.push_back(jsonData["segments"][i]["travelTimeSeconds"]);
-          }
         }
         
         ts.emplace(pathUuid, T(pathUuid,
@@ -96,7 +91,6 @@ namespace TrRouting
                                capnpT.getDirection(),
                                nodesRef,
                                tripsRef, //TODO This is empty
-                               travelTimesSeconds,
                                distancesMeters));
       }
     }
