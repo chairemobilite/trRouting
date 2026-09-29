@@ -189,7 +189,6 @@ int TestDataFetcher::getPaths(
                               std::string
                               ) {
 
-  std::vector<std::reference_wrapper<const TrRouting::Trip>> emptyVector;
   std::vector<TrRouting::NodeTimeDistance> nodesref;
   addNodeToPath(nodesref, nodes.at(nodeSouth2Uuid), 210, 1186);
   addNodeToPath(nodesref, nodes.at(nodeSouth1Uuid), 190, 1160);
@@ -199,9 +198,7 @@ int TestDataFetcher::getPaths(
   ts.emplace(pathSNUuid, TrRouting::Path(pathSNUuid,
                                          lines.at(lineSNUuid),
                                          "outbound",
-                                         nodesref,
-                                         emptyVector));
-  // Path's trip data will be filled in the setUpSchedules
+                                         nodesref));
   
   nodesref.clear();
   addNodeToPath(nodesref, nodes.at(nodeEast2Uuid), 150, 1025);
@@ -212,9 +209,7 @@ int TestDataFetcher::getPaths(
   ts.emplace(pathEWUuid, TrRouting::Path(pathEWUuid,
                                          lines.at(lineEWUuid),
                                          "outbound",
-                                         nodesref,
-                                         emptyVector));
-  // Path's trip data will be filled in the setUpSchedules
+                                         nodesref));
 
   nodesref.clear();
   addNodeToPath(nodesref, nodes.at(nodeEast1Uuid), 300, 1760);
@@ -222,9 +217,7 @@ int TestDataFetcher::getPaths(
   ts.emplace(pathExtraUuid, TrRouting::Path(pathExtraUuid,
                                             lines.at(lineExtraUuid),
                                             "outbound",
-                                            nodesref,
-                                            emptyVector));
-  // Path's trip data will be filled in the setUpSchedules
+                                            nodesref));
   return 0;
 }
 
@@ -253,8 +246,6 @@ int TestDataFetcher::getScenarios(
 
 void addTripData(TrRouting::Trip & trip, TrRouting::Path & path, std::vector<TrRouting::Connection>& connections, int arrivalTimes[], int departureTimes[], int arraySize)
 {
-    path.tripsRef.push_back(trip);
-
     for (int nodeTimeI = 0; nodeTimeI < arraySize - 1; nodeTimeI++) {
         connections.push_back(TrRouting::Connection(
             path.nodesRef[nodeTimeI],

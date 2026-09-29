@@ -88,9 +88,6 @@ namespace TrRouting
                 //Current trip
                 Trip & trip = trips.at(tripUuid);
 
-                // TODO This should probably be done in the Trip constructor (setting the back reference)
-                path.tripsRef.push_back(trip);
-
                 nodeTimesCount             = capnpTrip.getNodeArrivalTimesSeconds().size();
                 auto arrivalTimesSeconds   = capnpTrip.getNodeArrivalTimesSeconds();
                 auto departureTimesSeconds = capnpTrip.getNodeDepartureTimesSeconds();
