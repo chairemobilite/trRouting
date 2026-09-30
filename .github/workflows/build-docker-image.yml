@@ -3,7 +3,7 @@ name: Container Build and Push
 on:
   push:
     branches: 
-      - "v2c"
+      - "main"
   workflow_dispatch:
 
 env:
@@ -48,8 +48,8 @@ jobs:
             ${{ env.DOCKERHUB_REGISTRY }}/${{ env.DOCKERHUB_IMAGE }}
             ${{ env.GITHUB_REGISTRY }}/${{ env.GITHUB_IMAGE }}
           tags: |
-            # Tag as latest since v2c is the main branch
-            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/v2c' }}
+            # Tag as latest since main is the main branch
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
             # Include the branch name as a tag
             type=ref,event=branch
 

@@ -3,7 +3,7 @@ name: PR Container Build Check
 on:
   pull_request:
     branches: 
-      - "v2c"
+      - "main"
 
 jobs:
   pr-build-check:
