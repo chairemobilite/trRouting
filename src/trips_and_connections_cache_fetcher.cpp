@@ -63,7 +63,14 @@ namespace TrRouting
         for (const auto & schedule : schedules)
         {
           std::string serviceUuidStr = schedule.getServiceUuid();
-          auto & service  = services.at(uuidGenerator(serviceUuidStr));
+          auto serviceIter = services.find(uuidGenerator(serviceUuidStr));
+          if (serviceIter == services.end())
+          {
+            // Like the scenarios, which ignore unknown services, the trips of this schedule could not be used anyway
+            spdlog::warn("Ignoring the schedule of unknown service {} for line {} ({} {})", serviceUuidStr, boost::uuids::to_string(line.uuid), line.shortname, line.longname);
+            continue;
+          }
+          const Service & service = serviceIter->second;
 
           const auto periods {schedule.getPeriods()};
           for (const auto & period : periods)

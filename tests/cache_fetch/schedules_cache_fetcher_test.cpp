@@ -95,3 +95,29 @@ TEST_F(ScheduleCacheFetcherFixtureTests, TestGetSchedulesValid)
     ASSERT_EQ(50u, trips.size());
     ASSERT_EQ(275u, connections.size());
 }
+
+// A schedule of a service that is not in the services, for example a deleted
+// one, should be ignored instead of failing the whole data load
+TEST_F(ScheduleCacheFetcherFixtureTests, TestGetSchedulesUnknownService)
+{
+    // Remove the service of a trip of the valid data
+    cacheFetcher.getSchedules(trips, lines, paths, services, connections, VALID_CUSTOM_PATH);
+    const boost::uuids::uuid unknownServiceUuid = trips.begin()->second.service.uuid;
+    connections.clear();
+    trips.clear();
+    services.erase(unknownServiceUuid);
+    int retVal = cacheFetcher.getSchedules(
+      trips,
+      lines,
+      paths,
+      services,
+      connections,
+      VALID_CUSTOM_PATH
+    );
+    ASSERT_EQ(0, retVal);
+    ASSERT_LT(trips.size(), 50u);
+    for (const auto & [tripUuid, trip] : trips)
+    {
+        ASSERT_NE(unknownServiceUuid, trip.service.uuid);
+    }
+}
