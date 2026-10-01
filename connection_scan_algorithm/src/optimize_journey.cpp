@@ -209,14 +209,10 @@ namespace TrRouting
             else
             {
               usedOptimizationCases.push_back(1);
-              if (toJourneyStepIdx - fromJourneyStepIdx == 1)
-              {
-                journey.erase(journey.begin() + toJourneyStepIdx);
-              }
-              else if (toJourneyStepIdx - fromJourneyStepIdx > 1) // could not split correctly...
-              {
-                journey.erase(journey.begin() + fromJourneyStepIdx + 1, journey.begin() + toJourneyStepIdx);
-              }
+              // The from step passes by the node where the to step alights: it will alight
+              // there instead, so all the steps after it, up to and including the to step,
+              // are superfluous (see references/journey_optimization_1_csl.png)
+              journey.erase(journey.begin() + fromJourneyStepIdx + 1, journey.begin() + toJourneyStepIdx + 1);
               journey[fromJourneyStepIdx].setFinalExitConnection(connection);
 
               break;
