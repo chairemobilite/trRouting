@@ -118,7 +118,9 @@ namespace TrRouting
     LineVisitor visitor = LineVisitor();
 
     // TODO Extract the max travel time calculation to a function
-    maxTravelTime = parameters.getAlternativesMaxTravelTimeRatio() * routingResult.totalTravelTime + (parameters.isForwardCalculation() ? routingResult.departureTime - parameters.getTimeOfTrip() : 0);
+    // The maximum travel time of the alternatives is counted from the time of trip, so it includes the time between
+    // the time of trip and the fastest journey: before its departure, or after its arrival with an arrival time
+    maxTravelTime = parameters.getAlternativesMaxTravelTimeRatio() * routingResult.totalTravelTime + (parameters.isForwardCalculation() ? routingResult.departureTime - parameters.getTimeOfTrip() : parameters.getTimeOfTrip() - routingResult.arrivalTime);
     if (maxTravelTime < parameters.getMinAlternativeMaxTravelTimeSeconds())
     {
       maxTravelTime = parameters.getMinAlternativeMaxTravelTimeSeconds();
