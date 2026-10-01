@@ -1,3 +1,5 @@
+#include <charconv>
+#include <limits>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -19,11 +21,24 @@ namespace TrRouting {
       std::reference_wrapper<const Node> node;
       std::size_t osrmPosition;
     };
+
+    /* Append the value with exactly 6 decimals. Unlike std::to_string and
+       streams, std::to_chars never depends on the locale, so the decimal
+       separator is always a dot. */
+    void appendOsrmCoordinate(std::string &coordinates, double value) {
+      // Large enough for any double: the sign, up to 309 integer digits, the dot and 6 decimals
+      char buffer[std::numeric_limits<double>::max_exponent10 + 10];
+      auto result = std::to_chars(buffer, buffer + sizeof(buffer), value, std::chars_format::fixed, 6);
+      coordinates.append(buffer, result.ptr);
+    }
   }
 
   std::string OsrmGeoFilter::formatOsrmCoordinates(const Point &point) {
-    // By default, to_string convert a double to a string with 6 decimal digits
-    return std::to_string(point.longitude) + "," + std::to_string(point.latitude);
+    std::string coordinates;
+    appendOsrmCoordinate(coordinates, point.longitude);
+    coordinates += ",";
+    appendOsrmCoordinate(coordinates, point.latitude);
+    return coordinates;
   }
 
   OsrmGeoFilter::OsrmGeoFilter(const std::string &amode, const std::string &ahost, const std::string &aport) :
