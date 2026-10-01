@@ -1,5 +1,6 @@
 #include <deque>
 #include <ostream>
+#include <queue>
 #include <string>
 #include <vector>
 
@@ -53,10 +54,18 @@ protected:
     return lines.back();
   }
 
-  static bool contains(const std::vector<TrRouting::LineVector> & combinations,
+  // The queue is copied, since it can only be iterated by popping its elements
+  static bool contains(std::queue<TrRouting::LineVector> combinations,
                        const TrRouting::LineVector & expected)
   {
-    return std::find(combinations.begin(), combinations.end(), expected) != combinations.end();
+    for (; !combinations.empty(); combinations.pop())
+    {
+      if (combinations.front() == expected)
+      {
+        return true;
+      }
+    }
+    return false;
   }
 };
 
@@ -110,7 +119,7 @@ TEST_F(LineCombinationsFixtureTests, SubsetOfCombinationDoesNotMatch)
 
 TEST_F(LineCombinationsFixtureTests, GeneratesEverySubsetOfFoundLines)
 {
-  std::vector<TrRouting::LineVector> allCombinations;
+  std::queue<TrRouting::LineVector> allCombinations;
   TrRouting::CombinationMap alreadyCalculatedCombinations;
 
   TrRouting::generateCombinations({lineA, lineB}, {}, {}, allCombinations, alreadyCalculatedCombinations);
@@ -124,7 +133,7 @@ TEST_F(LineCombinationsFixtureTests, GeneratesEverySubsetOfFoundLines)
 
 TEST_F(LineCombinationsFixtureTests, GeneratesNothingFromEmptyFoundLines)
 {
-  std::vector<TrRouting::LineVector> allCombinations;
+  std::queue<TrRouting::LineVector> allCombinations;
   TrRouting::CombinationMap alreadyCalculatedCombinations;
 
   TrRouting::generateCombinations({}, {}, {}, allCombinations, alreadyCalculatedCombinations);
@@ -135,7 +144,7 @@ TEST_F(LineCombinationsFixtureTests, GeneratesNothingFromEmptyFoundLines)
 
 TEST_F(LineCombinationsFixtureTests, AlreadyCalculatedCombinationsAreNotGeneratedTwice)
 {
-  std::vector<TrRouting::LineVector> allCombinations;
+  std::queue<TrRouting::LineVector> allCombinations;
   TrRouting::CombinationMap alreadyCalculatedCombinations;
 
   TrRouting::generateCombinations({lineA, lineB}, {}, {}, allCombinations, alreadyCalculatedCombinations);
@@ -148,7 +157,7 @@ TEST_F(LineCombinationsFixtureTests, AlreadyCalculatedCombinationsAreNotGenerate
 
 TEST_F(LineCombinationsFixtureTests, PrefixIsAddedToEveryGeneratedCombinationAndSorted)
 {
-  std::vector<TrRouting::LineVector> allCombinations;
+  std::queue<TrRouting::LineVector> allCombinations;
   TrRouting::CombinationMap alreadyCalculatedCombinations;
 
   TrRouting::generateCombinations({lineA, lineB}, {lineC}, {}, allCombinations, alreadyCalculatedCombinations);
@@ -163,7 +172,7 @@ TEST_F(LineCombinationsFixtureTests, PrefixIsAddedToEveryGeneratedCombinationAnd
 TEST_F(LineCombinationsFixtureTests, CombinationsMatchingAFailedOneAreSkipped)
 {
   std::vector<TrRouting::LineVector> failedCombinations {{lineA}};
-  std::vector<TrRouting::LineVector> allCombinations;
+  std::queue<TrRouting::LineVector> allCombinations;
   TrRouting::CombinationMap alreadyCalculatedCombinations;
 
   TrRouting::generateCombinations({lineA, lineB}, {}, failedCombinations, allCombinations,
