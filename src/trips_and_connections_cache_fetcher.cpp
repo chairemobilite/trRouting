@@ -120,12 +120,14 @@ namespace TrRouting
                                           );
                   } catch (std::out_of_range const& exc) {
                     spdlog::error("Index out of range while parsing connection for trip on line ({}, {})", path.line.longname, boost::uuids::to_string(path.line.uuid));
+                    close(fd);
                     return -1;
                   }
                 }
               } catch (std::out_of_range const& exc) {
                 // This will catch some of the early at()
                 spdlog::error("Index out of range while getting schedules for trip ({}) and path ({})", tripUuidStr, pathUuidStr);
+                close(fd);
                 return -1;
               }
             }
