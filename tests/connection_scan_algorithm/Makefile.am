@@ -5,6 +5,7 @@ csa_test_SOURCES = gtest.cpp \
     ../../src/calculation_time.cpp \
     ../../src/euclideangeofilter.cpp \
     ../../src/geofilter.cpp \
+    ../../src/osrmgeofilter.cpp \
     ../../src/connection_set.cpp \
     ../../src/connection_cache.cpp \
     ../../src/transit_data.cpp \
@@ -22,7 +23,8 @@ csa_test_SOURCES = gtest.cpp \
     parameters/accessibility_param_test.cpp \
     combinations_test.cpp \
     alternative_filter_test.cpp \
-    line_combinations_test.cpp
+    line_combinations_test.cpp \
+    osrm_geofilter_test.cpp
 
 csa_test_LDADD = $(top_srcdir)/tests/libgtest.la ../../connection_scan_algorithm/src/libcsa.la
 
