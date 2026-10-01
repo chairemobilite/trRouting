@@ -315,6 +315,45 @@ TEST_F(SingleTAndACalculationFixtureTests, TripWithAlternativesTooLong)
 
 }
 
+// Parameter: arrival time
+class TripWithAlternativesArrivalTimeTests : public SingleTAndACalculationFixtureTests, public ::testing::WithParamInterface<int> {};
+
+// Same trip as TripWithAlternatives, with an arrival time instead of a
+// departure time. Both alternatives leave the origin around 9:52 and arrive
+// before 10:32. The time between their arrival and the arrival time is not
+// travel time, so they must be found however long it is.
+TEST_P(TripWithAlternativesArrivalTimeTests, TripWithAlternativesArrivingBy)
+{
+    int arrivalTime = GetParam();
+
+    TrRouting::RouteParameters testParameters = TrRouting::RouteParameters(
+        std::make_unique<TrRouting::Point>(45.5242, -73.5817),
+        std::make_unique<TrRouting::Point>(45.5541, -73.6186),
+        transitData.getScenarios().at(TestDataFetcher::scenarioUuid),
+        arrivalTime,
+        DEFAULT_MIN_WAITING_TIME,
+        DEFAULT_MAX_TOTAL_TIME,
+        DEFAULT_MAX_ACCESS_TRAVEL_TIME,
+        DEFAULT_MAX_EGRESS_TRAVEL_TIME,
+        DEFAULT_MAX_TRANSFER_TRAVEL_TIME,
+        DEFAULT_MAX_INNER_TIME_OF_TRIP_BUFFER,
+        true,
+        false
+    );
+
+    TrRouting::AlternativesResult routingResult = calculateWithAlternatives(testParameters);
+    ASSERT_EQ(2u, routingResult.alternatives.size());
+    for (const auto &alternative : routingResult.alternatives)
+    {
+        EXPECT_LE(alternative->arrivalTime, arrivalTime);
+    }
+}
+
+INSTANTIATE_TEST_SUITE_P(
+    ArrivalTimes, TripWithAlternativesArrivalTimeTests,
+    ::testing::Values(getTimeInSeconds(10, 45), getTimeInSeconds(10, 55))
+);
+
 // Test a query with alternatives, for a trip with no routing found because too far from network
 TEST_F(SingleTAndACalculationFixtureTests, TripWithNoRoutingAlternatives)
 {
