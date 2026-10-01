@@ -19,12 +19,11 @@ namespace TrRouting {
       std::reference_wrapper<const Node> node;
       std::size_t osrmPosition;
     };
-    
+  }
+
+  std::string OsrmGeoFilter::formatOsrmCoordinates(const Point &point) {
     // By default, to_string convert a double to a string with 6 decimal digits
-    // TODO Add a unit test to ensure the formatting always have the right precisions (default might change in future standards)
-    std::string formatOsrmCoordinates(const Point &point) {
-      return std::to_string(point.longitude) + "," + std::to_string(point.latitude);
-    }
+    return std::to_string(point.longitude) + "," + std::to_string(point.latitude);
   }
 
   OsrmGeoFilter::OsrmGeoFilter(const std::string &amode, const std::string &ahost, const std::string &aport) :
