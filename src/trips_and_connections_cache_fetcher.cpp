@@ -63,7 +63,14 @@ namespace TrRouting
         for (const auto & schedule : schedules)
         {
           std::string serviceUuidStr = schedule.getServiceUuid();
-          auto & service  = services.at(uuidGenerator(serviceUuidStr));
+          auto serviceIter = services.find(uuidGenerator(serviceUuidStr));
+          if (serviceIter == services.end())
+          {
+            // Like the scenarios, which ignore unknown services, the trips of this schedule could not be used anyway
+            spdlog::warn("Ignoring the schedule of unknown service {} for line {} ({} {})", serviceUuidStr, boost::uuids::to_string(line.uuid), line.shortname, line.longname);
+            continue;
+          }
+          const Service & service = serviceIter->second;
 
           const auto periods {schedule.getPeriods()};
           for (const auto & period : periods)
@@ -113,12 +120,14 @@ namespace TrRouting
                                           );
                   } catch (std::out_of_range const& exc) {
                     spdlog::error("Index out of range while parsing connection for trip on line ({}, {})", path.line.longname, boost::uuids::to_string(path.line.uuid));
+                    close(fd);
                     return -1;
                   }
                 }
               } catch (std::out_of_range const& exc) {
                 // This will catch some of the early at()
                 spdlog::error("Index out of range while getting schedules for trip ({}) and path ({})", tripUuidStr, pathUuidStr);
+                close(fd);
                 return -1;
               }
             }
