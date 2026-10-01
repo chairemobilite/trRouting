@@ -1,3 +1,4 @@
+#include <format>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -19,11 +20,14 @@ namespace TrRouting {
       std::reference_wrapper<const Node> node;
       std::size_t osrmPosition;
     };
+
+    // Number of decimals of the coordinates sent to OSRM: 6 decimals of a degree is about 0.1 m
+    constexpr int OSRM_COORDINATES_PRECISION = 6;
   }
 
   std::string OsrmGeoFilter::formatOsrmCoordinates(const Point &point) {
-    // By default, to_string convert a double to a string with 6 decimal digits
-    return std::to_string(point.longitude) + "," + std::to_string(point.latitude);
+    // std::format only uses the locale with the L specifier, so the decimal separator is always a dot
+    return std::format("{:.{}f},{:.{}f}", point.longitude, OSRM_COORDINATES_PRECISION, point.latitude, OSRM_COORDINATES_PRECISION);
   }
 
   OsrmGeoFilter::OsrmGeoFilter(const std::string &amode, const std::string &ahost, const std::string &aport) :
