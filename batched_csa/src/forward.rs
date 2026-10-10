@@ -43,6 +43,7 @@ pub struct Transfers<'a> {
 }
 
 /// Parameters shared by all the queries of a batch, in seconds
+#[repr(C)]
 pub struct Parameters {
   pub min_waiting_time: i32,
   pub max_total_travel_time: i32,
