@@ -23,7 +23,8 @@ csa_test_SOURCES = gtest.cpp \
     combinations_test.cpp \
     alternative_filter_test.cpp \
     line_combinations_test.cpp \
-    compact_connection_set_test.cpp
+    compact_connection_set_test.cpp \
+    compact_transfers_test.cpp
 
 csa_test_LDADD = $(top_srcdir)/tests/libgtest.la ../../connection_scan_algorithm/src/libcsa.la
 
