@@ -5,6 +5,7 @@ noinst_LTLIBRARIES = libcsa.la
 libcsa_la_SOURCES = alternative_filter.cpp \
 	           alternatives_routing.cpp \
 		   calculator.cpp \
+		   compact_connection_set.cpp \
 		   forward_calculation.cpp \
 		   forward_journey.cpp \
 		   initializations.cpp \
