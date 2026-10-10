@@ -102,3 +102,4 @@ tests/benchmark_csa/cache
 tests/connection_scan_algorithm/csa_test
 tests/connection_scan_algorithm/csa_test-*
 tests/connection_scan_algorithm/csa_test.log
+batched_csa/target

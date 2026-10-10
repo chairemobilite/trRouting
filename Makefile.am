@@ -7,4 +7,8 @@ SUBDIRS = include \
 	  src \
 	  tests
 
+# Unit tests of the batched CSA crate
+check-local:
+	$(CARGO) test --manifest-path $(srcdir)/batched_csa/Cargo.toml
+
 

@@ -42,6 +42,7 @@ brew install spdlog
 brew install nlohmann-json
 brew install libmemcached
 brew install drogon
+brew install rust
 ```
 
 libmemcached is optional
@@ -49,7 +50,7 @@ libmemcached is optional
 ## Ubuntu 24.04 Install
 
 ```bash
-sudo apt install libboost-all-dev libjemalloc-dev libcapnp-dev capnproto libexpat1-dev libjsoncpp-dev libspdlog-dev nlohmann-json3-dev libdrogon-dev
+sudo apt install libboost-all-dev libjemalloc-dev libcapnp-dev capnproto libexpat1-dev libjsoncpp-dev libspdlog-dev nlohmann-json3-dev libdrogon-dev cargo
 ```
 You if you haven't installed other basic build dependencies, like autoconf, you will need to install them:
 ```
@@ -80,7 +81,7 @@ git submodule init
 git submodule update
 ```
 
-Then, to run the unit tests individually, simply run `make check`.
+Then, to run the unit tests individually, simply run `make check`. It also runs the unit tests of the Rust crate in `batched_csa/` with `cargo test`.
 
 If you get the following error when running `make check`, that's because the submodule initiation and update was done after the compilation configuration. Simply run again `autoreconf -i && ./configure` and it should work.
 

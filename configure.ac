@@ -29,6 +29,10 @@ PKG_CHECK_MODULES(CAPNP, capnp)
 AC_PATH_PROG(CAPNP_BIN, capnp, no)
 AS_IF([test x"$CAPNP_BIN" = x"no"], [AC_MSG_ERROR([Please install capnp binary.])])
 
+# Rust toolchain for the batched CSA crate (batched_csa/)
+AC_PATH_PROG(CARGO, cargo, no)
+AS_IF([test x"$CARGO" = x"no"], [AC_MSG_ERROR([Please install the Rust toolchain (cargo).])])
+
 PKG_CHECK_MODULES(SPDLOG, spdlog)
 
 PKG_CHECK_MODULES(JSON, nlohmann_json)

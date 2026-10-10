@@ -1,0 +1,11 @@
+[package]
+name = "batched_csa"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+# staticlib to link into trRouting, lib for the cargo tests
+crate-type = ["staticlib", "lib"]
+
+[dependencies]
