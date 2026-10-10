@@ -2,6 +2,7 @@ check_PROGRAMS = gtest
 
 gtest_SOURCES = gtest.cpp \
     benchmark_CSA_test.cpp \
+    benchmark_batched_forward_test.cpp \
     ../../src/cache_fetcher.cpp \
     ../../src/agencies_cache_fetcher.cpp \
     ../../src/nodes_cache_fetcher.cpp \
