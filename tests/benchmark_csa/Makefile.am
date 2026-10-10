@@ -18,7 +18,7 @@ gtest_SOURCES = gtest.cpp \
     ../../src/geofilter.cpp \
     ../../src/euclideangeofilter.cpp
 
-gtest_LDADD = $(top_srcdir)/tests/libgtest.la ../../connection_scan_algorithm/src/libcsa.la
+gtest_LDADD = $(top_srcdir)/tests/libgtest.la ../../connection_scan_algorithm/src/libcsa.la $(BATCHED_CSA_LIB)
 
 gtest_LDFLAGS = -no-pie -pthread
 

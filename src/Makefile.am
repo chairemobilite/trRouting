@@ -25,4 +25,4 @@ if HAVE_MEMCACHED
 trRouting_SOURCES += memcachedgeofilter.cpp
 endif
 
-trRouting_LDADD = ../connection_scan_algorithm/src/libcsa.la
+trRouting_LDADD = ../connection_scan_algorithm/src/libcsa.la $(BATCHED_CSA_LIB)
