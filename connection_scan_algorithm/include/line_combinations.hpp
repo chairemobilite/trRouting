@@ -4,6 +4,7 @@
 #include <functional>
 #include <iterator>
 #include <map>
+#include <queue>
 #include <vector>
 
 #include "combinations.hpp"
@@ -57,7 +58,7 @@ namespace TrRouting
      (the lines already excluded by the alternative that produced `foundLines`,
      empty for the first generation) and sorted.
 
-     A combination is appended to `allCombinations` only if it has not been seen
+     A combination is pushed to `allCombinations` only if it has not been seen
      before and does not match a failed combination. Combinations rejected by the
      failed check are still recorded in `alreadyCalculatedCombinations`, so a
      later generation does not evaluate them again.
@@ -65,13 +66,13 @@ namespace TrRouting
      @param foundLines Lines used by the alternative we are branching from
      @param prefix Lines already excluded, added to every generated combination
      @param failedCombinations Combinations known to yield no route
-     @param allCombinations Container the accepted combinations are appended to
+     @param allCombinations Queue the accepted combinations are pushed to
      @param alreadyCalculatedCombinations Bookkeeping of every combination seen
    */
   inline void generateCombinations(const LineVector & foundLines,
                                    const LineVector & prefix,
                                    const std::vector<LineVector> & failedCombinations,
-                                   std::vector<LineVector> & allCombinations,
+                                   std::queue<LineVector> & allCombinations,
                                    CombinationMap & alreadyCalculatedCombinations)
   {
     for (size_t k = 1; k <= foundLines.size(); k++)
@@ -90,7 +91,7 @@ namespace TrRouting
         // failed calculation of a combination.
         if (!isSupersetOfAnyCombinations(newCombination, failedCombinations))
         {
-          allCombinations.push_back(newCombination);
+          allCombinations.push(newCombination);
         }
       }
     }

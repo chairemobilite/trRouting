@@ -88,7 +88,7 @@ namespace TrRouting
   AlternativesResult Calculator::alternativesRouting(const RouteParameters &parameters)
   {
 
-    std::vector< LineVector >  allCombinations;
+    std::queue< LineVector >   allCombinations;
     std::vector< LineVector >  failedCombinations;
     CombinationMap alreadyCalculatedCombinations;
     CombinationMap alreadyFoundLines;
@@ -164,14 +164,13 @@ namespace TrRouting
 
     // Process all combinations and calculate new route with those excluded
     const int maxValidAlternatives = parameters.getMaxValidAlternatives();
-    for (size_t i = 0;
-         i < allCombinations.size()
+    while (!allCombinations.empty()
            && alternativesCalculatedCount < maxAlternatives
-           && alternativeSequence - 1 < maxValidAlternatives;
-         i++)
+           && alternativeSequence - 1 < maxValidAlternatives)
     {
       // Generate parameters to send to calculate
-      const LineVector combination = allCombinations.at(i);
+      const LineVector combination = std::move(allCombinations.front());
+      allCombinations.pop();
 
       AlternativeLineFilter lineFilter(combination);
 
