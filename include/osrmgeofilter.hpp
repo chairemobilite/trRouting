@@ -18,6 +18,16 @@ namespace TrRouting
                                                                        float walkingSpeedMetersPerSecond,
                                                                        bool reversed = false);
   protected:
+    /**
+     * Format the coordinates of a point as sent to OSRM: "longitude,latitude",
+     * with exactly 6 decimals (about 0.1 m)
+     *
+     * @param point The point to format
+     * @return std::string The formatted coordinates
+     */
+    static std::string formatOsrmCoordinates(const Point &point);
+
+
     std::string mode;
     std::string host;
     std::string port; //Could be an int, but it's used as a string every where. Keep a string remove conversions
