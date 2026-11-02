@@ -63,8 +63,10 @@ namespace TrRouting {
 
     std::shared_ptr<ConnectionSet> getConnectionsForScenario(const Scenario & scenario) const;
 
+  protected:
     /**
-     * The update* methods get the data from the data fetcher
+     * The update* methods get the data from the data fetcher. They are only
+     * called once, from the constructor, when loading all the data.
      *
      * @return 0 in case of success, values below 0 when errors occurred:
      * -EBADMSG if deserialization did not work
@@ -72,15 +74,14 @@ namespace TrRouting {
      * -EINVAL For any other data related error
      * -(error codes from the open system call)
      */
-    int updateAgencies(std::string customPath = "");
-    int updateServices(std::string customPath = "");
-    int updateNodes(std::string customPath = "");
-    int updateLines(std::string customPath = "");
-    int updatePaths(std::string customPath = "");
-    int updateScenarios(std::string customPath = "");
-    int updateSchedules(std::string customPath = "");
-    
-  protected:
+    int updateAgencies();
+    int updateServices();
+    int updateNodes();
+    int updateLines();
+    int updatePaths();
+    int updateScenarios();
+    int updateSchedules();
+
     DataStatus loadAllData();
     int generateForwardAndReverseConnections();
 

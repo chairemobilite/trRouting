@@ -11,7 +11,6 @@
 
 #include <boost/uuid/uuid.hpp>
 #include <boost/program_options.hpp>
-#include <boost/algorithm/string.hpp>
 
 #include "cache_fetcher.hpp"
 #include "calculation_time.hpp"
@@ -229,103 +228,6 @@ int main(int argc, char** argv) {
   // the Drogon IO loops only accept connections and parse HTTP, all heavy
   // work is dispatched here so IO is never blocked by a calculation.
   trantor::ConcurrentTaskQueue computePool(programOptions.numberOfThreads, "csa-compute");
-
-  // updateCache:
-  registerGet("/updateCache",
-    [&transitData](const drogon::HttpRequestPtr &request, HandlerCallback &&callback) {
-
-    std::string              response {""};
-    std::string              customCacheDirectoryPath {""};
-    std::string              cacheNamesStr {""};
-    std::vector<std::string> cacheNames;
-    std::vector<std::string> cacheNamesVector;
-
-    // prepare parameters:
-    for (const auto &field : request->getParameters())
-    {
-      const std::string &parameterName = field.first;
-
-      if (parameterName == "names" || parameterName == "caches" || parameterName == "cache_names" || parameterName == "name" || parameterName == "cache" || parameterName == "cache_name")
-      {
-        boost::split(cacheNamesVector, field.second, boost::is_any_of(","));
-        for(std::string cacheName : cacheNamesVector)
-        {
-          cacheNames.push_back(cacheName);
-        }
-        continue;
-      }
-      if (parameterName == "path" || parameterName == "custom_path" || parameterName == "custom_cache_path")
-      {
-        customCacheDirectoryPath = field.second;
-        continue;
-      }
-    }
-
-    bool correctCacheName {false};
-    //TODO Merge this and the preparations.cpp code
-    for(std::string cacheName : cacheNames)
-    {
-      if (cacheName == "agencies" || cacheName == "all")
-      {
-        correctCacheName = true;
-        transitData.updateAgencies(customCacheDirectoryPath);
-      }
-      if (cacheName == "services" || cacheName == "all")
-      {
-        correctCacheName = true;
-        transitData.updateServices(customCacheDirectoryPath);
-      }
-      if (cacheName == "nodes" || cacheName == "all")
-      {
-        correctCacheName = true;
-        transitData.updateNodes(customCacheDirectoryPath);
-      }
-      if (cacheName == "lines" || cacheName == "all")
-      {
-        correctCacheName = true;
-        transitData.updateLines(customCacheDirectoryPath);
-      }
-      if (cacheName == "paths" || cacheName == "all")
-      {
-        correctCacheName = true;
-        transitData.updatePaths(customCacheDirectoryPath);
-      }
-      if (cacheName == "scenarios" || cacheName == "all")
-      {
-        correctCacheName = true;
-        transitData.updateScenarios(customCacheDirectoryPath);
-      }
-      if (cacheName == "schedules" || cacheName == "all")
-      {
-        correctCacheName = true;
-        transitData.updateSchedules(customCacheDirectoryPath);
-      }
-
-      //TODO This is incorrect if we have multiple name and the second one is wrong, correctCacheName is always true
-      if (correctCacheName)
-      {
-        cacheNamesStr += cacheName;
-        cacheNamesStr += ",";
-      }
-    }
-
-    //TODO do this only if we had at least one correct name
-    //Reinit some data after the update
-    // TODO Just the schedules???
-    if (cacheNames.size() > 0)
-    {
-      // Remove last ","
-      cacheNamesStr.pop_back();
-      response = "{\"status\": \"success\", \"cache_names\": \"" + cacheNamesStr + "\", \"custom_cache_path\": \"" + customCacheDirectoryPath + "\"}";
-    }
-    else
-    {
-      response = "{\"status\": \"error\", \"error\": \"missing or wrong cache name\"}";
-    }
-
-    callback(makeJsonResponse(response));
-
-  });
 
   // closeServer and exit app:
   registerGet("/exit",
