@@ -104,11 +104,27 @@ namespace TrRouting {
 
   int TransitData::updateSchedules()
   {
+    // Every query requires a scenario, so without scenarios no trip can ever
+    // be used: don't read the schedules at all. This is not returned as an
+    // error, so that the data status reports the missing scenarios.
+    if (scenarios.empty())
+    {
+      spdlog::error("There are no scenarios, the schedules are not loaded since every query requires a scenario");
+      return 0;
+    }
+
+    // No query can use the trips of a service that no scenario uses, so their
+    // schedules are not loaded. On caches that contain many unused services,
+    // for example from older GTFS imports, this saves a lot of memory.
+    std::set<boost::uuids::uuid> servicesToLoad = getServicesUsedByScenarios();
+    spdlog::info("Loading the schedules of the {} services used by the scenarios, out of {} services", servicesToLoad.size(), services.size());
+
     int ret =  dataFetcher.getSchedules(
       trips,
       getLines(),
       paths,
       getServices(),
+      servicesToLoad,
       connections
     );
     if (ret < 0)
@@ -116,6 +132,32 @@ namespace TrRouting {
       return ret;
     }
     return generateForwardAndReverseConnections();
+  }
+
+  std::set<boost::uuids::uuid> TransitData::getServicesUsedByScenarios() const
+  {
+    std::set<boost::uuids::uuid> usedServices;
+    for (const auto & scenarioIte : scenarios)
+    {
+      const Scenario & scenario = scenarioIte.second;
+      // getConnectionsForScenario enables the trips of all the services for a
+      // scenario without services. This also happens when none of the
+      // scenario's service uuids exist (see getScenarios).
+      if (scenario.servicesList.empty())
+      {
+        std::set<boost::uuids::uuid> allServices;
+        for (const auto & serviceIte : services)
+        {
+          allServices.insert(serviceIte.first);
+        }
+        return allServices;
+      }
+      for (const Service & service : scenario.servicesList)
+      {
+        usedServices.insert(service.uuid);
+      }
+    }
+    return usedServices;
   }
 
   int TransitData::generateForwardAndReverseConnections()

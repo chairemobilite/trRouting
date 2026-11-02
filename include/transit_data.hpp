@@ -2,6 +2,7 @@
 #define TR_TRANSIT_DATA
 
 #include <map>
+#include <set>
 #include <string>
 #include <vector>
 #include <memory>
@@ -63,6 +64,13 @@ namespace TrRouting {
 
     std::shared_ptr<ConnectionSet> getConnectionsForScenario(const Scenario & scenario) const;
 
+    /**
+     * Get the uuids of the services used by at least one scenario. This is
+     * all the services when a scenario has no services, which means all
+     * services for getConnectionsForScenario.
+     */
+    std::set<boost::uuids::uuid> getServicesUsedByScenarios() const;
+
   protected:
     /**
      * The update* methods get the data from the data fetcher. They are only
@@ -80,6 +88,8 @@ namespace TrRouting {
     int updateLines();
     int updatePaths();
     int updateScenarios();
+    // The scenarios must be loaded first, since only the schedules of the
+    // services they use are loaded
     int updateSchedules();
 
     DataStatus loadAllData();
