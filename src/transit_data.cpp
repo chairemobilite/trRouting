@@ -72,45 +72,44 @@ namespace TrRouting {
     return DataStatus::READY;
   }
 
-  int TransitData::updateNodes(std::string customPath)
+  int TransitData::updateNodes()
   {
-    return dataFetcher.getNodes(nodes, customPath);
+    return dataFetcher.getNodes(nodes);
   }
 
-  int TransitData::updateAgencies(std::string customPath)
+  int TransitData::updateAgencies()
   {
-    return dataFetcher.getAgencies(agencies, customPath);
+    return dataFetcher.getAgencies(agencies);
   }
 
-  int TransitData::updateServices(std::string customPath)
+  int TransitData::updateServices()
   {
-    return dataFetcher.getServices(services, customPath);
+    return dataFetcher.getServices(services);
   }
 
-  int TransitData::updateLines(std::string customPath)
+  int TransitData::updateLines()
   {
-    return dataFetcher.getLines(lines, getAgencies(), getModes(), customPath);
+    return dataFetcher.getLines(lines, getAgencies(), getModes());
   }
 
-  int TransitData::updatePaths(std::string customPath)
+  int TransitData::updatePaths()
   {
-    return dataFetcher.getPaths(paths, getLines(), getNodes(), customPath);
+    return dataFetcher.getPaths(paths, getLines(), getNodes());
   }
 
-  int TransitData::updateScenarios(std::string customPath)
+  int TransitData::updateScenarios()
   {
-    return dataFetcher.getScenarios(scenarios, getServices(), getLines(), getAgencies(), getNodes(), getModes(), customPath);
+    return dataFetcher.getScenarios(scenarios, getServices(), getLines(), getAgencies(), getNodes(), getModes());
   }
 
-  int TransitData::updateSchedules(std::string customPath)
+  int TransitData::updateSchedules()
   {
     int ret =  dataFetcher.getSchedules(
       trips,
       getLines(),
       paths,
       getServices(),
-      connections,
-      customPath
+      connections
     );
     if (ret < 0)
     {
@@ -125,10 +124,6 @@ namespace TrRouting {
     // Copy the connections to both forward and reverse vectors
     forwardConnections.assign(connections.begin(), connections.end());
     reverseConnections.assign(connections.begin(), connections.end());
-
-    // Only necessary when someone call updateSchedules with a smaller set of connections
-    forwardConnections.shrink_to_fit();
-    reverseConnections.shrink_to_fit();
 
     try
     {
