@@ -115,6 +115,7 @@ class TestDataFetcher : public TrRouting::DataFetcher
       const std::map<boost::uuids::uuid, TrRouting::Line>& lines,
       std::map<boost::uuids::uuid, TrRouting::Path>& paths,
       const std::map<boost::uuids::uuid, TrRouting::Service>& services,
+      const std::set<boost::uuids::uuid>& servicesToLoad,
       std::vector<TrRouting::Connection>& connections,
       std::string customPath = ""
     );

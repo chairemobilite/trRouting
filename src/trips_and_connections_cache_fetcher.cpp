@@ -25,6 +25,7 @@ namespace TrRouting
     const std::map<boost::uuids::uuid, Line>& lines,
     std::map<boost::uuids::uuid, Path>& paths,
     const std::map<boost::uuids::uuid, Service>& services,
+    const std::set<boost::uuids::uuid>& servicesToLoad,
     std::vector<Connection>& connections,
     std::string customPath
   )
@@ -39,6 +40,9 @@ namespace TrRouting
     unsigned long nodeTimesCount;
     unsigned long linesCount {lines.size()};
     int lineI {0};
+    // Count what is left out by the servicesToLoad filter, for the logs
+    unsigned long skippedSchedulesCount {0};
+    unsigned long skippedTripsCount {0};
     
     spdlog::info("Fetching trips and connections from cache... ({} lines)", linesCount);
 
@@ -63,7 +67,22 @@ namespace TrRouting
         for (const auto & schedule : schedules)
         {
           std::string serviceUuidStr = schedule.getServiceUuid();
-          auto & service  = services.at(uuidGenerator(serviceUuidStr));
+          boost::uuids::uuid serviceUuid = uuidGenerator(serviceUuidStr);
+
+          // Skip the schedules of services that should not be loaded, before
+          // reading their trips, so that their trips and connections are never
+          // created. Only their trips are counted, to log what was left out.
+          if (servicesToLoad.count(serviceUuid) == 0)
+          {
+            skippedSchedulesCount++;
+            for (const auto & period : schedule.getPeriods())
+            {
+              skippedTripsCount += period.getTrips().size();
+            }
+            continue;
+          }
+
+          auto & service  = services.at(serviceUuid);
 
           const auto periods {schedule.getPeriods()};
           for (const auto & period : periods)
@@ -137,7 +156,8 @@ namespace TrRouting
 
       close(fd);
     }
-    spdlog::info("Fetching trips and connections from cache DONE");
+    spdlog::info("Fetching trips and connections from cache DONE ({} trips, {} connections)", trips.size(), connections.size());
+    spdlog::info("Skipped {} trips in {} schedules of services that are not in the services to load", skippedTripsCount, skippedSchedulesCount);
 
     return 0;
 
