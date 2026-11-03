@@ -95,7 +95,7 @@ namespace TrRouting
           for (int i = 0; i < journeyStepIdx; i++)
           {
             
-            // Search for CSL (1): Cut superfluous line:
+            // CSL (1): this step alights where an earlier step already passes, so the line past that stop is superfluous
             if (inBetweenNodesByJourneyStepIdx[i].size() > 0)
             {
               auto commonNodeI = std::find(inBetweenNodesByJourneyStepIdx[i].begin(), inBetweenNodesByJourneyStepIdx[i].end(), lastNodeByJourneyStepIdx.at(journeyStepIdx).value());
@@ -184,20 +184,21 @@ namespace TrRouting
       // deal with optimization cases:
       if (optimizationCase == 1) // CSL
       {
+        // optimizationNode is the alighting node of the later step. The earlier step already passes by it and will be shortened to alight there.
         //TODO We might need to check if the optional have a value
         auto tripOptRef = journey[fromJourneyStepIdx].getFinalTrip();
         auto enterConnectOptRef = journey[fromJourneyStepIdx].getFinalEnterConnection();
         auto exitConnectOptRef = journey[fromJourneyStepIdx].getFinalExitConnection();
         
-        const Trip & trip = tripOptRef.value().get();
+        const Trip & tripToOptimize = tripOptRef.value().get();
         int sequenceStartIdx = enterConnectOptRef.value().get().getSequenceInTrip() - 1;
         int sequenceEndIdx = exitConnectOptRef.value().get().getSequenceInTrip() - 1;
 
         // Editorial comment: There's lot of +1/-1 in this code. This suggest that we have an array index that start at 1 instead of zero. This need confirmation
-        assert(trip.reverseConnections.size() >= static_cast<size_t>(1 + sequenceEndIdx)); // make sure sequenceIdx will be valid
-        for(size_t sequenceIdx = trip.reverseConnections.size() - 1 - sequenceEndIdx; sequenceIdx <= trip.reverseConnections.size() - 1 - sequenceStartIdx; ++sequenceIdx)
+        assert(tripToOptimize.reverseConnections.size() >= static_cast<size_t>(1 + sequenceEndIdx)); // make sure sequenceIdx will be valid
+        for(size_t sequenceIdx = tripToOptimize.reverseConnections.size() - 1 - sequenceEndIdx; sequenceIdx <= tripToOptimize.reverseConnections.size() - 1 - sequenceStartIdx; ++sequenceIdx)
         {
-          auto connection = trip.reverseConnections[sequenceIdx];
+          auto connection = tripToOptimize.reverseConnections[sequenceIdx];
           
           if (optimizationNode.value() == connection.get().getArrivalNode())
           {
@@ -209,14 +210,10 @@ namespace TrRouting
             else
             {
               usedOptimizationCases.push_back(1);
-              if (toJourneyStepIdx - fromJourneyStepIdx == 1)
-              {
-                journey.erase(journey.begin() + toJourneyStepIdx);
-              }
-              else if (toJourneyStepIdx - fromJourneyStepIdx > 1) // could not split correctly...
-              {
-                journey.erase(journey.begin() + fromJourneyStepIdx + 1, journey.begin() + toJourneyStepIdx);
-              }
+              // The from step passes by the node where the to step alights: it will alight
+              // there instead, so all the steps after it, up to and including the to step,
+              // are superfluous (see references/journey_optimization_1_csl.png)
+              journey.erase(journey.begin() + fromJourneyStepIdx + 1, journey.begin() + toJourneyStepIdx + 1);
               journey[fromJourneyStepIdx].setFinalExitConnection(connection);
 
               break;
