@@ -29,6 +29,8 @@ struct Period {
   numberOfUnits        @7 :Int16;
   trips                @8 :List(Trip);
   isFrozen             @9 :Int8;
+  customEndAtSeconds  @10 :Int32;
+  uuid                @11 :Text;
 }
 
 struct Schedule {
