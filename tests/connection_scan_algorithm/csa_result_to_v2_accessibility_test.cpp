@@ -40,7 +40,7 @@ TEST_F(ResultToV2AccessFixtureTest, TestNoRoutingFoundResultDefaultV2Access)
 {
     nlohmann::json jsonResponse = TrRouting::ResultToV2AccessibilityResponse::noRoutingFoundResponse(*accessParameters.get(), TrRouting::NoRoutingReason::NO_ROUTING_FOUND);
 
-    ASSERT_EQ(STATUS_NO_ROUTING_FOUND, jsonResponse["status"]);
+    ASSERT_EQ(STATUS_NO_ROUTING_FOUND, jsonResponse["status"].get<std::string>());
     assertQueryConversion(jsonResponse);
     ASSERT_EQ("NO_ROUTING_FOUND", jsonResponse["reason"]);
 }
@@ -49,7 +49,7 @@ TEST_F(ResultToV2AccessFixtureTest, TestNoRoutingFoundResultWithReasonV2Access)
 {
     nlohmann::json jsonResponse = TrRouting::ResultToV2AccessibilityResponse::noRoutingFoundResponse(*accessParameters.get(), TrRouting::NoRoutingReason::NO_ACCESS_AT_ORIGIN);
 
-    ASSERT_EQ(STATUS_NO_ROUTING_FOUND, jsonResponse["status"]);
+    ASSERT_EQ(STATUS_NO_ROUTING_FOUND, jsonResponse["status"].get<std::string>());
     assertQueryConversion(jsonResponse);
     ASSERT_EQ("NO_ACCESS_AT_PLACE", jsonResponse["reason"]);
 }
@@ -79,7 +79,7 @@ TEST_F(ResultToV2AccessFixtureTest, TestAllNodesForwardV2Access)
     // Validate response
     nlohmann::json jsonResponse = TrRouting::ResultToV2AccessibilityResponse::resultToJsonString(result, *accessParameters.get());
 
-    ASSERT_EQ(STATUS_SUCCESS, jsonResponse["status"]);
+    ASSERT_EQ(STATUS_SUCCESS, jsonResponse["status"].get<std::string>());
     assertQueryConversion(jsonResponse);
 
     // Validate result
@@ -87,9 +87,9 @@ TEST_F(ResultToV2AccessFixtureTest, TestAllNodesForwardV2Access)
     ASSERT_EQ(2u, jsonResponse["result"]["nodes"].size());
 
     // Validate first node
-    ASSERT_EQ(boardingNode->name, jsonResponse["result"]["nodes"][0]["nodeName"]);
-    ASSERT_EQ(boardingNode->code, jsonResponse["result"]["nodes"][0]["nodeCode"]);
-    ASSERT_EQ(boardingNodeUuid, jsonResponse["result"]["nodes"][0]["nodeUuid"]);
+    ASSERT_EQ(boardingNode->name, jsonResponse["result"]["nodes"][0]["nodeName"].get<std::string>());
+    ASSERT_EQ(boardingNode->code, jsonResponse["result"]["nodes"][0]["nodeCode"].get<std::string>());
+    ASSERT_EQ(boardingNodeUuid, jsonResponse["result"]["nodes"][0]["nodeUuid"].get<std::string>());
     ASSERT_EQ(boardingNode->point.get()->longitude, jsonResponse["result"]["nodes"][0]["nodeCoordinates"][0]);
     ASSERT_EQ(boardingNode->point.get()->latitude, jsonResponse["result"]["nodes"][0]["nodeCoordinates"][1]);
     ASSERT_EQ(DEFAULT_TIME + node1TravelTime, jsonResponse["result"]["nodes"][0]["nodeTime"]);
@@ -97,9 +97,9 @@ TEST_F(ResultToV2AccessFixtureTest, TestAllNodesForwardV2Access)
     ASSERT_EQ(node1Transfers, jsonResponse["result"]["nodes"][0]["numberOfTransfers"]);
 
     // Validate second node
-    ASSERT_EQ(unboardingNode->name, jsonResponse["result"]["nodes"][1]["nodeName"]);
-    ASSERT_EQ(unboardingNode->code, jsonResponse["result"]["nodes"][1]["nodeCode"]);
-    ASSERT_EQ(unboardingNodeUuid, jsonResponse["result"]["nodes"][1]["nodeUuid"]);
+    ASSERT_EQ(unboardingNode->name, jsonResponse["result"]["nodes"][1]["nodeName"].get<std::string>());
+    ASSERT_EQ(unboardingNode->code, jsonResponse["result"]["nodes"][1]["nodeCode"].get<std::string>());
+    ASSERT_EQ(unboardingNodeUuid, jsonResponse["result"]["nodes"][1]["nodeUuid"].get<std::string>());
     ASSERT_EQ(unboardingNode->point.get()->longitude, jsonResponse["result"]["nodes"][1]["nodeCoordinates"][0]);
     ASSERT_EQ(unboardingNode->point.get()->latitude, jsonResponse["result"]["nodes"][1]["nodeCoordinates"][1]);
     ASSERT_EQ(DEFAULT_TIME + node2TravelTime, jsonResponse["result"]["nodes"][1]["nodeTime"]);
@@ -148,7 +148,7 @@ TEST_F(ResultToV2AccessFixtureTest, TestAllNodesBackwardV2Access)
     // Validate response
     nlohmann::json jsonResponse = TrRouting::ResultToV2AccessibilityResponse::resultToJsonString(result, backwardParams);
 
-    ASSERT_EQ(STATUS_SUCCESS, jsonResponse["status"]);
+    ASSERT_EQ(STATUS_SUCCESS, jsonResponse["status"].get<std::string>());
     assertQueryConversion(jsonResponse, false);
 
     // Validate result
@@ -156,9 +156,9 @@ TEST_F(ResultToV2AccessFixtureTest, TestAllNodesBackwardV2Access)
     ASSERT_EQ(2u, jsonResponse["result"]["nodes"].size());
 
     // Validate first node
-    ASSERT_EQ(boardingNode->name, jsonResponse["result"]["nodes"][0]["nodeName"]);
-    ASSERT_EQ(boardingNode->code, jsonResponse["result"]["nodes"][0]["nodeCode"]);
-    ASSERT_EQ(boardingNodeUuid, jsonResponse["result"]["nodes"][0]["nodeUuid"]);
+    ASSERT_EQ(boardingNode->name, jsonResponse["result"]["nodes"][0]["nodeName"].get<std::string>());
+    ASSERT_EQ(boardingNode->code, jsonResponse["result"]["nodes"][0]["nodeCode"].get<std::string>());
+    ASSERT_EQ(boardingNodeUuid, jsonResponse["result"]["nodes"][0]["nodeUuid"].get<std::string>());
     ASSERT_EQ(boardingNode->point.get()->longitude, jsonResponse["result"]["nodes"][0]["nodeCoordinates"][0]);
     ASSERT_EQ(boardingNode->point.get()->latitude, jsonResponse["result"]["nodes"][0]["nodeCoordinates"][1]);
     ASSERT_EQ(DEFAULT_TIME - node1TravelTime, jsonResponse["result"]["nodes"][0]["nodeTime"]);
@@ -166,9 +166,9 @@ TEST_F(ResultToV2AccessFixtureTest, TestAllNodesBackwardV2Access)
     ASSERT_EQ(node1Transfers, jsonResponse["result"]["nodes"][0]["numberOfTransfers"]);
 
     // Validate second node
-    ASSERT_EQ(unboardingNode->name, jsonResponse["result"]["nodes"][1]["nodeName"]);
-    ASSERT_EQ(unboardingNode->code, jsonResponse["result"]["nodes"][1]["nodeCode"]);
-    ASSERT_EQ(unboardingNodeUuid, jsonResponse["result"]["nodes"][1]["nodeUuid"]);
+    ASSERT_EQ(unboardingNode->name, jsonResponse["result"]["nodes"][1]["nodeName"].get<std::string>());
+    ASSERT_EQ(unboardingNode->code, jsonResponse["result"]["nodes"][1]["nodeCode"].get<std::string>());
+    ASSERT_EQ(unboardingNodeUuid, jsonResponse["result"]["nodes"][1]["nodeUuid"].get<std::string>());
     ASSERT_EQ(unboardingNode->point.get()->longitude, jsonResponse["result"]["nodes"][1]["nodeCoordinates"][0]);
     ASSERT_EQ(unboardingNode->point.get()->latitude, jsonResponse["result"]["nodes"][1]["nodeCoordinates"][1]);
     ASSERT_EQ(DEFAULT_TIME - node2TravelTime, jsonResponse["result"]["nodes"][1]["nodeTime"]);
