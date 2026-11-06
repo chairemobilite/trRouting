@@ -11,8 +11,37 @@
 
 namespace TrRouting
 {
-  class NodeTimeDistance;
-  
+  class Node;
+
+  /* Store information about access time and distance to a specific Node.
+
+     This class must be defined before Node, which has vectors of it. Since
+     C++20, the std::vector destructor is constexpr, and Clang defines it
+     where it is first used, in the Node constructor, so we need the full
+     NodeTimeDistance type at that moment. */
+  class NodeTimeDistance {
+
+  public:
+    NodeTimeDistance(const Node& _node, int _time, int _distance) :
+      node(_node),
+      time(_time),
+      distance(_distance)
+    {
+
+    }
+    NodeTimeDistance(const NodeTimeDistance &_node):
+      node(_node.node),
+      time(_node.time),
+      distance(_node.distance)
+    {
+
+    }
+
+    const Node & node;
+    const int time;
+    const int distance;
+  };
+
   class Node {
   public:
 
@@ -65,30 +94,6 @@ namespace TrRouting
   {
     return lhs.get() < rhs.get();
   }
-
-  // Store information about access time and distance to a specific Node
-  class NodeTimeDistance {
-
-  public:
-    NodeTimeDistance(const Node& _node, int _time, int _distance) :
-      node(_node),
-      time(_time),
-      distance(_distance)
-    {
-
-    }
-    NodeTimeDistance(const NodeTimeDistance &_node):
-      node(_node.node),
-      time(_node.time),
-      distance(_node.distance)
-    {
-
-    }
-
-    const Node & node;
-    const int time;
-    const int distance;
-  };
 
 }
 
