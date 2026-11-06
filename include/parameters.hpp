@@ -7,11 +7,11 @@
 #include <optional>
 #include <boost/uuid/uuid.hpp>
 #include "toolbox.hpp" //MAX_INT
+#include "point.hpp" // The inline destructor of RouteParameters deletes Points, so they must be complete
 
 namespace TrRouting
 {
 
-  class Point;
   class Scenario;
   class Node;
   class Mode;
