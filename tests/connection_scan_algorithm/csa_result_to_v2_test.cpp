@@ -23,7 +23,7 @@ TEST_F(ResultToV2FixtureTest, TestNoRoutingFoundResultDefaultReasonV2)
     TrRouting::Point* origin = testParameters.get()->getOrigin();
     TrRouting::Point* destination = testParameters.get()->getDestination();
 
-    ASSERT_EQ(STATUS_NO_ROUTING_FOUND, jsonResponse["status"]);
+    ASSERT_EQ(STATUS_NO_ROUTING_FOUND, jsonResponse["status"].get<std::string>());
     ASSERT_EQ(origin->latitude, jsonResponse["query"]["origin"][1]);
     ASSERT_EQ(origin->longitude, jsonResponse["query"]["origin"][0]);
     ASSERT_EQ(destination->latitude, jsonResponse["query"]["destination"][1]);
@@ -40,7 +40,7 @@ TEST_F(ResultToV2FixtureTest, TestNoRoutingFoundResultWithReasonV2)
     TrRouting::Point* origin = testParameters.get()->getOrigin();
     TrRouting::Point* destination = testParameters.get()->getDestination();
 
-    ASSERT_EQ(STATUS_NO_ROUTING_FOUND, jsonResponse["status"]);
+    ASSERT_EQ(STATUS_NO_ROUTING_FOUND, jsonResponse["status"].get<std::string>());
     ASSERT_EQ(origin->latitude, jsonResponse["query"]["origin"][1]);
     ASSERT_EQ(origin->longitude, jsonResponse["query"]["origin"][0]);
     ASSERT_EQ(destination->latitude, jsonResponse["query"]["destination"][1]);
@@ -60,7 +60,7 @@ TEST_F(ResultToV2FixtureTest, TestSingleCalculationResultV2)
     nlohmann::json jsonResponse = TrRouting::ResultToV2Response::resultToJsonString(result, *testParameters.get());
 
     // Validate status and query results
-    ASSERT_EQ(STATUS_SUCCESS, jsonResponse["status"]);
+    ASSERT_EQ(STATUS_SUCCESS, jsonResponse["status"].get<std::string>());
     ASSERT_EQ(params.getOrigin()->latitude, jsonResponse["query"]["origin"][1]);
     ASSERT_EQ(params.getOrigin()->longitude, jsonResponse["query"]["origin"][0]);
     ASSERT_EQ(params.getDestination()->latitude, jsonResponse["query"]["destination"][1]);
@@ -90,7 +90,7 @@ TEST_F(ResultToV2FixtureTest, TestAlternativesResultV2)
     nlohmann::json jsonResponse =  TrRouting::ResultToV2Response::resultToJsonString(result, *testParameters.get());
 
     // Validate status and query results
-    ASSERT_EQ(STATUS_SUCCESS, jsonResponse["status"]);
+    ASSERT_EQ(STATUS_SUCCESS, jsonResponse["status"].get<std::string>());
     ASSERT_EQ(params.getOrigin()->latitude, jsonResponse["query"]["origin"][1]);
     ASSERT_EQ(params.getOrigin()->longitude, jsonResponse["query"]["origin"][0]);
     ASSERT_EQ(params.getDestination()->latitude, jsonResponse["query"]["destination"][1]);
@@ -143,21 +143,21 @@ void ResultToV2FixtureTest::assertResultConversion(nlohmann::json jsonResponse, 
     // Test the boarding step
     TrRouting::BoardingStep& boardingStep = dynamic_cast<TrRouting::BoardingStep&>(*result.steps[1].get());
     ASSERT_EQ("boarding", jsonResponse["steps"][1]["action"]);
-    ASSERT_EQ(agency->acronym, jsonResponse["steps"][1]["agencyAcronym"]);
-    ASSERT_EQ(agency->name, jsonResponse["steps"][1]["agencyName"]);
-    ASSERT_EQ(agencyUuid, jsonResponse["steps"][1]["agencyUuid"]);
-    ASSERT_EQ(line->shortname, jsonResponse["steps"][1]["lineShortname"]);
-    ASSERT_EQ(line->longname, jsonResponse["steps"][1]["lineLongname"]);
-    ASSERT_EQ(lineUuid, jsonResponse["steps"][1]["lineUuid"]);
-    ASSERT_EQ(pathUuid, jsonResponse["steps"][1]["pathUuid"]);
-    ASSERT_EQ(mode->name, jsonResponse["steps"][1]["modeName"]);
-    ASSERT_EQ(mode->shortname, jsonResponse["steps"][1]["mode"]);
-    ASSERT_EQ(tripUuid, jsonResponse["steps"][1]["tripUuid"]);
+    ASSERT_EQ(agency->acronym, jsonResponse["steps"][1]["agencyAcronym"].get<std::string>());
+    ASSERT_EQ(agency->name, jsonResponse["steps"][1]["agencyName"].get<std::string>());
+    ASSERT_EQ(agencyUuid, jsonResponse["steps"][1]["agencyUuid"].get<std::string>());
+    ASSERT_EQ(line->shortname, jsonResponse["steps"][1]["lineShortname"].get<std::string>());
+    ASSERT_EQ(line->longname, jsonResponse["steps"][1]["lineLongname"].get<std::string>());
+    ASSERT_EQ(lineUuid, jsonResponse["steps"][1]["lineUuid"].get<std::string>());
+    ASSERT_EQ(pathUuid, jsonResponse["steps"][1]["pathUuid"].get<std::string>());
+    ASSERT_EQ(mode->name, jsonResponse["steps"][1]["modeName"].get<std::string>());
+    ASSERT_EQ(mode->shortname, jsonResponse["steps"][1]["mode"].get<std::string>());
+    ASSERT_EQ(tripUuid, jsonResponse["steps"][1]["tripUuid"].get<std::string>());
     ASSERT_EQ(boardingStep.legSequenceInTrip, jsonResponse["steps"][1]["legSequenceInTrip"]);
     ASSERT_EQ(boardingStep.stopSequenceInTrip, jsonResponse["steps"][1]["stopSequenceInTrip"]);
-    ASSERT_EQ(boardingNode->name, jsonResponse["steps"][1]["nodeName"]);
-    ASSERT_EQ(boardingNode->code, jsonResponse["steps"][1]["nodeCode"]);
-    ASSERT_EQ(boardingNodeUuid, jsonResponse["steps"][1]["nodeUuid"]);
+    ASSERT_EQ(boardingNode->name, jsonResponse["steps"][1]["nodeName"].get<std::string>());
+    ASSERT_EQ(boardingNode->code, jsonResponse["steps"][1]["nodeCode"].get<std::string>());
+    ASSERT_EQ(boardingNodeUuid, jsonResponse["steps"][1]["nodeUuid"].get<std::string>());
     ASSERT_EQ(boardingNodePoint.longitude, jsonResponse["steps"][1]["nodeCoordinates"][0]);
     ASSERT_EQ(boardingNodePoint.latitude, jsonResponse["steps"][1]["nodeCoordinates"][1]);
     ASSERT_EQ(boardingStep.departureTime, jsonResponse["steps"][1]["departureTime"]);
@@ -166,21 +166,21 @@ void ResultToV2FixtureTest::assertResultConversion(nlohmann::json jsonResponse, 
     // Test the unboarding step
     TrRouting::UnboardingStep& unboardingStep = dynamic_cast<TrRouting::UnboardingStep&>(*result.steps[2].get());
     ASSERT_EQ("unboarding", jsonResponse["steps"][2]["action"]);
-    ASSERT_EQ(agency->acronym, jsonResponse["steps"][2]["agencyAcronym"]);
-    ASSERT_EQ(agency->name, jsonResponse["steps"][2]["agencyName"]);
-    ASSERT_EQ(agencyUuid, jsonResponse["steps"][2]["agencyUuid"]);
-    ASSERT_EQ(line->shortname, jsonResponse["steps"][2]["lineShortname"]);
-    ASSERT_EQ(line->longname, jsonResponse["steps"][2]["lineLongname"]);
-    ASSERT_EQ(lineUuid, jsonResponse["steps"][2]["lineUuid"]);
-    ASSERT_EQ(pathUuid, jsonResponse["steps"][2]["pathUuid"]);
-    ASSERT_EQ(mode->name, jsonResponse["steps"][2]["modeName"]);
-    ASSERT_EQ(mode->shortname, jsonResponse["steps"][2]["mode"]);
-    ASSERT_EQ(tripUuid, jsonResponse["steps"][2]["tripUuid"]);
+    ASSERT_EQ(agency->acronym, jsonResponse["steps"][2]["agencyAcronym"].get<std::string>());
+    ASSERT_EQ(agency->name, jsonResponse["steps"][2]["agencyName"].get<std::string>());
+    ASSERT_EQ(agencyUuid, jsonResponse["steps"][2]["agencyUuid"].get<std::string>());
+    ASSERT_EQ(line->shortname, jsonResponse["steps"][2]["lineShortname"].get<std::string>());
+    ASSERT_EQ(line->longname, jsonResponse["steps"][2]["lineLongname"].get<std::string>());
+    ASSERT_EQ(lineUuid, jsonResponse["steps"][2]["lineUuid"].get<std::string>());
+    ASSERT_EQ(pathUuid, jsonResponse["steps"][2]["pathUuid"].get<std::string>());
+    ASSERT_EQ(mode->name, jsonResponse["steps"][2]["modeName"].get<std::string>());
+    ASSERT_EQ(mode->shortname, jsonResponse["steps"][2]["mode"].get<std::string>());
+    ASSERT_EQ(tripUuid, jsonResponse["steps"][2]["tripUuid"].get<std::string>());
     ASSERT_EQ(unboardingStep.legSequenceInTrip, jsonResponse["steps"][2]["legSequenceInTrip"]);
     ASSERT_EQ(unboardingStep.stopSequenceInTrip, jsonResponse["steps"][2]["stopSequenceInTrip"]);
-    ASSERT_EQ(unboardingNode->name, jsonResponse["steps"][2]["nodeName"]);
-    ASSERT_EQ(unboardingNode->code, jsonResponse["steps"][2]["nodeCode"]);
-    ASSERT_EQ(unboardingNodeUuid, jsonResponse["steps"][2]["nodeUuid"]);
+    ASSERT_EQ(unboardingNode->name, jsonResponse["steps"][2]["nodeName"].get<std::string>());
+    ASSERT_EQ(unboardingNode->code, jsonResponse["steps"][2]["nodeCode"].get<std::string>());
+    ASSERT_EQ(unboardingNodeUuid, jsonResponse["steps"][2]["nodeUuid"].get<std::string>());
     ASSERT_EQ(unboardingNodePoint.longitude, jsonResponse["steps"][2]["nodeCoordinates"][0]);
     ASSERT_EQ(unboardingNodePoint.latitude, jsonResponse["steps"][2]["nodeCoordinates"][1]);
     ASSERT_EQ(unboardingStep.arrivalTime, jsonResponse["steps"][2]["arrivalTime"]);

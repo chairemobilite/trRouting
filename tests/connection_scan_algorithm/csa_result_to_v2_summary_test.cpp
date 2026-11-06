@@ -23,7 +23,7 @@ TEST_F(ResultToV2SummaryFixtureTest, TestNoRoutingFoundResultV2Summary)
     TrRouting::Point* origin = testParameters.get()->getOrigin();
     TrRouting::Point* destination = testParameters.get()->getDestination();
 
-    ASSERT_EQ(STATUS_SUCCESS, jsonResponse["status"]);
+    ASSERT_EQ(STATUS_SUCCESS, jsonResponse["status"].get<std::string>());
     ASSERT_EQ(origin->latitude, jsonResponse["query"]["origin"][1]);
     ASSERT_EQ(origin->longitude, jsonResponse["query"]["origin"][0]);
     ASSERT_EQ(destination->latitude, jsonResponse["query"]["destination"][1]);
@@ -67,7 +67,7 @@ void ResultToV2SummaryFixtureTest::assertResultConversion(nlohmann::json jsonRes
     TrRouting::Point* destination = params.getDestination();
 
     // Validate main results
-    ASSERT_EQ(STATUS_SUCCESS, jsonResponse["status"]);
+    ASSERT_EQ(STATUS_SUCCESS, jsonResponse["status"].get<std::string>());
     ASSERT_EQ(origin->latitude, jsonResponse["query"]["origin"][1]);
     ASSERT_EQ(origin->longitude, jsonResponse["query"]["origin"][0]);
     ASSERT_EQ(destination->latitude, jsonResponse["query"]["destination"][1]);
@@ -78,11 +78,11 @@ void ResultToV2SummaryFixtureTest::assertResultConversion(nlohmann::json jsonRes
     ASSERT_EQ(1u, jsonResponse["result"]["lines"].size());
 
     // Test the lines
-    ASSERT_EQ(agency->acronym, jsonResponse["result"]["lines"][0]["agencyAcronym"]);
-    ASSERT_EQ(agency->name, jsonResponse["result"]["lines"][0]["agencyName"]);
-    ASSERT_EQ(agencyUuid, jsonResponse["result"]["lines"][0]["agencyUuid"]);
-    ASSERT_EQ(line->shortname, jsonResponse["result"]["lines"][0]["lineShortname"]);
-    ASSERT_EQ(line->longname, jsonResponse["result"]["lines"][0]["lineLongname"]);
-    ASSERT_EQ(lineUuid, jsonResponse["result"]["lines"][0]["lineUuid"]);
+    ASSERT_EQ(agency->acronym, jsonResponse["result"]["lines"][0]["agencyAcronym"].get<std::string>());
+    ASSERT_EQ(agency->name, jsonResponse["result"]["lines"][0]["agencyName"].get<std::string>());
+    ASSERT_EQ(agencyUuid, jsonResponse["result"]["lines"][0]["agencyUuid"].get<std::string>());
+    ASSERT_EQ(line->shortname, jsonResponse["result"]["lines"][0]["lineShortname"].get<std::string>());
+    ASSERT_EQ(line->longname, jsonResponse["result"]["lines"][0]["lineLongname"].get<std::string>());
+    ASSERT_EQ(lineUuid, jsonResponse["result"]["lines"][0]["lineUuid"].get<std::string>());
    
 }

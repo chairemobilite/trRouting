@@ -11,8 +11,35 @@
 
 namespace TrRouting
 {
-  class NodeTimeDistance;
-  
+  class Node;
+
+  /* Store information about access time and distance to a specific Node.
+     Defined before Node, which stores vectors of it: since C++20, the
+     constexpr std::vector needs the complete type where Node's inline
+     constructor is defined (libc++ fails otherwise). */
+  class NodeTimeDistance {
+
+  public:
+    NodeTimeDistance(const Node& _node, int _time, int _distance) :
+      node(_node),
+      time(_time),
+      distance(_distance)
+    {
+
+    }
+    NodeTimeDistance(const NodeTimeDistance &_node):
+      node(_node.node),
+      time(_node.time),
+      distance(_node.distance)
+    {
+
+    }
+
+    const Node & node;
+    const int time;
+    const int distance;
+  };
+
   class Node {
   public:
 
@@ -65,30 +92,6 @@ namespace TrRouting
   {
     return lhs.get() < rhs.get();
   }
-
-  // Store information about access time and distance to a specific Node
-  class NodeTimeDistance {
-
-  public:
-    NodeTimeDistance(const Node& _node, int _time, int _distance) :
-      node(_node),
-      time(_time),
-      distance(_distance)
-    {
-
-    }
-    NodeTimeDistance(const NodeTimeDistance &_node):
-      node(_node.node),
-      time(_node.time),
-      distance(_node.distance)
-    {
-
-    }
-
-    const Node & node;
-    const int time;
-    const int distance;
-  };
 
 }
 
