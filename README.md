@@ -46,7 +46,7 @@ brew install drogon
 
 libmemcached is optional
 
-## Ubuntu 24.04 Install
+## Ubuntu 26.04 Install
 
 ```bash
 sudo apt install libboost-all-dev libjemalloc-dev libcapnp-dev capnproto libexpat1-dev libjsoncpp-dev libspdlog-dev nlohmann-json3-dev libdrogon-dev
@@ -57,6 +57,9 @@ sudo apt install build-essential autoconf pkg-config
 ```
 
 libmemcached-dev is optional
+
+trRouting can also be built on Ubuntu 24.04, but it requires a C++23 compiler like GCC 14 or later, while the default compiler of Ubuntu 24.04 is GCC 13. Install the `g++-14` package too, and use it by setting `CC=gcc-14 CXX=g++-14` when running the configure script.
+
 ## Compilation
 trRouting use autoconf/automake as its build system. A recap of the usual commands: 
 
