@@ -1,3 +1,4 @@
+#include <charconv>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -19,12 +20,31 @@ namespace TrRouting {
       std::reference_wrapper<const Node> node;
       std::size_t osrmPosition;
     };
-    
-    // By default, to_string convert a double to a string with 6 decimal digits
-    // TODO Add a unit test to ensure the formatting always have the right precisions (default might change in future standards)
-    std::string formatOsrmCoordinates(const Point &point) {
-      return std::to_string(point.longitude) + "," + std::to_string(point.latitude);
-    }
+
+    // Number of decimals of the coordinates sent to OSRM: 6 decimals of a degree is about 0.1 m
+    constexpr int OSRM_COORDINATES_PRECISION = 6;
+
+    /* Maximum number of integer digits of a coordinate sent to OSRM. The origin,
+       destination and place parameters are validated within the WGS84 range, and
+       the coordinates of the nodes are stored as Int32 millionths of a degree. */
+    constexpr std::size_t OSRM_COORDINATE_MAX_INTEGER_DIGITS = 4;
+
+    // The sign, the integer digits, the dot and the decimals
+    constexpr std::size_t OSRM_COORDINATE_MAX_LENGTH = 1 + OSRM_COORDINATE_MAX_INTEGER_DIGITS + 1 + OSRM_COORDINATES_PRECISION;
+  }
+
+  std::string OsrmGeoFilter::formatOsrmCoordinates(const Point &point) {
+    /* std::to_chars never depends on the locale, so the decimal separator is
+       always a dot. It writes directly in the returned string, sized for the
+       longest coordinates and the comma, then shrunk to the written length.
+       This relies on the coordinates being within the range described above. */
+    std::string coordinates(2 * OSRM_COORDINATE_MAX_LENGTH + 1, '\0');
+    char *end = coordinates.data() + coordinates.size();
+    char *position = std::to_chars(coordinates.data(), end, point.longitude, std::chars_format::fixed, OSRM_COORDINATES_PRECISION).ptr;
+    *position++ = ',';
+    position = std::to_chars(position, end, point.latitude, std::chars_format::fixed, OSRM_COORDINATES_PRECISION).ptr;
+    coordinates.resize(position - coordinates.data());
+    return coordinates;
   }
 
   OsrmGeoFilter::OsrmGeoFilter(const std::string &amode, const std::string &ahost, const std::string &aport) :
