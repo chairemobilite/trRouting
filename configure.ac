@@ -114,6 +114,7 @@ AC_CONFIG_FILES([
  Makefile
  src/Makefile
  tests/Makefile
+ tests/common/Makefile
  tests/cache_fetch/Makefile
  tests/benchmark_csa/Makefile
  tests/connection_scan_algorithm/Makefile

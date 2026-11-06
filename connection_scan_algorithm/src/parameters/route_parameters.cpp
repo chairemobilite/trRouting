@@ -80,6 +80,10 @@ namespace TrRouting
             throw ParameterException(ParameterException::Type::INVALID_ORIGIN);
           }
           origin = Point(std::stod(latitudeLongitudeVector[1]), std::stod(latitudeLongitudeVector[0]));
+          if (!origin->isValid())
+          {
+            throw ParameterException(ParameterException::Type::INVALID_ORIGIN);
+          }
         }
         catch (...)
         {
@@ -96,6 +100,10 @@ namespace TrRouting
             throw ParameterException(ParameterException::Type::INVALID_DESTINATION);
           }
           destination = Point(std::stod(latitudeLongitudeVector[1]), std::stod(latitudeLongitudeVector[0]));
+          if (!destination->isValid())
+          {
+            throw ParameterException(ParameterException::Type::INVALID_DESTINATION);
+          }
         }
         catch (...)
         {
