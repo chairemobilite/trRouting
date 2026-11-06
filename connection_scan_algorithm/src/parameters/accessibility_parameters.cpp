@@ -61,6 +61,10 @@ namespace TrRouting
             throw ParameterException(ParameterException::Type::INVALID_PLACE);
           }
           place = Point(std::stod(latitudeLongitudeVector[1]), std::stod(latitudeLongitudeVector[0]));
+          if (!place->isValid())
+          {
+            throw ParameterException(ParameterException::Type::INVALID_PLACE);
+          }
         }
         catch (...)
         {
