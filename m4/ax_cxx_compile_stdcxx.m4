@@ -43,6 +43,12 @@
 #   permitted in any medium without royalty provided the copyright notice
 #   and this notice are preserved.  This file is offered as-is, without any
 #   warranty.
+#
+# LOCAL CHANGE (trRouting)
+#
+#   The backticks around -Wunused in a comment of the C++17 test body are
+#   removed, since configure ran them as a shell command. Check this when
+#   updating the file from upstream.
 
 #serial 26
 
@@ -656,7 +662,8 @@ namespace cxx17
   {
 
     constexpr int foo = [](){return 42;}();
-    static_assert(foo == 42);  // mutes complaint from `-Wunused`.
+    // LOCAL CHANGE (trRouting): backticks removed around -Wunused below
+    static_assert(foo == 42);  // mutes complaint from -Wunused.
   }
 
   namespace test::nested_namespace::definitions
