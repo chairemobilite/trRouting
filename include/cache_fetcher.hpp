@@ -101,6 +101,7 @@ namespace TrRouting
       const std::map<boost::uuids::uuid, Line>& lines,
       std::map<boost::uuids::uuid, Path>& paths,
       const std::map<boost::uuids::uuid, Service>& services,
+      const std::set<boost::uuids::uuid>& servicesToLoad,
       std::vector<Connection>& connections,
       std::string customPath = ""
     );

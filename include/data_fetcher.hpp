@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include <memory>
+#include <set>
 #include <boost/uuid/uuid.hpp>
 #include "connection.hpp"
 
@@ -123,7 +124,11 @@ namespace TrRouting
 
     /**
      * Read the lines with schedules cache file and fill the trips vector.
-     * 
+     *
+     * @param servicesToLoad The uuids of the services whose schedules should
+     * be loaded. Schedules of other services are skipped: their trips and
+     * connections are not created, so they take no memory.
+     *
      * @return 0 in case of success, values below 0 when errors occurred:
      * -EBADMSG if deserialization did not work
      * -ENOENT if the file does not exist
@@ -135,6 +140,7 @@ namespace TrRouting
       const std::map<boost::uuids::uuid, Line>& lines,
       std::map<boost::uuids::uuid, Path>& paths,
       const std::map<boost::uuids::uuid, Service>& services,
+      const std::set<boost::uuids::uuid>& servicesToLoad,
       std::vector<Connection>& connections,
       std::string customPath = "") = 0;
 
